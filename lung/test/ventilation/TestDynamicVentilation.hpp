@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -134,6 +134,9 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(factory.GetMesh());
 #else
         std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif

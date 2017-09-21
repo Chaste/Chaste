@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,7 @@ private:
          * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpVoronoiTessellation;
-        mpVoronoiTessellation = NULL;
+        mpVoronoiTessellation = nullptr;
 
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
@@ -94,8 +94,6 @@ private:
     }
 
 protected:
-// LCOV_EXCL_START // Avoid prototypes being treated as code by gcov
-
     /**
      * Pointer to a VertexMesh object that stores the Voronoi tessellation that is dual to
      * mrMesh. The tessellation is created by calling CreateVoronoiTessellation() and can
@@ -145,8 +143,6 @@ protected:
     /** Node pairs for force calculations. */
     std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
 
-// LCOV_EXCL_STOP // Avoid prototypes being treated as code by gcov
-
     /**
      * Update mIsGhostNode if required by a remesh.
      *
@@ -161,8 +157,6 @@ protected:
     virtual void Validate();
 
 public:
-// LCOV_EXCL_START // Avoid prototypes being treated as code by gcov
-
     /**
      * Create a new cell population facade from a mesh and collection of cells.
      *
@@ -437,7 +431,7 @@ public:
      * Overridden WriteDataToVisualizerSetupFile() method.
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
+     *
      * @param pVizSetupFile a visualization setup file
      */
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
@@ -601,7 +595,6 @@ public:
     void SetRestLength(unsigned indexA, unsigned indexB, double restLength);
 
 };
-// LCOV_EXCL_STOP // Avoid prototypes being treated as code by gcov
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(MeshBasedCellPopulation)

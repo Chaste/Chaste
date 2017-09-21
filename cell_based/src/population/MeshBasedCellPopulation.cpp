@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,13 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulation.hpp"
-#include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "CellId.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
@@ -55,7 +53,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
                                       bool deleteMesh,
                                       bool validate)
     : AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>(rMesh, rCells, locationIndices),
-      mpVoronoiTessellation(NULL),
+      mpVoronoiTessellation(nullptr),
       mDeleteMesh(deleteMesh),
       mUseAreaBasedDampingConstant(false),
       mAreaBasedDampingConstantParameter(0.1),
@@ -86,7 +84,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
     : AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>(rMesh)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
-    mpVoronoiTessellation = NULL;
+    mpVoronoiTessellation = nullptr;
     mDeleteMesh = true;
 }
 
@@ -110,7 +108,7 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
     mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
 }
 
@@ -146,8 +144,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * where d0, d1 are parameters, A is the cell's area, and old_damping_const
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
-
-        assert(SPACE_DIM == 2);
+        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
 
         double rest_length = 1.0;
         double d0 = mAreaBasedDampingConstantParameter;
@@ -447,7 +444,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double springDivisionThreshold)
 {
     // Only implemented for 2D elements
-    assert(ELEMENT_DIM==2);
+    assert(ELEMENT_DIM == 2); // LCOV_EXCL_LINE
 
     std::vector<c_vector<unsigned, 5> > new_nodes;
     new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
@@ -565,7 +562,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFil
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
 {
-    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 0 && this->mpVoronoiTessellation == NULL)
+    if (SimulationTime::Instance()->GetTimeStepsElapsed() == 0 && this->mpVoronoiTessellation == nullptr)
     {
         TessellateIfNeeded(); // Update isn't run on time-step zero
     }
@@ -602,7 +599,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
     // Store the number of cells for which to output data to VTK
     unsigned num_cells_from_mesh = GetNumNodes();
-    if (!mWriteVtkAsPoints && (mpVoronoiTessellation != NULL))
+    if (!mWriteVtkAsPoints && (mpVoronoiTessellation != nullptr))
     {
         num_cells_from_mesh = mpVoronoiTessellation->GetNumElements();
     }
@@ -692,7 +689,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
-    else if (mpVoronoiTessellation != NULL)
+    else if (mpVoronoiTessellation != nullptr)
     {
         // Create mesh writer for VTK output
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
@@ -767,7 +764,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
     if (ELEMENT_DIM == SPACE_DIM)
     {
         // Ensure that the Voronoi tessellation exists
-        if (mpVoronoiTessellation == NULL)
+        if (mpVoronoiTessellation == nullptr)
         {
             CreateVoronoiTessellation();
         }
@@ -964,15 +961,18 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
         mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
     }
 }
+
 /**
  * Can't tessellate 2d meshes in 3d space yet.
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
 {
     // We don't allow tessellation yet.
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 /**
  * The cylindrical mesh is only defined in 2D, hence there is
@@ -990,39 +990,46 @@ void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 1>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
+
 
 /**
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 2>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 /**
  * The VoronoiTessellation class is only defined in 2D or 3D, hence there
  * are two definitions to this method (one templated and one not).
  */
+// LCOV_EXCL_START
 template<>
 void MeshBasedCellPopulation<1, 3>::CreateVoronoiTessellation()
 {
     // No 1D Voronoi tessellation
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM,SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVoronoiTessellation()
 {
-    assert(mpVoronoiTessellation!=NULL);
+    assert(mpVoronoiTessellation!=nullptr);
     return mpVoronoiTessellation;
 }
 
@@ -1152,6 +1159,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant
     mAreaBasedDampingConstantParameter = areaBasedDampingConstantParameter;
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
 {
@@ -1159,6 +1167,7 @@ std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopu
     NEVER_REACHED;
     return mNodePairs;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,45 +83,31 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
         EXCEPTION("The requested time " << rTime << " is outside the times stored in the data clamp.");
     }
 
-    std::vector<double>::iterator low;
-    low = std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
+    std::vector<double>::iterator upper_vec =
+            std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
+    // upper_vec points to first element that is (strictly) > rTime (so it can't be first one if rTime is in range)
 
     // Special case - here the lower bound is equal to upper bound and both are pointing to end!
-    if (low == mExperimentalTimes.end())
+    if (upper_vec == mExperimentalTimes.end())
     {
         return mExperimentalVoltages.back();
     }
 
-    unsigned upper_index = low - mExperimentalTimes.begin();
+    unsigned upper_index = upper_vec - mExperimentalTimes.begin();
 
-    if (upper_index == 0u)
-    {
-        // Special case - here the lower bound is equal to upper bound and no interpolation needed
-        return mExperimentalVoltages[0];
-    }
+    assert(upper_index>0u); // Sanity check to avoid seg faults below.
+    // if this assert ever fails we may need the code below, but I can't see how it could!
+//    if (upper_index == 0u)
+//    {
+//        // Special case - here the lower bound is equal to upper bound and no interpolation needed
+//        return mExperimentalVoltages[0];
+//    }
 
     double lower_time = mExperimentalTimes[upper_index-1];
     double increment = rTime - lower_time;
     double time_step = mExperimentalTimes[upper_index] - mExperimentalTimes[upper_index-1];
     double voltage_step = mExperimentalVoltages[upper_index] - mExperimentalVoltages[upper_index-1];
     return mExperimentalVoltages[upper_index-1] + increment * voltage_step / time_step;
-
-//    // Alternative simpler(?) method that used to be here.
-//    // A simple loop over a std::vector<double> is probably fairly efficient?
-//    unsigned i;
-//    for (i=1u; i<mExperimentalTimes.size(); i++)
-//    {
-//        if (mExperimentalTimes[i] >= rTime)
-//        {
-//            break;
-//        }
-//    }
-//
-//    double step_size = mExperimentalTimes[i] - mExperimentalTimes[i-1];
-//    double increment = rTime - mExperimentalTimes[i-1];
-//    double data_difference = mExperimentalVoltages[i] - mExperimentalVoltages[i-1];
-//
-//    return mExperimentalVoltages[i-1] + increment*data_difference/step_size;
 }
 
 void AbstractCvodeCellWithDataClamp::TurnOffDataClamp()

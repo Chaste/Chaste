@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -134,7 +134,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
             if (HeartConfig::Instance()->GetLoadMesh())
             {
                 CreateMeshFromHeartConfig();
-                std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_mesh_reader
+                std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_mesh_reader
                     = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshName());
                 mpMesh->ConstructFromMeshReader(*p_mesh_reader);
             }

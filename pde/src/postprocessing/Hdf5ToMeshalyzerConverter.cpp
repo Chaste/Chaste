@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
     }
     filename += type + ".dat";
 
-    out_stream p_file = out_stream(NULL);
+    out_stream p_file = out_stream(nullptr);
     if (PetscTools::AmMaster())
     {
         p_file = this->mpOutputFileHandler->OpenOutputFile(filename);
@@ -139,7 +139,7 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(cons
             ///\todo What if the mesh has been scaled, translated or rotated?
             // Note that the next line will throw if the mesh has not been read from file
             std::string original_file = this->mpMesh->GetMeshFileBaseName();
-            std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+            std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
                 = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
             mesh_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
         }

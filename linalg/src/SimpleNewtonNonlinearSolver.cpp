@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,7 +74,7 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
     // The "false" says that we are allowed to do new mallocs without PETSc 3.3 causing an error
     LinearSystem linear_system(current_solution, fill, false);
 
-    (*pComputeResidual)(NULL, current_solution, linear_system.rGetRhsVector(), pContext);
+    (*pComputeResidual)(nullptr, current_solution, linear_system.rGetRhsVector(), pContext);
 
 
     double residual_norm;
@@ -98,9 +98,9 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
 
         // Compute Jacobian and solve J dx = f for the (negative) update dx, (J the jacobian, f the residual)
 #if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
-        (*pComputeJacobian)(NULL, current_solution, (linear_system.rGetLhsMatrix()), NULL, pContext);
+        (*pComputeJacobian)(nullptr, current_solution, (linear_system.rGetLhsMatrix()), nullptr, pContext);
 #else
-        (*pComputeJacobian)(NULL, current_solution, &(linear_system.rGetLhsMatrix()), NULL, NULL, pContext);
+        (*pComputeJacobian)(nullptr, current_solution, &(linear_system.rGetLhsMatrix()), nullptr, nullptr, pContext);
 #endif
 
         Vec negative_update = linear_system.Solve();
@@ -120,7 +120,7 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
 
             // Compute new residual
             linear_system.ZeroLinearSystem();
-            (*pComputeResidual)(NULL, test_vec, linear_system.rGetRhsVector(), pContext);
+            (*pComputeResidual)(nullptr, test_vec, linear_system.rGetRhsVector(), pContext);
             VecNorm(linear_system.rGetRhsVector(), NORM_2, &residual_norm);
             scaled_residual_norm = residual_norm/size;
 
@@ -155,7 +155,7 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
 
         // Compute best residual vector again and store in linear_system for next Solve()
         linear_system.ZeroLinearSystem();
-        (*pComputeResidual)(NULL, current_solution, linear_system.rGetRhsVector(), pContext);
+        (*pComputeResidual)(nullptr, current_solution, linear_system.rGetRhsVector(), pContext);
 
         if (mWriteStats)
         {

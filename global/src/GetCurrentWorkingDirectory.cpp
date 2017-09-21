@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,12 +45,12 @@ std::string GetCurrentWorkingDirectory()
     {
         cwd = fs::current_path();
     }
+// LCOV_EXCL_START
     catch (...)
     {
-// LCOV_EXCL_START
-        // Not sure what could cause this, but just in case...
+        // Not sure what could cause this, so not covered, but just in case...
         EXCEPTION("Unable to determine current working directory");
-// LCOV_EXCL_STOP
     }
+// LCOV_EXCL_STOP
     return cwd.string();
 }

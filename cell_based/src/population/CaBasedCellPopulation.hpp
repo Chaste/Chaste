@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,13 +105,11 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-// LCOV_EXCL_START
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
         archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
         archive & mAvailableSpaces;
         archive & mpCaBasedDivisionRule;
-// LCOV_EXCL_STOP
     }
 
     /**
@@ -476,8 +474,7 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
 
-// No archiving yet so untested
-// LCOV_EXCL_START
+
 namespace boost
 {
 namespace serialization
@@ -511,6 +508,6 @@ inline void load_construct_data(
 }
 }
 } // namespace ...
-// LCOV_EXCL_STOP
+
 
 #endif /*CABASEDCELLPOPULATION_HPP_*/

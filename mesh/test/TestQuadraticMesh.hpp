@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -605,8 +605,12 @@ public:
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
             {
-                c_vector<double, 2> loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
-                c_vector<double, 2> loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
+                c_vector<double, 2> loc_read_back;
+                loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
+
+                c_vector<double, 2> loc_constructed;
+                loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
+
                 TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
 
@@ -654,8 +658,10 @@ public:
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
             {
-                c_vector<double, 2> loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
-                c_vector<double, 2> loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
+                c_vector<double, 2> loc_read_back;
+                loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
+                c_vector<double, 2> loc_constructed;
+                loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
                 TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
 
@@ -707,8 +713,12 @@ public:
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
             {
-                c_vector<double, 3> loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
-                c_vector<double, 3> loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
+                c_vector<double, 3> loc_read_back;
+                loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
+
+                c_vector<double, 3> loc_constructed;
+                loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
+
                 TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[2], loc_constructed[2], 1e-10);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -296,14 +296,15 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
             assert(hetero_intra_conductivities.size()==0);
             hetero_intra_conductivities.resize(num_local_elements, intra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &r_bad_alloc)
         {
-// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-// LCOV_EXCL_STOP
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -599,16 +600,18 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
             }
         }
-        catch (Exception&)
+        // LCOV_EXCL_START
+        catch (Exception& e)
         {
             ///\todo #2017 This code will be needed in the future, not being covered now.
             /// Add a test which covers this, e.g.  by doing a simulation with a bad stimulus for one of the
             /// Purkinje cells - stimulating with the wrong choice of sign say.
 
             NEVER_REACHED;
-            //PetscTools::ReplicateException(true);
-            //throw e;
+            PetscTools::ReplicateException(true);
+            throw e;
         }
+        // LCOV_EXCL_STOP
     }
 
     PetscTools::ReplicateException(false);

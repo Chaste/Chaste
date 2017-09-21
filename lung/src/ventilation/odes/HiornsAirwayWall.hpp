@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -109,22 +109,22 @@ public:
      * @param phi1 The parameter phi1
      */
     void Setphi1(double);
-    
+
      /**
      * @param phi2 The parameter phi2
      */
     void Setphi2(double);
-    
+
      /**
      * @param C1 The parameter C1
      */
     void SetC1(double);
-    
+
      /**
      * @param C2 The parameter C2
      */
     void SetC2(double);
-    
+
      /**
      * @param A The parameter A
      */
@@ -174,7 +174,7 @@ private:
 
     /** The parameter C2 from Hiorns et al. 2014 Biophys J*/
     double mC2;
-    
+
     /** The parameter A from Hiorns et al. 2014 Biophys J*/
     double mA;
 };

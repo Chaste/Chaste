@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,8 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DeltaNotchSrnModel.hpp"
-
-#include <cassert>
 
 DeltaNotchSrnModel::DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(2, pOdeSolver)
@@ -98,8 +96,8 @@ void DeltaNotchSrnModel::Initialise()
 
 void DeltaNotchSrnModel::UpdateDeltaNotch()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     double mean_delta = mpCell->GetCellData()->GetItem("mean delta");
     mpOdeSystem->SetParameter("Mean Delta", mean_delta);
@@ -107,21 +105,21 @@ void DeltaNotchSrnModel::UpdateDeltaNotch()
 
 double DeltaNotchSrnModel::GetNotch()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double notch = mpOdeSystem->rGetStateVariables()[0];
     return notch;
 }
 
 double DeltaNotchSrnModel::GetDelta()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double delta = mpOdeSystem->rGetStateVariables()[1];
     return delta;
 }
 
 double DeltaNotchSrnModel::GetMeanNeighbouringDelta()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     double mean_neighbouring_delta = mpOdeSystem->GetParameter("Mean Delta");
     return mean_neighbouring_delta;
 }

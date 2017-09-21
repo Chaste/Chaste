@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,16 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "MultiLobeAirwayGenerator.hpp"
+
 #include <boost/foreach.hpp>
 #include <map>
 
+#include "MultiLobeAirwayGenerator.hpp"
 #include "VtkMeshWriter.hpp"
 #include "VtkMeshReader.hpp"
 #include "CmguiMeshWriter.hpp"
 
 #ifdef CHASTE_VTK
-
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 #include "vtkAppendFilter.h"
@@ -171,7 +171,7 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
             if (!end_point_assigned) // If the end point is not contained in any lobe assign it to the nearest
             {
                 double dist_min = DBL_MAX;
-                AirwayGenerator* p_generator = NULL;
+                AirwayGenerator* p_generator = nullptr;
 
                 for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
                      generators_iter != mLobeGenerators.end();
@@ -354,6 +354,19 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
     vtkSmartPointer<vtkUnstructuredGrid> appended_grid = append_filter->GetOutput();
     vtkSmartPointer<vtkUnstructuredGrid> filtered_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     filtered_grid->SetPoints(appended_grid->GetPoints());
+
+#if VTK_MAJOR_VERSION == 6
+    /* Note that there is a bug in some versions of VTK 6 which involves filtering for
+     * duplicate points and attributes but not altering the size of the attribute vectors.
+     * This leads to attribute vectors which contain unintialised values.  See
+     * "BUG #15746: Fixes issues with Merge Points in vtkAppendFilter"
+     */
+    unsigned num_points = appended_grid->GetNumberOfPoints();
+    appended_grid->GetPointData()->GetArray("radius")->SetNumberOfTuples( num_points );
+    appended_grid->GetPointData()->GetArray("horsfield_order")->SetNumberOfTuples( num_points );
+    appended_grid->GetPointData()->GetArray("start_id")->SetNumberOfTuples( num_points );
+#endif
+
     filtered_grid->GetPointData()->AddArray(appended_grid->GetPointData()->GetArray("radius"));
     filtered_grid->GetPointData()->AddArray(appended_grid->GetPointData()->GetArray("horsfield_order"));
     filtered_grid->GetPointData()->AddArray(appended_grid->GetPointData()->GetArray("start_id"));

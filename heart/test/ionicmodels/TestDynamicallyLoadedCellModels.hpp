@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,6 +115,8 @@ private:
         OdeSolution solution2 = pCell->Compute(0.0, 60.0);
         solution2.WriteToFile("TestIonicModels", "DynamicallyLoadableLr91GetIIonic", "ms", 100, false, 4);
 
+        // For coverage
+        TS_ASSERT_DELTA(pCell->GetIntracellularCalciumConcentration(), 0.0012, 1e-4);
         TS_ASSERT_DELTA(pCell->GetIIonic(), 1.9411, tolerance);
     }
 
@@ -164,7 +166,15 @@ public:
             p_cell->SetStimulusFunction(p_stimulus);
             SimulateLr91AndCompare(p_cell.get());
 
-            // We can't now call LoadCvodeCell on this loader
+            // Are sources from the conversion preserved?
+            FileFinder cpp_file(handler.GetRelativePath() + "/LuoRudy1991.cpp", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(cpp_file.Exists());
+            TS_ASSERT(cpp_file.IsNewerThan(cellml_file));
+            FileFinder hpp_file(handler.GetRelativePath() + "/LuoRudy1991.hpp", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(hpp_file.Exists());
+            TS_ASSERT(hpp_file.IsNewerThan(cellml_file));
+
+           // We can't now call LoadCvodeCell on this loader
 #ifdef CHASTE_CVODE
             TS_ASSERT_THROWS_THIS(loader.LoadCvodeCell(),
                                   "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -107,12 +107,11 @@ public:
 
     /**
      * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
      */
     UniformCellCycleModel();
 
     /**
-     * Overridden SetCellCycleDuration Method to add stochastic cell cycle times
+     * Overridden SetCellCycleDuration() method to add stochastic cell cycle times
      */
     void SetCellCycleDuration();
 

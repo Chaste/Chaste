@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -113,6 +113,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
      */
+    // LCOV_EXCL_START
     virtual c_matrix<double,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableMatrixTerm(
         c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
         c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
@@ -126,6 +127,7 @@ protected:
         NEVER_REACHED;
         return zero_matrix<double>(PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES);
     }
+    // LCOV_EXCL_STOP
 
     /**
      * @return the vector to be added to element stiffness vector
@@ -147,6 +149,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
+    // LCOV_EXCL_START
     virtual c_vector<double,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableVectorTerm(
         c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
         c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
@@ -160,6 +163,7 @@ protected:
         NEVER_REACHED;
         return zero_vector<double>(PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES);
     }
+    // LCOV_EXCL_STOP
 
     /**
      * Calculate the contribution of a single cable element to the linear system.

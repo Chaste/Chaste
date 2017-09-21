@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -311,6 +311,29 @@ public:
         std::map<Node<2>*, c_vector<double, 2> > old_locations;
         TS_ASSERT_THROWS_THIS(plane_boundary_condition.ImposeBoundaryCondition(old_locations),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+
+        // Test the correct exception is thrown in 1D
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, true,  0.0));
+        nodes.push_back(new Node<1>(1, false, 1.0));
+        NodesOnlyMesh<1> nodes_only_mesh;
+        nodes_only_mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+        std::vector<CellPtr> node_based_cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_1d;
+        cells_generator_1d.GenerateBasicRandom(node_based_cells, nodes_only_mesh.GetNumNodes(), p_diff_type);
+        NodeBasedCellPopulation<1> node_based_cell_population(nodes_only_mesh, node_based_cells);
+
+        c_vector<double,1> point_1d = zero_vector<double>(1);
+        c_vector<double,1> normal_1d = zero_vector<double>(1);
+        normal_1d(0) = 1.0;
+        PlaneBoundaryCondition<1> plane_bc_1d(&node_based_cell_population, point_1d, normal_1d);
+        TS_ASSERT_THROWS_THIS(plane_bc_1d.VerifyBoundaryCondition(),
+            "PlaneBoundaryCondition is not implemented in 1D");
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestSphereGeometryBoundaryCondition() throw (Exception)

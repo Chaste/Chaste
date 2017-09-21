@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>::AbstractMesh()
-    : mpDistributedVectorFactory(NULL),
+    : mpDistributedVectorFactory(nullptr),
       mMeshFileBaseName(""),
       mMeshChangesDuringSimulation(false)
 {
@@ -115,23 +115,24 @@ Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeFromPrePermutation
     }
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const std::string& rNodesPerProcessorFile)
 {
     NEVER_REACHED;
 }
-
+// LCOV_EXCL_STOP
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 {
-    //Does nothing, since an AbstractMesh has no elements
+    // Does nothing, since an AbstractMesh has no elements
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedVectorFactory* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetDistributedVectorFactory()
 {
-    if (mpDistributedVectorFactory == NULL)
+    if (mpDistributedVectorFactory == nullptr)
     {
         mpDistributedVectorFactory = new DistributedVectorFactory(GetNumNodes());
         if (PetscTools::IsParallel())
@@ -156,11 +157,13 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(Distribut
     mpDistributedVectorFactory = pFactory;
 }
 
+// LCOV_EXCL_START
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeIterator AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetBoundaryNodeIteratorBegin() const
@@ -283,15 +286,19 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
 {
     if (mNodes.empty())
     {
-        // This happens in parallel if a process isn't assigned any nodes.
-        return UINT_MAX;
+        /*
+         * This happens in parallel if a process isn't assigned any nodes.
+         * This case is covered in TestDistributedTetrahedralMesh::TestConstructLinearMeshSmallest
+         * but only when there are 3 or more processes
+         */
+        return UINT_MAX;  // LCOV_EXCL_LINE
     }
     // Hold the best distance from node to point found so far
     // and the (local) node at which this was recorded
     unsigned best_node_index = 0u;
     double best_node_point_distance = DBL_MAX;
 
-    c_vector<double, SPACE_DIM> test_location = rTestPoint.rGetLocation();
+    const c_vector<double, SPACE_DIM>& test_location = rTestPoint.rGetLocation();
     // Now loop through the nodes, calculating the distance and updating best_node_point_distance
     for (unsigned node_index = 0; node_index < mNodes.size(); node_index++)
     {
@@ -386,7 +393,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double , SPACE_DIM, S
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_vector<double,3> axis, double angle)
 {
-    assert(SPACE_DIM == 3);
+    assert(SPACE_DIM == 3); // LCOV_EXCL_LINE
     double norm = norm_2(axis);
     c_vector<double,3> unit_axis=axis/norm;
 

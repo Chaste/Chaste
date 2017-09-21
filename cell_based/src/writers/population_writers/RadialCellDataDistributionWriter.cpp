@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -199,7 +199,7 @@ std::string RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::GetVariabl
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetNumRadialBins(unsigned numRadialBins)
 {
-	mNumRadialBins = numRadialBins;
+    mNumRadialBins = numRadialBins;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

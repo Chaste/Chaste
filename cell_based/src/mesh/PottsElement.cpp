@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,11 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "PottsElement.hpp"
 #include "RandomNumberGenerator.hpp"
-#include <cassert>
-#include "Exception.hpp"
-#include "UblasCustomFunctions.hpp"
-#include "petscsys.h"
-#include "petscblaslapack.h"
 
 
 template<unsigned DIM>
@@ -66,8 +61,7 @@ void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
 template<unsigned DIM>
 double PottsElement<DIM>::GetAspectRatio()
 {
-    assert(DIM == 2);
-
+    assert(DIM == 2); // LCOV_EXCL_LINE
     assert(this->GetNumNodes() != 0);
 
     if (this->GetNumNodes() <= 2)

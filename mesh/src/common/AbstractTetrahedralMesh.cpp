@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -201,7 +201,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
             boundary_element_node_indices.insert( (*face_iter)->GetNodeGlobalIndex(i) );
         }
 
-        Node<SPACE_DIM>* p_opposite_node = NULL;
+        Node<SPACE_DIM>* p_opposite_node = nullptr;
         Node<SPACE_DIM>* p_representative_node = (*face_iter)->GetNode(0);
           for (typename Node<SPACE_DIM>::ContainingElementIterator element_iter = p_representative_node->ContainingElementsBegin();
              element_iter != p_representative_node->ContainingElementsEnd();
@@ -227,7 +227,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
                 break;
             }
         }
-        assert(p_opposite_node != NULL);
+        assert(p_opposite_node != nullptr);
 
         // Vector from centroid of face to opposite node
         c_vector<double, SPACE_DIM> into_mesh = p_opposite_node->rGetLocation() - (*face_iter)->CalculateCentroid();
@@ -244,7 +244,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1);     // LCOV_EXCL_LINE
 
     for (unsigned node_index=0; node_index<=width; node_index++)
     {
@@ -276,8 +276,8 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsign
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
 
     //Construct the nodes
     unsigned node_index=0;
@@ -385,8 +385,8 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3);
-    assert(ELEMENT_DIM == 3);
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3);     // LCOV_EXCL_LINE
     //Construct the nodes
 
     unsigned node_index = 0;
@@ -618,7 +618,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
         unsigned dimension, double spaceStep,
         double width, double height, double depth)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
     if (dimension >= SPACE_DIM)
     {
         EXCEPTION("Cannot split on non-existent dimension");
@@ -839,7 +839,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMesh(Abstract
     {
         Node<SPACE_DIM>* p_node =  rOtherMesh.GetNode(i);
         assert(!p_node->IsDeleted());
-        c_vector<double, SPACE_DIM> location=p_node->rGetLocation();
+        const c_vector<double, SPACE_DIM>& location=p_node->rGetLocation();
         bool is_boundary=p_node->IsBoundaryNode();
 
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location, is_boundary);
@@ -1040,7 +1040,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
                                                                                                  std::set<unsigned> testElements)
 {
     assert(testElements.size() > 0);
-    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // CalculateInterpolationWeights hits an assertion otherwise
+    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE // CalculateInterpolationWeights hits an assertion otherwise
 
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;

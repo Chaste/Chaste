@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -138,13 +138,13 @@ public:
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeConstantInUSourceTermAtNode(const Node<SPACE_DIM>& rNode)
 {
-    return ComputeConstantInUSourceTerm(rNode.GetPoint(), NULL);
+    return ComputeConstantInUSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<SPACE_DIM>& rNode)
 {
-    return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), NULL);
+    return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 #endif //_ABSTRACTLINEARELLIPTICPDE_HPP_

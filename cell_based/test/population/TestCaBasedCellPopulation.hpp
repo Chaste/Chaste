@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), location_indices.size());
 
-        ///\todo this doesnt do anything as there aren't any cells!
+        ///\todo this doesn't do anything as there aren't any cells!
         TS_ASSERT_EQUALS(cells.size(), 0u);
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
         for (unsigned i=0; i<cells.size(); i++)
@@ -163,7 +163,7 @@ public:
 
         cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
-           // Change the initial cell location to avoid the above exception
+        // Change the initial cell location to avoid the above exception
         location_indices[2] = 1u;
 
         // Test that the correct exception is thrown when we try to create a cell population with validate = true (there is no validation in the case of a CaBasedCellPopulation)
@@ -219,6 +219,10 @@ public:
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+
+        // Coverage
+        Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
+        TS_ASSERT_EQUALS(p_node->GetIndex(), 0u);
 
         // Check cells are in the correct location
         TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
@@ -529,16 +533,20 @@ public:
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-        // Make one cell start apoptosis
+
+
+        // Make one cell start apoptosis on the master process
+        bool expected_result = true;
         if (PetscTools::AmMaster())
         {
             cell_population.GetCellUsingLocationIndex(12)->StartApoptosis();
+            expected_result = false;
         }
 
         cell_population.Update();
 
         // Note: The nodes of the FE mesh have indices 0 and 1, corresponding to the cells with location indices 12 and 13 in the PottsMesh
-        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), expected_result);
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
     }
 

@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1006,6 +1006,7 @@ class Intel(BuildType):
                                        #Following doesn't seem to play
                                        '-we810', #810: conversion from "double" to "unsigned int" may lose significant bits
                                        '-wr11021', # ipo warning unresolved symbols in third party libraries (usually!)
+                                       '-wr1478',  # #2811 turn off deprecation warnings for std::auto_ptr \todo: revisit when XSD 3.3 is dropped
                                        ])
             elif (version == 10 or version == 11):
                 self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable.

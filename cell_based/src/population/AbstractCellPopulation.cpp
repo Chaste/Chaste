@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,15 +34,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/bind.hpp>
-#include <boost/mem_fn.hpp>
 
 #include <algorithm>
 #include <functional>
 
 #include "AbstractCellPopulation.hpp"
 #include "AbstractPhaseBasedCellCycleModel.hpp"
-#include "Exception.hpp"
-#include "PetscTools.hpp"
 #include "SmartPointers.hpp"
 #include "CellAncestor.hpp"
 #include "ApoptoticCellProperty.hpp"
@@ -275,7 +272,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
      */
     if (GetNumAllCells() > 0u)
     {
-        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == NULL)
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == nullptr)
         {
             EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
         }

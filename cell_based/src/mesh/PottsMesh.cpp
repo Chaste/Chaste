@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsMesh.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "UblasCustomFunctions.hpp"
-#include <list>
 
 
 template<unsigned DIM>
@@ -200,7 +198,7 @@ template<unsigned DIM>
 double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
     ///\todo not implemented in 3d yet
-    assert(DIM==2 || DIM==3);
+    assert(DIM==2 || DIM==3); // LCOV_EXCL_LINE
 
     // Helper variables
     PottsElement<DIM>* p_element = GetElement(index);
@@ -389,7 +387,7 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                        bool placeOriginalElementBelow)
 {
     /// Not implemented in 1d
-    assert(DIM==2 || DIM==3);
+    assert(DIM==2 || DIM==3); // LCOV_EXCL_LINE
 
     // Store the number of nodes in the element (this changes when nodes are deleted from the element)
     unsigned num_nodes = pElement->GetNumNodes();

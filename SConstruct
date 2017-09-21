@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ Help("""
   For other options, such as profiling, optimised builds and 
   memory testing please refer to:
   
-  https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserBuildGuide
+  https://chaste.cs.ox.ac.uk/trac/wiki/SconsArchive/UserBuildGuide
 
 """)
 
@@ -298,8 +298,9 @@ else:
                  os.environ.get('CHASTE_TEST_OUTPUT',
                                 '/tmp/'+os.environ['USER']+'/testoutput/'),
              'CHASTE_DEBUG': str(debug),
+             'CHASTE_LIBS': os.environ.get('CHASTE_LIBS', ''),
              'LD_LIBRARY_PATH': ':'.join(other_libpaths),
-             'HOME': os.environ['HOME']
+             'HOME': os.environ['HOME'],
             })
 env.Append(BOPT = 'g_c++') # Needed for some versions of PETSc?
 env.Replace(CXX = build.tools['mpicxx'])
@@ -317,6 +318,11 @@ if int(ARGUMENTS.get('br', ARGUMENTS.get('brief', 0))):
 extra_flags = build.CcFlags() + ' ' + hostconfig.CcFlags()
 link_flags  = build.LinkFlags() + ' ' + hostconfig.LdFlags()
 include_flag = ' ' + build.IncludeFlag() + ' '
+
+# C++11 changes (#2811)
+extra_flags = extra_flags + ' -std=c++11'
+extra_flags = extra_flags + ' -Wno-deprecated-declarations'  # XSD 3.3 generates code with deprecated std::auto_ptr
+
 env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
            + ' ' + extra_flags)
 env.Append(LINKFLAGS = link_flags)

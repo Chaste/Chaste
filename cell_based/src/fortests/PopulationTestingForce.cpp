@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -91,7 +91,7 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
                                                                                       double damping,
                                                                                       c_vector<double, SPACE_DIM>& oldLocation,
                                                                                       double dt)
-{  
+{
     c_vector<double, SPACE_DIM> result;
     for (unsigned j = 0; j < SPACE_DIM; j++)
     {
@@ -109,7 +109,7 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
                                                                                     double damping,
                                                                                     c_vector<double, SPACE_DIM>& oldLocation,
                                                                                     double dt)
-{  
+{
     c_vector<double, SPACE_DIM> result;
     for (unsigned j = 0; j < SPACE_DIM; j++)
     {
@@ -123,7 +123,7 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
                                                                                       double damping,
                                                                                       c_vector<double, SPACE_DIM>& oldLocation,
                                                                                       double dt)
-{  
+{
     c_vector<double, SPACE_DIM> result;
     for (unsigned j = 0; j < SPACE_DIM; j++)
     {

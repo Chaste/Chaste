@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,14 +75,16 @@ public:
     /**
      * Specify what to do in the simulation at the end of each timestep.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
-    {
-    }
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)=0;
 
     /**
-     * Specify what to do in the simulation at the end of each output timestep.
+     * Specify what to do in the simulation at the end of each output timestep,
+     * after UpdateAtEndOfTimeStep() has been called.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -93,12 +95,13 @@ public:
     /**
      * Specify what to do in the simulation before the start of the time loop.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, std::string outputDirectory)
-    {
-    }
+    virtual void SetupSolve(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, std::string outputDirectory)=0;
 
     /**
      * Specify what to do in the simulation at the end of each time loop.

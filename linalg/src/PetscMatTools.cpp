@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -180,7 +180,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
     }
     */
 #elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , NULL, NULL);
+    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , nullptr, nullptr);
 #else
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue);
 #endif

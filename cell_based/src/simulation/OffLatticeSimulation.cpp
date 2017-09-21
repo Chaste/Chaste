@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,16 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OffLatticeSimulation.hpp"
 
-#include <cmath>
 #include <boost/make_shared.hpp>
 
 #include "CellBasedEventHandler.hpp"
-#include "LogFile.hpp"
-#include "Version.hpp"
-#include "ExecutableSupport.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "StepSizeException.hpp"
-#include "SmartPointers.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
@@ -95,6 +90,12 @@ const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > OffLat
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::rGetForceCollection() const
+{
+    return mForceCollection;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
@@ -105,7 +106,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
     while (time_advanced_so_far < target_time_step)
     {
-        // Store the initial node positions (these may be needed when applying boundary conditions)    
+        // Store the initial node positions (these may be needed when applying boundary conditions)
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
 
         for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
@@ -115,7 +116,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
         }
 
-        // Try to update node positions according to the numerical method 
+        // Try to update node positions according to the numerical method
         try
         {
             mpNumericalMethod->UpdateAllNodePositions(present_time_step);
@@ -213,7 +214,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     }
 
     // Use a forward Euler method by default, unless a numerical method has been specified already
-    if (mpNumericalMethod == NULL)
+    if (mpNumericalMethod == nullptr)
     {
         mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }

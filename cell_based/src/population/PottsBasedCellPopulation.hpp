@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -106,7 +106,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-// LCOV_EXCL_START
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
 
         /*
@@ -114,12 +113,10 @@ private:
          * of the PottsMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpElementTessellation;
-        mpElementTessellation = NULL;
+        mpElementTessellation = nullptr;
 
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
-
-// LCOV_EXCL_STOP
     }
 
     /**
@@ -408,15 +405,6 @@ public:
      * @return the Mutable Mesh
      */
     MutableMesh<DIM,DIM>* GetMutableMesh();
-
-    /**
-     * Overridden WriteDataToVisualizerSetupFile() method.
-     * Write any data necessary to a visualization setup file.
-     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
-     * 
-     * @param pVizSetupFile a visualization setup file
-     */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 
     /**
      * Overridden AddUpdateRule() method.

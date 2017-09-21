@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -477,6 +477,12 @@ public:
                 TS_ASSERT_DELTA(proteins[8], 0.00, 1e-3);
             }
         }
+
+        // Coverage
+        WntConcentration<2>::Instance()->SetConstantWntValueForTesting(5.0);
+        c_vector<double, 2> gradient = WntConcentration<2>::Instance()->GetWntGradient(*(crypt.Begin()));
+        TS_ASSERT_DELTA(gradient[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(gradient[1], 0.0, 1e-6);
 
         WntConcentration<2>::Destroy();
     }

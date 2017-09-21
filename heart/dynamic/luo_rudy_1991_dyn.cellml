@@ -1580,7 +1580,13 @@ The breakdown of the model into components and the definition of encapsulation a
       <variable units="millimolar" public_interface="out" name="Ko" initial_value="5.4"/>
    </component>
    <component name="intracellular_calcium_concentration">
-      <variable units="millimolar" public_interface="out" name="Cai" initial_value="0.0002"/>
+      <variable units="millimolar" public_interface="out" name="Cai" initial_value="0.0002" cmeta:id="cytosolic_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable units="millisecond" public_interface="in" name="time"/>
       <variable units="microA_per_cm2" public_interface="in" name="i_si"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">

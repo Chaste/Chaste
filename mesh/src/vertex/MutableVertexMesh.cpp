@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MutableVertexMesh.hpp"
+
+#include "LogFile.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
-#include "LogFile.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -53,7 +54,8 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
           mProtorosetteFormationProbability(protorosetteFormationProbability),
           mProtorosetteResolutionProbabilityPerTimestep(protorosetteResolutionProbabilityPerTimestep),
           mRosetteResolutionProbabilityPerTimestep(rosetteResolutionProbabilityPerTimestep),
-          mCheckForInternalIntersections(false)
+          mCheckForInternalIntersections(false),
+          mDistanceForT3SwapChecking(5.0)
 {
     // Threshold parameters must be strictly positive
     assert(cellRearrangementThreshold > 0.0);
@@ -126,7 +128,8 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh()
       mProtorosetteFormationProbability(0.0),
       mProtorosetteResolutionProbabilityPerTimestep(0.0),
       mRosetteResolutionProbabilityPerTimestep(0.0),
-      mCheckForInternalIntersections(false)
+      mCheckForInternalIntersections(false),
+      mDistanceForT3SwapChecking(5.0)
 {
     // Note that the member variables initialised above will be overwritten as soon as archiving is complete
     this->mMeshChangesDuringSimulation = true;
@@ -174,6 +177,20 @@ double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteResolutionProbabilit
 {
     return this->mRosetteResolutionProbabilityPerTimestep;
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetDistanceForT3SwapChecking(double distanceForT3SwapChecking)
+{
+    mDistanceForT3SwapChecking = distanceForT3SwapChecking;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDistanceForT3SwapChecking() const
+{
+    return mDistanceForT3SwapChecking;
+}
+
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCheckForInternalIntersections() const
@@ -354,8 +371,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                                                 c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -539,8 +556,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                                                                 bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
 
@@ -554,8 +571,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
                                                                   unsigned nodeBIndex,
                                                                   bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     // Sort nodeA and nodeB such that nodeBIndex > nodeAindex
     assert(nodeBIndex != nodeAIndex);
@@ -677,7 +694,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh(unsigned index)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
 
     // Mark any nodes that are contained only in this element as deleted
     for (unsigned i=0; i<this->mElements[index]->GetNumNodes(); i++)
@@ -855,8 +872,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElementMap)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM==2 || SPACE_DIM==3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);         // LCOV_EXCL_LINE
+
 
     if (SPACE_DIM == 2)
     {
@@ -1028,43 +1046,61 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
     else
     {
         // ...otherwise, just check that no boundary nodes have overlapped any boundary elements
-        std::set<unsigned> boundary_element_indices;
+        // First: find all boundary element and calculate their centroid only once
+        std::vector<unsigned> boundary_element_indices;
+        std::vector< c_vector<double, SPACE_DIM> > boundary_element_centroids;
         for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-             elem_iter != this->GetElementIteratorEnd();
-             ++elem_iter)
+                elem_iter != this->GetElementIteratorEnd();
+                ++elem_iter)
         {
             if (elem_iter->IsElementOnBoundary())
             {
-                boundary_element_indices.insert(elem_iter->GetIndex());
+                unsigned element_index = elem_iter->GetIndex();
+                boundary_element_indices.push_back(element_index);
+                // should be a map but I am too lazy to look up the syntax
+                boundary_element_centroids.push_back(this->GetCentroidOfElement(element_index));
             }
         }
 
+        // Second: Check intersections only for those nodes and elements within
+        // mDistanceForT3SwapChecking within each other (node<-->element centroid)
         for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
-             node_iter != this->GetNodeIteratorEnd();
-             ++node_iter)
+                node_iter != this->GetNodeIteratorEnd();
+                ++node_iter)
         {
             if (node_iter->IsBoundaryNode())
             {
                 assert(!(node_iter->IsDeleted()));
 
-                for (std::set<unsigned>::iterator elem_iter = boundary_element_indices.begin();
-                     elem_iter != boundary_element_indices.end();
-                     ++elem_iter)
+                // index in boundary_element_centroids and boundary_element_indices
+                unsigned boundary_element_index = 0;
+                for (std::vector<unsigned>::iterator elem_iter = boundary_element_indices.begin();
+                        elem_iter != boundary_element_indices.end();
+                        ++elem_iter)
                 {
                     // Check that the node is not part of this element
                     if (node_iter->rGetContainingElementIndices().count(*elem_iter) == 0)
                     {
-                        if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
+                        c_vector<double, SPACE_DIM> node_location = node_iter->rGetLocation();
+                        c_vector<double, SPACE_DIM> element_centroid = boundary_element_centroids[boundary_element_index];
+                        double node_element_distance = norm_2(this->GetVectorFromAtoB(node_location, element_centroid));
+
+                        if ( node_element_distance < mDistanceForT3SwapChecking )
                         {
-                            PerformT3Swap(&(*node_iter), *elem_iter);
-                            return true;
+                            if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
+                            {
+                                this->PerformT3Swap(&(*node_iter), *elem_iter);
+                                return true;
+                            }
                         }
                     }
+                    // increment the boundary element index
+                    boundary_element_index +=1u;
                 }
             }
         }
-    }
 
+    }
     return false;
 }
 
@@ -1580,8 +1616,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);                    // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);        // LCOV_EXCL_LINE
+
 
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
@@ -1814,8 +1851,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(SPACE_DIM == 2);                 // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
+
     assert(pNode->IsBoundaryNode());
 
     // Store the index of the elements containing the intersecting node

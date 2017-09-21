@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -296,7 +296,7 @@ double AbstractParameterisedSystem<VECTOR>::GetAnyVariable(unsigned index, doubl
         if (index - offset < GetNumberOfDerivedQuantities())
         {
             VECTOR dqs;
-            if (pDerivedQuantities == NULL)
+            if (pDerivedQuantities == nullptr)
             {
                 dqs = ComputeDerivedQuantitiesFromCurrentState(time);
                 pDerivedQuantities = &dqs;

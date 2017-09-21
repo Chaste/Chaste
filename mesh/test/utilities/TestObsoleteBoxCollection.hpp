@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -114,6 +114,12 @@ public:
 
             ObsoleteBoxCollection<3> box_collection(0.123, domain_size);
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 729u);
+
+            c_vector<double, 6> get_domain_size = box_collection.rGetDomainSize();
+            for (unsigned i=0; i<6; i++)
+            {
+                TS_ASSERT_DELTA(get_domain_size(i), domain_size(i), 1e-15);
+            }
         }
     }
 
@@ -129,8 +135,11 @@ public:
         domain_size(1) = 20.15;
 
         ObsoleteBoxCollection<1> box_collection(cut_off_length, domain_size);
-
         box_collection.SetupAllLocalBoxes();
+
+        // Coverage of IsOwned()
+        TS_ASSERT_EQUALS(box_collection.IsOwned(NULL), true);
+        TS_ASSERT_EQUALS(box_collection.IsBoxOwned(0), true);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
@@ -682,7 +691,7 @@ public:
         neighbours_should_be[8].insert(7);
         neighbours_should_be[9] = std::set<unsigned>();
         for (unsigned i=0; i<nodes.size(); i++){
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
 
@@ -834,7 +843,7 @@ public:
 
         // Check the neighbour lists
         for (unsigned i=0; i<nodes.size(); i++){
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
 

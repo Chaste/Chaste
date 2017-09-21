@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -162,7 +162,7 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
 {
     char *chaste_test_output = getenv("CHASTE_TEST_OUTPUT");
     FileFinder directory_root;
-    if (chaste_test_output == NULL || *chaste_test_output == 0)
+    if (chaste_test_output == nullptr || *chaste_test_output == 0)
     {
         // Default to 'testoutput' folder within the current directory
         directory_root.SetPath("testoutput", RelativeTo::CWD);
@@ -213,10 +213,12 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
                 }
             }
         }
+        // LCOV_EXCL_START
         catch (const fs::filesystem_error& e)
         {
             TERMINATE("Error making test output folder: " << e.what());
         }
+        // LCOV_EXCL_STOP
     }
 
     // Wait for master to finish before going on to use the directory.
@@ -294,10 +296,12 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
         {
             fs::copy_file(from_path, to_path);
         }
+        // LCOV_EXCL_START
         catch (const fs::filesystem_error& e)
         {
             TERMINATE("Error copying file '" << rSourceFile.GetAbsolutePath() << "': " << e.what());
         }
+        // LCOV_EXCL_STOP
     }
     PetscTools::Barrier("OutputFileHandler::CopyFileTo");
     return FileFinder(to_path.string(), RelativeTo::Absolute);

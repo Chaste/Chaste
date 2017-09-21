@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,9 +81,9 @@ c_vector<double, SPACE_DIM>& NodeAttributes<SPACE_DIM>::rGetAppliedForce()
 }
 
 template<unsigned SPACE_DIM>
-void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(c_vector<double, SPACE_DIM>& appliedForceContribution)
+void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
-    mAppliedForce += appliedForceContribution;
+    mAppliedForce += rForceContribution;
 }
 
 template<unsigned SPACE_DIM>

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,28 +35,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractExtendedBidomainSolver.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
-    {
-        return;
-    }
+    // The base class method that calls this function will only call it with a null linear system
+    assert(this->mpLinearSystem == NULL);
 
     // linear system created here
-    AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,3>::InitialiseForSolve(initialSolution);
+    AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 3>::InitialiseForSolve(initialSolution);
 
     if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
     {
 #ifdef TRACE_KSP
-        std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() <<"\n";
+        std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() << "\n";
 #endif
         this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
     }
     else
     {
 #ifdef TRACE_KSP
-        std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() <<"\n";
+        std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() << "\n";
 #endif
         this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
     }
@@ -64,7 +62,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(V
     this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
     this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
 
-    if (mRowForAverageOfPhiZeroed==INT_MAX)
+    if (mRowForAverageOfPhiZeroed == INT_MAX)
     {
         // not applying average(phi)=0 constraint, so matrix is symmetric
         this->mpLinearSystem->SetMatrixIsSymmetric(true);

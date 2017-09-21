@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(const TysonNovakCellCycleMode
 
 void TysonNovakCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
+    assert(mpOdeSystem == nullptr);
     mpOdeSystem = new TysonNovak2001OdeSystem;
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
@@ -93,7 +93,7 @@ void TysonNovakCellCycleModel::ResetForDivision()
 {
     AbstractOdeBasedCellCycleModel::ResetForDivision();
 
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     /**
      * This model needs the protein concentrations and phase resetting to G0/G1.

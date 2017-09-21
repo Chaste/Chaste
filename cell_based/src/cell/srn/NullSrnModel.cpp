@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NullSrnModel.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 
 NullSrnModel::NullSrnModel()
@@ -50,7 +47,7 @@ NullSrnModel::~NullSrnModel()
 
 void NullSrnModel::SimulateToCurrentTime()
 {
-    // does nothing but updates time
+    // Does nothing but updates time
     double current_time = SimulationTime::Instance()->GetTime();
     SetSimulatedToTime(current_time);
 }
@@ -74,14 +71,13 @@ NullSrnModel::NullSrnModel(const NullSrnModel& rModel)
      * in parent classes will be defined there.
      */
 
-    // No new vatiables so dont do anything
+    // No new variables, so don't do anything
 }
 
 AbstractSrnModel* NullSrnModel::CreateSrnModel()
 {
     return new NullSrnModel(*this);
 }
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

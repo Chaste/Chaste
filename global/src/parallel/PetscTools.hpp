@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -323,7 +323,7 @@ public:
      * @param rOutputFileFullPath where to read the matrix from
      * @param rParallelLayout If provided, rMat will have the same parallel layout. Its content is irrelevant.
      */
-    static void ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
+    static void ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPath, Vec rParallelLayout=nullptr);
 
     /**
      * Read a previously dumped PETSc object from disk.
@@ -332,7 +332,7 @@ public:
      * @param rOutputFileFullPath where to read the matrix from
      * @param rParallelLayout If provided, rMat will have the same parallel layout. Its content is irrelevant.
      */
-    static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
+    static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=nullptr);
 
     /**
      * Checks if PETSc has been configured with ParMetis partioning support.

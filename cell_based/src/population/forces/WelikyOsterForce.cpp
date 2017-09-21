@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,10 +52,10 @@ template<unsigned DIM>
 void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(DIM == 2); // this method only works in 2D at present
+    assert(DIM == 2); // LCOV_EXCL_LINE // this method only works in 2D at present
 
     // Throw an exception message if not using a VertexBasedCellPopulation
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
     }

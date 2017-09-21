@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -147,7 +147,7 @@ private:
 
             // Mesh in disc, copy it to the archiving folder
             std::string original_file=this->GetMeshFileBaseName();
-            std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+            std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
                 = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file, order_of_element, order_of_boundary_element);
 
             if (p_original_mesh_reader->IsFileFormatBinary())
@@ -207,10 +207,10 @@ private:
 
         // Store the DistributedVectorFactory loaded from the archive
         DistributedVectorFactory* p_factory = this->mpDistributedVectorFactory;
-        this->mpDistributedVectorFactory = NULL;
+        this->mpDistributedVectorFactory = nullptr;
 
         // Check whether we're migrating, or if we can use the original partition for the mesh
-        DistributedVectorFactory* p_our_factory = NULL;
+        DistributedVectorFactory* p_our_factory = nullptr;
         if (p_factory)
         {
             p_our_factory = p_factory->GetOriginalFactory();
@@ -224,7 +224,7 @@ private:
         {
             // Migrating; let the mesh re-partition if it likes
             /// \todo #1199  make this work for everything else...
-            p_our_factory = NULL;
+            p_our_factory = nullptr;
         }
 
         if (mMeshIsLinear)

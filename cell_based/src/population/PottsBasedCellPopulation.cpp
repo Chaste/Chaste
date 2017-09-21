@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,11 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsBasedCellPopulation.hpp"
-#include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "AbstractPottsUpdateRule.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "CellIdWriter.hpp"
 
@@ -80,8 +78,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                                         bool validate,
                                                         const std::vector<unsigned> locationIndices)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -96,8 +94,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -755,12 +753,6 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         outline_mesh_writer.WriteFilesUsingMesh(cell_outline_mesh);
     }
 #endif //CHASTE_VTK
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
-{
-    *pVizSetupFile << "PottsSimulation\n";
 }
 
 template<unsigned DIM>

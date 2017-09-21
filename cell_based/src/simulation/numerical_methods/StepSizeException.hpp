@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class StepSizeException : public std::exception
 {
 private:
-    
+
     /** A suggested new time step. */
     double mSuggestedNewStep;
 
@@ -61,7 +61,7 @@ public:
     /**
      * Construct an exception with a message string.
      *
-     * @param suggestedNewStep a suggestion for an updated timestep 
+     * @param suggestedNewStep a suggestion for an updated timestep
      * @param message the error message to display
      * @param isTerminal whether the error is terminal if true the the simulation stops
      */

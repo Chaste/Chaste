@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AveragedSourceParabolicPde.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
@@ -73,7 +72,7 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
         unsigned elem_index = 0;
         const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        if (pCellPdeElementMap != NULL)
+        if (pCellPdeElementMap != nullptr)
         {
             elem_index = (*pCellPdeElementMap)[*cell_iter];
         }
@@ -117,12 +116,14 @@ double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
     return coefficient*u;
 }
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
     NEVER_REACHED;
     return 0.0;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)

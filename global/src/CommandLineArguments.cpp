@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,23 +40,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 CommandLineArguments::CommandLineArguments()
-    : p_argc(NULL),
-      p_argv(NULL)
+    : p_argc(nullptr),
+      p_argv(nullptr)
 {
     // Make doubly sure there's only one instance
-    assert(mpInstance == NULL);
+    assert(mpInstance == nullptr);
 }
 
 CommandLineArguments* CommandLineArguments::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new CommandLineArguments;
     }
     return mpInstance;
 }
 
-CommandLineArguments* CommandLineArguments::mpInstance = NULL;
+CommandLineArguments* CommandLineArguments::mpInstance = nullptr;
 
 bool CommandLineArguments::OptionExists(const std::string& rOption)
 {

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -92,8 +92,8 @@ AbstractCellCycleModel* WntCellCycleModel::CreateCellCycleModel()
 
 void WntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     double beta_catenin_level = mpOdeSystem->rGetStateVariables()[6] + mpOdeSystem->rGetStateVariables()[7];
 
@@ -123,8 +123,8 @@ void WntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel(
 
 void WntCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
     double wnt_level = GetWntLevel();
 
     mpOdeSystem = new WntCellCycleOdeSystem(wnt_level, mpCell->GetMutationState());

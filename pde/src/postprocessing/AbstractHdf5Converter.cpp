@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -166,7 +166,7 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
     /*
      * Begin HDF5 iteration, calls a method that populates mDatasetNames.
      */
-    H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &mDatasetNames);
+    H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, nullptr, op_func, &mDatasetNames);
 
     H5Fclose(file);
 

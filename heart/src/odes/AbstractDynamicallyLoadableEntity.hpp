@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,6 +68,12 @@ private:
     /** The loader for our shared object file */
     DynamicCellModelLoaderPtr mpLoader;
 
+// LCOV_EXCL_START
+    /* The save and load methods in this mixin class are both adequately covered in TestDynamicallyLoadedCellModels::TestArchiving()
+     * and also in higher-level TestCardiacSimulation tests.  This coverage does not appear in standard gcov parsing and
+     * hence spuriously fails.
+     */
+
     friend class boost::serialization::access;
     /**
      * Save the path to the loadable module.
@@ -95,6 +101,7 @@ private:
         SetLoader(DynamicModelLoaderRegistry::Instance()->GetLoader(so_path));
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+// LCOV_EXCL_STOP
 };
 
 #endif /*ABSTRACTDYNAMICALLYLOADABLEENTITY_HPP_*/

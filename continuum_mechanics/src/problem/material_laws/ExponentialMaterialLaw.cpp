@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,14 +68,7 @@ double ExponentialMaterialLaw<DIM>::Get_dW_dI1(double I1, double I2)
 template<unsigned DIM>
 double ExponentialMaterialLaw<DIM>::Get_dW_dI2(double I1, double I2)
 {
-    /*
-     * This is covered, but gcov doesn't see this as being covered
-     * for some reason, maybe because of optimisations.
-     */
-    // LCOV_EXCL_START
-    assert(DIM == 3);
-    // LCOV_EXCL_STOP
-
+    assert(DIM == 3); // LCOV_EXCL_LINE
     return 0.0;
 }
 
@@ -88,28 +81,14 @@ double ExponentialMaterialLaw<DIM>::Get_d2W_dI1(double I1, double I2)
 template<unsigned DIM>
 double ExponentialMaterialLaw<DIM>::Get_d2W_dI2(double I1, double I2)
 {
-    /*
-     * This is covered, but gcov doesn't see this as being covered
-     * for some reason, maybe because of optimisations.
-     */
-    // LCOV_EXCL_START
-    assert(DIM == 3);
-    // LCOV_EXCL_STOP
-
+    assert(DIM == 3); // LCOV_EXCL_LINE
     return 0.0;
 }
 
 template<unsigned DIM>
 double ExponentialMaterialLaw<DIM>::Get_d2W_dI1I2(double I1, double I2)
 {
-    /*
-     * This is covered, but gcov doesn't see this as being covered
-     * for some reason, maybe because of optimisations.
-     */
-    // LCOV_EXCL_START
-    assert(DIM == 3);
-    // LCOV_EXCL_STOP
-
+    assert(DIM == 3); // LCOV_EXCL_LINE
     return 0.0;
 }
 

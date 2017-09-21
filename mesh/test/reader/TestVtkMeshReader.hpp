@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,8 +82,8 @@ public:
     void TestFilesOpen(void) throw(Exception)
     {
 #ifdef CHASTE_VTK
-        TS_ASSERT_THROWS_NOTHING( MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu") );
-        TS_ASSERT_THROWS_ANYTHING( MESH_READER3 mesh_reader("mesh/test/data/nofile.vtu") );
+        TS_ASSERT_THROWS_NOTHING(MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu"));
+        TS_ASSERT_THROWS_ANYTHING(MESH_READER3 mesh_reader("mesh/test/data/nofile.vtu"));
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
@@ -100,8 +100,8 @@ public:
 
         vtkUnstructuredGrid* vtk_unstructed_grid = mesh_reader.OutputMeshAsVtkUnstructuredGrid();
 
-        TS_ASSERT_EQUALS( vtk_unstructed_grid->GetNumberOfPoints(), 12 );
-        TS_ASSERT_EQUALS( vtk_unstructed_grid->GetNumberOfCells(), 12 );
+        TS_ASSERT_EQUALS(vtk_unstructed_grid->GetNumberOfPoints(), 12);
+        TS_ASSERT_EQUALS(vtk_unstructed_grid->GetNumberOfCells(), 12);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
@@ -118,17 +118,17 @@ public:
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
-        TS_ASSERT_EQUALS( mesh_reader.GetNumNodes(), 12U);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
 
         std::vector<double> first_node = mesh_reader.GetNextNode();
-        TS_ASSERT_DELTA( first_node[0] , 0.0 , 1e-6 );
-        TS_ASSERT_DELTA( first_node[1] , 0.0, 1e-6 );
-        TS_ASSERT_DELTA( first_node[2] , 0.0 , 1e-6 );
+        TS_ASSERT_DELTA(first_node[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(first_node[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(first_node[2], 0.0, 1e-6);
 
         std::vector<double> next_node = mesh_reader.GetNextNode();
-        TS_ASSERT_DELTA( next_node[0] , 0.2 , 1e-6 );
-        TS_ASSERT_DELTA( next_node[1] , 0.0 , 1e-6 );
-        TS_ASSERT_DELTA( next_node[2] , 0.0 , 1e-6 );
+        TS_ASSERT_DELTA(next_node[0], 0.2, 1e-6);
+        TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6);
 
         for (unsigned node=2; node < mesh_reader.GetNumNodes(); node++)
         {
@@ -148,22 +148,28 @@ public:
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
-        TS_ASSERT_EQUALS( mesh_reader.GetNumElements(), 12U);
-        TS_ASSERT_EQUALS( mesh_reader.GetNumElementAttributes(), 0u);
+        // Coverage of GetOrderOfBoundaryElements()
+        TS_ASSERT_EQUALS(mesh_reader.GetOrderOfBoundaryElements(), 1u);
+
+        // Coverage of GetReadContainingElementOfBoundaryElement()
+        TS_ASSERT_EQUALS(mesh_reader.GetReadContainingElementOfBoundaryElement(), false);
+
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 12u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
 
         ElementData first_element_data = mesh_reader.GetNextElementData();
-        TS_ASSERT_EQUALS( first_element_data.NodeIndices[0] , 11u );
-        TS_ASSERT_EQUALS( first_element_data.NodeIndices[1] ,  3u );
-        TS_ASSERT_EQUALS( first_element_data.NodeIndices[2] ,  8u );
-        TS_ASSERT_EQUALS( first_element_data.NodeIndices[3] ,  0u );
-        TS_ASSERT_EQUALS( first_element_data.AttributeValue, 0u );
+        TS_ASSERT_EQUALS(first_element_data.NodeIndices[0], 11u);
+        TS_ASSERT_EQUALS(first_element_data.NodeIndices[1], 3u);
+        TS_ASSERT_EQUALS(first_element_data.NodeIndices[2], 8u);
+        TS_ASSERT_EQUALS(first_element_data.NodeIndices[3], 0u);
+        TS_ASSERT_EQUALS(first_element_data.AttributeValue, 0u);
 
         ElementData next_element_data = mesh_reader.GetNextElementData();
-        TS_ASSERT_EQUALS( next_element_data.NodeIndices[0] , 10u );
-        TS_ASSERT_EQUALS( next_element_data.NodeIndices[1] ,  8u );
-        TS_ASSERT_EQUALS( next_element_data.NodeIndices[2] ,  5u );
-        TS_ASSERT_EQUALS( next_element_data.NodeIndices[3] , 11u );
-        TS_ASSERT_EQUALS( next_element_data.AttributeValue, 0u );
+        TS_ASSERT_EQUALS(next_element_data.NodeIndices[0], 10u);
+        TS_ASSERT_EQUALS(next_element_data.NodeIndices[1], 8u);
+        TS_ASSERT_EQUALS(next_element_data.NodeIndices[2], 5u);
+        TS_ASSERT_EQUALS(next_element_data.NodeIndices[3], 11u);
+        TS_ASSERT_EQUALS(next_element_data.AttributeValue, 0u);
 
         for (unsigned i=2; i<mesh_reader.GetNumElements(); i++)
         {
@@ -176,8 +182,8 @@ public:
 
         // Test on a .vtu file where the elements are triangles, rather than tetrahedra
         VtkMeshReader<3,3> invalid_mesh_reader("mesh/test/data/sids.vtu");
-        TS_ASSERT_EQUALS( invalid_mesh_reader.GetNumElements(), 736U);
-        TS_ASSERT_EQUALS( invalid_mesh_reader.GetNumElementAttributes(), 0u);
+        TS_ASSERT_EQUALS(invalid_mesh_reader.GetNumElements(), 736U);
+        TS_ASSERT_EQUALS(invalid_mesh_reader.GetNumElementAttributes(), 0u);
 
         TS_ASSERT_THROWS_THIS( first_element_data = invalid_mesh_reader.GetNextElementData(),
                                "Element is not of expected type (vtkTetra/vtkTriangle)" );
@@ -193,30 +199,30 @@ public:
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
-        TS_ASSERT_EQUALS( mesh_reader.GetNumFaces(), 20U);
-        TS_ASSERT_EQUALS( mesh_reader.GetNumEdges(), 20U);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 20u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 20u);
 
         ElementData first_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT_EQUALS( first_face_data.NodeIndices[0] , 11u );
-        TS_ASSERT_EQUALS( first_face_data.NodeIndices[1] ,  3u );
-        TS_ASSERT_EQUALS( first_face_data.NodeIndices[2] ,  0u );
+        TS_ASSERT_EQUALS(first_face_data.NodeIndices[0], 11u);
+        TS_ASSERT_EQUALS(first_face_data.NodeIndices[1], 3u);
+        TS_ASSERT_EQUALS(first_face_data.NodeIndices[2], 0u);
 
         ElementData next_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT_EQUALS( next_face_data.NodeIndices[0] ,  3u );
-        TS_ASSERT_EQUALS( next_face_data.NodeIndices[1] ,  8u );
-        TS_ASSERT_EQUALS( next_face_data.NodeIndices[2] ,  0u );
+        TS_ASSERT_EQUALS(next_face_data.NodeIndices[0], 3u);
+        TS_ASSERT_EQUALS(next_face_data.NodeIndices[1], 8u);
+        TS_ASSERT_EQUALS(next_face_data.NodeIndices[2], 0u);
 
         mesh_reader.Reset();
 
         first_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT_EQUALS( first_face_data.NodeIndices[0] , 11u );
-        TS_ASSERT_EQUALS( first_face_data.NodeIndices[1] ,  3u );
-        TS_ASSERT_EQUALS( first_face_data.NodeIndices[2] ,  0u );
+        TS_ASSERT_EQUALS(first_face_data.NodeIndices[0], 11u);
+        TS_ASSERT_EQUALS(first_face_data.NodeIndices[1], 3u);
+        TS_ASSERT_EQUALS(first_face_data.NodeIndices[2], 0u);
 
         next_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT_EQUALS( next_face_data.NodeIndices[0] ,  3u );
-        TS_ASSERT_EQUALS( next_face_data.NodeIndices[1] ,  8u );
-        TS_ASSERT_EQUALS( next_face_data.NodeIndices[2] ,  0u );
+        TS_ASSERT_EQUALS(next_face_data.NodeIndices[0], 3u);
+        TS_ASSERT_EQUALS(next_face_data.NodeIndices[1], 8u);
+        TS_ASSERT_EQUALS(next_face_data.NodeIndices[2], 0u);
 
         for (unsigned face=2; face<mesh_reader.GetNumFaces(); face++)
         {
@@ -239,19 +245,19 @@ public:
 
         VtkMeshReader<3,3> mesh_reader(vtk_unstructed_grid);
 
-        TS_ASSERT_EQUALS( mesh_reader.GetNumNodes(), 12U);
-        TS_ASSERT_EQUALS( mesh_reader.GetNumElements(), 12U);
-        TS_ASSERT_EQUALS( mesh_reader.GetNumFaces(), 20U);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 12u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 20u);
 
         std::vector<double> first_node = mesh_reader.GetNextNode();
-        TS_ASSERT_DELTA( first_node[0] , 0.0 , 1e-6 );
-        TS_ASSERT_DELTA( first_node[1] , 0.0, 1e-6 );
-        TS_ASSERT_DELTA( first_node[2] , 0.0 , 1e-6 );
+        TS_ASSERT_DELTA(first_node[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(first_node[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(first_node[2], 0.0, 1e-6);
 
         std::vector<double> next_node = mesh_reader.GetNextNode();
-        TS_ASSERT_DELTA( next_node[0] , 0.2 , 1e-6 );
-        TS_ASSERT_DELTA( next_node[1] , 0.0 , 1e-6 );
-        TS_ASSERT_DELTA( next_node[2] , 0.0 , 1e-6 );
+        TS_ASSERT_DELTA(next_node[0], 0.2, 1e-6);
+        TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
@@ -261,21 +267,21 @@ public:
     void TestGenericReader() throw(Exception)
     {
 #ifdef CHASTE_VTK
-        std::auto_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
+        std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
 
-        TS_ASSERT_EQUALS( p_mesh_reader->GetNumNodes(), 12U);
-        TS_ASSERT_EQUALS( p_mesh_reader->GetNumElements(), 12U);
-        TS_ASSERT_EQUALS( p_mesh_reader->GetNumFaces(), 20U);
+        TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 12u);
+        TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 12u);
+        TS_ASSERT_EQUALS(p_mesh_reader->GetNumFaces(), 20u);
 
         std::vector<double> first_node = p_mesh_reader->GetNextNode();
-        TS_ASSERT_DELTA( first_node[0] , 0.0 , 1e-6 );
-        TS_ASSERT_DELTA( first_node[1] , 0.0, 1e-6 );
-        TS_ASSERT_DELTA( first_node[2] , 0.0 , 1e-6 );
+        TS_ASSERT_DELTA(first_node[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(first_node[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(first_node[2], 0.0, 1e-6);
 
         std::vector<double> next_node = p_mesh_reader->GetNextNode();
-        TS_ASSERT_DELTA( next_node[0] , 0.2 , 1e-6 );
-        TS_ASSERT_DELTA( next_node[1] , 0.0 , 1e-6 );
-        TS_ASSERT_DELTA( next_node[2] , 0.0 , 1e-6 );
+        TS_ASSERT_DELTA(next_node[0], 0.2, 1e-6);
+        TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6);
 
         // Exception coverage
         TS_ASSERT_THROWS_THIS((GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu", 2, 2)),
@@ -319,7 +325,6 @@ public:
         TS_ASSERT_EQUALS((it)->GetNodeGlobalIndex(3), 51u);
         TS_ASSERT_EQUALS((it)->GetNode(1), mesh.GetNode(31));
 
-
         /**
          * Check that point and cell data attributes work properly.
          */
@@ -330,9 +335,10 @@ public:
         for (unsigned i = 0; i < 610; i+=60)
         {
 
-            TS_ASSERT_DELTA( quality[i], mesh.GetElement(i)->CalculateQuality(), 1e-4 );
+            TS_ASSERT_DELTA(quality[i], mesh.GetElement(i)->CalculateQuality(), 1e-4 );
 
         }
+
         // Check centroid attribute is read properly
         std::vector<c_vector<double, 3> > centroid;
         TS_ASSERT_THROWS_THIS(mesh_reader.GetCellData( "Quality", centroid), "The cell data \'Quality\' is not 3-vector data.");
@@ -342,7 +348,7 @@ public:
 
             for (unsigned j=0; j<3; j++)
             {
-                TS_ASSERT_DELTA( centroid[i][j], mesh.GetElement(i)->CalculateCentroid()[j], 1e-4 );
+                TS_ASSERT_DELTA(centroid[i][j], mesh.GetElement(i)->CalculateCentroid()[j], 1e-4);
             }
         }
 
@@ -353,7 +359,7 @@ public:
         mesh_reader.GetPointData( "Distance from origin", distance);
         for (unsigned i = 0; i < 173; i+=17)
         {
-            TS_ASSERT_DELTA( distance[i], norm_2(mesh.GetNode(i)->rGetLocation()), 1e-4 );
+            TS_ASSERT_DELTA(distance[i], norm_2(mesh.GetNode(i)->rGetLocation()), 1e-4);
         }
 
         // Check location attribute is read properly
@@ -364,7 +370,7 @@ public:
         {
             for (unsigned j=0; j<3; j++)
             {
-                TS_ASSERT_DELTA( location[i][j], mesh.GetNode(i)->rGetLocation()[j], 1e-4 );
+                TS_ASSERT_DELTA(location[i][j], mesh.GetNode(i)->rGetLocation()[j], 1e-4);
             }
         }
 
@@ -491,7 +497,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 40u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 10u);
 
-        //Cover exception - note that ConstructFromMeshReader has reset the reader
+        // Cover exception - note that ConstructFromMeshReader has reset the reader
         for (unsigned i=0; i<10; i++)
         {
             ElementData element_data = mesh_reader.GetNextCableElementData();
@@ -518,16 +524,15 @@ public:
         MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Check we have the right number of nodes & elements
+        // Check we have the right number of nodes and elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 387u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1298u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 616u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 5u);
 
-
         for (MixedDimensionMesh<3,3>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
-                     iter != mesh.GetCableElementIteratorEnd();
-                     ++iter)
+             iter != mesh.GetCableElementIteratorEnd();
+             ++iter)
         {
             TS_ASSERT_DELTA((*iter)->GetAttribute(), 2.0, 1e-9);
         }

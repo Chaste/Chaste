@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -180,4 +180,7 @@ if __name__ == "__main__":
     index_file.write('</html>\n')
     index_file.close()
     if not ok:
+        print('Memory testing not 100% pass rate - failing memory testing.')
         sys.exit(1)
+    else:
+        print('Memory testing 100% - test passed.')

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,13 +41,7 @@ const double Nash2004ContractionModel::kTa = 47.9;
 template<>
 void OdeSystemInformation<Nash2004ContractionModel>::Initialise()
 {
-    // this is definitely (currently) covered [put an assert(0) in here and run
-    // TestContractionModels and it will fail] [also see the call of
-    //   this->mpSystemInfo = OdeSystemInformation<Nash2004ContractionModel>::Instance()
-    // in this class' constructor], but for some reason gcov doesn't see it.
-    // LCOV_EXCL_START
     this->mVariableNames.push_back("Ta");
     this->mVariableUnits.push_back("kPa");
     this->mInitialised = true;
-    // LCOV_EXCL_STOP
 }

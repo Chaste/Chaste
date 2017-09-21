@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,7 +85,7 @@ protected:
      */
     std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
 
-    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides. 
+    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides.
      * This is a specialisation for centre-based models.
      */
     boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
@@ -323,8 +323,8 @@ public:
      * @return a default value for the time step to use
      * when simulating the cell population.
      *
-     * A hard-coded value of 1/120 is returned. However, note that the time 
-     * step can be reset by calling SetDt() on the simulation object used to 
+     * A hard-coded value of 1/120 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
     virtual double GetDefaultTimeStep();

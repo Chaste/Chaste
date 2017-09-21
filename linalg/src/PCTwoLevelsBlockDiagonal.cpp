@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -91,7 +91,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
     // Odd number of local rows: impossible if V_m and phi_e for each node are stored in the same processor.
     if ((num_rows%2 != 0) || (num_local_rows%2 != 0))
     {
-        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation.");
+        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation."); // LCOV_EXCL_LINE
     }
 
     // Allocate memory
@@ -314,7 +314,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 
     // Cast the context pointer to PCTwoLevelsBlockDiagonalContext
     PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalContext* block_diag_context = (PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Scatter x = [x1 x21 x22]'

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -62,7 +62,7 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
         unsigned elem_index = 0;
         const ChastePoint<DIM>& r_position_of_cell = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        if (pCellPdeElementMap != NULL)
+        if (pCellPdeElementMap != nullptr)
         {
             elem_index = (*pCellPdeElementMap)[*cell_iter];
         }

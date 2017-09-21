@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,6 @@ AbstractUntemplatedConvergenceTester::AbstractUntemplatedConvergenceTester()
       ConductionVelocity(0.0),
       PopulatedResult(false),
       FixedResult(false),
-      UseAbsoluteStimulus(false),
       AbsoluteStimulus(-1e7),
       SimulateFullActionPotential(false),
       Converged(false),

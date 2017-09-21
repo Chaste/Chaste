@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -107,7 +107,13 @@ public:
         p_solver->Initialise();
 
         TysonNovakCellCycleModel* p_other_cell_model = new TysonNovakCellCycleModel(p_solver);
+
+        // Coverage of GetOdeSolver()
+        boost::shared_ptr<AbstractCellCycleModelOdeSolver> p_solver_from_model = p_other_cell_model->GetOdeSolver();
+        TS_ASSERT_EQUALS(p_solver_from_model->GetSizeOfOdeSystem(), 6u);
+
         p_other_cell_model->SetBirthTime(p_simulation_time->GetTime());
+
         // Timestep for non-adaptive solvers defaults to 0.0001
         TS_ASSERT_EQUALS(p_other_cell_model->GetDt(), 0.0001);
         p_other_cell_model->SetDt(0.1/60.0);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,6 +130,13 @@ public:
 
         TS_ASSERT_DELTA(CompareDoubles::Difference(0.001, 0.002, true), 0.001, 1e-12); // Absolute diff
         TS_ASSERT_DELTA(CompareDoubles::Difference(0.001, 0.002, false), 1.0, 1e-12); // Max. relative diff
+    }
+
+    void TestSafeDivide() throw(Exception)
+    {
+        TS_ASSERT_EQUALS(SafeDivide(DBL_MAX, 0.5), DBL_MAX);
+        TS_ASSERT_DELTA(SafeDivide(0.0, 1.0), 0.0, 1e-6);
+        TS_ASSERT_DELTA(SafeDivide(1.0, 2.0), 0.5, 1e-6);
     }
 };
 

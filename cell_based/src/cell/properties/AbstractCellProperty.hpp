@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -111,7 +111,7 @@ public:
         // We put a const_cast in here so users don't have to worry about whether the
         // property object they are testing is const or not.
         BASECLASS* p_subclass = dynamic_cast<BASECLASS*>(const_cast<AbstractCellProperty*>(this));
-        return (p_subclass != NULL);
+        return (p_subclass != nullptr);
     }
 
     /**

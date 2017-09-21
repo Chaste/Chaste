@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1041,8 +1041,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(1)->GetIndex(), 3u);  // 3 is 3
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(2)->GetIndex(), 11u); // 11 was 8
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(3)->GetIndex(), 1u);  // 1 was 0
-    }
 
+        // Coverage of GetNodeFromPrePermutationIndex()
+        TS_ASSERT_EQUALS(mesh.GetNodeFromPrePermutationIndex(11)->GetIndex(), 9u);
+    }
 
     void TestClear() throw(Exception)
     {
@@ -1333,6 +1335,15 @@ public:
         // Weights are non-negative and sum to 1
         TS_ASSERT_DELTA(norm_1(weights), 1.0, 1e-12);
 
+        // If point is in element then projection is redundant - looks the same as above
+        weights = element3d.CalculateInterpolationWeightsWithProjection(in_point);
+        TS_ASSERT_LESS_THAN(0.0, weights[0]);
+        TS_ASSERT_LESS_THAN(0.0, weights[1]);
+        TS_ASSERT_LESS_THAN(0.0, weights[2]);
+        TS_ASSERT_LESS_THAN(0.0, weights[3]);
+        // Weights are non-negative and sum to 1
+        TS_ASSERT_DELTA(norm_1(weights), 1.0, 1e-12);
+
         ChastePoint<3> out_point(0.1, -10., 0.1);
         TS_ASSERT_EQUALS(element3d.IncludesPoint(out_point), false);
 
@@ -1503,7 +1514,7 @@ public:
 
     void TestReadingMeshesWithRegionsAndGenericReader() throw (Exception)
     {
-        std::auto_ptr<AbstractMeshReader<1,1> > p_mesh_reader = GenericMeshReader<1,1>("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
+        std::shared_ptr<AbstractMeshReader<1,1> > p_mesh_reader = GenericMeshReader<1,1>("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(*p_mesh_reader);
 
@@ -1597,7 +1608,7 @@ public:
         constructor1.Construct(mesh1, 1, 1.0);
         TS_ASSERT_EQUALS(constructor1.GetWidth(), 1.0);
         TS_ASSERT_EQUALS(mesh1.GetNumNodes(), 9u);
-        TS_ASSERT( mesh1.CheckIsConforming() );
+        TS_ASSERT(mesh1.CheckIsConforming());
 
         CuboidMeshConstructor<2> constructor2;
         TetrahedralMesh<2,2> mesh2;
@@ -1613,6 +1624,8 @@ public:
         TetrahedralMesh<1,3> mesh4;
         constructor4.Construct(mesh4, 1, 1.0);
         TS_ASSERT_EQUALS(mesh4.GetNumNodes(), 9u);
+
+        TS_ASSERT_EQUALS(constructor4.GetNumNodes(), 9u);
     }
 
     void TestMeshStoresFilename() throw(Exception)
@@ -1935,9 +1948,11 @@ public:
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
-                c_vector<double, 2> pos1 = iter->rGetLocation();
+                c_vector<double, 2> pos1;
+                pos1 = iter->rGetLocation();
                 // Position in the other mesh
-                c_vector<double, 2> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                c_vector<double, 2> pos2;
+                pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
             }
@@ -1985,9 +2000,11 @@ public:
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
-                c_vector<double, 3> pos1 = iter->rGetLocation();
+                c_vector<double, 3> pos1;
+                pos1 = iter->rGetLocation();
                 // Position in the other mesh
-                c_vector<double, 3> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                c_vector<double, 3> pos2;
+                pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
                 TS_ASSERT_DELTA(pos1[2], pos2[2], 1e-5);

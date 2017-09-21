@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -270,6 +270,10 @@ public:
         DistributedVectorFactory factory(number_nodes);
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_multi_column", false);
+
+        // Coverage
+        TS_ASSERT_EQUALS(writer.GetUsingCache(), false);
+
         writer.DefineFixedDimension(number_nodes);
 
         int node_id = writer.DefineVariable("Node","dimensionless");

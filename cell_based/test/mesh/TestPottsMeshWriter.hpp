@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -140,6 +140,25 @@ public:
         mesh2.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
+    }
+
+    void TestWriteFilesUsingMeshReader() throw (Exception)
+    {
+        // Create a PottsMeshReader and use it to write mesh files
+        PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshReader2d/potts_mesh_with_element_attributes");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
+
+        PottsMeshWriter<2> mesh_writer("TestWriteFilesUsingMeshReader", "potts_mesh");
+        mesh_writer.WriteFilesUsingMeshReader(mesh_reader);
+
+        // Now read in the mesh that was written
+        OutputFileHandler handler("TestWriteFilesUsingMeshReader", false);
+        PottsMeshReader<2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "potts_mesh");
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
     }
 };
 

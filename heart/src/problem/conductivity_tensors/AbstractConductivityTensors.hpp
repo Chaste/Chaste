@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ protected:
     FileFinder mFibreOrientationFile;
 
     /** Fibre file reader */
-    std::auto_ptr<FibreReader<SPACE_DIM> > mFileReader;
+    std::shared_ptr<FibreReader<SPACE_DIM> > mFileReader;
 
 public:
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 /**
  * A class to generate a division vector of unit length specified in
  * the class constructor.
- * 
+ *
  * This helper class is used in TestVertexhBasedCellPopulation.hpp.
  */
 template<unsigned SPACE_DIM>

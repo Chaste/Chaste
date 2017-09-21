@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -350,11 +350,13 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCa
     return CreateCellWithIntracellularStimulus(node_specific_stimulus, node_index);
 }
 
+// LCOV_EXCL_START
 template<unsigned SPACE_DIM>
 void HeartConfigRelatedCellFactory<SPACE_DIM>::FillInCellularTransmuralAreas()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<>
 void HeartConfigRelatedCellFactory<3u>::FillInCellularTransmuralAreas()

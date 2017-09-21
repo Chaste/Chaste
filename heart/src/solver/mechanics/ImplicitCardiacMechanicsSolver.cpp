@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,9 +115,9 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         p_contraction_model->RunDoNotUpdate(this->mCurrentTime,this->mNextTime,this->mOdeTimestep);
         rActiveTension = p_contraction_model->GetNextActiveTension();
     }
+    // LCOV_EXCL_START
     catch (Exception&)
     {
-        // LCOV_EXCL_START
         // if this failed during assembling the Jacobian this is a fatal error.
         if (assembleJacobian)
         {
@@ -129,10 +129,10 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         rActiveTension = DBL_MAX;
         std::cout << "WARNING: could not solve contraction model with this stretch and stretch rate. "
                   << "Setting active tension to infinity (DBL_MAX) so that the residual(-norm) is also infinite\n" << std::flush;
-        assert(0); // just to see if we ever get here, can be removed..
+        NEVER_REACHED;
         return;
-        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
 
     // if assembling the Jacobian, numerically evaluate dTa/dlam & dTa/d(lamdot)
     if (assembleJacobian)

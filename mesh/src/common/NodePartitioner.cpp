@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,13 +74,11 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
                                               std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3);      // LCOV_EXCL_LINE // Metis works with triangles and tetras
 
     if (!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
-// LCOV_EXCL_START
-        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");
-// LCOV_EXCL_STOP
+        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");      // LCOV_EXCL_LINE
     }
 
     unsigned num_nodes = rMeshReader.GetNumNodes();
@@ -321,8 +319,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 
         // Establish whether it lies in the domain. ChasteCuboid::DoesContain is
         // insufficient for this as it treats all boundaries as open.
-        ChastePoint<SPACE_DIM> lower = pRegion->rGetLowerCorner();
-        ChastePoint<SPACE_DIM> upper = pRegion->rGetUpperCorner();
+        const ChastePoint<SPACE_DIM>& lower = pRegion->rGetLowerCorner();
+        const ChastePoint<SPACE_DIM>& upper = pRegion->rGetUpperCorner();
 
         bool does_contain = true;
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -920,6 +920,128 @@ public:
 
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetFixedNodes(fixed_nodes, locations);
+
+            // the two variants of SetApplyNormalPressureOnDeformedSurface(). MyPressureFunction
+            // will return the same value as that in the variable pressure IF the current time
+            // is set to 1.0.
+            if (run==0)
+            {
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
+            }
+            else
+            {
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, MyPressureFunction);
+            }
+
+            IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                              problem_defn,
+                                                              "nonlin_elas_pressure_on_deformed");
+
+            if (run==1)
+            {
+                solver.SetCurrentTime(1.0);
+                // To speed up this test, we provide the correct answer as the initial guess for
+                // the second run. Note: the second run may still take an iteration or two, as the
+                // final newton solve tolerance may be different (eg if relative tolerance)
+                solver.rGetCurrentSolution() = soln_first_run;
+            }
+
+            solver.Solve();
+
+            if (run==0)
+            {
+                soln_first_run = solver.rGetCurrentSolution();
+            }
+
+            std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                double exact_x_before_rotation = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
+                double exact_y_before_rotation = lambda*mesh.GetNode(i)->rGetLocation()[1];
+
+                double exact_x = (1.0/sqrt(2.0))*( exact_x_before_rotation + exact_y_before_rotation);
+                double exact_y = (1.0/sqrt(2.0))*(-exact_x_before_rotation + exact_y_before_rotation);
+
+                TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-3 );
+                TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-3 );
+            }
+
+            // check the final pressure
+            std::vector<double>& r_pressures = solver.rGetPressures();
+            TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
+            for (unsigned i=0; i<r_pressures.size(); i++)
+            {
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
+            }
+        }
+    }
+
+    /*
+     *  Repeat of previous test but with SNES solver from PETSc.
+     *
+     *  Test the functionality for specifying that a pressure should act in the normal direction on the
+     *  DEFORMED SURFACE.
+     *
+     *  The deformation is based on that in TestSolveWithNonZeroBoundaryConditions (x=X/lambda,
+     *  y=Y*lam; see comments for this test), but the exact solution here is this rotated by
+     *  45 degrees anticlockwise. We choose dirichlet boundary conditions on the X=0 surface to
+     *  match this, and a pressure on the opposite surface (similar to the traction provided in
+     *  TestSolveWithNonZeroBoundaryConditions, except we don't provide the direction, the code
+     *  needs to work this out), and it is scaled by 1.0/lambda as it acts on a smaller surface
+     *  than would on the undeformed surface.
+     */
+    void TestSolveWithPressureBcsOnDeformedSurfaceSnes() throw(Exception)
+    {
+        std::vector<double> soln_first_run;
+
+        for (unsigned run=0; run<2; run++)
+        {
+            double lambda = 0.85;
+            double c1 = 1.0;
+            unsigned num_elem = 10;
+
+            QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+            MooneyRivlinMaterialLaw<2> law(c1);
+
+            std::vector<unsigned> fixed_nodes;
+            std::vector<c_vector<double,2> > locations;
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
+                {
+                    fixed_nodes.push_back(i);
+                    c_vector<double,2> new_position;
+                    new_position(0) = (lambda/sqrt(2.0)) * mesh.GetNode(i)->rGetLocation()[1];
+                    new_position(1) = (lambda/sqrt(2.0)) * mesh.GetNode(i)->rGetLocation()[1];
+                    locations.push_back(new_position);
+                }
+            }
+
+            std::vector<BoundaryElement<1,2>*> boundary_elems;
+            double pressure = (2*c1*(pow(lambda,-1) - lambda*lambda*lambda))/lambda;
+
+            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
+            {
+                if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
+                {
+                    BoundaryElement<1,2>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
+            }
+            assert(boundary_elems.size()==num_elem);
+
+            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+
+            problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn.SetFixedNodes(fixed_nodes, locations);
+
+            /*** Switch on SNES this time ***/
+            problem_defn.SetSolveUsingSnes();
+            /*** Switch on SNES this time ***/
 
             // the two variants of SetApplyNormalPressureOnDeformedSurface(). MyPressureFunction
             // will return the same value as that in the variable pressure IF the current time

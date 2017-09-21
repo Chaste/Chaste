@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -255,6 +255,33 @@ public:
         simulator.SetEndTime(0.05);
         simulator.SetOutputDirectory(output_directory+"_rerun");
         simulator.Solve();
+    }
+
+    void TestAllCases() throw (Exception)
+    {
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        TS_ASSERT_DELTA(mesh.GetAngleBetweenNodes(2,0), -0.75*M_PI, 1e-12);
+        TS_ASSERT_DELTA(mesh.GetAngleBetweenNodes(2,1), -0.5*M_PI, 1e-12);
+
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        std::vector<CellPtr> cells;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        force_collection.push_back(p_force);
+
+        DiscreteSystemForceCalculator calculator(cell_population, force_collection);
+
+        double epsilon = 0.5*M_PI;
+        calculator.SetEpsilon(epsilon);
+
+        TS_ASSERT_THROWS_NOTHING(calculator.GetSamplingAngles(2));
     }
 };
 

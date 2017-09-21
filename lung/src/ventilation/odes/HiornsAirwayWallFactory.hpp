@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,7 +74,7 @@ public:
      * @return An airway wall object parameterised for this airway
      */
     virtual HiornsAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
-    
+
     /**
      * Creates a new Hiorns airway wall.
      *
@@ -89,7 +89,7 @@ public:
      * @return The parameter mu for the given generation
      */
     double GetmuForGeneration(unsigned generation);
-    
+
     /**
      * @param generation The generation number to get the parameter for
      * @return The parameter phi1 for the given generation
@@ -125,7 +125,7 @@ public:
      * @return The parameter alpha0 for the given generation
      */
     double GetAlpha0ForGeneration(unsigned generation);
-    
+
 
     /**
      *
@@ -164,19 +164,19 @@ private:
 
     /** The number of generations. Nb generation number starts at 0! */
     static const double mMaxGeneration;
-    
+
     /** mu values by generation dimensionless  */
     static const double mmu[17];
-    
+
     /** phi1 values by generation dimensionless  */
     static const double mphi1[17];
-    
+
     /** phi2 values by generation dimensionless  */
     static const double mphi2[17];
-    
+
     /** C1 values by generation dimensionless  */
     static const double mC1[17];
-    
+
     /** C2 values by generation dimensionless  */
     static const double mC2[17];
 };

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,7 +98,7 @@ public:
         }
 
         element.SetIndex(27);
-        TS_ASSERT_EQUALS(element.GetIndex(), 27u)
+        TS_ASSERT_EQUALS(element.GetIndex(), 27u);
     }
 
     void TestEquals()
@@ -127,6 +127,10 @@ public:
                 TS_ASSERT_DELTA(another_element.GetNode(i)->GetPoint()[j], element.GetNode(i)->GetPoint()[j], 1e-10);
             }
         }
+
+        // Coverage of GetVolume()
+        element.MarkAsDeleted();
+        TS_ASSERT_DELTA(element.GetVolume(1.0), 0.0, 1e-6);
 
         for (unsigned i=0; i<corner_nodes.size(); i++)
         {

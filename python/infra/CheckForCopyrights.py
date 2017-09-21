@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 """, re.MULTILINE)
 
-current_notice="""Copyright (c) 2005-2016, University of Oxford.
+current_notice="""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -135,14 +135,11 @@ cpp_notice_to_add = cpp_current_notice + "\n\n"
 replacement_notice = current_notice.replace("\nThis file is part of Chaste.\n", r"\1")
 
 output_notice=current_notice.replace("\nThis file is part of Chaste.\n", "")
-boost_normal_distribution_notice = """/* boost random/normal_distribution.hpp header file
- *
- * Copyright Jens Maurer 2000-2001
- * Copyright Steven Watanabe 2010-2011
+boost_random_distribution_notice = """
  * Distributed under the Boost Software License, Version 1.0. (See
  * accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
- *"""
+ """
 pycml_notice=" Processed by pycml - CellML Tools in Python"
 xsd2_notice="// Copyright (C) 2005-2007 Code Synthesis Tools CC"
 xsd3_notice="// Copyright (C) 2005-2008 Code Synthesis Tools CC"
@@ -256,7 +253,7 @@ def InspectFile(fileName):
         #print 'Found current notice in '+file_name
         valid_notice=True
     if (CheckForCopyrightNotice(pycml_notice, file_in) or
-        CheckForCopyrightNotice(boost_normal_distribution_notice, file_in) or
+        CheckForCopyrightNotice(boost_random_distribution_notice, file_in) or
         CheckForCopyrightNotice(xsd2_notice, file_in) or
         CheckForCopyrightNotice(xsd3_notice, file_in) or
         CheckForCopyrightNotice(triangle_notice, file_in) or

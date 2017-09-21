@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -468,6 +468,25 @@ public:
         VertexMesh<3,3> mesh3d2;
         mesh3d2.ConstructFromMeshReader(mesh_reader3d2);
         TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetUnsignedAttribute(), 49u);
+    }
+
+    void TestWriteFilesUsingMeshReader() throw (Exception)
+    {
+        // Create a VertexMeshReader and use it to write mesh files
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
+
+        VertexMeshWriter<2,2> mesh_writer("TestWriteFilesUsingMeshReader", "vertex_mesh");
+        mesh_writer.WriteFilesUsingMeshReader(mesh_reader);
+
+        // Now read in the mesh that was written
+        OutputFileHandler handler("TestWriteFilesUsingMeshReader", false);
+        VertexMeshReader<2,2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh");
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
     }
 };
 

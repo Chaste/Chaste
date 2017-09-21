@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOdeSrnModel.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractSrnModel(),
@@ -73,7 +70,7 @@ AbstractOdeSrnModel::~AbstractOdeSrnModel()
 
 void AbstractOdeSrnModel::SimulateToCurrentTime()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
     assert(SimulationTime::Instance()->IsStartTimeSetUp());
 
     double current_time = SimulationTime::Instance()->GetTime();
@@ -99,8 +96,8 @@ void AbstractOdeSrnModel::SimulateToCurrentTime()
 
 void AbstractOdeSrnModel::Initialise(AbstractOdeSystem* pOdeSystem)
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     mpOdeSystem = pOdeSystem;
     if (mInitialConditions == std::vector<double>())

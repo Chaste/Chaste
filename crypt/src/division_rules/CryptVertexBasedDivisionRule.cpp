@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,7 @@ c_vector<double, SPACE_DIM> CryptVertexBasedDivisionRule<SPACE_DIM>::CalculateCe
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM> axis_of_division;
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(const Abstr
 
 double AbstractWntOdeBasedCellCycleModel::GetWntLevel() const
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     double level = 0;
 
     switch (mDimension)
@@ -98,7 +98,7 @@ void AbstractWntOdeBasedCellCycleModel::ResetForDivision()
 {
     AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
 
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
     // Keep the Wnt pathway in the same state but reset the cell cycle part
@@ -123,8 +123,8 @@ void AbstractWntOdeBasedCellCycleModel::UpdateCellCyclePhase()
 
 void AbstractWntOdeBasedCellCycleModel::UpdateCellProliferativeType()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
     ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
 }
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,8 +101,8 @@ void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
 
 void SingleOdeWntCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     double wnt_level = this->GetWntLevel();
     mpOdeSystem = new Mirams2010WntOdeSystem(wnt_level, mpCell->GetMutationState());
@@ -130,8 +130,8 @@ void SingleOdeWntCellCycleModel::AdjustOdeParameters(double currentTime)
 
 void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     if (GetBetaCateninConcentration() < GetBetaCateninDivisionThreshold())
     {

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A class written using the visitor pattern for writing the average radial distribution of a 
+ * A class written using the visitor pattern for writing the average radial distribution of a
  * given CellData item, from the centroid of the cell population outward, to file.
  *
  * The output file is called radial_dist.dat by default.
@@ -88,7 +88,7 @@ public:
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item, 
+     * Visit the population and write the average radial distribution of the CellData item,
      * from the centroid of the cell population outward, in the prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
@@ -102,7 +102,7 @@ public:
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item, 
+     * Visit the population and write the average radial distribution of the CellData item,
      * from the centroid of the cell population outward, in the prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
@@ -116,7 +116,7 @@ public:
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item, 
+     * Visit the population and write the average radial distribution of the CellData item,
      * from the centroid of the cell population outward, in the prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
@@ -130,7 +130,7 @@ public:
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item, 
+     * Visit the population and write the average radial distribution of the CellData item,
      * from the centroid of the cell population outward, in the prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
@@ -144,7 +144,7 @@ public:
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item, 
+     * Visit the population and write the average radial distribution of the CellData item,
      * from the centroid of the cell population outward, in the prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:

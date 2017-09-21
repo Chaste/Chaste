@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,17 +43,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLocationIndexWriter.hpp"
 #include "ExclusionCaBasedDivisionRule.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
 #include "ApoptoticCellProperty.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::Validate()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 CaBasedCellPopulation<DIM>::CaBasedCellPopulation(PottsMesh<DIM>& rMesh,

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -109,7 +109,7 @@ template<class Archive>
 inline void save_construct_data(
     Archive & ar, const Goldbeter1991OdeSystem * t, const unsigned int file_version)
 {
-    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 

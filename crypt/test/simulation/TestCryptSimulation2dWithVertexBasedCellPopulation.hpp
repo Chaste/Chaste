@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -154,8 +154,9 @@ public:
 
         for (unsigned node_index=0; node_index<simulator.rGetCellPopulation().GetNumNodes(); node_index++)
         {
-            c_vector<double, 2> node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
-            
+            c_vector<double, 2> node_location;
+            node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
+
             AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
             double damping = p_offLattice_pop->GetDampingConstant(node_index);
             c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(node_index, damping, old_node_locations[node_index], dt);

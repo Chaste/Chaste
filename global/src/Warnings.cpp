@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PosixPathFixer.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 
-Warnings* Warnings::mpInstance = NULL;
+Warnings* Warnings::mpInstance = nullptr;
 
 Warnings::Warnings()
 {
@@ -63,7 +63,7 @@ void Warnings::QuietDestroy(void)
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 
@@ -87,7 +87,7 @@ void Warnings::PrintWarnings(void)
 
 Warnings* Warnings::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new Warnings();
         std::atexit(NoisyDestroy);

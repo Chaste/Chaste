@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -141,6 +141,9 @@ public:
         // Check singleton-ness
         boost::shared_ptr<RkSolver> p_solver2 = RkSolver::Instance();
         TS_ASSERT_EQUALS(p_solver, p_solver2);
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(p_solver->Reset());
 
         p_solver->Initialise();
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -249,11 +249,12 @@ protected:
      * Helper method to output additional simulations parameters and information defined in
      * subclasses to file.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputAdditionalSimulationSetup(out_stream& rParamsFile)
-    {
-    }
+    virtual void OutputAdditionalSimulationSetup(out_stream& rParamsFile)=0;
 
 public:
 

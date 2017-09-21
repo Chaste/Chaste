@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,12 +54,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/foreach.hpp>
 typedef std::pair<std::string, std::string> StringPair;
 
+#include "ChasteSerialization.hpp"
 #include "CommandLineArguments.hpp"
 #include "Exception.hpp"
-#include "PetscTools.hpp"
-#include "PetscSetupUtils.hpp"
 #include "PetscException.hpp"
-#include "ChasteSerialization.hpp"
+#include "PetscSetupUtils.hpp"
+#include "PetscTools.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
@@ -70,10 +70,10 @@ typedef std::pair<std::string, std::string> StringPair;
 #include <sundials/sundials_config.h>
 #if CHASTE_SUNDIALS_VERSION >= 20600
 // SUNDIALS 2.6 defined SUNDIALS_PACKAGE_VERSION without quotes...
-#  include <boost/preprocessor/stringize.hpp>
-#  define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
+#include <boost/preprocessor/stringize.hpp>
+#define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
 #else
-#  define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
+#define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
 #endif // SUNDIALS >= 2.6.0
 #endif
 
@@ -85,9 +85,9 @@ typedef std::pair<std::string, std::string> StringPair;
 
 // Check whether the version of ParMETIS being used is the one we wanted
 #ifdef CHASTE_PARMETIS_REQUIRED
-#  if PARMETIS_MAJOR_VERSION != CHASTE_PARMETIS_REQUIRED
-#    error "Wrong ParMETIS version found: " #CHASTE_PARMETIS_REQUIRED " requested but " #PARMETIS_MAJOR_VERSION " present"
-#  endif
+#if PARMETIS_MAJOR_VERSION != CHASTE_PARMETIS_REQUIRED
+#error "Wrong ParMETIS version found: " #CHASTE_PARMETIS_REQUIRED " requested but " #PARMETIS_MAJOR_VERSION " present"
+#endif
 #endif
 
 FileFinder ExecutableSupport::mOutputDirectory;
@@ -114,10 +114,10 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
-// LCOV_EXCL_START
+        // LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -127,7 +127,7 @@ void ExecutableSupport::ShowCopyright()
     std::stringstream provenance_msg;
     provenance_msg << "This version of Chaste was compiled on:\n";
     provenance_msg << ChasteBuildInfo::GetBuildTime() << " by " << ChasteBuildInfo::GetBuilderUnameInfo() << " (uname)\n";
-    provenance_msg << "from revision number " << ChasteBuildInfo::GetRevisionNumber() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
+    provenance_msg << "from revision number " << std::hex << ChasteBuildInfo::GetRevisionNumber() << std::dec << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
 
     // Only show one copy of copyright/header
     if (PetscTools::AmMaster())
@@ -146,7 +146,8 @@ void ExecutableSupport::ShowParallelLaunching()
         // Information to show that Chaste is being run in parallel
         PetscTools::BeginRoundRobin();
         std::cout << "Chaste launched on process " << PetscTools::GetMyRank()
-            << " of " << PetscTools::GetNumProcs() << "." << std::endl << std::flush;
+                  << " of " << PetscTools::GetNumProcs() << "." << std::endl
+                  << std::flush;
         PetscTools::EndRoundRobin();
     }
 }
@@ -155,28 +156,31 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 {
     if (!mOutputDirectory.IsPathSet())
     {
-// LCOV_EXCL_START
+        // LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     std::stringstream file_name;
     file_name << fileBaseName << "_" << PetscTools::GetMyRank() << ".txt";
     out_stream out_file = out_file_handler.OpenOutputFile(file_name.str());
     *out_file << "Process " << PetscTools::GetMyRank() << " of "
-        << PetscTools::GetNumProcs() << "." << std::endl << std::flush;
+              << PetscTools::GetNumProcs() << "." << std::endl
+              << std::flush;
 
 #ifdef _MSC_VER
     //use native windows equivalent of system info. from uname and /proc/cpuinfo
 
     //operating system and machine name
-    *out_file << "uname sysname  = " << "Microsoft Windows" << std::endl;
-    #define INFO_BUFFER_SIZE 32767
+    *out_file << "uname sysname  = "
+              << "Microsoft Windows" << std::endl;
+#define INFO_BUFFER_SIZE 32767
     TCHAR info_buffer[INFO_BUFFER_SIZE];
     DWORD buffer_char_count = INFO_BUFFER_SIZE;
     if (!GetComputerName(info_buffer, &buffer_char_count))
-        *out_file << "uname nodename = " << "Windows machine name is unknown" << std::endl;
+        *out_file << "uname nodename = "
+                  << "Windows machine name is unknown" << std::endl;
     else
         *out_file << "uname nodename = " << info_buffer << std::endl;
     //more detailed operating system version information
@@ -184,41 +188,50 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     ZeroMemory(&os_info, sizeof(OSVERSIONINFO));
     os_info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
     //copy os version info into the structure
-    GetVersionEx((OSVERSIONINFO*) &os_info);
+    GetVersionEx((OSVERSIONINFO*)&os_info);
     //Pivot around Windows Vista (dwMajorVersion >= 6)
     //See http://msdn.microsoft.com/en-us/library/ms724834%28v=vs.85%29.aspx for details
     if (os_info.dwMajorVersion < 6)
     { //earlier than Windows Vista
-        *out_file << "uname release  = " << "Microsoft Windows Server 2003 R2 (or earlier)" << std::endl;
+        *out_file << "uname release  = "
+                  << "Microsoft Windows Server 2003 R2 (or earlier)" << std::endl;
     }
-    else {
+    else
+    {
         //reverse chronological order (simply add newer OS version to the top)
         if (os_info.dwMajorVersion > 6)
         {
-            *out_file << "uname release  = " << "Microsoft Windows (Later than Microsoft Windows 8)" << std::endl;
+            *out_file << "uname release  = "
+                      << "Microsoft Windows (Later than Microsoft Windows 8)" << std::endl;
         }
-        else  //os_info.dwMajorVersion == 6
+        else //os_info.dwMajorVersion == 6
         {
             if (os_info.dwMinorVersion == 2)
             {
                 if (os_info.wProductType == VER_NT_WORKSTATION)
-                    *out_file << "uname release  = " << "Microsoft Windows 8" << std::endl;
+                    *out_file << "uname release  = "
+                              << "Microsoft Windows 8" << std::endl;
                 else
-                    *out_file << "uname release  = " << "Microsoft Windows Server 2012" << std::endl;
+                    *out_file << "uname release  = "
+                              << "Microsoft Windows Server 2012" << std::endl;
             }
             else if (os_info.dwMinorVersion == 1)
             {
                 if (os_info.wProductType == VER_NT_WORKSTATION)
-                    *out_file << "uname release  = " << "Microsoft Windows 7" << std::endl;
+                    *out_file << "uname release  = "
+                              << "Microsoft Windows 7" << std::endl;
                 else
-                    *out_file << "uname release  = " << "Microsoft Windows Server 2008 R2" << std::endl;
+                    *out_file << "uname release  = "
+                              << "Microsoft Windows Server 2008 R2" << std::endl;
             }
             else if (os_info.dwMinorVersion == 0)
             {
                 if (os_info.wProductType == VER_NT_WORKSTATION)
-                    *out_file << "uname release  = " << "Microsoft Windows Server 2008" << std::endl;
+                    *out_file << "uname release  = "
+                              << "Microsoft Windows Server 2008" << std::endl;
                 else
-                    *out_file << "uname release  = " << "Microsoft Windows Vista" << std::endl;
+                    *out_file << "uname release  = "
+                              << "Microsoft Windows Vista" << std::endl;
             }
         }
     }
@@ -230,24 +243,30 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     GetSystemInfo(&sys_info);
     switch (sys_info.wProcessorArchitecture)
     {
-    case PROCESSOR_ARCHITECTURE_AMD64:
-        *out_file << "uname machine  = " << "x64 (AMD or Intel)" << std::endl;
-        break;
-    case PROCESSOR_ARCHITECTURE_ARM:
-        *out_file << "uname machine  = " << "ARM" << std::endl;
-        break;
-    case PROCESSOR_ARCHITECTURE_IA64:
-        *out_file << "uname machine  = " << "Intel Itanium-based" << std::endl;
-        break;
-    case PROCESSOR_ARCHITECTURE_INTEL:
-        *out_file << "uname machine  = " << "x86" << std::endl;
-        break;
-    case PROCESSOR_ARCHITECTURE_UNKNOWN:
-        *out_file << "uname machine  = " << "Unknown Architecture" << std::endl;
-        break;
-    default:
-        *out_file << "uname machine  = " << "Other Architecture. Code = " << sys_info.wProcessorArchitecture << std::endl;
-        break;
+        case PROCESSOR_ARCHITECTURE_AMD64:
+            *out_file << "uname machine  = "
+                      << "x64 (AMD or Intel)" << std::endl;
+            break;
+        case PROCESSOR_ARCHITECTURE_ARM:
+            *out_file << "uname machine  = "
+                      << "ARM" << std::endl;
+            break;
+        case PROCESSOR_ARCHITECTURE_IA64:
+            *out_file << "uname machine  = "
+                      << "Intel Itanium-based" << std::endl;
+            break;
+        case PROCESSOR_ARCHITECTURE_INTEL:
+            *out_file << "uname machine  = "
+                      << "x86" << std::endl;
+            break;
+        case PROCESSOR_ARCHITECTURE_UNKNOWN:
+            *out_file << "uname machine  = "
+                      << "Unknown Architecture" << std::endl;
+            break;
+        default:
+            *out_file << "uname machine  = "
+                      << "Other Architecture. Code = " << sys_info.wProcessorArchitecture << std::endl;
+            break;
     }
 
     *out_file << "\nInformation on number and type of processors:" << std::endl;
@@ -257,26 +276,31 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
     //get physical memory
     MEMORYSTATUSEX mem_status;
-    mem_status.dwLength = sizeof (mem_status);
-    GlobalMemoryStatusEx (&mem_status);
+    mem_status.dwLength = sizeof(mem_status);
+    GlobalMemoryStatusEx(&mem_status);
     *out_file << "\nInformation on system memory:" << std::endl;
-    *out_file << mem_status.ullTotalPhys/1024 << " kB" << std::endl;
+    *out_file << mem_status.ullTotalPhys / 1024 << " kB" << std::endl;
 #else
     struct utsname uts_info;
     uname(&uts_info);
 
-    *out_file << "uname sysname  = " << uts_info.sysname << std::endl << std::flush;
-    *out_file << "uname nodename = " << uts_info.nodename << std::endl << std::flush;
-    *out_file << "uname release  = " << uts_info.release << std::endl << std::flush;
-    *out_file << "uname version  = " << uts_info.version << std::endl << std::flush;
-    *out_file << "uname machine  = " << uts_info.machine << std::endl << std::flush;
+    *out_file << "uname sysname  = " << uts_info.sysname << std::endl
+              << std::flush;
+    *out_file << "uname nodename = " << uts_info.nodename << std::endl
+              << std::flush;
+    *out_file << "uname release  = " << uts_info.release << std::endl
+              << std::flush;
+    *out_file << "uname version  = " << uts_info.version << std::endl
+              << std::flush;
+    *out_file << "uname machine  = " << uts_info.machine << std::endl
+              << std::flush;
     char buffer[100];
     FILE* system_info;
 
 #ifdef __APPLE__
     *out_file << "\nInformation on number and type processors, and cache and memory sizes (in bytes)\n";
     system_info = popen("sysctl hw.ncpu hw.physicalcpu machdep.cpu.brand_string hw.l1icachesize hw.l1dcachesize hw.l2cachesize hw.l3cachesize hw.memsize", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while (fgets(buffer, 100, system_info) != NULL)
     {
         *out_file << buffer;
     }
@@ -285,7 +309,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     //GNU
     *out_file << "\nInformation on number and type of processors:\n";
     system_info = popen("grep ^model.name /proc/cpuinfo", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while (fgets(buffer, 100, system_info) != nullptr)
     {
         *out_file << buffer;
     }
@@ -293,7 +317,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
     *out_file << "\nInformation on processor caches, in the same order as above:\n";
     system_info = popen("grep ^cache.size /proc/cpuinfo", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while (fgets(buffer, 100, system_info) != nullptr)
     {
         *out_file << buffer;
     }
@@ -301,7 +325,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
     *out_file << "\nInformation on system memory:\n";
     system_info = popen("grep ^MemTotal /proc/meminfo", "r");
-    while ( fgets(buffer, 100, system_info) != NULL )
+    while (fgets(buffer, 100, system_info) != nullptr)
     {
         *out_file << buffer;
     }
@@ -316,10 +340,10 @@ void ExecutableSupport::WriteProvenanceInfoFile()
 {
     if (!mOutputDirectory.IsPathSet())
     {
-// LCOV_EXCL_START
+        // LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("provenance_info_", PetscTools::GetMyRank(), ".txt");
@@ -328,7 +352,7 @@ void ExecutableSupport::WriteProvenanceInfoFile()
     std::stringstream provenance_msg;
     provenance_msg << "This version of Chaste was compiled on:\n";
     provenance_msg << ChasteBuildInfo::GetBuildTime() << " by " << ChasteBuildInfo::GetBuilderUnameInfo() << " (uname)\n";
-    provenance_msg << "from revision number " << ChasteBuildInfo::GetRevisionNumber() << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
+    provenance_msg << "from revision number " << std::hex << ChasteBuildInfo::GetRevisionNumber() << std::dec << " with build type " << ChasteBuildInfo::GetBuildInformation() << ".\n\n";
     *out_file << provenance_msg.str();
 
     std::string output;
@@ -344,35 +368,40 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "<ChasteBuildInfo>\n";
 
     output << "\t<ProvenanceInfo>\n";
-    output << "\t\t<VersionString>"<< ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
-    output << "\t\t<IsWorkingCopyModified>"<< ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
-    output << "\t\t<BuildInformation>"<< ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
-    output << "\t\t<BuildTime>"<< ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
-    output << "\t\t<CurrentTime>"<< ChasteGetCurrentTime() << "</CurrentTime>\n";
-    output << "\t\t<BuilderUnameInfo>"<< ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
+    output << "\t\t<VersionString>" << ChasteBuildInfo::GetVersionString() << "</VersionString> <!-- build specific -->\n";
+    output << "\t\t<IsWorkingCopyModified>" << ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
+    output << "\t\t<BuildInformation>" << ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
+    output << "\t\t<BuildTime>" << ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
+    output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
+    output << "\t\t<BuilderUnameInfo>" << ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
     output << "\t\t<Projects>\n";
-    BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
+    // A bit ugly!  \todo Can neaten up with tuples in C++11
+    std::map<std::string, std::string> projects_modified = ChasteBuildInfo::rGetIfProjectsModified();
+    BOOST_FOREACH (const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
-// LCOV_EXCL_START
+        // LCOV_EXCL_START
         // No projects are checked out for continuous builds normally!
-        output<< "\t\t\t<Name>" << r_project_version.first << "</Name><Version>"
-                 << r_project_version.second << "</Version>\n";
-// LCOV_EXCL_STOP
+        output << "\t\t\t<Project>" << std::endl;
+        output << "\t\t\t\t<Name>" << r_project_version.first << "</Name>" << std::endl;
+        output << "\t\t\t\t<Version>" << r_project_version.second << "</Version>" << std::endl;
+        output << "\t\t\t\t<Modified>" << projects_modified[r_project_version.first] << "</Modified>" << std::endl;
+        output << "\t\t\t</Project>" << std::endl;
+        // LCOV_EXCL_STOP
     }
     output << "\t\t</Projects>\n";
     output << "\t</ProvenanceInfo>\n";
 
     output << "\t<Compiler>\n";
-    output << "\t\t<NameAndVersion>" << ChasteBuildInfo::GetCompilerType() << ", version " << ChasteBuildInfo::GetCompilerVersion() << "</NameAndVersion>\n" ;
-    output << "\t\t<Flags>" << ChasteBuildInfo::GetCompilerFlags() << "</Flags>\n" ;
+    output << "\t\t<NameAndVersion>" << ChasteBuildInfo::GetCompilerType() << ", version " << ChasteBuildInfo::GetCompilerVersion() << "</NameAndVersion>\n";
+    output << "\t\t<Flags>" << ChasteBuildInfo::GetCompilerFlags() << "</Flags>\n";
     output << "\t</Compiler>\n";
 
     output << "\t<Libraries>\n";
 
     output << "\t\t<CompiledIn>\n";
     output << "\t\t\t<PETSc>" << PETSC_VERSION_MAJOR << "." << PETSC_VERSION_MINOR << "." << PETSC_VERSION_SUBMINOR << "</PETSc>\n";
-    output << "\t\t\t<Boost>" << BOOST_VERSION  / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>\n";
-    output << "\t\t\t<HDF5>" << H5_VERS_MAJOR <<  "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>\n";
+    output << "\t\t\t<Boost>" << BOOST_VERSION / 100000 << "." << BOOST_VERSION / 100 % 1000 << "." << BOOST_VERSION % 100 << "</Boost>\n";
+    output << "\t\t\t<HDF5>" << H5_VERS_MAJOR << "." << H5_VERS_MINOR << "." << H5_VERS_RELEASE << "</HDF5>\n";
     output << "\t\t\t<Parmetis>" << PARMETIS_MAJOR_VERSION << "." << PARMETIS_MINOR_VERSION;
 #ifdef PARMETIS_SUBMINOR_VERSION // they only added this in v4.? !!
     output << "." << PARMETIS_SUBMINOR_VERSION;
@@ -381,7 +410,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t</CompiledIn>\n";
 
     output << "\t\t<Binaries>\n";
-    output << "\t\t\t<XSD>" <<  ChasteBuildInfo::GetXsdVersion() << "</XSD>\n";
+    output << "\t\t\t<XSD>" << ChasteBuildInfo::GetXsdVersion() << "</XSD>\n";
     output << "\t\t</Binaries>\n";
 
     output << "\t\t<Optional>\n";
@@ -432,10 +461,10 @@ void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
     // Write the error message to file
     if (!mOutputDirectory.IsPathSet())
     {
-// LCOV_EXCL_START
+        // LCOV_EXCL_START
         //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
-// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("chaste_errors_", PetscTools::GetMyRank(), ".txt", std::ios::out | std::ios::app);
@@ -448,7 +477,8 @@ void ExecutableSupport::Print(const std::string& rMessage)
     if (PetscTools::AmMaster())
     {
         // Write the error message to stdout
-        std::cout << rMessage << std::endl << std::flush;
+        std::cout << rMessage << std::endl
+                  << std::flush;
     }
 }
 

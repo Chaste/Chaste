@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,8 +68,14 @@ public:
      */
     void TestFilesOpen() throw(Exception)
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
 
+        TS_ASSERT_THROWS_THIS(READER_2D mesh_reader1("no_mesh_files"),"Could not open data file: no_mesh_files.node");
+        TS_ASSERT_THROWS_THIS(READER_2D mesh_reader1("mesh/test/data/square_no_ele_file"),
+                           "Could not open data file: mesh/test/data/square_no_ele_file.ele");
+        TS_ASSERT_THROWS_THIS(READER_2D mesh_reader1("mesh/test/data/square_no_edge_file"),
+                           "Could not open data file: mesh/test/data/square_no_edge_file.edge");
+
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         // For coverage purposes, not sure how to test this functionality...
         mesh_reader.SetReadBufferSize(2*1024*1024); //2MB
     }
@@ -868,7 +874,7 @@ public:
 
     void TestReadingWithGenericReader() throw(Exception)
     {
-        std::auto_ptr<AbstractMeshReader<2,2> > p_mesh_reader = GenericMeshReader<2,2>("mesh/test/data/disk_522_elements");
+        std::shared_ptr<AbstractMeshReader<2,2> > p_mesh_reader = GenericMeshReader<2,2>("mesh/test/data/disk_522_elements");
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 312u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 522u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumFaceAttributes(), 1u);

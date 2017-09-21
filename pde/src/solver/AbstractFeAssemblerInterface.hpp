@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -155,8 +155,8 @@ public:
 
 template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
 AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::AbstractFeAssemblerInterface()
-    : mVectorToAssemble(NULL),
-      mMatrixToAssemble(NULL),
+    : mVectorToAssemble(nullptr),
+      mMatrixToAssemble(nullptr),
       mZeroMatrixBeforeAssembly(true),
       mZeroVectorBeforeAssembly(true)
 {

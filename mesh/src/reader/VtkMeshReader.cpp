@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -283,18 +283,12 @@ unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaceAttributes() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
 {
-    mNodesRead=0;
-    mElementsRead=0;
-    mFacesRead=0;
-    mBoundaryFacesRead=0;
-    mBoundaryFacesSkipped=0;
-    mCableElementsRead=0;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Initialize()
-{
-    mpVtkUnstructuredGrid->Initialize();
+    mNodesRead = 0;
+    mElementsRead = 0;
+    mFacesRead = 0;
+    mBoundaryFacesRead = 0;
+    mBoundaryFacesSkipped = 0;
+    mCableElementsRead = 0;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

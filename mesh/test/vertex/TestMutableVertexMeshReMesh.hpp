@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -2259,6 +2259,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh;
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
+        vertex_mesh.SetDistanceForT3SwapChecking(100.0);
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
 
@@ -2707,6 +2708,7 @@ public:
 
         // Merge intersection to maintain non-overlapping elements
         vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
         vertex_mesh.CheckForIntersections();
 
         // Test that each moved node has the correct location following the rearrangement

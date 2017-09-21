@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ public:
      * @return An airway wall object parameterised for this airway
      */
     virtual LambertAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
-  
+
     double GetAlpha0ForGeneration(unsigned generation);
     double GetAlpha0PrimeForGeneration(unsigned generation);
     double GetN1ForGeneration(unsigned generation);
@@ -92,7 +92,7 @@ public:
      * @param pMesh  the mesh for which to create acinar units.
      */
     virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh);
-    
+
     /** alpha_0 values by generation dimensionless */
     static const double mAlpha0[17];
 

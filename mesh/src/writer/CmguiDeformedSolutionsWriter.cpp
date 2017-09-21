@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
 {
     QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadraticMesh);
 
-    if (p_quad_mesh == NULL)
+    if (p_quad_mesh == nullptr)
     {
         EXCEPTION("CmguiDeformedSolutionsWriter only supports use of a QuadraticMesh");
     }

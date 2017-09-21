@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 int CvodeRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* pData)
 {
-    assert(pData != NULL);
+    assert(pData != nullptr);
     CvodeData* p_data = (CvodeData*) pData;
     // Get y, ydot into std::vector<>s
     static std::vector<realtype> ydot_vec;
@@ -111,7 +111,7 @@ int CvodeRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* pData)
  */
 int CvodeRootAdaptor(realtype t, N_Vector y, realtype* pGOut, void* pData)
 {
-    assert(pData != NULL);
+    assert(pData != nullptr);
     CvodeData* p_data = (CvodeData*) pData;
     // Get y into a std::vector
     CopyToStdVector(y, *p_data->pY);
@@ -211,9 +211,9 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     {
         // Set up CVODE's memory.
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
+        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
         // Set error handler
-        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
+        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
         // Set the user data
         mData.pSystem = pOdeSystem;
         mData.pY = &rInitialY;
@@ -283,7 +283,7 @@ void CvodeAdaptor::FreeCvodeMemory()
     {
         CVodeFree(&mpCvodeMem);
     }
-    mpCvodeMem = NULL;
+    mpCvodeMem = nullptr;
 }
 
 
@@ -442,13 +442,13 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 
 CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
     : AbstractIvpOdeSolver(),
-      mpCvodeMem(NULL),
+      mpCvodeMem(nullptr),
       mRelTol(relTol),
       mAbsTol(absTol),
       mLastInternalStepSize(-0.0),
       mMaxSteps(0),
       mCheckForRoots(false),
-      mLastSolutionState(NULL),
+      mLastSolutionState(nullptr),
       mLastSolutionTime(0.0),
 #if CHASTE_SUNDIALS_VERSION >= 20400
       mForceReset(false),

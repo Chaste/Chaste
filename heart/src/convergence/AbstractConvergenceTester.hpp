@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -170,10 +170,7 @@ public:
      *  used in StimulusConverger in projects/jmpf
      */
     bool FixedResult;
-    /** true if the plane stimulus should applied with an exact value (not scaled by space-step)
-     *  used in StimulusConverger in projects/jmpf
-     */
-    bool UseAbsoluteStimulus;
+
     /**
      * A value to be used with a plane stimulus (not scaled by space-step)
      *  used in StimulusConverger in projects/jmpf
@@ -319,16 +316,7 @@ public:
                 }
                 case PLANE:
                 {
-                    if (this->UseAbsoluteStimulus)
-                    {
-                        // LCOV_EXCL_START
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(0, this->AbsoluteStimulus, true);
-                        // LCOV_EXCL_STOP
-                    }
-                    else
-                    {
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), false, this->AbsoluteStimulus);
-                    }
+                    p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), this->AbsoluteStimulus);
                     break;
                 }
                 case QUARTER:
@@ -487,13 +475,13 @@ public:
                     // LCOV_EXCL_STOP
                     ConductionVelocity  = ppc.CalculateConductionVelocity(first_quadrant_node,third_quadrant_node,0.5*mesh_width);
                 }
+                // LCOV_EXCL_START
                 catch (Exception e)
                 {
-                    // LCOV_EXCL_START
                     std::cout << "Warning - this run threw an exception in calculating propagation.  Check convergence results\n";
                     std::cout << e.GetMessage() << std::endl;
-                    // LCOV_EXCL_STOP
                 }
+                // LCOV_EXCL_STOP
                 double cond_velocity_error = 1e10;
                 double apd90_first_qn_error = 1e10;
                 double apd90_third_qn_error = 1e10;
@@ -634,6 +622,9 @@ public:
         }
     }
 
+    /**
+     * Show convergence details relevant to this run in std::cout
+     */
     void DisplayRun()
     {
         if (!PetscTools::AmMaster())
@@ -675,14 +666,6 @@ public:
         std::time_t rawtime;
         std::time( &rawtime );
         std::cout << std::ctime(&rawtime);
-        ///\todo The UseAbsoluteStimulus is temporary, while we are sorting out
-        ///3D stimulus.  It is to be removed later (along with StimulusConvergenceTester)
-        if (this->UseAbsoluteStimulus)
-        {
-            // LCOV_EXCL_START
-            std::cout<<"Using absolute stimulus of "<<this->AbsoluteStimulus<<std::endl;
-            // LCOV_EXCL_STOP
-        }
         std::cout << std::flush;
         //HeartEventHandler::Headings();
         //HeartEventHandler::Report();

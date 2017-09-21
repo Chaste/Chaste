@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,9 +69,10 @@ double LinearBasisFunction<3>::ComputeBasisFunction(
             return rPoint[2];
             break;
         default:
-           ; //not possible to get here because of assertions above
+            NEVER_REACHED; //not possible to get here because of assertions above
     }
-    return 0.0; // Avoid compiler warning
+
+    return 0.0; // LCOV_EXCL_LINE // Avoid compiler warning
 }
 
 /**
@@ -102,9 +103,9 @@ double LinearBasisFunction<2>::ComputeBasisFunction(
             return rPoint[1];
             break;
         default:
-           ; //not possible to get here because of assertions above
+           NEVER_REACHED; //not possible to get here because of assertions above
     }
-    return 0.0; // Avoid compiler warning
+    return 0.0; // LCOV_EXCL_LINE // Avoid compiler warning
 }
 
 /**
@@ -132,9 +133,9 @@ double LinearBasisFunction<1>::ComputeBasisFunction(
             return rPoint[0];
             break;
         default:
-           ; //not possible to get here because of assertions above
+           NEVER_REACHED; //not possible to get here because of assertions above
     }
-    return 0.0; // Avoid compiler warning
+    return 0.0; // LCOV_EXCL_LINE  // Avoid compiler warning
 }
 
 /**

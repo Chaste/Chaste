@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -387,7 +387,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
 
     PetscViewerDestroy(PETSC_DESTROY_PARAM(view));
 
-    if (rParallelLayout != NULL)
+    if (rParallelLayout != nullptr)
     {
         /*
          * The idea is to copy rMat into a matrix that has the appropriate
@@ -420,7 +420,7 @@ void PetscTools::ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPa
 
     PetscViewerBinaryOpen(PETSC_COMM_WORLD, rOutputFileFullPath.c_str(),
                           type, &view);
-    if (rParallelLayout == NULL)
+    if (rParallelLayout == nullptr)
     {
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
         VecCreate(PETSC_COMM_WORLD,&rVec);
@@ -458,7 +458,7 @@ bool PetscTools::HasParMetis()
 
     // We are expecting an error from PETSC on systems that don't have the interface, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
 
 #if (PETSC_VERSION_MAJOR == 2 || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2))
     PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MAT_PARTITIONING_PARMETIS);

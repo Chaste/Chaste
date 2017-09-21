@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,13 +49,7 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
         FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
         bool                      computeDTdE)
 {
-    /*
-     * This is covered, but gcov doesn't see this as being covered
-     * for some reason, maybe because of optimisations.
-     */
-    // LCOV_EXCL_START
-    assert((DIM==2) || (DIM==3));
-    // LCOV_EXCL_STOP
+    assert((DIM==2) || (DIM==3)); // LCOV_EXCL_LINE
 
     static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestNumericalMethods : public AbstractCellBasedTestSuite
 {
 public:
-    
+
     void TestMethodsAndExceptions() throw(Exception)
     {
 
@@ -168,9 +168,9 @@ public:
 
         // Create numerical method for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
-        
+
         double dt = 0.01;
-        
+
         p_fe_method->SetCellPopulation(&cell_population);
         p_fe_method->SetForceCollection(&force_collection);
 
@@ -181,24 +181,26 @@ public:
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
-     
-        // Update positions and check the answer   
+
+        // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
         for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
-            
+
             double damping =  cell_population.GetDampingConstant(j);
             c_vector<double, 2> expectedLocation;
             expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            
+
             TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-6);
         }
     }
 
     void TestUpdateAllNodePositionsWithMeshBasedWithGhosts() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         HoneycombMeshGenerator generator(3, 3, 1);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -218,9 +220,9 @@ public:
 
         // Create numerical methods for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
-        
+
         double dt = 0.01;
-       
+
         p_fe_method->SetCellPopulation(&cell_population);
         p_fe_method->SetForceCollection(&force_collection);
 
@@ -231,8 +233,8 @@ public:
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
-     
-        // Update positions   
+
+        // Update positions
         p_fe_method->UpdateAllNodePositions(dt);
 
         //Check the answer (for cell associated nodes only)
@@ -242,7 +244,7 @@ public:
         {
             int j = cell_population.GetLocationIndexUsingCell(*cell_iter);
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
-            
+
             double damping =  cell_population.GetDampingConstant(j);
             c_vector<double, 2> expectedLocation;
             expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
@@ -276,9 +278,9 @@ public:
 
         // Create numerical method for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
-        
+
         double dt = 0.01;
-        
+
         p_fe_method->SetCellPopulation(&cell_population);
         p_fe_method->SetForceCollection(&force_collection);
 
@@ -289,18 +291,18 @@ public:
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
-     
-        // Update positions and check the answer   
+
+        // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
         for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
-            
+
             double damping =  cell_population.GetDampingConstant(j);
             c_vector<double, 2> expectedLocation;
             expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            
+
             TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         }
     }
@@ -331,9 +333,9 @@ public:
 
         // Create numerical method for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
-        
+
         double dt = 0.01;
-        
+
         p_fe_method->SetCellPopulation(&cell_population);
         p_fe_method->SetForceCollection(&force_collection);
 
@@ -344,19 +346,19 @@ public:
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
-     
+
         // Update positions and check the answer
-        // Currently this throws an error as not set up correctly as it is in a simulation #2087   
+        // Currently this throws an error as not set up correctly as it is in a simulation #2087
         TS_ASSERT_THROWS_THIS(p_fe_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
 
         // for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         // {
         //     c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
-            
+
         //     double damping =  cell_population.GetDampingConstant(j);
         //     c_vector<double, 2> expectedLocation;
         //     expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            
+
         //     TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         // }
     }
@@ -390,9 +392,9 @@ public:
 
         // Create numerical method for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
-        
+
         double dt = 0.01;
-        
+
         p_fe_method->SetCellPopulation(&cell_population);
         p_fe_method->SetForceCollection(&force_collection);
 
@@ -403,18 +405,18 @@ public:
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
-     
-        // Update positions and check the answer   
+
+        // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
         for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
-            
+
             double damping =  cell_population.GetDampingConstant(j);
             c_vector<double, 2> expectedLocation;
             expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            
+
             TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         }
     }
@@ -444,9 +446,9 @@ public:
 
         // Create numerical methods for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);
-        
+
         double dt = 0.01;
-        
+
         p_fe_method->SetCellPopulation(&cell_population);
         p_fe_method->SetForceCollection(&force_collection);
 
@@ -457,18 +459,18 @@ public:
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
         }
-     
-        // Update positions and check the answer   
+
+        // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
         for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
-            
+
             double damping =  cell_population.GetDampingConstant(j);
             c_vector<double, 2> expectedLocation;
             expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            
+
             TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
         }
     }

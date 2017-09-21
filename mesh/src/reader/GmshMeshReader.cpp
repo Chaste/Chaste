@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -265,12 +265,14 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
     return mNumFaces;
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 {
     NEVER_REACHED;
     //return mNumCableElements;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOrderOfElements()
@@ -296,12 +298,14 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaceAttributes() const
     return mNumFaceAttributes;
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElementAttributes() const
 {
     NEVER_REACHED;
     //return mNumCableElementAttributes;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::Reset()
@@ -393,11 +397,13 @@ ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
     return element_data;
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextCableElementData()
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
@@ -453,23 +459,29 @@ ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
     return face_data;
 }
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index)
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementData(unsigned index)
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
+// LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned index)
 {
     NEVER_REACHED;
 }
+// LCOV_EXCL_STOP
 
 // Explicit instantiation
 template class GmshMeshReader<0,1>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ const double HiornsAirwayWallFactory::mC1[] = {179380., 176033., 8531., 2232., 9
 const double HiornsAirwayWallFactory::mC2[] = {101.9786, 102.3, 9.31, 2.72, 0.893, 0.4415, 0.2264, 0.1289, 0.07906, 0.04733, 0.02941, 0.018297, 0.0115175, 0.009006, 0.004454616, 0.002782845, 0.00165941};
 
 
-HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
+HiornsAirwayWallFactory::HiornsAirwayWallFactory(bool useStrahlerOrder) : mpWalker(nullptr), mUseStrahlerOrder(useStrahlerOrder)
 {}
 
 HiornsAirwayWallFactory::~HiornsAirwayWallFactory()
@@ -118,11 +118,11 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,
     unsigned upper_generation = std::ceil(generation_factor);
 
     assert(lower_generation >= 0.0);
-    assert(upper_generation <= 16.0);   
-    
+    assert(upper_generation <= 16.0);
+
     double RIn = pElement->GetAttribute()/2.;  // Measured R values are fully inflated.  As a proxy for uninflated, we simply divide by 2 (for now...)
     double ROut = 1.1*RIn;  // For now, assume ROut is 10% higher than RIn
-    
+
     double mu = mmu[lower_generation] + (mmu[upper_generation] - mmu[lower_generation] )*(generation_factor - lower_generation);
     double phi1 = mphi1[lower_generation] + (mphi1[upper_generation] - mphi1[lower_generation] )*(generation_factor - lower_generation);
     double phi2 = mphi2[lower_generation] + (mphi2[upper_generation] - mphi2[lower_generation] )*(generation_factor - lower_generation);
@@ -130,7 +130,7 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,
     double C2 = mC2[lower_generation] + (mC2[upper_generation] - mC2[lower_generation] )*(generation_factor - lower_generation);
 
     HiornsAirwayWall* wall = CreateBasicAirwayWall();
-    
+
     wall->Setmu(mu);
     wall->Setphi1(phi1);
     wall->Setphi2(phi2);

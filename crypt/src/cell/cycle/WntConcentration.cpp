@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,12 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** Pointer to the single instance */
 template<unsigned DIM>
-WntConcentration<DIM>* WntConcentration<DIM>::mpInstance = NULL;
+WntConcentration<DIM>* WntConcentration<DIM>::mpInstance = nullptr;
 
 template<unsigned DIM>
 WntConcentration<DIM>* WntConcentration<DIM>::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new WntConcentration;
     }
@@ -53,7 +53,7 @@ WntConcentration<DIM>::WntConcentration()
     : mCryptLength(DOUBLE_UNSET),
       mLengthSet(false),
       mWntType(NONE),
-      mpCellPopulation(NULL),
+      mpCellPopulation(nullptr),
       mTypeSet(false),
       mConstantWntValueForTesting(0),
       mUseConstantWntValueForTesting(false),
@@ -62,7 +62,7 @@ WntConcentration<DIM>::WntConcentration()
       mCryptProjectionParameterB(2.0)
 {
     // Make sure there's only one instance - enforces correct serialization
-    assert(mpInstance == NULL);
+    assert(mpInstance == nullptr);
 }
 
 template<unsigned DIM>
@@ -76,7 +76,7 @@ void WntConcentration<DIM>::Destroy()
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 
@@ -88,7 +88,7 @@ double WntConcentration<DIM>::GetWntLevel(CellPtr pCell)
         return mConstantWntValueForTesting;
     }
 
-    assert(mpCellPopulation!=NULL);
+    assert(mpCellPopulation!=nullptr);
     assert(mTypeSet);
     assert(mLengthSet);
 
@@ -115,7 +115,7 @@ c_vector<double, DIM> WntConcentration<DIM>::GetWntGradient(CellPtr pCell)
     {
         return zero_vector<double>(DIM);
     }
-    assert(mpCellPopulation!=NULL);
+    assert(mpCellPopulation!=nullptr);
     assert(mTypeSet);
     assert(mLengthSet);
 
@@ -260,7 +260,7 @@ template<unsigned DIM>
 bool WntConcentration<DIM>::IsWntSetUp()
 {
     bool result = false;
-    if (mTypeSet && mLengthSet && mpCellPopulation!=NULL && mWntType!=NONE)
+    if (mTypeSet && mLengthSet && mpCellPopulation!=nullptr && mWntType!=NONE)
     {
         result = true;
     }

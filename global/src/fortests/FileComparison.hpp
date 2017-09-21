@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -267,10 +267,8 @@ public:
             // If that assertion tripped...
             if (failures > 0u && !mSuppressOutput)
             {
-// LCOV_EXCL_START
                 // Report the paths to the files
                 TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
-// LCOV_EXCL_STOP
             }
         }
 

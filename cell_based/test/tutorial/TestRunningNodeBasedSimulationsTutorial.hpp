@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -174,9 +174,11 @@ public:
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.
      *
-     * Alternatively to view in Paraview
-     * Load the file {{{/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd}}},
-     * and add glyphs to represent cells.  An option is to use 3D spherical glyphs and then make a planar cut.
+     * Alternatively, to view in Paraview, load the file {{{/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd}}}
+     * and add glyphs to represent cells. An option is to use 3D spherical glyphs and then make a planar cut.
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
+     *
      *
      *
      * EMPTYLINE

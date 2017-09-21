@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -198,13 +198,10 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
         double alpha_plus_pi_plus_epsilon = alpha + M_PI + mEpsilon;
 
         // Calculate sampling angles in the range (-pi,pi]
-
-        // LCOV_EXCL_START
         if (alpha_minus_epsilon <= -M_PI)
         {
             alpha_minus_epsilon += 2*M_PI;
         }
-        // LCOV_EXCL_STOP
         sampling_angles[i] = alpha_minus_epsilon;
 
         assert(sampling_angles[i] <= M_PI);
@@ -327,4 +324,9 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
     }
 
     return extremal_angles;
+}
+
+void DiscreteSystemForceCalculator::SetEpsilon(double epsilon)
+{
+    mEpsilon = epsilon;
 }

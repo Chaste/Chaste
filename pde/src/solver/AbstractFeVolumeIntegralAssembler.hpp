@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -139,6 +139,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
      */
+    // LCOV_EXCL_START
     virtual c_matrix<double,PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeMatrixTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
@@ -152,6 +153,7 @@ protected:
         NEVER_REACHED;
         return zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1));
     }
+    // LCOV_EXCL_STOP
 
     /**
      * @return the vector to be added to element stiffness vector
@@ -172,6 +174,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
+    // LCOV_EXCL_START
     virtual c_vector<double,PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeVectorTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
@@ -185,6 +188,7 @@ protected:
         NEVER_REACHED;
         return zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
     }
+    // LCOV_EXCL_STOP
 
 
     /**
@@ -264,11 +268,11 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         assemble_event = HeartEventHandler::ASSEMBLE_RHS;
     }
 
-    if (this->mAssembleMatrix && this->mMatrixToAssemble==NULL)
+    if (this->mAssembleMatrix && this->mMatrixToAssemble==nullptr)
     {
         EXCEPTION("Matrix to be assembled has not been set");
     }
-    if (this->mAssembleVector && this->mVectorToAssemble==NULL)
+    if (this->mAssembleVector && this->mVectorToAssemble==nullptr)
     {
         EXCEPTION("Vector to be assembled has not been set");
     }

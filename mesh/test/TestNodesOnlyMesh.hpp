@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,8 +66,19 @@ public:
         nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
+        // For coverage, give an attribute to one of the nodes
+        nodes[0]->AddNodeAttribute(9.81);
+
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        if (PetscTools::IsSequential())
+        {
+            // Check that node 0 has the correct attribute
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->HasNodeAttributes(), true);
+            TS_ASSERT_EQUALS(mesh.GetNode(0)->rGetNodeAttributes().size(), 1u);
+            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetNodeAttributes()[0], 9.81, 1e-4);
+        }
 
         unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
@@ -82,6 +93,25 @@ public:
             {
                 TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
+            }
+        }
+
+        if (PetscTools::IsSequential())
+        {
+            /*
+             * Check that other nodes do not have attributes.
+             *
+             * Note: since the radius of each node is set to 0.5 in
+             * NodesOnlyMesh::ConstructNodesWithoutMesh(), this means
+             * that every node in a NodeBasedCellPopulaton has called
+             * ConstructNodeAttributes(); however, rGetNodeAttributes()
+             * will return an empty vector unless any attributes have
+             * been set by the user.
+             */
+            for (unsigned i=1; i<7; i++)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->HasNodeAttributes(), true);
+                TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetNodeAttributes().size(), 0u);
             }
         }
 
@@ -399,6 +429,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_boxes);
+
+        // Coverage of rGetInitiallyOwnedNodes()
+        std::vector<bool>& r_nodes = mesh.rGetInitiallyOwnedNodes();
+        TS_ASSERT_EQUALS(r_nodes.size(), 5u);
     }
 
     void TestGetNextAvailableIndex()
@@ -849,8 +883,17 @@ public:
             NodesOnlyMesh<2> mesh;
             mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 543u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices().size(), 543u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices()[2], 2u);
             mesh.GetNode(0)->SetRadius(1.12);
             mesh.GetNode(1)->SetRadius(2.34);
+
+            // Delete a node in order to test re-indexing (nodes 3,4,5... should still be named 3,4,5...)
+            mesh.DeleteNode(2);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 542u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices().size(), 542u);
+            TS_ASSERT_EQUALS(mesh.GetAllNodeIndices()[2], 3u);
 
             TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(mesh.GetNode(1)->GetRadius(), 2.34, 1e-6);
@@ -882,7 +925,7 @@ public:
             NodesOnlyMesh<2>* p_nodes_only_mesh = dynamic_cast<NodesOnlyMesh<2>*>(p_mesh2);
 
             // Check we have the right number of nodes & elements
-            TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumNodes(), 543u);
+            TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumNodes(), 543u - 1u);
             TS_ASSERT_EQUALS(p_nodes_only_mesh->GetNumElements(), 0u);
 
             // Check some node co-ordinates
@@ -891,10 +934,23 @@ public:
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[0], 1.0, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[1], 0.0, 1e-6);
 
+            // Node with index 2 is not available
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(2), "Requested node 2 does not belong to process ");
+            // Test re-indexing - Node with index 3 still has index 3
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(3)->GetPoint()[0], 0.992114, 1e-6);
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(3)->GetPoint()[1], 0.125333, 1e-6);
+
             // Check some cell radii
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetRadius(), 2.34, 1e-6);
 
+            // Test that a newly added node gets the correct index (543)
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(543), "Requested node 543 does not belong to process ");
+            // Node that the index "2" here is fake.  The new node gets a fresh index
+            p_nodes_only_mesh->AddNode(new Node<2>(2, true, 0.12345678, 2.0)); // This node pointer is added to the mesh and deleted by the destructor
+            // Node with index 2 is still not available
+            TS_ASSERT_THROWS_CONTAINS(p_nodes_only_mesh->GetNode(2), "Requested node 2 does not belong to process ");
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(543)->GetPoint()[0], 0.12345678, 1e-8);
             // Tidy up
             delete p_mesh2;
         }

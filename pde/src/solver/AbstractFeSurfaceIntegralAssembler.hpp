@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,6 +86,7 @@ protected:
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rX The point in space
      */
+    // LCOV_EXCL_START
     virtual c_vector<double, PROBLEM_DIM*ELEMENT_DIM> ComputeVectorSurfaceTerm(
         const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
         c_vector<double, ELEMENT_DIM>& rPhi,
@@ -96,6 +97,7 @@ protected:
         NEVER_REACHED;
         return zero_vector<double>(ELEMENT_DIM*PROBLEM_DIM);
     }
+    // LCOV_EXCL_STOP
 
     /**
      * Calculate the contribution of a single surface element with Neumann

@@ -1,0 +1,7 @@
+			<Rate>1.23</Rate>
+			<MaxTransitGenerations>3</MaxTransitGenerations>
+			<StemCellG1Duration>0.813008</StemCellG1Duration>
+			<TransitCellG1Duration>0.813008</TransitCellG1Duration>
+			<SDuration>5</SDuration>
+			<G2Duration>4</G2Duration>
+			<MDuration>1</MDuration>

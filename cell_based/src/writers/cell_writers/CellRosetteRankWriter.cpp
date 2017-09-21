@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRosetteRankWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "Exception.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::CellRosetteRankWriter()
@@ -51,7 +50,7 @@ double CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(Ce
     // We first need to test that the cell population is vertex-based
     VertexBasedCellPopulation<SPACE_DIM>* p_vbcp = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(pCellPopulation);
 
-    if (p_vbcp == NULL)
+    if (p_vbcp == nullptr)
     {
         EXCEPTION("Rosettte rank is only associated with vertex-based cell populations");
     }

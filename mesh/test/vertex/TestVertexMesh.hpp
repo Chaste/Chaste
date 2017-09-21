@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -231,6 +231,9 @@ public:
         // as we only have a NOT-equals operator defined on the iterator).
         bool iter_is_not_at_end = (iter != empty_mesh.GetNodeIteratorEnd());
         TS_ASSERT_EQUALS(iter_is_not_at_end, false);
+
+        // Coverage of AbstractMesh::SetElementOwnerships()
+        TS_ASSERT_THROWS_NOTHING(empty_mesh.SetElementOwnerships());
     }
 
     void TestVertexElementIterator() throw (Exception)
@@ -463,6 +466,27 @@ public:
 
         TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 76u);
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 89u);
+
+        // Test the correct exception is thrown in other cases
+        VertexMeshReader<1,1> mesh_reader_11("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1,1> mesh_11;
+        TS_ASSERT_THROWS_THIS(mesh_11.ConstructFromMeshReader(mesh_reader_11),
+            "VertexMesh<1,1>::ConstructFromMeshReader() is not implemented");
+
+        VertexMeshReader<1,2> mesh_reader_12("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1,2> mesh_12;
+        TS_ASSERT_THROWS_THIS(mesh_12.ConstructFromMeshReader(mesh_reader_12),
+            "VertexMesh<1,2>::ConstructFromMeshReader() is not implemented");
+
+        VertexMeshReader<1,3> mesh_reader_13("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1,3> mesh_13;
+        TS_ASSERT_THROWS_THIS(mesh_13.ConstructFromMeshReader(mesh_reader_13),
+            "VertexMesh<1,3>::ConstructFromMeshReader() is not implemented");
+
+        VertexMeshReader<2,3> mesh_reader_23("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<2,3> mesh_23;
+        TS_ASSERT_THROWS_THIS(mesh_23.ConstructFromMeshReader(mesh_reader_23),
+            "VertexMesh<2,3>::ConstructFromMeshReader() is not implemented");
     }
 
     void TestMeshConstructionFromMeshReaderIndexedFromOne()

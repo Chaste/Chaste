@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomDirectionCentreBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "StepSizeException.hpp"
-#include "Warnings.hpp"
 #include "WildTypeCellMutationState.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -109,7 +108,16 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
 
     // Create a new node
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary
-    p_new_node->ClearAppliedForce(); // Incase velocity is ouptut on the same timestep as the cell has divided
+
+    // Clear the applied force on the new node, in case velocity is ouptut on the same timestep as this cell's division
+    p_new_node->ClearAppliedForce();
+
+    // Copy any node attributes from the parent node
+    if (this->GetNode(node_index)->HasNodeAttributes())
+    {
+        p_new_node->rGetNodeAttributes() = this->GetNode(node_index)->rGetNodeAttributes();
+    }
+
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
 
     // Update cells vector
@@ -187,7 +195,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
 {
     double length = norm_2(rDisplacement);
- 
+
     if ((length > this->mAbsoluteMovementThreshold) && (!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
     {
         std::ostringstream message;

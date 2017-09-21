@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "Exception.hpp"
 #include "CellLocationIndexWriter.hpp"
 
 template<unsigned DIM>
@@ -337,7 +336,7 @@ template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    if (this->mpVoronoiTessellation != NULL)
+    if (this->mpVoronoiTessellation != nullptr)
     {
         unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
         std::stringstream time;

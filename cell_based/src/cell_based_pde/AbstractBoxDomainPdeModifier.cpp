@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,11 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractBoxDomainPdeModifier.hpp"
-#include "AbstractCellPopulation.hpp"
-#include "TetrahedralMesh.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
-#include <boost/make_shared.hpp>
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -77,7 +74,7 @@ double AbstractBoxDomainPdeModifier<DIM>::GetStepSize()
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
 {
-	mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
+    mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>

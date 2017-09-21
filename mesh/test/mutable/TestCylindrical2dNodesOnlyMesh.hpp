@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -267,7 +267,7 @@ public:
         //Check nodes moved correctly
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 2.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 1.0, 1e-6);
-        
+
         p_mesh->Translate(-2.0,0.0);
 
         //Check nodes moved periodically

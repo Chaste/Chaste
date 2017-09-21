@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
  * A class to generate two daughter cell positions, one given by the
  * position of the dividing cell and the other specified in the
  * class constructor.
- * 
+ *
  * This helper class is used in TestMeshBasedCellPopulation.hpp and
  * TestNodeBasedCellPopulation.hpp.
  */

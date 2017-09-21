@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -260,8 +260,8 @@ AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abs
      * there may be lots of places where we should be using SPACE_DIM not ELEMENT_DIM.
      */
     assert(SPACE_DIM==ELEMENT_DIM);
-    assert(pMesh!=NULL);
-    assert(pBoundaryConditions!=NULL);
+    assert(pMesh!=nullptr);
+    assert(pBoundaryConditions!=nullptr);
 
     mpSolver = new SimplePetscNonlinearSolver;
     mWeAllocatedSolverMemory = true;
@@ -314,7 +314,7 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
 
     PetscVecTools::Finalise(residualVector);
 
-    ApplyDirichletConditions(currentGuess, residualVector, NULL);
+    ApplyDirichletConditions(currentGuess, residualVector, nullptr);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -328,7 +328,7 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
 
         PetscMatTools::SwitchWriteMode(*pJacobian);
 
-        ApplyDirichletConditions(currentGuess, NULL, pJacobian);
+        ApplyDirichletConditions(currentGuess, nullptr, pJacobian);
 
         PetscMatTools::Finalise(*pJacobian);
     }
@@ -408,7 +408,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 Vec AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve(Vec initialGuess,
                                                                                        bool useAnalyticalJacobian)
 {
-    assert(initialGuess != NULL);
+    assert(initialGuess != nullptr);
     mUseAnalyticalJacobian = useAnalyticalJacobian;
 
     PetscInt size_of_init_guess;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,6 +73,9 @@ public:
 
     void TestCellConstructor() throw(Exception)
     {
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(null_deleter());
+
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);

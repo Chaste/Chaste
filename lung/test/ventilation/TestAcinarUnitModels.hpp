@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -146,6 +146,12 @@ public:
         double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
 
         SimpleBalloonAcinarUnit acinus;
+
+        // Coverage
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+        acinus.SetStretchRatio(15.3);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+
         acinus.SetAirwayPressure(0.0);
         acinus.SetPleuralPressure(0.0);
         acinus.SetFlow(0.0);
@@ -198,16 +204,25 @@ public:
         TS_ASSERT_DELTA(ode_volume, -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(acinus.GetVolume(), -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(flow_integral, -compliance*pleural_pressure, 1e-8);
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
     void TestSimpleBalloonExplicitAcinarUnitInspiration() throw (Exception)
-   {
+    {
        double viscosity = 1.92e-5;               //Pa s
        double terminal_airway_radius = 0.05;   //m
        double terminal_airway_length  = 0.02;   //m
        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
 
        SimpleBalloonExplicitAcinarUnit acinus;
+
+       // Coverage
+       TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+       acinus.SetStretchRatio(15.3);
+       TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+
        acinus.SetAirwayPressure(0.0);
        acinus.SetPleuralPressure(0.0);
        acinus.SetFlow(0.0);
@@ -257,6 +272,9 @@ public:
 
            time_stepper.AdvanceOneTimeStep();
        }
+
+       // Coverage
+       TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
    }
 
     void TestSigmoidalAcinarUnitInspiration() throw (Exception)
@@ -272,6 +290,12 @@ public:
         double d = 300; //Pa (3.8 cmH2O)
 
         SigmoidalAcinarUnit acinus;
+
+        // Coverage
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+        acinus.SetStretchRatio(15.3);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+
         acinus.SetA(a);
         acinus.SetB(b);
         acinus.SetC(c);
@@ -287,7 +311,7 @@ public:
         TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);   //With no pressure change we expect no flow
         TS_ASSERT_DELTA(acinus.GetVolume(), 0.0, 1e-2); //With no pressure change we expect no volume change
 
-        //Setup corresponding ODE for testing.
+        // Setup corresponding ODE for testing
         MySigmoidalOde my_ode(terminal_airway_resistance,a,b,c,d);
         BackwardEulerIvpOdeSolver euler_solver(1);
         std::vector<double> initial_condition;
@@ -315,13 +339,20 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
     void TestSwan2012AcinarUnit() throw(Exception)
     {
         Swan2012AcinarUnit acinus;
 
-        //Test against corresponding ODE
+        // Coverage
+        TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 1.26, 1e-6);
+
+        // Test against corresponding ODE
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.005;   //m
         double terminal_airway_length  = 0.02;   //m
@@ -361,6 +392,10 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
+        TS_ASSERT_THROWS_NOTHING(acinus.SolveAndUpdateState(0.0, 1.0));
     }
 };
 #endif /*_TESTACINARUNITMODELS_HPP_*/

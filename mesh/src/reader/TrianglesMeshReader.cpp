@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,9 +79,9 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
       mReadContainingElementOfBoundaryElement(readContainingElementForBoundaryElements),
       mFilesAreBinary(false),
       mMeshIsHexahedral(false),
-      mNodeFileReadBuffer(NULL),
-      mElementFileReadBuffer(NULL),
-      mFaceFileReadBuffer(NULL),
+      mNodeFileReadBuffer(nullptr),
+      mElementFileReadBuffer(nullptr),
+      mFaceFileReadBuffer(nullptr),
       mNodePermutationDefined(false)
 {
     // Only linear and quadratic elements
@@ -96,9 +96,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        // LCOV_EXCL_START
-        assert(SPACE_DIM==ELEMENT_DIM);
-        // LCOV_EXCL_STOP
+        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerElement = (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2;
     }
 
@@ -108,9 +106,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        // LCOV_EXCL_START
-        assert(SPACE_DIM==ELEMENT_DIM);
-        // LCOV_EXCL_STOP
+        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerBoundaryElement = ELEMENT_DIM*(ELEMENT_DIM+1)/2;
     }
 
@@ -280,7 +276,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
     {
         ret_indices.resize(mNodesPerBoundaryElement);
 
-        assert(ELEMENT_DIM != 0); //Covered in earlier exception, but needed in loop guard here.
+        assert(ELEMENT_DIM != 0); // LCOV_EXCL_LINE //Covered in earlier exception, but needed in loop guard here.
         do
         {
             face_data.AttributeValue = 1.0; // If an attribute is not read this stays as one, otherwise overwritten.
@@ -936,7 +932,7 @@ std::string TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMeshFileBaseName()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1);    // LCOV_EXCL_LINE
     mNumFaceAttributes = 0;
     if (!mOneDimBoundary.empty())
     {

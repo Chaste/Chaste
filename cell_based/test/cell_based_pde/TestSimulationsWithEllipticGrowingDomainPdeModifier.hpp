@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -456,6 +456,12 @@ public:
         // Eventually the number of cells will be less than the spatial dimension and an exception
         // will be thrown.
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "The number of nodes must exceed the spatial dimension.");
+
+        // Avoid memory leaks
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 };
 

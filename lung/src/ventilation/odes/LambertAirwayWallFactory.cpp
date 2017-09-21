@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ const double LambertAirwayWallFactory::mN2[] = {10.0,10.0,10.0,10.0,10.0,10.0,10
 
 const double LambertAirwayWallFactory::mMaxGeneration = 16;
 
-LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
+LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWalker(nullptr), mUseStrahlerOrder(useStrahlerOrder)
 {}
 
 LambertAirwayWallFactory::~LambertAirwayWallFactory()

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -203,7 +203,7 @@ public:
      * In the second test, similar to the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
      * in which we use
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model. However here we impose periodic boundaries.
-     * THe only differnece in this test is the generation of the mesh
+     * The only difference in this test is the generation of the mesh
      */
     void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
     {
@@ -306,6 +306,9 @@ public:
     * After opening Paraview, load the file {{{results.pvd}}}, then click "Apply" in the object inspector panel.
     * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
     * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
+    *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
     *
     * EMPTYLINE
     *

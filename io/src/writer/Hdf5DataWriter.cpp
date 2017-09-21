@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,10 +72,10 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mNeedExtend(false),
       mUseMatrixForIncompleteData(false),
       mCurrentTimeStep(0),
-      mSinglePermutation(NULL),
-      mDoublePermutation(NULL),
-      mSingleIncompleteOutputMatrix(NULL),
-      mDoubleIncompleteOutputMatrix(NULL),
+      mSinglePermutation(nullptr),
+      mDoublePermutation(nullptr),
+      mSingleIncompleteOutputMatrix(nullptr),
+      mDoubleIncompleteOutputMatrix(nullptr),
       mUseOptimalChunkSizeAlgorithm(true),
       mNumberOfChunks(0),
       mChunkTargetSize(0x20000), // 128 K
@@ -153,7 +153,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             hid_t attribute_type  = H5Aget_type(attribute_id);
             hid_t attribute_space = H5Aget_space(attribute_id);
             hsize_t attr_dataspace_dim;
-            H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, NULL);
+            H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, nullptr);
             unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
             assert(num_columns == mDatasetDims[2]); // I think...
 
@@ -189,7 +189,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             // How many time steps have been written so far?
             hid_t timestep_dataspace = H5Dget_space(mUnlimitedDatasetId);
             hsize_t num_timesteps;
-            H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, NULL);
+            H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, nullptr);
             H5Sclose(timestep_dataspace);
             mCurrentTimeStep = (long)num_timesteps - 1;
             mCacheFirstTimeStep = mCurrentTimeStep + 1;
@@ -461,8 +461,8 @@ void Hdf5DataWriter::DefineFixedDimensionUsingMatrix(const std::vector<unsigned>
     ComputeIncompleteOffset();
 
     // Make sure we've not done it already
-    assert(mSingleIncompleteOutputMatrix == NULL);
-    assert(mDoubleIncompleteOutputMatrix == NULL);
+    assert(mSingleIncompleteOutputMatrix == nullptr);
+    assert(mDoubleIncompleteOutputMatrix == nullptr);
     PetscTools::SetupMat(mSingleIncompleteOutputMatrix,   mFileFixedDimensionSize,   mDataFixedDimensionSize, 2,  mNumberOwned,  mHi - mLo);
     PetscTools::SetupMat(mDoubleIncompleteOutputMatrix, 2*mFileFixedDimensionSize, 2*mDataFixedDimensionSize, 4,  2*mNumberOwned, 2*(mHi - mLo));
 
@@ -629,7 +629,7 @@ void Hdf5DataWriter::EndDefineMode()
     // Create dataspace for the name, unit attribute
     const unsigned MAX_STRING_SIZE = 100;
     hsize_t columns[1] = {mVariables.size()};
-    hid_t colspace = H5Screate_simple(1, columns, NULL);
+    hid_t colspace = H5Screate_simple(1, columns, nullptr);
 
     // Create attribute for variable names
     char* col_data = (char*) malloc(mVariables.size() * sizeof(char) * MAX_STRING_SIZE);
@@ -658,7 +658,7 @@ void Hdf5DataWriter::EndDefineMode()
 
     // Create "boolean" attribute telling the data to be incomplete or not
     columns[0] = 1;
-    colspace = H5Screate_simple(1, columns, NULL);
+    colspace = H5Screate_simple(1, columns, nullptr);
     attr = H5Acreate(mVariablesDatasetId, "IsDataComplete", H5T_NATIVE_UINT, colspace,
                      H5P_DEFAULT, H5P_DEFAULT);
 
@@ -674,7 +674,7 @@ void Hdf5DataWriter::EndDefineMode()
         // We need to write a map
         // Create "unsigned" attribute with the map
         columns[0] = mFileFixedDimensionSize;
-        colspace = H5Screate_simple(1, columns, NULL);
+        colspace = H5Screate_simple(1, columns, nullptr);
         attr = H5Acreate(mVariablesDatasetId, "NodeMap", H5T_NATIVE_UINT, colspace,
                          H5P_DEFAULT, H5P_DEFAULT);
 
@@ -715,7 +715,7 @@ void Hdf5DataWriter::EndDefineMode()
 
         // Create the dataspace for the attribute
         hsize_t one = 1;
-        hid_t one_column_space = H5Screate_simple(1, &one, NULL);
+        hid_t one_column_space = H5Screate_simple(1, &one, nullptr);
 
         // Create an attribute for the time unit
         hid_t unit_attr = H5Acreate(mUnlimitedDatasetId, "Unit", string_type, one_column_space,
@@ -752,7 +752,7 @@ void Hdf5DataWriter::EndDefineMode()
     hid_t long_string_type = H5Tcopy(H5T_C_S1);
     H5Tset_size(long_string_type, MAX_PROVENANCE_STRING_SIZE );
     hsize_t prov_columns[1] = {1};
-    hid_t provenance_space = H5Screate_simple(1, prov_columns, NULL);
+    hid_t provenance_space = H5Screate_simple(1, prov_columns, nullptr);
     char* provenance_data = (char*) malloc(sizeof(char) * MAX_PROVENANCE_STRING_SIZE);
     assert( ChasteBuildInfo::GetProvenanceString().length() < MAX_PROVENANCE_STRING_SIZE);
 
@@ -804,7 +804,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     Vec output_petsc_vector;
 
     // Decide what to write
-    if (mSinglePermutation == NULL)
+    if (mSinglePermutation == nullptr)
     {
         // No permutation - just write
         output_petsc_vector = petscVector;
@@ -824,13 +824,13 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned};
-        memspace = H5Screate_simple(1, v_size, NULL);
+        memspace = H5Screate_simple(1, v_size, nullptr);
 
         hsize_t count[DATASET_DIMS] = {1, mNumberOwned, 1};
         hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(variableID)};
 
         hyperslab_space = H5Dget_space(mVariablesDatasetId);
-        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset_dims, NULL, count, NULL);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset_dims, nullptr, count, nullptr);
     }
     else
     {
@@ -967,7 +967,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     Vec output_petsc_vector;
 
     // Decide what to write
-    if (mDoublePermutation == NULL)
+    if (mDoublePermutation == nullptr)
     {
         // No permutation - just write
         output_petsc_vector = petscVector;
@@ -986,7 +986,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned*NUM_STRIPES};
-        memspace = H5Screate_simple(1, v_size, NULL);
+        memspace = H5Screate_simple(1, v_size, nullptr);
 
         hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(firstVariableID)};
         hsize_t stride[DATASET_DIMS] = {1, 1, 1};//we are imposing contiguous variables, hence the stride is 1 (3rd component)
@@ -1112,14 +1112,14 @@ void Hdf5DataWriter::WriteCache()
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mDataCache.size()};
-        memspace = H5Screate_simple(1, v_size, NULL);
+        memspace = H5Screate_simple(1, v_size, nullptr);
 
         hsize_t start[DATASET_DIMS] = {mCacheFirstTimeStep, mOffset, 0};
         hsize_t count[DATASET_DIMS] = {mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2]};
         assert((mCurrentTimeStep-mCacheFirstTimeStep)*mNumberOwned*mDatasetDims[2] == mDataCache.size()); // Got size right?
 
         hyperslab_space = H5Dget_space(mVariablesDatasetId);
-        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, NULL, count, NULL);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, nullptr, count, nullptr);
     }
     else
     {
@@ -1165,13 +1165,13 @@ void Hdf5DataWriter::PutUnlimitedVariable(double value)
     }
 
     hsize_t size[1] = {1};
-    hid_t memspace = H5Screate_simple(1, size, NULL);
+    hid_t memspace = H5Screate_simple(1, size, nullptr);
 
     // Select hyperslab in the file.
     hsize_t count[1] = {1};
     hsize_t offset[1] = {mCurrentTimeStep};
     hid_t hyperslab_space = H5Dget_space(mUnlimitedDatasetId);
-    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, NULL, count, NULL);
+    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
     H5Dwrite(mUnlimitedDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, H5P_DEFAULT, &value);
 
@@ -1342,8 +1342,8 @@ bool Hdf5DataWriter::ApplyPermutation(const std::vector<unsigned>& rPermutation,
         }
     }
     // Make sure we've not done it already
-    assert(mSinglePermutation == NULL);
-    assert(mDoublePermutation == NULL);
+    assert(mSinglePermutation == nullptr);
+    assert(mDoublePermutation == nullptr);
     PetscTools::SetupMat(mSinglePermutation,   mDataFixedDimensionSize,   mDataFixedDimensionSize, 2, mHi - mLo, mHi - mLo);
     PetscTools::SetupMat(mDoublePermutation, 2*mDataFixedDimensionSize, 2*mDataFixedDimensionSize, 4, 2*(mHi - mLo), 2*(mHi - mLo));
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x

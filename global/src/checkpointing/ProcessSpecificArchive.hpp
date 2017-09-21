@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,7 +71,7 @@ public:
     /** @return the stored secondary archive for this process. */
     static Archive* Get(void)
     {
-        if (mpArchive == NULL)
+        if (mpArchive == nullptr)
         {
             EXCEPTION("A ProcessSpecificArchive has not been set up.");
         }

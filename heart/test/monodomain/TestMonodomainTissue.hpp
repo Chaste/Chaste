@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -150,6 +150,12 @@ public:
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);
+
+        // Coverage
+        TS_ASSERT_THROWS_THIS(cell_factory.FillInCellularTransmuralAreas(),
+              "To get here you have probably asked for Epi/Mid/Endo CellularHeterogeneities in your HeartConfig "
+              "options or configuration .xml file, to use this you will need to provide a method"
+              " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
 
         // Stimulus function to use at node 0. Node 1 is not stimulated.
         boost::shared_ptr<SimpleStimulus> p_stimulus = cell_factory.GetStimulus();

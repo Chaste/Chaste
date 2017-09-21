@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,7 +105,7 @@ SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleNonlinearEllipticSol
     :  AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions),
        mpNonlinearEllipticPde(pPde)
 {
-    assert(pPde!=NULL);
+    assert(pPde!=nullptr);
 }
 
 // Explicit instantiation

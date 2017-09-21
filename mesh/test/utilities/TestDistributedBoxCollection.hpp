@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1202,9 +1202,9 @@ public:
 
                 for (unsigned i=0; i<nodes.size(); i++)
                 {
-                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
                     TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-                }   
+                }
 
                 std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                 pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
@@ -1282,7 +1282,7 @@ public:
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
                                                            neighbours_should_be[node_index].end());
                             TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
-                        }   
+                        }
 
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
@@ -1327,7 +1327,7 @@ public:
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
                                                            neighbours_should_be[node_index].end());
                             TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
-                        }   
+                        }
 
                         break;
                     }
@@ -1634,7 +1634,7 @@ public:
         {
             if (box_collection.IsBoxOwned(i))
             {
-                std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+                std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
                 TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
             }
         }
@@ -1773,8 +1773,8 @@ public:
                 neighbours_should_be.insert(7);
                 neighbours_should_be.insert(8);
 
-                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end()); 
-                TS_ASSERT_EQUALS(neighbours_of_4, expected); 
+                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end());
+                TS_ASSERT_EQUALS(neighbours_of_4, expected);
             }
         }
         /* Test the all node neighbours have been calculated on 3 processes */
@@ -1793,7 +1793,7 @@ public:
                 neighbours_should_be.insert(7);
                 neighbours_should_be.insert(8);
 
-                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end()); 
+                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end());
                 TS_ASSERT_EQUALS(neighbours_of_4, expected);
             }
         }
@@ -1911,9 +1911,9 @@ public:
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end()); 
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
-        }  
+        }
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));

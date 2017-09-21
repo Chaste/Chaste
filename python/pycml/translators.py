@@ -1,7 +1,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -518,7 +518,9 @@ class CellMLTranslator(object):
                      self.v_index, ')')
         self.open_block()
         self.writeln('mpStimulus = stim;\n')
-        for var in self.state_vars:
+        
+        for i, var in enumerate(self.state_vars):
+            self.writeln('// Y[', str(i), ']:')
             self.writeln('mVariableNames.push_back("', var.name, '");')
             self.writeln('mVariableUnits.push_back("', var.units, '");')
             init_val = getattr(var, u'initial_value', None)
@@ -2279,7 +2281,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Private data
         self.writeln('private:', indent_level=0)
         self.writeln('/** The single instance of the class */')
-        self.writeln('static std::auto_ptr<', self.lt_class_name, '> mpInstance;\n')
+        self.writeln('static std::shared_ptr<', self.lt_class_name, '> mpInstance;\n')
         if self.row_lookup_method:
             self.output_lut_row_lookup_memory()
         self.output_lut_declarations()
@@ -2287,7 +2289,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.set_indent(0)
         self.writeln('};\n')
         # Define the instance pointer
-        self.writeln('std::auto_ptr<', self.lt_class_name, '> ', self.lt_class_name, '::mpInstance;')
+        self.writeln('std::shared_ptr<', self.lt_class_name, '> ', self.lt_class_name, '::mpInstance;')
         self.writeln()
         return
 
@@ -3276,7 +3278,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         def output_var(vector, var):
             self.writeln('this->m', vector, 'Names.push_back("', self.var_display_name(var), '");')
             self.writeln('this->m', vector, 'Units.push_back("', var.units, '");')
-        for var in self.state_vars:
+        for i, var in enumerate(self.state_vars):
+            self.output_comment('rY[', str(i) ,']:')
             output_var('Variable', var)
             init_val = getattr(var, u'initial_value', None)
             if init_val is None:
@@ -3288,12 +3291,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('this->mInitialConditions.push_back(', init_val, ');',
                        init_comm, '\n')
         # Model parameters
-        for var in self.cell_parameters:
+        for i,var in enumerate(self.cell_parameters):
             if var.get_type() == VarTypes.Constant:
+                self.output_comment('mParameters[', str(i), ']:')
                 output_var('Parameter', var)
                 self.writeln()
         # Derived quantities
-        for var in self.derived_quantities:
+        for i,var in enumerate(self.derived_quantities):
+            self.output_comment('Derived Quantity index [', str(i), ']:')
             output_var('DerivedQuantity', var)
             self.writeln()
         self.output_model_attributes()
@@ -4760,7 +4765,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     binary_ops.update({'rem': '%'})
     nary_ops = CellMLToChasteTranslator.nary_ops.copy()
     nary_ops.update({'and': 'and', 'or': 'or'})
-    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log', 'exp': 'math.exp',
+    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log10', 'exp': 'math.exp',
                     'floor': 'math.floor', 'ceiling': 'math.ceil',
                     'factorial': 'factorial', # Needs external definition
                     'not': 'not',
@@ -4863,7 +4868,17 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         for name in vector_names:
             vector_outputs = cellml_metadata.find_variables(self.model, prop, name)
             assert len(vector_outputs) > 0
-            vector_outputs.sort(key=lambda v: self.var_display_name(v))
+            if name == 'state_variable':
+                # Special case to ensure the ordering as an output matches the state vector in the ODE system
+                def get_state_index(v):
+                    """Find the index of the state variable corresponding to this variable, which may be units converted."""
+                    v = v.get_source_variable(recurse=True)
+                    if v.get_type() is VarTypes.Computed:
+                        v = v.get_dependencies()[0].get_dependencies()[0]
+                    return self.state_vars.index(v)
+                vector_outputs.sort(key=get_state_index)
+            else:
+                vector_outputs.sort(key=lambda v: self.var_display_name(v))
             self._vector_outputs[name] = vector_outputs
         # Find model parameters that can be set from the protocol
         self.cell_parameters = filter(

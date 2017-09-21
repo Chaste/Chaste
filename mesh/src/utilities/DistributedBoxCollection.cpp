@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     // Periodicity only works in 2d
     if (isPeriodicInX)
     {
-        assert(DIM==2);
+        assert(DIM==2);    // LCOV_EXCL_LINE
     }
 
     // If the domain size is not 'divisible' (i.e. fmod(width, box_size) > 0.0) we swell the domain to enforce this.

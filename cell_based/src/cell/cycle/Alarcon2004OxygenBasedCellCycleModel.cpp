@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 
 #include "CellLabel.hpp"
-#include "Exception.hpp"
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
@@ -80,7 +79,7 @@ AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleMod
 void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
     AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
     // Keep the oxygen concentration the same but reset everything else
@@ -93,8 +92,8 @@ void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 
 void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
     mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled);

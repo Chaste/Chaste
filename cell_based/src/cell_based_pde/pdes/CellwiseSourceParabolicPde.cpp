@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CellwiseSourceParabolicPde.hpp"
-#include "Exception.hpp"
 
 template<unsigned DIM>
 CellwiseSourceParabolicPde<DIM>::CellwiseSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
@@ -60,12 +59,14 @@ double CellwiseSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const Cha
     return mDuDtCoefficient;
 }
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
     NEVER_REACHED;
     return 0.0;
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)

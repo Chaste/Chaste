@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -182,7 +182,7 @@ void DynamicallyLoadableLr91::EvaluateYDerivatives(double time,
     }
     else
     {
-    	// LCOV_EXCL_START
+        // LCOV_EXCL_START
         time_dependent_potassium_current_Xi_gate_Xi = 1.0;
         // LCOV_EXCL_STOP
     }
@@ -255,7 +255,7 @@ double DynamicallyLoadableLr91::GetIIonic(const std::vector<double>* pStateVaria
     }
     else
     {
-    	// LCOV_EXCL_START
+        // LCOV_EXCL_START
         time_dependent_potassium_current_Xi_gate_Xi = 1.0;
         // LCOV_EXCL_STOP
     }
@@ -345,7 +345,7 @@ void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise(void)
     this->mVariableUnits.push_back("");
     this->mInitialConditions.push_back(0.00187018);
 
-    this->mVariableNames.push_back("CaI");
+    this->mVariableNames.push_back("cytosolic_calcium_concentration");
     this->mVariableUnits.push_back("mMol");
     this->mInitialConditions.push_back(0.0002);
 

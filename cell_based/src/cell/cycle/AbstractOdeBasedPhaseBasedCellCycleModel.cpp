@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 AbstractOdeBasedPhaseBasedCellCycleModel::AbstractOdeBasedPhaseBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
@@ -79,7 +76,7 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::SetBirthTime(double birthTime)
 
 void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
 {
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     double current_time = SimulationTime::Instance()->GetTime();
 

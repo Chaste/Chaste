@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -196,7 +196,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
     out_stream p_regions_file, p_thickness_file, p_ave_thickness_file;
 
     //Make sure that only the master process writes the log files if requested.
-    bool logInfo = PetscTools::AmMaster() & mLogInfo;
+    bool logInfo = PetscTools::AmMaster() && mLogInfo;
 
     if (logInfo)
     {

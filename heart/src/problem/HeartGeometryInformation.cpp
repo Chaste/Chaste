@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -262,7 +262,8 @@ HeartRegionType HeartGeometryInformation<SPACE_DIM>::GetHeartRegion(unsigned nod
         }
     }
 
-    return UNKNOWN;
+    NEVER_REACHED;
+    return UNKNOWN; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>
@@ -317,7 +318,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
 
     // gcc wants to see a return statement at the end of the method.
     NEVER_REACHED;
-    return 0.0;
+    return 0.0; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>

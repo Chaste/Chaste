@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -722,6 +722,10 @@ public :
         // towards the end
         TS_ASSERT_DELTA(times[100000],1000,1e-3);
         TS_ASSERT_DELTA(active_tensions[100000],0.2496,1e-2);
+
+        // Coverage
+        nash_model.RunDoNotUpdate(0,dt,dt);
+        TS_ASSERT_DELTA(nash_model.GetNextActiveTension(),active_tensions.back(),1e-4);
     }
 
     void TestFakeBathContractionModel() throw(Exception)

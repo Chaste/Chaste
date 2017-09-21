@@ -135,6 +135,11 @@
     rdfs:label "Basic Chaste metadata" ;
     rdfs:comment "Core annotations needed for a model to work well with the Chaste simulator." .
 
+:BufferingTerm
+    a :Category ;
+    rdfs:label "Buffering" ;
+    rdfs:comment "Annotations needed for studying and altering ionic buffering." .
+
 # ======================================================================
 # General labels
 # ======================================================================
@@ -369,6 +374,29 @@
     a :ExtracellularConcentration ;
     rdfs:label "Concentration of potassium in the bath" ;
     rdfs:comment "TODO!" .
+    
+# =====================================================
+# BUFFERING TERMS
+# =====================================================
+
+:cytosolic_calcium_flux_scaling_from_intrinsic_buffers
+    a :Annotation ;
+    a :BufferingTerm ;
+    rdfs:label "Scaling factor for calcium fluxes in the cytosol due to buffering" ;
+    rdfs:comment "This term annotates how calcium fluxes in the cytosol are scaled due to intrinsic (natural) buffering" .
+
+:submembrane_space_calcium_flux_scaling_from_intrinsic_buffers
+    a :Annotation ;
+    a :BufferingTerm ;
+    rdfs:label "Scaling factor for calcium fluxes in the submembrane space due to buffering" ;
+    rdfs:comment "Some models have a separate compartment underlying the entire cell membrane, distinct from the dyadic sub-space. This term annotates how calcium fluxes here are scaled due to buffering" .
+
+:dyadic_space_calcium_flux_scaling_from_intrinsic_buffers
+    a :Annotation ;
+    a :BufferingTerm ;
+    rdfs:label "Scaling factor for calcium fluxes in the dyadic sub-space due to buffering" ;
+    rdfs:comment "Some models also have a separate dyadic sub-space (cytosol between JSR and t-tubules). This term annotates how calcium fluxes here are scaled due to buffering" .
+    
 
 # =====================================================
 # CURRENTS

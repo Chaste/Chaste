@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -137,9 +137,9 @@ public:
     /**
      * Add a contribution to the force vector
      *
-     * @param appliedForceContribution the contribution to add to mAppliedForce
+     * @param rForceContribution the contribution to add to mAppliedForce
      */
-    void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& appliedForceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution);
 
     /**
      * Set mAppliedForce to a zero vector.

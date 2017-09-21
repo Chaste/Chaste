@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,6 +83,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TenTusscher2006EpiBackwardEuler.hpp"
 #include "DiFrancescoNoble1985.hpp"
 #include "Maleckar2008.hpp"
+
 #include "ArchiveLocationInfo.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -454,6 +455,8 @@ public:
         {
             TS_ASSERT_EQUALS(lr91_ode_system.rGetStateVariables()[i], inits[i]);
         }
+
+        TS_ASSERT_DELTA(lr91_ode_system.GetParameter(1u),23,1e-12);
     }
 
     void TestSolverForLR91WithRegularStimulus(void) throw (Exception)

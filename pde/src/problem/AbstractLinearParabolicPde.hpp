@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -102,7 +102,7 @@ public:
      */
     virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
                                      double u,
-                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr)=0;
 
     /**
      * @return computed source term at a node.

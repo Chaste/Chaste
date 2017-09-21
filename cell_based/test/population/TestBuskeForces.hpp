@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,14 +65,16 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 20.0);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
+        mesh.GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -98,7 +100,7 @@ public:
         TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), 1.5, 1e-6);
         TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 1.0, 1e-6);
 
-        buske_adhesive_force.SetCutOffLength(DBL_MAX);
+        buske_adhesive_force.SetCutOffLength(5.0);
         buske_adhesive_force.SetAdhesionEnergyParameter(200);
 
         // Test node force calculation
@@ -128,6 +130,15 @@ public:
 
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
@@ -138,14 +149,16 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 20.0);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
+        mesh.GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -171,7 +184,7 @@ public:
         TS_ASSERT_DELTA(buske_elastic_force.GetCutOffLength(), 1.5, 1e-6);
         TS_ASSERT_DELTA(buske_elastic_force.GetDeformationEnergyParameter(), 1.0, 1e-6);
 
-        buske_elastic_force.SetCutOffLength(DBL_MAX);
+        buske_elastic_force.SetCutOffLength(5.0);
         buske_elastic_force.SetDeformationEnergyParameter(4.0/3.0);
 
         // Test node force calculation
@@ -202,6 +215,15 @@ public:
 
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 

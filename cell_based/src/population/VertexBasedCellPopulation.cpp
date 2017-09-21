@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,11 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
-#include <boost/foreach.hpp>
-#include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
-#include "ChasteSyscalls.hpp"
-#include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "StepSizeException.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -60,7 +56,8 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
                                           const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
@@ -84,7 +81,8 @@ template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 }
@@ -263,17 +261,20 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
-    {   
-        rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
-        
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+    if(mRestrictVertexMovement)
+    {
+        if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
+        {
+            rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
 
-        double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+            std::ostringstream message;
+            message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+            message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
 
-        throw StepSizeException(suggested_step, message.str(), false);
+            double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+
+            throw StepSizeException(suggested_step, message.str(), false);
+        }
     }
 }
 
@@ -591,7 +592,7 @@ template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
-    assert(DIM == 2);
+    assert(DIM == 2);                        // LCOV_EXCL_LINE - disappears at compile time.
     assert(PetscTools::IsSequential());
 
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
@@ -824,6 +825,19 @@ void VertexBasedCellPopulation<DIM>::SimulationSetupHook(AbstractCellBasedSimula
 {
     MAKE_PTR_ARGS(T2SwapCellKiller<DIM>, p_t2_swap_cell_killer, (this));
     pSimulation->AddCellKiller(p_t2_swap_cell_killer);
+}
+
+
+template<unsigned DIM>
+bool VertexBasedCellPopulation<DIM>::GetRestrictVertexMovementBoolean()
+{
+    return mRestrictVertexMovement;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restrictMovement)
+{
+    mRestrictVertexMovement = restrictMovement;
 }
 
 // Explicit instantiation

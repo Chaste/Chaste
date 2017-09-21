@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -388,6 +388,31 @@ public:
         p_simulation_time->IncrementTimeOneStep();
 
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
+    }
+
+    void TestAddNode() throw (Exception)
+    {
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
+
+        // Create a simple vertex-based mesh
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 68u);
+
+        Node<2>* p_node = new Node<2>(0, true, -15.0, 23.0);
+        cell_population.AddNode(p_node);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 69u);
     }
 
     void TestAddCellWithSimpleMesh() throw (Exception)

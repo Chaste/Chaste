@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,6 +58,26 @@ class Cell;
 
 /** Cells shouldn't be copied - it doesn't make sense.  So all access is via this pointer type. */
 typedef boost::shared_ptr<Cell> CellPtr;
+
+/**
+ * null_deleter means "doesn't delete" rather than "deletes nulls".
+ *
+ * Sometimes it is desirable to create a shared_ptr to an already existing object, so that the shared_ptr
+ * does not attempt to destroy the object when there are no more references left. As an example, the
+ * factory function:
+ *
+ * shared_ptr<X> createX();
+ * in certain situations may need to return a pointer to a statically allocated X instance.
+ *
+ * The solution is to use a custom deleter that does nothing:
+ */
+struct null_deleter
+{
+    /** Does not delete */
+    void operator()(void const *) const
+    {
+    }
+};
 
 /**
  * Cell is the basic container for all the biological information about a cell.
@@ -144,7 +164,7 @@ public:
      */
     Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
          AbstractCellCycleModel* pCellCycleModel,
-         AbstractSrnModel* pSrnModel=NULL,
+         AbstractSrnModel* pSrnModel=nullptr,
          bool archiving=false,
          CellPropertyCollection cellPropertyCollection=CellPropertyCollection());
 

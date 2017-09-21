@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -206,7 +206,7 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     the contents as for test_file.
     """
     if revision:
-        revision = ' at revision r' + str(revision)
+        revision = ' at revision [changeset:%s/git_repo]' % str(revision)
     output = []
     # Header
     output.append('This tutorial is automatically generated from the file ' + test_file_path + revision + '.\n')
@@ -255,6 +255,10 @@ if __name__ == '__main__':
         real_file_path = options.real_file_path
     else:
         real_file_path = test_file
+
+    # We're interested in the path relative to the root of the Chaste directory
+    chaste_build_dir_root = os.path.abspath(os.path.join(os.getcwd(), '..', '..', '..'))
+    real_file_path = os.path.relpath(test_file, chaste_build_dir_root)
     
     if test_file == '-':
         # Read from stdin (pipe mode)

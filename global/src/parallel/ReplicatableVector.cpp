@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,49 +44,49 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void ReplicatableVector::RemovePetscContext()
 {
-    if (mToAll != NULL)
+    if (mToAll != nullptr)
     {
         VecScatterDestroy(PETSC_DESTROY_PARAM(mToAll));
-        mToAll = NULL;
+        mToAll = nullptr;
     }
 
-    if (mReplicated != NULL)
+    if (mReplicated != nullptr)
     {
         PetscTools::Destroy(mReplicated);
-        mReplicated = NULL;
+        mReplicated = nullptr;
     }
 
-    if (mpData != NULL)
+    if (mpData != nullptr)
     {
         delete[] mpData;
-        mpData = NULL;
+        mpData = nullptr;
     }
 }
 
 // Constructors & destructors
 
 ReplicatableVector::ReplicatableVector()
-    : mpData(NULL),
+    : mpData(nullptr),
       mSize(0),
-      mToAll(NULL),
-      mReplicated(NULL)
+      mToAll(nullptr),
+      mReplicated(nullptr)
 {
 }
 
 ReplicatableVector::ReplicatableVector(Vec vec)
-    : mpData(NULL),
+    : mpData(nullptr),
       mSize(0),
-      mToAll(NULL),
-      mReplicated(NULL)
+      mToAll(nullptr),
+      mReplicated(nullptr)
 {
     ReplicatePetscVector(vec);
 }
 
 ReplicatableVector::ReplicatableVector(unsigned size)
-    : mpData(NULL),
+    : mpData(nullptr),
       mSize(0),
-      mToAll(NULL),
-      mReplicated(NULL)
+      mToAll(nullptr),
+      mReplicated(nullptr)
 {
     Resize(size);
 }
@@ -114,14 +114,15 @@ void ReplicatableVector::Resize(unsigned size)
     {
         mpData = new double[mSize];
     }
+// LCOV_EXCL_START
     catch(std::bad_alloc &badAlloc)
     {
-// LCOV_EXCL_START
         std::cout << "Failed to allocate a ReplicatableVector of size " << size  << std::endl;
         PetscTools::ReplicateException(true);
         throw badAlloc;
-// LCOV_EXCL_STOP
     }
+// LCOV_EXCL_STOP
+
     PetscTools::ReplicateException(false);
 }
 
@@ -167,7 +168,7 @@ void ReplicatableVector::ReplicatePetscVector(Vec vec)
     {
         Resize(size);
     }
-    if (mReplicated == NULL)
+    if (mReplicated == nullptr)
     {
         // This creates mToAll (the scatter context) and mReplicated (to store values)
         VecScatterCreateToAll(vec, &mToAll, &mReplicated);

@@ -1,3 +1,4 @@
+bidomain/TestBenchmarkPreconditionersForMeshIndependence.hpp
 bidomain/TestBidomainDistributedMesh.hpp
 bidomain/TestBidomainTissue.hpp
 bidomain/TestBidomainProblem.hpp
@@ -38,6 +39,8 @@ mechanics/TestNhsModelWithBackwardSolver.hpp
 monodomain/TestMonodomainStiffnessMatrixAssembler.hpp
 monodomain/TestMonodomainConductionVelocity.hpp
 monodomain/TestMonodomainProblem.hpp
+monodomain/TestMonodomainPurkinjeAssemblersAndSolver.hpp
+monodomain/TestMonodomainPurkinjeProblem.hpp
 monodomain/TestMonodomainFitzHughNagumo.hpp
 monodomain/TestMonodomainMassLumping.hpp
 monodomain/TestMonodomainTissue.hpp

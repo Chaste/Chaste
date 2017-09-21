@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,16 +60,16 @@ double LaPradAirwayWall::CalculatePressureRadiusResidual(double radius)
 {
 
     mTargetPressure = mAirwayPressure - mPleuralPressure;
-    
+
     double rin = radius;
-    
+
     double areaOfAirwayWall = M_PI*(mROut*mROut - mRIn*mRIn);
     double rout = sqrt(rin*rin + areaOfAirwayWall/M_PI);
     long double functionValues[10000];
     double rValues[10000];
     double pressure;
-            
-    for (int i = 0; i < 10000; i++) 
+
+    for (int i = 0; i < 10000; i++)
     {
 
         double RVal = mRIn + (double)i*(mROut - mRIn)/(10000. - 1.);
@@ -79,27 +79,27 @@ double LaPradAirwayWall::CalculatePressureRadiusResidual(double radius)
 
 
     pressure = (0.5*(functionValues[0] + functionValues[10000 - 1]));
-    for (int i = 1; i < (10000 - 1); i++) 
+    for (int i = 1; i < (10000 - 1); i++)
     {
         pressure = pressure + functionValues[i];
     }
     pressure = pressure*(rValues[1] - rValues[0]);
-    
-    double residual = mTargetPressure - pressure; 
-    
+
+    double residual = mTargetPressure - pressure;
+
     return residual;
-    
+
 }
 
 void LaPradAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
 {
-    
+
     double guess = (mRIn + mROut)/2.;
     double factor = 2.;
 
     Tolerance tol = 0.000001;
     boost::uintmax_t maxIterations = 500u;
-    
+
     std::pair<double, double> found = boost::math::tools::bracket_and_solve_root(boost::bind(&LaPradAirwayWall::CalculatePressureRadiusResidual, this, _1), guess, factor, false, tol, maxIterations);
     mDeformedAirwayRadius = found.first;
 }

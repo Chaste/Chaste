@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -113,14 +113,15 @@ void BidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             //initialise with the values of the default conductivity tensor
             hetero_extra_conductivities.resize(num_local_elements, extra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &r_bad_alloc)
         {
-// LCOV_EXCL_START
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-// LCOV_EXCL_STOP
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;

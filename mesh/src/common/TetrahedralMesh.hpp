@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -141,7 +141,7 @@ protected:
      *
      */
     template <class MESHER_IO>
-    void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=NULL);
+    void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=nullptr);
 
     /**
      * Import the mesh from an external mesher

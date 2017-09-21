@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -419,7 +419,7 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithI
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // CalculateInterpolationWeights hits an assertion otherwise
+    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM);  // LCOV_EXCL_LINE // CalculateInterpolationWeights hits an assertion otherwise
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;
     for (unsigned i=0; i<this->mElements.size(); i++)
@@ -485,8 +485,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned indexA, unsigned indexB)
 {
-    assert(SPACE_DIM == 2);
-    assert(SPACE_DIM == ELEMENT_DIM);
+    assert(SPACE_DIM == 2);             // LCOV_EXCL_LINE
+    assert(SPACE_DIM == ELEMENT_DIM);     // LCOV_EXCL_LINE
 
     double x_difference = this->mNodes[indexB]->rGetLocation()[0] - this->mNodes[indexA]->rGetLocation()[0];
     double y_difference = this->mNodes[indexB]->rGetLocation()[1] - this->mNodes[indexA]->rGetLocation()[1];
@@ -733,7 +733,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetJacobianForElement(unsigned ele
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const
 {
-    assert(ELEMENT_DIM <= SPACE_DIM);
+    assert(ELEMENT_DIM <= SPACE_DIM);     // LCOV_EXCL_LINE
     assert(elementIndex < this->mElementInverseJacobians.size());
     rInverseJacobian = this->mElementInverseJacobians[elementIndex];
     rJacobian = this->mElementJacobians[elementIndex];
@@ -743,7 +743,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsig
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const
 {
-    assert(ELEMENT_DIM < SPACE_DIM);
+    assert(ELEMENT_DIM < SPACE_DIM);     // LCOV_EXCL_LINE
     assert(elementIndex < this->mElementWeightedDirections.size());
     rWeightedDirection = this->mElementWeightedDirections[elementIndex];
     rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
@@ -761,18 +761,18 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::InitialiseTriangulateIo(triangulateio& mesherIo)
 {
     mesherIo.numberofpoints = 0;
-    mesherIo.pointlist = NULL;
+    mesherIo.pointlist = nullptr;
     mesherIo.numberofpointattributes = 0;
-    mesherIo.pointattributelist = (double *) NULL;
-    mesherIo.pointmarkerlist = (int *) NULL;
+    mesherIo.pointattributelist = (double *) nullptr;
+    mesherIo.pointmarkerlist = (int *) nullptr;
     mesherIo.numberofsegments = 0;
     mesherIo.numberofholes = 0;
     mesherIo.numberofregions = 0;
-    mesherIo.trianglelist = (int *) NULL;
-    mesherIo.triangleattributelist = (double *) NULL;
+    mesherIo.trianglelist = (int *) nullptr;
+    mesherIo.triangleattributelist = (double *) nullptr;
     mesherIo.numberoftriangleattributes = 0;
-    mesherIo.edgelist = (int *) NULL;
-    mesherIo.edgemarkerlist = (int *) NULL;
+    mesherIo.edgelist = (int *) nullptr;
+    mesherIo.edgemarkerlist = (int *) nullptr;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -824,7 +824,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
             new_index++;
         }
     }
-    if (elementList != NULL)
+    if (elementList != nullptr)
     {
         unsigned element_index = 0;
 
@@ -919,7 +919,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
          * Tetgen produces only boundary faces (set edgeMarkerList to NULL).
          * Triangle marks which edges are on the boundary.
          */
-        if (edgeMarkerList == NULL || edgeMarkerList[boundary_element_index] == 1)
+        if (edgeMarkerList == nullptr || edgeMarkerList[boundary_element_index] == 1)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
             for (unsigned j=0; j<ELEMENT_DIM; j++)
@@ -945,11 +945,17 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
                 this->mBoundaryElements.push_back(p_b_element);
                 next_boundary_element_index++;
             }
+            // LCOV_EXCL_START
             catch (Exception &)
             {
-                // Tetgen is feeding us lies  //Watch this space for coverage
+                // Tetgen is feeding us lies
+                /*
+                 *  Note: this code is covered in profiling (Test3dOffLatticeRepresentativeSimulation).
+                 *  It's hard to replicate Tetgen's behaviour with a unit test.
+                 */
                 assert(SPACE_DIM == 3);
             }
+            // LCOV_EXCL_STOP
         }
     }
 

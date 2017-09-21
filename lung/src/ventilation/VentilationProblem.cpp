@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VentilationProblem.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
-//#include "Timer.hpp"
 
 /**
  * Helper function for varying terminal fluxes in order to match terminal pressure boundary conditions
@@ -59,11 +57,11 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mFluxGivenAtInflow(false),
       mFluxGivenAtOutflow(false),
-      mTerminalInteractionMatrix(NULL),
+      mTerminalInteractionMatrix(nullptr),
       mNumNonZeroesPerRow(25u), //See note in header definition
-      mTerminalFluxChangeVector(NULL),
-      mTerminalPressureChangeVector(NULL),
-      mTerminalKspSolver(NULL)
+      mTerminalFluxChangeVector(nullptr),
+      mTerminalPressureChangeVector(nullptr),
+      mTerminalKspSolver(nullptr)
 {
     Initialise();
 }
@@ -176,7 +174,7 @@ void VentilationProblem::SetupIterativeSolver()
 {
     //double start = Timer::GetElapsedTime();
     mNumNonZeroesPerRow = std::min(mNumNonZeroesPerRow, mMesh.GetNumBoundaryNodes()-1);
-    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, NULL, &mTerminalInteractionMatrix);
+    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, nullptr, &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
 
@@ -326,7 +324,7 @@ ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure
 void VentilationProblem::SolveFromPressureWithSnes()
 {
     assert( !mFluxGivenAtInflow );  // It's not a direct solve
-    if (mTerminalInteractionMatrix == NULL)
+    if (mTerminalInteractionMatrix == nullptr)
     {
         SetupIterativeSolver();
     }
@@ -337,7 +335,7 @@ void VentilationProblem::SolveFromPressureWithSnes()
     // Set the residual creation function (direct solve flux->pressure followed by pressure matching)
     SNESSetFunction(snes, mTerminalPressureChangeVector /*residual*/ , &ComputeSnesResidual, this);
     // The approximate Jacobian has been precomputed so we are going to wing it
-    SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ NULL, this);
+    SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ nullptr, this);
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x
     SNESSetLagJacobian(snes, -1 /*Never rebuild Jacobian*/);
 #else
@@ -390,7 +388,7 @@ void VentilationProblem::SolveFromPressureWithSnes()
 
 void VentilationProblem::SolveIterativelyFromPressure()
 {
-    if (mTerminalInteractionMatrix == NULL)
+    if (mTerminalInteractionMatrix == nullptr)
     {
         SetupIterativeSolver();
     }

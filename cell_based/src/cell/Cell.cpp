@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,31 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestor.hpp"
 #include "CellId.hpp"
 #include "CellLabel.hpp"
-#include "CellPropertyRegistry.hpp"
 #include "DefaultCellProliferativeType.hpp"
 #include "NullSrnModel.hpp"
-#include "SimulationTime.hpp"
 #include "SmartPointers.hpp"
-
-/**
- * null_deleter means "doesn't delete" rather than "deletes nulls".
- *
- * Sometimes it is desirable to create a shared_ptr to an already existing object, so that the shared_ptr
- * does not attempt to destroy the object when there are no more references left. As an example, the
- * factory function:
- *
- * shared_ptr<X> createX();
- * in certain situations may need to return a pointer to a statically allocated X instance.
- *
- * The solution is to use a custom deleter that does nothing:
- */
-struct null_deleter
-{
-    /** Does not delete */
-    void operator()(void const *) const
-    {
-    }
-};
 
 Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
            AbstractCellCycleModel* pCellCycleModel,
@@ -86,7 +64,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         EXCEPTION("Cell is setting up a cell-cycle model but SimulationTime has not been set up");
     }
 
-    if (pCellCycleModel == NULL)
+    if (pCellCycleModel == nullptr)
     {
         EXCEPTION("Cell-cycle model is null");
     }
@@ -94,7 +72,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
 
     // Create a null srn model if none given
-    if (pSrnModel == NULL)
+    if (pSrnModel == nullptr)
     {
         pSrnModel = new NullSrnModel;
         mpSrnModel = pSrnModel;

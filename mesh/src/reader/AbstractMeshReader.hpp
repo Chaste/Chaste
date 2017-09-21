@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,6 +50,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 struct ElementData
 {
+    // Constructor to initialise default values, to prevent -Werror=maybe-uninitialized on some compilers
+    ElementData()
+            : NodeIndices(std::vector<unsigned>()),
+              AttributeValue(DOUBLE_UNSET),
+              ContainingElement(UNSIGNED_UNSET) {}
     std::vector<unsigned> NodeIndices; /**< Vector of Node indices owned by the element. */
     double AttributeValue; /**< Attribute value associated with the element. */
     unsigned ContainingElement; /**< Only applies to boundary elements: which element contains this boundary element. Only set if reader called with correct params */
@@ -233,16 +238,6 @@ public:
     {
     public:
         /**
-         * Default constructor for an iterator that doesn't point to anything.
-         */
-        ElementIterator()
-            : mIndex(UNSIGNED_UNSET),
-              mpIndices(NULL),
-              mpReader(NULL)
-        {
-        }
-
-        /**
          * Constructor for pointing to a specific item.
          *
          * Note that, in the case of an ASCII mesh file, this will actually
@@ -254,7 +249,7 @@ public:
          */
         ElementIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
-              mpIndices(NULL),
+              mpIndices(nullptr),
               mpReader(pReader)
         {
             CacheData(mIndex, true);
@@ -370,16 +365,6 @@ public:
     {
     public:
         /**
-         * Default constructor for an iterator that doesn't point to anything.
-         */
-        NodeIterator()
-            : mIndex(UNSIGNED_UNSET),
-              mpIndices(NULL),
-              mpReader(NULL)
-        {
-        }
-
-        /**
          * Constructor for pointing to a specific item.
          *
          * Note that, in the case of an ASCII mesh file, this will actually
@@ -391,7 +376,7 @@ public:
          */
         NodeIterator(unsigned index, AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
             : mIndex(index),
-              mpIndices(NULL),
+              mpIndices(nullptr),
               mpReader(pReader)
         {
             CacheData(mIndex, true);

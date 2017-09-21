@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,8 +47,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
- * A class to generate a division vector of length 
- * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points 
+ * A class to generate a division vector of length
+ * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation that points
  * in a random direction.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
