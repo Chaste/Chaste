@@ -101,7 +101,7 @@ void ImmersedBoundaryMorseInteractionForce<DIM>::AddImmersedBoundaryForceContrib
 
                     if (apical_lam)
                     {
-                        eff_well_depth *= 0.2;
+                        eff_well_depth *= 1.0;
                     }
                 }
 

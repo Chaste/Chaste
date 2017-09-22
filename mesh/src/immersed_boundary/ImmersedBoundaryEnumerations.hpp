@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  *  Various enumerations are specified for naming important concepts in certain immersed boundary simulations.
  */
-enum ImmersedBoundaryNodeRegionNames
+enum ImmersedBoundaryNodeRegionNames : unsigned
 {
     LEFT_APICAL_REGION,
     RIGHT_APICAL_REGION,
@@ -53,7 +53,7 @@ enum ImmersedBoundaryNodeRegionNames
     NO_REGION
 };
 
-enum ImmersedBoundaryElementCornerNames
+enum ImmersedBoundaryElementCornerNames : unsigned
 {
     LEFT_APICAL_CORNER,
     RIGHT_APICAL_CORNER,
