@@ -967,6 +967,11 @@ class CellMLTranslator(object):
         Generate a dictionary mapping tables to their index variables.
         """
         doc = self.doc
+        # Remove xml:base to work around Amara bug!
+        for elt in [doc, doc.model]:
+            if u'base' in getattr(elt, 'xml_attributes', {}):
+                print 'Delete base from', repr(elt)
+                del elt.xml_attributes[u'base']
         # Get list of suitable expressions
         doc.lookup_tables = doc.xml_xpath(u"//*[@lut:possible='yes']")
         doc.lookup_tables.sort(cmp=element_path_cmp)
