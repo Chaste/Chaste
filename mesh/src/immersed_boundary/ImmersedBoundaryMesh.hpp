@@ -107,6 +107,9 @@ protected:
     /** Vector of fluid sources used to balance those of the elements. */
     std::vector<FluidSource<SPACE_DIM>*> mBalancingFluidSources;
 
+    /** Array to store the three Kochanek parameters for spline interpolation */
+    std::array<double, 3> mKochanekParams;
+
     /**
      * Solve node mapping method. This overridden method is required
      * as it is pure virtual in the base class.
@@ -589,6 +592,12 @@ public:
      * @param the new value of mNeighbourDist
      */
     void SetNeighbourDist(double neighbourDist);
+
+    /** @return reference to mKochanekParams */
+    const std::array<double, 3>& rGetKochanekParams() const;
+
+    /** @param rKochanekParams the new array of Kochanek spline parameters */
+    void SetKochanekParams(const std::array<double, 3>& rKochanekParams);
 
     /**
      * ReMesh method that evenly redistributes nodes around each element and lamina.

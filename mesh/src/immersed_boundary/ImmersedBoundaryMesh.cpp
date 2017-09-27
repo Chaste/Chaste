@@ -160,6 +160,8 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         current_location += balancing_source_spacing;
     }
 
+    mKochanekParams = {{1.0, -1.0, 0.0}};
+
     this->mMeshChangesDuringSimulation = true;
 }
 
@@ -1663,14 +1665,14 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
      */
 
     auto x_spline = vtkSmartPointer<vtkKochanekSpline>::New();
-    x_spline->SetDefaultTension(0.5);
-    x_spline->SetDefaultContinuity(-0.5);
-    x_spline->SetDefaultBias(0.0);
+    x_spline->SetDefaultTension(mKochanekParams[0]);
+    x_spline->SetDefaultContinuity(mKochanekParams[1]);
+    x_spline->SetDefaultBias(mKochanekParams[2]);
 
     auto y_spline = vtkSmartPointer<vtkKochanekSpline>::New();
-    y_spline->SetDefaultTension(0.5);
-    y_spline->SetDefaultContinuity(-0.5);
-    y_spline->SetDefaultBias(0.0);
+    y_spline->SetDefaultTension(mKochanekParams[0]);
+    y_spline->SetDefaultContinuity(mKochanekParams[1]);
+    y_spline->SetDefaultBias(mKochanekParams[2]);
 
     auto vtk_spline = vtkSmartPointer<vtkParametricSpline>::New();
     vtk_spline->SetXSpline(x_spline);
@@ -1894,6 +1896,18 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
         this->GetElement(static_cast<unsigned>(it->source_index()))->SetIsBoundaryElement(this_cell_is_infinite);
     }
 //#endif // BOOST_VERSION >= 105200
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetKochanekParams() const
+{
+    return mKochanekParams;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetKochanekParams(const std::array<double, 3>& rKochanekParams)
+{
+    mKochanekParams = rKochanekParams;
 }
 
 // Explicit instantiation
