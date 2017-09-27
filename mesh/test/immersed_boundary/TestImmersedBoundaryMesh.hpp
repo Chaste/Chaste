@@ -223,7 +223,7 @@ public:
         nodes.push_back(new Node<2>(19, true, 0.9, 0.3));
 
         nodes.push_back(new Node<2>(20, true, 0.2, 0.2));
-        nodes.push_back(new Node<2>(21, true, 0.2, 0.7));
+        nodes.push_back(new Node<2>(21, true, 0.7, 0.7));
 
         // Triangle
         nodes_elem1.push_back(nodes[0]);
@@ -289,8 +289,8 @@ public:
         // Verify everything's still the same
         for (unsigned node_idx = 0; node_idx < p_mesh->GetNumNodes(); node_idx++)
         {
-            TS_ASSERT_DELTA(old_locations[node_idx][0], p_mesh->GetNode(node_idx)->rGetLocation()[0], 1e-12);
-            TS_ASSERT_DELTA(old_locations[node_idx][1], p_mesh->GetNode(node_idx)->rGetLocation()[1], 1e-12);
+            TS_ASSERT_DELTA(old_locations[node_idx][0], p_mesh->GetNode(node_idx)->rGetLocation()[0], 1e-6);
+            TS_ASSERT_DELTA(old_locations[node_idx][1], p_mesh->GetNode(node_idx)->rGetLocation()[1], 1e-6);
 
             TS_ASSERT_EQUALS(node_idx, p_mesh->GetNode(node_idx)->GetRegion());
         }
@@ -486,13 +486,13 @@ public:
 
             for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
-                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(p_mesh->GetLamina(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
+                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(p_mesh->GetLamina(0)->GetNode(node_idx)->rGetLocation()), 1e-6);
             }
 
             delete p_mesh;
         }
 
-        // ReMeshLamina where nothing should change
+        // ReMeshLamina where points should become more evenly distributed than they were
         {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.1, 0.3));
@@ -509,20 +509,20 @@ public:
 
             p_mesh->ReMesh();
 
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[0], 0.1, 1e-12);
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[1], 0.3, 1e-12);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[0], 0.1, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(0)->rGetLocation()[1], 0.3, 1e-6);
 
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(1)->rGetLocation()[0], 0.3, 1e-12);
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(1)->rGetLocation()[1], 0.3, 1e-12);
+            TS_ASSERT_LESS_THAN(p_mesh->GetLamina(0)->GetNode(1)->rGetLocation()[0], 0.32);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(1)->rGetLocation()[1], 0.3, 1e-6);
 
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(2)->rGetLocation()[0], 0.5, 1e-12);
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(2)->rGetLocation()[1], 0.3, 1e-12);
+            TS_ASSERT_LESS_THAN(p_mesh->GetLamina(0)->GetNode(2)->rGetLocation()[0], 0.53);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(2)->rGetLocation()[1], 0.3, 1e-6);
 
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(3)->rGetLocation()[0], 0.7, 1e-12);
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(3)->rGetLocation()[1], 0.3, 1e-12);
+            TS_ASSERT_LESS_THAN(0.64, p_mesh->GetLamina(0)->GetNode(3)->rGetLocation()[0]);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(3)->rGetLocation()[1], 0.3, 1e-6);
 
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(4)->rGetLocation()[0], 0.9, 1e-12);
-            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(4)->rGetLocation()[1], 0.3, 1e-12);
+            TS_ASSERT_LESS_THAN(0.88, p_mesh->GetLamina(0)->GetNode(4)->rGetLocation()[0]);
+            TS_ASSERT_DELTA(p_mesh->GetLamina(0)->GetNode(4)->rGetLocation()[1], 0.3, 1e-6);
 
             delete p_mesh;
         }
