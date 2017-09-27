@@ -37,33 +37,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 
-#include "CheckpointArchiveTypes.hpp"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+// This macro prevents errors with GCC 4.8 of form "unable to find numeric literal operator 'operator"" Q'"
+// when compiling with -std=gnu++11 (see #2929). \todo: remove when GCC 4.8 is no longer supported.
+#define BOOST_MATH_DISABLE_FLOAT128
 #include <boost/math/special_functions/bessel.hpp>
 
-#include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "EllipticGrowingDomainPdeModifier.hpp"
-#include "CellwiseSourceEllipticPde.hpp"
-#include "UniformSourceEllipticPde.hpp"
-#include "AveragedSourceEllipticPde.hpp"
-#include "UniformCellCycleModel.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "CellsGenerator.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "CellsGenerator.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "CellsGenerator.hpp"
+#include "EllipticGrowingDomainPdeModifier.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "ReplicatableVector.hpp"
+#include "SmartPointers.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "UniformSourceEllipticPde.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"

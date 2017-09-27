@@ -325,7 +325,7 @@ public:
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * @return a vector containing the node attributes.
+     * @return a vector containing the node attributes. An exception is thrown if the node has no attributes.
      */
     std::vector<double>& rGetNodeAttributes();
 
@@ -366,9 +366,9 @@ public:
 
     /**
      * Add a contribution to the force applied to this node.
-     * @param forceContribution the force vector to add to mAppliedForce
+     * @param rForceContribution the force vector to add to mAppliedForce
      */
-    void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution);
 
     /**
      * @return whether this node is a particle or not
@@ -382,7 +382,7 @@ public:
     void SetIsParticle(bool isParticle);
 
     /**
-     * @return the radius of this node.
+     * @return the radius of this node. An exception is thrown if the node has no attributes.
      */
     double GetRadius();
 

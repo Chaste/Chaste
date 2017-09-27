@@ -967,6 +967,11 @@ class CellMLTranslator(object):
         Generate a dictionary mapping tables to their index variables.
         """
         doc = self.doc
+        # Remove xml:base to work around Amara bug!
+        for elt in [doc, doc.model]:
+            if u'base' in getattr(elt, 'xml_attributes', {}):
+                print 'Delete base from', repr(elt)
+                del elt.xml_attributes[u'base']
         # Get list of suitable expressions
         doc.lookup_tables = doc.xml_xpath(u"//*[@lut:possible='yes']")
         doc.lookup_tables.sort(cmp=element_path_cmp)
@@ -4765,7 +4770,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     binary_ops.update({'rem': '%'})
     nary_ops = CellMLToChasteTranslator.nary_ops.copy()
     nary_ops.update({'and': 'and', 'or': 'or'})
-    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log', 'exp': 'math.exp',
+    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log10', 'exp': 'math.exp',
                     'floor': 'math.floor', 'ceiling': 'math.ceil',
                     'factorial': 'factorial', # Needs external definition
                     'not': 'not',
@@ -4868,7 +4873,17 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         for name in vector_names:
             vector_outputs = cellml_metadata.find_variables(self.model, prop, name)
             assert len(vector_outputs) > 0
-            vector_outputs.sort(key=lambda v: self.var_display_name(v))
+            if name == 'state_variable':
+                # Special case to ensure the ordering as an output matches the state vector in the ODE system
+                def get_state_index(v):
+                    """Find the index of the state variable corresponding to this variable, which may be units converted."""
+                    v = v.get_source_variable(recurse=True)
+                    if v.get_type() is VarTypes.Computed:
+                        v = v.get_dependencies()[0].get_dependencies()[0]
+                    return self.state_vars.index(v)
+                vector_outputs.sort(key=get_state_index)
+            else:
+                vector_outputs.sort(key=lambda v: self.var_display_name(v))
             self._vector_outputs[name] = vector_outputs
         # Find model parameters that can be set from the protocol
         self.cell_parameters = filter(

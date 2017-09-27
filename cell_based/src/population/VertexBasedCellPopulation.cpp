@@ -56,7 +56,8 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
                                           const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
@@ -80,7 +81,8 @@ template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 }
@@ -259,17 +261,20 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
+    if(mRestrictVertexMovement)
     {
-        rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
+        if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
+        {
+            rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
 
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+            std::ostringstream message;
+            message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+            message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
 
-        double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+            double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
 
-        throw StepSizeException(suggested_step, message.str(), false);
+            throw StepSizeException(suggested_step, message.str(), false);
+        }
     }
 }
 
@@ -820,6 +825,19 @@ void VertexBasedCellPopulation<DIM>::SimulationSetupHook(AbstractCellBasedSimula
 {
     MAKE_PTR_ARGS(T2SwapCellKiller<DIM>, p_t2_swap_cell_killer, (this));
     pSimulation->AddCellKiller(p_t2_swap_cell_killer);
+}
+
+
+template<unsigned DIM>
+bool VertexBasedCellPopulation<DIM>::GetRestrictVertexMovementBoolean()
+{
+    return mRestrictVertexMovement;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restrictMovement)
+{
+    mRestrictVertexMovement = restrictMovement;
 }
 
 // Explicit instantiation

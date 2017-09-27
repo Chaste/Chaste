@@ -74,13 +74,21 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
     {
         if (mpBoxCollection->IsOwned(rNodes[i]))
         {
+            assert(!rNodes[i]->IsDeleted());
+
             mLocalInitialNodes[i] = true;
 
-            assert(!rNodes[i]->IsDeleted());
+            // Create a copy of the node, sharing its location
             c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
-
             Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(GetNextAvailableIndex(), location);
-            p_node_copy->SetRadius(0.5);    // Default value.
+
+            p_node_copy->SetRadius(0.5);
+
+            // If the original node has attributes, then copy these
+            if (rNodes[i]->HasNodeAttributes())
+            {
+                p_node_copy->rGetNodeAttributes() = rNodes[i]->rGetNodeAttributes();
+            }
 
             this->mNodes.push_back(p_node_copy);
 

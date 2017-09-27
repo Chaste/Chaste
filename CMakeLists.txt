@@ -532,14 +532,16 @@ foreach(potential_dir ${potential_dirs})
     if (IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${potential_dir}")
         # test for CMakeLists.txt file
         if (EXISTS "${Chaste_SOURCE_DIR}/projects/${potential_dir}/CMakeLists.txt")
+            option(Chaste_ENABLE_project_${potential_dir} "Turn ${potential_dir} ON or OFF." ON)
+            option(Chaste_ENABLE_project_${potential_dir}_INSTALL "Install ${potential_dir} along with standard Chaste libraries." OFF)
             file(READ "${Chaste_SOURCE_DIR}/projects/${potential_dir}/CMakeLists.txt" cmake_lists_file)
-            if (cmake_lists_file MATCHES "\nfind_package\\(Chaste COMPONENTS.*project_.*\\)")
-                list(APPEND Chaste_PROJECTS "${potential_dir}")
-            else()
-                list(INSERT Chaste_PROJECTS 0 "${potential_dir}")
+            if (Chaste_ENABLE_project_${potential_dir})
+                if (cmake_lists_file MATCHES "\nfind_package\\(Chaste COMPONENTS.*project_.*\\)")
+                    list(APPEND Chaste_PROJECTS "${potential_dir}")
+                else()
+                    list(INSERT Chaste_PROJECTS 0 "${potential_dir}")
+                endif()
             endif()
-            set(Chaste_ENABLE_project_${potential_dir} ON CACHE BOOL "Turn ${potential_dir} ON or OFF.")
-            set(Chaste_ENABLE_project_${potential_dir}_INSTALL OFF CACHE BOOL "Install ${potential_dir} along with standard Chaste libraries.")
         else()
             message(WARNING "No CMakeLists.txt file found in project directory ${Chaste_SOURCE_DIR}/projects/${potential_dir}. This project will not be built")
         endif()
@@ -809,7 +811,7 @@ if (Chaste_COVERAGE)
 
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* */global/src/random/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
         set(_page_title "\"Chaste Coverage Results for commit ${Chaste_REVISION}\"")
         COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
         COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned

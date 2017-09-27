@@ -113,6 +113,12 @@ public:
 
     /**
      * Update the current levels of Delta and Notch in the cell.
+     *
+     * N.B. Despite the name, this doesn't update the levels of delta or notch, or compute mean levels.
+     * It just copies the current mean delta from the CellData
+     * (set by DeltaNotchTrackingModifier) to the DeltaNotchOdeSystem.
+     *
+     * \todo #2752 Improve the name of this method!
      */
     void UpdateDeltaNotch();
 
@@ -127,7 +133,10 @@ public:
     double GetDelta();
 
     /**
-     * @return the current level of Delta neighbouring the cell.
+     * @return the current level of mean Delta in the neighbouring cells.
+     *
+     * N.B. This doesn't calculate anything, it just returns the parameter
+     * from the DeltaNotchOdeSystem.
      */
     double GetMeanNeighbouringDelta();
 
