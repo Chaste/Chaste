@@ -65,6 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+#include "Debug.hpp"
+
 /*
  * In this test suite we check the solution of the AveragedPdes for each population type.
  * In each case we are solving Laplacian U = f where f is constant in different regions.
@@ -151,22 +153,22 @@ public:
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
+MARK;
             // Serialize via pointer
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
+            AbstractPdeSystemModifier<2,1>* const p_modifier = &modifier;
             output_arch << p_modifier;
         }
-
+MARK;
         // Separate scope to read the archive
         {
-            AbstractCellBasedSimulationModifier<2,2>* p_modifier2;
+            AbstractPdeSystemModifier<2,1>* p_modifier2;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
             input_arch >> p_modifier2;
-
+MARK;
             // Test that member variables are correct
             TS_ASSERT_EQUALS((static_cast<EllipticBoxDomainPdeSystemModifier<2>*>(p_modifier2))->rGetDependentVariableName(), "averaged quantity");
             TS_ASSERT_DELTA((static_cast<EllipticBoxDomainPdeSystemModifier<2>*>(p_modifier2))->GetStepSize(), 2.0, 1e-5);

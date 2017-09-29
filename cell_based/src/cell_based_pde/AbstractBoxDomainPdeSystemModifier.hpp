@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_
 #define ABSTRACTBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+
 #include "AbstractPdeSystemModifier.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
@@ -51,6 +55,30 @@ class AbstractBoxDomainPdeSystemModifier : public AbstractPdeSystemModifier<DIM,
     friend class TestEllipticBoxDomainPdeSystemModifier;
     friend class TestParabolicBoxDomainPdeSystemModifier;
     friend class TestOffLatticeSimulationWithPdes;
+
+private:
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+MARK;
+        archive & boost::serialization::base_object<AbstractPdeSystemModifier<DIM, PROBLEM_DIM> >(*this);
+MARK;
+//        archive & mCellPdeElementMap; ///\todo #2930
+        archive & mpMeshCuboid;
+        archive & mStepSize;
+        archive & mSetBcsOnBoxBoundary;
+MARK;
+    }
 
 protected:
 
@@ -194,6 +222,7 @@ AbstractBoxDomainPdeSystemModifier<DIM, PROBLEM_DIM>::AbstractBoxDomainPdeSystem
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true)
 {
+MARK;
     if (pMeshCuboid)
     {
         // We only need to generate mpFeMesh once, as it does not vary with time

@@ -36,6 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTPDESYSTEMMODIFIER_HPP_
 #define ABSTRACTPDESYSTEMMODIFIER_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
@@ -47,14 +50,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourceEllipticPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
+#include "Debug.hpp"
+
 /**
  * An abstract modifier class containing functionality common to AbstractBoxDomainPdeSystemModifier,
  * AbstractGrowingDomainPdeSystemModifier and their subclasses, which solve a linear elliptic or
  * parabolic PDE coupled to a cell-based simulation.
  */
 template<unsigned DIM, unsigned PROBLEM_DIM=1>
-class AbstractPdeSystemModifier : public AbstractCellBasedSimulationModifier<DIM>
+class AbstractPdeSystemModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
+private:
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+MARK;
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
+MARK;
+        archive & mpPdeSystem;
+        archive & mpBoundaryConditions;
+        archive & mIsNeumannBoundaryCondition;
+        archive & mDependentVariableNames;
+//        archive & mSolution; ///\todo #2930
+//        archive & mpFeMesh; ///\todo #2930
+        archive & mOutputDirectory;
+        archive & mOutputGradient;
+        archive & mOutputSolutionAtPdeNodes;
+//        archive & mpVizPdeSolutionResultsFile; ///\todo #2930
+        archive & mDeleteFeMesh;
+MARK;
+    }
+
 protected:
 
     /**
@@ -281,6 +317,7 @@ AbstractPdeSystemModifier<DIM, PROBLEM_DIM>::AbstractPdeSystemModifier(
       mOutputSolutionAtPdeNodes(false),
       mDeleteFeMesh(false)
 {
+MARK;
     if (solution)
     {
         mSolution = solution;

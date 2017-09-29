@@ -36,11 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELLIPTICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 #define ELLIPTICBOXDOMAINPDESYSTEMMODIFIER_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "AbstractBoxDomainPdeSystemModifier.hpp"
 #include "BoundaryConditionsContainer.hpp"
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
 #include "LinearEllipticPdeSystemSolver.hpp"
+
+#include "Debug.hpp"
 
 /**
  * A modifier class in which a linear elliptic PDE coupled to a cell-based simulation
@@ -61,9 +66,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * AveragedSourceEllipticPde, VolumeDependentAveragedSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM, unsigned PROBLEM_DIM=1>
-class EllipticBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemModifier<DIM,PROBLEM_DIM>
+class EllipticBoxDomainPdeSystemModifier : public AbstractBoxDomainPdeSystemModifier<DIM, PROBLEM_DIM>
 {
     friend class TestEllipticBoxDomainPdeSystemModifier;
+
+private:
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+MARK;
+        archive & boost::serialization::base_object<AbstractBoxDomainPdeSystemModifier<DIM, PROBLEM_DIM> >(*this);
+MARK;
+    }
 
 public:
 
@@ -148,6 +172,7 @@ EllipticBoxDomainPdeSystemModifier<DIM, PROBLEM_DIM>::EllipticBoxDomainPdeSystem
                                                            stepSize,
                                                            solution)
 {
+MARK;
 }
 
 template <unsigned DIM, unsigned PROBLEM_DIM>
