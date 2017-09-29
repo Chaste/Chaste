@@ -206,7 +206,7 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     the contents as for test_file.
     """
     if revision:
-        revision = ' at revision [changeset:%s/git_repo]' % str(revision)
+        revision = ' at revision [changeset:%s/git_repo]' % str(revision.strip())
     output = []
     # Header
     output.append('This tutorial is automatically generated from the file ' + test_file_path + revision + '.\n')
