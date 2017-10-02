@@ -40,10 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 // Includes from projects/ImmersedBoundary
-#include "ImmersedBoundaryMesh.hpp"
-#include "ImmersedBoundaryMeshWriter.hpp"
-#include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
+#include "ImmersedBoundaryMesh.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -53,8 +51,84 @@ class TestImmersedBoundaryHoneycombMeshGenerator : public CxxTest::TestSuite
 public:
 
     ///\todo Improve testing
-    void TestNothingMuch() throw(Exception)
+    void TestBoundaryElementsAreTaggedCorrectly() throw(Exception)
     {
+        /*
+         * Elements are numbered from bottom-left, upwards, then from left to right.  E.g. for a 3x3:
+         *
+         *      5
+         *   2     8
+         *      4
+         *   1     7
+         *      3
+         *   0     6
+         */
+
+        // 3x3 mesh
+        {
+            ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 5u, 0.05, 0.2);
+            auto p_mesh = gen.GetMesh();
+
+            // Only element with idx 4 should be non-boundary
+            TS_ASSERT(!p_mesh->GetElement(4u)->IsElementOnBoundary());
+
+            // All other elements are on the boundary
+            TS_ASSERT(p_mesh->GetElement(0u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(1u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(2u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(3u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(5u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(6u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(7u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(8u)->IsElementOnBoundary());
+        }
+
+        // 3x4 mesh
+        {
+            ImmersedBoundaryHoneycombMeshGenerator gen(3u, 4u, 5u, 0.05, 0.2);
+            auto p_mesh = gen.GetMesh();
+
+            // Only elements with ids 5 and 6 should be non-boundary
+            TS_ASSERT(!p_mesh->GetElement(5u)->IsElementOnBoundary());
+            TS_ASSERT(!p_mesh->GetElement(6u)->IsElementOnBoundary());
+
+            // All other elements are on the boundary
+            TS_ASSERT(p_mesh->GetElement(0u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(1u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(2u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(3u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(4u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(7u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(8u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(9u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(10u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(11u)->IsElementOnBoundary());
+        }
+
+        // 5x3 mesh
+        {
+            ImmersedBoundaryHoneycombMeshGenerator gen(5u, 3u, 5u, 0.05, 0.2);
+            auto p_mesh = gen.GetMesh();
+
+            // Only elements with ids 4, 7, and 10 should be non-boundary
+            TS_ASSERT(!p_mesh->GetElement(4u)->IsElementOnBoundary());
+            TS_ASSERT(!p_mesh->GetElement(7u)->IsElementOnBoundary());
+            TS_ASSERT(!p_mesh->GetElement(10u)->IsElementOnBoundary());
+
+            // All other elements are on the boundary
+            TS_ASSERT(p_mesh->GetElement(0u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(1u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(2u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(3u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(5u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(6u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(8u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(9u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(11u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(12u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(13u)->IsElementOnBoundary());
+            TS_ASSERT(p_mesh->GetElement(14u)->IsElementOnBoundary());
+        }
     }
 };
 
