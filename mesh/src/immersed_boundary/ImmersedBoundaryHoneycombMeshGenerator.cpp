@@ -41,7 +41,7 @@ ImmersedBoundaryHoneycombMeshGenerator::ImmersedBoundaryHoneycombMeshGenerator(u
                                                                                unsigned numNodesPerEdge,
                                                                                double proportionalGap,
                                                                                double padding)
-        : mpMesh(NULL)
+        : mpMesh(nullptr)
 {
     // Check for sensible input
     assert(numElementsX > 0);
@@ -118,14 +118,13 @@ ImmersedBoundaryHoneycombMeshGenerator::ImmersedBoundaryHoneycombMeshGenerator(u
         ImmersedBoundaryElement<2,2>* p_elem = new ImmersedBoundaryElement<2,2>(offset, nodes_this_elem);
 
         // Set whether it's on the boundary
-        if (offset < numElementsY ||
-            offset >= numElementsY * (numElementsX - 1) ||
-            offset % numElementsY == 0 ||
-            offset + 1 % numElementsY == 1)
+        if (offset < numElementsY ||                        // left edge
+            offset >= numElementsY * (numElementsX - 1) ||  // right edge
+            offset % numElementsY == 0 ||                   // bottom edge
+            (offset + 1) % numElementsY == 0)               // top edge
         {
             p_elem->SetIsBoundaryElement(true);
         }
-
 
         elements.push_back(p_elem);
     }
