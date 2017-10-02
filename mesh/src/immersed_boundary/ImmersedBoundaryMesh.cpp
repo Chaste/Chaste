@@ -34,17 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundaryMesh.hpp"
-#include "RandomNumberGenerator.hpp"
-#include "UblasCustomFunctions.hpp"
-#include "Warnings.hpp"
-#include "ImmersedBoundaryEnumerations.hpp"
 
 #include <algorithm>
 
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 105200
-#include <boost/polygon/voronoi.hpp>
-#endif // BOOST_VERSION >= 105200
+#include "ImmersedBoundaryEnumerations.hpp"
+#include "RandomNumberGenerator.hpp"
+#include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 #ifdef CHASTE_VTK
 #include <vtkKochanekSpline.h>
@@ -61,7 +57,8 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
                                                                    unsigned numGridPtsY)
         : mNumGridPtsX(numGridPtsX),
           mNumGridPtsY(numGridPtsY),
-          mElementDivisionSpacing(DOUBLE_UNSET)
+          mElementDivisionSpacing(DOUBLE_UNSET),
+          mSummaryOfNodeLocations(DOUBLE_UNSET)
 {
     // Clear mNodes and mElements
     Clear();
@@ -1748,70 +1745,87 @@ bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::NodesInDifferentElementOrLami
     }
 }
 
+#include "Debug.hpp"
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementIndices(unsigned elemIdx)
 {
-    if (mLaminas.size() > 0)
+    if (!mLaminas.empty())
     {
         EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(elemIdx);
+    /*
+     * This method uses geometric information from a voronoi diagram of every node.  The voronoi cell of an element
+     * (the union of voronoi cells of nodes in the element) provides a precise boundary between elements on which the
+     * concept of 'neighbourhood' is well-defined.
+     *
+     * We first update the voronoi diagram, if it is out of date.
+     */
+    UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
 
-    std::set<unsigned> indices;
+    std::set<unsigned> neighbouring_element_indices;
 
-    for (unsigned node_idx = 0; node_idx < p_this_elem->GetNumNodes(); ++node_idx)
+    for (unsigned node_local_idx = 0; node_local_idx < this->GetElement(elemIdx)->GetNumNodes(); ++node_local_idx)
     {
-        // The vec of node neighbours includes all within neighbouring boxes: need to check against neighbour dist
-        const std::vector<unsigned>& node_neighbours = GetElement(elemIdx)->GetNode(node_idx)->rGetNeighbours();
+        const unsigned node_global_idx = this->GetElement(elemIdx)->GetNodeGlobalIndex(node_local_idx);
+        const unsigned voronoi_cell_id = mVoronoiCellIdsInNodeOrder[node_global_idx];
 
-        for(std::vector<unsigned>::const_iterator gbl_idx_it = node_neighbours.begin();
-            gbl_idx_it != node_neighbours.end(); ++gbl_idx_it)
+        /*
+         * Iterate over the edges of the voronoi cell corresponding to the current node.  Each primary edge has a twin
+         * in a voronoi cell corresponding to a different node.  The element containing that node (which may be the
+         * current element under consideration) is added to the set of neighbours precisely if the distance between
+         * nodes is less than mNeighbourDist.
+         */
+        const auto voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
+        auto p_edge = voronoi_cell.incident_edge();
+
+        do
         {
-            if (this->GetDistanceBetweenNodes(p_this_elem->GetNodeGlobalIndex(node_idx), *gbl_idx_it) < mNeighbourDist)
+            if (p_edge->is_primary())
             {
-                indices.insert(*(this->GetNode(*gbl_idx_it)->rGetContainingElementIndices().begin()));
+                // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
+                const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+                const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
+
+                // Only bother to check the node distances if the nodes are in different elements
+                if (twin_elem_idx != elemIdx)
+                {
+                    if (this->GetDistanceBetweenNodes(node_global_idx, twin_node_idx) < mNeighbourDist)
+                    {
+                        neighbouring_element_indices.insert(twin_elem_idx);
+                    }
+                }
             }
-        }
+            p_edge = p_edge->next();
+        } while (p_edge != voronoi_cell.incident_edge());
     }
 
-    // Remove own index from the list
-    indices.erase(elemIdx);
-
-    return indices;
+    return neighbouring_element_indices;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDistribution()
+std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDistribution()
 {
     assert(SPACE_DIM == 2);
 
-    if (mLaminas.size() > 0)
-    {
-        EXCEPTION("This method does not yet work in the presence of laminas");
-    }
+    std::array<unsigned, 13> polygon_dist = {{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u}};
 
-    std::vector<unsigned> poly_dist(11, 0);
-
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
-         elem_it != this->GetElementIteratorEnd();
-         ++elem_it)
+    for (auto elem_it = this->GetElementIteratorBegin(); elem_it != this->GetElementIteratorEnd(); ++elem_it)
     {
         if (!elem_it->IsElementOnBoundary())
         {
-            // Accumulate all 10+ sided shapes
-            unsigned num_neighbours = std::min<unsigned>(10u, GetNeighbouringElementIndices(elem_it->GetIndex()).size());
-            poly_dist[num_neighbours]++;
+            // Accumulate all 12+ sided shapes
+            unsigned num_neighbours = std::min<unsigned>(12u, GetNeighbouringElementIndices(elem_it->GetIndex()).size());
+            polygon_dist[num_neighbours]++;
         }
     }
 
-    return poly_dist;
+    return polygon_dist;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
 {
-//#if BOOST_VERSION >= 105200
     assert(SPACE_DIM == 2);
 
     using boost::polygon::voronoi_builder;
@@ -1895,7 +1909,60 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
 
         this->GetElement(static_cast<unsigned>(it->source_index()))->SetIsBoundaryElement(this_cell_is_infinite);
     }
-//#endif // BOOST_VERSION >= 105200
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDiagramIfOutOfDate()
+{
+    /*
+     * The voronoi diagram needs updating only if the node locations have changed (i.e. not more than once per
+     * timestep).  We test a chosen summary of node locations against the cached mSummaryOfNodeLocations to determine
+     * this.
+     */
+    double new_location_summary = this->mNodes[0]->rGetLocation()[0] +
+                                  this->mNodes[0]->rGetLocation()[1] +
+                                  this->mNodes[this->mNodes.size() - 1]->rGetLocation()[0] +
+                                  this->mNodes[this->mNodes.size() - 1]->rGetLocation()[1];
+
+    bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
+
+    if (voronoi_needs_updating)
+    {
+        mSummaryOfNodeLocations = new_location_summary;
+
+        // We need to translate node locations into boost points, which take integer values. We scale by INT_MAX.
+        using boost_point = boost::polygon::point_data<int>;
+
+        std::vector<boost_point> points;
+        for (const auto& p_node : this->mNodes)
+        {
+            int x_pos = std::lround((2.0 * p_node->rGetLocation()[0] - 1.0) * INT_MAX);
+            int y_pos = std::lround((2.0 * p_node->rGetLocation()[1] - 1.0) * INT_MAX);
+            points.emplace_back(boost_point(x_pos, y_pos));
+        }
+
+        construct_voronoi(std::begin(points), std::end(points), &mNodeLocationsVoronoiDiagram);
+
+        // We need an efficient map from node global index to the voronoi cell representing it
+        const auto node_with_max_idx = *std::max_element(std::begin(this->mNodes), std::end(this->mNodes),
+                                                         [](Node<SPACE_DIM>* a, Node<SPACE_DIM>* b) -> bool
+                                                         {
+                                                            return a->GetIndex() < b->GetIndex();
+                                                         });
+        mVoronoiCellIdsInNodeOrder.resize(node_with_max_idx->GetIndex());
+
+        for (unsigned voronoi_cell_id = 0 ; voronoi_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++voronoi_cell_id)
+        {
+            // Source index is incrementally given to each input point, which is in order of nodes in this->mNodes.
+            // We need to identify the current voronoi_cell_id by the global node index
+            const unsigned source_idx = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id].source_index();
+            const unsigned node_idx = this->mNodes[source_idx]->GetIndex();
+            mVoronoiCellIdsInNodeOrder[node_idx] = voronoi_cell_id;
+
+            // Also keep the global node index in the cell "color"
+            mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id].color(node_idx);
+        }
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

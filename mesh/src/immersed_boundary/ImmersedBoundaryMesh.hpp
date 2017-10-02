@@ -40,22 +40,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class ImmersedBoundaryMeshWriter;
 
-#include <algorithm>
-#include <iostream>
-#include <map>
+#include <set>
+#include <vector>
 
+#include <boost/polygon/voronoi.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/vector.hpp>
-#include "ChasteSerialization.hpp"
 
 #include "AbstractMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "ChasteSerialization.hpp"
 #include "FluidSource.hpp"
 #include "ImmersedBoundaryArray.hpp"
 #include "ImmersedBoundaryElement.hpp"
 #include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
+#include "Node.hpp"
 
 /**
  * An immersed boundary mesh class, in which elements may contain different numbers of nodes.
@@ -84,6 +85,12 @@ protected:
     /** The distance at which two elements are neighbouring */
     double mNeighbourDist;
 
+    /**
+     * A summary statistic used by UpdateNodeLocationsVoronoiDiagramIfOutOfDate()
+     * to determine if mNodeLocationsVoronoiDiagram is out of date
+     */
+    double mSummaryOfNodeLocations;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -109,6 +116,15 @@ protected:
 
     /** Array to store the three Kochanek parameters for spline interpolation */
     std::array<double, 3> mKochanekParams;
+
+    /** A voronoi diagram of the node locations, used to determine the element neighbours */
+    boost::polygon::voronoi_diagram<double> mNodeLocationsVoronoiDiagram;
+
+    /**
+     * A vector keeping track voronoi cell indices in order of global node indices. This vector is the length of the
+     * largest node index, and is updated by UpdateNodeLocationsVoronoiDiagramIfOutOfDate().
+     */
+    std::vector<unsigned> mVoronoiCellIdsInNodeOrder;
 
     /**
      * Solve node mapping method. This overridden method is required
@@ -136,6 +152,12 @@ protected:
      * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
+
+    /**
+     * Update mNodeLocationsVoronoiDiagram if it is out of date, which is the case when
+     * mNodeLocationsVoronoiDiagramLastUpdated < SimulationTime::Instance()->GetTimeStepsElapsed()
+     */
+    void UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
 
     /**
      * Divide an element along the axis passing through two of its nodes.
@@ -636,14 +658,14 @@ public:
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elemIdx);
 
     /**
-     * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..., 10+}-gons.
+     * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..., 12+}-gons.
      * Note that the vector will always begin {0, 0, 0, ...} as there can be no 0, 1, or 2-gons, but this choice means
      * that accessing the nth element of the vector gives you the number of n-gons which seems to be most natural.
-     * All 10-sided and higher order polygons are accumulated in the [10]th position.
+     * All 12-sided and higher order polygons are accumulated in the array[12] position.
      *
-     * @return a vector representing the polygon distribution.
+     * @return an array of length 13 representing the polygon distribution.
      */
-    std::vector<unsigned> GetPolygonDistribution();
+    std::array<unsigned, 13> GetPolygonDistribution();
 
     /**
      * Determine whether each element is on the boundary or not, and call the element's SetIsBoundaryElement() method.
@@ -652,8 +674,6 @@ public:
      * of nodes as in a vertex population.  Instead we take the centroid of each element, calculate the voronoi diagram
      * of this set of centroids, and define an element to be on the boundary if its corresponding voronoi cell is
      * infinite.
-     *
-     * This requires boost version 105200, so will not compute anything if the boost version is lower than this.
      */
     void TagBoundaryElements();
 

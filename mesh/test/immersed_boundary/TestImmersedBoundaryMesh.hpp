@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
+#include "Debug.hpp"
+
 class TestImmersedBoundaryMesh : public CxxTest::TestSuite
 {
 public:
@@ -648,6 +650,77 @@ public:
         c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
         TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
+    }
+
+    void TestGetNeighbouringElementIndices() throw(Exception)
+    {
+        /* This 3x3 honeycomb will look like:
+         *    5
+         * 2     8
+         *    4
+         * 1     7
+         *    3
+         * 0     6
+         */
+        ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 5u, 0.05, 0.2);
+
+        auto p_mesh = gen.GetMesh();
+        p_mesh->SetNeighbourDist(0.1);
+
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(0u), std::set<unsigned>({1u, 3u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(1u), std::set<unsigned>({0u, 2u, 3u, 4u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(2u), std::set<unsigned>({1u, 4u, 5u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(3u), std::set<unsigned>({0u, 1u, 4u, 6u, 7u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(4u), std::set<unsigned>({1u, 2u, 3u, 5u, 7u, 8u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(5u), std::set<unsigned>({2u, 4u, 8u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(6u), std::set<unsigned>({3u, 7u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(7u), std::set<unsigned>({3u, 4u, 6u, 8u}));
+        TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(8u), std::set<unsigned>({4u, 5u, 7u}));
+    }
+
+    void TestGetPolygonDistribution() throw(Exception)
+    {
+        // A 3x3 honeycomb will just have a single non-boundary element
+        ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 5u, 0.05, 0.2);
+
+        auto p_mesh = gen.GetMesh();
+        p_mesh->SetNeighbourDist(0.1);
+
+        std::array<unsigned, 13> polygon_dist = p_mesh->GetPolygonDistribution();
+        TS_ASSERT_EQUALS(polygon_dist[0], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[1], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[2], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[3], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[4], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[5], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[6], 1u);
+        TS_ASSERT_EQUALS(polygon_dist[7], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[8], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[9], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[10], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[11], 0u);
+        TS_ASSERT_EQUALS(polygon_dist[12], 0u);
+
+        // If we pretend none of the elements are on the boundary, the answer should changes
+        for (unsigned elem_idx = 0; elem_idx < p_mesh->GetNumElements(); ++elem_idx)
+        {
+            p_mesh->GetElement(elem_idx)->SetIsBoundaryElement(false);
+        }
+
+        std::array<unsigned, 13> new_polygon_dist = p_mesh->GetPolygonDistribution();
+        TS_ASSERT_EQUALS(new_polygon_dist[0], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[1], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[2], 2u);
+        TS_ASSERT_EQUALS(new_polygon_dist[3], 3u);
+        TS_ASSERT_EQUALS(new_polygon_dist[4], 2u);
+        TS_ASSERT_EQUALS(new_polygon_dist[5], 1u);
+        TS_ASSERT_EQUALS(new_polygon_dist[6], 1u);
+        TS_ASSERT_EQUALS(new_polygon_dist[7], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[8], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[9], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[10], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[11], 0u);
+        TS_ASSERT_EQUALS(new_polygon_dist[12], 0u);
     }
 };
 
