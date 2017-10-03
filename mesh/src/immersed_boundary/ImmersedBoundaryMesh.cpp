@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 #include "ImmersedBoundaryEnumerations.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -158,6 +159,15 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     }
 
     mKochanekParams = {{1.0, -1.0, 0.0}};
+
+    // Calculate a default neighbour dist, as half the root of the average element volume
+    constexpr double power = 1.0 / SPACE_DIM;
+    const double total_volume_of_elems = std::accumulate(mElements.begin(), mElements.end(), 0.0,
+                                                         [this](double d, ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* a)
+                                                         {
+                                                             return d + this->GetVolumeOfElement(a->GetIndex());
+                                                         });
+    mNeighbourDist = 0.5 * std::pow(total_volume_of_elems / mElements.size(), power);
 
     this->mMeshChangesDuringSimulation = true;
 }
