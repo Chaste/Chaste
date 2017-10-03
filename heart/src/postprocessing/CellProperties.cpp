@@ -69,6 +69,7 @@ void CellProperties::CalculateProperties()
     double current_time_of_upstroke_velocity = 0;
     double current_resting_value = DBL_MAX;
     double current_peak = -DBL_MAX;
+    double current_peak_time = -DBL_MAX;
     double current_minimum_velocity = DBL_MAX;
     double prev_voltage_derivative = 0;
     unsigned ap_counter = 0;
@@ -137,18 +138,19 @@ void CellProperties::CalculateProperties()
                     switching_phase = true;
                     found_a_flat_bit = false;
                     ap_phase = ABOVETHRESHOLD;
-                    // no break here - deliberate fall through to next case
                 }
                 else
                 {
                     break;
                 }
+            // no break here - deliberate fall through to next case
 
             case ABOVETHRESHOLD:
                 //While above threshold, look for the peak potential for the current AP
                 if (v > current_peak)
                 {
                     current_peak = v;
+                    current_peak_time = t;
                 }
 
                 // we check whether we have above threshold depolarisations
@@ -169,8 +171,10 @@ void CellProperties::CalculateProperties()
                 {
                     // Register peak value for this AP
                     mPeakValues.push_back(current_peak);
+                    mTimesAtPeakValues.push_back(current_peak_time);
                     // Re-initialise the current_peak.
                     current_peak = mThreshold;
+                    current_peak_time = -DBL_MAX;
 
                     // Register maximum upstroke velocity for this AP
                     mMaxUpstrokeVelocities.push_back(max_upstroke_velocity);
@@ -207,6 +211,7 @@ void CellProperties::CalculateProperties()
     {
         mMaxUpstrokeVelocities.push_back(max_upstroke_velocity);
         mPeakValues.push_back(current_peak);
+        mTimesAtPeakValues.push_back(current_peak_time);
         mTimesAtMaxUpstrokeVelocity.push_back(current_time_of_upstroke_velocity);
         mUnfinishedActionPotentials = true;
     }
@@ -374,6 +379,12 @@ std::vector<double> CellProperties::GetPeakPotentials()
     return mPeakValues;
 }
 
+std::vector<double> CellProperties::GetTimesAtPeakPotentials()
+{
+    CheckReturnedToThreshold();
+    return mTimesAtPeakValues;
+}
+
 std::vector<double> CellProperties::GetMaxUpstrokeVelocities()
 {
     CheckReturnedToThreshold();
@@ -453,6 +464,12 @@ double CellProperties::GetTimeAtLastMaxUpstrokeVelocity()
 {
     CheckReturnedToThreshold();
     return mTimesAtMaxUpstrokeVelocity.back();
+}
+
+double CellProperties::GetTimeAtLastPeakPotential()
+{
+    CheckReturnedToThreshold();
+    return mTimesAtPeakValues.back();
 }
 
 double CellProperties::GetTimeAtLastCompleteMaxUpstrokeVelocity()

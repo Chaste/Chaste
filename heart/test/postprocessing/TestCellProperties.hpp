@@ -585,6 +585,13 @@ public:
                 TS_ASSERT_DELTA(peak_Vs[0], -52.03, tolerance);
                 TS_ASSERT_DELTA(peak_Vs[1], 20.742, tolerance);
 
+                std::vector<double> peak_V_times = cell_properties.GetTimesAtPeakPotentials();
+                TS_ASSERT_EQUALS(peak_V_times.size(), 2u);
+                TS_ASSERT_DELTA(peak_V_times[0], 8.5, tolerance);
+                TS_ASSERT_DELTA(peak_V_times[1], 2018.5, tolerance);
+
+                TS_ASSERT_DELTA(cell_properties.GetTimeAtLastPeakPotential(), 2018.5, tolerance);
+
                 std::vector<double> amplitudes = cell_properties.GetActionPotentialAmplitudes();
                 TS_ASSERT_EQUALS(amplitudes.size(), 2u);
                 TS_ASSERT_DELTA(amplitudes[0], 33.39, tolerance);
