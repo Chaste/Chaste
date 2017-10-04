@@ -262,6 +262,9 @@ endif()
 ####  Find Python
 ################################
 find_package(PythonInterp REQUIRED)
+if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 2)
+    message(FATAL_ERROR "Python 2 is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python2")
+endif()
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package(TextTest)
