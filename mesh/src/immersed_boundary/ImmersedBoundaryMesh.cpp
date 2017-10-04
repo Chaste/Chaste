@@ -1791,19 +1791,16 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
 
         do
         {
-            if (p_edge->is_primary())
-            {
-                // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
-                const unsigned twin_node_idx = p_edge->twin()->cell()->color();
-                const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
+            // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
+            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+            const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
 
-                // Only bother to check the node distances if the nodes are in different elements
-                if (twin_elem_idx != elemIdx)
+            // Only bother to check the node distances if the nodes are in different elements
+            if (twin_elem_idx != elemIdx)
+            {
+                if (this->GetDistanceBetweenNodes(node_global_idx, twin_node_idx) < mNeighbourDist)
                 {
-                    if (this->GetDistanceBetweenNodes(node_global_idx, twin_node_idx) < mNeighbourDist)
-                    {
-                        neighbouring_element_indices.insert(twin_elem_idx);
-                    }
+                    neighbouring_element_indices.insert(twin_elem_idx);
                 }
             }
             p_edge = p_edge->next();
@@ -1836,88 +1833,75 @@ std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygo
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
 {
-    assert(SPACE_DIM == 2);
-
-    using boost::polygon::voronoi_builder;
-    using boost::polygon::voronoi_diagram;
-    typedef boost::polygon::point_data<int> boost_point;
-
-    // Datatype is boost::polygon::point_data<int>
-    std::vector<boost_point> points;
-
-    double average_area = 0.0; // the average (2d) volume of immersed boundary elements
-
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
-         elem_it != this->GetElementIteratorEnd();
-         ++elem_it)
+    if (!mLaminas.empty())
     {
-        average_area += this->GetVolumeOfElement(elem_it->GetIndex());
-
-        c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(elem_it->GetIndex());
-
-        // Assume SPACE_DIM is 2
-        // Assume centroid is within unit square so that scaling by INT_MAX will not overflow the integer
-        int x_pos = static_cast<int>(centroid[0] * INT_MAX);
-        int y_pos = static_cast<int>(centroid[1] * INT_MAX);
-
-        points.push_back(boost_point(x_pos, y_pos));
+        EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
-    average_area /= this->GetNumElements();
+    /*
+     * This method uses geometric information from a voronoi diagram of every node.
+     *
+     * Nodes with infinite voronoi cells must be on the boundary.  In addition, if a node is on a free edge, the
+     * perimeter of its voronoi cell will be much larger than the "size" of the element.
+     */
+    UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
 
-    // Construct the Voronoi tessellation of these element centroids
-    voronoi_diagram<double> vd;
-    construct_voronoi(points.begin(), points.end(), &vd);
-
-    // Loop over the cells in the voronoi diagram.  Assume these cells are ordered the same as the centroids we put in.
-    for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
-         it != vd.cells().end();
-         ++it)
+    // Begin by resetting mesh to have no boundary elements, and caching length factors associated with each element
+    std::vector<double> elem_length_factors(this->mElements.size());
+    for (const auto& p_elem : this->mElements)
     {
+        p_elem->SetIsBoundaryElement(false);
 
-        // Loop over the edges of the current cell
-        const voronoi_diagram<double>::edge_type* p_edge = it->incident_edge();
+        const unsigned idx = p_elem->GetIndex();
+        if (idx >= elem_length_factors.size())
+        {
+            elem_length_factors.resize(1 + idx);    // Resize, in case elements aren't contiguously numbered
+        }
+        // \todo remove this magic number
+        elem_length_factors[idx] = 1.8 * sqrt(this->GetVolumeOfElement(p_elem->GetIndex()));
+    }
 
-        bool this_cell_is_infinite = false;
+    // Lambda to get the length of a voronoi edge
+    auto length_of_voronoi_edge = [](const boost::polygon::voronoi_diagram<double>::edge_type* p_edge) -> double
+    {
+        constexpr double scale_factor = 1.0 / (2.0 * INT_MAX);
+        const double d_x = p_edge->vertex1()->x() - p_edge->vertex0()->x();
+        const double d_y = p_edge->vertex1()->y() - p_edge->vertex0()->y();
 
-        std::vector<double> x_pos;
-        std::vector<double> y_pos;
+        return scale_factor * std::sqrt(d_x * d_x + d_y * d_y);
+    };
 
+    // For each node, check whether corresponding voronoi cell is infinite or not.
+    // If so, tag its containing element as being on the boundary.
+    for (const auto& p_node : this->mNodes)
+    {
+        const unsigned containing_elem_idx = *p_node->ContainingElementsBegin();
+        const unsigned voronoi_cell_id = mVoronoiCellIdsInNodeOrder[p_node->GetIndex()];
+        const auto voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
+
+
+        auto p_edge = voronoi_cell.incident_edge();
+
+        // Loop over the voronoi cell, check for infinite edges, and calculate cell perimeter
+        double voronoi_perimter = 0.0;
         do
         {
             if (p_edge->is_infinite())
             {
-                this_cell_is_infinite = true;
+                this->GetElement(containing_elem_idx)->SetIsBoundaryElement(true);
                 break;
             }
 
-            x_pos.push_back(static_cast<double>(p_edge->vertex0()->x()));
-            y_pos.push_back(static_cast<double>(p_edge->vertex0()->y()));
+            voronoi_perimter += length_of_voronoi_edge(p_edge);
 
             p_edge = p_edge->next();
+        } while (p_edge != voronoi_cell.incident_edge());
 
-        } while (p_edge != it->incident_edge());
-
-        // If the cell is not infinite, calculate the surface area of it; if it's on the edge it will be significantly
-        // larger than the surface area of the corresponding element.
-        if (!this_cell_is_infinite)
+        // The node is "free" (on the boundary) if its voronoi cell perimeter is bigger than would be expected
+        if (voronoi_perimter > elem_length_factors[containing_elem_idx])
         {
-            double area = 0.0;
-
-            for (unsigned point = 0; point < x_pos.size(); ++point)
-            {
-                area += x_pos[point] * y_pos[(point + 1) % x_pos.size()] - y_pos[point] * x_pos[(point + 1) % x_pos.size()];
-            }
-
-            area *= 0.5;
-
-            // Normalise by INT_MAX^2, and take absolute value
-            area = fabs((area / INT_MAX) / INT_MAX);
-
-            this_cell_is_infinite = area > 1.4 * average_area;
+            this->GetElement(containing_elem_idx)->SetIsBoundaryElement(true);
         }
-
-        this->GetElement(static_cast<unsigned>(it->source_index()))->SetIsBoundaryElement(this_cell_is_infinite);
     }
 }
 
@@ -1929,10 +1913,10 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
      * timestep).  We test a chosen summary of node locations against the cached mSummaryOfNodeLocations to determine
      * this.
      */
-    double new_location_summary = this->mNodes[0]->rGetLocation()[0] +
-                                  this->mNodes[0]->rGetLocation()[1] +
-                                  this->mNodes[this->mNodes.size() - 1]->rGetLocation()[0] +
-                                  this->mNodes[this->mNodes.size() - 1]->rGetLocation()[1];
+    double new_location_summary = this->mNodes.front()->rGetLocation()[0] +
+                                  this->mNodes.front()->rGetLocation()[1] +
+                                  this->mNodes.back()->rGetLocation()[0] +
+                                  this->mNodes.back()->rGetLocation()[1];
 
     bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
 
