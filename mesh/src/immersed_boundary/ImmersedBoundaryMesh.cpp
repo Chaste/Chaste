@@ -1959,7 +1959,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
                                                          {
                                                             return a->GetIndex() < b->GetIndex();
                                                          });
-        mVoronoiCellIdsInNodeOrder.resize(node_with_max_idx->GetIndex());
+        mVoronoiCellIdsInNodeOrder.resize(node_with_max_idx->GetIndex() + 1);
 
         for (unsigned voronoi_cell_id = 0 ; voronoi_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++voronoi_cell_id)
         {
