@@ -1951,6 +1951,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
             points.emplace_back(boost_point(x_pos, y_pos));
         }
 
+        mNodeLocationsVoronoiDiagram.clear();
         construct_voronoi(std::begin(points), std::end(points), &mNodeLocationsVoronoiDiagram);
 
         // We need an efficient map from node global index to the voronoi cell representing it
