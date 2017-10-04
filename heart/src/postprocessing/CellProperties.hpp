@@ -238,6 +238,13 @@ public:
     double GetLastCompletePeakPotential();
 
     /**
+     * Returns the time of the last complete AP's peak potential.
+     *
+     * @return last peak potential time.
+     */
+    double GetTimeAtLastCompletePeakPotential();
+
+    /**
      * Returns the minimum resting potential BEFORE each AP.
      *
      * These are calculated as the point where the derivative

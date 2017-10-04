@@ -435,6 +435,25 @@ double CellProperties::GetLastCompletePeakPotential()
     return peak_value;
 }
 
+double CellProperties::GetTimeAtLastCompletePeakPotential()
+{
+    CheckReturnedToThreshold();
+    double peak_value_time;
+    if (mUnfinishedActionPotentials && mTimesAtPeakValues.size() > 1u)
+    {
+        peak_value_time = mTimesAtPeakValues[mTimesAtPeakValues.size() - 2u];
+    }
+    else if (mUnfinishedActionPotentials && mTimesAtPeakValues.size() == 1u)
+    {
+        EXCEPTION("No peak potential matching a full action potential was recorded.");
+    }
+    else
+    {
+        peak_value_time = mTimesAtPeakValues.back();
+    }
+    return peak_value_time;
+}
+
 double CellProperties::GetLastMaxUpstrokeVelocity()
 {
     CheckReturnedToThreshold();

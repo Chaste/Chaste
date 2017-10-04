@@ -103,6 +103,7 @@ public:
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastPeakPotential(), "AP did not occur, never descended past threshold voltage.");
+            TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastPeakPotential(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetMaxUpstrokeVelocities(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimesAtMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");
         }
@@ -125,6 +126,7 @@ public:
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), "No MaxUpstrokeVelocity matching a full action potential was recorded.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), "No TimeAtMaxUpstrokeVelocity matching a full action potential was recorded.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastCompletePeakPotential(), "No peak potential matching a full action potential was recorded.");
+            TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastCompletePeakPotential(), "No peak potential matching a full action potential was recorded.");
         }
 
         // Stay up for a while...
@@ -144,6 +146,7 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), 100, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), 105, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompletePeakPotential(), 20, 1e-6);
+            TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompletePeakPotential(), 100, 1e-6);
         }
 
         // Stay down for a while
@@ -165,6 +168,7 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), 100, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), 105, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompletePeakPotential(), 20, 1e-6);
+            TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompletePeakPotential(), 100, 1e-6);
         }
 
         // Go down again...
@@ -181,6 +185,7 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), 141, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), 85, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompletePeakPotential(), 0, 1e-6);
+            TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompletePeakPotential(), 141, 1e-6);
         }
 
         times.push_back(999);
@@ -233,6 +238,7 @@ public:
         TS_ASSERT_DELTA(cell_props.GetActionPotentialAmplitudes()[size - 1], 127.606, 0.001);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialAmplitude(), 127.606, 0.001);
         TS_ASSERT_DELTA(cell_props.GetLastPeakPotential(), 43.1665, 0.0001);
+        TS_ASSERT_DELTA(cell_props.GetTimeAtLastPeakPotential(), 3101.15, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(20), 6.5202, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(50), 271.1389, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(90), 362.0155, timestep); // Should use penultimate AP
