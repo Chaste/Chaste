@@ -1714,8 +1714,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
 
     vtk_spline->SetPoints(vtk_points);
 
-    std::array<double, 3> interp_point {};
-    std::array<double, 3> interp_location {};
+    std::array<double, 3> interp_point;
+    std::array<double, 3> interp_location;
 
     auto reposition = [](double& a) -> double
     {
