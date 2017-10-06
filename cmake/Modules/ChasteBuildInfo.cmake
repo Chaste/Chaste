@@ -4,18 +4,27 @@
 set(Chaste_GENERATE_DIR ${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/src)
 
 #Generate Version.cpp
-set(CHASTE_WC_MODIFIED "false")
+set(Chaste_WC_MODIFIED "false")
+set(Chaste_revision "0")
 set(version_file "${CMAKE_CURRENT_BINARY_DIR}/ReleaseVersion.txt")
 if(EXISTS "${version_file}")
+    # its a release
     file(STRINGS "${version_file}" v_data)
     list(GET v_data 0 full_version)
     string(REPLACE "." ";" full_version_list "${full_version}")
     list(LENGTH full_version_list len)
     math(EXPR length ${len}-1)
-    list(GET full_version_list ${length} chaste_revision)
-    message(STATUS "Chaste Release Full Version = ${full_version}, Revision = ${chaste_revision}")
+    list(GET full_version_list ${length} Chaste_revision)
+    message(STATUS "Chaste Release Full Version = ${full_version}, Revision = ${Chaste_revision}")
+elseif(EXISTS "${Chaste_SOURCE_DIR}/.git")
+    # its a git repo 
+    find_package(Git REQUIRED)
+    Git_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
+    set(Chaste_revision "${chaste_WC_REVISION}")
+    message(STATUS "Current Chaste Git Revision = ${chaste_WC_REVISION}. Chaste Modified = ${Chaste_WC_MODIFIED}")
 else()
-    # ReleaseVersion file not found, obtain revision information from SVN
+    # ReleaseVersion file not found and not a git repo, 
+    # obtain revision information from SVN
 	# The following requires a proper command-line svn client to be installed, not
 	# just an ordinary shell extension like TortoiseSVN'
 	# Install SlikSVN or the distribution from Collabnet (if you don't mind registering)
@@ -29,21 +38,17 @@ else()
 
        if(${Subversion_svn_info_result} EQUAL 0)
           Subversion_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
-	      set(chaste_revision "${chaste_WC_REVISION}")
+	      set(Chaste_revision "${chaste_WC_REVISION}")
 	      message(STATUS "Current Chaste SVN Revision = ${chaste_WC_REVISION}. Chaste Last Changed Revision = ${chaste_WC_LAST_CHANGED_REV}")
 	      if(${chaste_WC_REVISION} EQUAL ${chaste_WC_LAST_CHANGED_REV})
-	         set(chaste_WC_MODIFIED "false")
+	         set(Chaste_WC_MODIFIED "false")
 	      else()
-	         set(chaste_WC_MODIFIED "true")
+	         set(Chaste_WC_MODIFIED "true")
 	      endif()
-       endif()
-    endif(SUBVERSION_FOUND)
-    if (NOT (SUBVERSION_FOUND AND (${Subversion_svn_info_result} EQUAL 0)))
-       # assume its a git repo 
-       find_package(Git REQUIRED)
-       Git_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
-       set(chaste_revision "${chaste_WC_REVISION}")
-       message(STATUS "Current Chaste Git Revision = ${chaste_WC_REVISION}. Chaste Modified = ${chaste_WC_MODIFIED}")
+       else()
+           # nothing has worked so far, so just use the default
+           message(STATUS "Cannot find Git revision or WC_MODIFIED")
+        endif()
     endif()
 endif()
 
