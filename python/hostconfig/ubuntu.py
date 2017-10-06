@@ -202,7 +202,7 @@ def Configure(prefs, build):
         vtk_version = vtk_include_path[len(vtk_base):]
         other_includepaths.append(vtk_include_path)
         if vtk_version[0] == '6':
-            vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources']
+            vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources','FiltersGeneral']
             vtk_ver = map(int, vtk_version.split('.')[:2])
             if vtk_ver >= [6,2]:
                 vtk_libs[2:2] = ['IOParallelXML']
