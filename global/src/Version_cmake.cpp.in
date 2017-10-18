@@ -74,7 +74,7 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
     return ${Chaste_VERSION_MINOR}u;
 }
 
-unsigned ChasteBuildInfo::GetRevisionNumber()
+unsigned long long ChasteBuildInfo::GetRevisionNumber()
 {
     return 0x${Chaste_revision};
 }
