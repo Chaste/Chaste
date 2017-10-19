@@ -1391,7 +1391,7 @@ public:
         }
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
-                         "Unable to locate schema file ChasteParameters_3_4.xsd. You will need to ensure it is available when resuming from the checkpoint.");
+                         "Unable to locate schema file ChasteParameters_2017_1.xsd. You will need to ensure it is available when resuming from the checkpoint.");
     }
 
     void TestArchiving() throw (Exception)
@@ -1547,6 +1547,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"), 3001u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"), 3003u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"), 3004u);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1"), 2017001u);
         // and exceptions
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/1__1"),
                               "https://chaste.comlab.ox.ac.uk/nss/parameters/1__1 is not a recognised Chaste parameters namespace.");
@@ -1956,8 +1957,10 @@ private:
         map["cp31"].schema = "ChasteParameters_3_1.xsd";
         map["cp33"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
         map["cp33"].schema = "ChasteParameters_3_3.xsd";
-        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
-        map["cp"].schema = "ChasteParameters_3_4.xsd";
+        map["cp34"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
+        map["cp34"].schema = "ChasteParameters_3_4.xsd";
+        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1";
+        map["cp"].schema = "ChasteParameters_2017_1.xsd";
         cp::ChasteParameters(*p_parameters_file, *pParams, map);
     }
 
