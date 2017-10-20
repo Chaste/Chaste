@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 FixedSequenceCellCycleModel::FixedSequenceCellCycleModel()
     : ExponentialG1GenerationalCellCycleModel()
 {
-	  mStemCellG1Duration = mTransitCellG1Duration;
+      mStemCellG1Duration = mTransitCellG1Duration;
 }
 
 FixedSequenceCellCycleModel::FixedSequenceCellCycleModel(const FixedSequenceCellCycleModel& rModel)
@@ -73,7 +73,7 @@ AbstractCellCycleModel* FixedSequenceCellCycleModel::CreateCellCycleModel()
 
 void FixedSequenceCellCycleModel::SetG1Duration()
 {
-	CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+    CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
 
     if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
             || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
@@ -93,16 +93,16 @@ void FixedSequenceCellCycleModel::SetG1Duration()
 
 void FixedSequenceCellCycleModel::SetRate(double rate)
 {
-	CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
-	p_cell_cycle_times_generator->SetRate(rate);
+    CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+    p_cell_cycle_times_generator->SetRate(rate);
     mTransitCellG1Duration = 1.0/rate;
     mStemCellG1Duration = 1.0/rate;
 }
 
 double FixedSequenceCellCycleModel::GetRate()
 {
-	CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
-	return p_cell_cycle_times_generator->GetRate();
+    CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+    return p_cell_cycle_times_generator->GetRate();
 }
 
 void FixedSequenceCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)

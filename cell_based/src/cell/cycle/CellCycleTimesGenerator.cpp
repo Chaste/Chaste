@@ -40,9 +40,9 @@ CellCycleTimesGenerator* CellCycleTimesGenerator::mpInstance = NULL;
 
 CellCycleTimesGenerator::CellCycleTimesGenerator()
     : mRandomSeed(0u),
-	  mCurrentIndex(0u),
-	  mRate(1.0/2.0),
-	  mVectorCreated(false)
+      mCurrentIndex(0u),
+      mRate(1.0/2.0),
+      mVectorCreated(false)
 {
     assert(mpInstance == NULL); // Ensure correct serialization
 }
@@ -67,23 +67,23 @@ void CellCycleTimesGenerator::Destroy()
 
 void CellCycleTimesGenerator::SetRandomSeed(unsigned randomSeed)
 {
-	mRandomSeed = randomSeed;
+    mRandomSeed = randomSeed;
 }
 
 unsigned CellCycleTimesGenerator::GetRandomSeed()
 {
-	return mRandomSeed;
+    return mRandomSeed;
 }
 
 void CellCycleTimesGenerator::GenerateCellCycleTimeSequence()
 {
-	if (mVectorCreated)
-	{
-		EXCEPTION("Trying to generate the cell cycle times twice. Need to call CellCycleTimesGenerator::Destroy() first.");
-	}
-	else
-	{
-	    unsigned number_stored_times = 15000u;
+    if (mVectorCreated)
+    {
+        EXCEPTION("Trying to generate the cell cycle times twice. Need to call CellCycleTimesGenerator::Destroy() first.");
+    }
+    else
+    {
+        unsigned number_stored_times = 15000u;
         mCellCycleTimes.reserve(number_stored_times);
 
         RandomNumberGenerator* p_random_number_generator = RandomNumberGenerator::Instance();
@@ -91,29 +91,29 @@ void CellCycleTimesGenerator::GenerateCellCycleTimeSequence()
 
         for (unsigned index = 0; index < 15000u; index++)
         {
-        	mCellCycleTimes.push_back( p_random_number_generator->ExponentialRandomDeviate(mRate) );
+            mCellCycleTimes.push_back( p_random_number_generator->ExponentialRandomDeviate(mRate) );
         }
 
         mCurrentIndex = 0;
         mVectorCreated = true;
-	}
+    }
 }
 
 void CellCycleTimesGenerator::SetRate(double rate)
 {
-	if( mVectorCreated)
-	{
+    if( mVectorCreated)
+    {
         EXCEPTION("You cannot reset the rate after cell cycle times are created.");
-	}
-	else
-	{
-	    mRate = rate;
-	}
+    }
+    else
+    {
+        mRate = rate;
+    }
 }
 
 double CellCycleTimesGenerator::GetRate()
 {
-	return mRate;
+    return mRate;
 }
 
 double CellCycleTimesGenerator::GetNextCellCycleTime()
