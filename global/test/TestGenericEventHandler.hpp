@@ -63,7 +63,7 @@ public:
         // Coverage
         AnEventHandler::Instance()->DisableImpl();
         TS_ASSERT_THROWS_THIS(AnEventHandler::Instance()->GetElapsedTime(AnEventHandler::TEST1),
-        		"Asked to report on a disabled event handler.  Check for contributory errors above.");
+                "Asked to report on a disabled event handler.  Check for contributory errors above.");
         AnEventHandler::Instance()->EnableImpl();
 
         AnEventHandler::BeginEvent(AnEventHandler::TEST1);
@@ -152,7 +152,7 @@ public:
 
         // Test in milliseconds (at least 10 and not too much)
         TS_ASSERT_LESS_THAN_EQUALS(10.0, AnEventHandler::GetElapsedTime(AnEventHandler::TEST2));
-        TS_ASSERT_LESS_THAN_EQUALS(AnEventHandler::GetElapsedTime(AnEventHandler::TEST2), 35.0);
+        TS_ASSERT_LESS_THAN_EQUALS(AnEventHandler::GetElapsedTime(AnEventHandler::TEST2), 60.0);
     }
 
     void TestSilentlyCloseEvent()

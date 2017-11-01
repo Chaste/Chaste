@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ExponentialG1GenerationalCellCycleModel.hpp"
+#include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
@@ -89,7 +90,7 @@ void ExponentialG1GenerationalCellCycleModel::SetG1Duration()
     }
 }
 
-double ExponentialG1GenerationalCellCycleModel::GetRate() const
+double ExponentialG1GenerationalCellCycleModel::GetRate()
 {
     return mRate;
 }

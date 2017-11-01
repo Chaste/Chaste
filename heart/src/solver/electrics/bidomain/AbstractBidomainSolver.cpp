@@ -42,20 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
-    {
-        return;
-    }
+    // The base class method that calls this function will only call it with a null linear system
+    assert(this->mpLinearSystem == NULL);
 
     // linear system created here
-    AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>::InitialiseForSolve(initialSolution);
+    AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>::InitialiseForSolve(initialSolution);
 
     if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
     {
 #ifdef TRACE_KSP
         if (PetscTools::AmMaster())
         {
-            std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() <<"\n";
+            std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() << "\n";
         }
 #endif
         this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
@@ -65,7 +63,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 #ifdef TRACE_KSP
         if (PetscTools::AmMaster())
         {
-            std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() <<"\n";
+            std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() << "\n";
         }
 #endif
         this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
@@ -75,10 +73,10 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 
     // Note that twolevelblockdiagonal was never finished.  It was a preconditioner specific to the Parabolic-Parabolic formulation of Bidomain
     // Two levels block diagonal only worked in serial with TetrahedralMesh.
-    assert(std::string(HeartConfig::Instance()->GetKSPPreconditioner()) != std::string("twolevelsblockdiagonal") );
+    assert(std::string(HeartConfig::Instance()->GetKSPPreconditioner()) != std::string("twolevelsblockdiagonal"));
     this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
 
-    if (mRowForAverageOfPhiZeroed==INT_MAX)
+    if (mRowForAverageOfPhiZeroed == INT_MAX)
     {
         // not applying average(phi)=0 constraint, so matrix is symmetric
         this->mpLinearSystem->SetMatrixIsSymmetric(true);
@@ -92,7 +90,9 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
         this->mpLinearSystem->SetMatrixIsSymmetric(false);
     }
 
-    this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
+    this->mpLinearSystem->SetUseFixedNumberIterations(
+        HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(),
+        HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

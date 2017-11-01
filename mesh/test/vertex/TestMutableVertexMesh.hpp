@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
 #include "MutableVertexMesh.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 #include "ArchiveOpener.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -1342,6 +1343,7 @@ public:
         mesh.SetCellRearrangementThreshold(0.54);
         mesh.SetT2Threshold(0.012);
         mesh.SetCellRearrangementRatio(1.6);
+        mesh.SetDistanceForT3SwapChecking(7.3);
 
         AbstractMesh<2,2>* const p_mesh = &mesh;
 
@@ -1389,6 +1391,8 @@ public:
             TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_original->GetDistanceForT3SwapChecking(), 7.3, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetDistanceForT3SwapChecking(), 7.3, 1e-6);
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
@@ -1803,6 +1807,18 @@ public:
         // or edge 2.  The closest edge is not well defined in this situation.
         unsigned edge_closest_to_point1 = mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point1,0);
         TS_ASSERT(edge_closest_to_point1 == 1u || edge_closest_to_point1 == 2u);
+    }
+
+    void TestSetAndGetDistanceForT3SwapChecking()
+    {
+        HoneycombVertexMeshGenerator mesh_generator(10,10); // is_flat_bottom, T1swaptthreshold, T2swapthreshold, elementArea
+        MutableVertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        double standard_distance = p_mesh->GetDistanceForT3SwapChecking();
+        TS_ASSERT_EQUALS(standard_distance, 5.0);
+
+        p_mesh->SetDistanceForT3SwapChecking( 10.0 );
+        double new_distance = p_mesh->GetDistanceForT3SwapChecking();
+        TS_ASSERT_EQUALS(new_distance, 10.0);
     }
 
     void TestHandleHighOrderJunctions()

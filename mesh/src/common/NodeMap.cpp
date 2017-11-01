@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "NodeMap.hpp"
 #include "Exception.hpp"
-
+#include <cassert>
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -65,6 +65,7 @@ void NodeMap::ResetToIdentity()
 
 void NodeMap::SetNewIndex(unsigned oldIndex, unsigned newIndex)
 {
+    assert(oldIndex<mMap.size());
     mMap[oldIndex] = newIndex;
     if (mIsIdentity && (oldIndex != newIndex))
     {

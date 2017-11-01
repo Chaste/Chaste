@@ -43,45 +43,53 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
-#include "FileComparison.hpp"
-#include "Cell.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-#include "UniformG1GenerationalCellCycleModel.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "TysonNovakCellCycleModel.hpp"
-#include "DeltaNotchSrnModel.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "Cell.hpp"
+#include "CellAncestor.hpp"
+#include "CellLabel.hpp"
+#include "CellsGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "DeltaNotchSrnModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
-#include "CellsGenerator.hpp"
+#include "NoCellCycleModel.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "CellAncestor.hpp"
 #include "SimulationTime.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "CellLabel.hpp"
 #include "SmartPointers.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TysonNovakCellCycleModel.hpp"
+#include "UblasCustomFunctions.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
-#include "CellDeltaNotchWriter.hpp"
+#include "CellAppliedForceWriter.hpp"
+#include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "CellDataItemWriter.hpp"
+#include "CellDeltaNotchWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabelWriter.hpp"
 #include "CellLocationIndexWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
-#include "CellCycleModelProteinConcentrationsWriter.hpp"
-#include "CellVolumesWriter.hpp"
-#include "CellRosetteRankWriter.hpp"
 #include "CellRadiusWriter.hpp"
+#include "CellRosetteRankWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Boost
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -1492,6 +1500,178 @@ public:
 
             delete p_cell_writer_2;
        }
+    }
+
+    void TestCellAppliedForceWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0u));
+        nodes.push_back(new Node<2>(1u));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Add an applied force to the nodes
+        c_vector<double, 2> force_0 = Create_c_vector(1.23, 2.34);
+        c_vector<double, 2> force_1 = Create_c_vector(3.45, 4.56);
+        mesh.GetNode(0u)->AddAppliedForceContribution(force_0);
+        mesh.GetNode(1u)->AddAppliedForceContribution(force_1);
+
+        // Create output directory
+        std::string output_directory = "TestCellAppliedForceWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        CellAppliedForceWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_file_handler);
+        cell_writer.WriteTimeStamp();
+        for (auto cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
+        cell_writer.CloseFile();
+
+        // Test that the data are output correctly
+        FileComparison(results_dir + "cellappliedforce.dat", "cell_based/test/data/TestCellWriters/cellappliedforce.dat").CompareFiles();
+
+        // Test the correct data are returned for VTK vector output for the first cell
+        c_vector<double, 2> vtk_data_0 = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        c_vector<double, 2> vtk_data_1 = cell_writer.GetVectorCellDataForVtkOutput(*(++cell_population.Begin()), &cell_population);
+
+        TS_ASSERT_DELTA(vtk_data_0[0], 1.23, 1e-6);
+        TS_ASSERT_DELTA(vtk_data_0[1], 2.34, 1e-6);
+        TS_ASSERT_DELTA(vtk_data_1[0], 3.45, 1e-6);
+        TS_ASSERT_DELTA(vtk_data_1[1], 4.56, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "Cell applied force");
+
+        cell_writer.SetVtkVectorCellDataName("New name");
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "New name");
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
+    }
+
+    void TestCellAppliedForceWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellRadiusWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAppliedForceWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+        PetscTools::Barrier(); // Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+    void TestDefaultVecBehaviourWhenWritingScalars() throw (Exception)
+    {
+        // We test here that a writer designed to only output scalar data has the correct default behaviour for
+        // outputting vectors
+        EXIT_IF_PARALLEL;
+
+        CellRadiusWriter<2,2> cell_writer;
+
+        TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "DefaultVtkVectorCellDataName");
+        TS_ASSERT(cell_writer.GetOutputScalarData());
+        TS_ASSERT(!cell_writer.GetOutputVectorData());
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0u));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        c_vector<double, 2> vec_data = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        for(auto& component : vec_data)
+        {
+            TS_ASSERT_EQUALS(component, DOUBLE_UNSET);
+        }
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
+    }
+
+    void TestDefaultScalarBehaviourWhenWritingVectors() throw (Exception)
+    {
+        // We test here that a writer designed to only output vector data has the correct default behaviour for
+        // outputting scalars
+        EXIT_IF_PARALLEL;
+
+        CellAppliedForceWriter<2,2> cell_writer;
+
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "DefaultVtkCellDataName");
+        TS_ASSERT(!cell_writer.GetOutputScalarData());
+        TS_ASSERT(cell_writer.GetOutputVectorData());
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0u));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        double scalar_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_EQUALS(scalar_data, DOUBLE_UNSET);
+
+        // Avoid memory leak
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
+        }
     }
 };
 

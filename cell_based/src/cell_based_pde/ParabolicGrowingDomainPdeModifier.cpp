@@ -43,9 +43,9 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(boost:
                                                                           bool isNeumannBoundaryCondition,
                                                                           Vec solution)
     : AbstractGrowingDomainPdeModifier<DIM>(pPde,
-    		                                pBoundaryCondition,
-    		                                isNeumannBoundaryCondition,
-    		                                solution)
+                                            pBoundaryCondition,
+                                            isNeumannBoundaryCondition,
+                                            solution)
 {
 }
 
@@ -60,7 +60,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     this->GenerateFeMesh(rCellPopulation);
 
     // Set up boundary conditions
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
 
     // Construct the solution vector from cell data (takes care of cells dividing);
     UpdateSolutionVector(rCellPopulation);
@@ -109,9 +109,9 @@ void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<D
 }
 
 template<unsigned DIM>
-std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
+std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer()
 {
-    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     if (this->IsNeumannBoundaryCondition())
     {

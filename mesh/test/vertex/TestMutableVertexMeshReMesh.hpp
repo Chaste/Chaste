@@ -2259,6 +2259,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh;
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
+        vertex_mesh.SetDistanceForT3SwapChecking(100.0);
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
 

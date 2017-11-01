@@ -126,6 +126,65 @@ public:
         Warnings::QuietDestroy();
     }
 
+    void TestDoNotRestrictVertexMovement() throw (Exception)
+    {
+        // Construct a 2D vertex mesh consisting of a single element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes = 20;
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            double theta = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
+        }
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        double cell_swap_threshold = 0.01;
+        double edge_division_threshold = 2.0;
+        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->SetBirthTime(-1.0);
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
+        TS_ASSERT(cell_population.GetRestrictVertexMovementBoolean())
+        cell_population.SetRestrictVertexMovementBoolean(false);
+        TS_ASSERT(!cell_population.GetRestrictVertexMovementBoolean())
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestVertexSimulationWithoutMovementRestriction");
+        simulator.SetEndTime(1.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+        simulator.AddForce(p_nagai_honda_force);
+
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Test relaxes to circle (can be more stringent with more nodes and more time)
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetVolumeOfElement(0), 1.0, 0.05);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetSurfaceAreaOfElement(0), 3.549077, 0.1);
+
+        // Test that the vertex restriction warning does not occur
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+    }
+
     void TestSingleCellRelaxationWelikyOster() throw (Exception)
     {
         // Construct a 2D vertex mesh consisting of a single element

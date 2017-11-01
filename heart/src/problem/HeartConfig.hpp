@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 
-#include "ChasteParameters_3_4.hpp"
+#include "ChasteParameters_2017_1.hpp"
 
 #include "AbstractStimulusFunction.hpp"
 #include "AbstractChasteRegion.hpp"
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/set.hpp>
 
-namespace cp = chaste::parameters::v3_4;
+namespace cp = chaste::parameters::v2017_1;
 
 // Forward declaration to avoid circular includes
 class HeartFileFinder;
@@ -1273,7 +1273,7 @@ private:
     boost::shared_ptr<cp::chaste_parameters_type> mpParameters;
 
     /** The single instance of the class */
-    static std::auto_ptr<HeartConfig> mpInstance;
+    static boost::shared_ptr<HeartConfig> mpInstance;
 
     /**
      * Where the user parameters were read from.

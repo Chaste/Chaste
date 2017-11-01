@@ -213,6 +213,9 @@ public:
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
      *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
+     *
      * Select the "Display" tab and select "color by" cell index to see individual cells.
      *
      * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
@@ -427,6 +430,9 @@ public:
      * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
+     *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      *
      * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
      *

@@ -49,7 +49,7 @@ void Node<SPACE_DIM>::CommonConstructor(unsigned index, bool isBoundaryNode)
     mIsBoundaryNode = isBoundaryNode;
     mIsInternal = false;
     mIsDeleted = false;
-    mpNodeAttributes = NULL;
+    mpNodeAttributes = nullptr;
 }
 
 template<unsigned SPACE_DIM>
@@ -201,7 +201,7 @@ unsigned Node<SPACE_DIM>::GetNumNodeAttributes()
 template<unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::HasNodeAttributes()
 {
-    return (mpNodeAttributes != NULL);
+    return (mpNodeAttributes != nullptr);
 }
 
 template<unsigned SPACE_DIM>
@@ -221,11 +221,11 @@ void Node<SPACE_DIM>::ClearAppliedForce()
 }
 
 template<unsigned SPACE_DIM>
-void Node<SPACE_DIM>::AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution)
+void Node<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
     ConstructNodeAttributes();
 
-    mpNodeAttributes->AddAppliedForceContribution(forceContribution);
+    mpNodeAttributes->AddAppliedForceContribution(rForceContribution);
 }
 
 template<unsigned SPACE_DIM>
@@ -387,7 +387,7 @@ std::vector<unsigned>& Node<SPACE_DIM>::rGetNeighbours()
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::CheckForNodeAttributes() const
 {
-    if (mpNodeAttributes == NULL)
+    if (mpNodeAttributes == nullptr)
     {
         EXCEPTION("Node has no attributes associated with it. Construct attributes first");
     }
@@ -396,7 +396,7 @@ void Node<SPACE_DIM>::CheckForNodeAttributes() const
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::ConstructNodeAttributes()
 {
-    if (mpNodeAttributes == NULL)
+    if (mpNodeAttributes == nullptr)
     {
         mpNodeAttributes = new NodeAttributes<SPACE_DIM>();
     }

@@ -37,10 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
 
-AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(NULL),
-                                                mpChildTwo(NULL),
-                                                mpParent(NULL),
-                                                mpSibling(NULL),
+AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(nullptr),
+                                                mpChildTwo(nullptr),
+                                                mpParent(nullptr),
+                                                mpSibling(nullptr),
                                                 mIndex(UINT_MAX),
                                                 mRadiusOnEdge(radiusOnEdge)
 {}
@@ -140,7 +140,7 @@ c_vector<double, 3> AirwayBranch::GetDirection()
 
 bool AirwayBranch::IsMajor()
 {
-    if (this->GetSibling() == NULL)
+    if (this->GetSibling() == nullptr)
     {
         return true;
     }
@@ -150,7 +150,7 @@ bool AirwayBranch::IsMajor()
 
 double AirwayBranch::GetBranchAngle()
 {
-    if (this->GetParent() == NULL)
+    if (this->GetParent() == nullptr)
     {
         EXCEPTION("Insufficient airway tree structure to calculate branch angle.");
     }
@@ -163,7 +163,7 @@ double AirwayBranch::GetBranchAngle()
 
 double AirwayBranch::GetRotationAngle()
 {
-    if (this->GetParent() == NULL || this->GetParent()->GetSibling() == NULL || this->GetSibling() == NULL)
+    if (this->GetParent() == nullptr || this->GetParent()->GetSibling() == nullptr || this->GetSibling() == nullptr)
     {
         EXCEPTION("Insufficient airway tree structure to calculate rotation angle.");
     }
@@ -279,7 +279,7 @@ Node<3>* AirwayBranch::GetProximalNode()
         UNUSED_OPT(first_elem_node_1_global_idx);
         unsigned second_elem_node_0_global_idx = p_second_element->GetNode(0)->GetIndex();
         UNUSED_OPT(second_elem_node_0_global_idx);
-        
+
         // In case of failure, there's a problem with node ordering in the mesh: look at commented code below.
         assert(first_elem_node_1_global_idx == second_elem_node_0_global_idx);
         return p_first_element->GetNode(0);

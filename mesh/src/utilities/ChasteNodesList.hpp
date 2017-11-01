@@ -120,7 +120,7 @@ template<class Archive, unsigned SPACE_DIM>
 inline void save_construct_data(
     Archive & ar, const ChasteNodesList<SPACE_DIM> * t, const unsigned int file_version)
 {
-    const std::vector<Node<SPACE_DIM>* > node_list = t->rGetNodesList();
+    const std::vector<Node<SPACE_DIM>*>& node_list = t->rGetNodesList();
 
     // Archive the size first
     unsigned size = t->GetSize();

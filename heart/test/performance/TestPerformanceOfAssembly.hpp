@@ -54,14 +54,14 @@ class TestPerformanceOfAssembly : public CxxTest::TestSuite
 {
 public:
 
-    void TestPerf() throw(Exception)
+    void TestPerfAssembly() throw(Exception)
     {
         // Write headings
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2>::DisplayHeadings();
         HeartEventHandler::Headings();
 
         // Base line
-        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester;
+        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester("TestPerAssembly");
         tester.SimTime=0.0025;
 
         for (unsigned mesh_num=0; mesh_num<3; mesh_num++)

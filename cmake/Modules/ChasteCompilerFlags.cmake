@@ -1,10 +1,14 @@
-message("* Adding compiler flags...")
+message(STATUS "Adding compiler flags...")
 
 # default flags added to all compilers except MSVC
 set(default_flags "-Wall")
 if (Chaste_ERROR_ON_WARNING)
     set(default_flags "${default_flags} -Werror")
 endif()
+
+# Set the C++ Standard
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 set(default_exe_linker_flags "")
 if (UNIX)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -15,7 +19,7 @@ if (UNIX)
 endif()
 
 if (Chaste_COVERAGE)
-    message("adding --coverage to CXX flags for coverage checking")
+    message(STATUS "adding --coverage to CXX flags for coverage checking")
     #--coverage seems to be the preferred flag
     #set(default_flags "${default_flags} -fprofile-arcs -ftest-coverage")
     #set(default_exe_linker_flags "${default_exe_linker_flags} -fprofile-arcs -ftest-coverage")
@@ -25,7 +29,7 @@ if (Chaste_COVERAGE)
 endif()
 
 if (Chaste_PROFILE_GPROF)
-    message("adding -O2 and -pg to CXX flags for Gprof profiling")
+    message(STATUS "adding -O2 and -pg to CXX flags for Gprof profiling")
     set(default_flags "${default_flags} -O2 -pg -Wno-array-bounds")
     set(default_shared_link_flags "${default_shared_link_flags} -pg")
     set(default_exe_linker_flags "${default_exe_linker_flags} -pg")
@@ -33,28 +37,28 @@ endif()
 
 
 if (Chaste_PROFILE_GPERFTOOLS)
-    message("adding -O3 to CXX flags for Gperftools profiling")
+    message(STATUS "adding -O3 to CXX flags for Gperftools profiling")
     set(default_flags "${default_flags} -O3")
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Cray")
-    message("\t...for Cray compiler")
+    message(STATUS "\t...for Cray compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    message("\t...for GNU compiler")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -std=gnu++98 -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
+    message(STATUS "\t...for GNU compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-    message("\t... for Clang compiler")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
+    message(STATUS "\t... for Clang compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-undefined-var-template -Wno-unknown-warning-option -ftemplate-depth-512")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-    message("\t... for Intel compiler")
+    message(STATUS "\t... for Intel compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
     set(Intel_flags
         # Not available on 10.0
@@ -113,7 +117,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-    message("\t... for MSVC compiler")
+    message(STATUS "\t... for MSVC compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     #For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
     #The overrides.cmake include takes care of non GUI builds.
     foreach(flag_var

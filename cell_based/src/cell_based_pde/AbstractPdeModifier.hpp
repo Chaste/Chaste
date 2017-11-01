@@ -144,7 +144,7 @@ public:
     AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
                         boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                         bool isNeumannBoundaryCondition=true,
-                        Vec solution=NULL);
+                        Vec solution=nullptr);
 
     /**
      * Destructor.
@@ -192,7 +192,7 @@ public:
      * @param pMesh Pointer to a tetrahedral mesh
      * @param pCellPdeElementMap map between cells and elements
      */
-    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=NULL);
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
 
     /**
      * @return mSolution.

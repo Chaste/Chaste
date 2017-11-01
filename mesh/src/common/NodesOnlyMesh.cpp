@@ -44,7 +44,7 @@ NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
           mIndexCounter(0u),
           mMinimumNodeDomainBoundarySeparation(1.0),
           mMaxAddedNodeIndex(0u),
-          mpBoxCollection(NULL),
+          mpBoxCollection(nullptr),
           mCalculateNodeNeighbours(true)
 {
 }
@@ -74,13 +74,21 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
     {
         if (mpBoxCollection->IsOwned(rNodes[i]))
         {
+            assert(!rNodes[i]->IsDeleted());
+
             mLocalInitialNodes[i] = true;
 
-            assert(!rNodes[i]->IsDeleted());
+            // Create a copy of the node, sharing its location
             c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
-
             Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(GetNextAvailableIndex(), location);
-            p_node_copy->SetRadius(0.5);    // Default value.
+
+            p_node_copy->SetRadius(0.5);
+
+            // If the original node has attributes, then copy these
+            if (rNodes[i]->HasNodeAttributes())
+            {
+                p_node_copy->rGetNodeAttributes() = rNodes[i]->rGetNodeAttributes();
+            }
 
             this->mNodes.push_back(p_node_copy);
 
@@ -162,7 +170,7 @@ Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) con
         p_node = this->GetNode(index);
     }
 
-    assert(p_node != NULL);
+    assert(p_node != nullptr);
 
     return p_node;
 }
@@ -545,7 +553,7 @@ void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
     {
         delete mpBoxCollection;
     }
-    mpBoxCollection = NULL;
+    mpBoxCollection = nullptr;
 }
 
 template<unsigned SPACE_DIM>
@@ -663,6 +671,23 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_
     {
         this->mNodes[i]->SetIndex(GetNextAvailableIndex());
     }
+}
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetAllNodeIndices() const
+{
+    std::vector<unsigned> indices(GetNumNodes()); // GetNumNodes = mNodes - mDeletedNodes
+    unsigned live_index=0;
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        // Only use nodes which are not deleted
+        if (!this->mNodes[i]->IsDeleted())
+        {
+            indices[live_index] = this->mNodes[i]->GetIndex();
+            live_index++;
+        }
+    }
+    return indices;
 }
 
 // Explicit instantiation

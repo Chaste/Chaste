@@ -54,7 +54,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model and member variables.
+     * Archive the SRN model and member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -67,7 +67,7 @@ private:
 
 protected:
     /**
-     * Protected copy-constructor for use by CreateSrnModel.  The only way for external code to create a copy of a SRN model
+     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
@@ -98,7 +98,7 @@ public:
     AbstractSrnModel* CreateSrnModel();
 
     /**
-     * Initialise the cell-cycle model at the start of a simulation.
+     * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
@@ -113,6 +113,12 @@ public:
 
     /**
      * Update the current levels of Delta and Notch in the cell.
+     *
+     * N.B. Despite the name, this doesn't update the levels of delta or notch, or compute mean levels.
+     * It just copies the current mean delta from the CellData
+     * (set by DeltaNotchTrackingModifier) to the DeltaNotchOdeSystem.
+     *
+     * \todo #2752 Improve the name of this method!
      */
     void UpdateDeltaNotch();
 
@@ -127,12 +133,15 @@ public:
     double GetDelta();
 
     /**
-     * @return the current level of Delta neighbouring the cell.
+     * @return the current level of mean Delta in the neighbouring cells.
+     *
+     * N.B. This doesn't calculate anything, it just returns the parameter
+     * from the DeltaNotchOdeSystem.
      */
     double GetMeanNeighbouringDelta();
 
     /**
-     * Output cell-cycle model parameters to file.
+     * Output SRN model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

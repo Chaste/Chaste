@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellBasedWriter.hpp"
 #include "Cell.hpp"
+#include "UblasVectorInclude.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
@@ -54,6 +55,7 @@ private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+
     /**
      * Serialize the object and its member variables.
      *
@@ -64,14 +66,25 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & mOutputScalarData;
+        archive & mOutputVectorData;
+        archive & mVtkCellDataName;
+        archive & mVtkVectorCellDataName;
     }
 
 protected:
 
-    /**
-     * The name of the cell data used in VTK output.
-     */
+    /** Whether to output scalar data for VTK using GetCellDataForVtkOutput(). Default true. */
+    bool mOutputScalarData;
+
+    /** Whether to output scalar data for VTK using GetVectorCellDataForVtkOutput(). Default false. */
+    bool mOutputVectorData;
+
+    /** The name of the cell data used in VTK output. */
     std::string mVtkCellDataName;
+
+    /** The name of the vector cell data used in VTK output. */
+    std::string mVtkVectorCellDataName;
 
 public:
 
@@ -85,15 +98,27 @@ public:
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * By default this method returns a DOUBLE_UNSET, but it may be overridden in subclasses
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell.
      *
      * @return data associated with the cell
      */
-    virtual double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
+    virtual double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Get a c_vector associated with a cell. This method reduces duplication
+     * of code between the methods VisitCell() and AddVtkData().
+     *
+     * By default this method returns a c_vector of DOUBLE_UNSET, but it may be overridden in subclasses
+     *
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell.
+     *
+     * @return data associated with the cell
+     */
+    virtual c_vector<double, SPACE_DIM> GetVectorCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit a cell and write its data.
@@ -107,19 +132,48 @@ public:
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
-     * Set the name of the cell data used in VTK output.
+     * Get whether to invoke GetCellDataForVtkOutput()
+     *
+     * @return mOutputScalarData
+     */
+    bool GetOutputScalarData();
+
+    /**
+     * Get whether to invoke GetVectorCellDataForVtkOutput()
+     *
+     * @return mOutputScalarData
+     */
+    bool GetOutputVectorData();
+
+    /**
+     * Set the name of the scalar cell data used in VTK output.
      * This method allows the user to change mVtkCellDataName from
      * its default value, which is set in each subclass's
      * constructor.
      *
-     * @param vtkCellDataName the output file name
+     * @param vtkCellDataName the name of the VTK field
      */
     void SetVtkCellDataName(std::string vtkCellDataName);
 
     /**
-     * @return the name of the cell data used in VTK output.
+     * Set the name of the vector cell data used in VTK output.
+     * This method allows the user to change mVtkCellDataName from
+     * its default value, which is set in each subclass's
+     * constructor.
+     *
+     * @param vtkCellDataName the name of the VTK field
+     */
+    void SetVtkVectorCellDataName(std::string vtkCellDataName);
+
+    /**
+     * @return the name of the scalar cell data used in VTK output.
      */
     std::string GetVtkCellDataName();
+
+    /**
+     * @return the name of the vector cell data used in VTK output.
+     */
+    std::string GetVtkVectorCellDataName();
 };
 
 #endif /*ABSTRACTCELLWRITER_HPP_*/

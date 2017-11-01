@@ -69,7 +69,7 @@ double LinearBasisFunction<3>::ComputeBasisFunction(
             return rPoint[2];
             break;
         default:
-        	NEVER_REACHED; //not possible to get here because of assertions above
+            NEVER_REACHED; //not possible to get here because of assertions above
     }
 
     return 0.0; // LCOV_EXCL_LINE // Avoid compiler warning

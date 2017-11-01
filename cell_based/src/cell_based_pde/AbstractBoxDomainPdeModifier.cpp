@@ -74,7 +74,7 @@ double AbstractBoxDomainPdeModifier<DIM>::GetStepSize()
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
 {
-	mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
+    mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>

@@ -420,7 +420,7 @@ public:
      * @return the solution vector
      * @param lhsGuess  an optional initial guess for the solution (defaults to NULL)
      */
-    Vec Solve(Vec lhsGuess=NULL);
+    Vec Solve(Vec lhsGuess=nullptr);
 
     /**
      * Set an element of the right-hand side vector to a given value.

@@ -59,7 +59,7 @@ BernoulliTrialCellCycleModel::BernoulliTrialCellCycleModel(const BernoulliTrialC
 
 bool BernoulliTrialCellCycleModel::ReadyToDivide()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     if (!mReadyToDivide)
     {

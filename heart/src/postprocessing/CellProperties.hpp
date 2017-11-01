@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #ifndef _CELLPROPERTIES_HPP_
 #define _CELLPROPERTIES_HPP_
 
@@ -74,16 +73,25 @@ private:
 
     /** Cached vector containing AP onset properties */
     std::vector<double> mOnsets;
+
     /** Cached vector containing AP resting properties */
     std::vector<double> mRestingValues;
+
     /** Cached vector containing AP cycle lengths properties */
     std::vector<double> mCycleLengths;
+
     /** Cached vector containing AP peak properties */
     std::vector<double> mPeakValues;
+
+    /** Cached vector containing the times of AP peaks */
+    std::vector<double> mTimesAtPeakValues;
+
     /** Cached vector containing AP upstroke properties */
     std::vector<double> mMaxUpstrokeVelocities;
+
     /** Cached vector containing the times of AP upstrokes */
     std::vector<double> mTimesAtMaxUpstrokeVelocity;
+
     /** Cached vector containing the number of recorded depolarisations while above threshold */
     std::vector<unsigned> mCounterOfPlateauDepolarisations;
 
@@ -120,7 +128,6 @@ private:
     void CheckReturnedToThreshold(void);
 
 public:
-
     /**
      * Constructor sets the data and calls CalculateProperties
      *
@@ -129,13 +136,13 @@ public:
      * @param threshold is the threshold for determining if an AP started, defaults to -30
      *
      */
-    CellProperties(const std::vector<double> &rVoltage,
-                   const std::vector<double> &rTime,
-                   double threshold=-30.0)
-        : mrVoltage(rVoltage),
-          mrTime(rTime),
-          mUnfinishedActionPotentials(false),
-          mThreshold(threshold)
+    CellProperties(const std::vector<double>& rVoltage,
+                   const std::vector<double>& rTime,
+                   double threshold = -30.0)
+            : mrVoltage(rVoltage),
+              mrTime(rTime),
+              mUnfinishedActionPotentials(false),
+              mThreshold(threshold)
     {
         CalculateProperties();
     }
@@ -203,6 +210,20 @@ public:
     std::vector<double> GetPeakPotentials();
 
     /**
+     * Returns the times of all the peak potentials for all APs.
+     *
+     * @return a vector containing the times of peak potentials for all APs
+     */
+    std::vector<double> GetTimesAtPeakPotentials();
+
+    /**
+     * Returns the time of the final peak potential.
+     *
+     * @return the times of the final peak potentials
+     */
+    double GetTimeAtLastPeakPotential();
+
+    /**
      * Returns the last peak potential.
      *
      * @return last peak potential V_max
@@ -215,6 +236,13 @@ public:
      * @return last peak potential V_max
      */
     double GetLastCompletePeakPotential();
+
+    /**
+     * Returns the time of the last complete AP's peak potential.
+     *
+     * @return last peak potential time.
+     */
+    double GetTimeAtLastCompletePeakPotential();
 
     /**
      * Returns the minimum resting potential BEFORE each AP.

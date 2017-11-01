@@ -465,7 +465,7 @@ public:
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
-        	delete nodes[i];
+            delete nodes[i];
         }
 
         // Test the correct exception is thrown if using a CaBasedCellPopulation
@@ -1231,7 +1231,7 @@ public:
         }
 
         // Test with a NodeBasedCellPopulation
-        { 
+        {
             std::vector<Node<2>* > node_based_nodes;
             node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
             node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
