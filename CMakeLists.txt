@@ -553,35 +553,33 @@ add_custom_target(tutorials)
 #################################################
 
 set(Chaste_ALL_LIBRARIES "")
-if (Chaste_ENABLE_TESTING)
-    foreach(type ${TestPackTypes})
-        add_custom_target(${type})
-    endforeach()
+foreach(type ${TestPackTypes})
+    add_custom_target(${type})
+endforeach()
 
-    foreach(component ${Chaste_COMPONENTS})
-        # ${component} target will build library and tests
-        add_custom_target(${component})
-        # chaste_${component} is the actual library target
-        list(APPEND Chaste_ALL_LIBRARIES chaste_${component})
-    endforeach()
+foreach(component ${Chaste_COMPONENTS})
+    # ${component} target will build library and tests
+    add_custom_target(${component})
+    # chaste_${component} is the actual library target
+    list(APPEND Chaste_ALL_LIBRARIES chaste_${component})
+endforeach()
 
-    foreach(project ${Chaste_PROJECTS})
-        # project_${project} target will build library and tests
-        add_custom_target(project_${project})
-        # chaste_project_${project} target is the actual library target
-        if (Chaste_ENABLE_project_${project}_INSTALL)
-            list(APPEND Chaste_ALL_LIBRARIES chaste_project_${project})
-        endif()
-    endforeach()
+foreach(project ${Chaste_PROJECTS})
+    # project_${project} target will build library and tests
+    add_custom_target(project_${project})
+    # chaste_project_${project} target is the actual library target
+    if (Chaste_ENABLE_project_${project}_INSTALL)
+        list(APPEND Chaste_ALL_LIBRARIES chaste_project_${project})
+    endif()
+endforeach()
 
-    # Targets for making core components and core component libraries, respectively
-    add_custom_target(core)
-    add_custom_target(chaste_core)
+# Targets for making core components and core component libraries, respectively
+add_custom_target(core)
+add_custom_target(chaste_core)
 
-    # Targets for making all components and all component libraries, respectively
-    add_custom_target(all_components)
-    add_custom_target(chaste_all_components)
-endif()
+# Targets for making all components and all component libraries, respectively
+add_custom_target(all_components)
+add_custom_target(chaste_all_components)
 
 #######################################################
 # SETUP COMPONENT DEPENDANCIES AND HEADER DIRECTORIES #
