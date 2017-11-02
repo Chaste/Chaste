@@ -328,7 +328,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
         {
             bool boundary_check;
             boundary_check = ((location[d] > lower[d]) || sqrt((location[d]-lower[d])*(location[d]-lower[d])) < DBL_EPSILON);
-            does_contain = (boundary_check && (location[d] < upper[d]));
+            does_contain = (dose_contain && boundary_check && (location[d] < upper[d]));
         }
 
         if (does_contain)
