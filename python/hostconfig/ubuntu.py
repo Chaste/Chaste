@@ -52,7 +52,10 @@ if ubuntu_ver == 'Trusty':
 else:
     ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
-if ubuntu_ver >= [17,04]:
+if ubuntu_ver >= [17,10]:
+    petsc_ver = 3.7
+    petsc_path = '/usr/lib/petscdir/3.7.6/'
+elif ubuntu_ver >= [17,04]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.5/'
 elif ubuntu_ver >= [16,10]:
