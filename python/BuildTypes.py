@@ -406,6 +406,8 @@ class Gcc(BuildType):
         else:
             self._compiler_type = 'gcc'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
+            if self.GetCompilerVersion() >= 7:
+                self._cc_flags.extend('-Wimplicit-fallthrough')
 
 class GccDebug(Gcc):
     """
