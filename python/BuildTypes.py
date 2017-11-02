@@ -407,7 +407,16 @@ class Gcc(BuildType):
             self._compiler_type = 'gcc'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
             if self.GetCompilerVersion() >= 7:
-                self._cc_flags.extend('-Wimplicit-fallthrough')
+                self._cc_flags.extend(['-Wimplicit-fallthrough'])
+
+    def GetCompilerVersion(self):
+        """Get the major version number of the compiler being used."""
+        version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
+        try:
+            return int(version_str.split('.')[0])
+        except:
+            return 0
+
 
 class GccDebug(Gcc):
     """
