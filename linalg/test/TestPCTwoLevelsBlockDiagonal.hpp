@@ -53,7 +53,7 @@ class TestPCTwoLevelsBlockDiagonal : public CxxTest::TestSuite
 {
 public:
 
-    void TestBasicFunctionality() throw (Exception)
+    void TestBasicFunctionality()
     {
         EXIT_IF_PARALLEL;
 

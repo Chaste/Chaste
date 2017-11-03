@@ -70,7 +70,7 @@ class TestArchiveCell: public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestArchivingOfCell() throw(Exception)
+    void TestArchivingOfCell()
     {
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();

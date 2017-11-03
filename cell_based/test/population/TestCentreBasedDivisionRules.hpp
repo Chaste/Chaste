@@ -180,7 +180,7 @@ public:
         TS_ASSERT_DELTA(daughter_location[1], expected_daughter_location[1], 1e-6);
     }
 
-    void TestArchiveRandomDirectionCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveRandomDirectionCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "RandomDirectionCentreBasedDivisionRule.arch";
@@ -207,7 +207,7 @@ public:
         }
     }
 
-    void TestArchiveFixedCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveFixedCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "FixedCentreBasedDivisionRule.arch";

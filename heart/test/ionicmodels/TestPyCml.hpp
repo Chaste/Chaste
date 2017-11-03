@@ -144,7 +144,7 @@ public:
      * This test is designed to quickly check that PyCml-generated code matches the Chaste interfaces,
      * and gives expected results.
      */
-    void TestPyCmlCodeGeneration() throw(Exception)
+    void TestPyCmlCodeGeneration()
     {
         clock_t ck_start, ck_end;
 
@@ -478,7 +478,7 @@ public:
         }
     }
 
-    void TestModelWithNoIntracellularCalcium() throw(Exception)
+    void TestModelWithNoIntracellularCalcium()
     {
         boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);

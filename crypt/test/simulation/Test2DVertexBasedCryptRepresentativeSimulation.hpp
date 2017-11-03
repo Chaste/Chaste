@@ -65,7 +65,7 @@ class Test2DVertexCryptRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void Test2DVertexCryptRepresentativeSimulationForProfiling() throw (Exception)
+    void Test2DVertexCryptRepresentativeSimulationForProfiling()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);

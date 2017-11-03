@@ -364,7 +364,7 @@ public:
         PetscTools::Destroy(petsc_vec);
     }
 
-    void TestReadOnlyDistributedVector() throw (Exception)
+    void TestReadOnlyDistributedVector()
     {
         DistributedVectorFactory factory(10);
         Vec petsc_vec = factory.CreateVec();
@@ -402,7 +402,7 @@ public:
         PetscTools::Destroy(petsc_vec);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         const unsigned TOTAL = 100;
         DistributedVectorFactory factory(TOTAL);

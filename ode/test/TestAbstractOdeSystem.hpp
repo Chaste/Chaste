@@ -222,7 +222,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_info->GetAnyVariableUnits(3u), "Invalid index passed to GetAnyVariableUnits.");
     }
 
-    void TestAttributes() throw (Exception)
+    void TestAttributes()
     {
         ParameterisedOde ode;
         TS_ASSERT_EQUALS(ode.GetNumberOfAttributes(), 1u);
@@ -240,7 +240,7 @@ public:
     }
 
 
-    void TestArchivingOfParameters() throw (Exception)
+    void TestArchivingOfParameters()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
@@ -338,7 +338,7 @@ public:
         }
     }
 
-    void TestDerivedQuantities() throw (Exception)
+    void TestDerivedQuantities()
     {
         ParameterisedOde ode;
         boost::shared_ptr<const AbstractOdeSystemInformation> p_info = ode.GetSystemInformation();

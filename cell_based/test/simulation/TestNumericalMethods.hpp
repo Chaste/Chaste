@@ -74,7 +74,7 @@ class TestNumericalMethods : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestMethodsAndExceptions() throw(Exception)
+    void TestMethodsAndExceptions()
     {
 
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
@@ -145,7 +145,7 @@ public:
         }
     }
 
-    void TestUpdateAllNodePositionsWithMeshBased() throw(Exception)
+    void TestUpdateAllNodePositionsWithMeshBased()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -197,7 +197,7 @@ public:
         }
     }
 
-    void TestUpdateAllNodePositionsWithMeshBasedWithGhosts() throw(Exception)
+    void TestUpdateAllNodePositionsWithMeshBasedWithGhosts()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -252,7 +252,7 @@ public:
         }
     }
 
-    void TestUpdateAllNodePositionsWithNodeBased() throw(Exception)
+    void TestUpdateAllNodePositionsWithNodeBased()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -307,7 +307,7 @@ public:
         }
     }
 
-    void TestUpdateAllNodePositionsWithNodeBasedWithBuskeUpdate() throw(Exception)
+    void TestUpdateAllNodePositionsWithNodeBasedWithBuskeUpdate()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -363,7 +363,7 @@ public:
         // }
     }
 
-    void TestUpdateAllNodePositionsWithNodeBasedWithParticles() throw(Exception)
+    void TestUpdateAllNodePositionsWithNodeBasedWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -421,7 +421,7 @@ public:
         }
     }
 
-    void TestUpdateAllNodePositionsWithVertexBased() throw (Exception)
+    void TestUpdateAllNodePositionsWithVertexBased()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
@@ -475,7 +475,7 @@ public:
         }
     }
 
-    void TestSettingAndGettingFlags() throw (Exception)
+    void TestSettingAndGettingFlags()
     {
         // Create numerical methods for testing
         MAKE_PTR(ForwardEulerNumericalMethod<2>, p_fe_method);

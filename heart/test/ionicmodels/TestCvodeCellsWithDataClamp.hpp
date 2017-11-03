@@ -57,7 +57,7 @@ private:
 #endif
 
 public:
-    void TestInterpolatorTimesAndGenerateReferenceTrace() throw(Exception)
+    void TestInterpolatorTimesAndGenerateReferenceTrace()
     {
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("CvodeCellsWithDataClamp");
@@ -200,7 +200,7 @@ public:
 #endif
     }
 
-    void TestArchivingCvodeCellsWithDataClamp() throw(Exception)
+    void TestArchivingCvodeCellsWithDataClamp()
     {
         // We also hijack this test to test the archiving and restoration of modifiers.
 #ifdef CHASTE_CVODE

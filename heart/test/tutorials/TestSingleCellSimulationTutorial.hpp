@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSingleCellSimulationTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestShannonSimulation() throw(Exception)
+    void TestShannonSimulation()
     {
 /* CVODE is still an optional Chaste dependency, but it is highly recommended for
  * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled

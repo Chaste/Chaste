@@ -89,7 +89,7 @@ public:
 class TestCardiacElectroMechanicsOnAnnulus : public CxxTest::TestSuite
 {
 public:
-    void TestDynamicExpansionNoElectroMechanics() throw (Exception)
+    void TestDynamicExpansionNoElectroMechanics()
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
@@ -189,7 +189,7 @@ public:
     }
 
 
-    void TestStaticExpansionAndElectroMechanics() throw (Exception)
+    void TestStaticExpansionAndElectroMechanics()
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;

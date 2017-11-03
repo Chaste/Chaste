@@ -223,7 +223,7 @@ class TestCreatingAndUsingNewCellBasedWritersTutorial : public AbstractCellBased
 {
 public:
 
-    void TestOffLatticeSimulationWithMotileCellPropertyAndWriters() throw(Exception)
+    void TestOffLatticeSimulationWithMotileCellPropertyAndWriters()
     {
         /*
          * We begin by creating a {{{NodeBasedCellPopulation}}}, just as in [wiki:UserTutorials/CreatingAndUsingANewCellProperty].

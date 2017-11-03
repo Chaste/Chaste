@@ -64,7 +64,7 @@ public:
      * Test that the matrix is calculated correctly on the cannonical triangle.
      * Tests against the analytical solution calculated by hand.
      */
-    void TestAssembler()  throw(Exception)
+    void TestAssembler()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);

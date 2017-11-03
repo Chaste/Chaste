@@ -72,7 +72,7 @@ class Test2DCryptRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void TestRepresentativeSimulationForProfiling() throw (Exception)
+    void TestRepresentativeSimulationForProfiling()
     {
         EXIT_IF_PARALLEL;
 

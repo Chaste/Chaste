@@ -137,7 +137,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestArchivingCellPopulation() throw (Exception)
+    void TestArchivingCellPopulation()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't yet work in parallel.
 

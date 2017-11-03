@@ -55,7 +55,7 @@ typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2
 class TestExplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 {
 public:
-    void TestWithSimpleContractionModel() throw(Exception)
+    void TestWithSimpleContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
@@ -110,7 +110,7 @@ public:
 
     // with stretch (and stretch-rate) independent contraction models the implicit and explicit schemes
     // are identical
-    void TestCompareImplicitAndExplicitWithStretchIndependentContractionModel() throw(Exception)
+    void TestCompareImplicitAndExplicitWithStretchIndependentContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
 
@@ -167,7 +167,7 @@ public:
 
 
     // with stretch-dependent contraction models the implicit and explicit schemes can be similar
-    void TestCompareImplicitAndExplicitWithStretchDependentContractionModel() throw(Exception)
+    void TestCompareImplicitAndExplicitWithStretchDependentContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
 
@@ -255,7 +255,7 @@ public:
     }
 
     // cover all other contraction model options which are allowed but not been used in a test so far
-    void TestCoverage() throw(Exception)
+    void TestCoverage()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -333,7 +333,7 @@ public:
         delete p_pair_wrong;
     }
 
-    void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)
+    void TestCrossFibreTensionWithSimpleContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
@@ -419,7 +419,7 @@ public:
      *
      * Therefore nothing should happen!
      */
-    void TestIsotropicCrossFibreTensions() throw(Exception)
+    void TestIsotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -509,7 +509,7 @@ public:
      * This time we will make x (fibres) and z (sheet-normal) contract,
      * and y will not contract (so nodes will expand out for y, shrink in for x,z).
      */
-    void TestAnisotropicCrossFibreTensions() throw(Exception)
+    void TestAnisotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:

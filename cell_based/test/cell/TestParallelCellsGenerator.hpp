@@ -55,7 +55,7 @@ class TestParallelCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestConstruct1dParallelPopulation() throw (Exception)
+    void TestConstruct1dParallelPopulation()
     {
         NodesOnlyMesh<1> mesh;
         mesh.SetMaximumInteractionDistance(0.5);
@@ -91,7 +91,7 @@ public:
         }
     }
 
-    void TestConstruct2dParallelPopulation() throw (Exception)
+    void TestConstruct2dParallelPopulation()
     {
         NodesOnlyMesh<2> mesh;
         mesh.SetMaximumInteractionDistance(0.5);
@@ -126,7 +126,7 @@ public:
         }
     }
 
-    void TestConstruct3dParallelPopulation() throw (Exception)
+    void TestConstruct3dParallelPopulation()
     {
         NodesOnlyMesh<3> mesh;
         mesh.SetMaximumInteractionDistance(0.5);

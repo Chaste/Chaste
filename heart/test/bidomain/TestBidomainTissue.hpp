@@ -197,7 +197,7 @@ public:
     }
 
 
-    void TestBidomainTissueWithHeterogeneousConductivitiesDistributed() throw (Exception)
+    void TestBidomainTissueWithHeterogeneousConductivitiesDistributed()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -278,7 +278,7 @@ public:
 
     }
 
-    void TestBidomainTissueConductivityModifier() throw (Exception)
+    void TestBidomainTissueConductivityModifier()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -309,7 +309,7 @@ public:
         TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(3u)(0,0),7.0);
     }
 
-    void TestBidomainTissueWithHeterogeneousConductivitiesEllipsoid() throw (Exception)
+    void TestBidomainTissueWithHeterogeneousConductivitiesEllipsoid()
     {
         HeartConfig::Instance()->Reset();
 

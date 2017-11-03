@@ -380,7 +380,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),8u);
     }
 
-    void TestVolumeTrackedOffLatticeSimulationArchiving() throw (Exception)
+    void TestVolumeTrackedOffLatticeSimulationArchiving()
     {
         EXIT_IF_PARALLEL;
 

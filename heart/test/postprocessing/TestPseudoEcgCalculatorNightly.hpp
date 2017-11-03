@@ -54,7 +54,7 @@ class TestPseudoEcgCalculatorNightly : public CxxTest::TestSuite
 {
 public:
 
-    void TestCalculatorRealistic3D() throw (Exception)
+    void TestCalculatorRealistic3D()
     {
         //get the mesh, whole heart mesh
         TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
@@ -89,7 +89,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestCalculatorRealistic3DNotDistributed() throw (Exception)
+    void TestCalculatorRealistic3DNotDistributed()
     {
          //get the mesh, whole heart mesh
         TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");

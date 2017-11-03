@@ -148,7 +148,7 @@ public:
      * Test two ODE solvers with this ODE system (correct values calculated using the Matlab solver ode15s).
      *
      */
-    void TestAlarcon2004Solver() throw(Exception)
+    void TestAlarcon2004Solver()
     {
         // Set up
         double oxygen_concentration = 1.0;

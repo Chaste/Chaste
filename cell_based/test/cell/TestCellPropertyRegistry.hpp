@@ -58,7 +58,7 @@ class TestCellLabel : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellLabelMethods() throw (Exception)
+    void TestCellLabelMethods()
     {
         MAKE_PTR(CellLabel, p_label);
         TS_ASSERT_EQUALS(p_label->GetCellCount(), 0u);
@@ -85,7 +85,7 @@ public:
         TS_ASSERT(const_label.IsSame(p_other_label.get()));
     }
 
-    void TestCellPropertyRegistry() throw(Exception)
+    void TestCellPropertyRegistry()
     {
         boost::shared_ptr<AbstractCellProperty> p_property1(
                 CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -122,7 +122,7 @@ public:
         delete p_registry;
     }
 
-    void TestCellPropertyOrdering() throw(Exception)
+    void TestCellPropertyOrdering()
     {
         CellPropertyRegistry* p_instance = CellPropertyRegistry::Instance();
         p_instance->Clear();
@@ -150,7 +150,7 @@ public:
         p_instance->Clear();
     }
 
-    void TestArchiveCellLabel() throw(Exception)
+    void TestArchiveCellLabel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "label.arch";
@@ -195,7 +195,7 @@ public:
         }
     }
 
-    void TestArchiveCellPropertyRegistry() throw(Exception)
+    void TestArchiveCellPropertyRegistry()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "property.arch";

@@ -48,7 +48,7 @@ class TestAirwayPropertiesCalculator : public CxxTest::TestSuite
 public:
 
 
-    void TestBranchProperties() throw(Exception)
+    void TestBranchProperties()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002");
@@ -92,7 +92,7 @@ public:
     }
 
 
-    void TestOrders() throw(Exception)
+    void TestOrders()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
@@ -124,7 +124,7 @@ public:
         TS_ASSERT_EQUALS(properties_calculator.GetBranchGeneration(branches[4]), 2u);
     }
 
-    void TestSubtreeProperties() throw(Exception)
+    void TestSubtreeProperties()
     {
         // Load test mesh
         TetrahedralMesh<1, 3> mesh;
@@ -179,7 +179,7 @@ public:
         TS_ASSERT_DELTA(branch_centroids[1][2], 0.0, 1e-6);
     }
 
-    void TestUpstreamProperties() throw(Exception)
+    void TestUpstreamProperties()
     {
         // Load test mesh
         TetrahedralMesh<1, 3> mesh;

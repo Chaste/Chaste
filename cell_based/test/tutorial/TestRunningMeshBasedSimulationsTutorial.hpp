@@ -107,7 +107,7 @@ public:
      * In the first test, we run a simple mesh-based simulation, in which we create a monolayer
      * of cells, using a mutable mesh. Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /* Next, we generate a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}}. This generates a honeycomb-shaped mesh,
@@ -219,7 +219,7 @@ public:
      * create a monolayer of cells, using a mutable mesh.
      * Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayerWithGhostNodes() throw(Exception)
+    void TestMonolayerWithGhostNodes()
     {
         /* We start by generating a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}} as before. Here the first and second arguments

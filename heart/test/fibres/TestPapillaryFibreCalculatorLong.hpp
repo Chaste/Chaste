@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPapillaryFibreCalculatorLong : public CxxTest::TestSuite
 {
 public:
-    void TestGetFibreOrientationsOnCylinder(void) throw(Exception)
+    void TestGetFibreOrientationsOnCylinder(void)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cylinder_14748_elem");
         TetrahedralMesh<3,3> mesh;

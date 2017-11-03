@@ -248,7 +248,7 @@ public:
     }
 
     /**This test checks heterogeneous conductivities*/
-    void TestExtendedTissueHeterogeneous3D() throw (Exception)
+    void TestExtendedTissueHeterogeneous3D()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -323,7 +323,7 @@ public:
 
     }
 
-    void TestExtendedTissueHeterogeneousConductivities2D() throw (Exception)
+    void TestExtendedTissueHeterogeneousConductivities2D()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -402,7 +402,7 @@ public:
         TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(3u)(0,0),65.0);//within no cuboid
     }
 
-    void TestExtendedTissueHeterogeneousGgap3D() throw (Exception)
+    void TestExtendedTissueHeterogeneousGgap3D()
     {
         HeartConfig::Instance()->Reset();
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -478,7 +478,7 @@ public:
         PetscTools::Destroy(vector);
     }
 
-    void TestExtendedBidomainTissueParameters() throw (Exception)
+    void TestExtendedBidomainTissueParameters()
     {
         HeartConfig::Instance()->Reset();
 
@@ -522,7 +522,7 @@ public:
      * It creates one, changes the default values of some member variables and saves.
      * Then it tries to load from the archive and checks that the member variables are with the right values.
      */
-    void TestSaveAndLoadExtendedBidomainTissue() throw (Exception)
+    void TestSaveAndLoadExtendedBidomainTissue()
     {
         HeartConfig::Instance()->Reset();
         // Archive settings

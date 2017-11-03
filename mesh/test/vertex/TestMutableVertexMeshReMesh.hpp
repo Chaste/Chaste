@@ -50,7 +50,7 @@ class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestPerformNodeMerge() throw(Exception)
+    void TestPerformNodeMerge()
     {
         /*
          * Create a mesh comprising a single triangular element, as shown below.
@@ -111,7 +111,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2.0), 1e-6);
     }
 
-    void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement() throw(Exception)
+    void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement()
     {
         /**
          * Create a mesh comprising two square elements, as shown below. We will test that the
@@ -183,7 +183,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapAndIdentifySwapType() throw(Exception)
+    void TestPerformT1SwapAndIdentifySwapType()
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -277,7 +277,7 @@ public:
         TS_ASSERT_EQUALS(t1_locations.size(), 0u);
     }
 
-    void TestPerformT1SwapOnBoundary() throw(Exception)
+    void TestPerformT1SwapOnBoundary()
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all nodes are
@@ -365,7 +365,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapOnBoundary2() throw(Exception)
+    void TestPerformT1SwapOnBoundary2()
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all but one node
@@ -455,7 +455,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapWhenVoidForms() throw(Exception)
+    void TestPerformT1SwapWhenVoidForms()
     {
         /*
          * Create a mesh containing six nodes containing in two elements. We will test that
@@ -529,7 +529,7 @@ public:
         }
     }
 
-    void TestPerformT1SwapExceptions() throw(Exception)
+    void TestPerformT1SwapExceptions()
     {
         /*
          * Create a mesh comprising six nodes containing in two triangle and two rhomboid elements,
@@ -575,7 +575,7 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes are too close together, this shouldn't happen");
     }
 
-    void TestPerformT1SwapWithAddingEdgeToTriangularElement() throw(Exception)
+    void TestPerformT1SwapWithAddingEdgeToTriangularElement()
     {
         /**
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
@@ -643,7 +643,7 @@ public:
         }
     }
 
-    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
+    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement()
     {
         /**
          * In this test we check that a T1 swap does not occur if one of the elements is triangular
@@ -711,7 +711,7 @@ public:
         }
     }
 
-    void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement() throw(Exception)
+    void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement()
     {
         /**
          * In this test we check that void removal does not occur if one of the adjacent elements is triangular
@@ -764,7 +764,7 @@ public:
                               "Triangular element next to triangular void, not implemented yet.");
     }
 
-    void TestPerformT2Swap() throw(Exception)
+    void TestPerformT2Swap()
     {
         /*
          * Create a mesh comprising six nodes contained in three trapezium element and
@@ -845,7 +845,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
     }
 
-    void TestPerformT2SwapWithBoundaryNodes() throw(Exception)
+    void TestPerformT2SwapWithBoundaryNodes()
     {
         /*
          * Create a mesh comprising six nodes contained in two trapezium elements
@@ -980,7 +980,7 @@ public:
         }
     }
 
-    void TestT2SwapsDontOccurWithTriangularNeighbours() throw(Exception)
+    void TestT2SwapsDontOccurWithTriangularNeighbours()
     {
         // Make 6 nodes to assign to four elements
         std::vector<Node<2>*> nodes;
@@ -1028,7 +1028,7 @@ public:
                 "dealing with this has not been implemented yet" );
     }
 
-    void TestPerformT2SwapWithRosettes() throw(Exception)
+    void TestPerformT2SwapWithRosettes()
     {
         /* Create a mesh containing a smaller triangular element, each of whose nodes are
          * 'rosette' nodes. Test that a T2 swap correctly removes the triangular element
@@ -1130,7 +1130,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(3), 7u);
     }
 
-    void TestReMeshForT1Swaps() throw(Exception)
+    void TestReMeshForT1Swaps()
     {
         /*
          * Read in a vertex mesh that contains several pairs of nodes that are close enough for
@@ -1181,7 +1181,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
     }
 
-    void TestReMeshExceptionWhenNonBoundaryNodesAreContainedOnlyInTwoElements() throw(Exception)
+    void TestReMeshExceptionWhenNonBoundaryNodesAreContainedOnlyInTwoElements()
     {
         /*
          * Create a mesh comprising six nodes contained in two elements, as shown below. We will test
@@ -1221,7 +1221,7 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non-boundary nodes contained only in two elements; something has gone wrong.");
     }
 
-    void TestIdentifySwapTypeExceptionWhenBoundaryNodeIsContainedInThreeElements() throw(Exception)
+    void TestIdentifySwapTypeExceptionWhenBoundaryNodeIsContainedInThreeElements()
     {
         /*
          * Create a mesh as shown below, where the two nodes marked with an x are to be merged.
@@ -1270,7 +1270,7 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7)), "There is a boundary node contained in three elements something has gone wrong.");
     }
 
-    void TestReMeshExceptionWhenNonBoundaryNodeIsContainedOnlyInTwoElements() throw(Exception)
+    void TestReMeshExceptionWhenNonBoundaryNodeIsContainedOnlyInTwoElements()
     {
         /*
          * Create a mesh as shown below, where the two nodes marked with an x are to be merged.
@@ -1310,7 +1310,7 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There is a non-boundary node contained only in two elements; something has gone wrong.");
     }
 
-    void TestAnotherReMeshExceptionWhenNonBoundaryNodesAreContainedOnlyInTwoElements() throw(Exception)
+    void TestAnotherReMeshExceptionWhenNonBoundaryNodesAreContainedOnlyInTwoElements()
     {
         /*
          * Create a mesh as shown below, where the two central nodes marked with an x are to be merged. We will
@@ -1518,7 +1518,7 @@ public:
         TS_ASSERT_EQUALS(t3_locations.size(), 0u);
     }
 
-    void TestPerformT3SwapException() throw(Exception)
+    void TestPerformT3SwapException()
     {
         /*
          * Create a mesh comprising three joined triangular elements intersecting at a node inside a square element,
@@ -1570,7 +1570,7 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "Trying to merge a node, contained in more than 2 elements, into another element, this is not possible with the vertex mesh.");
     }
 
-    void TestPerformT3SwapAnotherException() throw(Exception)
+    void TestPerformT3SwapAnotherException()
     {
         /*
          * Create a mesh comprising six nodes contained in three elements, as shown below.
@@ -2216,7 +2216,7 @@ public:
         }
     }
 
-    void TestReMeshForT3Swaps() throw(Exception)
+    void TestReMeshForT3Swaps()
     {
         /**
          * Load a vertex mesh from file, in which several nodes are intersecting other elements.
@@ -2289,7 +2289,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
     }
 
-    void TestReMeshForRemovingVoids() throw(Exception)
+    void TestReMeshForRemovingVoids()
     {
         /*
          * Create a mesh comprising eight nodes contained in three elements with a small central void,
@@ -2383,7 +2383,7 @@ public:
         }
     }
 
-    void TestReMeshForRemovingVoidsException() throw(Exception)
+    void TestReMeshForRemovingVoidsException()
     {
         /*
          * Create a mesh comprising eleven nodes contain in four elements with two small
@@ -2462,7 +2462,7 @@ public:
                               "Triangular element next to triangular void, not implemented yet.");
     }
 
-    void TestT3SwapForRemovingVoids() throw(Exception)
+    void TestT3SwapForRemovingVoids()
     {
         /*
          * Create a mesh comprising seven nodes containing in three elements with a central
@@ -2663,7 +2663,7 @@ public:
         }
     }
 
-    void TestPerformIntersectionSwap() throw(Exception)
+    void TestPerformIntersectionSwap()
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements.
@@ -2744,7 +2744,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 2.3062, 1e-4);
     }
 
-    void TestPerformIntersectionSwapOtherWayRound() throw(Exception)
+    void TestPerformIntersectionSwapOtherWayRound()
     {
         /*
          * This test is very similar to TestPerformIntersectionSwap() but with a different ordering

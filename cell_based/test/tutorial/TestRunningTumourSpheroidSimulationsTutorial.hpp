@@ -122,7 +122,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningTumourSpheroidSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    void TestSpheroidTutorial() throw(Exception)
+    void TestSpheroidTutorial()
     {
         /*
          * This first line can be ignored: it is a macro which just says

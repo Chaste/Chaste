@@ -105,7 +105,7 @@ public:
         delete p_mesh;
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -149,7 +149,7 @@ public:
         delete p_mesh;
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -189,7 +189,7 @@ public:
         delete p_mesh;
     }
 
-    void TestAddNode() throw (Exception)
+    void TestAddNode()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -278,7 +278,7 @@ public:
         delete p_mesh;
     }
 
-    void TestConstuctingBoxCollection() throw (Exception)
+    void TestConstuctingBoxCollection()
     {
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
 
@@ -330,7 +330,7 @@ public:
     }
 
     // NB This checks that periodicity is maintained through archiving...
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 

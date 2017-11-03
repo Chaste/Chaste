@@ -260,7 +260,7 @@ public:
         }
     }
 
-    void TestPermutationShuffle() throw(Exception)
+    void TestPermutationShuffle()
     {
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(0);

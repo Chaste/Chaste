@@ -249,7 +249,7 @@ class TestCombinedOdeSystem : public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleCombinedOdeSystem() throw (Exception)
+    void TestSimpleCombinedOdeSystem()
     {
         // Create two ODE systems
         SimpleOde1 ode_for_y; // dy/dt = x

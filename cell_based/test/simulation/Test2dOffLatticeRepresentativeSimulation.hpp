@@ -63,7 +63,7 @@ class Test2DMonolayerRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void Test2DMonolayerRepresentativeSimulationForProfiling() throw (Exception)
+    void Test2DMonolayerRepresentativeSimulationForProfiling()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);

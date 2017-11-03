@@ -167,7 +167,7 @@ public:
      *
      * We begin by testing that our new cell mutation state is implemented correctly.
      */
-    void TestP53GainOfFunctionCellMutationState() throw(Exception)
+    void TestP53GainOfFunctionCellMutationState()
     {
         /* We begin by testing that some of the base class methods work correctly.
          * We typically use shared pointers to create and access cell mutation states, as
@@ -246,7 +246,7 @@ public:
      * We conclude with a brief test demonstrating how {{{P53GainOfFunctionCellMutationState}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithP53GainOfFunctionCellMutationState() throw(Exception)
+    void TestOffLatticeSimulationWithP53GainOfFunctionCellMutationState()
     {
         /* We use the {{{HoneycombMeshGenerator}}} to create a honeycomb mesh covering a
          * circular domain of given radius, as follows. */

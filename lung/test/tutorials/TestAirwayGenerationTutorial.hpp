@@ -89,7 +89,7 @@ class TestAirwayGenerationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestGenerateAirways() throw (Exception)
+    void TestGenerateAirways()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 

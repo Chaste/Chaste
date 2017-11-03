@@ -54,7 +54,7 @@ class TestOutputFileHandler : public CxxTest::TestSuite
 {
 public:
 
-    void TestHandler() throw(Exception)
+    void TestHandler()
     {
         // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
         // a class object is instantiated
@@ -215,7 +215,7 @@ public:
         TS_ASSERT_EQUALS(handler_self.GetAbsolutePath(), handler.GetOutputDirectoryFullPath());
     }
 
-    void TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves() throw(Exception, std::exception)
+    void TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves()
     {
         std::string test_folder = "cannot_delete_me";
         if (PetscTools::AmMaster())

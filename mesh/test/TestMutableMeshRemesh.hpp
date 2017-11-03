@@ -61,7 +61,7 @@ public:
     /**
      * Test 3D remesh replaces TestOperationOfTetgenMoveNodes which called the tetgen binary directly.
      */
-    void TestRemesh3dMoveNodes() throw (Exception)
+    void TestRemesh3dMoveNodes()
     {
         TrianglesMeshReader<3,3> mesh_reader2("mesh/test/data/cube_1626_elements");
         TetrahedralMesh<3,3> old_mesh;
@@ -141,7 +141,7 @@ public:
         TS_ASSERT_DELTA(old_volume, new_volume, 1e-7);
     }
 
-    void TestRemeshWithMethod1D() throw (Exception)
+    void TestRemeshWithMethod1D()
     {
         // Create 1D mesh
         MutableMesh<1,1> mesh;
@@ -320,7 +320,7 @@ public:
         }
     }
 
-    void TestRemeshWithMethod2D() throw (Exception)
+    void TestRemeshWithMethod2D()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -383,7 +383,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetVolume(), area, 1e-6);
     }
 
-    void TestRemeshWithMethod3D() throw (Exception)
+    void TestRemeshWithMethod3D()
     {
         // Create mutable tetrahedral mesh which is Delaunay
         std::vector<Node<3> *> nodes;
@@ -448,7 +448,7 @@ public:
         TS_ASSERT_EQUALS(map.IsIdentityMap(), false);
     }
 
-    void Test1DReMeshFailsAfterEnoughDeletions() throw (Exception)
+    void Test1DReMeshFailsAfterEnoughDeletions()
     {
         // Construct mesh
         MutableMesh<1,1> mesh;
@@ -482,7 +482,7 @@ public:
         TS_ASSERT_THROWS_THIS(mesh.ReMesh(map),"The number of nodes must exceed the spatial dimension.");
     }
 
-    void Test2DReMeshFailsAfterEnoughDeletions() throw (Exception)
+    void Test2DReMeshFailsAfterEnoughDeletions()
     {
         MutableMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(1,1);
@@ -610,7 +610,7 @@ public:
 
     }
 
-    void TestRemeshWithLibraryMethodSimple() throw (Exception)
+    void TestRemeshWithLibraryMethodSimple()
     {
         // Same data as previous 2d test
         std::vector<Node<2> *> nodes;
@@ -643,7 +643,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 4u);
     }
 
-    void TestRemeshWithLibraryMethod2D() throw (Exception)
+    void TestRemeshWithLibraryMethod2D()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -679,7 +679,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetVolume(), area, 1e-6);
     }
 
-    void TestRemeshWithLibraryMethod3D() throw (Exception)
+    void TestRemeshWithLibraryMethod3D()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
         MutableMesh<3,3> mesh;

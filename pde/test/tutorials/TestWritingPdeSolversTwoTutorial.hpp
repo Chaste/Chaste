@@ -272,7 +272,7 @@ public:
 class TestWritingPdeSolversTwoTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestExplicitSolver() throw (Exception)
+    void TestExplicitSolver()
     {
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);

@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestBidomainWithBathAndFibresTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestSimulation() throw(Exception)
+    void TestSimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorialWithBathAndFibres");

@@ -74,7 +74,7 @@ class TestPottsBasedCryptSimulation : public AbstractCellBasedWithTimingsTestSui
 {
 public:
 
-    void TestPottsCryptWithSimpleWntCellCycleModel() throw (Exception)
+    void TestPottsCryptWithSimpleWntCellCycleModel()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
 
@@ -128,7 +128,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
     }
 
-    void TestPottsCryptWithGenerationalCellCycleModel() throw (Exception)
+    void TestPottsCryptWithGenerationalCellCycleModel()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
 

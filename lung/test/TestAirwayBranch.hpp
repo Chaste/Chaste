@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayBranch : public CxxTest::TestSuite
 {
 public:
-    void TestMakeBranch() throw(Exception)
+    void TestMakeBranch()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
@@ -109,7 +109,7 @@ public:
         TS_ASSERT_DELTA(branch_three.GetPoiseuilleResistance(), 2.7313, 1e-3);
     }
 
-    void TestAngleCalculations() throw(Exception)
+    void TestAngleCalculations()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh");
@@ -153,7 +153,7 @@ public:
         TS_ASSERT_DELTA(branch_two.GetRotationAngle(), 0.0, 1e-6);
     }
 
-    void TestBranchIndexing() throw(Exception)
+    void TestBranchIndexing()
     {
         AirwayBranch branch;
 
@@ -165,7 +165,7 @@ public:
         TS_ASSERT_EQUALS(branch.GetIndex(), 5u);
     }
 
-    void TestGetProximalAndDistalNodes() throw(Exception)
+    void TestGetProximalAndDistalNodes()
     {
         // Load mesh
         TetrahedralMesh<1,3> mesh;
@@ -246,7 +246,7 @@ public:
         TS_ASSERT_LESS_THAN(non_distal_to_proximal, proximal_to_distal);
     }
 
-    void TestBranchProperties() throw(Exception)
+    void TestBranchProperties()
     {
         Node<3> node_a(0u, true, 0.0, 0.0, 0.0);
         Node<3> node_b(1u, true, 1.0, 0.0, 0.0);

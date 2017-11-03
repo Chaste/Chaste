@@ -191,7 +191,7 @@ public:
 class TestMonodomainExactSolution : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainExactSolution1d() throw(Exception)
+    void TestMonodomainExactSolution1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h=0.01; //cm
@@ -254,7 +254,7 @@ public:
         }
     }
 
-    void TestMonodomainExactSolution2d() throw(Exception)
+    void TestMonodomainExactSolution2d()
     {
         TetrahedralMesh<2,2> mesh;
         double h=0.02; //cm
@@ -324,7 +324,7 @@ public:
     }
 
 
-    void TestMonodomainExactSolution3d() throw(Exception)
+    void TestMonodomainExactSolution3d()
     {
         TetrahedralMesh<3,3> mesh;
         double h=0.05; //cm

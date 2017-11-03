@@ -101,7 +101,7 @@ public:
      * In the first test, we run a simple node-based simulation, in which we create a monolayer
      * of cells, using a nodes only mesh. Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /** The next line is needed because HoneycombMeshGenerator is not designed to be run in parallel */
         EXIT_IF_PARALLEL;
@@ -191,7 +191,7 @@ public:
      * to the 2D test with the dimension template (<2,2> and <2>) changed from 2 to 3 and instead of using a mesh
      * generator we generate the nodes directly.
      */
-    void TestSpheroid() throw(Exception)
+    void TestSpheroid()
     {
         /** The next line is needed because we cannot currently run node based simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -269,7 +269,7 @@ public:
      *
      * In the third test we run a node-based simulation restricted to the surface of a sphere.
      */
-    void TestOnSurfaceOfSphere() throw(Exception)
+    void TestOnSurfaceOfSphere()
     {
         /** The next line is needed because we cannot currently run node based simulations in parallel. */
         EXIT_IF_PARALLEL;

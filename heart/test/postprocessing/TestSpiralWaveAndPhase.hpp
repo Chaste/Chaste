@@ -83,7 +83,7 @@ public:
      * heart/test/data/PhasePostprocessing/results.h5
      * and is used by the subsequent tests.
      */
-    void xTestSpiralWaveSimulationWithPhaseCalculations() throw (Exception)
+    void xTestSpiralWaveSimulationWithPhaseCalculations()
     {
         // Run a simulation to generate a spiral wave in an h5 file.
         {
@@ -143,7 +143,7 @@ public:
         assert(0); // Should stop test and copy results across now.
     }
 
-    void TestPhaseCalculation() throw (Exception)
+    void TestPhaseCalculation()
     {
         // Copy solution from the repository to the relevant test output directory.
         FileFinder reference_voltage("heart/test/data/PhasePostprocessing/results.h5", RelativeTo::ChasteSourceRoot);
@@ -213,7 +213,7 @@ public:
     /**
      * Here we test that we can successfully output meshalyzer files of both the original data and Phase.
      */
-    void TestMeshalyzerPhasePlot() throw (Exception)
+    void TestMeshalyzerPhasePlot()
     {
         // Write out voltage (just for fun, to compare with phase plot).
         Hdf5ToMeshalyzerConverter<2,2> converter1(FileFinder("SpiralWaveAndPhase", RelativeTo::ChasteTestOutput),

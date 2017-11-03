@@ -128,7 +128,7 @@ public:
      *  Computes the tensors based in all the info set
      * @param pMesh a pointer to the mesh on which these tensors are to be used
      */
-    virtual void Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh) throw (Exception) = 0;
+    virtual void Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh)  = 0;
 
     /**
      *  @return the diffussion tensor of the element number "index"

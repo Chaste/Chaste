@@ -142,7 +142,7 @@ public:
 class TestBidomainWithConductivityModifierTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestConductivityModifier() throw(Exception)
+    void TestConductivityModifier()
     {
         /*
          * Generate a mesh.

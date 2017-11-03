@@ -73,7 +73,7 @@ class TestCardiacElectroMechanicsProblem : public CxxTest::TestSuite
 {
 public:
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -132,7 +132,7 @@ public:
     // free - ie sliding boundary conditions. With a homogeneous
     // force this means the solution should be a perfect rectangle,
     // ie x=alpha*X, y=beta*Y for some alpha, beta.
-    void TestWithHomogeneousEverythingCompressible() throw(Exception)
+    void TestWithHomogeneousEverythingCompressible()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -218,7 +218,7 @@ public:
      * This test is the same as above but with bidomain instead of monodomain.
      * Extracellular conductivities are set very high so the results should be the same.
      */
-    void TestWithHomogeneousEverythingCompressibleBidomain() throw(Exception)
+    void TestWithHomogeneousEverythingCompressibleBidomain()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -324,7 +324,7 @@ public:
     // except it uses incompressible solid mechanics. Since the solution should be
     // x=alpha*X, y=beta*Y for some alpha, beta (see comments for above test),
     // we also test that alpha*beta = 1.0
-    void TestWithHomogeneousEverythingIncompressible() throw(Exception)
+    void TestWithHomogeneousEverythingIncompressible()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -405,7 +405,7 @@ public:
     //We construct the electrics mesh in a  way that most of it is bath
     // We then fix the only nodes in the mechanics mesh which are not bath
     //and then we check that nothing moved
-    void TestMechanicsWithBidomainAndBathImplicit() throw(Exception)
+    void TestMechanicsWithBidomainAndBathImplicit()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -492,7 +492,7 @@ public:
     }
 
     //This test is identical to the test above, just that we use a model that requires an explicit solver
-    void TestMechanicsWithBidomainAndBathExplicit() throw(Exception)
+    void TestMechanicsWithBidomainAndBathExplicit()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -579,7 +579,7 @@ public:
     }
 
     // These tests are older than the above tests..
-    void TestImplicitNhs2dOneMechanicsElement() throw(Exception)
+    void TestImplicitNhs2dOneMechanicsElement()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -645,7 +645,7 @@ public:
         MechanicsEventHandler::Report();
     }
 
-    void TestWithKerchoffs() throw(Exception)
+    void TestWithKerchoffs()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -686,7 +686,7 @@ public:
     //
     //  Now removed
     //
-    void removedTestExplicitSolverWithNash2004() throw(Exception)
+    void removedTestExplicitSolverWithNash2004()
     {
 #ifdef MECH_USE_HYPRE
         TS_FAIL("This test is known to fail with HYPRE - see comments in test");
@@ -724,7 +724,7 @@ public:
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[1](0), 0.0419, 0.0002);
     }
 
-    void TestWithCompressibleApproach() throw(Exception)
+    void TestWithCompressibleApproach()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 

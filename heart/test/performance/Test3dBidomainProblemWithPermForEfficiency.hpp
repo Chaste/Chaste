@@ -52,7 +52,7 @@ class Test3dBidomainProblemWithPermForEfficiency :  public CxxTest::TestSuite
 {
 public:
 
-    void TestBidomain3d() throw (Exception)
+    void TestBidomain3d()
     {
 
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));

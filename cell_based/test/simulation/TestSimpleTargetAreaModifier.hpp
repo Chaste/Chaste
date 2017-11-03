@@ -66,7 +66,7 @@ class TestSimpleTargetAreaModifier : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
+    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions()
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -104,7 +104,7 @@ public:
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
-    void TestSimpleTargetAreaModifierMethods() throw (Exception)
+    void TestSimpleTargetAreaModifierMethods()
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime* p_simulation_time = SimulationTime::Instance();

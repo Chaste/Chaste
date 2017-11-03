@@ -56,7 +56,7 @@ private:
     bool expected_fail_result;
 public:
 
-    void TestBasicFunctionality() throw(Exception)
+    void TestBasicFunctionality()
     {
         std::string base_file = "./global/test/data/random_data.txt";
         std::string noised_file = "./global/test/data/same_random_data_with_1e-4_noise.txt";
@@ -79,7 +79,7 @@ public:
     // By default the class expects to be used collectively, so only the master does file operations,
     // and there's a barrier before opening the files.  This case is "tested" in the other
     // tests - it's working if they don't deadlock!  Here we test the ability to be used non-collectively.
-    void TestParallelOperation() throw(Exception)
+    void TestParallelOperation()
     {
         CalledCollectively = false;
         if (PetscTools::AmMaster())
@@ -91,7 +91,7 @@ public:
         CalledCollectively = true;
     }
 
-    void TestFileFinderInterface() throw(Exception)
+    void TestFileFinderInterface()
     {
         FileFinder base_file("global/test/data/random_data.txt",
                              RelativeTo::ChasteSourceRoot);
@@ -102,7 +102,7 @@ public:
         TS_ASSERT_EQUALS(same_data.CompareFiles(0,false), expected_fail_result);
     }
 
-    void TestIgnoreHeader() throw(Exception)
+    void TestIgnoreHeader()
     {
         std::string base_file = "./global/test/data/random_data.txt";
         std::string changed_file = "./global/test/data/same_random_data_with_different_header.txt";
@@ -125,7 +125,7 @@ public:
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(1,false), expected_fail_result);
     }
 
-    void TestIgnoreBlankLines() throw (Exception)
+    void TestIgnoreBlankLines()
     {
         std::string base_file = "./global/test/data/random_data.txt";
         std::string changed_file = "./global/test/data/same_random_data_with_blanks.txt";
@@ -144,7 +144,7 @@ public:
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(0, false), expected_fail_result);
     }
 
-    void TestBinaryFiles() throw(Exception)
+    void TestBinaryFiles()
     {
         std::string base_file = "./mesh/test/data/simple_cube_binary.node";
         TS_ASSERT(FileComparison(base_file, base_file, CalledCollectively, SuppressOutput).CompareFiles());

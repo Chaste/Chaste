@@ -83,7 +83,7 @@ class TestFibreReaderAbilityExtendedBidomainProblem: public CxxTest::TestSuite
 
 public:
 
-    void TestFibreAbilityNoFibreExtendedProblem() throw (Exception)
+    void TestFibreAbilityNoFibreExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -134,7 +134,7 @@ public:
         }
     }
 
-    void TestOrthoFibreAbilityExtendedProblem() throw (Exception)
+    void TestOrthoFibreAbilityExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    void Test3DAxiFibreAbilityExtendedProblem() throw (Exception)
+    void Test3DAxiFibreAbilityExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();

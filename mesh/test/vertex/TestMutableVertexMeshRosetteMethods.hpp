@@ -214,7 +214,7 @@ private:
 
 public:
 
-    void TestSetAndGetMethods() throw (Exception)
+    void TestSetAndGetMethods()
     {
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
@@ -240,7 +240,7 @@ public:
         delete p_mesh;
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         // Set archiving location
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -342,7 +342,7 @@ public:
         }
     }
 
-    void TestHandleHighOrderJunctions() throw (Exception)
+    void TestHandleHighOrderJunctions()
     {
         /*
          * We test the method HandleHighOrderJunctions by calling IdentifySwapType on a mesh with suitable nodes,
@@ -399,7 +399,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(mesh.IdentifySwapType(p_node_0, p_node_5));
     }
 
-    void TestPerformRosetteRankIncrease() throw (Exception)
+    void TestPerformRosetteRankIncrease()
     {
         // Create the standard five-cell rosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
@@ -472,7 +472,7 @@ public:
         delete p_mesh;
     }
 
-    void TestPerformProtorosetteResolution() throw (Exception)
+    void TestPerformProtorosetteResolution()
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructProtorosette();
@@ -557,7 +557,7 @@ public:
         delete p_mesh;
     }
 
-    void TestPerformRosetteRankDecrease() throw (Exception)
+    void TestPerformRosetteRankDecrease()
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
@@ -616,7 +616,7 @@ public:
         delete p_mesh;
     }
 
-    void TestCheckForRosettes() throw (Exception)
+    void TestCheckForRosettes()
     {
         // Let us first create reference meshes for four and five cell rosettes
         MutableVertexMesh<2,2>* p_ref_rosette = ConstructFiveCellRosette();
@@ -694,7 +694,7 @@ public:
         delete p_protorosette;
     }
 
-    void TestEnsureCoverangeWhenCheckingForRosettes() throw (Exception)
+    void TestEnsureCoverangeWhenCheckingForRosettes()
     {
         /**
          * When checking for set intersections, there is a 50/50 chance of the correct element being selected first.
@@ -719,7 +719,7 @@ public:
         }
     }
 
-    void TestPerformProtorosetteFormationInIdentifySwapType() throw (Exception)
+    void TestPerformProtorosetteFormationInIdentifySwapType()
     {
         MutableVertexMesh<2, 2>* p_mesh = this->ConstructT1Scenario();
 

@@ -330,7 +330,7 @@ public:
         TS_ASSERT_EQUALS(v3[2], 3);
     }
 
-    void TestEigenVectorValueCalculation() throw(Exception)
+    void TestEigenVectorValueCalculation()
     {
         c_matrix<double, 3, 3> A;
         A(0,0) = 22.4;

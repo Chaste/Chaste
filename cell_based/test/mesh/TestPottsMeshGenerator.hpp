@@ -48,7 +48,7 @@ class TestPottsMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestPottsMeshGeneratorIn2dFromBottomLeft() throw(Exception)
+    void TestPottsMeshGeneratorIn2dFromBottomLeft()
     {
         // Coverage
         //TS_ASSERT_THROWS_NOTHING(PottsMeshGenerator<2> empty_generator());
@@ -139,7 +139,7 @@ public:
         }
     }
 
-    void TestPottsMeshGenerator2dInCentre() throw(Exception)
+    void TestPottsMeshGenerator2dInCentre()
     {
         PottsMeshGenerator<2> generator(6, 2, 2, 7, 2, 2); //should have a gap of one on the left right and bottom and 2 on the top
 
@@ -227,7 +227,7 @@ public:
         }
     }
 
-    void TestPottsMeshGenerator3dFromBottomLeft() throw(Exception)
+    void TestPottsMeshGenerator3dFromBottomLeft()
     {
         PottsMeshGenerator<3> generator(4, 2, 2, 4, 2, 2, 6, 2, 2, true); // last bool makes elements start in bottom left
 
@@ -325,7 +325,7 @@ public:
         }
     }
 
-    void TestPottsMeshGenerator3dInCentre() throw(Exception)
+    void TestPottsMeshGenerator3dInCentre()
     {
         PottsMeshGenerator<3> generator(6, 2, 2, 4, 1, 2, 4, 1, 2); //should have a gap of one on all sides
 
@@ -420,7 +420,7 @@ public:
         }
     }
 
-    void TestGenerator3dLarge() throw (Exception)
+    void TestGenerator3dLarge()
     {
         // Create a simple 3D PottsMesh
         unsigned domain_size = 10;

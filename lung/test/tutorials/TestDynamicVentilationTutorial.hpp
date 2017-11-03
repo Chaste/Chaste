@@ -139,7 +139,7 @@ class TestDynamicVentilationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestSimulateTidalBreathing() throw (Exception)
+    void TestSimulateTidalBreathing()
     {
         /*
          * !DynamicVentilationProblem is not (yet) parallel.

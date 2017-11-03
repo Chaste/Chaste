@@ -77,7 +77,7 @@ private:
     }
 
 public:
-    void TestCalculateRelativeWallPositionSimple2dMesh() throw(Exception)
+    void TestCalculateRelativeWallPositionSimple2dMesh()
     {
         DistributedTetrahedralMesh<2,2> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
@@ -127,7 +127,7 @@ public:
         }
     }
 
-    void TestCalculateRelativeWallPositionSimple3dMesh() throw(Exception)
+    void TestCalculateRelativeWallPositionSimple3dMesh()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
@@ -192,7 +192,7 @@ public:
         }
     }
 
-    void TestCalculateRelativeWallPositionWithThreeSurfaces() throw(Exception)
+    void TestCalculateRelativeWallPositionWithThreeSurfaces()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         //This mesh will have 9 nodes per side, spaced by 1, it is a cube
@@ -283,7 +283,7 @@ public:
 
     }
 
-    void TestDetermineLayerForEachNodeWritingAndReading() throw (Exception)
+    void TestDetermineLayerForEachNodeWritingAndReading()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         //This mesh will have 31 nodes per side, spaced by 1, it is a cube
@@ -385,7 +385,7 @@ public:
         TS_ASSERT_THROWS_THIS(HeartGeometryInformation<3> info_bad_file("heart/test/data/ValidPseudoEcg1D.dat"), "A value in the heterogeneities file (heart/test/data/ValidPseudoEcg1D.dat) is out of range (or not an integer). It should be epi = 0, mid = 1, endo = 2");
     }
 
-    void TestHeartGeometryTakingMeshFromFile() throw (Exception)
+    void TestHeartGeometryTakingMeshFromFile()
     {
         //files containing list of nodes on each surface
         std::string epi_surface = "heart/test/data/box_shaped_heart/epi.tri";
@@ -512,7 +512,7 @@ public:
     }
 
 
-    void TestHeartGeometryOnlyLeftVentricle() throw (Exception)
+    void TestHeartGeometryOnlyLeftVentricle()
     {
          //files containing list of nodes on each surface
          std::string epi_surface = "heart/test/data/box_shaped_heart/epi.tri";

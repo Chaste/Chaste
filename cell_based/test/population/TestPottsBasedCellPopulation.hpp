@@ -73,7 +73,7 @@ class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestConstructor() throw(Exception)
+    void TestConstructor()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -129,7 +129,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetDefaultTimeStep(), 0.1, 1e-6);
     }
 
-    void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
+    void TestIsCellAssociatedWithADeletedLocation()
     {
         // Create a Potts-based cell population but do not try to validate
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -160,7 +160,7 @@ public:
         }
     }
 
-    void TestValidate() throw (Exception)
+    void TestValidate()
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -250,7 +250,7 @@ public:
             "At time 0, Element 0 appears to have 2 cells associated with it");
     }
 
-    void TestRemoveDeadCellsAndUpdate() throw(Exception)
+    void TestRemoveDeadCellsAndUpdate()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -304,7 +304,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(1), true);
     }
 
-    void TestAddCell() throw(Exception)
+    void TestAddCell()
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
@@ -514,7 +514,7 @@ public:
         FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.parameters").CompareFiles();
     }
 
-    void TestNodeAndMeshMethods() throw(Exception)
+    void TestNodeAndMeshMethods()
     {
         // Create a Potts-based cell population
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -570,7 +570,7 @@ public:
             "Cannot call GetNeighbouringNodeIndices() on a subclass of AbstractOnLatticeCellPopulation, need to go through the PottsMesh instead");
     }
 
-    void TestGetLocationOfCellCentre() throw (Exception)
+    void TestGetLocationOfCellCentre()
     {
         // Create a Potts-based cell population
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -600,7 +600,7 @@ public:
         }
     }
 
-    void TestAddingUpdateRules() throw(Exception)
+    void TestAddingUpdateRules()
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
@@ -628,7 +628,7 @@ public:
         TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "VolumeConstraintPottsUpdateRule-2");
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "potts_cell_population_2d.arch";
@@ -725,7 +725,7 @@ public:
         }
     }
 
-    void TestMakeMutableMeshForPdes() throw(Exception)
+    void TestMakeMutableMeshForPdes()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -748,7 +748,7 @@ public:
         TS_ASSERT_EQUALS(p_mutable_mesh->GetNumElements(), 18u);
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -780,7 +780,7 @@ public:
         delete p_tet_mesh;
     }
 
-    void TestGetCellDataItemAtPdeNode() throw (Exception)
+    void TestGetCellDataItemAtPdeNode()
     {
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();

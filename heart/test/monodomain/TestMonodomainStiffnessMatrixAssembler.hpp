@@ -48,7 +48,7 @@ class TestMonodomainStiffnessMatrixAssembler : public CxxTest::TestSuite
 {
 public:
 
-    void TestMonodomainStiffnessMatrixAssembler1d() throw(Exception)
+    void TestMonodomainStiffnessMatrixAssembler1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;

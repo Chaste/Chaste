@@ -90,7 +90,7 @@ class TestVertexBasedCellPopulation : public AbstractCellBasedTestSuite
 public:
 
     // Test construction, accessors and iterator
-    void TestCreateSmallVertexBasedCellPopulationAndGetWidth() throw (Exception)
+    void TestCreateSmallVertexBasedCellPopulationAndGetWidth()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
@@ -168,7 +168,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetDefaultTimeStep(), 0.002, 1e-6);
     }
 
-    void TestValidate() throw (Exception)
+    void TestValidate()
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -365,7 +365,7 @@ public:
             "At time 0, Node 4 is not contained in any elements, so GetDampingConstant() returns zero");
     }
 
-    void TestUpdateWithoutBirthOrDeath() throw (Exception)
+    void TestUpdateWithoutBirthOrDeath()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
@@ -390,7 +390,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.Update());
     }
 
-    void TestAddNode() throw (Exception)
+    void TestAddNode()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
@@ -415,7 +415,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 69u);
     }
 
-    void TestAddCellWithSimpleMesh() throw (Exception)
+    void TestAddCellWithSimpleMesh()
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;
@@ -543,7 +543,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), old_num_elements);
     }
 
-    void TestAddCellWithGivenDivisionVector() throw (Exception)
+    void TestAddCellWithGivenDivisionVector()
     {
         // Make a vertex mesh consisting of a single square element
         std::vector<Node<2>*> nodes;
@@ -626,7 +626,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), 1u);
     }
 
-    void TestAddCellWithHoneycombMesh() throw (Exception)
+    void TestAddCellWithHoneycombMesh()
     {
         // Create a mesh with 9 elements
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -771,7 +771,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNode(30)->rGetContainingElementIndices(), expected_elements_containing_node_30);
     }
 
-    void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
+    void TestIsCellAssociatedWithADeletedLocation()
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
@@ -798,7 +798,7 @@ public:
         }
     }
 
-    void TestRemoveDeadCellsAndUpdate() throw (Exception)
+    void TestRemoveDeadCellsAndUpdate()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
@@ -881,7 +881,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestVertexBasedCellPopulationWriteResultsToFile() throw (Exception)
+    void TestVertexBasedCellPopulationWriteResultsToFile()
     {
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
@@ -1041,7 +1041,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestArchiving2dVertexBasedCellPopulation() throw(Exception)
+    void TestArchiving2dVertexBasedCellPopulation()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "vertex_cell_population_2d.arch";
@@ -1180,7 +1180,7 @@ public:
         }
     }
 
-    void TestArchiving3dVertexBasedCellPopulation() throw(Exception)
+    void TestArchiving3dVertexBasedCellPopulation()
     {
         // Create mutable vertex mesh
         std::vector<Node<3>*> nodes;
@@ -1382,7 +1382,7 @@ public:
         }
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw (Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         /* Create a simple VertexMesh comprising three VertexElements.
          *
@@ -1487,7 +1487,7 @@ public:
         delete p_tetrahedral_mesh;
     }
 
-    void TestGetCellDataItemAtPdeNode() throw (Exception)
+    void TestGetCellDataItemAtPdeNode()
     {
         // Create a small cell population
         HoneycombVertexMeshGenerator generator(4, 4);

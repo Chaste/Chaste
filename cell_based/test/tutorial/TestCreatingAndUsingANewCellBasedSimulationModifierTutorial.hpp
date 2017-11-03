@@ -224,7 +224,7 @@ public:
      * We conclude with a brief test demonstrating how {{{CellHeightTrackingModifier}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithCellHeightTrackingModifier() throw(Exception)
+    void TestOffLatticeSimulationWithCellHeightTrackingModifier()
     {
         /*
          * In this case, we choose to create a small {{{NodeBasedCellPopulation}}} comprising 25 cells.

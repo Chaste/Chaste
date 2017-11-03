@@ -230,7 +230,7 @@ private:
 
 public:
 
-    void TestWithDifferentCellsAndSolvers() throw(Exception)
+    void TestWithDifferentCellsAndSolvers()
     {
         double duration = 25;
         HeartConfig::Instance()->SetSimulationDuration(duration); //ms

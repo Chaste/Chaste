@@ -202,7 +202,7 @@ public:
         TS_ASSERT_THROWS_THIS(node.RemoveBoundaryElement(256),"Tried to remove an index which was not in the set");
     }
 
-    void TestNodeWithAttributes() throw (Exception)
+    void TestNodeWithAttributes()
     {
         Node<3> node(0, false, 0.0, 1.0, 2.0);
 

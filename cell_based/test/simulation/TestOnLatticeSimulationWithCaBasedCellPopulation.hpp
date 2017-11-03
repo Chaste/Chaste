@@ -108,7 +108,7 @@ public:
             "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
 
-    void TestCaSingleCellRandomMovement() throw (Exception)
+    void TestCaSingleCellRandomMovement()
     {
         EXIT_IF_PARALLEL;
 
@@ -195,7 +195,7 @@ public:
         simulator.RemoveAllUpdateRules();
     }
 
-    void TestCaMonolayerWithBirth() throw (Exception)
+    void TestCaMonolayerWithBirth()
     {
         EXIT_IF_PARALLEL;
 
@@ -264,7 +264,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestCaMonolayerWithDeath() throw (Exception)
+    void TestCaMonolayerWithDeath()
     {
         EXIT_IF_PARALLEL;
 
@@ -332,7 +332,7 @@ public:
         }
     }
 
-    void  TestCaMonolayerWithApoptoticCellKiller() throw (Exception)
+    void  TestCaMonolayerWithApoptoticCellKiller()
     {
         EXIT_IF_PARALLEL;
 
@@ -426,7 +426,7 @@ public:
         #endif //CHASTE_VTK
     }
 
-    void TestCaMonolayerWithRandomSwitching() throw (Exception)
+    void TestCaMonolayerWithRandomSwitching()
     {
         EXIT_IF_PARALLEL;
 
@@ -496,7 +496,7 @@ public:
     }
 
     ///\todo #2713 check this test makes sense
-    void TestCaMonolayerWithRandomSwitchingAndUpdateNodesInNonRandomOrder() throw (Exception)
+    void TestCaMonolayerWithRandomSwitchingAndUpdateNodesInNonRandomOrder()
     {
         EXIT_IF_PARALLEL;
 
@@ -579,7 +579,7 @@ public:
      * RandomMovement has been tested in TestCaSingleCellRandomMovement for one cell per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestCaMultipleCellsRandomMovement() throw (Exception)
+    void TestCaMultipleCellsRandomMovement()
     {
         EXIT_IF_PARALLEL;
 
@@ -624,7 +624,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 40u);
     }
 
-    void TestCaMultipleCellsRandomMovementIn3d() throw (Exception)
+    void TestCaMultipleCellsRandomMovementIn3d()
     {
         EXIT_IF_PARALLEL;
 
@@ -674,7 +674,7 @@ public:
      * This test adds to the above by further testing cellular birth considering multiple cells per lattice site.
      * A  two-lattice mesh was created and only one lattice had free space to add one daughter cell.
      */
-    void TestMultipleCellsPerLatticeSiteWithBirth() throw (Exception)
+    void TestMultipleCellsPerLatticeSiteWithBirth()
     {
         EXIT_IF_PARALLEL;
 
@@ -738,7 +738,7 @@ public:
      * Cellular death has been tested in TestCaMonolayerWithDeath for one cell per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestMultipleCellsPerLatticeSiteWithDeath() throw (Exception)
+    void TestMultipleCellsPerLatticeSiteWithDeath()
     {
         EXIT_IF_PARALLEL;
 
@@ -807,7 +807,7 @@ public:
         }
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;
 
@@ -855,7 +855,7 @@ public:
         TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
     }
 
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;
 
@@ -893,7 +893,7 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;
 

@@ -44,7 +44,7 @@ class TestPapillaryFibreCalculator : public CxxTest::TestSuite
 {
 public:
 
-    void TestGetSingleRadiusVector(void) throw(Exception)
+    void TestGetSingleRadiusVector(void)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
         TetrahedralMesh<3,3> mesh;
@@ -64,7 +64,7 @@ public:
         TS_ASSERT_DELTA(radius_vector[2], -0.275, 1e-9);
     }
 
-    void TestGetRadiusVectorsAndConstructStructureTensors(void) throw(Exception)
+    void TestGetRadiusVectorsAndConstructStructureTensors(void)
     {
         // Test in three parts to use the results of one test in the next...
         //
@@ -133,7 +133,7 @@ public:
     }
 
     // see also TestPapillaryFibreCalculatorLong() for bigger test of the main method on a cylinder.
-    void TestGetFibreOrientationsOnSimpleCube(void) throw(Exception)
+    void TestGetFibreOrientationsOnSimpleCube(void)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
         TetrahedralMesh<3,3> mesh;
