@@ -71,7 +71,7 @@ public:
 class TestTimeAdaptivityController : public CxxTest::TestSuite
 {
 public:
-    void TestToyController() throw(Exception)
+    void TestToyController()
     {
         ToyController controller(0.2,1.0);
         TS_ASSERT_EQUALS(controller.GetNextTimeStep(0.5,NULL), 0.2);

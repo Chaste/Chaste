@@ -63,7 +63,7 @@ public:
     }
 
     // Solve on a 1D string of cells, 1mm long with a space step of 0.1mm.
-    void TestMonodomainConstantStimulus() throw(Exception)
+    void TestMonodomainConstantStimulus()
     {
         // this parameters are a bit arbitrary, and chosen to get a good spread of voltages
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75));
@@ -115,7 +115,7 @@ public:
 
     }
 
-    void TestMonodomainSquareWaveStimulus() throw(Exception)
+    void TestMonodomainSquareWaveStimulus()
     {
         // this parameters are a bit arbitrary, and chosen to get a good spread of voltages
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75));

@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCitations : public CxxTest::TestSuite
 {
 public:
-    void TestChasteCitation() throw(Exception)
+    void TestChasteCitation()
     {
         /*
          * Get location of output file to pass through as -citation argument.

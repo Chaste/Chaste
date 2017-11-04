@@ -59,7 +59,7 @@ class TestCryptProjectionStatistics : public AbstractCellBasedTestSuite
 {
 
 public:
-    void TestGetSection() throw(Exception)
+    void TestGetSection()
     {
         double a = 0.2;
         double b = 2.0;

@@ -334,7 +334,7 @@ private:
 
 public:
 
-    void TestMultiStepReader() throw (Exception)
+    void TestMultiStepReader()
     {
         WriteMultiStepData();
 
@@ -476,7 +476,7 @@ public:
         H5E_END_TRY;
     }
 
-    void TestMultiStepExceptions() throw (Exception)
+    void TestMultiStepExceptions()
     {
         DistributedVectorFactory factory(NUMBER_NODES);
 
@@ -540,7 +540,7 @@ public:
         reader.Close();
     }
 
-    void TestIncompleteData() throw (Exception)
+    void TestIncompleteData()
     {
         DistributedVectorFactory factory(NUMBER_NODES);
 
@@ -591,7 +591,7 @@ public:
                                   "GetVariableOverTimeOverMultipleNodes() cannot be called using incomplete data sets");
     }
 
-    void TestReadingExtraData() throw(Exception)
+    void TestReadingExtraData()
     {
         // In this test we read data from a file in the source
         // (which is re-created and compared with in TestHdf5DataWriter.hpp)
@@ -629,7 +629,7 @@ public:
         }
     }
 
-    void TestListingDatasetsInAnHdf5File() throw (Exception)
+    void TestListingDatasetsInAnHdf5File()
     {
         /*
          * Open file.

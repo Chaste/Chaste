@@ -66,7 +66,7 @@ private:
     }
 
 public:
-    void TestHeartConfigBasic() throw (Exception)
+    void TestHeartConfigBasic()
     {
         double chi = HeartConfig::Instance()->mpParameters->Physiological().SurfaceAreaToVolumeRatio().get();
         TS_ASSERT_EQUALS(chi, 1400);
@@ -86,7 +86,7 @@ public:
         TS_ASSERT_EQUALS(conductivity_2, 7.0);
     }
 
-    void TestUserProvidedDifferentFromDefault() throw (Exception)
+    void TestUserProvidedDifferentFromDefault()
     {
         // Here we have defaults
         TS_ASSERT(HeartConfig::Instance()->mpParameters->Simulation().present());
@@ -112,7 +112,7 @@ public:
 
      }
 
-    void TestGetFunctions() throw (Exception)
+    void TestGetFunctions()
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
 
@@ -294,7 +294,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetConductivityMedia(), cp::media_type::NoFibreOrientation);
     }
 
-    void TestGetHeterogeneities() throw (Exception)
+    void TestGetHeterogeneities()
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
         ///////////////
@@ -532,7 +532,7 @@ public:
         TS_ASSERT_EQUALS(extra_conductivities[2], 7.0);
     }
 
-    void TestIsMeshProvided() throw (Exception)
+    void TestIsMeshProvided()
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsMeshProvided(), false);
@@ -545,7 +545,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetCreateMesh(), false);
     }
 
-    void TestTransmuralHeterogeneities() throw (Exception)
+    void TestTransmuralHeterogeneities()
     {
         {
             HeartConfig::Reset();
@@ -743,7 +743,7 @@ public:
         }
     }
 
-    void Test2dProblems() throw (Exception)
+    void Test2dProblems()
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParameters2D.xml");
 
@@ -770,7 +770,7 @@ public:
         TS_ASSERT_EQUALS(inter_node_space, 0.1);
     }
 
-    void Test1dProblems() throw (Exception)
+    void Test1dProblems()
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParameters1D.xml");
 
@@ -797,7 +797,7 @@ public:
     }
 
 
-    void TestSetFunctions() throw (Exception)
+    void TestSetFunctions()
     {
         // Start with a file that doesn't have much in it
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
@@ -1254,7 +1254,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves(), 20u);
     }
 
-    void TestPostProcessingFunctions() throw (Exception)
+    void TestPostProcessingFunctions()
     {
         // Tests for set functions of postprocessing
         HeartConfig::Reset();
@@ -1357,7 +1357,7 @@ public:
             TS_ASSERT_EQUALS(pseudo_ecg_parameters_get[0][dim], electrode_point[dim]);
         }
     }
-    void TestWrite() throw (Exception)
+    void TestWrite()
     {
         OutputFileHandler output_file_handler("Xml/output", true);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetOdeTimeStep(), 0.01);
@@ -1394,7 +1394,7 @@ public:
                          "Unable to locate schema file ChasteParameters_2017_1.xsd. You will need to ensure it is available when resuming from the checkpoint.");
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1480,7 +1480,7 @@ public:
         }
     }
 
-    void TestExceptions() throw (Exception)
+    void TestExceptions()
     {
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->SetParametersFile("DoesNotExist.xml"),
                 "Missing file parsing configuration file: DoesNotExist.xml");
@@ -1527,7 +1527,7 @@ public:
      *  The following test is aimed at checking that the ChasteParameters.xml file,
      *  which is distributed with the executable, remains valid.
      */
-    void TestChasteParametersFile() throw (Exception)
+    void TestChasteParametersFile()
     {
         HeartConfig::Instance()->SetParametersFile("ChasteParameters.xml");
     }
@@ -1535,7 +1535,7 @@ public:
     /**
      * And here we try to check that using old XML or XSD files does The Right Thing.
      */
-    void TestVersioning() throw (Exception)
+    void TestVersioning()
     {
         // Test we can recognise known versions
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace(""), 1001u);
@@ -1693,7 +1693,7 @@ public:
      * This gives some indication of whether Chaste will cope being checked out into
      * a path with spaces.
      */
-    void TestSpacesInPath() throw (Exception)
+    void TestSpacesInPath()
     {
         HeartConfig::Reset();
         HeartConfig::SchemaLocationsMap schema_locations;
@@ -1702,7 +1702,7 @@ public:
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease1_1.xml");
     }
 
-    void TestGetOuputVariablesFromXML() throw (Exception)
+    void TestGetOuputVariablesFromXML()
     {
         // Use the configuration file we just modified.
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
@@ -1728,7 +1728,7 @@ public:
         }
     }
 
-    void TestSetAndGetOuputVariables() throw (Exception)
+    void TestSetAndGetOuputVariables()
     {
         // Set the variables we are interested in writing.
         std::vector<std::string> output_variables;
@@ -1759,7 +1759,7 @@ public:
         }
     }
 
-    void TestSetAndGetArchivingStuff() throw (Exception)
+    void TestSetAndGetArchivingStuff()
     {
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
         TS_ASSERT(HeartConfig::Instance()->IsSimulationDefined());
@@ -1855,7 +1855,7 @@ public:
                               "OutputVariables information is not available in a resumed simulation.");
     }
 
-    void TestOutputVisualizerSettings() throw (Exception)
+    void TestOutputVisualizerSettings()
     {
         // Defaults file doesn't have the OutputVisualizer element
         TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer().present());
@@ -1925,7 +1925,7 @@ public:
     }
 
     // See #1807
-    void TestNoCheckpointingError() throw (Exception)
+    void TestNoCheckpointingError()
     {
         TS_ASSERT_THROWS_CONTAINS(HeartConfig::Instance()->GetCheckpointTimestep(),
                                   "No XML element Simulation/CheckpointSimulation found in parameters");
@@ -1965,7 +1965,7 @@ private:
     }
 
 public:
-    void TestMergingParameters() throw (Exception)
+    void TestMergingParameters()
     {
         std::string base = OutputFileHandler::GetChasteTestOutputDirectory() + "ChasteResults/";
         std::string file_name = "/ChasteParameters.xml";

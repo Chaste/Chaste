@@ -49,7 +49,7 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Cray")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     message(STATUS "\t...for GNU compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7)
+    if(NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=0")  # See #2933
     endif(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wvla")

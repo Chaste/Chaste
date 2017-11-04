@@ -112,7 +112,7 @@ public:
      * give each cell a fixed cell-cycle model, and enforce sloughing at the top of
      * the crypt.
      */
-    void TestVertexBasedCrypt() throw(Exception)
+    void TestVertexBasedCrypt()
     {
         /* Create a cylindrical mesh, and get the cell location indices. To enforce
          * periodicity at the left and right hand sides of the mesh, we use a subclass
@@ -195,7 +195,7 @@ public:
      * whilst those above this Wnt threshold are defined to be differentiated. The cell cycle length of
      * transit cells is then assigned randomly from a uniform distribution.
      */
-    void TestVertexBasedCryptWithSimpleWntCellCycleModel() throw(Exception)
+    void TestVertexBasedCryptWithSimpleWntCellCycleModel()
     {
         /* Create a cylindrical mesh, and get the cell location indices, as before. */
         CylindricalHoneycombVertexMeshGenerator generator(6, 9);

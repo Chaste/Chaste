@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestElectrodes : public CxxTest::TestSuite
 {
 public:
-    void TestElectrodeGrounded2dAndSwitchOffSwitchOn() throw (Exception)
+    void TestElectrodeGrounded2dAndSwitchOffSwitchOn()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
         DistributedTetrahedralMesh<2,2> mesh;
@@ -127,7 +127,7 @@ public:
     }
 
 
-    void TestElectrodeUngrounded2d() throw (Exception)
+    void TestElectrodeUngrounded2d()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
         DistributedTetrahedralMesh<2,2> mesh;
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    void TestElectrodeUngrounded2dDifferentAreas() throw (Exception)
+    void TestElectrodeUngrounded2dDifferentAreas()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
         DistributedTetrahedralMesh<2,2> mesh;
@@ -225,7 +225,7 @@ public:
         }
     }
 
-    void TestElectrodeGrounded3d() throw (Exception)
+    void TestElectrodeGrounded3d()
     {
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(10,10,10);
@@ -265,7 +265,7 @@ public:
         TS_ASSERT_EQUALS(num_grounded_nodes, 121u);
     }
 
-    void TestElectrodeUngrounded3d() throw (Exception)
+    void TestElectrodeUngrounded3d()
     {
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(10,10,10);

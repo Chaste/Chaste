@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayRemesher : public CxxTest::TestSuite
 {
 public:
-    void TestRemeshSingleBranch() throw(Exception)
+    void TestRemeshSingleBranch()
     {
         //Load a single branch mesh file
         TrianglesMeshReader<1,3> reader("mesh/test/data/1D_in_3D_0_to_1mm_10_elements");
@@ -106,7 +106,7 @@ public:
         //writer.WriteFilesUsingMesh(output_mesh_three);
     }
 
-    void TestRemeshFullTree() throw(Exception)
+    void TestRemeshFullTree()
     {
         TrianglesMeshReader<1,3> reader("lung/test/data/TestSubject002");
 

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacSimulationNightly : public CxxTest::TestSuite
 {
 public:
-    void TestCardiacSimulationBasicBidomain() throw(Exception)
+    void TestCardiacSimulationBasicBidomain()
     {
         // run a bidomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/base_bidomain.xml");
@@ -57,7 +57,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-3));
     }
 
-    void TestCardiacSimulationBasicMonodomain() throw(Exception)
+    void TestCardiacSimulationBasicMonodomain()
     {
         // run a monodomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/base_monodomain.xml");
@@ -68,7 +68,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-3));
     }
 
-    void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
+    void TestCardiacSimulationPostprocessMonodomain()
     {
         // run a monodomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/postprocess_monodomain.xml");
@@ -79,7 +79,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-3));
     }
 
-    void TestCardiacSimulationSaveBidomain() throw(Exception)
+    void TestCardiacSimulationSaveBidomain()
     {
         // run a bidomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/save_bidomain.xml");
@@ -94,7 +94,7 @@ public:
         TS_ASSERT(file.Exists());
     }
 
-    void TestCardiacSimulationSaveMonodomain() throw(Exception)
+    void TestCardiacSimulationSaveMonodomain()
     {
         // run a monodomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/save_monodomain.xml");

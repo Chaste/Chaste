@@ -116,7 +116,7 @@ class TestMonodomainHeart : public CxxTest::TestSuite
 {
 
 public:
-    void TestMonodomainDg0Heart() throw(Exception)
+    void TestMonodomainDg0Heart()
     {
         ///////////////////////////////////////////////////////////////////////
         // Solve

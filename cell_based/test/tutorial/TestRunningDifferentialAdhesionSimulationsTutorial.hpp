@@ -108,7 +108,7 @@ public:
      * second test in the TestRunningPottsBasedSimulationsTutorial, which implements a similar
      * simulation using a cellular Potts model.
      */
-    void TestVertexBasedDifferentialAdhesionSimulation() throw (Exception)
+    void TestVertexBasedDifferentialAdhesionSimulation()
     {
         /* First we create a regular vertex mesh. Here we choose to set the value of the cell rearrangement threshold. */
         HoneycombVertexMeshGenerator generator(5, 5);

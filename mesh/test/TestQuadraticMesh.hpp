@@ -52,7 +52,7 @@ class TestQuadraticMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestQuadraticMesh1d() throw(Exception)
+    void TestQuadraticMesh1d()
     {
         QuadraticMesh<1> mesh;
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
@@ -83,7 +83,7 @@ public:
     }
 
     // Identical to above, except mesh is generated not read
-    void TestQuadraticMesh1dAutomaticallyGenerated() throw(Exception)
+    void TestQuadraticMesh1dAutomaticallyGenerated()
     {
         QuadraticMesh<1> mesh(0.1, 1.0);
 
@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void TestQuadraticMesh2d() throw(Exception)
+    void TestQuadraticMesh2d()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
@@ -173,7 +173,7 @@ public:
         }
     }
 
-    void TestQuadraticMesh3d() throw(Exception)
+    void TestQuadraticMesh3d()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1, false);
@@ -250,7 +250,7 @@ public:
         }
     }
 
-    void TestAutomaticallyGenerated2dMesh1() throw(Exception)
+    void TestAutomaticallyGenerated2dMesh1()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -321,7 +321,7 @@ public:
 
     }
 
-    void TestAutomaticallyGenerated2dMesh2() throw(Exception)
+    void TestAutomaticallyGenerated2dMesh2()
     {
         QuadraticMesh<2> mesh(3.14159/10,  3.14159, 3.14159/2);
 
@@ -345,7 +345,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 30u);
     }
 
-    void TestAutomaticallyGenerated3dMeshSimple() throw(Exception)
+    void TestAutomaticallyGenerated3dMeshSimple()
     {
         double h = 3.14159;
         double width = h;
@@ -392,7 +392,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.CalculateMaximumNodeConnectivityPerProcess(), 27U); //The midpoint, as given above
     }
 
-    void TestAutomaticallyGenerated3dMesh() throw(Exception)
+    void TestAutomaticallyGenerated3dMesh()
     {
         QuadraticMesh<3> mesh(0.5,  2.5, 2.5, 2.5);
 
@@ -414,7 +414,7 @@ public:
         TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(), 65U);
     }
 
-    void TestWritingReadingBoundaryElementsWithContainingElementInfo() throw(Exception)
+    void TestWritingReadingBoundaryElementsWithContainingElementInfo()
     {
         // This mesh has quadratic node and ele files, a linear face file that has containing element info
         QuadraticMesh<3> mesh;
@@ -429,7 +429,7 @@ public:
         }
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "quadratic_mesh.arch";
@@ -480,7 +480,7 @@ public:
         delete p_mesh;
     }
 
-    void TestConstructRegularSlabMesh_Directly_1d() throw(Exception)
+    void TestConstructRegularSlabMesh_Directly_1d()
     {
         QuadraticMesh<1> mesh;
         TS_ASSERT_THROWS_THIS(mesh.ConstructRegularSlabMesh(0.75, 1.0), "Space step does not divide the size of the mesh");
@@ -525,7 +525,7 @@ public:
     }
 
 
-    void TestConstructRegularSlabMesh_Directly_2d() throw(Exception)
+    void TestConstructRegularSlabMesh_Directly_2d()
     {
         QuadraticMesh<2> mesh;
         mesh.ConstructRegularSlabMesh(0.1, 1.0, 2.0);
@@ -549,7 +549,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_read_back.GetNumBoundaryNodes(), 120u);
     }
 
-    void TestConstructRegularSlabMesh_Directly_3d() throw(Exception)
+    void TestConstructRegularSlabMesh_Directly_3d()
     {
         QuadraticMesh<3> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0, 2.0, 3.0);
@@ -735,7 +735,7 @@ public:
         }
     }
 
-    void TestLinearToQuadraticMeshConversion2d() throw(Exception)
+    void TestLinearToQuadraticMeshConversion2d()
     {
         QuadraticMesh<2> quad_mesh;
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements");
@@ -765,7 +765,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumBoundaryNodes(), 64u);
     }
 
-    void TestLinearToQuadraticMeshConversion2dNonconvex() throw(Exception)
+    void TestLinearToQuadraticMeshConversion2dNonconvex()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/l_shape");
 
@@ -790,7 +790,7 @@ public:
     /* HOW_TO_TAG Mesh
      * Convert a linear tetrahedral mesh to quadratic and write back to file.
      */
-    void TestLinearToQuadraticMeshConversion3d() throw(Exception)
+    void TestLinearToQuadraticMeshConversion3d()
     {
         QuadraticMesh<3> quad_mesh;
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_136_elements");
@@ -821,7 +821,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumBoundaryNodes(), 194u);
     }
 
-    void TestLinearToQuadraticMeshConversion3dNonconvex() throw(Exception)
+    void TestLinearToQuadraticMeshConversion3dNonconvex()
     {
         TrianglesMeshReader<3,3> reader("mesh/test/data/l_shape3d");
 
@@ -845,7 +845,7 @@ public:
         TS_ASSERT_DELTA(quad_mesh.GetSurfaceArea(), 14.0, 1e-15);
     }
 
-    void TestQuadraticMesh2dReordered() throw (Exception)
+    void TestQuadraticMesh2dReordered()
     {
         // Quadratics mesh - with different ordering
         QuadraticMesh<2> quad_mesh;
@@ -881,7 +881,7 @@ public:
     /**
      * Check that we can build a QuadraticMesh using the VTK mesh reader.
      */
-    void TestBuildQuadraticMeshFromVtkMeshReader(void) throw(Exception)
+    void TestBuildQuadraticMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
@@ -1001,7 +1001,7 @@ public:
         return global_hist;
     }
 
-    void TestElementsContainedByNodes3d() throw (Exception)
+    void TestElementsContainedByNodes3d()
     {
         QuadraticMesh<3> mesh;
         double h = 1.0;

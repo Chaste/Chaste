@@ -54,7 +54,7 @@ class TestPerformanceOfAssembly : public CxxTest::TestSuite
 {
 public:
 
-    void TestPerfAssembly() throw(Exception)
+    void TestPerfAssembly()
     {
         // Write headings
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2>::DisplayHeadings();

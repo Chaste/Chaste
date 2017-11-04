@@ -108,7 +108,7 @@ public:
        return (double)(rusage.ru_maxrss)/(1024);// Convert KB to MB
     }
 
-    void TestMonodomain3dRabbitHeart() throw(Exception)
+    void TestMonodomain3dRabbitHeart()
     {
         /*
          * HOW_TO_TAG Cardiac/Problem definition

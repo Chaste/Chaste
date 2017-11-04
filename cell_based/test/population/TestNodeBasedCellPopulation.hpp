@@ -138,7 +138,7 @@ private:
 public:
 
     // Test construction, accessors and Iterator
-    void TestNodeBasedCellPopulation1d2d3d() throw(Exception)
+    void TestNodeBasedCellPopulation1d2d3d()
     {
         DimensionTestSimpleNodeBasedCellPopulation<1>("mesh/test/data/1D_0_to_1_10_elements");
         DimensionTestSimpleNodeBasedCellPopulation<2>("mesh/test/data/square_4_elements");
@@ -243,7 +243,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetDefaultTimeStep(), 1.0/120.0, 1e-6);
     }
 
-    void TestUpdatingCellLocationMapOnDelete() throw (Exception)
+    void TestUpdatingCellLocationMapOnDelete()
     {
         std::vector<Node<3>* > nodes;
         nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
@@ -983,7 +983,7 @@ public:
          }
     }
 
-    void TestSettingCellAncestors() throw (Exception)
+    void TestSettingCellAncestors()
     {
         // Create a small node-based cell population
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -1030,7 +1030,7 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), (unsigned)(mesh.GetNumNodes() > 0));
     }
 
-    void TestGetLocationOfCellCentreAndGetWidth() throw (Exception)
+    void TestGetLocationOfCellCentreAndGetWidth()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -1469,7 +1469,7 @@ public:
 
     }
 
-    void TestArchivingCellPopulation() throw (Exception)
+    void TestArchivingCellPopulation()
     {
         EXIT_IF_PARALLEL;    // Population archiving doesn't work in parallel yet.
 
@@ -1581,7 +1581,7 @@ public:
         }
     }
 
-    void TestAddAndRemoveMovedCell()    throw (Exception)
+    void TestAddAndRemoveMovedCell()
     {
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
@@ -1629,7 +1629,7 @@ public:
         }
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         EXIT_IF_PARALLEL;  // The population.GetTetrahedralMeshForPdeModifier() method does not yet work in parallel.
 
@@ -1665,7 +1665,7 @@ public:
         delete p_tet_mesh;
     }
 
-    void TestGetCellDataItemAtPdeNode() throw (Exception)
+    void TestGetCellDataItemAtPdeNode()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;

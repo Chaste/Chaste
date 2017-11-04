@@ -87,7 +87,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestOrthoWriterAscii() throw (Exception)
+    void TestOrthoWriterAscii()
     {
         FileFinder file_finder("heart/test/data/fibre_tests/Orthotropic3D.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<3> fibre_reader(file_finder, ORTHO);
@@ -106,7 +106,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestOrthoWriterBinary() throw (Exception)
+    void TestOrthoWriterBinary()
     {
         FileFinder file_finder("heart/test/data/fibre_tests/Orthotropic3D.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<3> fibre_reader(file_finder, ORTHO);
@@ -128,7 +128,7 @@ public:
 
     //Following are convenience methods
 private:
-    void ConvertToBinaryOrtho(std::string fullPath, std::string baseName, bool copyOutput) throw (Exception)
+    void ConvertToBinaryOrtho(std::string fullPath, std::string baseName, bool copyOutput)
     {
         FileFinder file_finder(fullPath+"/"+baseName+".ortho", RelativeTo::ChasteSourceRoot);
 
@@ -173,7 +173,7 @@ private:
         }
     }
 
-    void ConvertToBinaryAxi(std::string fullPath, std::string baseName, bool copyOutput) throw (Exception)
+    void ConvertToBinaryAxi(std::string fullPath, std::string baseName, bool copyOutput)
     {
         FileFinder file_finder(fullPath+"/"+baseName+".axi", RelativeTo::ChasteSourceRoot);
         FibreReader<3> fibre_reader(file_finder, AXISYM);
@@ -208,13 +208,13 @@ private:
     }
 
 public:
-    void TestConvertFiles() throw (Exception)
+    void TestConvertFiles()
     {
           ConvertToBinaryOrtho("heart/test/data/box_shaped_heart/", "box_heart", false);
           ConvertToBinaryAxi("heart/test/data/box_shaped_heart/", "box_heart", false);
     }
 
-    void doNotTestReallyConvertFiles() throw (Exception)
+    void doNotTestReallyConvertFiles()
     {
           ConvertToBinaryOrtho("heart/test/data/fibre_tests/", "downsampled", true);
           ConvertToBinaryOrtho("heart/test/data/point50_heart_mesh/", "point50", true);

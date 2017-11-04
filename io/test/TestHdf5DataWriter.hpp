@@ -263,7 +263,7 @@ public:
         H5Fclose(file_id);
     }
 
-    void TestHdf5DataWriterMultipleColumns() throw(Exception)
+    void TestHdf5DataWriterMultipleColumns()
     {
         int number_nodes = 100;
 
@@ -322,7 +322,7 @@ public:
         PetscTools::Destroy(petsc_data_2);
     }
 
-    void TestHdf5DataWriterSingleColumnNoTimeCachedFails() throw(Exception)
+    void TestHdf5DataWriterSingleColumnNoTimeCachedFails()
     {
         int number_nodes = 100;
 
@@ -358,7 +358,7 @@ public:
         PetscTools::Destroy(petsc_data_1);
     }
 
-    void TestHdf5DataWriterMultipleColumnsCachedFails() throw(Exception)
+    void TestHdf5DataWriterMultipleColumnsCachedFails()
     {
         int number_nodes = 100;
 
@@ -397,7 +397,7 @@ public:
         PetscTools::Destroy(petsc_data_1);
     }
 
-    void TestHdf5DataWriterSingleColumnCached() throw(Exception)
+    void TestHdf5DataWriterSingleColumnCached()
     {
         int number_nodes = 100;
         DistributedVectorFactory factory(number_nodes);
@@ -482,7 +482,7 @@ public:
                                                 "io/test/data", filename + "_extended", false));
     }
 
-    void TestHdf5DataWriterNonEvenRowDistribution() throw(Exception)
+    void TestHdf5DataWriterNonEvenRowDistribution()
     {
         int number_nodes = 100;
 
@@ -539,7 +539,7 @@ public:
         PetscTools::Destroy(petsc_data_2);
     }
 
-    void TestHdf5DataWriterFullFormatIncomplete() throw(Exception)
+    void TestHdf5DataWriterFullFormatIncomplete()
     {
         int number_nodes = 100;
 
@@ -607,7 +607,7 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterFullFormatIncompleteCached() throw(Exception)
+    void TestHdf5DataWriterFullFormatIncompleteCached()
     {
         int number_nodes = 100;
 
@@ -661,7 +661,7 @@ public:
         PetscTools::Destroy(petsc_data_1);
     }
 
-    void TestHdf5DataWriterFullFormat() throw(Exception)
+    void TestHdf5DataWriterFullFormat()
     {
         int number_nodes = 100;
 
@@ -719,7 +719,7 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterFullFormatStriped() throw(Exception)
+    void TestHdf5DataWriterFullFormatStriped()
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -791,7 +791,7 @@ public:
         PetscTools::Destroy(petsc_data_short);
     }
 
-    void TestHdf5DataWriterStripedCached() throw(Exception)
+    void TestHdf5DataWriterStripedCached()
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -869,7 +869,7 @@ public:
         PetscTools::Destroy(petsc_data_long);
     }
 
-    void TestHdf5DataWriterStripedNoTimeCachedFails() throw(Exception)
+    void TestHdf5DataWriterStripedNoTimeCachedFails()
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -914,7 +914,7 @@ public:
         PetscTools::Destroy(petsc_data_long);
     }
 
-    void TestHdf5DataWriterFullFormatStripedWith3Variables() throw(Exception)
+    void TestHdf5DataWriterFullFormatStripedWith3Variables()
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -966,7 +966,7 @@ public:
         PetscTools::Destroy(petsc_data);
     }
 
-    void Hdf5DataWriterFullFormatStripedIncomplete(bool useCache, std::string outputFile, std::string expectedException) throw(Exception)
+    void Hdf5DataWriterFullFormatStripedIncomplete(bool useCache, std::string outputFile, std::string expectedException)
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -1055,14 +1055,14 @@ public:
         PetscTools::Destroy(petsc_data_1var);
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncomplete() throw(Exception)
+    void TestHdf5DataWriterFullFormatStripedIncomplete()
     {
         Hdf5DataWriterFullFormatStripedIncomplete(false,
                                                   "hdf5_test_full_format_striped_incomplete",
                                                   "The PutStripedVector functionality for incomplete data is supported for only 2 stripes");
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncompleteCached() throw(Exception)
+    void TestHdf5DataWriterFullFormatStripedIncompleteCached()
     {
         Hdf5DataWriterFullFormatStripedIncomplete(true,
                                                   "hdf5_test_full_format_striped_incomplete_cached",
@@ -1485,7 +1485,7 @@ public:
     /**
      *  Test for adding a new dataset ("Extra stuff") to an existing HDF5 file.
      */
-    void TestHdf5DataWriterAddNewVariable() throw(Exception)
+    void TestHdf5DataWriterAddNewVariable()
     {
         int number_nodes = 100;
 
@@ -1897,7 +1897,7 @@ public:
                                                 "io/test/data", "hdf5_permuted", false));
     }
 
-    void TestHdf5DataWriterFullFormatIncompleteUsingMatrix() throw(Exception)
+    void TestHdf5DataWriterFullFormatIncompleteUsingMatrix()
     {
         int number_nodes = 100;
 
@@ -1961,7 +1961,7 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterSingleIncompleteUsingMatrixCached() throw(Exception)
+    void TestHdf5DataWriterSingleIncompleteUsingMatrixCached()
     {
         int number_nodes = 100;
 
@@ -2013,7 +2013,7 @@ public:
         PetscTools::Destroy(petsc_data_1);
     }
 
-    void Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(bool useCache, std::string outputFile) throw(Exception)
+    void Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(bool useCache, std::string outputFile)
     {
         /* This test doesn't get run directly, see following two blocks */
         int number_nodes = 100;
@@ -2078,19 +2078,19 @@ public:
         PetscTools::Destroy(petsc_data_long);
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix() throw(Exception)
+    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix()
     {
         // Without caching
         Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(false, "hdf5_test_full_format_striped_incomplete_using_matrix");
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached() throw(Exception)
+    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached()
     {
         // With caching
         Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(true, "hdf5_test_full_format_striped_incomplete_using_matrix_cached");
     }
 
-    void TestHdf5DataWriterManualChunkSizeAndAlignment() throw(Exception)
+    void TestHdf5DataWriterManualChunkSizeAndAlignment()
     {
         std::string folder("TestHdf5DataWriter");
         std::string filename("hdf5_test_manual_chunk_size_and_alignment");

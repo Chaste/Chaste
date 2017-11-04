@@ -48,7 +48,7 @@ class TestMonodomainMassLumping : public CxxTest::TestSuite
 
 public:
 
-    void TestCompareCubePlaneStimulus() throw(Exception)
+    void TestCompareCubePlaneStimulus()
     {
         HeartConfig::Instance()->SetSimulationDuration(20); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
@@ -102,7 +102,7 @@ public:
         }
     }
 
-    void TestCompareCubePlaneStimulusOnlyPrecondLumping() throw(Exception)
+    void TestCompareCubePlaneStimulusOnlyPrecondLumping()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(20); //ms

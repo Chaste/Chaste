@@ -48,7 +48,7 @@ class TestQuadraturePointsGroup : public CxxTest::TestSuite
 {
 public:
 
-    void TestGetQuadPointLocations1d() throw(Exception)
+    void TestGetQuadPointLocations1d()
     {
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
         TetrahedralMesh<1,1> mesh;
@@ -81,7 +81,7 @@ public:
         TS_ASSERT_DELTA(quad_point(0), 0.8+local_quad_point_1[0]/10, 1e-9);
     }
 
-    void TestGetQuadPointLocations2d() throw(Exception)
+    void TestGetQuadPointLocations2d()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
         TetrahedralMesh<2,2> mesh;
@@ -116,7 +116,7 @@ public:
         }
     }
 
-    void TestGetQuadPointLocations2dDistributed() throw(Exception)
+    void TestGetQuadPointLocations2dDistributed()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
         DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);

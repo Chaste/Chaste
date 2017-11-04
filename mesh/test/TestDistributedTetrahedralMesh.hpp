@@ -576,7 +576,7 @@ public:
 
     }
 
-    void TestConstructionFromMeshReaderWithNodeAttributes() throw(Exception)
+    void TestConstructionFromMeshReaderWithNodeAttributes()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements_with_node_attributes");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
@@ -641,7 +641,7 @@ public:
         CompareMeshes( mesh, mesh_from_ncl );
     }
 
-    void TestRandomShuffle() throw (Exception)
+    void TestRandomShuffle()
     {
         unsigned num_elts = 200;
 
@@ -830,7 +830,7 @@ public:
     }
 
 
-    void TestConstruct3DWithRegions() throw (Exception)
+    void TestConstruct3DWithRegions()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart_nonnegative_flags");
         DistributedTetrahedralMesh<3,3> mesh;
@@ -885,7 +885,7 @@ public:
      * This test constructs a simple cuboid mesh and divides
      * between two processes
      */
-    void TestGeometricPartition() throw(Exception)
+    void TestGeometricPartition()
     {
         unsigned num_procs = PetscTools::GetNumProcs();
         unsigned rank = PetscTools::GetMyRank();
@@ -949,7 +949,7 @@ public:
     }
 
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder main_archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_tetrahedral_mesh.arch";
@@ -1089,7 +1089,7 @@ public:
         delete p_mesh;
     }
 
-    void TestArchivingBinaryMesh() throw(Exception)
+    void TestArchivingBinaryMesh()
     {
         FileFinder archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "binary_mesh.arch";
@@ -2049,7 +2049,7 @@ public:
         }
     }
 
-    void TestArchiveOfConstructedMesh() throw(Exception)
+    void TestArchiveOfConstructedMesh()
     {
         FileFinder archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_rectangle.arch";
@@ -2162,7 +2162,7 @@ public:
         delete p_mesh;
     }
 
-    void TestLoadBadFacesException() throw (Exception)
+    void TestLoadBadFacesException()
     {
         DistributedTetrahedralMesh<3,3> distributed_mesh_bad;
         TrianglesMeshReader<3,3> mesh_reader_bad("mesh/test/data/cube_21_nodes_side/Cube21_bad_faces"); // 5x5x5mm cube (internode distance = 0.25mm)
@@ -2216,7 +2216,7 @@ public:
 
     }
 
-    void TestCheckOutwardNormals() throw (Exception)
+    void TestCheckOutwardNormals()
     {
         {
             DistributedTetrahedralMesh<2,2> mesh;
@@ -2230,7 +2230,7 @@ public:
         }
     }
 
-    void TestCalculateEdgeLengths() throw (Exception)
+    void TestCalculateEdgeLengths()
     {
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -2257,7 +2257,7 @@ public:
         }
     }
 
-    void TestPartitionHasNoElementsWithAllHaloNodes() throw (Exception)
+    void TestPartitionHasNoElementsWithAllHaloNodes()
     {
         TrianglesMeshReader<3,3> reader("heart/test/data/box_shaped_heart/box_heart");
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
@@ -2285,7 +2285,7 @@ public:
      * split plane.  The default is for parallel code to split 2-D meshes into slices in the y-dimension
      * and 3-D meshes in the z-dimension.
      */
-    void TestConstructSlabMeshWithDimensionSplit() throw (Exception)
+    void TestConstructSlabMeshWithDimensionSplit()
     {
         double step = 1.0;
         unsigned width = 3;

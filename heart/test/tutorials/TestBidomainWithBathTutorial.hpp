@@ -88,7 +88,7 @@ class TestBidomainWithBathTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestWithBathAndElectrodes() throw (Exception)
+    void TestWithBathAndElectrodes()
     {
         /* First, set the end time and output info. In this simulation
          * we'll explicitly read the mesh, alter it, then pass it

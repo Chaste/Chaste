@@ -86,7 +86,7 @@ class TestCellPopulationWriters : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestBoundaryNodeWriter() throw (Exception)
+    void TestBoundaryNodeWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -128,7 +128,7 @@ public:
         FileComparison(results_dir + "results.vizboundarynodes", "cell_based/test/data/TestCellPopulationWriters/results.vizboundarynodes_twice").CompareFiles();
     }
 
-    void TestBoundaryNodeWriterArchiving() throw (Exception)
+    void TestBoundaryNodeWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -151,7 +151,7 @@ public:
        }
     }
 
-    void TestCellPopulationAdjacencyMatrixWriter() throw (Exception)
+    void TestCellPopulationAdjacencyMatrixWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -261,7 +261,7 @@ public:
         }
     }
 
-    void TestCellPopulationAdjacencyMatrixWriterArchiving() throw (Exception)
+    void TestCellPopulationAdjacencyMatrixWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -284,7 +284,7 @@ public:
        }
     }
 
-    void TestCellPopulationAreaWriter() throw (Exception)
+    void TestCellPopulationAreaWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -389,7 +389,7 @@ public:
             "CellPopulationAreaWriter cannot be used with a VertexBasedCellPopulation");
     }
 
-    void TestCellPopulationAreaWriterArchiving() throw (Exception)
+    void TestCellPopulationAreaWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -412,7 +412,7 @@ public:
        }
     }
 
-    void TestCellPopulationElementWriter() throw (Exception)
+    void TestCellPopulationElementWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -485,7 +485,7 @@ public:
             "CellPopulationElementWriter cannot be used with a CaBasedCellPopulation");
     }
 
-    void TestCellPopulationElementWriterArchiving() throw (Exception)
+    void TestCellPopulationElementWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -508,7 +508,7 @@ public:
        }
     }
 
-    void TestHeterotypicBoundaryLengthWriter() throw (Exception)
+    void TestHeterotypicBoundaryLengthWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -815,7 +815,7 @@ public:
         }
     }
 
-    void TestHeterotypicBoundaryLengthWriterArchiving() throw (Exception)
+    void TestHeterotypicBoundaryLengthWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -838,7 +838,7 @@ public:
        }
     }
 
-    void TestNodeLocationWriter() throw (Exception)
+    void TestNodeLocationWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -882,7 +882,7 @@ public:
         delete nodes[1];
     }
 
-    void TestNodeLocationWriterArchiving() throw (Exception)
+    void TestNodeLocationWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -905,7 +905,7 @@ public:
        }
     }
 
-    void TestNodeVelocityWriterWithMeshBasedCellPopulation() throw (Exception)
+    void TestNodeVelocityWriterWithMeshBasedCellPopulation()
     {
         EXIT_IF_PARALLEL;
 
@@ -962,7 +962,7 @@ public:
         FileComparison(mesh_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestCellPopulationWriters/nodevelocities_mesh.dat").CompareFiles();
     }
 
-    void TestNodeVelocityWriterWithNodeBasedCellPopulation() throw (Exception)
+    void TestNodeVelocityWriterWithNodeBasedCellPopulation()
     {
         EXIT_IF_PARALLEL;
 
@@ -1034,7 +1034,7 @@ public:
         delete node_based_nodes[1];
     }
 
-    void TestNodeVelocityWriterWithVertexBasedCellPopulation() throw (Exception)
+    void TestNodeVelocityWriterWithVertexBasedCellPopulation()
     {
         EXIT_IF_PARALLEL;
 
@@ -1086,7 +1086,7 @@ public:
 
     }
 
-    void TestNodeVelocityWriterExceptions() throw (Exception)
+    void TestNodeVelocityWriterExceptions()
     {
         EXIT_IF_PARALLEL;
 
@@ -1119,7 +1119,7 @@ public:
             "NodeVelocityWriter cannot be used with a PottsBasedCellPopulation");
     }
 
-    void TestNodeVelocityWriterArchiving() throw (Exception)
+    void TestNodeVelocityWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1142,7 +1142,7 @@ public:
        }
     }
 
-    void TestRadialCellDataDistributionWriter() throw (Exception)
+    void TestRadialCellDataDistributionWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1272,7 +1272,7 @@ public:
         }
     }
 
-    void TestRadialCellDataDistributionWriterArchiving() throw (Exception)
+    void TestRadialCellDataDistributionWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1304,7 +1304,7 @@ public:
        }
     }
 
-    void TestVertexT1SwapLocationsWriter() throw (Exception)
+    void TestVertexT1SwapLocationsWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1403,7 +1403,7 @@ public:
         }
     }
 
-    void TestVertexT1SwapLocationsWriterArchiving() throw (Exception)
+    void TestVertexT1SwapLocationsWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1427,7 +1427,7 @@ public:
        }
     }
 
-    void TestVertexT2SwapLocationsWriter() throw (Exception)
+    void TestVertexT2SwapLocationsWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1526,7 +1526,7 @@ public:
         }
     }
 
-    void TestVertexT2SwapLocationsWriterArchiving() throw (Exception)
+    void TestVertexT2SwapLocationsWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1550,7 +1550,7 @@ public:
        }
     }
 
-    void TestVertexT3SwapLocationsWriter() throw (Exception)
+    void TestVertexT3SwapLocationsWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1649,7 +1649,7 @@ public:
         }
     }
 
-    void TestVertexT3SwapLocationsWriterArchiving() throw (Exception)
+    void TestVertexT3SwapLocationsWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1672,7 +1672,7 @@ public:
        }
     }
 
-    void TestVoronoiDataWriter() throw (Exception)
+    void TestVoronoiDataWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1777,7 +1777,7 @@ public:
             "VoronoiDataWriter cannot be used with a VertexBasedCellPopulation");
     }
 
-    void TestVoronoiDataWriterArchiving() throw (Exception)
+    void TestVoronoiDataWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);

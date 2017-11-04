@@ -69,7 +69,7 @@ public:
      * change any model parameters around line 90,
      * and give the simulator options around line 95.
      */
-    void TestGenerateSteadyStateCryptArchives() throw (Exception)
+    void TestGenerateSteadyStateCryptArchives()
     {
         std::string output_directory = "SteadyStateCrypt";
 

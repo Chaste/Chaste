@@ -46,7 +46,7 @@ class TestCellBasedEventHandler : public CxxTest::TestSuite
 {
 public:
 
-    void TestEvents() throw(Exception)
+    void TestEvents()
     {
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::EVERYTHING);
 

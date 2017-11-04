@@ -84,7 +84,7 @@ public:
         TS_ASSERT_DELTA(derivs[5], 7.777500000000001e-03*60.0, 1e-5);
     }
 
-    void TestTysonNovakSolver() throw(Exception)
+    void TestTysonNovakSolver()
     {
         TysonNovak2001OdeSystem tyson_novak_system;
 

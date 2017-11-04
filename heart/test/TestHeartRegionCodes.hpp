@@ -82,7 +82,7 @@ class TestHeartRegionCodes : public CxxTest::TestSuite
 
     }
 
-    void TestExceptions() throw (Exception)
+    void TestExceptions()
     {
         std::set<unsigned> tissue_ids;
         tissue_ids.insert(0);

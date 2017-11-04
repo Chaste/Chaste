@@ -72,7 +72,7 @@ class TestCellKillers : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestTargetedCellKiller() throw(Exception)
+    void TestTargetedCellKiller()
     {
         // Set up singleton classes
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -149,7 +149,7 @@ public:
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestRandomCellKiller() throw(Exception)
+    void TestRandomCellKiller()
     {
         // Set up singleton classes
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -254,7 +254,7 @@ public:
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestApoptoticCellKiller() throw(Exception)
+    void TestApoptoticCellKiller()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         double end_time = 1.0;
@@ -345,7 +345,7 @@ public:
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestPlaneBasedCellKillerIn1d() throw(Exception)
+    void TestPlaneBasedCellKillerIn1d()
     {
         // Create 1D mesh
         unsigned num_cells = 14;
@@ -394,7 +394,7 @@ public:
         }
     }
 
-    void TestPlaneBasedCellKillerIn2d() throw(Exception)
+    void TestPlaneBasedCellKillerIn2d()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -441,7 +441,7 @@ public:
         }
     }
 
-    void TestPlaneBasedCellKillerIn3d() throw(Exception)
+    void TestPlaneBasedCellKillerIn3d()
     {
         // Create 3D mesh
         MutableMesh<3,3> mesh;
@@ -487,7 +487,7 @@ public:
         }
     }
 
-    void TestIsolatedLabelledCellKiller() throw(Exception)
+    void TestIsolatedLabelledCellKiller()
     {
         // Create a non-vertex based cell population
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -563,7 +563,7 @@ public:
         }
     }
 
-    void TestArchivingOfTargetedCellKiller() throw (Exception)
+    void TestArchivingOfTargetedCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -600,7 +600,7 @@ public:
        }
     }
 
-    void TestArchivingOfRandomCellKiller() throw (Exception)
+    void TestArchivingOfRandomCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -637,7 +637,7 @@ public:
         }
     }
 
-    void TestArchivingOfApoptoticCellKiller() throw (Exception)
+    void TestArchivingOfApoptoticCellKiller()
     {
         // Set up
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -672,7 +672,7 @@ public:
         }
     }
 
-    void TestArchivingOfPlaneBasedCellKiller() throw (Exception)
+    void TestArchivingOfPlaneBasedCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -716,7 +716,7 @@ public:
         }
     }
 
-    void TestArchivingOfIsolatedLabelledCellKiller() throw (Exception)
+    void TestArchivingOfIsolatedLabelledCellKiller()
     {
         // Set up singleton classes
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);

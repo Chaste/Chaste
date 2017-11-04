@@ -53,7 +53,7 @@ using std::ofstream;
 class TestHeterogeneousConductivities : public CxxTest::TestSuite
 {
 public:
-    void TestSimpleSimulation() throw(Exception)
+    void TestSimpleSimulation()
     {
         /*Simulation parameters*/
         HeartConfig::Instance()->SetSimulationDuration(0.7); //ms (falls over after this)

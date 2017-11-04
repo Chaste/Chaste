@@ -65,7 +65,7 @@ public:
      * \todo When vertex-based cell population code is added to cell_based folder, move this
      *       test to TestWntConcentration.hpp
      */
-    void TestWntConcentrationWithVertexBasedCellPopulation() throw(Exception)
+    void TestWntConcentrationWithVertexBasedCellPopulation()
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;

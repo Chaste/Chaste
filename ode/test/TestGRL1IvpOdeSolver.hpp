@@ -340,7 +340,7 @@ public:
         TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)order), 1.5e-1);
     }
 
-    void TestArchivingSolvers() throw(Exception)
+    void TestArchivingSolvers()
     {
         OutputFileHandler handler("archive",false);
         handler.SetArchiveDirectory();

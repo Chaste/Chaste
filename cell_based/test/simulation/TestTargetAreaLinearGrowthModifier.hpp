@@ -65,7 +65,7 @@ class TestTargetAreaLinearGrowthModifier : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions() throw (Exception)
+    void TestNonPhaseBasedCellCycleModelMethodsAndExceptions()
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -116,7 +116,7 @@ public:
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
-    void TestTargetAreaLinearGrowthModifierMethods() throw (Exception)
+    void TestTargetAreaLinearGrowthModifierMethods()
     {
         // Create a modifier
         MAKE_PTR(TargetAreaLinearGrowthModifier<2>,p_growth_modifier);

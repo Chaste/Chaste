@@ -100,7 +100,7 @@ class TestCellWriters : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellAgesWriter() throw (Exception)
+    void TestCellAgesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    void TestCellAgesWriterArchiving() throw (Exception)
+    void TestCellAgesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -206,7 +206,7 @@ public:
         }
     }
 
-    void TestCellAncestorWriter() throw (Exception)
+    void TestCellAncestorWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -273,7 +273,7 @@ public:
         }
     }
 
-    void TestCellAncestorWriterArchiving() throw (Exception)
+    void TestCellAncestorWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -302,7 +302,7 @@ public:
         }
     }
 
-    void TestCellDeltaNotchWriter() throw (Exception)
+    void TestCellDeltaNotchWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -368,7 +368,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell delta");
     }
 
-    void TestCellDeltaNotchWriterArchiving() throw (Exception)
+    void TestCellDeltaNotchWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -397,7 +397,7 @@ public:
         }
     }
 
-    void TestCellDataItemWriter() throw (Exception)
+    void TestCellDataItemWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -454,7 +454,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "CellData test_variable");
     }
 
-    void TestCellDataItemWriterArchiving() throw (Exception)
+    void TestCellDataItemWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -490,7 +490,7 @@ public:
         }
     }
 
-    void TestCellIdWriter() throw (Exception)
+    void TestCellIdWriter()
     {
 
         EXIT_IF_PARALLEL;
@@ -562,7 +562,7 @@ public:
         }
     }
 
-    void TestCellIdWriterArchiving() throw (Exception)
+    void TestCellIdWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -591,7 +591,7 @@ public:
         }
     }
 
-    void TestCellLabelWriter() throw (Exception)
+    void TestCellLabelWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -656,7 +656,7 @@ public:
         }
     }
 
-    void TestCellLabelWriterArchiving() throw (Exception)
+    void TestCellLabelWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -685,7 +685,7 @@ public:
         }
     }
 
-    void TestCellLocationIndexWriter() throw (Exception)
+    void TestCellLocationIndexWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -735,7 +735,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Location indices");
     }
 
-    void TestCellLocationIndexWriterArchiving() throw (Exception)
+    void TestCellLocationIndexWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -764,7 +764,7 @@ public:
         }
     }
 
-    void TestCellMutationStatesWriter() throw (Exception)
+    void TestCellMutationStatesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -834,7 +834,7 @@ public:
         }
     }
 
-    void TestCellMutationStatesWriterArchiving() throw (Exception)
+    void TestCellMutationStatesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -863,7 +863,7 @@ public:
         }
     }
 
-    void TestCellProliferativePhasesWriter() throw (Exception)
+    void TestCellProliferativePhasesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -927,7 +927,7 @@ public:
         }
     }
 
-    void TestCellProliferativePhasesWriterArchiving() throw (Exception)
+    void TestCellProliferativePhasesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -956,7 +956,7 @@ public:
         }
     }
 
-    void TestCellProliferativeTypesWriter() throw (Exception)
+    void TestCellProliferativeTypesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1035,7 +1035,7 @@ public:
         }
     }
 
-    void TestCellProliferativeTypesWriterArchiving() throw (Exception)
+    void TestCellProliferativeTypesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1064,7 +1064,7 @@ public:
         }
     }
 
-    void TestCellCycleModelProteinConcentrationsWriter() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1133,7 +1133,7 @@ public:
         }
     }
 
-    void TestCellCycleModelProteinConcentrationsWriterException() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriterException()
     {
         EXIT_IF_PARALLEL;
 
@@ -1183,7 +1183,7 @@ public:
         }
     }
 
-    void TestCellCycleModelProteinConcentrationsWriterArchiving() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1212,7 +1212,7 @@ public:
        }
     }
 
-    void TestCellVolumesWriter() throw (Exception)
+    void TestCellVolumesWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1258,7 +1258,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell volumes");
     }
 
-    void TestCellVolumesWriterArchiving() throw (Exception)
+    void TestCellVolumesWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1287,7 +1287,7 @@ public:
         }
     }
 
-    void TestCellRosetteRankWriter() throw (Exception)
+    void TestCellRosetteRankWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1380,7 +1380,7 @@ public:
         }
     }
 
-    void TestCellRosetteRankWriterArchiving() throw (Exception)
+    void TestCellRosetteRankWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1409,7 +1409,7 @@ public:
         }
     }
 
-    void TestCellRadiusWriter() throw (Exception)
+    void TestCellRadiusWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1473,7 +1473,7 @@ public:
         }
     }
 
-    void TestCellRadiusWriterArchiving() throw (Exception)
+    void TestCellRadiusWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1502,7 +1502,7 @@ public:
        }
     }
 
-    void TestCellAppliedForceWriter() throw (Exception)
+    void TestCellAppliedForceWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -1570,7 +1570,7 @@ public:
         }
     }
 
-    void TestCellAppliedForceWriterArchiving() throw (Exception)
+    void TestCellAppliedForceWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -1599,7 +1599,7 @@ public:
         }
     }
 
-    void TestDefaultVecBehaviourWhenWritingScalars() throw (Exception)
+    void TestDefaultVecBehaviourWhenWritingScalars()
     {
         // We test here that a writer designed to only output scalar data has the correct default behaviour for
         // outputting vectors
@@ -1638,7 +1638,7 @@ public:
         }
     }
 
-    void TestDefaultScalarBehaviourWhenWritingVectors() throw (Exception)
+    void TestDefaultScalarBehaviourWhenWritingVectors()
     {
         // We test here that a writer designed to only output vector data has the correct default behaviour for
         // outputting scalars

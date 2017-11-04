@@ -56,7 +56,7 @@ public:
     // the left face.
     // Should behave like the 1D case, extrapolated.
     // See also TestMonodomainSlab.hpp
-    void TestMonodomain3DWithFaceStimulus( void ) throw(Exception)
+    void TestMonodomain3DWithFaceStimulus( void )
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
         HeartConfig::Instance()->SetSimulationDuration(4); //ms

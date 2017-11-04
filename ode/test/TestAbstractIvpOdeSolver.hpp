@@ -176,7 +176,7 @@ private:
 
 public:
 
-    void TestCoverageOfWriteToFile() throw (Exception)
+    void TestCoverageOfWriteToFile()
     {
         Ode2 ode_system;
         OdeSolution solutions;
@@ -205,7 +205,7 @@ public:
         TS_ASSERT(file_comparer.CompareFiles());
     }
 
-    void TestEulerSolver() throw (Exception)
+    void TestEulerSolver()
     {
         EulerIvpOdeSolver euler_solver;
 
@@ -602,7 +602,7 @@ public:
         TS_ASSERT_DELTA(testvalue_rk4, exact_solution, global_error_rk4);
     }
 
-    void TestArchivingSolvers() throw(Exception)
+    void TestArchivingSolvers()
     {
         OutputFileHandler handler("archive",false);
         handler.SetArchiveDirectory();

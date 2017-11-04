@@ -59,7 +59,7 @@ class TestDeltaNotchOdeSystem : public CxxTest::TestSuite
 {
 public:
 
-    void TestDeltaNotchOdeSystemSetup() throw(Exception)
+    void TestDeltaNotchOdeSystemSetup()
     {
 #ifdef CHASTE_CVODE
         DeltaNotchOdeSystem ode_system;

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayTreeWalker : public CxxTest::TestSuite
 {
 public:
-    void TestGetMethods() throw(Exception)
+    void TestGetMethods()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
@@ -83,7 +83,7 @@ public:
         TS_ASSERT_EQUALS(walker.GetDistalNodeIndex(mesh.GetElement(9u)), 9u);
     }
 
-    void TestGenerations() throw(Exception)
+    void TestGenerations()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
@@ -104,7 +104,7 @@ public:
         TS_ASSERT_EQUALS(walker.GetMaxElementGeneration(), 2u);
     }
 
-    void TestOrders() throw(Exception)
+    void TestOrders()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");

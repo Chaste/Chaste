@@ -68,7 +68,7 @@ class TestOffLatticeSimulationWithVertexBasedCellPopulation : public AbstractCel
 {
 public:
 
-    void TestSingleCellRelaxationNagaiHonda() throw (Exception)
+    void TestSingleCellRelaxationNagaiHonda()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -126,7 +126,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestDoNotRestrictVertexMovement() throw (Exception)
+    void TestDoNotRestrictVertexMovement()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -185,7 +185,7 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
     }
 
-    void TestSingleCellRelaxationWelikyOster() throw (Exception)
+    void TestSingleCellRelaxationWelikyOster()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -238,7 +238,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestSingleCellDividing() throw (Exception)
+    void TestSingleCellDividing()
     {
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
@@ -291,7 +291,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestVertexMonolayerWithCellBirth() throw (Exception)
+    void TestVertexMonolayerWithCellBirth()
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(5, 5);
@@ -357,7 +357,7 @@ public:
     }
 
     // This test uses a larger timestep to run faster.
-    void TestVertexMonolayerWithVoid() throw (Exception)
+    void TestVertexMonolayerWithVoid()
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -418,7 +418,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestVertexMonolayerWithCellDeath() throw (Exception)
+    void TestVertexMonolayerWithCellDeath()
     {
         /*
          * We don't want apoptosing cells to be labelled as dead after a certain time in
@@ -499,7 +499,7 @@ public:
      * It asserts that neighbouring cells have the correct adhesion parameter for difference
      * pairs of nodes.
      */
-    void TestVertexMonolayerWithTwoMutationTypes() throw (Exception)
+    void TestVertexMonolayerWithTwoMutationTypes()
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
@@ -556,7 +556,7 @@ public:
      * may be configured and used in a vertex-based simulation. See also the
      * tutorial TestRunningDifferentialAdhesionSimulationsTutorial.hpp.
      */
-    void TestVertexMonolayerWithDifferentialAdhesion() throw (Exception)
+    void TestVertexMonolayerWithDifferentialAdhesion()
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
@@ -615,7 +615,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestSingleCellRelaxationAndApoptosis() throw (Exception)
+    void TestSingleCellRelaxationAndApoptosis()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -689,7 +689,7 @@ public:
      *
      * \todo In order to work the mesh archiving must support boundary nodes (see #1076)
      */
-    void noTestVertexStressTest() throw (Exception)
+    void noTestVertexStressTest()
     {
         double start_time = 0.0;
         double end_time = 100.0;
@@ -748,7 +748,7 @@ public:
     }
 
     // Test archiving of a OffLatticeSimulation that uses a VertexBasedCellPopulation.
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         // Set end time
         double end_time = 0.1;

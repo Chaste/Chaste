@@ -89,7 +89,7 @@ public:
         }
     }
 
-    void TestTensorException() throw (Exception)
+    void TestTensorException()
     {
         c_vector<double, 1> constant_conductivities_1d(Create_c_vector(2.1));
         c_vector<double, 2> constant_conductivities_2d(Create_c_vector(2.1, 0.8));
@@ -113,7 +113,7 @@ public:
 
     }
 
-    void TestFibreOrientationFileExceptions() throw (Exception)
+    void TestFibreOrientationFileExceptions()
     {
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(1,1,1);

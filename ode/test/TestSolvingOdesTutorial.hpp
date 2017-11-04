@@ -221,7 +221,7 @@ void OdeSystemInformation<My2dOde>::Initialise()
 class TestSolvingOdesTutorial: public CxxTest::TestSuite
 {
 public:
-    void TestSolvingOdes() throw(Exception)
+    void TestSolvingOdes()
     {
         /* First, create an instance of the ODE class to be solved. */
         MyOde my_ode;

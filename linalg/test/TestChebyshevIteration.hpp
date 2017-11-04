@@ -54,7 +54,7 @@ class TestChebyshevIteration : public CxxTest::TestSuite
 {
 public:
 
-    void TestChebyshevVsCG() throw (Exception)
+    void TestChebyshevVsCG()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -122,7 +122,7 @@ public:
         PetscTools::Destroy(parallel_layout);
     }
 
-    void TestChebyshevAdaptiveVsNoAdaptive() throw (Exception)
+    void TestChebyshevAdaptiveVsNoAdaptive()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);

@@ -104,7 +104,7 @@ class TestPerElementWriter : public CxxTest::TestSuite
 
 public:
 
-    void TestPerElement() throw (Exception)
+    void TestPerElement()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(2, 3, 4);

@@ -328,7 +328,7 @@ public:
         TS_ASSERT_DELTA(cycle_lengths[size - 1], 2500, 1);
     }
 
-    void TestEadDetection() throw(Exception)
+    void TestEadDetection()
     {
         //this file contains 4 Aps
         std::ifstream ead_file("heart/test/data/sample_APs/Ead.dat");
@@ -367,7 +367,7 @@ public:
         TS_ASSERT_EQUALS(number_of_changes_for_last_ap, above_threshold_depo[size - 1]);
     }
 
-    void TestVeryLongApDetection() throw(Exception)
+    void TestVeryLongApDetection()
     {
         // This test is added to deal with a problem where you get long action potentials (overlapping the next stimulus)
         // and then, depending on the threshold, these got reported as one or two action potentials.
@@ -413,7 +413,7 @@ public:
         }
     }
 
-    void TestActionPotentialCalculations() throw(Exception)
+    void TestActionPotentialCalculations()
     {
         /*
         * In this simulation the stimulus was introduced at t=1ms.

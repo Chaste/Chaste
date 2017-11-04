@@ -161,7 +161,7 @@ public:
 class TestMonodomain3dExampleWithCvodeTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
 #ifdef CHASTE_CVODE
         DistributedTetrahedralMesh<3,3> mesh;

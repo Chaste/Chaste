@@ -369,7 +369,7 @@ public:
             "Cells reaching the top of the crypt need to increase length to at least double the sloughing height.");
     }
 
-    void TestArchiveCryptCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveCryptCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "CryptCentreBasedDivisionRule.arch";
@@ -396,7 +396,7 @@ public:
         }
     }
 
-    void TestArchiveCryptVertexBasedDivisionRule() throw(Exception)
+    void TestArchiveCryptVertexBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "CryptVertexBasedDivisionRule.arch";
@@ -423,7 +423,7 @@ public:
         }
     }
 
-    void TestArchivingCryptShovingCaBasedDivisionRule() throw (Exception)
+    void TestArchivingCryptShovingCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

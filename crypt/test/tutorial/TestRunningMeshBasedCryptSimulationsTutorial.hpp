@@ -127,7 +127,7 @@ public:
      * cylindrical mesh, with each cell progressing through a fixed cell-cycle model,
      * and sloughing enforced at the top of the crypt.
      */
-    void TestCryptWithFixedCellCycle() throw(Exception)
+    void TestCryptWithFixedCellCycle()
     {
         /* First, we generate a mesh. The basic Chaste mesh is a {{{TetrahedralMesh}}}.
          * To enforce periodicity at the left- and right-hand sides of the mesh, we
@@ -231,7 +231,7 @@ public:
      * using a fixed cell-cycle model, we use a Wnt-dependent cell-cycle model,
      * with the Wnt concentration varying within the crypt in a predefined manner.
      */
-    void TestCryptWithWntCellCycle() throw(Exception)
+    void TestCryptWithWntCellCycle()
     {
         /* First we create a cylindrical mesh, and get the cell location indices, exactly as before.
          * Note that time is re-initialized to zero and random number generator is re-seeded to zero in the {{{AbstractCellBasedTestSuite}}}.*/

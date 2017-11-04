@@ -86,7 +86,7 @@ class Test3dBidomainProblemForEfficiencyWithFasterOdes :  public CxxTest::TestSu
 {
 public:
 
-    void TestBidomain3d() throw (Exception)
+    void TestBidomain3d()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));

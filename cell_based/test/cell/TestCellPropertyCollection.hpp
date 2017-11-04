@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCellPropertyCollection : public AbstractCellBasedTestSuite
 {
 public:
-    void TestPropertyCollection() throw (Exception)
+    void TestPropertyCollection()
     {
         CellPropertyCollection collection;
         TS_ASSERT_EQUALS(collection.GetSize(), 0u);
@@ -137,7 +137,7 @@ public:
                               "Can only call GetProperty on a collection of size 1.");
     }
 
-    void TestArchiveCellPropertyCollection() throw (Exception)
+    void TestArchiveCellPropertyCollection()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "properties.arch";

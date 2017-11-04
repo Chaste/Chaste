@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeWithJacobian : public CxxTest::TestSuite
 {
 public:
-    void TestTimingsWithAndWithoutJacobian() throw (Exception)
+    void TestTimingsWithAndWithoutJacobian()
     {
 #ifdef CHASTE_CVODE
         // Set up a default solver and a stimulus

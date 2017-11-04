@@ -84,7 +84,7 @@ public:
 class TestAbstractContractionCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestContractionCellFactory() throw (Exception)
+    void TestContractionCellFactory()
     {
         {
             LabelBasedContractionCellFactory<2> factory(CONSTANT);
@@ -123,7 +123,7 @@ public:
         }
     }
 
-    void TestContractionCellFactoryOnSquare() throw (Exception)
+    void TestContractionCellFactoryOnSquare()
     {
 
         //2D square meshes for electrics and mechanics

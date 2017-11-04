@@ -102,7 +102,7 @@ private:
 
 public:
 
-    void TestParabolicGrowingDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeModifierWithVertexBasedMonolayer()
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -162,7 +162,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9941, 1e-4);
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeModifierWithNodeBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -208,7 +208,7 @@ public:
         delete p_mesh; // to stop memory leaks
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeModifierWithMeshBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -256,7 +256,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -299,7 +299,7 @@ public:
         TS_ASSERT_THROWS_THIS(simulator.Solve(),"Currently can't solve PDEs on meshes with ghost nodes");
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeModifierWithPottsBasedMonolayer()
     {
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -348,7 +348,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9809, 1e-4);
     }
 
-    void TestParabolicGrowingDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
+    void TestParabolicGrowingDomainPdeModifierWithCaBasedMonolayer()
     {
         // Create a simple 2D PottsMesh
         unsigned domain_wide = 5*M_NUM_CELLS_ACROSS;

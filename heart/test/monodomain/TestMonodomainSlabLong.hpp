@@ -82,7 +82,7 @@ public:
 class TestMonodomainSlabLong : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainSlabLongWithCornerNodesStimulated( void ) throw (Exception)
+    void TestMonodomainSlabLongWithCornerNodesStimulated( void )
     {
         HeartConfig::Instance()->SetSimulationDuration(200); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");

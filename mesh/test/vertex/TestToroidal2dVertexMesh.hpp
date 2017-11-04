@@ -94,7 +94,7 @@ public:
         TS_ASSERT_DELTA(height, 6.0/sqrt(3.0), 1e-4);
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -152,7 +152,7 @@ public:
         TS_ASSERT_DELTA(vector[1], 1/sqrt(3.0), 1e-4);
     }
 
-    void TestSetNodeLocationForToroidalMesh() throw (Exception)
+    void TestSetNodeLocationForToroidalMesh()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -195,7 +195,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[1], 6.0/sqrt(3.0) - 0.1, 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(6, 6);
@@ -443,7 +443,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(4), 37u);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "toroidal_vertex_mesh_base.arch";
@@ -537,7 +537,7 @@ public:
         }
     }
 
-    void TestToroidalReMesh() throw (Exception)
+    void TestToroidalReMesh()
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -556,7 +556,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
     }
 
-    void TestToroidalReMeshAfterDelete() throw (Exception)
+    void TestToroidalReMeshAfterDelete()
     {
         // Create mesh
         unsigned num_cells_across = 6;

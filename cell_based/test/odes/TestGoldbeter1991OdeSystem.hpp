@@ -87,7 +87,7 @@ public:
     }
 
 
-    void TestGoldbeter1991OSolver() throw(Exception)
+    void TestGoldbeter1991OSolver()
     {
         Goldbeter1991OdeSystem ode_system;
 

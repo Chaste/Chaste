@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAnotherBidomainTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestFibreSimulation() throw(Exception)
+    void TestFibreSimulation()
     {
         /* It is not the case here, but if there were other tests in the file that
          * had already been run and might have changed parameters in `HeartConfig`, we

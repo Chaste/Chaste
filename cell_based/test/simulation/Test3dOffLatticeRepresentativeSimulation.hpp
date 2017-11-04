@@ -72,7 +72,7 @@ public:
      * Create and simulate a simple 3D cell population with a cuboid
      * mesh, with ghost nodes around the outside
      */
-    void Test3DHoneycombMeshWithGhostNodes() throw (Exception)
+    void Test3DHoneycombMeshWithGhostNodes()
     {
         /*          _ _ _ _ _
          *        /        /|

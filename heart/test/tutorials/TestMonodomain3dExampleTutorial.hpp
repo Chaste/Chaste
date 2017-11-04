@@ -97,7 +97,7 @@ public:
 class TestMonodomain3dExampleTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
         /* HOW_TO_TAG Cardiac/Problem definition
          * Generate a slab (cuboid) mesh rather than read a mesh in, and pass it to solver

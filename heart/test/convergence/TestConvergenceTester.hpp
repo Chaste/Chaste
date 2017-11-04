@@ -68,7 +68,7 @@ public:
 //        unsigned secs = time(NULL) - start;
 //        std::cout<<"REAL TIME Test took "<< secs/60<<" minutes, "<< secs%60<<" seconds of real time\n";
 //    }
-    void Test1DOdeTime() throw(Exception)
+    void Test1DOdeTime()
     {
         OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
@@ -79,7 +79,7 @@ public:
         TS_ASSERT_EQUALS(tester.OdeTimeStep, 0.0025);
     }
 
-    void Test1DOdeTimeWarning() throw(Exception)
+    void Test1DOdeTimeWarning()
     {
         OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum = 1;
@@ -92,7 +92,7 @@ public:
         Warnings::Instance()->QuietDestroy();
     }
 
-    void Test1DPdeTime() throw(Exception)
+    void Test1DPdeTime()
     {
         PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
@@ -103,7 +103,7 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02); // Was 0.01 before using lookup tables
     }
 
-    void Test1DOdePdeTime() throw(Exception)
+    void Test1DOdePdeTime()
     {
         OdePdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
@@ -114,7 +114,7 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.005);
     }
 
-    void Test1DPdeTimeRegion() throw(Exception)
+    void Test1DPdeTimeRegion()
     {
         PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
@@ -126,7 +126,7 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.01);
     }
 
-    void Test1DPdeTimeNeumann() throw(Exception)
+    void Test1DPdeTimeNeumann()
     {
         PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
@@ -137,7 +137,7 @@ public:
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02);
     }
 
-    void TestSpaceConvergenceMonoIn1DWithRelativeTolerance() throw(Exception)
+    void TestSpaceConvergenceMonoIn1DWithRelativeTolerance()
     {
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-4);
@@ -151,7 +151,7 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void TestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance() throw(Exception)
+    void TestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance()
     {
         // Zero pivot detected in Cholesky factorisation for mesh 1. This is not an error and it may always happen when using bjacobi with singular systems.
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");

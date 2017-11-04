@@ -47,7 +47,7 @@ class TestOutputDirectoryFifoQueue : public CxxTest::TestSuite
 {
 public:
 
-    void TestQueueCreatesDirectories() throw (Exception)
+    void TestQueueCreatesDirectories()
     {
         FileFinder checkpoints("checkpoints", RelativeTo::ChasteTestOutput);
         // Remove directory in case it was there from previous executions.
@@ -71,7 +71,7 @@ public:
         TS_ASSERT(dir2.IsDir());
     }
 
-    void TestQueueRemovesAndCreatesDirectories() throw (Exception)
+    void TestQueueRemovesAndCreatesDirectories()
     {
         FileFinder checkpoints("checkpoints2", RelativeTo::ChasteTestOutput);
         // Remove directory in case it was there from previous executions.

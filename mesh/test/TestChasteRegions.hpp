@@ -57,7 +57,7 @@ class TestRegions : public CxxTest::TestSuite
 {
 public:
 
-    void TestCuboidCreationAndContained() throw(Exception)
+    void TestCuboidCreationAndContained()
     {
         //3D case
         ChastePoint<3> point_a(-3, -3, -3);
@@ -136,7 +136,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(cuboid_a_b.Destroy());
     }
 
-    void TestNodesList() throw(Exception)
+    void TestNodesList()
     {
         ChastePoint<3> point_a(-3, -3, -3);
         ChastePoint<3> point_b(3, 3, 3);
@@ -165,7 +165,7 @@ public:
 
     }
 
-    void TestEllipsoidCreationAndContained() throw(Exception)
+    void TestEllipsoidCreationAndContained()
     {
         ChastePoint<3> centre_3D(0, 0, 0);
         ChastePoint<3> radii_3D(2, 4, 6);
@@ -225,7 +225,7 @@ public:
 
     }
 
-    void TestArchivingRegions() throw(Exception)
+    void TestArchivingRegions()
     {
         EXIT_IF_PARALLEL;
 

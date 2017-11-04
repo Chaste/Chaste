@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestHelloWorld : public CxxTest::TestSuite
 {
 public:
-    void TestPrintHelloWorld() throw(Exception)
+    void TestPrintHelloWorld()
     {
         std::cout << "\nHello, world!\nChaste and dependencies are (at least partially) installed and running!\n\n";
     }

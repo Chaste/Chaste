@@ -80,7 +80,7 @@ public:
 class TestCardiacElectroMechanicsOnEllipsoid : public CxxTest::TestSuite
 {
 public:
-    void TestOnEllipsoid() throw(Exception)
+    void TestOnEllipsoid()
     {
         EXIT_IF_PARALLEL; // needs investigation, possibly related to #2057
 

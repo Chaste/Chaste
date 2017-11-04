@@ -59,7 +59,7 @@ class TestMirams2010WntOdeSystem : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestMirams2010WntOdeSystemSetup() throw(Exception)
+    void TestMirams2010WntOdeSystemSetup()
     {
 #ifdef CHASTE_CVODE
         double wnt_level = 0.5;
@@ -95,7 +95,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestGarysWntOdeSystemApc2Hit() throw(Exception)
+    void TestGarysWntOdeSystemApc2Hit()
     {
 #ifdef CHASTE_CVODE
         double wnt_level = 0.5;
@@ -129,7 +129,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestGarysWntOdeSystemBetaCatenin1Hit() throw(Exception)
+    void TestGarysWntOdeSystemBetaCatenin1Hit()
     {
 #ifdef CHASTE_CVODE
         double wnt_level = 0.5;

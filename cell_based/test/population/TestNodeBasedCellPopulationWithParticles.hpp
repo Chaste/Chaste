@@ -80,7 +80,7 @@ public:
      * 0 to be associated with node 1 instead of node 0, and Validate() throws an
      * exception. We then set node 0 to be a particle node, and Validate() passes.
      */
-    void TestValidateNodeBasedCellPopulationWithParticles() throw(Exception)
+    void TestValidateNodeBasedCellPopulationWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -135,7 +135,7 @@ public:
     }
 
     // Test with particles, checking that the Iterator doesn't loop over particles
-    void TestNodeBasedCellPopulationWithParticlesSetup() throw(Exception)
+    void TestNodeBasedCellPopulationWithParticlesSetup()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -205,7 +205,7 @@ public:
         TS_ASSERT_EQUALS(counter + particle_indices.size(), mesh.GetNumNodes());
     }
 
-    void TestCellPopulationIteratorWithNoCells() throw(Exception)
+    void TestCellPopulationIteratorWithNoCells()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -442,7 +442,7 @@ public:
     }
 
 
-    void TestCellPopulationWritersIn3dWithParticles() throw(Exception)
+    void TestCellPopulationWritersIn3dWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -562,7 +562,7 @@ public:
         }
     }
 
-    void TestArchivingCellPopulation() throw (Exception)
+    void TestArchivingCellPopulation()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 

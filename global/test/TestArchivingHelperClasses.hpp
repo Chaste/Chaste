@@ -63,7 +63,7 @@ class TestArchivingHelperClasses : public CxxTest::TestSuite
 {
 public:
 
-    void TestArchiveLocationInfoMethods() throw(Exception)
+    void TestArchiveLocationInfoMethods()
     {
         // These throw because we are getting things before they are set.
         TS_ASSERT_THROWS_THIS(ArchiveLocationInfo::GetArchiveDirectory(),
@@ -103,7 +103,7 @@ public:
         TS_ASSERT(ArchiveLocationInfo::GetIsDirRelativeToChasteTestOutput());
     }
 
-    void TestArchiveLocationInfoProcessUniqueNaming() throw(Exception)
+    void TestArchiveLocationInfoProcessUniqueNaming()
     {
         FileFinder dir("new_archive_dir", RelativeTo::CWD);
         ArchiveLocationInfo::SetArchiveDirectory(dir);
@@ -118,7 +118,7 @@ public:
         TS_ASSERT_EQUALS(ArchiveLocationInfo::GetProcessUniqueFilePath("fred", 12), expected2);
     }
 
-    void TestProcessSpecificArchive() throw(Exception)
+    void TestProcessSpecificArchive()
     {
         TS_ASSERT_THROWS_THIS(ProcessSpecificArchive<boost::archive::text_oarchive>::Get(),
                               "A ProcessSpecificArchive has not been set up.");
@@ -153,7 +153,7 @@ public:
 
     std::string mArchiveDir;
 
-    void TestArchiveOpenerReadAndWrite() throw(Exception)
+    void TestArchiveOpenerReadAndWrite()
     {
         // Should this test fail with an exception involving
         // apps/texttest/chaste/resume_bidomain/save_bidomain
@@ -206,7 +206,7 @@ public:
     }
 
     // This test relies on TestArchiveOpenerReadAndWrite succeeding
-    void TestArchiveOpenerExceptions() throw(Exception)
+    void TestArchiveOpenerExceptions()
     {
         OutputFileHandler handler(mArchiveDir, false);
         handler.SetArchiveDirectory();
@@ -266,7 +266,7 @@ public:
         PetscTools::Barrier("TestArchiveOpenerExceptions-5");
     }
 
-    void TestSpecifyingSecondaryArchive() throw (Exception)
+    void TestSpecifyingSecondaryArchive()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "specific_secondary.arch";
@@ -311,7 +311,7 @@ public:
         }
     }
 
-    void TestOpenFutureBoostArchive() throw (Exception)
+    void TestOpenFutureBoostArchive()
     {
         //Check testout/archive/specific_secondary.arch
         FileFinder archive_dir("global/test/data", RelativeTo::ChasteSourceRoot);

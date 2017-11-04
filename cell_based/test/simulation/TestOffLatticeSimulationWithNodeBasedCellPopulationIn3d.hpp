@@ -64,7 +64,7 @@ class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractC
 {
 public:
 
-    void Test3dNodeBasedRestrictedToSphere() throw (Exception)
+    void Test3dNodeBasedRestrictedToSphere()
     {
         // Create a simple 3D NodeBasedCellPopulation
         std::vector<Node<3>*> nodes;
@@ -126,7 +126,7 @@ public:
         }
     }
 
-    void Test3dNodeBasedPlaneBoundary() throw (Exception)
+    void Test3dNodeBasedPlaneBoundary()
     {
         EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
 

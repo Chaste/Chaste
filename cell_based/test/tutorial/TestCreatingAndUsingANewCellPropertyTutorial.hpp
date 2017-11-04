@@ -272,7 +272,7 @@ public:
      *
      * We begin by testing that our new cell property is implemented correctly.
      */
-    void TestMotileCellProperty() throw(Exception)
+    void TestMotileCellProperty()
     {
         /* We begin by testing that some of the base class methods work correctly.
          * We typically use shared pointers to create and access a cell property
@@ -343,7 +343,7 @@ public:
      * We conclude with a brief test demonstrating how {{{MotileCellProperty}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMotileCellProperty() throw(Exception)
+    void TestOffLatticeSimulationWithMotileCellProperty()
     {
         /* Note that HoneycombMeshGenerator, used in this test, is not
          *  yet implemented in parallel. */

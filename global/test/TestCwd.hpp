@@ -63,7 +63,7 @@ public:
         TS_ASSERT(fs::equivalent(cwd,chaste_source_root));
     }
 
-    void TestDivideOneByZero() throw(Exception)
+    void TestDivideOneByZero()
     {
         double one = 1.0;
         double zero = 0.0;
@@ -81,7 +81,7 @@ public:
 #endif
     }
 
-    void TestDivideZeroByZero() throw(Exception)
+    void TestDivideZeroByZero()
     {
         double zero = 0.0;
         double ans;

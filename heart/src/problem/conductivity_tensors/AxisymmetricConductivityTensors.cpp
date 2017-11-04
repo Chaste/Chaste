@@ -62,7 +62,7 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::SetConstantConduct
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh) throw (Exception)
+void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh)
 {
     this->mpMesh = pMesh;
 

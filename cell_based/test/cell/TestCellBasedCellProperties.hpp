@@ -58,7 +58,7 @@ class TestCellBasedCellProperties : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellIdMethods() throw(Exception)
+    void TestCellIdMethods()
     {
         // Resetting the Maximum cell Id to zero (to account for previous tests) is done in the Setup method...
         // CellId::ResetMaxCellId();
@@ -75,7 +75,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_id->GetMaxCellId(), 1u);
     }
 
-    void TestArchiveCellId() throw(Exception)
+    void TestArchiveCellId()
     {
         MAKE_PTR(CellId, p_extra_cell_id);
         p_extra_cell_id->AssignCellId();
@@ -124,7 +124,7 @@ public:
         }
     }
 
-    void TestCellDataMethods() throw(Exception)
+    void TestCellDataMethods()
     {
         MAKE_PTR(CellData, p_cell_data);
 
@@ -140,7 +140,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_data->GetNumItems(), 3u);
     }
 
-    void TestArchiveCellData() throw(Exception)
+    void TestArchiveCellData()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_data.arch";

@@ -82,7 +82,7 @@ public:
 class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 {
 public:
-    void Test1dApd() throw(Exception)
+    void Test1dApd()
     {
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
         HeartConfig::Instance()->SetSimulationDuration(400); //ms

@@ -3090,12 +3090,12 @@ void XmlTransforms::SetDefaultVisualizer(xercesc::DOMDocument* pDocument,
  */
 template void HeartConfig::GetIonicModelRegions<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
 template void HeartConfig::GetStimuli<3u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*) ;
+template void HeartConfig::GetCellHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
 template void HeartConfig::GetConductivityHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
 
 template void HeartConfig::GetIonicModelRegions<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
 template void HeartConfig::GetStimuli<2u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*) ;
+template void HeartConfig::GetCellHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
 template void HeartConfig::GetConductivityHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
 
 template void HeartConfig::GetIonicModelRegions<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
