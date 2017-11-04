@@ -417,6 +417,7 @@ class Gcc(BuildType):
         except:
             return 0
 
+
 class GccDebug(Gcc):
     """
     gcc compiler with debug enabled.

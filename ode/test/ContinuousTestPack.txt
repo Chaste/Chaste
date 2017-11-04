@@ -8,6 +8,7 @@ TestCvodeAdaptor.hpp
 TestGRL1IvpOdeSolver.hpp
 TestGRL2IvpOdeSolver.hpp
 TestMockEulerIvpOdeSolver.hpp
+TestRKC21IvpOdeSolver.hpp
 TestRungeKuttaFehlbergIvpOdeSolver.hpp
 TestSolvingStiffOdeSystems.hpp
 TestSolvingOdesTutorial.hpp
