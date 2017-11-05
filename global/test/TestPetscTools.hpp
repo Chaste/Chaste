@@ -415,6 +415,12 @@ public:
         TS_ASSERT_THROWS_CONTAINS(TRY_IF_MASTER(EXCEPTION("master; bailing out")),
                 "; bailing out"); // both the replicated and original should contain this phrase
     }
+
+    void TestSetOptionWithLogging()
+    {
+        // See #2933: we need to cover either PetscLogBegin() or PetscLogDefaultBegin()
+        PetscTools::SetOption("-log_summary", "");
+    }
 };
 
 #endif /*TESTPETSCTOOLS_HPP_*/
