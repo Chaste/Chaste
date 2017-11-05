@@ -161,8 +161,7 @@ public:
 
         /* `SetWriteInfo` is a useful method that means that the min/max voltage is
          * printed as the simulation runs (useful for verifying that cells are stimulated
-         * and the wave propagating, for example) (although note scons does buffer output
-         * before printing to screen) */
+         * and the wave propagating, for example) */
         monodomain_problem.SetWriteInfo();
 
         /* Finally, call `Initialise` and `Solve` as before */

@@ -48,9 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
- *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
+ *  (ii) compile but do not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
  *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
  *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see ChasteGuides/RunningBinariesFromCommandLine)
+ *
  *
  *
  *  For example:
