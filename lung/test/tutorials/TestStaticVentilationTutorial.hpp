@@ -75,7 +75,7 @@ class TestStaticVentilationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestCalculatePressureDrop() throw (Exception)
+    void TestCalculatePressureDrop()
     {
         EXIT_IF_PARALLEL;
 

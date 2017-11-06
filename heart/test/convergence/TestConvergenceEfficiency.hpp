@@ -61,7 +61,7 @@ class TestConvergenceEfficiency : public CxxTest::TestSuite
 {
 
 public:
-    void Test3DSpace10Efficiency() throw(Exception)
+    void Test3DSpace10Efficiency()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");

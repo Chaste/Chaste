@@ -64,7 +64,7 @@ class TestOdeBasedSrnModels : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDeltaNotchSrnCorrectBehaviour() throw(Exception)
+    void TestDeltaNotchSrnCorrectBehaviour()
     {
         TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnModel srn_model);
 
@@ -189,7 +189,7 @@ public:
         }
     }
 
-    void TestGoldbeter1991SrnCorrectBehaviour() throw(Exception)
+    void TestGoldbeter1991SrnCorrectBehaviour()
     {
         TS_ASSERT_THROWS_NOTHING(Goldbeter1991SrnModel srn_model);
 

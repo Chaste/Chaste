@@ -151,7 +151,7 @@ public:
         TS_ASSERT_DELTA(inner_prod(new_location2-old_location2, trans_vec), 0, 1e-6);
     }
 
-    void TestTranslationMethod() throw (Exception)
+    void TestTranslationMethod()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
         TetrahedralMesh<3,3> mesh;

@@ -120,7 +120,7 @@ class TestCvodeCells : public CxxTest::TestSuite
 {
 public:
 
-    void TestLuoRudyCvodeCell() throw(Exception)
+    void TestLuoRudyCvodeCell()
     {
 #ifdef CHASTE_CVODE
         // Set stimulus
@@ -309,7 +309,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestShannon2004() throw(Exception)
+    void TestShannon2004()
     {
 #ifdef CHASTE_CVODE
         // Set stimulus
@@ -461,7 +461,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestArchivingCvodeCells() throw(Exception)
+    void TestArchivingCvodeCells()
     {
 #ifdef CHASTE_CVODE
         //Archive

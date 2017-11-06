@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPottsMesh : public CxxTest::TestSuite
 {
 public:
-    void TestBasic2dPottsMesh() throw(Exception)
+    void TestBasic2dPottsMesh()
     {
         // Make 6 nodes to assign to two elements
         std::vector<Node<2>*> basic_nodes;
@@ -203,7 +203,7 @@ public:
         TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
     }
 
-    void TestBasic3dPottsMesh() throw(Exception)
+    void TestBasic3dPottsMesh()
     {
         // Make 8 nodes to assign to two elements
         std::vector<Node<3>*> basic_nodes;
@@ -405,7 +405,7 @@ public:
         TS_ASSERT_EQUALS(basic_potts_mesh.IsMeshChanging(), true);
     }
 
-    void TestConstructorExcepions() throw(Exception)
+    void TestConstructorExcepions()
     {
         // Make 2 nodes to assign to one elements
         std::vector<Node<2>*> basic_nodes;
@@ -447,7 +447,7 @@ public:
         basic_potts_elements.clear();
     }
 
-    void TestNodeIterator() throw (Exception)
+    void TestNodeIterator()
     {
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
 
@@ -492,7 +492,7 @@ public:
         TS_ASSERT_EQUALS(iter_is_not_at_end, false);
     }
 
-    void TestPottsElementIterator() throw (Exception)
+    void TestPottsElementIterator()
     {
         // Create mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
@@ -1354,7 +1354,7 @@ public:
         TS_ASSERT_DELTA(new_location2[1], old_location2[1] + 3.0, 1e-6);
     }
 
-    void TestAddElement() throw (Exception)
+    void TestAddElement()
     {
         // Make 6 nodes to assign to two elements
         std::vector<Node<2>*> nodes;
@@ -1394,7 +1394,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
     }
 
-    void TestDividePottsElementIn2d() throw(Exception)
+    void TestDividePottsElementIn2d()
     {
         {
             // Original Element BELOW new element
@@ -1530,7 +1530,7 @@ public:
         }
     }
 
-    void TestDividePottsElementIn3d() throw(Exception)
+    void TestDividePottsElementIn3d()
     {
         {
             // Original Element BELOW new element
@@ -1636,7 +1636,7 @@ public:
         }
     }
 
-    void TestDeleteAndDividePottsElement() throw(Exception)
+    void TestDeleteAndDividePottsElement()
     {
         // Make four nodes
         std::vector<Node<2>*> basic_nodes;
@@ -1703,7 +1703,7 @@ public:
         TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(0)->GetNodeGlobalIndex(0), 3u);
     }
 
-    void TestDeleteNode() throw(Exception)
+    void TestDeleteNode()
     {
         // Create simle mesh with 2 potts elements and connectivities
         PottsMeshGenerator<2> generator(2, 2, 1, 2, 1, 2);

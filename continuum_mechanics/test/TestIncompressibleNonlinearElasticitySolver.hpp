@@ -123,7 +123,7 @@ class TestIncompressibleNonlinearElasticitySolver : public CxxTest::TestSuite
 {
 public:
     // This is purely for coverage of assembling a 3D system...
-    void TestAssembleSystem3D() throw (Exception)
+    void TestAssembleSystem3D()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -149,7 +149,7 @@ public:
         TS_ASSERT_THROWS_THIS(IncompressibleNonlinearElasticitySolver<3> another_solver(mesh,problem_defn,""), "SolidMechanicsProblemDefinition object contains compressible material laws");
     }
 
-    void TestAssembleSystem() throw (Exception)
+    void TestAssembleSystem()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
         ExponentialMaterialLaw<2> law(2.0, 3.0);
@@ -314,7 +314,7 @@ public:
         }
     }
 
-    void TestComputeResidualAndGetNormWithBadDeformation() throw(Exception)
+    void TestComputeResidualAndGetNormWithBadDeformation()
     {
         // There are 10 nodes (including internals) which means that the (non)linear system
         // can't be distributed over more than 10 processes.  This may cause deadlock in
@@ -375,7 +375,7 @@ public:
     // A test where the solution should be zero displacement
     // It mainly tests that the initial guess was set up correctly to
     // the final correct solution, ie u=0, p=zero_strain_pressure (!=0)
-    void TestWithZeroDisplacement() throw(Exception)
+    void TestWithZeroDisplacement()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
@@ -426,7 +426,7 @@ public:
         }
     }
 
-    void TestSettingUpHeterogeneousProblem() throw(Exception)
+    void TestSettingUpHeterogeneousProblem()
     {
         // two element quad mesh on the square
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
@@ -461,7 +461,7 @@ public:
         TS_ASSERT_DELTA(solver.rGetCurrentSolution()[11], 10.0, 1e-6); //3*3+2
     }
 
-    void TestSolve() throw(Exception)
+    void TestSolve()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
@@ -547,7 +547,7 @@ public:
      *  compare the computed displacement and pressure against the true solution.
      *
      */
-    void TestSolveWithNonZeroBoundaryConditions() throw(Exception)
+    void TestSolveWithNonZeroBoundaryConditions()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -736,7 +736,7 @@ public:
      *  s = 2c[Y*alpha/lam^2, 1/lam - lam]  on Y=1
      *
      */
-    void TestAgainstExactSolution() throw(Exception)
+    void TestAgainstExactSolution()
     {
         for (unsigned run=0; run<2; run++)
         {
@@ -873,7 +873,7 @@ public:
      *  needs to work this out), and it is scaled by 1.0/lambda as it acts on a smaller surface
      *  than would on the undeformed surface.
      */
-    void TestSolveWithPressureBcsOnDeformedSurface() throw(Exception)
+    void TestSolveWithPressureBcsOnDeformedSurface()
     {
         std::vector<double> soln_first_run;
 
@@ -991,7 +991,7 @@ public:
      *  needs to work this out), and it is scaled by 1.0/lambda as it acts on a smaller surface
      *  than would on the undeformed surface.
      */
-    void TestSolveWithPressureBcsOnDeformedSurfaceSnes() throw(Exception)
+    void TestSolveWithPressureBcsOnDeformedSurfaceSnes()
     {
         std::vector<double> soln_first_run;
 
@@ -1120,7 +1120,7 @@ public:
      *  compare the computed displacement and pressure against the true solution.
      *
      */
-    void TestSlidingBoundaryConditions() throw(Exception)
+    void TestSlidingBoundaryConditions()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -1225,7 +1225,7 @@ public:
     // same set up as TestSolveWithNonZeroBoundaryConditions, here we test
     // that the simulation works fine if the internal nodes are not assumed to
     // have indices greater than vertex nodes
-    void TestWithReordering() throw(Exception)
+    void TestWithReordering()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -1330,7 +1330,7 @@ public:
 
     // same set up as SolveWithNonZeroBoundaryConditions, here we test
     // that the simulation works fine with a DistributedQuadraticMesh
-    void TestSolveDistributedQuadraticMeshWithNonZeroBoundaryConditions() throw(Exception)
+    void TestSolveDistributedQuadraticMeshWithNonZeroBoundaryConditions()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -1502,7 +1502,7 @@ public:
 
 
     // This is purely to ensure coverage of vtk output in 3d
-    void TestVtkCoverage3d() throw(Exception)
+    void TestVtkCoverage3d()
     {
        QuadraticMesh<3> mesh;
        TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -1537,7 +1537,7 @@ public:
     // after the solve by linearly interpolating from vertices. Here we test this directly - in particular in 3d as the
     // 3d tests use constant pressure solutions so it is important to check with non-constant pressure
     // at the vertices.
-    void TestRemoveDummyPressure() throw(Exception)
+    void TestRemoveDummyPressure()
     {
         // 2d version
         {

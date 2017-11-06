@@ -70,7 +70,7 @@ private:
 
 public:
 
-    void xTestSetTheRandomNumbersForAllTheseTests() throw(Exception)
+    void xTestSetTheRandomNumbersForAllTheseTests()
     {
         // If random numbers change then copy the output of these to the static definitions at the bottom.
 
@@ -82,7 +82,7 @@ public:
         std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
     }
 
-    void TestSimpleWntCellCycleModel() throw(Exception)
+    void TestSimpleWntCellCycleModel()
     {
         // Set up the simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();

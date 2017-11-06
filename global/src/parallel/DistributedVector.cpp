@@ -75,7 +75,7 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
     assert ((mSizeMultiplier * mProblemSize) == (unsigned)size);
 }
 
-double& DistributedVector::operator[](unsigned globalIndex) throw (DistributedVectorException)
+double& DistributedVector::operator[](unsigned globalIndex)
 {
     assert(mSizeMultiplier == 1);
     if (mLo<=globalIndex && globalIndex<mHi)
@@ -85,7 +85,7 @@ double& DistributedVector::operator[](unsigned globalIndex) throw (DistributedVe
     throw DistributedVectorException();
 }
 
-double& DistributedVector::operator[](Iterator index) throw (DistributedVectorException)
+double& DistributedVector::operator[](Iterator index)
 {
     assert(mSizeMultiplier==1);
     return mpVec[index.Local];

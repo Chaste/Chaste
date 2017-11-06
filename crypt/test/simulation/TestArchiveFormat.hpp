@@ -90,7 +90,7 @@ public:
      *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/
      *
      */
-    void TestLoadArchive() throw (Exception)
+    void TestLoadArchive()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);

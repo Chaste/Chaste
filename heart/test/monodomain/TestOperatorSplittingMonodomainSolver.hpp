@@ -99,7 +99,7 @@ public:
     //
     // Here we run on a fine (as opposed to v fine) mesh and with a normal dt, and check that the solutions
     // are near.
-    void TestComparisonOnNormalMeshes() throw(Exception)
+    void TestComparisonOnNormalMeshes()
     {
         ReplicatableVector final_voltage_normal;
         ReplicatableVector final_voltage_operator_splitting;

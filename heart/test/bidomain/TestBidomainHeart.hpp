@@ -94,7 +94,7 @@ private:
     }
 public:
 
-    void TestBidomainDg0Heart() throw (Exception)
+    void TestBidomainDg0Heart()
     {
         SetParameters();
 

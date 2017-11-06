@@ -341,7 +341,7 @@ public:
     }
 
 
-    void TestSolverForFHN61WithSimpleStimulus(void) throw (Exception)
+    void TestSolverForFHN61WithSimpleStimulus(void)
     {
         clock_t ck_start, ck_end;
 
@@ -459,7 +459,7 @@ public:
         TS_ASSERT_DELTA(lr91_ode_system.GetParameter(1u),23,1e-12);
     }
 
-    void TestSolverForLR91WithRegularStimulus(void) throw (Exception)
+    void TestSolverForLR91WithRegularStimulus(void)
     {
         // Set stimulus
         double magnitude = -25.5;
@@ -493,7 +493,7 @@ public:
         TS_ASSERT_DELTA(lr91_ode_system.GetVoltage(), v, 1e-10);
     }
 
-    void TestBackwardEulerLr91WithDelayedSimpleStimulus(void) throw (Exception)
+    void TestBackwardEulerLr91WithDelayedSimpleStimulus(void)
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -680,7 +680,7 @@ public:
     }
 
 
-    void TestSolverForFox2002WithRegularStimulus(void) throw (Exception)
+    void TestSolverForFox2002WithRegularStimulus(void)
     {
         clock_t ck_start, ck_end;
 
@@ -817,7 +817,7 @@ public:
         TS_ASSERT_DELTA(TT_model_initial.GetIIonic(), 0.0012 , 1e-3);
     }
 
-    void TestBackwardEulerTenTusscher06(void) throw (Exception)
+    void TestBackwardEulerTenTusscher06(void)
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -863,7 +863,7 @@ public:
           << backward << std::endl;
     }
 
-    void TestDifrancescoNoble1985(void) throw (Exception)
+    void TestDifrancescoNoble1985(void)
     {
         // Set stimulus (no stimulus in this case because this cell is self excitatory)
         boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus);
@@ -890,7 +890,7 @@ public:
         TS_ASSERT_THROWS_THIS(purkinje_ode_system.UseCellMLDefaultStimulus(),"This class has no default stimulus from CellML metadata.");
     }
 
-    void TestMahajan2008(void) throw (Exception)
+    void TestMahajan2008(void)
     {
         // Set stimulus
         double magnitude_stimulus = -1800;
@@ -921,7 +921,7 @@ public:
         CheckCellModelResults("Mahajan2008");
     }
 
-    void TestBackwardEulerMahajan(void) throw (Exception)
+    void TestBackwardEulerMahajan(void)
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -967,7 +967,7 @@ public:
                   << backward << std::endl;
     }
 
-    void TestMaleckar(void) throw (Exception)
+    void TestMaleckar(void)
     {
         boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-5.6, // Changed because now it is in the right units.
                                                                           6,
@@ -1063,7 +1063,7 @@ public:
 //
 //    }
 
-    void TestLR1991AndN98WithSacArchiving(void) throw(Exception)
+    void TestLR1991AndN98WithSacArchiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1133,7 +1133,7 @@ public:
         }
     }
 
-    void TestMaleckar2009Archiving(void) throw(Exception)
+    void TestMaleckar2009Archiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1189,7 +1189,7 @@ public:
         }
     }
 
-    void TestBackwardCellsArchiving(void) throw(Exception)
+    void TestBackwardCellsArchiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1307,7 +1307,7 @@ public:
         }
      }
 
-    void TestPyCMLArchiving(void) throw(Exception)
+    void TestPyCMLArchiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1383,7 +1383,7 @@ public:
         }
      }
 
-    void TestBackwardEulerDifficultCase() throw (Exception)
+    void TestBackwardEulerDifficultCase()
     {
 
         //These data come from a failing human heart mesh test, but have been rounded
@@ -1405,7 +1405,7 @@ public:
 
 
 private:
-    void TryTestLr91WithVoltageDrop(unsigned ratio) //throw (Exception)
+    void TryTestLr91WithVoltageDrop(unsigned ratio) //
     {
         double end_time = 10;        // ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01/ratio, 0.01, 0.01);

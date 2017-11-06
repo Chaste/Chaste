@@ -66,7 +66,7 @@ class TestGIModifiedModels : public CxxTest::TestSuite
 {
 public:
 
-    void TestICCmodelModified(void) throw (Exception)
+    void TestICCmodelModified(void)
     {
         HeartConfig::Instance()->Reset();
 
@@ -113,7 +113,7 @@ public:
         }
     }
 
-    void TestSMCmodelModified(void) throw (Exception)
+    void TestSMCmodelModified(void)
     {
         // Set stimulus (no stimulus in this case)
         double magnitude_stimulus = 0.0;   // dimensionless
@@ -183,7 +183,7 @@ public:
 
      }
 
-    void TestArchiving(void) throw(Exception)
+    void TestArchiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);

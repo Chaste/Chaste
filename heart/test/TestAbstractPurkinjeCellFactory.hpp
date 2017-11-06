@@ -84,7 +84,7 @@ public:
 class TestAbstractPurkinjeCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestPurkinjeCellFactory() throw (Exception)
+    void TestPurkinjeCellFactory()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         MixedDimensionMesh<2,2> mixed_mesh;

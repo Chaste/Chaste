@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacElectroMechanicsProblemLong : public CxxTest::TestSuite
 {
 public:
-    void Test2dHardcodedResult() throw(Exception)
+    void Test2dHardcodedResult()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -80,7 +80,7 @@ public:
         MechanicsEventHandler::Report();
     }
 
-    void Test2dVariableFibres() throw(Exception)
+    void Test2dVariableFibres()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -138,7 +138,7 @@ public:
         MechanicsEventHandler::Report();
     }
 
-    void Test3d() throw(Exception)
+    void Test3d()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
@@ -193,7 +193,7 @@ public:
      * * Copy output
        cp /tmp/$USER/testoutput/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad
      */
-    void TestTwistingCube() throw(Exception)
+    void TestTwistingCube()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
@@ -255,7 +255,7 @@ public:
 
 
     // longer running, finer-mesh version of TestWithCompressibleApproach() in TestCardiacElectroMechanicsProblem.hpp
-    void TestWithCompressibleApproachLong() throw(Exception)
+    void TestWithCompressibleApproachLong()
     {
         HeartEventHandler::Disable();
 
@@ -286,7 +286,7 @@ public:
     // runs 5 different 3d tests with fibres read to be in various directions, and
     // checks contraction occurs in the right directions (and bulging occurs in the
     // other directions)
-    void TestFibreRead() throw(Exception)
+    void TestFibreRead()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory(-5000*1000);
 
@@ -504,7 +504,7 @@ public:
     }
 
 
-//    void Test3dWithNoble98SacAndImpact() throw(Exception)
+//    void Test3dWithNoble98SacAndImpact()
 //    {
 //        // zero stimuli
 //        PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 3> cell_factory(0);

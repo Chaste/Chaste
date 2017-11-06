@@ -65,7 +65,7 @@ class TestRushLarsen : public CxxTest::TestSuite
     AbstractCardiacCell* mpRushLarsenCell;
     AbstractCardiacCell* mpRushLarsenCellOpt;
 
-    void GenerateCells() throw (Exception)
+    void GenerateCells()
     {
         // Do the conversions preserving generated sources
         CellMLToSharedLibraryConverter converter(true);

@@ -121,7 +121,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * == IMPORTANT: using HYPRE ==
  *
- * Mechanics solves being nonlinear are expensive, so it is recommended you also use `build=GccOpt_ndebug` (when running scons)
+ * Mechanics solves being nonlinear are expensive, so it is recommended you also use a `Release` build type for `cmake`
+ * (or `build=GccOpt_ndebug` when running on the old `scons` build system)
  * on larger problems. Also:
  *
  * Mechanics solves involve solving a nonlinear system, which is broken down into a sequence of linear solves.
@@ -144,7 +145,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacElectroMechanicsTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestCardiacElectroMechanicsExample() throw(Exception)
+    void TestCardiacElectroMechanicsExample()
     {
         /* All electro-mechanics problems require a cell factory as normal. This particular
          * factory stimulates the LHS side (X=0) surface. */
@@ -225,7 +226,7 @@ public:
     /* == Same simulation, this time using `CardiacElectroMechanicsProblem` ==
      *
      * Let us repeat the above test using `CardiacElectroMechanicsProblem`. */
-    void TestCardiacElectroMechanicsExampleAgain() throw(Exception)
+    void TestCardiacElectroMechanicsExampleAgain()
     {
         /* This lines is as above */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000);
@@ -336,7 +337,7 @@ public:
      * This test shows how to do 3d simulations (trivial changes), and how to pass in
      * fibre directions for the mechanics mesh. It also uses a compressible law.
      */
-    void dontTestTwistingCube() throw(Exception)
+    void dontTestTwistingCube()
     {
         /* Cell factory as normal */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);

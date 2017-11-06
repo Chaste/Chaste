@@ -715,7 +715,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     if (mFilesAreBinary)
     {
         mElementFileDataStart = mElementsFile.tellg(); // Record the position of the first byte after the header.
-        mElementItemWidth = mNodesPerElement*sizeof(unsigned) +  extra_attributes*sizeof(double) ;
+        mElementItemWidth = mNodesPerElement*sizeof(unsigned) +  extra_attributes*sizeof(double);
     }
 
     /*

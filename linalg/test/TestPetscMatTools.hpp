@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPetscMatTools : public CxxTest::TestSuite
 {
 public:
-    void TestEqualityCheck() throw (Exception)
+    void TestEqualityCheck()
     {
         Mat matrix1;
         Mat matrix2;
@@ -81,7 +81,7 @@ public:
         PetscTools::Destroy(matrix2);
     }
 
-    void TestSymmetryCheck() throw (Exception)
+    void TestSymmetryCheck()
     {
         Mat matrix;
         const unsigned size = 10u;
@@ -106,7 +106,7 @@ public:
         PetscTools::Destroy(matrix);
     }
 
-    void TestZeroRowsAndColumnsWithValueOnDiagonal() throw (Exception)
+    void TestZeroRowsAndColumnsWithValueOnDiagonal()
     {
         Mat matrix;
         const unsigned size = 5u;
@@ -148,7 +148,7 @@ public:
     }
 
 
-    void TestTurnOffVariableAllocationError() throw (Exception)
+    void TestTurnOffVariableAllocationError()
     {
         Mat matrix;
         const unsigned size = 5u;

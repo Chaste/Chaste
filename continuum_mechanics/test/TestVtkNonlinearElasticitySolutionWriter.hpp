@@ -70,7 +70,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtuFile() throw(Exception)
+    void TestVtuFile()
     {
 #ifdef CHASTE_VTK
         for (unsigned run=0; run<3; run++)

@@ -102,7 +102,7 @@ public:
         }
     }
 
-    void TestCheckpointingGeneratesMultipleDirectories() throw(Exception)
+    void TestCheckpointingGeneratesMultipleDirectories()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {

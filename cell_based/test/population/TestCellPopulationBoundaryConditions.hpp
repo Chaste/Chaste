@@ -70,7 +70,7 @@ class TestCellPopulationBoundaryConditions : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestPlaneBoundaryConditionWithNodeBasedCellPopulation() throw(Exception)
+    void TestPlaneBoundaryConditionWithNodeBasedCellPopulation()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -135,7 +135,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
     }
 
-    void TestPlaneBoundaryConditionWithNodeBasedCellPopulationAndJiggledNodes() throw(Exception)
+    void TestPlaneBoundaryConditionWithNodeBasedCellPopulationAndJiggledNodes()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -196,7 +196,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
     }
 
-    void TestPlaneBoundaryConditionWithVertexBasedCellPopulation() throw(Exception)
+    void TestPlaneBoundaryConditionWithVertexBasedCellPopulation()
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(2, 2);
@@ -287,7 +287,7 @@ public:
         }
     }
 
-    void TestPlaneBoundaryConditionExceptions() throw(Exception)
+    void TestPlaneBoundaryConditionExceptions()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
@@ -336,7 +336,7 @@ public:
         }
     }
 
-    void TestSphereGeometryBoundaryCondition() throw (Exception)
+    void TestSphereGeometryBoundaryCondition()
     {
         // We first test that the correct exception is thrown in 1D
         TrianglesMeshReader<1,1> mesh_reader_1d("mesh/test/data/1D_0_to_1_10_elements");
@@ -441,7 +441,7 @@ public:
         TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), true);
     }
 
-    void TestArchivingOfPlaneBoundaryCondition() throw (Exception)
+    void TestArchivingOfPlaneBoundaryCondition()
     {
         EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
         // Set up singleton classes
@@ -503,7 +503,7 @@ public:
        }
     }
 
-    void TestArchivingOfSphereGeometryBoundaryCondition() throw (Exception)
+    void TestArchivingOfSphereGeometryBoundaryCondition()
     {
         EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
 

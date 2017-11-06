@@ -79,7 +79,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
     AbstractCardiacCell* mpGeneralizedRushLarsenCell;
 //    AbstractCardiacCell* mpGeneralizedRushLarsenCellOpt;
 
-    void GenerateCells() throw (Exception)
+    void GenerateCells()
     {
         // Do the conversions preserving generated sources
         CellMLToSharedLibraryConverter converter(true);
@@ -104,7 +104,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
         }
     }
 
-    void GenerateCells2() throw (Exception)
+    void GenerateCells2()
     {
         // Do the conversions preserving generated sources
         CellMLToSharedLibraryConverter converter(true);

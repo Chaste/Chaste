@@ -102,7 +102,7 @@ private:
 
 public:
 
-    void TestCreateColumnWriter() throw(Exception)
+    void TestCreateColumnWriter()
     {
         // Create a new writer
         std::string dirname("TestColumnDataReaderWriter");
@@ -114,7 +114,7 @@ public:
         delete mpTestWriter;
     }
 
-    void TestCreateColumnReader() throw(Exception)
+    void TestCreateColumnReader()
     {
         // File does not exist
         TS_ASSERT_THROWS_CONTAINS(mpTestReader = new ColumnDataReader("", "testdoesnotexist"), "Couldn't open info file: ");
@@ -138,7 +138,7 @@ public:
         delete mpTestReader;
     }
 
-    void TestDetermineFieldWidth() throw(Exception)
+    void TestDetermineFieldWidth()
     {
         mpTestReader = new ColumnDataReader("io/test/data", "testfixed_good", false);
         TS_ASSERT_EQUALS(mpTestReader->GetFieldWidth(), 12u);
@@ -152,7 +152,7 @@ public:
                               "Badly formatted scientific data field");
     }
 
-    void TestDefineUnlimitedDimension() throw(Exception)
+    void TestDefineUnlimitedDimension()
     {
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testdefineunlimited", false));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineUnlimitedDimension("Time", "msecs"));
@@ -169,7 +169,7 @@ public:
         delete mpTestWriter;
     }
 
-    void TestDefineFixedDimension() throw(Exception)
+    void TestDefineFixedDimension()
     {
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testdefinefixed", false));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineFixedDimension("Node","dimensionless", 5000));
@@ -184,7 +184,7 @@ public:
         delete mpTestWriter;
     }
 
-    void TestDefineVariable() throw(Exception)
+    void TestDefineVariable()
     {
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testdefinevariable", false));
         int ina_var_id = 0;
@@ -208,7 +208,7 @@ public:
         delete mpTestWriter;
     }
 
-    void TestEndDefineMode() throw(Exception)
+    void TestEndDefineMode()
     {
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testenddefine", false));
 
@@ -246,7 +246,7 @@ public:
         TS_ASSERT(FilesMatch(output_dir + "testenddefine.info", "io/test/data/testenddefine_good.info"));
     }
 
-    void TestCantAddUnlimitedAfterEndDefine() throw(Exception)
+    void TestCantAddUnlimitedAfterEndDefine()
     {
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testdefine", false));
         int ina_var_id = 0;
@@ -265,7 +265,7 @@ public:
         delete mpTestWriter;
     }
 
-    void TestPutVariableInUnlimitedFile() throw(Exception)
+    void TestPutVariableInUnlimitedFile()
     {
         mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testunlimited", false);
         int time_var_id = 0;
@@ -319,7 +319,7 @@ public:
         CompareVectors(our_reader.GetValues("I_Ca"), good_reader.GetValues("I_Ca"), 1e-6);
     }
 
-    void TestPutNegativeVariable() throw(Exception)
+    void TestPutNegativeVariable()
     {
 #ifdef  _MSC_VER
         _set_output_format(_TWO_DIGIT_EXPONENT);
@@ -367,7 +367,7 @@ public:
         CompareVectors(our_reader.GetValues("I_Ca"), good_reader.GetValues("I_Ca"), 1e-6);
     }
 
-    void TestPutVariableInFixedFileAndPrecision() throw(Exception)
+    void TestPutVariableInFixedFileAndPrecision()
     {
 #ifdef  _MSC_VER
         _set_output_format(_TWO_DIGIT_EXPONENT);
@@ -464,7 +464,7 @@ public:
 
     // This test is abstracted from TestIonicModels::TestSolverForLR91WithRegularStimulus where data from a recently run
     // cell model are checked against data from an ancient run of the same model
-    void TestReadingAnOlderFile() throw (Exception)
+    void TestReadingAnOlderFile()
     {
         ColumnDataReader old_data_reader("io/test/data", "Lr91RegularStimValidData", false);
         std::vector<double> oldstyle_v_values = old_data_reader.GetValues("V");
@@ -476,7 +476,7 @@ public:
         }
     }
     // This test is abstracted from TestPyCmlNightly
-    void TestReadingAnotherOldFile() throw (Exception)
+    void TestReadingAnotherOldFile()
     {
         ColumnDataReader old_data_reader("io/test/data", "earm_noble_model_1990", false);
         std::vector<double> oldstyle_v_values = old_data_reader.GetValues("membrane_voltage");
@@ -485,7 +485,7 @@ public:
             TS_ASSERT_DELTA(oldstyle_v_values[i], -75, 25);
         }
     }
-    void TestPutNegativeVariableInFixedFile() throw(Exception)
+    void TestPutNegativeVariableInFixedFile()
     {
 
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testfixed_negatives", false));
@@ -527,7 +527,7 @@ public:
         }
     }
 
-    void TestPutVariableInFixedandUnlimitedFile() throw(Exception)
+    void TestPutVariableInFixedandUnlimitedFile()
     {
 #ifdef _MSC_VER
         _set_output_format(_TWO_DIGIT_EXPONENT);
@@ -612,7 +612,7 @@ public:
      * the fixed and unlimited dimensions are both set and the unlimited parameter
      * (i.e. time) is passed in negative.
      */
-    void TestNegativeWithFixedAndUnlimitedDefined() throw(Exception)
+    void TestNegativeWithFixedAndUnlimitedDefined()
     {
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testunlimitednegative2", false));
 
@@ -650,7 +650,7 @@ public:
      *  issues in reading it back.
      *
      */
-    void TestReadingFileWithVerySmallHighPrecisionNumbers() throw (Exception)
+    void TestReadingFileWithVerySmallHighPrecisionNumbers()
     {
         ColumnDataReader reader("io/test/data", "lr91_chaste", false);
 
@@ -713,7 +713,7 @@ public:
      *  Meanwhile, Gnu/Linux is able to read back all small numbers and round to zero if the number is inexpressible
      *
      */
-    void TestWritingAndReadingWithThreeDigitExponents() throw (Exception)
+    void TestWritingAndReadingWithThreeDigitExponents()
     {
         mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "widenumbers", false);
 

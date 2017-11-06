@@ -151,7 +151,7 @@ public:
      * This test demonstrates the easiest way to load a single cell model from CellML,
      * using the CellMLLoader class.
      */
-    void TestCellmlLoaderClass() throw(Exception)
+    void TestCellmlLoaderClass()
     {
         FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
         // Stimulus to use for simulation, so it matches other tests in this suite
@@ -201,7 +201,7 @@ public:
      * This is based on TestOdeSolverForLR91WithDelayedSimpleStimulus from
      * TestIonicModels.hpp.
      */
-    void TestDynamicallyLoadedLr91() throw(Exception)
+    void TestDynamicallyLoadedLr91()
     {
         // Load the cell model dynamically
         std::string model_name = "libDynamicallyLoadableLr91.";
@@ -217,7 +217,7 @@ public:
         RunLr91Test(*p_loader2);
     }
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         // Try loading a .so that doesn't exist
         std::string file_name = "non-existent-file-we-hope";
@@ -231,7 +231,7 @@ public:
                                   "Failed to load cell creation function from .so file");
     }
 
-    void TestCellmlConverter() throw(Exception)
+    void TestCellmlConverter()
     {
         // Copy CellML file into output dir
         std::string dirname = "TestCellmlConverter";
@@ -313,7 +313,7 @@ public:
         }
     }
 
-    void TestCellmlConverterWithOptions() throw(Exception)
+    void TestCellmlConverterWithOptions()
     {
         // Copy CellML file into output dir
         std::string dirname = "TestCellmlConverterWithOptions";
@@ -367,7 +367,7 @@ public:
 #endif
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
         // Check the previous test has left us a .so file

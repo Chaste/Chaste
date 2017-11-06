@@ -65,7 +65,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModelAndMutationAPCONEHIT() throw(Exception)
+    void TestWithWntCellCycleModelAndMutationAPCONEHIT()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
@@ -139,7 +139,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModelAndMutationBetaCat() throw(Exception)
+    void TestWithWntCellCycleModelAndMutationBetaCat()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
@@ -214,7 +214,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModelAndMutationAPC2() throw(Exception)
+    void TestWithWntCellCycleModelAndMutationAPC2()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 

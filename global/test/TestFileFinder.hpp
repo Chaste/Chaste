@@ -50,7 +50,7 @@ class TestFileFinder : public CxxTest::TestSuite
 {
 public:
 
-    void TestFileFinderOpening() throw(Exception)
+    void TestFileFinderOpening()
     {
         {
             // Can we find our own source file?
@@ -310,7 +310,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(obscure_file.DangerousRemove(), ", the Chaste source folder");
     }
 
-    void TestFindMatches() throw (Exception)
+    void TestFindMatches()
     {
         std::string dirname("TestFileFinder_TestFindMatches");
         OutputFileHandler handler(dirname);
@@ -360,7 +360,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(file.FindMatches("*"), "as it is not a directory.");
     }
 
-    void TestCopying() throw (Exception)
+    void TestCopying()
     {
         FileFinder source("global/test/TestFileFinder.hpp", RelativeTo::ChasteSourceRoot);
         std::string dest_dir_name("TestFileFinder_TestCopying");
@@ -428,7 +428,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(source.CopyTo(dest_dir), "as it would overwrite an existing file.");
     }
 
-    void TestDefaultConstructor() throw (Exception)
+    void TestDefaultConstructor()
     {
         FileFinder unset;
         TS_ASSERT(!unset.IsPathSet());

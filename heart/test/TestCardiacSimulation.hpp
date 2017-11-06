@@ -90,7 +90,7 @@ class TestCardiacSimulation : public CxxTest::TestSuite
 //    }
 public:
 
-    void TestMono1dSmall() throw(Exception)
+    void TestMono1dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -111,7 +111,7 @@ public:
         CardiacSimulation simulation2("heart/test/data/xml/monodomain1d_resume.xml", true);
     }
 
-    void TestMono2dSmall() throw(Exception)
+    void TestMono2dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -158,7 +158,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestMono3dSmall() throw(Exception)
+    void TestMono3dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -170,7 +170,7 @@ public:
         CardiacSimulation simulation2("heart/test/data/xml/monodomain3d_resume.xml");
     }
 
-    void TestMono1dSodiumBlockBySettingNamedParameter() throw(Exception)
+    void TestMono1dSodiumBlockBySettingNamedParameter()
     {
         CardiacSimulation simulation("heart/test/data/xml/monodomain1d_sodium_block.xml");
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "mono_1d_sodium_block", false,
@@ -182,7 +182,7 @@ public:
                               "No parameter named 'missing-parameter'.");
     }
 
-    void TestMonoStimUsingEllipsoids() throw(Exception)
+    void TestMonoStimUsingEllipsoids()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -195,7 +195,7 @@ public:
                                                  "Mono1DStimUsingEllipsoid", "SimulationResults", true, 1e-6));
     }
 
-    void TestBi1dSmall() throw(Exception)
+    void TestBi1dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -212,7 +212,7 @@ public:
                                   "The simulation duration must be positive, not -0.1");
         }
     }
-    void TestBi2dSmall() throw(Exception)
+    void TestBi2dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -223,7 +223,7 @@ public:
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/bidomain2d_resume.xml");
     }
-    void TestBi3dSmall() throw(Exception)
+    void TestBi3dSmall()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -235,7 +235,7 @@ public:
         CardiacSimulation simulation2("heart/test/data/xml/bidomain3d_resume.xml");
     }
 
-    void TestBiWithBath1dSmall() throw(Exception)
+    void TestBiWithBath1dSmall()
     {
         { CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath1d_small.xml"); }
         { CardiacSimulation simulation2("heart/test/data/xml/bidomain_with_bath1d_resume.xml"); }
@@ -248,24 +248,24 @@ public:
         }
     }
 
-    void TestBiWithBath2dSmall() throw(Exception)
+    void TestBiWithBath2dSmall()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath2d_small.xml");
         CardiacSimulation simulation2("heart/test/data/xml/bidomain_with_bath2d_resume.xml");
     }
 
-    void TestBiWithBath3dSmall() throw(Exception)
+    void TestBiWithBath3dSmall()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath3d_small.xml");
         CardiacSimulation simulation2("heart/test/data/xml/bidomain_with_bath3d_resume.xml");
     }
 
-    void TestBiWith2dHeterogeneousConductivities() throw(Exception)
+    void TestBiWith2dHeterogeneousConductivities()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain2d_heterogeneous.xml", true);
     }
 
-    void TestCardiacSimulationBasicBidomainShort() throw(Exception)
+    void TestCardiacSimulationBasicBidomainShort()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain_with_bath simulation
@@ -276,7 +276,7 @@ public:
                                                  "BaseBidomainShort", "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationBasicMonodomainShort() throw(Exception)
+    void TestCardiacSimulationBasicMonodomainShort()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -287,7 +287,7 @@ public:
                                                  "BaseMonodomainShort", "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
+    void TestCardiacSimulationPostprocessMonodomain()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -299,7 +299,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationArchiveBidomain() throw(Exception)
+    void TestCardiacSimulationArchiveBidomain()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -321,7 +321,7 @@ public:
     }
 
     // requires TestCardiacSimulationArchiveBidomain() to have been run
-    void TestCardiacSimulationResumeBidomain() throw(Exception)
+    void TestCardiacSimulationResumeBidomain()
     {
         // run a bidomain simulation
         HeartConfig::Instance()->SetSpaceDimension(1);
@@ -337,7 +337,7 @@ public:
         //assert(0);
     }
 
-    void TestCardiacSimulationArchiveMonodomain() throw(Exception)
+    void TestCardiacSimulationArchiveMonodomain()
     {
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
@@ -359,7 +359,7 @@ public:
     }
 
     // requires TestCardiacSimulationArchiveMonodomain() to have been run
-    void TestCardiacSimulationResumeMonodomain() throw(Exception)
+    void TestCardiacSimulationResumeMonodomain()
     {
         // run a monodomain simulation
         HeartConfig::Instance()->SetSpaceDimension(1);
@@ -371,7 +371,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-6));
     }
 
-    void TestCardiacSimulationArchiveDynamic() throw(Exception)
+    void TestCardiacSimulationArchiveDynamic()
     {
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
         // run a monodomain simulation
@@ -419,7 +419,7 @@ public:
        rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/ChasteParameters_?_?xsd
        rm -rf heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/output
      */
-    void TestCardiacSimulationResumeMigration() throw(Exception)
+    void TestCardiacSimulationResumeMigration()
     {
         // We can only load simulations from CHASTE_TEST_OUTPUT, so copy the archives there
         std::string source_directory = "heart/test/data/checkpoint_migration_via_xml/0.2ms/";
@@ -524,13 +524,13 @@ public:
         }
     }
 
-    void TestResumeChangingSettings() throw(Exception)
+    void TestResumeChangingSettings()
     {
         doTestResumeChangingSettings("heart/test/data/xml/save_monodomain_with_parameter.xml");
         doTestResumeChangingSettings("heart/test/data/xml/save_monodomain_with_parameter_append.xml");
     }
 
-    void TestCardiacSimulationPatchwork() throw(Exception)
+    void TestCardiacSimulationPatchwork()
     {
         OutputFileHandler handler("DynamicallyLoadedModel");
         FileFinder cellml_file("heart/dynamic/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteSourceRoot);
@@ -544,7 +544,7 @@ public:
                                                 foldername, "SimulationResults", true, 1e-5));
     }
 
-    void TestCardiacSimulationKirsten() throw(Exception)
+    void TestCardiacSimulationKirsten()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -559,7 +559,7 @@ public:
                                                           foldername, "SimulationResults", true, 5e-4)); // lower tolerance as comparing with non-backward-euler results.
     }
 
-    void TestTransmuralCellularheterogeneities() throw(Exception)
+    void TestTransmuralCellularheterogeneities()
     {
         CardiacSimulation simulation("heart/test/data/xml/ChasteParametersCellHeterogeneities.xml");
         std::string foldername = "ChasteResults_heterogeneities";
@@ -568,7 +568,7 @@ public:
                    foldername, "SimulationResults", true));
     }
 
-    void TestElectrodes() throw(Exception)
+    void TestElectrodes()
     {
         CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath2d_electrodes.xml");
         std::string foldername = "ChasteResults_electrodes";
@@ -577,7 +577,7 @@ public:
                    foldername, "SimulationResults", true, 1e-4));
     }
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/monodomain8d_small.xml"),
                               "Space dimension not supported: should be 1, 2 or 3");
@@ -610,7 +610,7 @@ public:
 #endif
     }
 
-    void TestDynamicallyLoadingCvodeCell() throw (Exception)
+    void TestDynamicallyLoadingCvodeCell()
     {
         // Coverage - using native CVODE cells should no longer throw
 #ifdef CHASTE_CVODE

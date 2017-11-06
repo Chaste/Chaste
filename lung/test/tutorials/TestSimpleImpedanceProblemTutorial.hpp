@@ -75,7 +75,7 @@ class TestSimpleImpedanceProblemTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestCalculateImpedance() throw (Exception)
+    void TestCalculateImpedance()
     {
         EXIT_IF_PARALLEL;
 

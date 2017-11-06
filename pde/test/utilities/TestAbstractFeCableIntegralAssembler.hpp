@@ -130,7 +130,7 @@ public:
 class TestAbstractFeCableIntegralAssembler : public CxxTest::TestSuite
 {
 public:
-    void TestBasicCableAssemblers() throw(Exception)
+    void TestBasicCableAssemblers()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -234,7 +234,7 @@ public:
     }
 
 
-    void TestExceptionsAndSetCurrentSolution() throw(Exception)
+    void TestExceptionsAndSetCurrentSolution()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);

@@ -121,7 +121,7 @@ public:
 class TestBidomainWithSvi : public CxxTest::TestSuite
 {
 public:
-    void TestConductionVelocityConvergesFasterWithSvi1d() throw(Exception)
+    void TestConductionVelocityConvergesFasterWithSvi1d()
     {
         double h[3] = {0.001,0.01,0.02};
         std::vector<double> conduction_vel_nci(3);
@@ -246,7 +246,7 @@ public:
         }
     }
 
-    void TestConductionVelocityInCrossFibreDirection2d() throw(Exception)
+    void TestConductionVelocityInCrossFibreDirection2d()
     {
         ReplicatableVector final_solution_ici;
         ReplicatableVector final_solution_svi;
@@ -309,7 +309,7 @@ public:
         TS_ASSERT_DELTA(final_solution_svi[234*2], 38.9004, 1e-3); // Node 234 phi_i
     }
 
-    void TestBidomainWithBathWithSvi() throw(Exception)
+    void TestBidomainWithBathWithSvi()
     {
         /* Make a 4x4 node mesh and set two interior elements to be bath elements */
         DistributedTetrahedralMesh<2,2> mesh;

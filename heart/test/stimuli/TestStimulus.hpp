@@ -426,7 +426,7 @@ public:
         }
     }
 
-    void TestArchivingStimuli() throw(Exception)
+    void TestArchivingStimuli()
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;

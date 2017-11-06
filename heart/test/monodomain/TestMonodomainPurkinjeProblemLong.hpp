@@ -132,7 +132,7 @@ public:
 
     // Solve on a cylinder (fibre running down the centre) - run with just a monodomain problem, then
     // run with
-    void TestIn3d() throw (Exception)
+    void TestIn3d()
     {
         // Settings common to both problems
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);

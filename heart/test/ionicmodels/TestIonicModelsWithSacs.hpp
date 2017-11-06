@@ -125,7 +125,7 @@ public:
 
     // series of tests. one has a hardcoded test. See figure in #1345.
 
-    void TestN98WithSacAt300msShort() throw(Exception)
+    void TestN98WithSacAt300msShort()
     {
         double stretch = 1.1;
         double stretch_start_time = 300.0;
@@ -135,7 +135,7 @@ public:
                                    "TestN98WithSac", "sac300short", true);
     }
 
-    void TestN98WithSacAt300msLong() throw(Exception)
+    void TestN98WithSacAt300msLong()
     {
         double stretch = 1.1;
         double stretch_start_time = 300.0;
@@ -151,7 +151,7 @@ public:
         TS_ASSERT(comp.CompareFiles());
     }
 
-    void TestN98WithSacAt200msShort() throw(Exception)
+    void TestN98WithSacAt200msShort()
     {
         double stretch = 1.1;
         double stretch_start_time = 200.0;
@@ -161,7 +161,7 @@ public:
                                    "TestN98WithSac", "sac200short", false);
     }
 
-    void TestN98WithSacAt800msLong() throw(Exception)
+    void TestN98WithSacAt800msLong()
     {
 
         double stretch = 1.1;
@@ -173,7 +173,7 @@ public:
     }
 
 //// other possibilities - all fine - just uncomment and run
-//    void TestN98WithSacAt200msLong() throw(Exception)
+//    void TestN98WithSacAt200msLong()
 //    {
 //        double stretch = 1.1;
 //        double stretch_start_time = 200.0;
@@ -183,7 +183,7 @@ public:
 //                                   "TestN98WithSac", "sac200long", false);
 //    }
 //
-//    void TestN98WithSacAt800msShort() throw(Exception)
+//    void TestN98WithSacAt800msShort()
 //    {
 //
 //        double stretch = 1.1;
@@ -194,7 +194,7 @@ public:
 //                                   "TestN98WithSac", "sac800short", false);
 //    }
 //
-//    void TestN98WithSacAt800msLong() throw(Exception)
+//    void TestN98WithSacAt800msLong()
 //    {
 //
 //        double stretch = 1.1;
@@ -205,7 +205,7 @@ public:
 //                                   "TestN98WithSac", "sac800long", false);
 //    }
 //
-//    void TestN98WithSacAt230msLong() throw(Exception)
+//    void TestN98WithSacAt230msLong()
 //    {
 //
 //        double stretch = 1.1;

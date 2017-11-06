@@ -1,0 +1,1354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1"
+  xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>This is the schema for Chaste cardiac (monodomain or bidomain)
+      simulations</xs:documentation>
+  </xs:annotation>
+  <!-- Note to developers:
+       If you add functionality to the schema, please also edit
+       heart/test/data/xml/ChasteParametersFullFormat.xml
+       to give an example of its use.
+  -->
+  <xs:complexType name="time_type">
+    <xs:annotation>
+      <xs:documentation>Represents variables with dimensions of time. Measured in
+        milliseconds.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="ms">
+          <xs:annotation>
+            <xs:documentation>Chaste time is measured in milliseconds</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="dimensionless_type">
+    <xs:annotation>
+      <xs:documentation>Used to represent dimensionless variables.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="dimensionless"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="conductivity_type">
+    <xs:annotation>
+      <xs:documentation>Represents conductivity. Measured in mS/cm.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="mS/cm"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="stimulus_strength_type">
+    <xs:annotation>
+      <xs:documentation>Represents the strength of stimulus per unit volume. Measured in
+        uA/cm^3.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="uA/cm^3"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="surface_stimulus_strength_type">
+    <xs:annotation>
+      <xs:documentation>Represents the strength of stimulus per unit area. Measured in
+        uA/cm^2.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="uA/cm^2"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="inverse_length_type">
+    <xs:annotation>
+      <xs:documentation>Used for variables with dimensions 1/length. Units of
+        1/cm.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="1/cm"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="capacitance_type">
+    <xs:annotation>
+      <xs:documentation>Represents capacitance per unit area. Measured in
+        uF/cm^2.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:decimal">
+        <xs:attribute name="unit" type="xs:string" use="required" fixed="uF/cm^2"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="apply_drug_type">
+    <xs:annotation>
+      <xs:documentation>Specifies the use of a single drug block model applied to any
+      number of ion channels within the cell models.  Note that drug is applied globally to every
+      cell at the same concentration.  Multiple IC50 elements may be used to specify its action on
+      each channel.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="IC50" type="ic50_type" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="concentration" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The concentration of drug applied, in arbitrary units---must
+      be consistent with the IC50 values supplied.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="ic50_type">
+    <xs:annotation>
+      <xs:documentation>Specifies the action of the enclosing drug on a particular channel,
+      by giving the IC50 value for that channel's dose response curve.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:double">
+        <xs:attribute name="current" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>The channel this element applies to.  Should be a name taken
+          from the Oxford metadata list, corresponding to an annotated conductance parameter within the
+          cell model.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="hill" type="xs:double" default="1.0">
+          <xs:annotation>
+            <xs:documentation>Hill coefficient of the dose response curve.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="location_type">
+    <xs:annotation>
+      <xs:documentation>Defines a special region with different behaviour from elsewhere. This will
+        be either an axis-aligned cuboid or a layer of the cardiac wall.</xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element name="Cuboid" type="box_type">
+        <xs:annotation>
+          <xs:documentation>Axis-aligned bounding box defined by LowerCoordinates and
+            UpperCoordinates attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Ellipsoid" type="ellipsoid_type">
+        <xs:annotation>
+          <xs:documentation>Axis-aligned ellipsoid defined by Centre and
+            Radii attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="NotUsed" type="xs:boolean" fixed="true">
+        <xs:annotation>
+          <xs:documentation>Never to be used.  This location is for completeness testing.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="EpiLayer" type="dimensionless_type">
+        <xs:annotation>
+          <xs:documentation>Proportion of cardiac wall that is in the epicardium (outer wall). Value
+            must be between 0 and 1. The sum of EpiLayer, MidLayer and EndoLayer should be
+            1.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MidLayer" type="dimensionless_type">
+        <xs:annotation>
+          <xs:documentation>Proportion of cardiac wall that is in the myocardium (middle). Value
+            must be between 0 and 1. The sum of EpiLayer, MidLayer and EndoLayer should be
+            1.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="EndoLayer" type="dimensionless_type">
+        <xs:annotation>
+          <xs:documentation>Proportion of cardiac wall that is in the endocardium (inner wall).
+            Value must be between 0 and 1. The sum of EpiLayer, MidLayer and EndoLayer should be
+            1.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="unit" type="xs:string" use="required" fixed="cm"/>
+  </xs:complexType>
+  <xs:simpleType name="domain_type">
+    <xs:annotation>
+      <xs:documentation>Whether a monodomain, bidomain or bidomain with bath simulation will be run. Values restricted
+        to "Mono", "Bi" or "BiWithBath".</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Mono"/>
+      <xs:enumeration value="Bi"/>
+      <xs:enumeration value="BiWithBath"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="axis_type">
+    <xs:annotation>
+      <xs:documentation>Sets either x, y or z axis for any application.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="x"/>
+      <xs:enumeration value="y"/>
+      <xs:enumeration value="z"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ionic_models_available_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> An enumeration of cardiac ionic models supplied with Chaste.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DifrancescoNoble"/>
+      <xs:enumeration value="Fox2002"/>
+      <xs:enumeration value="Fox2002BackwardEuler"/>
+      <xs:enumeration value="FaberRudy2000"/>
+      <xs:enumeration value="FaberRudy2000Optimised"/>
+      <xs:enumeration value="HodgkinHuxley"/>
+      <xs:enumeration value="LuoRudyI"/>
+      <xs:enumeration value="LuoRudyIBackwardEuler"/>
+      <xs:enumeration value="MahajanShiferaw"/>
+      <xs:enumeration value="MahajanShiferawBackwardEuler"/>
+      <xs:enumeration value="Maleckar"/>
+      <xs:enumeration value="tenTusscher2006"/>
+      <xs:enumeration value="tenTusscher2006BackwardEuler"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ionic_model_selection_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Ionic models may be specified in 2 ways: either through a
+        model hardcoded into Chaste, and chosen from a list, or through a model dynamically loaded
+        from a shared library (.so file). In the latter case, this shared library can be created
+        from a CellML file on the fly, subject to a few caveats. </xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element name="Hardcoded" type="ionic_models_available_type"/>
+      <xs:element name="Dynamic" type="dynamically_loaded_ionic_model_type"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="dynamically_loaded_ionic_model_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> A dynamically loadable ionic model is (currently) specified
+        just by giving the path of the file to load. This must be either a .so file, which can be
+        loaded directly, or a .cellml file, which will first be compiled to a .so on the fly. The
+        compiled .so will be stored in the same folder as the .cellml file (so the master process
+        needs write access to this folder). Note that doing so requires that the Chaste source tree
+        which created the running program must exist on the master process' machine, since this
+        source tree is used to perform the compilation. Also note that, if running in parallel, all
+        processes which own cells created from this CellML file must be able to read the folder in
+        which it is located, as this is where the .so will be placed. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Path" type="path_type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="path_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> A file path. </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="relative_to" type="relative_to_type" default="cwd"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="relative_to_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> An attribute for path_type elements that describes how to
+        interpret the path value. It can be relative to the current working directory, relative to
+        $CHASTE_TEST_OUTPUT, relative to the parameters file, relative to the Chaste source
+        code root, relative to the directory Chaste was built in (which for SCons builds is the same
+        as the source root, but may differ for CMake builds), or an absolute path. It can also be
+        specified as a path relative to the XML configuration file. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cwd"/>
+      <xs:enumeration value="chaste_test_output"/>
+      <xs:enumeration value="chaste_source_root"/>
+      <xs:enumeration value="chaste_build_root"/>
+      <xs:enumeration value="absolute"/>
+      <xs:enumeration value="this_file"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ionic_model_region_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Associates a region of the mesh with a particular ionic
+        model. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="IonicModel" type="ionic_model_selection_type"/>
+      <xs:element name="Location" type="location_type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ionic_models_type">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This element specifies the ionic model(s) to use for
+        simulation. A default model must be given, and can be overridden in particular regions.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Default" type="ionic_model_selection_type">
+        <xs:annotation>
+          <xs:documentation>Default ionic model type to be run everywhere. Can be overridden by
+            specifying a region model type.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Region" type="ionic_model_region_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Specifies an ionic model type in a region to be used instead of the
+            default type.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="apd_map_type">
+    <xs:annotation>
+      <xs:documentation>Postprocessing type. Requests a sequence of action potential durations (in
+        milliseconds) at each mesh node. Requires specification of repolarisation percentage (i.e.
+        90% for APD90, 20% for APD20 etc) and a threshold (a voltage used internally in Chaste code
+        to determine the end of one action potential and prepare for the start of the
+        next).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="repolarisation_percentage" type="xs:double" use="required"/>
+    <xs:attribute name="threshold" type="xs:double" use="required"/>
+    <xs:attribute name="threshold_unit" type="xs:string" use="required" fixed="mV"/>
+  </xs:complexType>
+  <xs:complexType name="upstrokes_map_type">
+    <xs:annotation>
+      <xs:documentation>Postprocessing type. Requests a sequence of the times of upstrokes (in
+        milliseconds) at each mesh node. Requires specification of a threshold (a voltage used
+        internally in Chaste code to determine the end of one action potential and prepare for the
+        start of the next).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="threshold" type="xs:double" use="required"/>
+    <xs:attribute name="threshold_unit" type="xs:string" use="required" fixed="mV"/>
+  </xs:complexType>
+  <xs:complexType name="max_upstrokes_velocity_map_type">
+    <xs:annotation>
+      <xs:documentation>Postprocessing type. Requests a sequence of the maximum upstroke velocity
+        (in mV/ms) at each mesh node. Requires specification of a threshold (a voltage used
+        internally in Chaste code to determine the end of one action potential and prepare for the
+        start of the next).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="threshold" type="xs:double" use="required"/>
+    <xs:attribute name="threshold_unit" type="xs:string" use="required" fixed="mV"/>
+  </xs:complexType>
+  <xs:complexType name="conduction_velocity_map_type">
+    <xs:annotation>
+      <xs:documentation>Postprocessing type. For each mesh node, computes the conduction velocity of
+        an action potential relative to an origin node. The conduction velocity is the difference
+        between the times of first upstroke divided by the distance between the nodes (measured as
+        the shortest path within the mesh). Requires specification of the origin node
+        index.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="origin_node" type="xs:nonNegativeInteger" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="node_number_type">
+    <xs:annotation>
+      <xs:documentation>A type non-negative integers denoting node numbers.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="node_number" type="xs:nonNegativeInteger" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="media_type">
+    <xs:annotation>
+      <xs:documentation>The conductivity media of the tissue. This is taken from an enumeration:
+        Orthotropic is for 3 orthogonal conductivity directions (fibre, sheet and normal);
+        Axisymmetric is for fibre direction only; NoFibreOrientation is for isotropic
+        conductivity.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Orthotropic"/>
+      <xs:enumeration value="Axisymmetric"/>
+      <xs:enumeration value="NoFibreOrientation"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="point_type">
+    <xs:annotation>
+      <xs:documentation>Used to represent a point in space (up to 3d). Attributes x, y, z (all
+        doubles) measured in cm.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="x" type="xs:double" use="required"/>
+    <xs:attribute name="y" type="xs:double" use="required"/>
+    <xs:attribute name="z" type="xs:double" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="box_type">
+    <xs:annotation>
+      <xs:documentation>Axis-aligned bounding box defined by LowerCoordinates and UpperCoordinates
+        attributes.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="LowerCoordinates" type="point_type">
+        <xs:annotation>
+          <xs:documentation>Represents the vertex in the cuboid that has the most negative values of
+            all coordinates.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="UpperCoordinates" type="point_type">
+        <xs:annotation>
+          <xs:documentation>Represents the vertex in the cuboid that has the most positive values of
+            all coordinates.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ellipsoid_type">
+    <xs:annotation>
+      <xs:documentation>Axis-aligned ellipsoid defined by Centre and Radii
+        attributes.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Centre" type="point_type">
+        <xs:annotation>
+          <xs:documentation>Represents the centre of the ellipsoid.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Radii" type="point_type">
+        <xs:annotation>
+          <xs:documentation>Represents the radii of the ellipsoid along the coordinate axes.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="stimulus_type">
+    <xs:annotation>
+      <xs:documentation>Defines a simple intra-cellular current stimulus which injects a square-wave
+        current into all stimulated cells in a given location (cuboid or transmural
+        layer)</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Strength" type="stimulus_strength_type">
+        <xs:annotation>
+          <xs:documentation>The strength of the stimulus (current per unit volume measured in
+            uA/cm^3).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Duration" type="time_type">
+        <xs:annotation>
+          <xs:documentation>Time for which to apply the stimulus (ms).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Delay" type="time_type">
+        <xs:annotation>
+          <xs:documentation>Delay is the time at which to start applying the
+            stimulus.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Period" type="time_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Period is an optional element. If defined, the stimulus is reapplied every
+            period ms. Note that in this scenario Delay is only applied once.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="StopTime" type="time_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>StopTime is an optional element. It can only happen if Period has been previously defined.
+            If defined, the train of stimuli will stop at the given time.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Location" type="location_type">
+        <xs:annotation>
+          <xs:documentation>Location of the nodes at which to apply this
+            stimulus.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="set_parameter_type">
+    <xs:annotation>
+      <xs:documentation>Type for specifying the value of a named parameter.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Name of the parameter to set.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Value for the parameter.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="electrodes_type">
+    <xs:annotation>
+      <xs:documentation>Defines electrodes which stimulate a domain. These must be applied at flat surfaces at either
+        end of the domain (in either x, y or z direction).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="GroundSecondElectrode" type="yesno_type">
+        <xs:annotation>
+          <xs:documentation>Whether or not the second electrode is grounded (this is the one with higher value of the coordinate).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="PerpendicularToAxis" type="axis_type">
+        <xs:annotation>
+          <xs:documentation>Axis that the electrodes are perpendicular to (should be x, y or z).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Strength" type="surface_stimulus_strength_type">
+        <xs:annotation>
+          <xs:documentation>The strength of the stimulus on the electrodes (uA/cm^2).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="StartTime" type="time_type">
+        <xs:annotation>
+          <xs:documentation>StartTime is the time at which to start the shock stimulus.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Duration" type="time_type">
+        <xs:annotation>
+          <xs:documentation>Duration of shock stimulus.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="cell_heterogeneity_type">
+    <xs:annotation>
+      <xs:documentation>Defines a heterogeneity in a set of cells in a given location (cuboid or
+        transmural layer). This heterogeneity is defined by scaling certain (potassium) currents
+        from their CellML default values.
+        
+        As of version 2.1 of Chaste, any named parameter in the CellML file may also be modified within
+        a defined region.  Named parameters are those annotated with a pycml:modifiable-parameter=yes
+        RDF annotation.  The name of the parameter is the cmeta:id of the annotated variable.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ScaleFactorGks" type="dimensionless_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Scales the Gks slow delayed rectifier potassium current. (A value of 1.0
+            will reset to the default value in the CellML definition.)
+            
+            This heterogeneity is only supported for some cell models:
+            either those with a parameter named ScaleFactorGks, or with
+            support hardcoded into Chaste.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ScaleFactorIto" type="dimensionless_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Scales the Ito transient outward potassium current. (A value of 1.0 will
+            reset to the default value in the CellML definition.)
+            
+            This heterogeneity is only supported for some cell models:
+            either those with a parameter named ScaleFactorIto, or with
+            support hardcoded into Chaste.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ScaleFactorGkr" type="dimensionless_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Scales the Gkr rapid delayed rectifier potassium current. (A value of
+            1.0 will reset to the default value in the CellML definition.)
+            
+            This heterogeneity is only supported for some cell models:
+            either those with a parameter named ScaleFactorGkr, or with
+            support hardcoded into Chaste.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Location" type="location_type">
+        <xs:annotation>
+          <xs:documentation>Location of nodes at which to apply these scale
+            factors.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SetParameter" type="set_parameter_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Set a named parameter on the cell models in this region.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="conductivity_heterogeneity_type">
+    <xs:annotation>
+      <xs:documentation>Defines a conductivity heterogeneity (non-default value) at nodes in a given
+        location (cuboid or transmural layer).</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="IntracellularConductivities" type="conductivities_type" minOccurs="0"/>
+      <xs:element name="ExtracellularConductivities" type="conductivities_type" minOccurs="0"/>
+      <xs:element name="Location" type="location_type"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="slab_type">
+    <xs:annotation>
+      <xs:documentation>Defines a 3D cuboid "slab" mesh ranging from (0, 0, 0) to (x, y, z). The
+        internode spacing is used to define the typical mesh step size in the x,y,z-directions
+        (diagonal edges will be slightly longer).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="x" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The "width" of the mesh in the x-direction</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="y" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The "height" of the mesh in the y-direction.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="z" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The "height" of the mesh in the y-direction.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inter_node_space" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>This is the mesh step size in each coordinate direction. All axis-aligned
+          edges in the mesh will be of this size.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="sheet_type">
+    <xs:annotation>
+      <xs:documentation>Defines a 2D rectangular "sheet" mesh ranging from (0, 0) to (x, y). The
+        internode spacing is used to define the typical mesh step size in the x,y-directions
+        (diagonal edges will be slightly longer).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="x" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The "width" of the mesh in the x-direction</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="y" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The "height" of the mesh in the y-direction.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inter_node_space" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>This is the mesh step size in each coordinate direction. All axis-aligned
+          edges in the mesh will be of this size.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="fibre_type">
+    <xs:annotation>
+      <xs:documentation>Defines a 1D "fibre" mesh ranging from 0 to x. The internode spacing is used
+        to define the mesh step size in the x-direction.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="x" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The "width" of the mesh in the x-direction</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inter_node_space" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>This is the mesh step size.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="load_mesh_type">
+    <xs:annotation>
+      <xs:documentation>Type for storing information about the location of the mesh file and the
+        mesia type (presence of fibres, etc)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Path to the set of mesh files (.node, .ele ...). This is a relative path
+          and it should include the basename of the files but not the ".node"
+          suffices.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="conductivity_media" type="media_type" use="required">
+      <xs:annotation>
+        <xs:documentation>The conductivity media of the tissue
+          (Orthotropic/Axisymmetric/NoFibreOrientation)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="mesh_type">
+    <xs:annotation>
+      <xs:documentation>Type of mesh. Can be loaded from file or a semi-structured 1D, 2D or 3D
+        cuboid constructed in memory.</xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element name="Slab" type="slab_type">
+        <xs:annotation>
+          <xs:documentation>3D cuboid mesh ranging from (0,0,0) to (x,y,z) constructed in
+            memory.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Sheet" type="sheet_type">
+        <xs:annotation>
+          <xs:documentation>2D rectangular mesh ranging from (0,0) to (x,y) constructed in
+            memory.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Fibre" type="fibre_type">
+        <xs:annotation>
+          <xs:documentation>1D mesh ranging from 0 to x constructed in memory.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="LoadMesh" type="load_mesh_type">
+        <xs:annotation>
+          <xs:documentation>Load the mesh in from file.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="unit" type="xs:string" use="required" fixed="cm"/>
+  </xs:complexType>
+  <xs:complexType name="conductivities_type">
+    <xs:annotation>
+      <xs:documentation>Defines a default conductivities over the mesh in fibre, sheet and normal
+        directions.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="longi" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Conductivity in the longitudinal direction (conductivity along the
+          fibre).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="trans" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Conductivity in the transverse direction (conductivity within the sheet
+          but perpendicular to the fibre direction).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="normal" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Conductivity in the normal direction (conductivity between sheets of
+          fibres).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="unit" type="xs:string" use="required" fixed="mS/cm">
+      <xs:annotation>
+        <xs:documentation>Conductivities are measured in mS/cm</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="var_type">
+    <xs:annotation>
+      <xs:documentation>The name of a variable in a CellML cell model.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of a variable in a CellML cell model.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="output_variables_type">
+    <xs:annotation>
+      <xs:documentation>Simulations will output V_m and Phi_e by default. Some cell models will also
+        output certain named cell variables on request.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Var" type="var_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>The name of a variable in a CellML cell model to output during the
+            simulation.  Variables named must appear in the model, and either be a state variable,
+            or annotated as a parameter or derived quantity.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="yesno_type">
+    <xs:annotation>
+      <xs:documentation>Whether or not to apply.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="output_visualizer_type">
+    <xs:annotation>
+      <xs:documentation>Data (mesh and HDF5 data) may be converted at the end of the simulation to a
+        variety of output types. Zero or more output types may be given: no output conversion,
+        conversion to one output type (normal usage) or conversion to more than one output type.
+        Note that in parallel the output meshes may be renumbered from the original input but will
+        be consistent with the HDF5 data.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="meshalyzer" type="yesno_type" default="no" use="optional">
+      <xs:annotation>
+        <xs:documentation>Convert mesh and voltage data to Meshalyzer format
+          http://carp.meduni-graz.at/03_visualization/03_meshalyzer.htm</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cmgui" type="yesno_type" default="no" use="optional">
+      <xs:annotation>
+        <xs:documentation>Convert mesh and voltage data to Cmgui (CMISS) format
+          http://www.cmiss.org/cmgui</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="vtk" type="yesno_type" default="no" use="optional">
+      <xs:annotation>
+        <xs:documentation>Convert mesh and voltage data to VTK format suitable for Paraview, Mayavi2
+          etc (.vtu file format). Requires that code has been compiled against vtkIO library (-DCHASTE_VTK).
+          www.vtk.org</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="parallel_vtk" type="yesno_type" default="no" use="optional">
+      <xs:annotation>
+        <xs:documentation>Convert mesh and voltage data to parallel VTK format suitable for Paraview, Mayavi2
+          etc (.pvtu file format). Requires that code has been compiled against vtkIO library (-DCHASTE_VTK).
+          www.vtk.org</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="precision" type="xs:nonNegativeInteger" default="0" use="optional">
+      <xs:annotation>
+        <xs:documentation>For textual output formats, the precision with which to write floating point values,
+          i.e. the number of digits to use. The default of '0' gives an implementation-defined precision.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="time_steps_type">
+    <xs:annotation>
+      <xs:documentation>Type for storing time steps together. This is so that consistency checks can
+        be made. (printing &gt;= pde &gt;= ode etc.)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="ode" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The time step used in the ODE solution of cell models. This should divide
+          the PDE time step, so that one or more ODE steps are taken in the cell models between each
+          PDE diffusion solve.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="pde" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The time step used in the PDE diffusion solution. This should divide the
+          printing time step, so that one or more PDE diffussion steps between each
+          output.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="printing" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The printing time step indicates at what level output can be written to
+          the HDF5 data file. This determines the granularity with which the simulation can be
+          interrogated in postprocessing.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="unit" type="xs:string" use="required" fixed="ms">
+      <xs:annotation>
+        <xs:documentation>All time steps are given in milliseconds</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="ksp_tolerances_type">
+    <xs:annotation>
+      <xs:documentation>Type of KSP (Krylov subspace) tolerance to use. It can be specified as relative (KSPRelative) or absolute (KSPAbsolute).</xs:documentation>
+    </xs:annotation>
+    <xs:choice>
+      <xs:element name="KSPRelative" type="xs:double">
+        <xs:annotation>
+          <xs:documentation>Type for specification of the KSP relative tolerance</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="KSPAbsolute" type="xs:double">
+        <xs:annotation>
+          <xs:documentation>Type for specification of the KSP absolute tolerance</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:simpleType name="ksp_solver_type">
+    <xs:annotation>
+      <xs:documentation>Type of KSP solver method. It can be specified as conjugate gradient (cg),
+        symmetric LQ (symmlq), generalized minimum residual method (gmres), or Chebyshev iteration (chebychev).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cg"/>
+      <xs:enumeration value="symmlq"/>
+      <xs:enumeration value="gmres"/>
+      <xs:enumeration value="chebychev"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ksp_preconditioner_type">
+    <xs:annotation>
+      <xs:documentation>Type of KSP preconditioner to use. It can specified as jacobi (jaccobi), 
+        block jacobi (bjacobi), algebraic multigrid (hypre), multi-level preconditioning (ml), 
+        sparse approximate inverse preconditioner (spai), block diagonal (blockdiagonal), 
+        ldu factorization (ldufactorization), two levels block diagonal (twolevelsblockdiagonal)
+        or no preconditioner (none).
+        Note that some of these may only work if you have compiled PETSc with support for them
+        (e.g. hypre).
+        </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="jacobi"/>
+      <xs:enumeration value="bjacobi"/>
+      <xs:enumeration value="hypre"/>
+      <xs:enumeration value="ml"/>
+      <xs:enumeration value="spai"/>
+      <xs:enumeration value="blockdiagonal"/>
+      <xs:enumeration value="ldufactorisation"/>
+      <xs:enumeration value="twolevelsblockdiagonal"/>
+      <xs:enumeration value="none"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="mesh_partitioning_type">
+    <xs:annotation>
+      <xs:documentation>The method to use when partitioning a mesh for parallel simulation.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="dumb"/>
+      <xs:enumeration value="parmetis"/>
+      <xs:enumeration value="metis"/>
+      <xs:enumeration value="petsc"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="checkpoint_type">
+    <xs:annotation>
+      <xs:documentation>Type for specification of a checkpoint in a simulation. It stores
+        information on when to checkpoint (timestep), its units (fixed to ms) and the maximum number
+        of checkpoints. </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="timestep" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Specifies how frequently to checkpoint.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_checkpoints_on_disk" type="xs:unsignedInt" use="required">
+      <xs:annotation>
+        <xs:documentation>Specifies the maximum number of checkpoint archives to keep on
+          disk.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="unit" type="xs:string" use="required" fixed="ms">
+      <xs:annotation>
+        <xs:documentation>The units of the time step at which to checkpoint. In Chaste time is in
+          ms.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="adaptivity_parameters_type">
+    <xs:annotation>
+      <xs:documentation>Type for specification of parameters for spatial adaptivity. It stores
+        information on the target error, the value of sigma, the maximum and minimum edge length
+        that the adapting algorithm is allowed to impose, the maximum difference between the edge of
+        a tetrahedron and the next (gradation), the maximum level of refinement allowed (max_nodes)
+        and the number of times the adapting algorithm is allowed to examine the mesh
+        (num_sweeps).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="target_error" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>The error at which the spatial adaptation will stop.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sigma" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Specifies the value of sigma, one of the parameters of the adapting
+          algorithm. http://amcg.ese.ic.ac.uk</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_edge_length" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Maximum length of an edge. It is an upper bound to how much the mesh can
+          be coarsened during adaptation.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min_edge_length" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Minimum length of an edge. It sets the limit at how much the mesh is
+          allowed to be refined during adaptation.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="gradation" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Specifies the value of the mesh gradation, one of the parameters of the
+          adapting algorithm. http://amcg.ese.ic.ac.uk</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max_nodes" type="xs:integer" use="required">
+      <xs:annotation>
+        <xs:documentation>Maximum number of nodes allowed during adaptive mesh
+          refinement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="num_sweeps" type="xs:integer" use="required">
+      <xs:annotation>
+        <xs:documentation>Number of times which the adaptivity algorithm sweeps/iterates over the mesh.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="cell_heterogeneities_type">
+    <xs:annotation>
+      <xs:documentation>A list of cell model heterogeneities.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="CellHeterogeneity" type="cell_heterogeneity_type" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Defines a current-scaling heterogeneity in a set of cells in a given location (cuboid or transmural layer).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="stimuli_type">
+    <xs:annotation>
+      <xs:documentation>A list of intracellular stimuli.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Stimulus" type="stimulus_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Defines a simple intra-cellular current stimulus which injects a square-wave current into all stimulated cells in a given location (cuboid or transmural layer)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="simulation_type">
+    <xs:annotation>
+      <xs:documentation>Main XML component for running a cardaic bidomain or monodomain simulation</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="SpaceDimension" type="xs:integer" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Space dimension should be 1,2 or 3.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SimulationDuration" type="time_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Duration of this simulation (measured in milliseconds)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Domain" type="domain_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The domain/type of the simulation.  "Mono" = monodomain.  "Bi" = bidomain.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Purkinje" type="purkinje_simulation_type">
+        <xs:annotation>
+          <xs:documentation>If this element is present then the simulation will include the Purkinje system, and the mesh must define the Purkinje fibres.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Mesh" type="mesh_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Mesh can be loaded from file or a semi-structured 1D, 2D or 3D cuboid
+            constructed in memory.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="IonicModels" type="ionic_models_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The ionic model(s) to use for
+        simulation. A default model must be given, and can be overridden in particular regions.
+      </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Stimuli" type="stimuli_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>One or more intra-cellular current stimuli.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Electrodes" type="electrodes_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The electrodes that we want to use in the simulation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CellHeterogeneities" type="cell_heterogeneities_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional list of current-scaling heterogeneities in cells at given locations (cuboids or transmural layers).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="OutputDirectory" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Name of the output directory in which to store the results files.  This will be created as a subfolder of the environmental variable CHASTE_TEST_OUTPUT if set. If CHASTE_TEST_OUTPUT is not set, results will be found relative to a 'testoutput' folder in the current directory.
+</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="OutputFilenamePrefix" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Prefix to apply to the .h5 files etc. in the OutputDirectory.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="OutputVariables" type="output_variables_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional list of extra cell model variables to save during the simulation.  Simulations will output V_m and Phi_e by default. Some cell models will also output certain named cell variables on request.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="OutputVisualizer" type="output_visualizer_type" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Data (mesh and HDF5 data) may be converted at the end of the simulation to a variety of output types. Zero or more output types may be given: no output conversion, conversion to one output type (normal usage) or conversion to more than one output type.
+Note that in parallel the output meshes may be renumbered from the original input but will be consistent with the HDF5 data.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="OutputUsingOriginalNodeOrdering" default="no" type="yesno_type"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Set to "yes" for writing data from parallel simulations with the original mesh
+          ordering.  This slows down parallel simulations, but means that the output data are unpermuted and
+          could be visualised on the original mesh.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CheckpointSimulation" type="checkpoint_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Tell Chaste to checkpoint the simulation at regular intervals.
+            It stores information on how frequently to checkpoint (timestep),
+            and the maximum number of checkpoints to keep on disk.
+            Note that the checkpoint timestep should be a multiple of the printing step.
+            
+            See the release notes for more information on checkpointing.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="resume_simulation_type">
+    <xs:annotation>
+      <xs:documentation>Main XML component for resuming a cardaic bidomain or monodomain simulation from checkpoint.  This contains those resources (such as simulation duration) which are going to be overwritten.</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="ArchiveDirectory" type="path_type">
+        <xs:annotation>
+          <xs:documentation>Location of the input directory from which to read the checkpoint archive files.  This is expected to be a subfolder of the environmental variable CHASTE_TEST_OUTPUT, if set. If CHASTE_TEST_OUTPUT is not set, the archive directory is expected relative to a 'testoutput' folder in the current directory.
+</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SpaceDimension" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>Space dimension should be 1,2 or 3 and should match the dimension specified in the checkpoint.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Domain" type="domain_type">
+        <xs:annotation>
+          <xs:documentation>The domain/type of the simulation.  "Mono" = monodomain.  "Bi" = bidomain.  Should match the domain type specified in the checkpoint.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="SimulationDuration" type="time_type">
+        <xs:annotation>
+          <xs:documentation>Duration of this simulation (measured in milliseconds) from the beginning of the original simulation.  It should therefore be in the future of the time that the checkpoint was made.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Stimuli" type="stimuli_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>One or more intra-cellular current stimuli.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CellHeterogeneities" type="cell_heterogeneities_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional list of current-scaling heterogeneities in cells at given locations (cuboids or transmural layers).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="CheckpointSimulation" type="checkpoint_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Specification of a checkpoint in the resumed simulation. It stores information on when to checkpoint (timestep), its units (fixed to ms) and the maximum number of checkpoints.   Note that the checkpoint timestep should be a multiple of the printing step but can be different from the checkpoint specification of the original checkpointed simulation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="OutputVisualizer" type="output_visualizer_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Data (mesh and HDF5 data) may be converted at the end of the simulation to a variety of output types. Zero or more output types may be given: no output conversion, conversion to one output type (normal usage) or conversion to more than one output type.
+Note that in parallel the output meshes may be renumbered from the original input but will be consistent with the HDF5 data.
+
+Since the data from the original simulation will be included in the output, this functionality provides a way to convert the original simulation to a different visualization package.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="physiological_type">
+    <xs:annotation>
+      <xs:documentation>Holder for physiological parameters such as conductivities and capacitances</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="IntracellularConductivities" type="conductivities_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Default conductivities over the mesh in fibre, sheet and normal directions.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ExtracellularConductivities" type="conductivities_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Default conductivities over the mesh in fibre, sheet and normal directions.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="BathConductivity" type="conductivity_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Bath or fluid-filled cavity conductivity. Measured in mS/cm.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ConductivityHeterogeneities" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optional list of conductivity heterogeneitis at nodes in given locations (cuboids or transmural layers).</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ConductivityHeterogeneity" type="conductivity_heterogeneity_type"
+              minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Defines a conductivity heterogeneity (non-default value) at nodes in a given location (cuboid or transmural layer).</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SurfaceAreaToVolumeRatio" type="inverse_length_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Surface area to volume ratio (usually denoted Chi or Am in mono-/bidomain PDEs).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Capacitance" type="capacitance_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Surface capacitance (usually denoted Cm in mono-/bidomain PDEs).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ApplyDrug" type="apply_drug_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Optionally specify parameters for a drug effect conductance block model.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Purkinje" type="purkinje_physiological_type">
+        <xs:annotation>
+          <xs:documentation>Optionally specify physiological parameters of the Purkinje system.
+Note that the presence of this element does not imply that the simulation will actually involve Purkinje fibres - see the Simulation/Purkinje element for that.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="numerical_type">
+    <xs:annotation>
+      <xs:documentation>Holder for numerical parameters such as timesteps and linear-system parameters</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="TimeSteps" type="time_steps_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Stores the ODE, PDE and printing time steps together. This is so that consistency checks can be made. (printing &gt;= pde &gt;= ode etc.)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="KSPTolerances" type="ksp_tolerances_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>KSP (Krylov subspace) tolerance to use. It can be specified as relative (KSPRelative) or absolute (KSPAbsolute).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="KSPSolver" type="ksp_solver_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>KSP solver method. It can be specified as conjugate gradient (cg),
+symmetric LQ (symmlq) or generalized minimum residual method (gmres).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="KSPPreconditioner" type="ksp_preconditioner_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>KSP preconditioner to use (-pc_type). It can specified as incomplete LU factorization (ilu), jacobi (jacobi), block jacobi (bjacobi), algebraic multigrid (hypre), multi-level preconditioning (ml), sparse approximate inverse preconditioner (spai), block diagonal (blockdiagonal), ldu factorization (ldufactorization) or no preconditioner (none).
+
+Note that the preconditioners supplied by PETSc (ilu, jacobi and bjacobi) are supported -- other preconditioners are experimental and/or require the installation of optional libraries.
+</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MeshPartitioning" type="mesh_partitioning_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The method to use to partition the mesh when running in parallel.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="UseStateVariableInterpolation" type="yesno_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Whether to interpolate cell model state variables on to element gauss points, rather than just interpolating
+the membrane ionic current.  State variable interpolation is slower, but gives improved accuracy which may be important in certain
+situations.  See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/StateVariableInterpolation for details.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="AdaptivityParameters" type="adaptivity_parameters_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Specification of parameters for spatial adaptivity when used with the University of London, Imperial College adaptivity library.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="postprocessing_type">
+    <xs:annotation>
+      <xs:documentation>Holder for postprocessing requests such as APD maps or activation maps</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ActionPotentialDurationMap" type="apd_map_type" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Optional list of requests for sequences of action potential durations (in milliseconds) at each mesh node.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="UpstrokeTimeMap" type="upstrokes_map_type" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Optional list of requests for sequences of upstroke time maps (in milliseconds) at each mesh node.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="MaxUpstrokeVelocityMap" type="max_upstrokes_velocity_map_type" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Optional list of requests for sequences of maximum upstroke (activation) times in milliseconds at each mesh node.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ConductionVelocityMap" type="conduction_velocity_map_type" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Optional list of requests for conduction velocities at each mesh node for a given source node.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="TimeTraceAtNode" type="node_number_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Optional list of node indices for which a time trace is requested. The node indices
+          refers to the original numbering in the mesh (e.g., in a mesh file). Note that the numbering that can be visualized with previous simulation
+          results may or may not correspond to the original numbering  </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="PseudoEcgElectrodePosition" type="point_type" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Optional list of requests to calculate a pseudo-ECG using an electrode at the given position.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="chaste_parameters_type">
+    <xs:annotation>
+      <xs:documentation>Main XML component for either running a new simulation (with "Simulation" specified) or resuming a simulation from a checkpoint (with "ResumeSimulation" specified).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="Simulation" type="simulation_type">
+          <xs:annotation>
+            <xs:documentation>Main XML component for running a cardaic bidomain or monodomain simulation</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="ResumeSimulation" type="resume_simulation_type">
+          <xs:annotation>
+            <xs:documentation>Main XML component for resuming a cardaic bidomain or monodomain simulation from checkpoint.  This contains those resources (such as simulation duration) which are going to be overwritten.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+      <xs:element name="Physiological" type="physiological_type">
+        <xs:annotation>
+          <xs:documentation>Holder for physiological parameters such as conductivities and capacitances</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Numerical" type="numerical_type">
+        <xs:annotation>
+          <xs:documentation>Holder for numerical parameters such as timesteps and linear-system parameters</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="PostProcessing" type="postprocessing_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Holder for postprocessing requests such as APD maps or activation maps</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- The single root element.  All parameters files must start with this. -->
+  <xs:element name="ChasteParameters" type="chaste_parameters_type">
+    <xs:annotation>
+      <xs:documentation>Main XML component for either running a new simulation (with "Simulation" specified) or resuming a simulation from a checkpoint (with "ResumeSimulation" specified).</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="purkinje_physiological_type">
+    <xs:all>
+      <xs:element minOccurs="0" name="SurfaceAreaToVolumeRatio" type="inverse_length_type">
+        <xs:annotation>
+          <xs:documentation>The surface area to volume ratio for Purkinje fibres.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Capacitance" type="capacitance_type">
+        <xs:annotation>
+          <xs:documentation>The surface capacitance for Purkinje myocytes.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Conductivity" type="conductivity_type">
+        <xs:annotation>
+          <xs:documentation>The default conductivity for Purkinje fibres.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="purkinje_simulation_type"/>
+</xs:schema>

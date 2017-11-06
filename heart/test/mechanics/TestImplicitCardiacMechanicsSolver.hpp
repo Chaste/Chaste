@@ -61,7 +61,7 @@ double MatrixNorm(c_matrix<double,2,2> mat)
 class TestImplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 {
 public:
-    void TestCompareJacobians() throw(Exception)
+    void TestCompareJacobians()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
@@ -169,7 +169,7 @@ public:
     // A test where we specify the 'resting' intracellular calcium concentration
     // for which the active tension should be zero, so should solve in 0 newton
     // iterations
-    void TestWithZeroActiveTension() throw(Exception)
+    void TestWithZeroActiveTension()
     {
         QuadraticMesh<2> mesh(0.125, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
@@ -217,7 +217,7 @@ public:
 
     // Specifies a non-constant active tension and checks the lambda behaves
     // as it should do. Also has hardcoded tests
-    void TestSpecifiedCalciumCompression() throw(Exception)
+    void TestSpecifiedCalciumCompression()
     {
         // NOTE: test hardcoded for num_elem = 4
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
@@ -338,7 +338,7 @@ public:
     // through either setting a constant fibre direction or using a file of different (though in this case
     // all equal) fibre directions for each element.
     // The stretches should be identical to in the above test, the deformation rotated.
-    void TestDifferentFibreDirections() throw(Exception)
+    void TestDifferentFibreDirections()
     {
         for (unsigned run=1; run<=2; run++)
         {
@@ -436,7 +436,7 @@ public:
 
     // cover all other contraction model options which are allowed but not been used in a test
     // so far (or in TestExplicitCardiacMechanicsSolver)
-    void TestCoverage() throw(Exception)
+    void TestCoverage()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -484,7 +484,7 @@ public:
     }
 
 
-    void TestComputeDeformationGradientAndStretchesEachElement() throw(Exception)
+    void TestComputeDeformationGradientAndStretchesEachElement()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -658,7 +658,7 @@ public:
         delete p_pair;
     }
 
-    void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)
+    void TestCrossFibreTensionWithSimpleContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
@@ -751,7 +751,7 @@ public:
      *
      * Therefore nothing should happen!
      */
-    void TestIsotropicCrossFibreTensions() throw(Exception)
+    void TestIsotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -841,7 +841,7 @@ public:
      * This time we will make x (fibres) and z (sheet-normal) contract,
      * and y will not contract (so nodes will expand out for y, shrink in for x,z).
      */
-    void TestAnisotropicCrossFibreTensions() throw(Exception)
+    void TestAnisotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -945,7 +945,7 @@ public:
 //    // to the entire X=0 edge makes it runs in sequential (~60 iters PCBJACOBI) and parallel
 //    // (~400 iters PCBJACOBI).
 //    //
-//    void strangefailingbehaviourinparallelTestCompareWithDeadExplicitSolver() throw(Exception)
+//    void strangefailingbehaviourinparallelTestCompareWithDeadExplicitSolver()
 //    {
 //        // note 8 elements is assumed in the fixed nodes
 //        QuadraticMesh<2> mesh(0.125, 1.0, 1.0);

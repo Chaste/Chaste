@@ -73,7 +73,7 @@ public:
         FileComparison( boundary_force_results_dir + "boundary_results.parameters", "crypt/test/data/TestForcesForCrypt/boundary_results.parameters").CompareFiles();
     }
 
-    void TestVertexCryptBoundaryForceMethods() throw (Exception)
+    void TestVertexCryptBoundaryForceMethods()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
@@ -130,7 +130,7 @@ public:
         }
     }
 
-    void TestVertexCryptBoundaryForceForceWithNonVertexCellPopulation() throw (Exception)
+    void TestVertexCryptBoundaryForceForceWithNonVertexCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;

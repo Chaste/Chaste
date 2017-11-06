@@ -126,7 +126,7 @@ public:
      * In the first test, we demonstrate how to simulate a monolayer that incorporates
      * Delta/Notch signalling, using a vertex-based approach.
      */
-    void TestVertexBasedMonolayerWithDeltaNotch() throw (Exception)
+    void TestVertexBasedMonolayerWithDeltaNotch()
     {
         /* We include the next line because Vertex simulations cannot be run in parallel */
         EXIT_IF_PARALLEL;
@@ -210,7 +210,7 @@ public:
      * In the next test we run a similar simulation as before, but this time with node-based
      * 'overlapping spheres' model.
      */
-    void TestNodeBasedMonolayerWithDeltaNotch() throw (Exception)
+    void TestNodeBasedMonolayerWithDeltaNotch()
     {
         /* We include the next line because HoneycombMeshGenerator, used in this test, is not
          *  yet implemented in parallel. */

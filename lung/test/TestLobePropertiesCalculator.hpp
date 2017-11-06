@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestLobePropertiesCalculator : public CxxTest::TestSuite
 {
 public:
-    void TestVolumes() throw(Exception)
+    void TestVolumes()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -87,7 +87,7 @@ public:
 #endif
     }
 
-    void TestRealVolumeFractions() throw(Exception)
+    void TestRealVolumeFractions()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 

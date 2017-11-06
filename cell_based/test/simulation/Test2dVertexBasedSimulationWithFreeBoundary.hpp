@@ -62,7 +62,7 @@ class Test2DVertexSimulationWithFreeBoundary : public AbstractCellBasedTestSuite
 {
 public:
 
-    void Test2DFreeBoundaryVertexSimulationForProfiling() throw (Exception)
+    void Test2DFreeBoundaryVertexSimulationForProfiling()
     {
         // make the simulation
         std::vector<CellPtr> cells;

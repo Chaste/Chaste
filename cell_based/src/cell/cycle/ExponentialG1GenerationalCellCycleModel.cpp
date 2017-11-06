@@ -90,7 +90,7 @@ void ExponentialG1GenerationalCellCycleModel::SetG1Duration()
     }
 }
 
-double ExponentialG1GenerationalCellCycleModel::GetRate() 
+double ExponentialG1GenerationalCellCycleModel::GetRate()
 {
     return mRate;
 }

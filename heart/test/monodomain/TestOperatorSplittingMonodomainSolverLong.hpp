@@ -89,7 +89,7 @@ class TestOperatorSplittingMonodomainSolverLong : public CxxTest::TestSuite
 public:
     // like TestOperatorSplittingMonodomainSolver but much finer mesh and smaller
     // dt so can check for proper convergence
-    void TestConvergenceOnFineMesh() throw(Exception)
+    void TestConvergenceOnFineMesh()
     {
         ReplicatableVector final_voltage_normal;
         ReplicatableVector final_voltage_operator_splitting;

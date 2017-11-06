@@ -299,7 +299,7 @@ public:
         TS_ASSERT_EQUALS(int(num_nonzeros),6);
     }
 
-    void TestZeroMatrixRowsAndColumnsWithValueOnDiagonal() throw(Exception)
+    void TestZeroMatrixRowsAndColumnsWithValueOnDiagonal()
     {
         LinearSystem ls(5);
         for (int i=0; i<5; i++)
@@ -908,7 +908,7 @@ public:
         PetscTools::Destroy(solution_vector);
     }
 
-    void TestGetSetKSP() throw (Exception)
+    void TestGetSetKSP()
     {
         {
             // Test that small systems don't have preconditioning
@@ -1312,7 +1312,7 @@ public:
         PetscTools::Destroy(system_rhs);
     }
 
-//    void TestSingularSolves() throw(Exception)
+//    void TestSingularSolves()
 //    {
 //        LinearSystem ls(2);
 //
@@ -1413,7 +1413,7 @@ public:
         PetscTools::Destroy(system_matrix);
     }
 
-    void TestFixedNumberOfIterations() throw (Exception)
+    void TestFixedNumberOfIterations()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -1533,7 +1533,7 @@ public:
         PetscTools::Destroy(guess);
     }
 
-    void TestFixedNumberOfIterationsRelativeToleranceCoverage() throw (Exception)
+    void TestFixedNumberOfIterationsRelativeToleranceCoverage()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -1602,7 +1602,7 @@ public:
         PetscTools::Destroy(guess);
     }
 
-    void TestSolveZerosInitialGuessForSmallRhs() throw(Exception)
+    void TestSolveZerosInitialGuessForSmallRhs()
     {
         LinearSystem ls(2);
 
@@ -1631,7 +1631,7 @@ public:
     }
 
     /** See #1834 */
-    void xxxxTestSolveShowingPetscRubbishInEvenMoreWays() throw(Exception)
+    void xxxxTestSolveShowingPetscRubbishInEvenMoreWays()
     {
         LinearSystem ls(2);
 

@@ -84,7 +84,7 @@ public:
 class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 {
 public:
-    void TestWithCube() throw(Exception)
+    void TestWithCube()
     {
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
         HeartConfig::Instance()->SetSimulationDuration(3); //ms
@@ -141,7 +141,7 @@ public:
         TS_ASSERT_DELTA(max_adaptive, 25.6083, 1e-3);
     }
 
-    void TestWithChebyshevAndFixedIterations() throw(Exception)
+    void TestWithChebyshevAndFixedIterations()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);

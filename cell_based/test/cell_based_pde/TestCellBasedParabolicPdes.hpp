@@ -62,7 +62,7 @@ class TestCellBasedParabolicPdes : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellwiseSourceParabolicPdeMethods() throw(Exception)
+    void TestCellwiseSourceParabolicPdeMethods()
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -99,7 +99,7 @@ public:
         }
     }
 
-    void TestCellwiseSourceParabolicPdeArchiving() throw(Exception)
+    void TestCellwiseSourceParabolicPdeArchiving()
     {
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -167,7 +167,7 @@ public:
         }
     }
 
-    void TestUniformSourceParabolicPdeMethods() throw(Exception)
+    void TestUniformSourceParabolicPdeMethods()
     {
         // Create a PDE object
         UniformSourceParabolicPde<2> pde(0.1);
@@ -194,7 +194,7 @@ public:
         }
     }
 
-    void TestUniformSourceParabolicPdeArchiving() throw(Exception)
+    void TestUniformSourceParabolicPdeArchiving()
     {
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -234,7 +234,7 @@ public:
         }
     }
 
-    void TestAveragedSourceParabolicPdeMethods() throw(Exception)
+    void TestAveragedSourceParabolicPdeMethods()
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -307,7 +307,7 @@ public:
         }
     }
 
-    void TestAveragedSourceParabolicPdeArchiving() throw(Exception)
+    void TestAveragedSourceParabolicPdeArchiving()
     {
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);

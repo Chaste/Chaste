@@ -48,9 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
- *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
+ *  (ii) compile but do not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
  *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
  *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see ChasteGuides/RunningBinariesFromCommandLine)
+ *
  *
  *
  *  For example:
@@ -71,7 +72,7 @@ class TestCommandLineArguments : public CxxTest::TestSuite
 {
 public:
 
-    void TestCommandLineArgumentsSingleton() throw(Exception)
+    void TestCommandLineArgumentsSingleton()
     {
         // Test that argc and argv are populated
         int argc = *(CommandLineArguments::Instance()->p_argc);
@@ -263,7 +264,7 @@ public:
         CommandLineArguments::Instance()->p_argv = p_real_argv;
     }
 
-    void TestCommandLineArgumentsMocker() throw(Exception)
+    void TestCommandLineArgumentsMocker()
     {
         {
             /* HOW_TO_TAG General
@@ -298,7 +299,7 @@ public:
     }
 
     /* A test which a user can run in order to check that they are passing command line arguments correctly*/
-    void TestCommandLineArgumentsParrotting() throw(Exception)
+    void TestCommandLineArgumentsParrotting()
     {
         std::string verb = "--verbose";
         if (CommandLineArguments::Instance()->OptionExists(verb))

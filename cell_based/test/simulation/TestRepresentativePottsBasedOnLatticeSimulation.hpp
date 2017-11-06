@@ -71,7 +71,7 @@ class TestRepresentativePottsBasedOnLatticeSimulation : public AbstractCellBased
 {
 public:
 
-    void TestPottsMonolayerCellSorting() throw (Exception)
+    void TestPottsMonolayerCellSorting()
     {
         EXIT_IF_PARALLEL;
 

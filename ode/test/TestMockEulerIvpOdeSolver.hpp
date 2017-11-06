@@ -90,7 +90,7 @@ public:
         TS_ASSERT_EQUALS(euler_solver.GetCallCount(), 2u);
     }
 
-    void TestArchivingMockEulerSolver() throw(Exception)
+    void TestArchivingMockEulerSolver()
     {
         EXIT_IF_PARALLEL;
 

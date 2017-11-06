@@ -77,7 +77,7 @@ class TestMonodomainMassLumping : public CxxTest::TestSuite
 
 public:
 
-    void TestCompareRealisticGeometry() throw(Exception)
+    void TestCompareRealisticGeometry()
     {
         HeartConfig::Reset();
         HeartConfig::Instance()->SetSimulationDuration(50); //ms

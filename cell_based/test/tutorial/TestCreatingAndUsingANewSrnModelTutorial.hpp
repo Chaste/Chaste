@@ -303,7 +303,7 @@ public:
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMySrnModel() throw(Exception)
+    void TestMySrnModel()
     {
         /* Test that we can construct a {{{MySrnModel}}} object: */
         TS_ASSERT_THROWS_NOTHING(MySrnModel srn_model);
@@ -421,7 +421,7 @@ public:
      * We conclude with a brief test demonstrating how {{{MySrnModel}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMySrnModel() throw(Exception)
+    void TestOffLatticeSimulationWithMySrnModel()
     {
         /* We use the honeycomb vertex mesh generator to create a vertex mesh.
          */

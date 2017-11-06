@@ -72,7 +72,7 @@ class TestDeltaNotchModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestUpdateAtEndOfTimeStepNodeBased() throw(Exception)
+    void TestUpdateAtEndOfTimeStepNodeBased()
     {
         EXIT_IF_PARALLEL;
 
@@ -366,7 +366,7 @@ public:
         }
     }
 
-    void TestUpdateAtEndOfTimeStepVertex() throw (Exception)
+    void TestUpdateAtEndOfTimeStepVertex()
     {
         EXIT_IF_PARALLEL;
 
@@ -430,7 +430,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 0.9921, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepMeshBasedWithGhostes() throw (Exception)
+    void TestUpdateAtEndOfTimeStepMeshBasedWithGhostes()
     {
         EXIT_IF_PARALLEL;
 
@@ -493,7 +493,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepPottsBased() throw (Exception)
+    void TestUpdateAtEndOfTimeStepPottsBased()
     {
         EXIT_IF_PARALLEL;
 
@@ -551,7 +551,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepCaBased() throw (Exception)
+    void TestUpdateAtEndOfTimeStepCaBased()
     {
         EXIT_IF_PARALLEL;
 
@@ -622,7 +622,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;
 

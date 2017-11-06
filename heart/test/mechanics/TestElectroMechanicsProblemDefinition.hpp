@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestElectroMechanicsProblemDefinition : public CxxTest::TestSuite
 {
 public:
-    void TestInterface() throw (Exception)
+    void TestInterface()
     {
         QuadraticMesh<2> mesh(0.1, 1.0, 1.0);
 

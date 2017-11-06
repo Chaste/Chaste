@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPlaneStimulusCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestBasicContructor() throw (Exception)
+    void TestBasicContructor()
     {
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(2,2,2);
@@ -91,7 +91,7 @@ public:
         }
     }
 
-    void TestHeartGeometryIntoCellFactory() throw(Exception)
+    void TestHeartGeometryIntoCellFactory()
     {
         TetrahedralMesh<2,2> mesh;
         //This mesh will have 6 nodes per face, spaced by 1

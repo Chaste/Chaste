@@ -244,7 +244,7 @@ public:
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMyCellCycleModel() throw(Exception)
+    void TestMyCellCycleModel()
     {
         /* Test that we can construct a {{{MyCellCycleModel}}} object: */
         TS_ASSERT_THROWS_NOTHING(MyCellCycleModel cell_model3);
@@ -379,7 +379,7 @@ public:
      * We conclude with a brief test demonstrating how {{{MyCellCycleModel}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyCellCycleModel() throw(Exception)
+    void TestOffLatticeSimulationWithMyCellCycleModel()
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh covering a
          * circular domain of given radius.

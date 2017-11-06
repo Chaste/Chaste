@@ -123,7 +123,7 @@ public:
     }
 
 
-    void TestArchivingExclusionCaBasedDivisionRule() throw (Exception)
+    void TestArchivingExclusionCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -289,7 +289,7 @@ public:
             "Cells reaching the boundary of the domain. Make the Potts mesh larger.");
     }
 
-    void TestArchivingShovingCaBasedDivisionRule() throw (Exception)
+    void TestArchivingShovingCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

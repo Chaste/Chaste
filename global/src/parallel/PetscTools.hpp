@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petsc.h>
 #include <petscvec.h>
 #include <petscmat.h>
+#include <petscsys.h>
 
 /** For use in tests that do not work when run in parallel. */
 #define EXIT_IF_PARALLEL if(PetscTools::IsParallel()){TS_TRACE("This test does not pass in parallel yet.");return;}
@@ -382,6 +383,18 @@ public:
       */
      static inline void SetOption(const char* pOptionName, const char* pOptionValue)
      {
+         // If this option turns on logging, PETSc needs to be made aware in different ways for different versions
+         // See #2933 for details
+         const std::string str_option_name(pOptionName);
+         if (str_option_name.find("log") != std::string::npos)
+         {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 6) // PETSc 3.6
+             PetscLogBegin();
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
+             PetscLogDefaultBegin();
+#endif
+         }
+
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
          PetscOptionsSetValue(NULL, pOptionName, pOptionValue);
 #else

@@ -72,7 +72,7 @@ class TestCardiacCheckpointingAndRestartingTutorial : public CxxTest::TestSuite
 {
 public:
     /* First, the checkpointing test. */
-    void TestCheckpointing() throw(Exception)
+    void TestCheckpointing()
     {
         /* We set up exactly the same simulation as in UserTutorials/AnotherBidomainSimulation */
         HeartConfig::Instance()->Reset();
@@ -97,7 +97,7 @@ public:
     }
 
     /* This is how to restart the test. */
-    void TestRestarting() throw(Exception)
+    void TestRestarting()
     {
         /* To restart from the saved simulation directory we  use the `CardiacSimulationArchiver` class, as shown in the following.
          * Note the `BidomainProblem<2>` as the template parameter again.  The dimension (2) must match the one given in the

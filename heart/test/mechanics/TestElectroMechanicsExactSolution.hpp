@@ -132,7 +132,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
 class TestElectroMechanicsExactSolution : public CxxTest::TestSuite
 {
 public:
-    void TestIncompressibleSolveWithExactSolution() throw(Exception)
+    void TestIncompressibleSolveWithExactSolution()
     {
         MechanicsEventHandler::Reset();
 

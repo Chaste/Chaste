@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestHeartFileFinder : public CxxTest::TestSuite
 {
 public:
-    void TestHeartFileFinderOpening() throw(Exception)
+    void TestHeartFileFinderOpening()
     {
         {
             // Can we find our own source file?

@@ -97,7 +97,7 @@ class TestLongPostprocessing : public CxxTest::TestSuite
 public:
 
 
-    void Test2DSimulations() throw(Exception)
+    void Test2DSimulations()
     {
         double conductivity_scale = 1;
         double h = 0.01; // cm

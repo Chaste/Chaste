@@ -67,7 +67,7 @@ public:
         ++i; // Stop the compiler complaining about unused variable
     }
 
-    void TestSmartPointers() throw (Exception)
+    void TestSmartPointers()
     {
         std::shared_ptr<double> p_shared;
         std::unique_ptr<double> p_unique;
@@ -75,18 +75,18 @@ public:
         auto p_made_shared = std::make_shared<double>();
     }
 
-    void TestStdArray() throw (Exception)
+    void TestStdArray()
     {
         std::array<unsigned, 3> my_array;
         ++my_array[0]; // Stop the compiler complaining about unused variable
     }
 
-    void TestStdInitializerList() throw (Exception)
+    void TestStdInitializerList()
     {
         std::vector<unsigned> my_vec = {1, 2, 3, 4, 5};
     }
 
-    void TestRangeFor() throw (Exception)
+    void TestRangeFor()
     {
         // Traversing a vector
         {
@@ -128,7 +128,7 @@ public:
         }
     }
 
-    void TestLambdas() throw (Exception)
+    void TestLambdas()
     {
         // Sort a vector of arrays by their x-location
         const unsigned DIM = 3;
@@ -154,13 +154,13 @@ public:
         std::sort(my_vec.begin(), my_vec.end(), sort_x);
     }
 
-    void TestTuple() throw (Exception)
+    void TestTuple()
     {
         auto my_tuple = std::make_tuple(1.23, 5u, "a_string");
         ++std::get<1>(my_tuple); // Stop the compiler complaining about unused variable
     }
 
-    void TestNullptrType() throw (Exception)
+    void TestNullptrType()
     {
         int* i = nullptr;
         ++i;

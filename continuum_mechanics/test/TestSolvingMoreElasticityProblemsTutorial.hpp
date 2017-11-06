@@ -89,7 +89,7 @@ public:
      * on the Dirichlet boundary, and also show how to prescribe a traction that is given in functional form
      * rather than prescribed for each boundary element.
      */
-    void TestIncompressibleProblemMoreComplicatedExample() throw(Exception)
+    void TestIncompressibleProblemMoreComplicatedExample()
     {
         /* Create a mesh */
         QuadraticMesh<2> mesh;
@@ -201,7 +201,7 @@ public:
      * translation in the Y direction could be added a solution to obtain another valid solution, so we
      * fully fix the node at the origin.)
      */
-    void TestWithSlidingDirichletBoundaryConditions() throw(Exception)
+    void TestWithSlidingDirichletBoundaryConditions()
     {
         QuadraticMesh<2> mesh;
         mesh.ConstructRegularSlabMesh(0.1 /*stepsize*/, 1.0 /*width*/, 1.0 /*height*/);
@@ -261,7 +261,7 @@ public:
      * Note: for other examples of compressible solves, including problems with an exact solution, see the
      * file `continuum_mechanics/test/TestCompressibleNonlinearElasticitySolver.hpp`
      */
-    void TestSolvingCompressibleProblem() throw (Exception)
+    void TestSolvingCompressibleProblem()
     {
         /* All mechanics problems must take in quadratic meshes, but the mesh files for
          * (standard) linear meshes in Triangles/Tetgen can be automatically converted

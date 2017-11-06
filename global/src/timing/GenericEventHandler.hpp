@@ -130,7 +130,7 @@ public:
      *
      * @param event  the index of an event (this must be less than NUM_EVENTS)
      */
-    static void BeginEvent(unsigned event) throw (Exception)
+    static void BeginEvent(unsigned event)
     {
         Instance()->BeginEventImpl(event);
     }
@@ -234,7 +234,7 @@ private:
      *
      * @param event  the index of an event (this must be less than NUM_EVENTS)
      */
-    void BeginEventImpl(unsigned event) throw (Exception)
+    void BeginEventImpl(unsigned event)
     {
         if (!mEnabled)
         {

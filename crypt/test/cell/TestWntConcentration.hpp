@@ -62,7 +62,7 @@ class TestWntConcentration : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestNoWnt() throw(Exception)
+    void TestNoWnt()
     {
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), false);
@@ -88,7 +88,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestLinearWntConcentration() throw(Exception)
+    void TestLinearWntConcentration()
     {
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), false);
@@ -123,7 +123,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestExponentialWntConcentration() throw(Exception)
+    void TestExponentialWntConcentration()
     {
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), false);
@@ -167,7 +167,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestOffsetLinearWntConcentration() throw(Exception)
+    void TestOffsetLinearWntConcentration()
     {
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
         p_wnt->SetType(LINEAR);
@@ -207,7 +207,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestRadialWntConcentration() throw(Exception)
+    void TestRadialWntConcentration()
     {
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
         p_wnt->SetType(RADIAL);
@@ -420,7 +420,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntInitialisationSetup() throw(Exception)
+    void TestWntInitialisationSetup()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");

@@ -88,7 +88,7 @@ public:
      * is used.  Whether the working copy is modified is ignored by this method; use
      * IsWorkingCopyModified to test that.
      */
-    static unsigned GetRevisionNumber();
+    static unsigned long long GetRevisionNumber();
 
     /**
      * @return  If this Chaste was built from a subversion working copy, then return whether there

@@ -61,7 +61,7 @@ class TestCellMutationStates : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellMutationStateMethods() throw(Exception)
+    void TestCellMutationStateMethods()
     {
         MAKE_PTR(WildTypeCellMutationState, p_state);
         TS_ASSERT_EQUALS(p_state->GetCellCount(), 0u);
@@ -92,7 +92,7 @@ public:
         TS_ASSERT(const_wt_state.IsSame(p_wt_state.get()));
     }
 
-    void TestArchiveCellMutationState() throw(Exception)
+    void TestArchiveCellMutationState()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_mutation_state.arch";

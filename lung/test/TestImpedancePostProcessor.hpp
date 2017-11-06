@@ -46,7 +46,7 @@ class TestImpedancePostProcessor : public CxxTest::TestSuite
 private:
 
 public:
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         std::vector<double> freqs;
         freqs.push_back(4);
@@ -61,7 +61,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(ImpedancePostProcessor(freqs, imps), "Impedance post processor requires data points at 5 Hz & 20 Hz");
     }
 
-    void TestCalculatePropertiesWithNiceData() throw(Exception)
+    void TestCalculatePropertiesWithNiceData()
     {
         std::vector<double> freqs;
         freqs.push_back(4);
@@ -89,7 +89,7 @@ public:
         TS_ASSERT_DELTA(processor.GetRrs(), 4.48, 1e-2);
     }
 
-    void TestCalculatePropertiesWithHorridData() throw(Exception)
+    void TestCalculatePropertiesWithHorridData()
     {
         //Corner cases
         std::vector<double> freqs;

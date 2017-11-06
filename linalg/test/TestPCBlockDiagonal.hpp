@@ -54,7 +54,7 @@ class TestPCBlockDiagonal : public CxxTest::TestSuite
 {
 public:
 
-    void TestBasicFunctionality() throw (Exception)
+    void TestBasicFunctionality()
     {
         /*
          * We need to make sure here that the matrix is loaded with the appropriate parallel layout. Petsc's

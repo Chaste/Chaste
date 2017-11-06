@@ -128,7 +128,7 @@ public:
 class TestCableTestProblem : public CxxTest::TestSuite
 {
 public:
-    void TestSolvingTestProblem() throw(Exception)
+    void TestSolvingTestProblem()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder");
         TrianglesMeshReader<3,3> reader(mesh_base);

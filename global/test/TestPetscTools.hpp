@@ -51,7 +51,7 @@ class TestPetscTools : public CxxTest::TestSuite
 {
 public:
 
-    void TestMostOfPetscTools() throw (Exception)
+    void TestMostOfPetscTools()
     {
         TS_ASSERT(PetscTools::IsInitialised());
         PetscInt my_rank;
@@ -178,7 +178,7 @@ public:
         PetscTools::Destroy(mat3);
     }
 
-    void TestBarrier() throw (Exception)
+    void TestBarrier()
     {
         /*
          * Testing the barrier method is kind of tricky, since we really want to check
@@ -187,7 +187,7 @@ public:
         PetscTools::Barrier("TestBarrier");
     }
 
-    void TestReplicateBool() throw (Exception)
+    void TestReplicateBool()
     {
         bool my_flag = false;
         if (PetscTools::AmMaster())
@@ -198,7 +198,7 @@ public:
         TS_ASSERT(PetscTools::ReplicateBool(my_flag));
     }
 
-    void TestReplicateException() throw (Exception)
+    void TestReplicateException()
     {
         DistributedVectorFactory factory(1);
         if (factory.IsGlobalIndexLocal(0))
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    void TestProcessIsolation() throw (Exception)
+    void TestProcessIsolation()
     {
         TS_ASSERT_EQUALS(PetscTools::GetWorld(), PETSC_COMM_WORLD); // No isolation at first
         TS_ASSERT(!PetscTools::IsIsolated());
@@ -248,7 +248,7 @@ public:
         TS_ASSERT(!PetscTools::IsIsolated());
     }
 
-    void TestDumpPetscObjects() throw (Exception)
+    void TestDumpPetscObjects()
     {
         Mat matrix;
         Vec vector;
@@ -324,7 +324,7 @@ public:
      * back in with a different parallel layout. For p=2 it is partitioned in 6 and 4 rows,
      * for p=3 4, 4, and 2.
      */
-    void TestReadWithNonDefaultParallelLayout() throw (Exception)
+    void TestReadWithNonDefaultParallelLayout()
     {
         DistributedVectorFactory factory(5);
 
@@ -372,7 +372,7 @@ public:
         PetscTools::Destroy(parallel_layout);
     }
 
-    void TestUnevenCreation() throw (Exception)
+    void TestUnevenCreation()
     {
         /*
          * Uneven test (as in TestDistributedVectorFactory).
@@ -396,14 +396,14 @@ public:
         PetscTools::Destroy(petsc_vec_uneven);
     }
 
-    void TestHasParMetis() throw (Exception)
+    void TestHasParMetis()
     {
         //This just covers the method, as there is no other way to test if ParMetis is available.
         std::cout << "Testing to see if Petsc is configured with ParMetis support. " << std::endl;
         PetscTools::HasParMetis();
     }
 
-    void TestExceptionMacros() throw (Exception)
+    void TestExceptionMacros()
     {
         // Should not throw
         TS_ASSERT_THROWS_NOTHING(TRY_IF_MASTER(std::cout << "No exception\n"));
@@ -414,6 +414,12 @@ public:
         // Should get thrown by all processes as exception is replicated.
         TS_ASSERT_THROWS_CONTAINS(TRY_IF_MASTER(EXCEPTION("master; bailing out")),
                 "; bailing out"); // both the replicated and original should contain this phrase
+    }
+
+    void TestSetOptionWithLogging()
+    {
+        // See #2933: we need to cover either PetscLogBegin() or PetscLogDefaultBegin()
+        PetscTools::SetOption("-log_summary", "");
     }
 };
 
