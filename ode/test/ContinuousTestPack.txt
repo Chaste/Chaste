@@ -13,3 +13,4 @@ TestRungeKuttaFehlbergIvpOdeSolver.hpp
 TestSolvingStiffOdeSystems.hpp
 TestSolvingOdesTutorial.hpp
 TestHeun2IvpOdeSolver.hpp
+TestRungeKutta3IvpOdeSolver.hpp   

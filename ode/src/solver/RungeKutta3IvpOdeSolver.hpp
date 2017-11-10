@@ -34,6 +34,11 @@
  */
 
 
+/**
+ * Jessica Cervi and Raymond Spiteri
+ * University of Saskatchewan
+ * September 2016
+ */
 
 #ifndef _RUNGEKUTTA3IVPODESOLVER_HPP_
 #define _RUNGEKUTTA3IVPODESOLVER_HPP_

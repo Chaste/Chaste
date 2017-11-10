@@ -71,6 +71,7 @@ void RungeKutta3IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOd
     {
         k1[i] = timeStep*dy[i];
         yki[i] = rCurrentYValues[i] + 0.5*k1[i];
+
     }
     
     pAbstractOdeSystem->EvaluateYDerivatives(time+0.5*timeStep, yki, dy);

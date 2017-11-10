@@ -35,7 +35,7 @@
 
 
 /*
-Jessica Cervi and Raymind J. Spiteri
+Jessica Cervi and Raymond J. Spiteri
  University of Saskatchewan
  September 2016
  */
@@ -174,9 +174,9 @@ private:
     }
     
 public:
-    void TestRK3Solver()
+    void TestRungeKutta3Solver()
     {
-        RK3IvpOdeSolver solver;
+        RungeKutta3IvpOdeSolver solver;
         
         MyTestGenericSolver(solver, 0.0, 2.0, 0.001, 0.001);
         MyTestGenericSolver(solver, 1.0, 2.0, 0.001, 0.01);
@@ -199,7 +199,7 @@ public:
         double h_value2 = 0.00125;
         
         //RK3 solver solution worked out
-        RK3IvpOdeSolver solver1, solver2;
+        RungeKutta3IvpOdeSolver solver1, solver2;
         OdeSolution solutions1, solutions2;
         
         std::vector<double> state_variables1 = ode_system1.GetInitialConditions();
@@ -226,7 +226,7 @@ public:
         exact_solution[1] = sin(2.0)+cos(2.0);
         exact_solution[2] = 2*sin(2.0);
         
-        double order = 2;
+        double order = 3;
         
         //Test that the error is going down by a factor of 2^order
         double error1 = testvalue1[0] - exact_solution[0];
@@ -241,16 +241,16 @@ public:
         error2 = testvalue2[2] - exact_solution[2];
         TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
     }
-    
+
     
     //Test the order of the method by comparing two solutions using dt/2 for the second.
     void TestOrderOnMediumSystem()
     {
-        OdeSecondOrder ode_system1, ode_system2;
+        OdeThirdOrder ode_system1, ode_system2;
         
         double h_value1 = 0.02;
         double h_value2 = 0.01;
-        RK3IvpOdeSolver solver1, solver2;
+        RungeKutta3IvpOdeSolver solver1, solver2;
         OdeSolution solutions1,solutions2;
         
         std::vector<double> state_variables1 = ode_system1.GetInitialConditions();
@@ -266,10 +266,10 @@ public:
         unsigned last2 = solutions2.GetNumberOfTimeSteps();
         double testvalue2 = solutions2.rGetSolutions()[last2][0];
         
-        unsigned order = 2;
+        unsigned order = 3;
         
         //Test that the error is going down by a factor of 2^order
-        double exact_solution = sin(2.0);
+        double exact_solution = -sin(2.0);
         double error1 = testvalue1 - exact_solution;
         double error2 = testvalue2 - exact_solution;
         TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)order), 1.5e-1);
@@ -282,7 +282,7 @@ public:
         
         double h_value1 = 0.01;
         double h_value2 = 0.005;
-        RK3IvpOdeSolver solver1, solver2;
+        RungeKutta3IvpOdeSolver solver1, solver2;
         OdeSolution solutions1,solutions2;
         
         std::vector<double> state_variables1 = ode_system1.GetInitialConditions();
@@ -298,7 +298,7 @@ public:
         unsigned last2 = solutions2.GetNumberOfTimeSteps();
         double testvalue2 = solutions2.rGetSolutions()[last2][0];
         
-        unsigned order = 2;
+        unsigned order = 3;
         
         //Test that the error is going down by a factor of 2^order
         double exact_solution = -sin(2.0);
@@ -319,7 +319,7 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
             
             // Set up a solver
-            AbstractIvpOdeSolver* const p_RK3_ode_solver = new RK3IvpOdeSolver;
+            AbstractIvpOdeSolver* const p_RK3_ode_solver = new RungeKutta3IvpOdeSolver;
             
             // Should always archive a pointer
             output_arch << p_RK3_ode_solver;
