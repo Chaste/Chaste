@@ -36,15 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
 
-#petsc_ver = 3.3
-#petsc_path='/usr/local/Cellar/petsc/3.3-p5/'
-#petsc_build_name = ''
-#petsc_build_name_profile = ''
-#petsc_build_name_optimized = ''
-
-#changed here
-petsc_ver = 3.7
-petsc_path='/usr/local/Cellar/petsc/3.7.4_1'
+petsc_ver = 3.3
+petsc_path='/usr/local/Cellar/petsc/3.3-p5/'
 petsc_build_name = ''
 petsc_build_name_profile = ''
 petsc_build_name_optimized = ''
@@ -61,34 +54,29 @@ other_libraries = ['X11', 'boost_serialization-mt', 'boost_filesystem-mt', 'boos
 
 
 # Location of Apple's versions of BLAS and LAPACK: -framework vecLib
+ldflags='-framework vecLib'
 
-#changed here
-#ldflags='-framework vecLib'
-ldflags='-framework Accelerate'
 
 def Configure(prefs, build):
     """Set up the build configuring.
+        
+        prefs can specify which version of various libraries we should use, and which optional libraries.
+        
+        build is an instance of BuildTypes.BuildType.
+        """
     
-    prefs can specify which version of various libraries we should use, and which optional libraries.
-    
-    build is an instance of BuildTypes.BuildType.
-    """
-
     # VTK setup
     global use_vtk
     use_vtk = True
     if use_vtk:
-        #original version
-#        other_includepaths.append('/usr/local/include/vtk-5.10')
-#        other_libpaths.append('/usr/local/lib/vtk-5.10')
-        #my modification
-        other_includepaths.append('/usr/local/Cellar/vtk/7.0.0_1/include/vtk-7.0/')
-        other_libpaths.append('/usr/local/Cellar/vtk/7.0.0_1/lib/cmake')
-
-
+        other_includepaths.append('/usr/local/include/vtk-5.10')
+        other_libpaths.append('/usr/local/lib/vtk-5.10')
+        other_libraries.extend(['vtkFiltering', 'vtkIO', 'vtkCommon', 'vtksys', 'vtkzlib', 'vtkexpat', 'vtkGraphics'])
+    
     # CVODE setup
     global use_cvode
     use_cvode = True
     if use_cvode:
         DetermineCvodeVersion('/usr/local/include')
         other_libraries.extend(['sundials_cvode', 'sundials_nvecserial'])
+
