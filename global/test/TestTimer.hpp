@@ -63,7 +63,7 @@ public:
         double current_time = Timer::GetWallTime();
         // Note: on some systems this is seconds since the epoch, on others
         // it is seconds since last reboot!  So it might be quite small...
-        TS_ASSERT_LESS_THAN(10.0, current_time);
+        TS_ASSERT_LESS_THAN(0.1, current_time);
     }
 };
 
