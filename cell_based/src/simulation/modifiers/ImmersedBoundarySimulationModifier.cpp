@@ -34,14 +34,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImmersedBoundarySimulationModifier.hpp"
+
+#include "ChasteMakeUnique.hpp"
 #include "FluidSource.hpp"
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
-      mpMesh(NULL),
-      mpCellPopulation(NULL),
+      mpMesh(nullptr),
+      mpCellPopulation(nullptr),
       mNodeNeighbourUpdateFrequency(1u),
       mNumGridPtsX(0u),
       mNumGridPtsY(0u),
@@ -49,31 +51,13 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingY(0.0),
       mFftNorm(0.0),
       mAdditiveNormalNoise(false),
-      mNormalNoiseMean(1.0),
-      mNormalNoiseStdDev(0.0),
-      mpBoxCollection(NULL),
+      mNoiseStrength(0.0),
+      mpBoxCollection(nullptr),
       mReynoldsNumber(1e-4),
       mI(0.0, 1.0),
-      mpArrays(NULL),
-      mpFftInterface(NULL)
+      mpArrays(nullptr),
+      mpFftInterface(nullptr)
 {
-}
-
-template<unsigned DIM>
-ImmersedBoundarySimulationModifier<DIM>::~ImmersedBoundarySimulationModifier()
-{
-    if (mpBoxCollection)
-    {
-        delete(mpBoxCollection);
-    }
-    if (mpArrays)
-    {
-        delete(mpArrays);
-    }
-    if (mpFftInterface)
-    {
-        delete(mpFftInterface);
-    }
 }
 
 template<unsigned DIM>
@@ -125,7 +109,7 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractC
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    if (dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation) == NULL)
+    if (dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("Cell population must be immersed boundary");
     }
@@ -147,7 +131,13 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     domain_size(1) = 1.0;
     domain_size(2) = 0.0;
     domain_size(3) = 1.0;
-    mpBoxCollection = new ObsoleteBoxCollection<DIM>(mpCellPopulation->GetInteractionDistance(), domain_size, true, true);
+
+    mpBoxCollection = our::make_unique<ObsoleteBoxCollection<DIM>>(
+            mpCellPopulation->GetInteractionDistance(),
+            domain_size,
+            true,
+            true
+    );
     mpBoxCollection->SetupLocalBoxesHalfOnly();
     mpBoxCollection->CalculateNodePairs(mpMesh->rGetNodes(), mNodePairs);
 
@@ -156,12 +146,20 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     {
         case 2:
         {
-            mpArrays = new ImmersedBoundary2dArrays<DIM>(mpMesh, SimulationTime::Instance()->GetTimeStep(), mReynoldsNumber, mpCellPopulation->DoesPopulationHaveActiveSources());
-            mpFftInterface = new ImmersedBoundaryFftInterface<DIM>(mpMesh,
-                                                                   &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
-                                                                   &(mpArrays->rGetModifiableFourierGrids()[0][0][0]),
-                                                                   &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
-                                                                   mpCellPopulation->DoesPopulationHaveActiveSources());
+            mpArrays = our::make_unique<ImmersedBoundary2dArrays<DIM>>(
+                    mpMesh,
+                    SimulationTime::Instance()->GetTimeStep(),
+                    mReynoldsNumber,
+                    mpCellPopulation->DoesPopulationHaveActiveSources()
+            );
+
+            mpFftInterface = our::make_unique<ImmersedBoundaryFftInterface<DIM>>(
+                    mpMesh,
+                    &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
+                    &(mpArrays->rGetModifiableFourierGrids()[0][0][0]),
+                    &(mpMesh->rGetModifiable2dVelocityGrids()[0][0][0]),
+                    mpCellPopulation->DoesPopulationHaveActiveSources()
+            );
 
             mFftNorm = (double) mNumGridPtsX * (double) mNumGridPtsY;
             break;
@@ -220,21 +218,6 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForceContributi
          ++iter)
     {
         (*iter)->AddImmersedBoundaryForceContribution(mNodePairs, *mpCellPopulation);
-    }
-
-    // If noise is to be added to the forces, add it here, after all forces have been calculated.
-    if (mAdditiveNormalNoise)
-    {
-        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-        // Loop over each node, and apply a random normal factor to its force vector
-        for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpMesh->GetNodeIteratorBegin(false);
-             node_iter != mpMesh->GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            node_iter->rGetAppliedForce()[0] *= p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
-            node_iter->rGetAppliedForce()[1] *= p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
-        }
     }
 }
 
@@ -680,27 +663,15 @@ void ImmersedBoundarySimulationModifier<DIM>::SetAdditiveNormalNoise(bool additi
 }
 
 template <unsigned DIM>
-double ImmersedBoundarySimulationModifier<DIM>::GetNormalNoiseMean() const
+double ImmersedBoundarySimulationModifier<DIM>::GetNoiseStrength() const
 {
-    return mNormalNoiseMean;
+    return mNoiseStrength;
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetNormalNoiseMean(double normalNoiseMean)
+void ImmersedBoundarySimulationModifier<DIM>::SetNoiseStrength(double noiseStrength)
 {
-    mNormalNoiseMean = normalNoiseMean;
-}
-
-template <unsigned DIM>
-double ImmersedBoundarySimulationModifier<DIM>::GetNormalNoiseStdDev() const
-{
-    return mNormalNoiseStdDev;
-}
-
-template <unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetNormalNoiseStdDev(double normalNoiseStdDev)
-{
-    mNormalNoiseStdDev = normalNoiseStdDev;
+    mNoiseStrength = noiseStrength;
 }
 
 // Explicit instantiation

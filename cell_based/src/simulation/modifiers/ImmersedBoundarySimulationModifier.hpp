@@ -83,10 +83,10 @@ private:
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
     }
 
-    /** Pointer to the immersed boundary mesh */
+    /** Non-owning pointer to the immersed boundary mesh */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
-    /** Pointer to the immersed boundary cell population */
+    /** Non-owning pointer to the immersed boundary cell population */
     ImmersedBoundaryCellPopulation<DIM>* mpCellPopulation;
 
     /** How often we calculate which cells are neighbours */
@@ -115,17 +115,14 @@ private:
     /** Normalising constant needed for FFT */
     double mFftNorm;
 
-    /** Whether to apply multiplicative normal noise to the calculated force */
+    /** Whether to apply additive normal noise to the fluid force grids */
     bool mAdditiveNormalNoise;
 
-    /** The mean of the Normal distribution from which random noise variations are drawn */
-    double mNormalNoiseMean;
+    /** The strength of the normal noise to be added to the force grids */
+    double mNoiseStrength;
 
-    /** The standard deviation of the Normal distribution from which random noise variations are drawn */
-    double mNormalNoiseStdDev;
-
-    /** A box collection to efficiently keep track of node neighbours */
-    ObsoleteBoxCollection<DIM>* mpBoxCollection;
+    /** An owning pointer to a box collection for efficiently keeping track of node neighbours */
+    std::unique_ptr<ObsoleteBoxCollection<DIM>> mpBoxCollection;
 
     /** A vector of pairs of pointers to nodes, representing all possible node-node interactions */
     std::vector<std::pair<Node<DIM>*, Node<DIM>*> > mNodePairs;
@@ -146,11 +143,14 @@ private:
     /** A list of force laws to determine the force applied to each node */
     std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > > mForceCollection;
 
-    /** Pointer to structure storing all necessary arrays */
-    ImmersedBoundary2dArrays<DIM>* mpArrays;
+    /** An owning pointer to structure storing all necessary arrays */
+    std::unique_ptr<ImmersedBoundary2dArrays<DIM>> mpArrays;
 
-    ///\todo Document class member
-    ImmersedBoundaryFftInterface<DIM>* mpFftInterface;
+    /** An owning pointer to the interface that handles discrete Fourier transforms */
+    std::unique_ptr<ImmersedBoundaryFftInterface<DIM>> mpFftInterface;
+
+    /** An owning pointer to a uniform grid random field generator, for adding noise if required */
+    std::unique_ptr<UniformGridRandomFieldGenerator<DIM>> mpRandomField;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid
@@ -239,9 +239,9 @@ public:
     ImmersedBoundarySimulationModifier();
 
     /**
-     * Destructor.
+     * Default destructor.
      */
-    virtual ~ImmersedBoundarySimulationModifier();
+    virtual ~ImmersedBoundarySimulationModifier() = default;
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -302,20 +302,15 @@ public:
     /** @return mAdditiveNormalNoise */
     bool GetAdditiveNormalNoise() const;
 
-    /** @param additiveNormalNoise whether to include multiplicative normal noise */
+    /** @param additiveNormalNoise whether to include additive normal noise */
     void SetAdditiveNormalNoise(bool additiveNormalNoise);
 
-    /** @return mNormalNoiseMean */
-    double GetNormalNoiseMean() const;
+    /** @return mNoiseStrength */
+    double GetNoiseStrength() const;
 
-    /** @param normalNoiseMean the new value of mNormalNoiseMean */
-    void SetNormalNoiseMean(double normalNoiseMean);
+    /** @param noiseStrength the new value of mNoiseStrength */
+    void SetNoiseStrength(double noiseStrength);
 
-    /** @return mNormalNoiseStdDev */
-    double GetNormalNoiseStdDev() const;
-
-    /** @param normalNoiseStdDev the new value of mNormalNoiseStdDev */
-    void SetNormalNoiseStdDev(double normalNoiseStdDev);
 };
 
 #include "SerializationExportWrapper.hpp"
