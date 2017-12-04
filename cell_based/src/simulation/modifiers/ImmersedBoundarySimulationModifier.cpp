@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteMakeUnique.hpp"
 #include "FluidSource.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "Warnings.hpp"
 
 template<unsigned DIM>
 ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
@@ -52,11 +53,14 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mFftNorm(0.0),
       mAdditiveNormalNoise(false),
       mNoiseStrength(0.0),
+      mNoiseSkip(1u),
+      mNoiseLengthScale(0.1),
       mpBoxCollection(nullptr),
       mReynoldsNumber(1e-4),
       mI(0.0, 1.0),
       mpArrays(nullptr),
-      mpFftInterface(nullptr)
+      mpFftInterface(nullptr),
+      mpRandomField(nullptr)
 {
 }
 
@@ -96,6 +100,12 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractC
     this->ClearForcesAndSources();
     this->AddImmersedBoundaryForceContributions();
     this->PropagateForcesToFluidGrid();
+
+    // If random noise is required, add it to the force grids
+    if (mAdditiveNormalNoise)
+    {
+        this->AddNormalNoise();
+    }
 
     // If sources are active, we must propagate them from their nodes to the grid
     if (mpCellPopulation->DoesPopulationHaveActiveSources())
@@ -166,6 +176,48 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
         }
         default:
             NEVER_REACHED; // Not yet implemented in 3D
+    }
+
+    // Set up random noise, if required
+    if(mAdditiveNormalNoise)
+    {
+        std::array<double, DIM> lower_corner;
+        lower_corner.fill(0.0);
+
+        std::array<double, DIM> upper_corner;
+        upper_corner.fill(1.0);
+
+        std::array<unsigned, DIM> num_grid_pts;
+        num_grid_pts.fill(mNumGridPtsX / mNoiseSkip);
+
+        std::array<bool, DIM> periodicity;
+        periodicity.fill(true);
+
+        // Calculate about a quarter of the eigenvalues \todo: remove this magic number
+        const double total_gridpts = std::accumulate(num_grid_pts.begin(), num_grid_pts.end(), 1.0, std::multiplies<double>());
+        const unsigned num_eigenvals = 0.25 * total_gridpts;
+
+        // Warn at this point if parameters are not sensible
+        if (mNumGridPtsX % mNoiseSkip != 0)
+        {
+            WARNING("mNoiseSkip should perfectly divide mNumGridPtsX or adding forces will likely not work as expected.");
+        }
+        if (total_gridpts > 100.0 * 100.0)  // This is about the maximum that can be handled
+        {
+            WARNING("You probably have too many grid points for creating a random field.  Increase mNoiseSkip");
+        }
+
+        // Set up the random field generator and save it to cache
+        mpRandomField = our::make_unique<UniformGridRandomFieldGenerator<DIM>>(
+                lower_corner,
+                upper_corner,
+                num_grid_pts,
+                periodicity,
+                num_eigenvals,
+                mNoiseLengthScale
+        );
+
+        mpRandomField->SaveToCache();
     }
 }
 
@@ -638,6 +690,41 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForce(boost::sh
 }
 
 template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::AddNormalNoise() const noexcept
+{
+    auto& r_force_grids = mpArrays->rGetModifiableForceGrids();
+
+    // Add the noise
+    for (unsigned dim = 0; dim < r_force_grids.shape()[0]; dim++)
+    {
+        // Get an instance of the random field for the current dimension
+        std::vector<double> field = mpRandomField->SampleRandomField();
+
+        // Calculate the sum of the random field, which we must adjust to have a net-zero impact
+        const double adjustment = std::accumulate(field.begin(), field.end(), 0.0) / field.size();
+
+        for (unsigned x = 0, idx = 0; x < r_force_grids.shape()[1]; x += mNoiseSkip)
+        {
+            for (unsigned y = 0; y < r_force_grids.shape()[2]; y += mNoiseSkip, idx++)
+            {
+                // Value from the random grid at this location
+                const double val = mNoiseStrength * (field[idx] - adjustment);
+
+                // Fill in the mSkip x mSkip square of points
+                for (unsigned i = 0; i < mNoiseSkip; ++i)
+                {
+                    for (unsigned j = 0; j < mNoiseSkip; ++j)
+                    {
+                        r_force_grids[dim][x+i][y+j] += val;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetReynoldsNumber(double reynoldsNumber)
 {
     assert(reynoldsNumber > 0.0);
@@ -672,6 +759,30 @@ template <unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetNoiseStrength(double noiseStrength)
 {
     mNoiseStrength = noiseStrength;
+}
+
+template <unsigned DIM>
+unsigned ImmersedBoundarySimulationModifier<DIM>::GetNoiseSkip() const
+{
+    return mNoiseSkip;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetNoiseSkip(unsigned noiseSkip)
+{
+    mNoiseSkip = noiseSkip;
+}
+
+template <unsigned DIM>
+double ImmersedBoundarySimulationModifier<DIM>::GetNoiseLengthScale() const
+{
+    return mNoiseLengthScale;
+}
+
+template <unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetNoiseLengthScale(double noiseLengthScale)
+{
+    mNoiseLengthScale = noiseLengthScale;
 }
 
 // Explicit instantiation
