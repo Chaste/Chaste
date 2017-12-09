@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,22 +74,22 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
     // even rows, even columns
     matrix_slice<c_matrix<double, 2*ELEMENT_DIM+2, 2*ELEMENT_DIM+2> >
     slice00(ret, slice (0, 2, ELEMENT_DIM+1), slice (0, 2, ELEMENT_DIM+1));
-    slice00 = (Am*Cm*PdeSimulationTime::GetPdeTimeStepInverse())*basis_outer_prod + grad_phi_sigma_i_grad_phi;
+    slice00 = (Am*Cm*PdeSimulationTime::GetPdeTimeStepInverse())*basis_outer_prod + mAlpha*grad_phi_sigma_i_grad_phi;
 
     // odd rows, even columns
     matrix_slice<c_matrix<double, 2*ELEMENT_DIM+2, 2*ELEMENT_DIM+2> >
     slice10(ret, slice (1, 2, ELEMENT_DIM+1), slice (0, 2, ELEMENT_DIM+1));
-    slice10 = grad_phi_sigma_i_grad_phi;
+    slice10 = mBeta*grad_phi_sigma_i_grad_phi;
 
     // even rows, odd columns
     matrix_slice<c_matrix<double, 2*ELEMENT_DIM+2, 2*ELEMENT_DIM+2> >
     slice01(ret, slice (0, 2, ELEMENT_DIM+1), slice (1, 2, ELEMENT_DIM+1));
-    slice01 = grad_phi_sigma_i_grad_phi;
+    slice01 = mGamma*grad_phi_sigma_i_grad_phi;
 
     // odd rows, odd columns
     matrix_slice<c_matrix<double, 2*ELEMENT_DIM+2, 2*ELEMENT_DIM+2> >
     slice11(ret, slice (1, 2, ELEMENT_DIM+1), slice (1, 2, ELEMENT_DIM+1));
-    slice11 = grad_phi_sigma_i_grad_phi + grad_phi_sigma_e_grad_phi;
+    slice11 = mRho*(grad_phi_sigma_i_grad_phi + grad_phi_sigma_e_grad_phi);
 
     return ret;
 }
@@ -97,13 +97,72 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-            BidomainTissue<SPACE_DIM>* pTissue)
+            BidomainTissue<SPACE_DIM>* pTissue,
+            BidomainAssembler_helper::MatrixType matrixType)
     : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue)
 {
     assert(pTissue != NULL);
+    mpConfig = HeartConfig::Instance();
+    mMatrixType = matrixType;
+    //Dependent on the method being used for time discretization
+    switch (mMatrixType)
+    {
+      case BidomainAssembler_helper::BACKWARDEULER :
+
+	mAlpha = 1.0;
+	mBeta = 1.0;
+	mGamma = 1.0;
+	mRho = 1.0;
+	break;
+      case BidomainAssembler_helper::CRANKNICOLSON :
+	mAlpha = 0.5;
+	mBeta = 1.0;
+	mGamma = 1.0;
+	mRho = 2.0;
+	break;
+      case BidomainAssembler_helper::SDIRK :
+	mAlpha = (2.0-sqrt(2.0))/2.0;
+	mBeta = mAlpha;
+	mGamma = mAlpha;
+	mRho = mAlpha;
+	break;
+    case BidomainAssembler_helper::SDIRK2O3 :
+    mAlpha = (3.0-sqrt(3.0))/6.0;
+    mBeta = mAlpha;
+    mGamma = mAlpha;
+    mRho = mAlpha;
+    break;
+    case BidomainAssembler_helper::SDIRK3O4 :
+            mAlpha =(1.0+1.0/sqrt(3.0)*2*cos(3.1415/18.0))/2.0;
+            mBeta = mAlpha;
+            mGamma = mAlpha;
+            mRho = mAlpha;
+    break;
+    case BidomainAssembler_helper::DIRK3O3_stage1 :
+            mAlpha =1;
+            mBeta =1;
+            mGamma =1;
+            mRho =1;
+    break;
+    case BidomainAssembler_helper::DIRK3O3_stage2 :
+            mAlpha =5/12;
+            mBeta = mAlpha;
+            mGamma = mAlpha;
+            mRho = mAlpha;
+            break;
+    case BidomainAssembler_helper::DIRK3O3_stage3 :
+            mAlpha =1/4;
+            mBeta = mAlpha;
+            mGamma = mAlpha;
+            mRho = mAlpha;
+    break;
+    }
 }
 
-// Explicit instantiation
+///////////////////////////////////////////////////////
+// explicit instantiation
+///////////////////////////////////////////////////////
+
 template class BidomainAssembler<1,1>;
 template class BidomainAssembler<2,2>;
 template class BidomainAssembler<3,3>;

@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2016, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  that arises when the bidomain equations are discretised, and for assembling
  *  the contribution to the RHS vector that comes from a surface integral.
  *
- *  The discretised bidomain equation leads to the linear system (see FEM
- *  implementations document)
+ *  The discretised bidomain equation leads to the linear system for the default solver
+ *  (see FEM implementations document) 
  *
  *  [ (chi*C/dt) M + K1    K1   ] [ V^{n+1}   ]  =  [  (chi*C/dt) M V^{n} + M F^{n} + c1_surf ]
  *  [        K1            K2   ] [ PhiE^{n+1}]     [              c2_surf                    ]
@@ -58,18 +58,45 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  voltages and phi_e at time n, F^{n} the vector of (chi*Iionic + Istim) at each node,
  *  and c1_surf and c2_surf vectors arising from any surface stimuli (usually zero).
  *
- *  This assembler is used to assemble the LHS matrix, ie
+ *  Note: The LHS matrix and RHS vector are different for other solvers,
+ *  i.e., Backward Euler (Godunov), CN, and SDIRK2O2  
  *
- *  [ (chi*C/dt) M + K1    K1   ]
- *  [        K1            K2   ]
+ *  This assembler is used for assembling the coefficient matrix
+ *
+ *  [ (chi*C/dt) M + mAlpha*K1    mBeta*K1   ]
+ *  [        mGamma*K1            mRho*K2    ]
  *
  *  Hence, this class inherits from AbstractCardiacFeVolumeIntegralAssembler and implements the
  *  methods ComputeMatrixTerm()
+ * 
+ *  mAlpha=mBeta=mGamma=mRho=1.0 for Backward Euler (Godunov) method
+ *  mAlpha=0.5 mBeta=mGamma = 1.0 mRho=2.0 for CN method
+ *  mAlpha=mBeta=mGamma=mRho=(2.0-sqrt(2.0))/2.0 for SDIRK2O2 method
+ *  mAlpha = mBeta = mGamma = mRho = (3.0-sqrt(3.0)/6.0) for the sdirk2O3 method
  */
+
+
+  /**
+   * Enumeration determining which matrices to create.
+   */
+  namespace BidomainAssembler_helper
+  {
+      enum MatrixType{BACKWARDEULER, CRANKNICOLSON, SDIRK, SDIRK2O3,  DIRK3O3_stage1, DIRK3O3_stage2, DIRK3O3_stage3, SDIRK3O4};
+  }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class BidomainAssembler : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>
 {
 protected:
+    /** Local cache of the configuration singleton instance*/
+    HeartConfig* mpConfig;
+
+    /** The type of matrix that needs to be assembled, defaults to Backward Euler*/
+    BidomainAssembler_helper::MatrixType mMatrixType;
+
+    /** Factors for the matrix, dependent on which method is used*/
+    double mAlpha, mBeta, mGamma, mRho;
+
     /**
      * ComputeMatrixTerm()
      *
@@ -101,7 +128,8 @@ public:
      * @param pTissue pointer to the tissue
      */
     BidomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                      BidomainTissue<SPACE_DIM>* pTissue);
+                      BidomainTissue<SPACE_DIM>* pTissue,
+                      BidomainAssembler_helper::MatrixType matrixType = BidomainAssembler_helper::MatrixType());
 
     /**
      * Destructor.
