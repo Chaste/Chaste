@@ -698,7 +698,7 @@ void ImmersedBoundarySimulationModifier<DIM>::AddNormalNoise() const noexcept
     for (unsigned dim = 0; dim < r_force_grids.shape()[0]; dim++)
     {
         // Get an instance of the random field for the current dimension
-        std::vector<double> field = mpRandomField->SampleRandomField();
+        const std::vector<double> field = mpRandomField->SampleRandomField();
 
         // Calculate the sum of the random field, which we must adjust to have a net-zero impact
         const double adjustment = std::accumulate(field.begin(), field.end(), 0.0) / field.size();
