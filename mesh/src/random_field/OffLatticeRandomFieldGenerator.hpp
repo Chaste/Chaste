@@ -170,8 +170,9 @@ public:
      *
      * @param rNodes
      * @param proportionOfTrace
+     * @return the number of eigenvalues that will be calculated per update, after this tuning
      */
-    void TuneNumEigenvals(const std::vector<Node<SPACE_DIM>*>& rNodes, const double proportionOfTrace);
+    unsigned TuneNumEigenvals(const std::vector<Node<SPACE_DIM>*>& rNodes, const double proportionOfTrace);
 
     /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then

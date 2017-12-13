@@ -122,13 +122,13 @@ void OffLatticeRandomFieldGenerator<SPACE_DIM>::Update(const std::vector<Node<SP
 }
 
 template <unsigned SPACE_DIM>
-void OffLatticeRandomFieldGenerator<SPACE_DIM>::TuneNumEigenvals(
+unsigned OffLatticeRandomFieldGenerator<SPACE_DIM>::TuneNumEigenvals(
         const std::vector<Node<SPACE_DIM>*>& rNodes, const double proportionOfTrace)
 {
     // Special case of zero correlation length
     if (mLengthScale == 0.0)
     {
-        return;
+        return mNumEigenvals;
     }
 
     const unsigned most_eigenvals = rNodes.size() - 1;
@@ -171,13 +171,7 @@ void OffLatticeRandomFieldGenerator<SPACE_DIM>::TuneNumEigenvals(
         EXCEPTION("Something has gone wrong tuning mNumEigenvals.  Check 0 < proportionOfTrace < 1.");
     }
 
-    std::cout << "Random field generator: tuned to "
-              << mNumEigenvals
-              << " eigenvalues ("
-              << (100.0 * mNumEigenvals) / rNodes.size()
-              << "%) at "
-              << 100.0 * proportionOfTrace
-              << "% of trace.\n";
+    return mNumEigenvals;
 }
 
 template <unsigned SPACE_DIM>
