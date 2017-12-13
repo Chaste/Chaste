@@ -100,6 +100,9 @@ private:
     /** Store the calculated grid spacings to avoid recalculation during interpolation */
     std::array<double, SPACE_DIM> mGridSpacing;
 
+    /** The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached random fields will be saved */
+    const std::string mCacheDir;
+
     /**
      * Archive the member variables.
      *

@@ -75,18 +75,8 @@ public:
             }
         }
 
-
-
         // Tidy up
         results_file->close();
-
-    }
-
-    void TestGetFilenameFromParams()
-    {
-//        UniformGridRandomFieldGenerator<2> gen;
-//
-//        PRINT_VARIABLE(gen.GetFilenameFromParams());
     }
 };
 

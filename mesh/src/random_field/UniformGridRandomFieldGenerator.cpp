@@ -37,15 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iomanip>
 #include <fstream>
-
 #include <numeric>
+
 // Spectra includes (for the eigenvalue and eigenvector calculations)
 #include <SymEigsSolver.h>
-
 #include <MatOp/SparseGenMatProd.h>
+
 #include "Exception.hpp"
 #include "FileFinder.hpp"
 #include "Node.hpp"
+#include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
@@ -63,7 +64,8 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
           mNumGridPts(numGridPts),
           mPeriodicity(periodicity),
           mNumEigenvals(numEigenvals),
-          mLengthScale(lengthScale)
+          mLengthScale(lengthScale),
+          mCacheDir("CachedRandomFields/")
 {
     // Calculate the total number of grid points
     mNumTotalGridPts = std::accumulate(mNumGridPts.begin(), mNumGridPts.end(), 1u, std::multiplies<unsigned>());
@@ -88,7 +90,7 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
     }
 
     // Check if there's a cached random field matching these parameters
-    FileFinder cached_version_file(GetFilenameFromParams(), RelativeTo::ChasteTestOutput);
+    FileFinder cached_version_file(mCacheDir + GetFilenameFromParams(), RelativeTo::ChasteTestOutput);
 
     if (cached_version_file.Exists())
     {
@@ -245,7 +247,7 @@ template <unsigned SPACE_DIM>
 std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() const noexcept
 {
     std::stringstream name;
-    name << std::fixed << std::setprecision(3) << "CachedRandomFields/";
+    name << std::fixed << std::setprecision(3);
 
     switch(SPACE_DIM)
     {
@@ -352,13 +354,13 @@ template <unsigned SPACE_DIM>
 void UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache()
 {
     // Get the absolute file path to the cached file, given the current parameters
-    FileFinder cached_version_file(GetFilenameFromParams(), RelativeTo::ChasteTestOutput);
+    FileFinder cached_version_file(mCacheDir + GetFilenameFromParams(), RelativeTo::ChasteTestOutput);
 
     // If the cache does not exist, create it
     if (not cached_version_file.Exists())
     {
-        std::ofstream output_file(cached_version_file.GetAbsolutePath(), std::ios::out | std::ios::binary);
-        EXCEPT_IF_NOT(output_file.is_open());
+        OutputFileHandler results_handler(mCacheDir, false);
+        auto results_file = results_handler.OpenOutputFile(GetFilenameFromParams(), std::ios::out | std::ios::binary);
 
         // Generate the header struct
         RandomFieldCacheHeader<SPACE_DIM> header;
@@ -370,10 +372,10 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache()
         header.mLengthScale = mLengthScale;
 
         // Write the information to file
-        output_file.write((char *) &header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
-        output_file.write((char *) mEigenvals.data(), mEigenvals.size() * sizeof(double));
-        output_file.write((char *) mEigenvecs.data(), mEigenvecs.size() * sizeof(double));
-        output_file.close();
+        results_file->write((char *) &header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
+        results_file->write((char *) mEigenvals.data(), mEigenvals.size() * sizeof(double));
+        results_file->write((char *) mEigenvecs.data(), mEigenvecs.size() * sizeof(double));
+        results_file->close();
     }
 }
 
