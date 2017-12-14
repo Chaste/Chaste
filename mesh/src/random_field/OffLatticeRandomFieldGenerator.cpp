@@ -117,7 +117,12 @@ void OffLatticeRandomFieldGenerator<SPACE_DIM>::Update(const std::vector<Node<SP
         EXCEPTION("Spectra decomposition not completed successfully.");
     }
 
-    mSqrtEigenvals = eigs.eigenvalues().array().sqrt();
+    /*
+     * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen due to
+     * rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we don't mind
+     * the slight error.
+     */
+    mSqrtEigenvals = eigs.eigenvalues().array().max(0.0).sqrt();
     mEigenvecs = eigs.eigenvectors();
 }
 
@@ -151,7 +156,8 @@ unsigned OffLatticeRandomFieldGenerator<SPACE_DIM>::TuneNumEigenvals(
     // The trace of the covariance matrix, which is also the sum of the eigenvalues, is just 1 * rNodes.size()
     const double trace_threshold = proportionOfTrace * rNodes.size();
 
-    mNumEigenvals = UINT_MAX;
+    // This is the maximum number that can be calculated using the Spectra solver
+    mNumEigenvals = rNodes.size() - 1;
 
     const Eigen::ArrayXd& e_vals = eigs.eigenvalues().array();
     double cumulative_sum = 0.0;
@@ -159,16 +165,11 @@ unsigned OffLatticeRandomFieldGenerator<SPACE_DIM>::TuneNumEigenvals(
     {
         cumulative_sum += e_vals.coeffRef(e_val_idx);
 
-        if (cumulative_sum > trace_threshold)
+        if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
         {
             mNumEigenvals = e_val_idx + 1;
             break;
         }
-    }
-
-    if (mNumEigenvals + 1 > rNodes.size())
-    {
-        EXCEPTION("Something has gone wrong tuning mNumEigenvals.  Check 0 < proportionOfTrace < 1.");
     }
 
     return mNumEigenvals;
