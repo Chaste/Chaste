@@ -309,7 +309,7 @@ public:
     {
         OutputFileHandler handler("archive",false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("ode_solver.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("rkc21_ode_solver.arch");
 
         // Archive
         {
