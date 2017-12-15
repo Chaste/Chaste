@@ -416,7 +416,7 @@ public:
         // Where to archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("factory.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("factory.arch");
 
         // Archive
         {

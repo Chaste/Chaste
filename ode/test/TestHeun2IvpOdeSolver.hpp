@@ -393,7 +393,7 @@ public:
     {
         OutputFileHandler handler("archive",false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("heun_ode_solver.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("heun_ode_solver.arch");
 
         // Archive
         {

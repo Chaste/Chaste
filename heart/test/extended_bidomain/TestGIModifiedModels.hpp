@@ -188,7 +188,7 @@ public:
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("GI.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("GI.arch");
 
         // Save
         {

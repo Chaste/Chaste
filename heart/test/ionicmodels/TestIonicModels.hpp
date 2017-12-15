@@ -1068,7 +1068,7 @@ public:
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("lr91.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("lr91.arch");
 
         // Save
         {
@@ -1138,7 +1138,7 @@ public:
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("Maleckar.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("Maleckar.arch");
 
         // Save
         {
@@ -1194,7 +1194,7 @@ public:
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("backward_cells.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("backward_cells.arch");
 
         double time_step = 0.01;
 
@@ -1312,7 +1312,7 @@ public:
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("noble98.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("noble98.arch");
 
         // Save
         {

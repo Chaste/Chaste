@@ -467,7 +467,7 @@ public:
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("lr91_cvode.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("lr91_cvode.arch");
 
         const double magnitude_stimulus = -3;  // uA/cm2
         const double duration_stimulus = 3;  // ms
