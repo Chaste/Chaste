@@ -209,6 +209,11 @@ public:
     Node<SPACE_DIM>* GetNode(unsigned index) const;
 
     /**
+     * @return reference to the nodes vector
+     */
+    const std::vector<Node<SPACE_DIM>*>& rGetNodes() const;
+
+    /**
      * Get the node with a given index in the mesh (synonym of GetNode() unless overridden in a distributed mesh).
      *
      * @param index the global index of the node

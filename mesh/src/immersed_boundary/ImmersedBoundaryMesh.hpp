@@ -352,11 +352,6 @@ public:
     multi_array<double, 4>& rGetModifiable3dVelocityGrids();
 
     /**
-     * @return reference to the vector of nodes
-     */
-    std::vector<Node<SPACE_DIM>*>& rGetNodes();
-
-    /**
      * @param the new number of fluid mesh points in the x direction.
      */
     void SetNumGridPtsX(unsigned mesh_points_x);

@@ -635,12 +635,6 @@ multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifi
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<Node<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes()
-{
-    return AbstractMesh<ELEMENT_DIM, SPACE_DIM>::mNodes;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
 {
     // This code currently assumes the grid is precisely [0,1)x[0,1)
