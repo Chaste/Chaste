@@ -70,13 +70,13 @@ public:
         const std::array<bool, 2> periodicity = {{false, false}};
 
         // Define the number of eigenvalues to calculate
-        const unsigned num_evals = 100u;
+        const double trace_proportion = 0.8;
 
         // Define the correlation length for the noise in the random field
         const double length_scale = 0.5;
 
         // Generate and cache the random field
-        UniformGridRandomFieldGenerator<2> gen(lower_corner, upper_corner, num_grid_pts, periodicity, num_evals, length_scale);
+        UniformGridRandomFieldGenerator<2> gen(lower_corner, upper_corner, num_grid_pts, periodicity, trace_proportion, length_scale);
         gen.SaveToCache();
     }
 };

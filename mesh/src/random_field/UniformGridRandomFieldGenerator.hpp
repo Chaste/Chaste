@@ -54,8 +54,9 @@ struct RandomFieldCacheHeader
     std::array<double, SPACE_DIM> mUpperCorner;
     std::array<unsigned, SPACE_DIM> mNumGridPts;
     std::array<bool, SPACE_DIM> mPeriodicity;
-    unsigned mNumEigenvals;
+    double mTraceProportion;
     double mLengthScale;
+    unsigned mNumEigenvals;
 };
 
 /**
@@ -82,17 +83,14 @@ private:
     /** Whether the grid is periodic in each dimension */
     std::array<bool, SPACE_DIM> mPeriodicity;
 
-    /** Number of eigenvalues to calculate in the matrix decomposition */
-    unsigned mNumEigenvals;
+    /** Proportion of the trace that the sum of N calculated eigenvalues must exceed */
+    double mTraceProportion;
 
     /** Length scale over which the noise is to be correlated */
     double mLengthScale;
 
-    /** Vector storing the eigenvalues of the covariance matrix */
-    Eigen::VectorXd mEigenvals;
-
     /** Matrix storing the eigenvectors of the covariance matrix */
-    Eigen::MatrixXd mEigenvecs;
+    Eigen::MatrixXd mScaledEigenvecs;
 
     /** The product of mNumGridPts; the total number of grid points in the cuboid */
     unsigned mNumTotalGridPts;
@@ -102,6 +100,9 @@ private:
 
     /** The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached random fields will be saved */
     const std::string mCacheDir;
+
+    /** Number of eigenvalues calculated, such that their sum minimally exceeds mTraceProportion * mNumTotalGridPts */
+    unsigned mNumEigenvals;
 
     /**
      * Archive the member variables.
@@ -117,20 +118,20 @@ private:
         archive & mUpperCorner;
         archive & mNumGridPts;
         archive & mPeriodicity;
-        archive & mNumEigenvals;
+        archive & mTraceProportion;
         archive & mLengthScale;
     }
 
     /**
      * Helper method for the constructor that takes parameters as arguments.
      *
-     * This is the main workhorse of this class.  Fills in mEigenvals and mEigenvecs given the parameters passed to the
+     * This is the main workhorse of this class.  Fills in mScaledEigenvecs given the parameters passed to the
      * constructor, in the case where there is no cache saved to file.
      *
      * This method will throw if the Spectra eigen decomposition is unsuccessful.
      *
 
-     *  * Uses the Spectra routines to calculate the first mEigenvals eigenvalues and eigenvectors of this matrix
+     * Uses the Spectra routines to calculate the first N eigenvalues and eigenvectors of this matrix
      */
     void CalculateEigenDecomposition();
 
@@ -170,8 +171,7 @@ private:
      * The cache format is as follows:
      *
      * 1x RandomFieldCacheHeader (which is sizeof(RandomFieldCacheHeader<SPACE_DIM>) chars)
-     * mEigenvals vector (which is mNumEigenvals * sizeof(double) chars)
-     * mEigenvecs matrix (which is total_grid_pts * mNumEigenvals * sizeof(double) chars
+     * mScaledEigenvecs matrix (which is total_grid_pts * mNumEigenvals * sizeof(double) chars
      *
      * @param absoluteFilePath the absolute file path of the cached random field
      */
@@ -190,14 +190,14 @@ public:
      * @param upperCorner the upper corner of the rectangular grid
      * @param numGridPts the number of grid points in each dimension
      * @param periodicity whether the grid is periodic in each dimension
-     * @param numEigenvals the number of eigenvalues to calculate
+     * @param traceProportion that the sum of N calculated eigenvalues must exceed
      * @param lengthScale the length scale of the correlation when calculating the covariance matrix
      */
     UniformGridRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
                                     std::array<double, SPACE_DIM> upperCorner,
                                     std::array<unsigned, SPACE_DIM> numGridPts,
                                     std::array<bool, SPACE_DIM> periodicity,
-                                    unsigned numEigenvals,
+                                    double traceProportion,
                                     double lengthScale);
 
     /**
@@ -206,7 +206,7 @@ public:
      *
      * @param filename the file name, relative to $CHASTE_TEST_OUTPUT
      */
-    UniformGridRandomFieldGenerator(const std::string filename);
+    explicit UniformGridRandomFieldGenerator(const std::string filename);
 
     /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
@@ -235,8 +235,7 @@ public:
      * The cache format is as follows:
      *
      * 1x RandomFieldCacheHeader (which is sizeof(RandomFieldCacheHeader<SPACE_DIM>) chars)
-     * mEigenvals vector (which is mNumEigenvals * sizeof(double) chars)
-     * mEigenvecs matrix (which is total_grid_pts * mNumEigenvals * sizeof(double) chars
+     * mScaledEigenvecs matrix (which is total_grid_pts * mNumEigenvals * sizeof(double) chars
      */
     void SaveToCache();
 

@@ -55,7 +55,7 @@ public:
     {
         const unsigned n = 12u;
 
-        UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 100, 0.03);
+        UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 0.8, 0.03);
         gen.SaveToCache();
 
         OutputFileHandler results_handler(".", false);

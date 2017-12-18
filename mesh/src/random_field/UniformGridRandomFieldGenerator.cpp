@@ -57,13 +57,13 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
                                                                             std::array<double, SPACE_DIM> upperCorner,
                                                                             std::array<unsigned, SPACE_DIM> numGridPts,
                                                                             std::array<bool, SPACE_DIM> periodicity,
-                                                                            unsigned numEigenvals,
+                                                                            double traceProportion,
                                                                             double lengthScale)
         : mLowerCorner(lowerCorner),
           mUpperCorner(upperCorner),
           mNumGridPts(numGridPts),
           mPeriodicity(periodicity),
-          mNumEigenvals(numEigenvals),
+          mTraceProportion(traceProportion),
           mLengthScale(lengthScale),
           mCacheDir("CachedRandomFields/")
 {
@@ -78,8 +78,8 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
             assert(mNumGridPts[dim] > 0);
         }
 
-        assert(mNumEigenvals > 0);
-        assert(mNumEigenvals < mNumTotalGridPts);
+        assert(mTraceProportion > 0.0);
+        assert(mTraceProportion < 1.0);
         assert(mLengthScale > 0.0);
     }
 
@@ -107,7 +107,11 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(cons
 {
     // First check the cached random field exists
     FileFinder cached_version_file(filename, RelativeTo::ChasteTestOutput);
-    EXCEPT_IF_NOT(cached_version_file.Exists());
+
+    if (!cached_version_file.Exists())
+    {
+        EXCEPTION("Cached random field " + cached_version_file.GetAbsolutePath() + " does not exist." );
+    }
 
     LoadFromCache(cached_version_file.GetAbsolutePath());
 }
@@ -117,17 +121,47 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
 {
     Eigen::SparseMatrix<double> cov_matrix = CalculateCovarianceMatrix();
 
+    // Calculate all (but one, due to the Spectra algorithm) of the eigenvalues
     Spectra::SparseGenMatProd<double> op(cov_matrix);
     Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
-            &op, mNumEigenvals, std::min(2 * mNumEigenvals, mNumTotalGridPts));
+            &op, mNumTotalGridPts - 1, mNumTotalGridPts);
 
     eigs.init();
     eigs.compute();
 
-    EXCEPT_IF_NOT(eigs.info() == Spectra::SUCCESSFUL);
+    if (eigs.info() != Spectra::SUCCESSFUL)
+    {
+        EXCEPTION("Spectra decomposition was not successful.");
+    }
 
-    mEigenvals = eigs.eigenvalues();
-    mEigenvecs = eigs.eigenvectors();
+    /*
+     * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen due to
+     * rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we don't mind
+     * the slight error.
+     */
+    const Eigen::ArrayXd& sqrt_evals = eigs.eigenvalues().array().max(0.0).sqrt();
+
+    // Decide how many eigenvalues to keep
+    const double trace_threshold = mTraceProportion * mNumTotalGridPts;
+    double cumulative_sum = 0.0;
+    mNumEigenvals = mNumTotalGridPts - 1;
+    for (unsigned e_val_idx = 0; e_val_idx < sqrt_evals.size(); ++e_val_idx)
+    {
+        cumulative_sum += sqrt_evals.coeffRef(e_val_idx);
+
+        if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
+        {
+            mNumEigenvals = e_val_idx + 1;
+            break;
+        }
+    }
+
+    // Store only those eigenvectors that we need
+    mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
+    for (unsigned e_val = 0; e_val < mNumEigenvals; ++e_val)
+    {
+        mScaledEigenvecs.col(e_val) = sqrt_evals.coeffRef(e_val) * eigs.eigenvectors().col(e_val);
+    }
 }
 
 template <unsigned SPACE_DIM>
@@ -190,7 +224,7 @@ Eigen::SparseMatrix<double> UniformGridRandomFieldGenerator<SPACE_DIM>::Calculat
 
     // Create vector of eigen triplets representing the pairwise covariance using the Gaussian covariance function
     const double length_squared = mLengthScale * mLengthScale;
-    const double tol_cov = -std::log(1e-12);  // \todo: remove this magic number
+    const double tol_cov = -std::log(1e-15);  // \todo: remove this magic number
     std::vector<Eigen::Triplet<double>> triplets;
     for (unsigned x = 0; x < mNumTotalGridPts; ++x)
     {
@@ -258,7 +292,7 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
                  << mUpperCorner[0] << "_"
                  << mNumGridPts[0] << "_"
                  << mPeriodicity[0] << "_"
-                 << mNumEigenvals << "_"
+                 << mTraceProportion << "_"
                  << mLengthScale;
             break;
         }
@@ -269,7 +303,7 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
                  << mUpperCorner[0] << "_" << mUpperCorner[1] << "_"
                  << mNumGridPts[0] << "_" << mNumGridPts[1] << "_"
                  << mPeriodicity[0] << "_" << mPeriodicity[1] << "_"
-                 << mNumEigenvals << "_"
+                 << mTraceProportion << "_"
                  << mLengthScale;
             break;
         }
@@ -280,7 +314,7 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
                  << mUpperCorner[0] << "_" << mUpperCorner[1] << "_" << mUpperCorner[2] << "_"
                  << mNumGridPts[0] << "_" << mNumGridPts[1] << "_" << mNumGridPts[2] << "_"
                  << mPeriodicity[0] << "_" << mPeriodicity[1] << "_" << mPeriodicity[2] << "_"
-                 << mNumEigenvals << "_"
+                 << mTraceProportion << "_"
                  << mLengthScale;
             break;
         }
@@ -296,24 +330,26 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
 template <unsigned SPACE_DIM>
 void UniformGridRandomFieldGenerator<SPACE_DIM>::LoadFromCache(const std::string& absoluteFilePath)
 {
-    RandomFieldCacheHeader<SPACE_DIM> header;
-
     std::ifstream input_file(absoluteFilePath, std::ios::in | std::ios::binary);
-    EXCEPT_IF_NOT(input_file.is_open());
+    if (!input_file.is_open())
+    {
+        EXCEPTION("File " + absoluteFilePath + " did not open successfully.");
+    }
 
     // Read the header, and populate class parameters
-    input_file.read((char*) &header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
+    RandomFieldCacheHeader<SPACE_DIM> header;
+    input_file.read((char*)& header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
     mLowerCorner = header.mLowerCorner;
     mUpperCorner = header.mUpperCorner;
     mNumGridPts = header.mNumGridPts;
     mPeriodicity = header.mPeriodicity;
-    mNumEigenvals = header.mNumEigenvals;
+    mTraceProportion = header.mTraceProportion;
     mLengthScale = header.mLengthScale;
+    mNumEigenvals = header.mNumEigenvals;
 
     // Calculate how many grid points there are in total, and resize the eigen data arrays accordingly
     mNumTotalGridPts = std::accumulate(mNumGridPts.begin(), mNumGridPts.end(), 1u, std::multiplies<unsigned>());
-    mEigenvals.resize(mNumEigenvals);
-    mEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
+    mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
 
     // Calculate the remaining unknown: the grid spacing in each dimension, needed for interpolation
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
@@ -321,9 +357,8 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::LoadFromCache(const std::string
         mGridSpacing[dim] = (mUpperCorner[dim] - mLowerCorner[dim]) / mNumGridPts[dim];
     }
 
-    // Read the eigenvalues and eigenvectors into their respective data arrays
-    input_file.read((char*) mEigenvals.data(), mNumEigenvals * sizeof(double));
-    input_file.read((char*) mEigenvecs.data(), mNumTotalGridPts * mNumEigenvals * sizeof(double));
+    // Read the scaled eigenvectors into their respective data arrays
+    input_file.read((char*) mScaledEigenvecs.data(), mNumTotalGridPts * mNumEigenvals * sizeof(double));
 
     input_file.close();
 }
@@ -341,9 +376,9 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
     // Generate the instance of the random field
     Eigen::VectorXd grf(mNumTotalGridPts);
     grf.setZero();
-    for (unsigned j = 0; j < mNumEigenvals; ++j)
+    for (unsigned j = 0; j < mScaledEigenvecs.cols(); ++j)
     {
-        grf += samples_from_n01[j] * std::sqrt(mEigenvals(j)) * mEigenvecs.col(j);
+        grf += samples_from_n01[j] * mScaledEigenvecs.col(j);
     }
 
     // Translate to a std::vector so that eigen objects aren't leaking out to other places in Chaste
@@ -368,13 +403,13 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache()
         header.mUpperCorner = mUpperCorner;
         header.mNumGridPts = mNumGridPts;
         header.mPeriodicity = mPeriodicity;
-        header.mNumEigenvals = mNumEigenvals;
+        header.mTraceProportion = mTraceProportion;
         header.mLengthScale = mLengthScale;
+        header.mNumEigenvals = mNumEigenvals;
 
         // Write the information to file
         results_file->write((char *) &header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
-        results_file->write((char *) mEigenvals.data(), mEigenvals.size() * sizeof(double));
-        results_file->write((char *) mEigenvecs.data(), mEigenvecs.size() * sizeof(double));
+        results_file->write((char *) mScaledEigenvecs.data(), mScaledEigenvecs.size() * sizeof(double));
         results_file->close();
     }
 }

@@ -67,13 +67,13 @@ public:
         const std::array<bool, 2> periodicity = {{false, false}};
 
         // Calculate most of the eigenvalues
-        const unsigned num_evals = 100u;
+        const double trace_proportion = 0.8;
 
         // Fairly large lengthscale compared to the domain size
         const double length_scale = 0.5;
 
         // Generate and cache the random field
-        UniformGridRandomFieldGenerator<2> gen(lower_corner, upper_corner, num_grid_pts, periodicity, num_evals, length_scale);
+        UniformGridRandomFieldGenerator<2> gen(lower_corner, upper_corner, num_grid_pts, periodicity, trace_proportion, length_scale);
         gen.SaveToCache();
     }
 
@@ -89,7 +89,7 @@ public:
     void TestOuputSamplesToFile()
     {
         // Change this vaiable to your cached random field (relative to $CHASTE_TEST_OUTPUT)
-        const std::string file_path = "CachedRandomFields/xy_0.000_1.000_2.000_5.000_10_12_0_0_100_0.500.rfg";
+        const std::string file_path = "CachedRandomFields/xy_0.000_1.000_2.000_5.000_10_12_0_0_0.800_0.500.rfg";
 
         // Change this variable to the number of instances of the random field you want to sample
         const unsigned num_fields_to_sample = 100u;
