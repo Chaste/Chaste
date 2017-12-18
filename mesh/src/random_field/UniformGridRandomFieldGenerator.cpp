@@ -386,10 +386,11 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 }
 
 template <unsigned SPACE_DIM>
-void UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache()
+const std::string UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache() const
 {
     // Get the absolute file path to the cached file, given the current parameters
-    FileFinder cached_version_file(mCacheDir + GetFilenameFromParams(), RelativeTo::ChasteTestOutput);
+    const std::string file_relative_to_output = mCacheDir + GetFilenameFromParams();
+    FileFinder cached_version_file(file_relative_to_output, RelativeTo::ChasteTestOutput);
 
     // If the cache does not exist, create it
     if (not cached_version_file.Exists())
@@ -412,6 +413,8 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache()
         results_file->write((char *) mScaledEigenvecs.data(), mScaledEigenvecs.size() * sizeof(double));
         results_file->close();
     }
+
+    return file_relative_to_output;
 }
 
 template <unsigned SPACE_DIM>

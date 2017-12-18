@@ -236,9 +236,10 @@ public:
      *
      * 1x RandomFieldCacheHeader (which is sizeof(RandomFieldCacheHeader<SPACE_DIM>) chars)
      * mScaledEigenvecs matrix (which is total_grid_pts * mNumEigenvals * sizeof(double) chars
+     *
+     * @return the file name of the cached file, relative to $CHASTE_TEST_OUTPUT
      */
-    void SaveToCache();
-
+    const std::string SaveToCache() const;
 };
 
 
