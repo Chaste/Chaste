@@ -631,8 +631,8 @@ const c_vector<double, 2 * DIM>& ObsoleteBoxCollection<DIM>::rGetDomainSize() co
 }
 
 template<unsigned DIM>
-void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
-                                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void ObsoleteBoxCollection<DIM>::CalculateNodePairs(const std::vector<Node<DIM>*>& rNodes,
+                                                    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
 
