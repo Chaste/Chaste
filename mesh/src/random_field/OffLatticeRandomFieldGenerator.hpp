@@ -84,6 +84,9 @@ private:
     /** An owning pointer to a box collection for efficiently keeping track of nearby nodes */
     std::unique_ptr<ObsoleteBoxCollection<SPACE_DIM>> mpBoxCollection;
 
+    /** The number of nodes passed in at the most recent Update() */
+    unsigned mNumNodesAtLastUpdate;
+
     /**
      * Archive the member variables.
      *

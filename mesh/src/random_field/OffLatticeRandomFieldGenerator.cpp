@@ -97,6 +97,9 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::a
 template <unsigned SPACE_DIM>
 void OffLatticeRandomFieldGenerator<SPACE_DIM>::Update(const std::vector<Node<SPACE_DIM>*>& rNodes)
 {
+    // Update the number of nodes, which is useful particularly in the special case of mLengthScale == 0.0
+    mNumNodesAtLastUpdate = rNodes.size();
+
     // Special case of zero correlation length
     if (mLengthScale == 0.0)
     {
@@ -260,7 +263,7 @@ template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
 {
     // Generate a normally-distributed random number for each node in the mesh
-    std::vector<double> samples_from_n01(mEigenvecs.rows());
+    std::vector<double> samples_from_n01(mNumNodesAtLastUpdate);
     for (auto& sample : samples_from_n01)
     {
         sample = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
@@ -273,7 +276,7 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     }
 
     // Generate the instance of the random field
-    Eigen::VectorXd grf = Eigen::VectorXd::Zero(mEigenvecs.rows());
+    Eigen::VectorXd grf = Eigen::VectorXd::Zero(mNumNodesAtLastUpdate);
     for (unsigned j = 0; j < mEigenvecs.cols(); ++j)
     {
         const double factor = samples_from_n01[j] * mSqrtEigenvals.coeffRef(j);
