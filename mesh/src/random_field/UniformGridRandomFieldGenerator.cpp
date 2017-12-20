@@ -121,47 +121,69 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
 {
     Eigen::SparseMatrix<double> cov_matrix = CalculateCovarianceMatrix();
 
-    // Calculate all (but one, due to the Spectra algorithm) of the eigenvalues
-    Spectra::SparseGenMatProd<double> op(cov_matrix);
-    Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
-            &op, mNumTotalGridPts - 1, mNumTotalGridPts);
-
-    eigs.init();
-    eigs.compute();
-
-    if (eigs.info() != Spectra::SUCCESSFUL)
-    {
-        EXCEPTION("Spectra decomposition was not successful.");
-    }
-
-    /*
-     * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen due to
-     * rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we don't mind
-     * the slight error.
-     */
-    const Eigen::ArrayXd& sqrt_evals = eigs.eigenvalues().array().max(0.0).sqrt();
-
-    // Decide how many eigenvalues to keep
+    // mTraceProportion * mNumTotalGridPts is an upper bound for the number of eigenvalues to calculate
     const double trace_threshold = mTraceProportion * mNumTotalGridPts;
-    double cumulative_sum = 0.0;
-    mNumEigenvals = mNumTotalGridPts - 1;
-    for (unsigned e_val_idx = 0; e_val_idx < sqrt_evals.size(); ++e_val_idx)
-    {
-        cumulative_sum += sqrt_evals.coeffRef(e_val_idx);
 
-        if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
+    // Calculate incremental proportions of the eigenvalues
+    // \todo: refine how this is done. There should be a way to provide a good residual vec from previous calculation
+    for (const double& proportion : {0.2, 0.4, 0.6, 0.8, 1.0})
+    {
+        MARK;
+        const long num_evals_to_compute = std::lround(proportion * trace_threshold);
+
+        Spectra::SparseGenMatProd<double> op(cov_matrix);
+        Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
+                &op, num_evals_to_compute, mNumTotalGridPts);
+
+        eigs.init();
+        eigs.compute();
+
+        if (eigs.info() != Spectra::SUCCESSFUL)
         {
-            mNumEigenvals = e_val_idx + 1;
-            break;
+            EXCEPTION("Spectra decomposition was not successful.");
         }
-    }
 
-    // Store only those eigenvectors that we need
-    mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
-    for (unsigned e_val = 0; e_val < mNumEigenvals; ++e_val)
-    {
-        mScaledEigenvecs.col(e_val) = sqrt_evals.coeffRef(e_val) * eigs.eigenvectors().col(e_val);
+        PRINT_2_VARIABLES(eigs.eigenvalues().array().sum(), trace_threshold);
+
+        // Go straight back to the top of the loop at this point if we didn't calculate enough eigenvalues
+        if (eigs.eigenvalues().array().sum() < trace_threshold)
+        {
+            continue;
+        }
+
+        /*
+         * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen
+         * due to rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we
+         * don't mind the slight error.
+         */
+        const Eigen::ArrayXd& evals = eigs.eigenvalues().array().max(0.0);
+        MARK;
+        // Decide how many eigenvalues to keep
+        double cumulative_sum = 0.0;
+        mNumEigenvals = num_evals_to_compute;
+        for (unsigned e_val_idx = 0; e_val_idx < evals.size(); ++e_val_idx)
+        {
+            cumulative_sum += evals.coeffRef(e_val_idx);
+
+            if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
+            {
+                mNumEigenvals = e_val_idx + 1;
+                break;
+            }
+        }
+        MARK;
+        // Store only those eigenvectors that we need
+        const auto e_vectors = eigs.eigenvectors();
+        mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
+        for (unsigned e_val = 0; e_val < mNumEigenvals; ++e_val)
+        {
+            mScaledEigenvecs.col(e_val) = std::sqrt(evals.coeffRef(e_val)) * e_vectors.col(e_val);
+        }
+        MARK;
+        // Break out of the loop to prevent any unnecessary eigenvalue calculations
+        break;
     }
+    MARK;
 }
 
 template <unsigned SPACE_DIM>
@@ -223,21 +245,27 @@ Eigen::SparseMatrix<double> UniformGridRandomFieldGenerator<SPACE_DIM>::Calculat
     }
 
     // Create vector of eigen triplets representing the pairwise covariance using the Gaussian covariance function
-    const double length_squared = mLengthScale * mLengthScale;
-    const double tol_cov = -std::log(1e-15);  // \todo: remove this magic number
+    const double minus_one_over_len_sq = -1.0 / (mLengthScale * mLengthScale);
     std::vector<Eigen::Triplet<double>> triplets;
     for (unsigned x = 0; x < mNumTotalGridPts; ++x)
     {
-        for (unsigned y = 0; y < mNumTotalGridPts; ++y)
+        for (unsigned y = 0; y < x; ++y)
         {
-            const double dist_squared = GetSquaredDistAtoB(nodes[x].rGetLocation(), nodes[y].rGetLocation());
-            const double exponent = dist_squared / length_squared;
+            const double val = std::exp(minus_one_over_len_sq * GetSquaredDistAtoB(nodes[x].rGetLocation(), nodes[y].rGetLocation()));
 
-            if (exponent < tol_cov)
+            if (val > 1e-9)  // \todo: remove this magic number?
             {
-                triplets.emplace_back(Eigen::Triplet<double>(x, y, std::exp(-exponent)));
+                // Do (x,y) and (y,x) as the distance is symmetric
+                triplets.emplace_back(Eigen::Triplet<double>(x, y, val));
+                triplets.emplace_back(Eigen::Triplet<double>(y, x, val));
             }
         }
+    }
+
+    // Efficiently take case of the diagonal terms
+    for (unsigned x = 0; x < mNumTotalGridPts; ++x)
+    {
+        triplets.emplace_back(Eigen::Triplet<double>(x, x, 1.0));
     }
 
     // Create a sparse matrix given the grid points
@@ -361,6 +389,9 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::LoadFromCache(const std::string
     input_file.read((char*) mScaledEigenvecs.data(), mNumTotalGridPts * mNumEigenvals * sizeof(double));
 
     input_file.close();
+
+    const double eval_prop = static_cast<double>(mNumEigenvals) / mNumTotalGridPts;
+    PRINT_VARIABLE(eval_prop);
 }
 
 template <unsigned SPACE_DIM>
