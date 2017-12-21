@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,7 +95,7 @@ public:
     NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh);
 
     /**
-     * Overridden UpdateNodeLocations() method. To use the update from Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     * Method to movet the cells according to the update from Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
      *
      * @param dt the time step
      */

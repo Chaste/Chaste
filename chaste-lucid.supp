@@ -24,27 +24,26 @@
    fun:__write_nocancel
    ...
    fun:MPIOI_File_write
-   fun:mca_io_romio_dist_MPI_File_write_at
    ...
    fun:PMPI_File_write_at
-   obj:/usr/lib/libhdf5.so.6.0.3
-# On Maverick we don't have all the details that follow.
-#   ...
-#   fun:H5I_dec_ref
-#   fun:H5Fclose
+# If HDF5 is statically linked then this won't match; when installed via PETSc the linking is typically static!
+#   obj:*libhdf5.*
+   ...
+   fun:H5Fclose
 }
+
 {
    HDF5 file create
    Memcheck:Leak
    fun:malloc
    ...
    fun:PMPI_File_open
-   obj:/usr/lib/libhdf5.so.*
-# On Maverick we don't have all the details that follow.
-#   fun:H5FD_open
-#   fun:H5F_open
-#   fun:H5Fcreate
+# If HDF5 is statically linked then this won't match; when installed via PETSc the linking is typically static!
+#   obj:*libhdf5.*
+   ...
+   fun:H5F_open
 }
+
 
 # Boost
 #######

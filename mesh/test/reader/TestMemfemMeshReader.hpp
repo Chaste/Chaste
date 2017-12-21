@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,9 +82,9 @@ public:
         delete pMeshReader;
     }
 
-    void TestGenericReader() throw (Exception)
+    void TestGenericReader()
     {
-        std::auto_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/Memfem_slab");
+        std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/Memfem_slab");
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 381u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 1030u);
@@ -114,9 +114,7 @@ public:
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetFaceData(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetEdgeData(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetContainingElementIndices(0), "Ncl files are only implemented in mesh readers for binary mesh files.");
-
     }
-
 };
 
 #endif //_TESTMEMFEMMESHREADER_HPP_

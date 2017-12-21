@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,6 @@ private:
     std::vector<double> k3;  /**< Working memory: expression k3 in the RK4 method. */
     std::vector<double> k4;  /**< Working memory: expression k4 in the RK4 method. */
     std::vector<double> yki; /**< Working memory: expression yki in the RK4 method. */
-
 };
 
 #include "SerializationExportWrapper.hpp"

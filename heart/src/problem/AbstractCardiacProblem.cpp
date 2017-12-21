@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,9 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mSolution(NULL),
       mCurrentTime(0.0),
       mpTimeAdaptivityController(NULL),
-      mpWriter(NULL)
+      mpWriter(NULL),
+      mUseHdf5DataWriterCache(false),
+      mHdf5DataWriterChunkSizeAndAlignment(0)
 {
     assert(mNodesToOutput.empty());
     if (!mpCellFactory)
@@ -92,7 +94,9 @@ AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProble
       mSolution(NULL),
       mCurrentTime(0.0),
       mpTimeAdaptivityController(NULL),
-      mpWriter(NULL)
+      mpWriter(NULL),
+      mUseHdf5DataWriterCache(false),
+      mHdf5DataWriterChunkSizeAndAlignment(0)
 {
 }
 
@@ -130,7 +134,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
             if (HeartConfig::Instance()->GetLoadMesh())
             {
                 CreateMeshFromHeartConfig();
-                std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_mesh_reader
+                std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_mesh_reader
                     = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(HeartConfig::Instance()->GetMeshName());
                 mpMesh->ConstructFromMeshReader(*p_mesh_reader);
             }
@@ -226,17 +230,17 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetBoundaryCondi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::PreSolveChecks()
 {
-    if ( mpCardiacTissue == NULL ) // if tissue is NULL, Initialise() probably hasn't been called
+    if (mpCardiacTissue == NULL) // if tissue is NULL, Initialise() probably hasn't been called
     {
         EXCEPTION("Cardiac tissue is null, Initialise() probably hasn't been called");
     }
-    if ( HeartConfig::Instance()->GetSimulationDuration() <= mCurrentTime)
+    if (HeartConfig::Instance()->GetSimulationDuration() <= mCurrentTime)
     {
         EXCEPTION("End time should be in the future");
     }
     if (mPrintOutput)
     {
-        if( (HeartConfig::Instance()->GetOutputDirectory()=="") || (HeartConfig::Instance()->GetOutputFilenamePrefix()==""))
+        if ((HeartConfig::Instance()->GetOutputDirectory()=="") || (HeartConfig::Instance()->GetOutputFilenamePrefix()==""))
         {
             EXCEPTION("Either explicitly specify not to print output (call PrintOutput(false)) or specify the output directory and filename prefix");
         }
@@ -253,7 +257,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::PreSolveChecks()
      * HeartConfig checks pde_dt divides printing dt.
      */
     ///\todo remove magic number? (#1884)
-    if( fabs(end_time - pde_time*round(end_time/pde_time)) > 1e-10 )
+    if (fabs(end_time - pde_time*round(end_time/pde_time)) > 1e-10)
     {
         EXCEPTION("PDE timestep does not seem to divide end time - check parameters");
     }
@@ -364,7 +368,6 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetUseTimeAdapti
         mpTimeAdaptivityController = NULL;
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
@@ -592,8 +595,11 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         // Nothing to do
         return;
     }
+    HeartEventHandler::BeginEvent(HeartEventHandler::WRITE_OUTPUT);
+    // If write caching is on, the next line might actually take a significant amount of time.
     delete mpWriter;
     mpWriter = NULL;
+    HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
 
     FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
 
@@ -607,11 +613,13 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
      *********************************************************************************/
 
     HeartEventHandler::BeginEvent(HeartEventHandler::POST_PROC);
-    if(HeartConfig::Instance()->IsPostProcessingRequested())
+    if (HeartConfig::Instance()->IsPostProcessingRequested())
     {
         PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh,
                                                                  test_output,
-                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix());
+                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                                                                 "V",
+                                                                 mHdf5DataWriterChunkSizeAndAlignment);
         post_writer.WritePostProcessingFiles();
     }
     HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);
@@ -680,7 +688,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineWriterColu
 {
     if (!extending)
     {
-        if ( mNodesToOutput.empty() )
+        if (mNodesToOutput.empty() )
         {
             //Set writer to output all nodes
             mpWriter->DefineFixedDimension( mpMesh->GetNumNodes() );
@@ -833,8 +841,22 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
                                   HeartConfig::Instance()->GetOutputDirectory(),
                                   HeartConfig::Instance()->GetOutputFilenamePrefix(),
                                   !extend_file, // don't clear directory if extension requested
-                                  extend_file);
+                                  extend_file,
+                                  "Data",
+                                  mUseHdf5DataWriterCache);
 
+    /* If user has specified a chunk size and alignment parameter, pass it
+     * through. We set them to the same value as we think this is the most
+     * likely use case, specifically on striped filesystems where a chunk
+     * should squeeze into a stripe.
+     * Only happens if !extend_file, i.e. we're NOT loading a checkpoint, or
+     * we are loading a checkpoint but the H5 file doesn't exist yet.
+     */
+    if (!extend_file && mHdf5DataWriterChunkSizeAndAlignment)
+    {
+        mpWriter->SetTargetChunkSize(mHdf5DataWriterChunkSizeAndAlignment);
+        mpWriter->SetAlignment(mHdf5DataWriterChunkSizeAndAlignment);
+    }
 
     // Define columns, or get the variable IDs from the writer
     DefineWriterColumns(extend_file);
@@ -859,6 +881,18 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetUseHdf5DataWriterCache(bool useCache)
+{
+    mUseHdf5DataWriterCache = useCache;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetHdf5DataWriterTargetChunkSizeAndAlignment(hsize_t size)
+{
+    mHdf5DataWriterChunkSizeAndAlignment = size;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetOutputNodes(std::vector<unsigned> &nodesToOutput)
 {
     mNodesToOutput = nodesToOutput;
@@ -867,7 +901,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetOutputNodes(s
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 Hdf5DataReader AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::GetDataReader()
 {
-    if( (HeartConfig::Instance()->GetOutputDirectory()=="") || (HeartConfig::Instance()->GetOutputFilenamePrefix()==""))
+    if ((HeartConfig::Instance()->GetOutputDirectory()=="") || (HeartConfig::Instance()->GetOutputFilenamePrefix()==""))
     {
         EXCEPTION("Data reader invalid as data writer cannot be initialised");
     }
@@ -885,10 +919,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetElectrodes()
 {
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
 
 // Monodomain
 template class AbstractCardiacProblem<1,1,1>;

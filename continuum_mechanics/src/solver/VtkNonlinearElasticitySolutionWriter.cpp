@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,9 +50,9 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
     // write the displacement
     std::vector<c_vector<double,DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
     std::vector<c_vector<double,DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
-    for(unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
     {
-        for(unsigned j=0; j<DIM; j++)
+        for (unsigned j=0; j<DIM; j++)
         {
             displacement[i](j) = r_spatial_solution[i](j)- mpSolver->mrQuadMesh.GetNode(i)->rGetLocation()[j];
         }
@@ -67,7 +67,7 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
 
     // write the element attribute as cell data.
     std::vector<double> element_attribute;
-    for(typename QuadraticMesh<DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
+    for (typename QuadraticMesh<DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
         iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
         ++iter)
     {
@@ -127,12 +127,6 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
 #endif // CHASTE_VTK
 }
 
-
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class VtkNonlinearElasticitySolutionWriter<2>;
 template class VtkNonlinearElasticitySolutionWriter<3>;
-
-

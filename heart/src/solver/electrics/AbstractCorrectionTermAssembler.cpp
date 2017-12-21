@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
         {
             unsigned element_index = r_element.GetIndex();
             // If bath element, don't try to use SVI
-            if ( HeartRegionCode::IsRegionBath(r_element.GetUnsignedAttribute()) )
+            if (HeartRegionCode::IsRegionBath(r_element.GetUnsignedAttribute()))
             {
                 mElementsCanDoSvi[element_index] = false;
                 continue;
@@ -79,13 +79,12 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
     // Note: the mStateVariables std::vector is resized if correction will be applied to a given element
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ResetInterpolatedQuantities()
 {
     // reset ionic current, and state variables
     mIionicInterp = 0;
-    for(unsigned i=0; i<mStateVariablesAtQuadPoint.size(); i++)
+    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); i++)
     {
         mStateVariablesAtQuadPoint[i] = 0;
     }
@@ -105,8 +104,6 @@ void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Increme
         mStateVariablesAtQuadPoint[i] += phiI * state_vars[i];
     }
 }
-
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 bool AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ElementAssemblyCriterion(Element<ELEMENT_DIM,SPACE_DIM>& rElement)
@@ -148,10 +145,7 @@ bool AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Element
     return will_assemble;
 }
 
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class AbstractCorrectionTermAssembler<1,1,1>;
 template class AbstractCorrectionTermAssembler<1,2,1>;
 template class AbstractCorrectionTermAssembler<1,3,1>;

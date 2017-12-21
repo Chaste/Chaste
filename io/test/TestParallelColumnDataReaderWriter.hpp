@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -251,7 +251,7 @@ public:
     }
 
     // Read back the data written in the test TestParallelColumnWriter above
-    void TestColumnReader() throw(Exception)
+    void TestColumnReader()
     {
         /*
          * There is no *Parallel* ColumnDataReader.  Since everyone might

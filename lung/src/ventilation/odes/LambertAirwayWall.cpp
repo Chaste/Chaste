@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ void LambertAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
 
     double ri2 = 0.0;
 
-    if(transpulmonary_pressure <= 0.0)
+    if (transpulmonary_pressure <= 0.0)
     {
         ri2 = mRi*mRi*std::pow(1 - transpulmonary_pressure/mP1, -mN1);
         //std::cout << "here " << transpulmonary_pressure << " " << mP1 << " " <<  transpulmonary_pressure/mP1 << " " << mN1 << " " << ri2 << std::endl;;

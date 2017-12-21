@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,26 +34,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexBasedCellPopulation.hpp"
-#include <boost/foreach.hpp>
-#include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
-#include "ChasteSyscalls.hpp"
-#include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
+#include "StepSizeException.hpp"
+#include "WildTypeCellMutationState.hpp"
+#include "Cylindrical2dVertexMesh.hpp"
+#include "SmartPointers.hpp"
+#include "T2SwapCellKiller.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
+#include "AbstractCellBasedSimulation.hpp"
 
 template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
@@ -63,7 +56,8 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
                                           const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
     mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
@@ -87,7 +81,8 @@ template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mOutputCellRearrangementLocations(true)
+      mOutputCellRearrangementLocations(true),
+      mRestrictVertexMovement(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 }
@@ -122,9 +117,8 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
     {
         CellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
         bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
-        bool cell_is_labelled = p_cell->HasCellProperty<CellLabel>();
 
-        if (cell_is_wild_type && !cell_is_labelled)
+        if (cell_is_wild_type)
         {
             average_damping_constant += this->GetDampingConstantNormal()*temp;
         }
@@ -205,17 +199,17 @@ unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 }
 
 template<unsigned DIM>
-CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
-                                                const c_vector<double,DIM>& rCellDivisionVector,
-                                                CellPtr pParentCell)
+CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
+    // Get the orientation of division
+    c_vector<double, DIM> division_vector = mpVertexBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+
     // Divide the element
-    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element,
-                                                                                  rCellDivisionVector,
-                                                                                  true);
+    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
+
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -223,6 +217,7 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
     CellPtr p_created_cell = this->mCells.back();
     this->SetCellUsingLocationIndex(new_element_index,p_created_cell);
     this->mCellLocationMap[p_created_cell.get()] = new_element_index;
+
     return p_created_cell;
 }
 
@@ -262,50 +257,31 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(double dt)
+void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt)
 {
-    // Iterate over all nodes associated with real cells to update their positions
-    for (unsigned node_index=0; node_index<GetNumNodes(); node_index++)
+    double length = norm_2(rDisplacement);
+
+    if(mRestrictVertexMovement)
     {
-        // Get the damping constant for this node
-        double damping_const = this->GetDampingConstant(node_index);
-
-        // Compute the displacement of this node
-        c_vector<double, DIM> displacement = dt*this->GetNode(node_index)->rGetAppliedForce()/damping_const;
-
-        /*
-         * If the displacement of this node is greater than half the cell rearrangement threshold,
-         * this could result in nodes moving into the interior of other elements, which should not
-         * be possible. Therefore in this case we restrict the displacement of the node to the cell
-         * rearrangement threshold and warn the user that a smaller timestep should be used. This
-         * restriction ensures that vertex elements remain well defined (see #1376).
-         */
-        if (norm_2(displacement) > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
+        if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
         {
-            WARN_ONCE_ONLY("Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-            displacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/norm_2(displacement);
+            rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
+
+            std::ostringstream message;
+            message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+            message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+
+            double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
+
+            throw StepSizeException(suggested_step, message.str(), false);
         }
-
-        // Get new node location
-        c_vector<double, DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;
-
-        for (unsigned i=0; i<DIM; i++)
-        {
-            assert(!std::isnan(new_node_location(i)));
-        }
-
-        // Create ChastePoint for new node location
-        ChastePoint<DIM> new_point(new_node_location);
-
-        // Move the node
-        this->SetNode(node_index, new_point);
     }
 }
 
 template<unsigned DIM>
 bool VertexBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
 {
-    return GetElementCorrespondingToCell(pCell)->IsDeleted();;
+    return GetElementCorrespondingToCell(pCell)->IsDeleted();
 }
 
 template<unsigned DIM>
@@ -613,10 +589,10 @@ void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsingVertexMesh()
+TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential
-    assert(DIM == 2);
+    assert(DIM == 2);                        // LCOV_EXCL_LINE - disappears at compile time.
     assert(PetscTools::IsSequential());
 
     unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
@@ -646,12 +622,10 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
 
         ///\todo will the nodes in mpMutableVertexMesh always have indices 0,1,2,...? (#2221)
         unsigned index = p_node->GetIndex();
-
-        c_vector<double, DIM> location = p_node->rGetLocation();
-
+        const c_vector<double, DIM>& r_location = p_node->rGetLocation();
         unsigned is_boundary_node = p_node->IsBoundaryNode() ? 1 : 0;
 
-        (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
+        (*p_node_file) << index << "\t" << r_location[0] << "\t" << r_location[1] << "\t" << is_boundary_node << std::endl;
     }
 
     // Now write an additional node at each VertexElement's centroid
@@ -733,7 +707,8 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
 
     // Having written the mesh to file, now construct it using TrianglesMeshReader
     TetrahedralMesh<DIM, DIM>* p_mesh = new TetrahedralMesh<DIM, DIM>;
-    // Nested scope so reader is destroyed before we remove the temporary files.
+
+    // Nested scope so reader is destroyed before we remove the temporary files
     {
         TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
         p_mesh->ConstructFromMeshReader(mesh_reader);
@@ -746,6 +721,123 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_mesh->SetMeshHasChangedSinceLoading();
 
     return p_mesh;
+}
+
+template<unsigned DIM>
+bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool non_apoptotic_cell_present = true;
+
+    if (pdeNodeIndex < this->GetNumNodes())
+    {
+        std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
+
+        for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+             iter != containing_element_indices.end();
+             iter++)
+        {
+            if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
+            {
+                non_apoptotic_cell_present = false;
+                break;
+            }
+        }
+    }
+    else
+    {
+        /*
+         * This node of the tetrahedral finite element mesh is in the centre of the element of the
+         * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
+         */
+        non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
+    }
+
+    return non_apoptotic_cell_present;
+}
+
+template<unsigned DIM>
+double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
+        unsigned pdeNodeIndex,
+        std::string& rVariableName,
+        bool dirichletBoundaryConditionApplies,
+        double dirichletBoundaryValue)
+{
+    unsigned num_nodes = this->GetNumNodes();
+    double value = 0.0;
+
+    // Cells correspond to nodes in the centre of the vertex element; nodes on vertices have averaged values from containing cells
+
+    if (pdeNodeIndex >= num_nodes)
+    {
+        // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
+        assert(pdeNodeIndex-num_nodes < num_nodes);
+
+        CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex - num_nodes);
+        value = p_cell->GetCellData()->GetItem(rVariableName);
+    }
+    else
+    {
+        ///\todo Work out a better way to do the nodes not associated with cells
+        if (dirichletBoundaryConditionApplies)
+        {
+            // We need to impose the Dirichlet boundaries again here as not represented in cell data
+            value = dirichletBoundaryValue;
+        }
+        else
+        {
+            assert(pdeNodeIndex < num_nodes);
+            Node<DIM>* p_node = this->GetNode(pdeNodeIndex);
+
+            // Average over data from containing elements (cells)
+            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+            for (std::set<unsigned>::iterator index_iter = containing_elements.begin();
+                 index_iter != containing_elements.end();
+                 ++index_iter)
+            {
+                assert(*index_iter < num_nodes);
+                CellPtr p_cell = this->GetCellUsingLocationIndex(*index_iter);
+                value += p_cell->GetCellData()->GetItem(rVariableName);
+            }
+            value /= containing_elements.size();
+        }
+    }
+
+    return value;
+}
+
+template<unsigned DIM>
+double VertexBasedCellPopulation<DIM>::GetDefaultTimeStep()
+{
+    return 0.002;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+{
+    if (bool(dynamic_cast<Cylindrical2dVertexMesh*>(&(this->mrMesh))))
+    {
+        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+    }
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation)
+{
+    MAKE_PTR_ARGS(T2SwapCellKiller<DIM>, p_t2_swap_cell_killer, (this));
+    pSimulation->AddCellKiller(p_t2_swap_cell_killer);
+}
+
+
+template<unsigned DIM>
+bool VertexBasedCellPopulation<DIM>::GetRestrictVertexMovementBoolean()
+{
+    return mRestrictVertexMovement;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restrictMovement)
+{
+    mRestrictVertexMovement = restrictMovement;
 }
 
 // Explicit instantiation

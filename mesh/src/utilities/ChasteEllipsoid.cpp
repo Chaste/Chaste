@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ bool ChasteEllipsoid<2>::DoesContain(const ChastePoint<2>& rPointToCheck) const
     double x_distance = (rPointToCheck[0]-mCentre[0])/mRadii[0];
     double y_distance = (rPointToCheck[1]-mCentre[1])/mRadii[1];
 
-    if ( (x_distance*x_distance + y_distance*y_distance) > (1.0 + 100.0 * DBL_EPSILON) )
+    if ((x_distance*x_distance + y_distance*y_distance) > (1.0 + 100.0 * DBL_EPSILON))
     {
         return false;
     }
@@ -107,7 +107,7 @@ bool ChasteEllipsoid<3>::DoesContain(const ChastePoint<3>& rPointToCheck) const
     double y_distance = (rPointToCheck[1]-mCentre[1])/mRadii[1];
     double z_distance = (rPointToCheck[2]-mCentre[2])/mRadii[2];
 
-    if ( (x_distance*x_distance + y_distance*y_distance + z_distance*z_distance) > (1.0 + 100.0 * DBL_EPSILON) )
+    if ((x_distance*x_distance + y_distance*y_distance + z_distance*z_distance) > (1.0 + 100.0 * DBL_EPSILON))
     {
         return false;
     }
@@ -134,9 +134,7 @@ const ChastePoint<SPACE_DIM>& ChasteEllipsoid<SPACE_DIM>::rGetRadii() const
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class ChasteEllipsoid<1>;
 template class ChasteEllipsoid<2>;

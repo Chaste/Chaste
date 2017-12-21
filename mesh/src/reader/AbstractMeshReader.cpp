@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,6 @@ ElementData AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeData()
 {
     return GetNextFaceData();
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index)
@@ -202,7 +201,7 @@ typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::ElementIterator(const std::set<unsigned>& rIndices,
-                                                                             AbstractMeshReader* pReader)
+                                                                             AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
     : mpIndices(&rIndices),
       mpReader(pReader)
 {
@@ -275,7 +274,6 @@ void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator::CacheData(unsi
     mIndex = index;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeIteratorBegin()
@@ -299,7 +297,7 @@ typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::NodeIterator(const std::set<unsigned>& rIndices,
-                                                                             AbstractMeshReader* pReader)
+                                                                             AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>* pReader)
     : mpIndices(&rIndices),
       mpReader(pReader)
 {
@@ -372,11 +370,7 @@ void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::CacheData(unsigne
     mIndex = index;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractMeshReader<0,1>;
 template class AbstractMeshReader<1,1>;
 template class AbstractMeshReader<1,2>;

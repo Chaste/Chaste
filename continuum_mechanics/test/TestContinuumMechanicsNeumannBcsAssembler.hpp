@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestContinuumMechanicsNeumannBcsAssembler : public CxxTest::TestSuite
 {
 public:
-    void TestAssembler2d() throw (Exception)
+    void TestAssembler2d()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);
@@ -105,7 +105,7 @@ public:
         TS_ASSERT_DELTA(vec_repl[4], t2/6.0, 1e-8);
 
         // nodes 2, 3, 4 are not on the surface
-        for(unsigned i=2; i<5; i++)
+        for (unsigned i=2; i<5; i++)
         {
             TS_ASSERT_DELTA(vec_repl[3*i], 0.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl[3*i], 0.0, 1e-8);
@@ -129,7 +129,7 @@ public:
     }
 
 
-    void TestAssembler3d() throw (Exception)
+    void TestAssembler3d()
     {
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
@@ -175,18 +175,18 @@ public:
         // and
         // \intgl_{canonical element} \phi_i dV = 1/6  for i=3,4,5 (ie bases on mid-nodes)
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double z = mesh.GetNode(i)->rGetLocation()[2];
 
-            if(fabs(z)<1e-8) // ie if z=0
+            if (fabs(z) < 1e-8) // ie if z=0
             {
-                if( fabs(x-0.5)<1e-8 || fabs(y-0.5)<1e-8 ) // if x=0.5 or y=0.5
+                if (fabs(x-0.5)<1e-8 || fabs(y-0.5)<1e-8) // if x=0.5 or y=0.5
                 {
                     unsigned num_surf_elems_contained_in = 1;
-                    if( fabs(x+y-1.0)<1e-8 ) // if x=0.5 AND y=0.5
+                    if (fabs(x+y-1.0) < 1e-8) // if x=0.5 AND y=0.5
                     {
                         num_surf_elems_contained_in = 2;
                     }
@@ -211,7 +211,7 @@ public:
             }
         }
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA(vec_repl[4*i+3],   0.0, 1e-8);
         }

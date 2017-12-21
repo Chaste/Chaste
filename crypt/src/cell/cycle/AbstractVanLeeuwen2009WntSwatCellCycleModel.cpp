@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,16 +35,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasIncludes.hpp"
 #include "AbstractVanLeeuwen2009WntSwatCellCycleModel.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 AbstractVanLeeuwen2009WntSwatCellCycleModel::AbstractVanLeeuwen2009WntSwatCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
    : AbstractWntOdeBasedCellCycleModel(pOdeSolver)
 {
 }
 
+AbstractVanLeeuwen2009WntSwatCellCycleModel::AbstractVanLeeuwen2009WntSwatCellCycleModel(const AbstractVanLeeuwen2009WntSwatCellCycleModel& rModel)
+   : AbstractWntOdeBasedCellCycleModel(rModel)
+{
+    /*
+     * The member variables mDivideTime and mG2PhaseStartTime are
+     * initialized in the AbstractOdeBasedPhaseBasedCellCycleModel
+     * constructor.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
+}
+
 void AbstractVanLeeuwen2009WntSwatCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
     double beta_catenin_level =   mpOdeSystem->rGetStateVariables()[16]
                                 + mpOdeSystem->rGetStateVariables()[17]
                                 + mpOdeSystem->rGetStateVariables()[18]
@@ -76,8 +96,8 @@ void AbstractVanLeeuwen2009WntSwatCellCycleModel::ChangeCellProliferativeTypeDue
 
 void AbstractVanLeeuwen2009WntSwatCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     double wnt_level = GetWntLevel();
 
@@ -119,8 +139,6 @@ double AbstractVanLeeuwen2009WntSwatCellCycleModel::GetNuclearBetaCateninLevel()
 
 void AbstractVanLeeuwen2009WntSwatCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractWntOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }

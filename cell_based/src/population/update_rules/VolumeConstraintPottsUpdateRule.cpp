@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -133,7 +133,7 @@ void VolumeConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class VolumeConstraintPottsUpdateRule<1>;
 template class VolumeConstraintPottsUpdateRule<2>;
 template class VolumeConstraintPottsUpdateRule<3>;

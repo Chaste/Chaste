@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MATRIXVENTILATIONPROBLEM_HPP_
 #define MATRIXVENTILATIONPROBLEM_HPP_
 
-//#define LUNG_USE_UMFPACK 1 //Uncomment to use a direct solver
+//#define LUNG_USE_KLU 1 //Uncomment to use a direct solver
 
 #include "AbstractVentilationProblem.hpp"
 #include "LinearSystem.hpp"
@@ -153,8 +153,6 @@ public:
      * @param rPressuresOnNodes The component of the mSolution Vec which represents pressures (this vector is resized)
      */
     void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes);
-
-
 };
 
 #endif /* MATRIXVENTILATIONPROBLEM_HPP_ */

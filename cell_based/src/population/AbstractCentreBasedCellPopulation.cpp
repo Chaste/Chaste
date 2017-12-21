@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,6 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCentreBasedCellPopulation.hpp"
+#include "RandomDirectionCentreBasedDivisionRule.hpp"
+#include "RandomNumberGenerator.hpp"
+#include "StepSizeException.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -51,13 +55,14 @@ AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCe
         unsigned index = locationIndices.empty() ? node_iter->GetIndex() : locationIndices[i]; // assume that the ordering matches
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index,*it);
     }
+
+    mpCentreBasedDivisionRule.reset(new RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
     : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh),
       mMeinekeDivisionSeparation(0.3) // educated guess
-
 {
 }
 
@@ -75,10 +80,44 @@ Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell)
+double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellDataItemAtPdeNode(
+    unsigned pdeNodeIndex,
+    std::string& rVariableName,
+    bool dirichletBoundaryConditionApplies,
+    double dirichletBoundaryValue)
 {
+    CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex);
+    double value = p_cell->GetCellData()->GetItem(rVariableName);
+
+    return value;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+{
+    // Calculate the locations of the two daughter cells
+    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+
+    c_vector<double, SPACE_DIM> parent_position = positions.first;
+    c_vector<double, SPACE_DIM> daughter_position = positions.second;
+
+    // Set the parent cell to use this location
+    ChastePoint<SPACE_DIM> parent_point(parent_position);
+    unsigned node_index = this->GetLocationIndexUsingCell(pParentCell);
+    this->SetNode(node_index, parent_point);
+
     // Create a new node
-    Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), rCellDivisionVector, false);   // never on boundary
+    Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(this->GetNumNodes(), daughter_position, false); // never on boundary
+
+    // Clear the applied force on the new node, in case velocity is ouptut on the same timestep as this cell's division
+    p_new_node->ClearAppliedForce();
+
+    // Copy any node attributes from the parent node
+    if (this->GetNode(node_index)->HasNodeAttributes())
+    {
+        p_new_node->rGetNodeAttributes() = this->GetNode(node_index)->rGetNodeAttributes();
+    }
+
     unsigned new_node_index = this->AddNode(p_new_node); // use copy constructor so it doesn't matter that new_node goes out of scope
 
     // Update cells vector
@@ -153,53 +192,41 @@ std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Get
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocations(double dt)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
 {
-    // Iterate over all nodes associated with real cells to update their positions
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    double length = norm_2(rDisplacement);
+
+    if ((length > this->mAbsoluteMovementThreshold) && (!this->IsGhostNode(nodeIndex)) && (!this->IsParticle(nodeIndex)))
     {
-        // Get index of node associated with cell
-        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        std::ostringstream message;
+        message << "Cells are moving by " << length;
+        message << ", which is more than the AbsoluteMovementThreshold: use a smaller timestep to avoid this exception.";
 
-        // Get damping constant for node
-        double damping_const = this->GetDampingConstant(node_index);
+        // Suggest a net time step that will give a movement smaller than the movement threshold
+        double new_step = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
 
-        // Get displacement
-        c_vector<double,SPACE_DIM> displacement=dt*this->GetNode(node_index)->rGetAppliedForce()/damping_const;
-
-        // Throws an exception if the cell movement goes beyond mAbsoluteMovementThreshold
-        if (norm_2(displacement) > this->mAbsoluteMovementThreshold)
-        {
-            EXCEPTION("Cells are moving by: " << norm_2(displacement) <<
-                    ", which is more than the AbsoluteMovementThreshold: "
-                    << this->mAbsoluteMovementThreshold <<
-                    ". Use a smaller timestep to avoid this exception.");
-        }
-
-        // Get new node location
-        c_vector<double, SPACE_DIM> new_node_location = this->GetNode(node_index)->rGetLocation() + displacement;
-
-        // Create ChastePoint for new node location
-        ChastePoint<SPACE_DIM> new_point(new_node_location);
-
-        // Move the node
-        this->SetNode(node_index, new_point);
+        throw StepSizeException(new_step, message.str(), true); // terminate
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstant(unsigned nodeIndex)
 {
-    CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
-    if (p_cell->GetMutationState()->IsType<WildTypeCellMutationState>() && !p_cell->HasCellProperty<CellLabel>())
+    if (this->IsGhostNode(nodeIndex) || this->IsParticle(nodeIndex))
     {
         return this->GetDampingConstantNormal();
     }
     else
     {
-        return this->GetDampingConstantMutant();
+        CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
+        if (p_cell->GetMutationState()->IsType<WildTypeCellMutationState>())
+        {
+            return this->GetDampingConstantNormal();
+        }
+        else
+        {
+            return this->GetDampingConstantMutant();
+        }
     }
 }
 
@@ -247,18 +274,38 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriters
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCentreBasedDivisionRule()
+{
+    return mpCentreBasedDivisionRule;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCentreBasedDivisionRule(boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule)
+{
+    mpCentreBasedDivisionRule = pCentreBasedDivisionRule;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MeinekeDivisionSeparation>" << mMeinekeDivisionSeparation << "</MeinekeDivisionSeparation>\n";
+
+    // Add the division rule parameters
+    *rParamsFile << "\t\t<CentreBasedDivisionRule>\n";
+    mpCentreBasedDivisionRule->OutputCellCentreBasedDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</CentreBasedDivisionRule>\n";
 
     // Call method on direct parent class
     AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDefaultTimeStep()
+{
+    return 1.0/120.0;
+}
 
+// Explicit instantiation
 template class AbstractCentreBasedCellPopulation<1,1>;
 template class AbstractCentreBasedCellPopulation<1,2>;
 template class AbstractCentreBasedCellPopulation<2,2>;

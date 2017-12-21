@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,15 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCENTREBASEDCELLPOPULATION_HPP_
 
 #include "AbstractOffLatticeCellPopulation.hpp"
+#include "AbstractCentreBasedDivisionRule.hpp"
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule; // Circular definition thing.
 
 /**
  * An abstract facade class encapsulating a centre-based cell population, in which
  * each cell corresponds to a Node.
  */
-template<unsigned ELEMENT_DIM, unsigned  SPACE_DIM=ELEMENT_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCentreBasedCellPopulation : public AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+    /**
+     * This test uses the private constructor to simplify testing.
+     */
+    friend class TestCentreBasedDivisionRules;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -60,6 +68,7 @@ private:
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeinekeDivisionSeparation;
         archive & mMarkedSprings;
+        archive & mpCentreBasedDivisionRule;
     }
 
 protected:
@@ -75,6 +84,11 @@ protected:
      * (which are represented as two cells joined by a shorter spring).
      */
     std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
+
+    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides.
+     * This is a specialisation for centre-based models.
+     */
+    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
 
     /**
      * Constructor that just takes in a mesh.
@@ -109,8 +123,8 @@ public:
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
-    AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                        std::vector<CellPtr>& rCells,
+    AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                      std::vector<CellPtr>& rCells,
                                       const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
@@ -133,15 +147,34 @@ public:
     Node<SPACE_DIM>* GetNodeCorrespondingToCell(CellPtr pCell);
 
     /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
+
+    /**
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * @return a an ordered pair of pointers to two given Cells.
@@ -195,11 +228,15 @@ public:
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
-     * Overridden UpdateNodeLocations() method.
+     * Checks whether a given node displacement violates the movement threshold
+     * for this population. If so, a stepSizeException is generated that contains
+     * a warning/error message and a suggested smaller dt that should avoid the problem.
      *
-     * @param dt the time step
+     * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
+     * @param rDisplacement Movement vector of the node at this time step
+     * @param dt Current time step size
      */
-    virtual void UpdateNodeLocations(double dt);
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt);
 
     /**
      * Overridden GetDampingConstant() method.
@@ -242,7 +279,8 @@ public:
     /**
      * Method to return the connected nodes in  a centre based simulation.
      *
-     * Overridden in sub classes to have correct functionality.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @return Node pairs for force calculation.
      */
@@ -261,11 +299,35 @@ public:
     void SetMeinekeDivisionSeparation(double divisionSeparation);
 
     /**
+     * @return The division rule that is currently being used.
+     */
+    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > GetCentreBasedDivisionRule();
+
+    /**
+     * Set the division rule for this population.
+     *
+     * @param pCentreBasedDivisionRule  pointer to the new division rule
+     */
+    void SetCentreBasedDivisionRule(boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule);
+
+    /**
      * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+
+    /**
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 1/120 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
+     * simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep();
 };
 
 #endif /*ABSTRACTCENTREBASEDCELLPOPULATION_HPP_*/

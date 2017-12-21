@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ private:
     template<class Problem, unsigned SPACE_DIM>
     void CreateAndRun()
     {
-        std::auto_ptr<Problem> p_problem;
+        boost::shared_ptr<Problem> p_problem;
 
         if (HeartConfig::Instance()->IsSimulationDefined())
         {
@@ -141,8 +141,14 @@ private:
                 std::string checkpoint_dir_basename = directory_queue.CreateNextDir(checkpoint_id.str());
 
                 // Archive simulation (in a subdirectory of checkpoint_dir_basename).
+                char time_stamp[60]; // Write out without scientific notation in time - ticket 2861
+
+                // Here we cope with times of up to 16 significant figures, which should be OK without floating-point crazy decimal places like 1.000000000000000000000000000000000001
+                std::sprintf(time_stamp,"%0.16g",HeartConfig::Instance()->GetSimulationDuration());
+
                 std::stringstream archive_foldername;
-                archive_foldername << HeartConfig::Instance()->GetOutputDirectory() << "_" << HeartConfig::Instance()->GetSimulationDuration() << "ms";
+                archive_foldername << HeartConfig::Instance()->GetOutputDirectory() << "_" << time_stamp << "ms";
+
                 CardiacSimulationArchiver<Problem>::Save(*(p_problem.get()), checkpoint_dir_basename + archive_foldername.str(), false);
 
                 // Put a copy of the partial results aside (in a subdirectory of checkpoint_dir_basename).

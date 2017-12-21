@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompareHdf5ResultsFiles.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
-#include "Debug.hpp"
 
 class TestCheckpointing : public CxxTest::TestSuite
 {
@@ -101,10 +100,9 @@ public:
             TS_ASSERT_DELTA(single_vm[index], multiple_vm[index], 1e-8);
             TS_ASSERT_DELTA(single_phie[index], multiple_phie[index], 1e-8);
         }
-
     }
 
-    void TestCheckpointingGeneratesMultipleDirectories() throw(Exception)
+    void TestCheckpointingGeneratesMultipleDirectories()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {

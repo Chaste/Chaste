@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellProliferativePhasesWriter.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesWriter()
@@ -46,14 +47,14 @@ CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesWr
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    double phase = pCell->GetCellCycleModel()->GetCurrentCellCyclePhase();
+    double phase = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel())->GetCurrentCellCyclePhase();
     return phase;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    double phase = pCell->GetCellCycleModel()->GetCurrentCellCyclePhase();
+    double phase = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel())->GetCurrentCellCyclePhase();
     *this->mpOutStream << phase << " ";
 }
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -284,10 +284,7 @@ GaussianQuadratureRule<ELEMENT_DIM>::GaussianQuadratureRule(unsigned quadratureO
     EXCEPTION("Gauss quadrature rule not available for this dimension.");
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class GaussianQuadratureRule<0>;
 template class GaussianQuadratureRule<1>;
 template class GaussianQuadratureRule<2>;

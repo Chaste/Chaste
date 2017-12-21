@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,18 +82,16 @@ void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     for (unsigned i=0; i<num_equations; i++)
     {
         // std::cout<<"Partial F"<< mPartialF[i]<<std::endl;
-        if(fabs(mPartialF[i])<delta)
+        if (fabs(mPartialF[i]) < delta)
         {
-            rNextYValues[i]=rCurrentYValues[i]+mEvalF[i]*timeStep;
+            rNextYValues[i] = rCurrentYValues[i]+mEvalF[i]*timeStep;
         }
         else
         {
-            rNextYValues[i]=rCurrentYValues[i]+(mEvalF[i]/mPartialF[i])*(exp(mPartialF[i]*timeStep)-1);
+            rNextYValues[i] = rCurrentYValues[i]+(mEvalF[i]/mPartialF[i])*(exp(mPartialF[i]*timeStep)-1);
         }
-
     }
 }
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

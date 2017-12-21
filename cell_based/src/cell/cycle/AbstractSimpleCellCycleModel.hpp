@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,21 +38,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
+
 #include <boost/serialization/base_object.hpp>
 
+#include <vector>
+
 #include "AbstractCellCycleModel.hpp"
+#include "CellCyclePhases.hpp"
+#include "SimulationTime.hpp"
+
 
 /**
- * This class contains all the functionality shared by 'simple' cell-cycle models,
- * where the duration of each cell cycle phase is determined when the cell-cycle
- * model is created. Note that whether or not the cell should actually divide may
- * still depend on further conditions in subclasses; for example, the cell may only
- * divide if the local concentration of a signalling molecule is sufficiently high/
- *
- * This class of cell-cycle models is distinct from 'ODE-based' cell-cycle models,
- * where the duration of one or more cell cycle phases are evaluated 'on the fly'
- * as the cell ages, according to a system of ordinary differential equations (ODEs)
- * governing (for example) the concentrations of key intracellular proteins.
+ * This class contains basic information to all cell-cycle models
+ * that do NOT explicitly include distinct phases (G1, S, G2, M).
  */
 class AbstractSimpleCellCycleModel : public AbstractCellCycleModel
 {
@@ -61,7 +59,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model.
+     * Archive the object and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -70,16 +68,31 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+        archive & mCellCycleDuration;
     }
 
 protected:
 
     /**
-     * Subclasses can override this function if they wish, this just
-     * allocates the default values for each of the different cell
-     * types' G1 durations as defined in AbstractCellCycleModel.
+     * Duration of cell cycle.
+     * May be used as a mean duration for stochastic cell-cycle models.
      */
-    virtual void SetG1Duration();
+    double mCellCycleDuration;
+
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel.
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the cell cycle model to copy.
+     */
+    AbstractSimpleCellCycleModel(const AbstractSimpleCellCycleModel& rModel);
 
 public:
 
@@ -93,31 +106,53 @@ public:
      */
     virtual ~AbstractSimpleCellCycleModel();
 
+    /**
+     * See AbstractCellCycleModel::ResetForDivision()
+     *
+     * @return whether the cell is ready to divide (enter M phase).
+     */
+    virtual bool ReadyToDivide();
+
     /** See AbstractCellCycleModel::ResetForDivision() */
     virtual void ResetForDivision();
 
     /**
-     * Default UpdateCellCyclePhase() method for a simple cell-cycle model.
+     * Overridden InitialiseDaughterCell() method.
      *
-     * Can be overridden if they should do something more subtle.
-     */
-    virtual void UpdateCellCyclePhase();
-
-    /**
-     * Set the new cell's G1 duration once it has been created after division.
-     * The duration will be based on cell type.
+     * Set the new cell's cell cycle duration once it has been created after division.
+     * This is by calling SetCellCycleDuration() defined in child classes.
      */
     void InitialiseDaughterCell();
 
-    /** See AbstractCellCycleModel::Initialise() */
+    /** See AbstractPhaseBasedCellCycleModel::Initialise()
+     *
+     * Calls SetCellCycleDuration() defined in child classes.
+     */
     virtual void Initialise();
+
+    /**
+     * This method is implemented in Subclasses to set the cell cycle duration of the cell.
+     * It is called on the beginning of the simulation (intialisation) when initialising
+     * daughter cells and when reseting parent cells
+     *
+     * It must be implemented in child classes.
+     */
+    virtual void SetCellCycleDuration() = 0;
+
+    /**
+     * @return mCellCycleDuration
+     */
+    double GetCellCycleDuration() const;
 
     /**
      * Outputs cell cycle model parameters to file.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile)=0;
 };
 
 CLASS_IS_ABSTRACT(AbstractSimpleCellCycleModel)

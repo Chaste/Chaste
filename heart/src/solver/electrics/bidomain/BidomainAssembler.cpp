@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,12 +103,7 @@ BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
     assert(pTissue != NULL);
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class BidomainAssembler<1,1>;
 template class BidomainAssembler<2,2>;
 template class BidomainAssembler<3,3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,7 +98,7 @@ public:
         }
 
         element.SetIndex(27);
-        TS_ASSERT_EQUALS(element.GetIndex(), 27u)
+        TS_ASSERT_EQUALS(element.GetIndex(), 27u);
     }
 
     void TestEquals()
@@ -127,6 +127,10 @@ public:
                 TS_ASSERT_DELTA(another_element.GetNode(i)->GetPoint()[j], element.GetNode(i)->GetPoint()[j], 1e-10);
             }
         }
+
+        // Coverage of GetVolume()
+        element.MarkAsDeleted();
+        TS_ASSERT_DELTA(element.GetVolume(1.0), 0.0, 1e-6);
 
         for (unsigned i=0; i<corner_nodes.size(); i++)
         {
@@ -304,7 +308,7 @@ public:
         TS_ASSERT_EQUALS(element2.GetNode(0)->GetPoint()[1], point2[1]);
     }
 
-    void TestGetNodeLocation() throw(Exception)
+    void TestGetNodeLocation()
     {
         ChastePoint<2> point1(0.0, 1.0);
         ChastePoint<2> point2(4.0, 6.0);
@@ -745,7 +749,7 @@ public:
         }
     }
 
-    void Test1DRefineElement() throw (Exception)
+    void Test1DRefineElement()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;
@@ -807,7 +811,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-6);
     }
 
-    void Test1DRefineElementWithPointTooFarRightFails() throw (Exception)
+    void Test1DRefineElementWithPointTooFarRightFails()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;
@@ -822,7 +826,7 @@ public:
                 "RefineElement could not be started (point is not in element)");
     }
 
-    void Test1DRefineElementWithPointTooFarLeftFails() throw (Exception)
+    void Test1DRefineElementWithPointTooFarLeftFails()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;
@@ -837,7 +841,7 @@ public:
                 "RefineElement could not be started (point is not in element)");
     }
 
-    void Test1DRefineElementManyNodes() throw (Exception)
+    void Test1DRefineElementManyNodes()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;
@@ -854,7 +858,7 @@ public:
         }
     }
 
-    void Test2DRefineElement() throw (Exception)
+    void Test2DRefineElement()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
         MutableMesh<2,2> mesh;
@@ -906,7 +910,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 0.4, 1e-6);
     }
 
-    void Test2DRefineElementFails() throw (Exception)
+    void Test2DRefineElementFails()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
         MutableMesh<2,2> mesh;
@@ -923,7 +927,7 @@ public:
                 "RefineElement could not be started (point is not in element)");
     }
 
-    void Test3DRefineElement() throw (Exception)
+    void Test3DRefineElement()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
         MutableMesh<3,3> mesh;
@@ -973,7 +977,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 6.0, 1e-6);
     }
 
-    void Test3DRefineElementFails() throw (Exception)
+    void Test3DRefineElementFails()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
         MutableMesh<3,3> mesh;
@@ -1024,7 +1028,6 @@ public:
         p_element->SetAttribute(3);
         TS_ASSERT_EQUALS(p_element->GetUnsignedAttribute(), 3u);
     }
-
 };
 
 #endif //_TESTELEMENT_HPP_

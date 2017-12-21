@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,8 @@ protected:
     enum
     {
         RADIUS,         //!< Radius of edge (where given in file)
-        SEGMENT_LENGTH  //!< Length of segment when several edges are linked by non-bifurcating intermediate nodes
+        SEGMENT_LENGTH,  //!< Length of segment when several edges are linked by non-bifurcating intermediate nodes.  This is a derived quantity and not (necessarily) the same as edge length.
+        PEDLEY_CORRECTION
     };
 
     TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
@@ -98,6 +99,13 @@ protected:
 
     /** Use dynamic (flux related) resistance and a nonlinear solver */
     bool mDynamicResistance;
+    /**
+     * When using dynamic (flux related) resistance.  It's possible to set a different Pedley resistance factor on
+     * each individual edge.  This can be
+     *  * Set on a generational basis (van Ertbruggen 2005)
+     *  * Set in the mesh file \todo This is not yet implemented
+     */
+    bool mPerGenerationDynamicResistance;
 
     /** False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
     bool mRadiusOnEdge;
@@ -113,7 +121,7 @@ protected:
      *
      * @param rElement  The edge on which to perform this calculation
      * @param usePedley  Whether to add Pedley's increasing correction term.  Here the resistance increases
-     * which the sqrt of Reynold's number (dependent on flux).
+     * with the sqrt of Reynold's number (dependent on flux).
      * @param flux  The flux in the edge (used for Pedley correction).
      * @return the resistance of this element/edge
      */
@@ -296,6 +304,15 @@ public:
      */
     void WriteVtk(const std::string& rDirName, const std::string& rFileBaseName);
 #endif // CHASTE_VTK
+
+    /**
+     * Set up per element dynamic resistance in the manner prescribed by
+     * van Ertbruggen et al. 2005.
+     * This method walks the tree and sets the attributes for the Pedley correction factor C
+     * which is related to van Ertbruggen's gamma: C = 4*sqrt(2)*gamma.
+     * Later use of the Solve method will pick up these factors in altering the local resistance.
+     */
+    void SetPerGenerationDynamicResistance();
 };
 
 #endif /* ABSTRACTVENTILATIONPROBLEM_HPP_ */

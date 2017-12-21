@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ public:
         NhsContractionModel nhs_forward;
 
         unsigned num_vars = nhs_backward.GetNumberOfStateVariables();
-        for(unsigned i=0; i<num_vars; i++)
+        for (unsigned i=0; i<num_vars; i++)
         {
             // both should be the same (ie initial values)
             TS_ASSERT_DELTA(nhs_backward.rGetStateVariables()[i],
@@ -92,7 +92,7 @@ public:
         // update state vars on implicit system
         nhs_backward.UpdateStateVariables();
 
-        for(unsigned i=0; i<num_vars; i++)
+        for (unsigned i=0; i<num_vars; i++)
         {
             std::cout << nhs_backward.rGetStateVariables()[i] << " "
                       << nhs_forward.rGetStateVariables()[i] << "\n";
@@ -146,7 +146,7 @@ public:
         double explicit_solve_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
 
         unsigned num_vars = nhs_backward.GetNumberOfStateVariables();
-        for(unsigned i=0; i<num_vars; i++)
+        for (unsigned i=0; i<num_vars; i++)
         {
             std::cout << nhs_backward.rGetStateVariables()[i] << " "
                       << nhs_forward.rGetStateVariables()[i] << "\n";
@@ -177,7 +177,7 @@ public:
 //        nhs_backward2.UpdateStateVariables();
 //
 //        unsigned num_vars = nhs_backward.GetNumberOfStateVariables();
-//        for(unsigned i=0; i<num_vars; i++)
+//        for (unsigned i=0; i<num_vars; i++)
 //        {
 //            std::cout << nhs_backward.rGetStateVariables()[i] << " "
 //                      << nhs_backward2.rGetStateVariables()[i] << "\n";

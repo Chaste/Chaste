@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *pData)
 {
-    assert(pData != NULL);
+    assert(pData != nullptr);
     AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
     try
     {
@@ -124,7 +124,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
 #endif
     void *pData, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
-    assert(pData != NULL);
+    assert(pData != nullptr);
     AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
     try
     {
@@ -140,7 +140,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
 
 AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
     : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
-      mLastSolutionState(NULL),
+      mLastSolutionState(nullptr),
       mLastSolutionTime(0.0),
 #if CHASTE_SUNDIALS_VERSION >=20400
       mForceReset(false),
@@ -152,7 +152,7 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
       mForceMinimalReset(false),
       mHasAnalyticJacobian(false),
       mUseAnalyticJacobian(false),
-      mpCvodeMem(NULL),
+      mpCvodeMem(nullptr),
       mMaxSteps(0),
       mLastInternalStepSize(0)
 {
@@ -222,7 +222,7 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
         if (ierr<0)
         {
 //            DebugSteps(mpCvodeMem, this);
-            CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at);
+            CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at, stepper.GetTime(), stepper.GetNextTime());
         }
         // Not root finding, so should have reached requested time
         assert(fabs(cvode_stopped_at - stepper.GetNextTime()) < DBL_EPSILON);
@@ -263,7 +263,7 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     if (ierr<0)
     {
 //        DebugSteps(mpCvodeMem, this);
-        CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at);
+        CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at, tStart, tEnd);
     }
     // Not root finding, so should have reached requested time
     assert(fabs(cvode_stopped_at - tEnd) < DBL_EPSILON);
@@ -383,10 +383,10 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     {
         //std::cout << "New CVODE solver\n";
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
+        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
 
         // Set error handler
-        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, NULL);
+        CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
         // Set the user data
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeSetUserData(mpCvodeMem, (void*)(this));
@@ -462,11 +462,12 @@ void AbstractCvodeSystem::FreeCvodeMemory()
     {
         CVodeFree(&mpCvodeMem);
     }
-    mpCvodeMem = NULL;
+    mpCvodeMem = nullptr;
 }
 
 
-void AbstractCvodeSystem::CvodeError(int flag, const char * msg, const double& rTime)
+void AbstractCvodeSystem::CvodeError(int flag, const char * msg,
+                                     const double& rTime, const double& rStartTime, const double& rEndTime)
 {
     std::stringstream err;
     char* p_flag_name = CVodeGetReturnFlagName(flag);
@@ -491,7 +492,7 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg, const double& r
         free(p_ls_flag_name);
     }
 
-    err << "\nGot to time " << rTime << "\n";
+    err << "\nGot from time " << rStartTime << " to time " << rTime << ", was supposed to finish at time " << rEndTime << "\n";
     err << "\nState variables are now:\n";
     std::vector<double> state_vars = MakeStdVec(mStateVariables);
     std::vector<std::string> state_var_names = rGetStateVariableNames();

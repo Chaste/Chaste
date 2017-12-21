@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,9 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TEST3DBIDOMAINFOREFFICIENCY_HPP_
 #define TEST3DBIDOMAINFOREFFICIENCY_HPP_
 
-
-
-
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
 #include "BidomainProblem.hpp"
@@ -53,7 +50,7 @@ class Test3dBidomainProblemForEfficiency :  public CxxTest::TestSuite
 {
 public:
 
-    void TestBidomain3d() throw (Exception)
+    void TestBidomain3d()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));

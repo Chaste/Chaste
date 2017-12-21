@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,6 +43,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * "A computational model of the topographic distribution of ventilation in
  *  healthy human lungs"
+ *
+ *  Note, that this model is implemented to match the equations underlying
+ *  the model presented in Swan 2012, but does not seek to implement
+ *  the numerical coupling method used. Instead, the method described in
+ *  Coleman 1977 is applied.
  */
 class Swan2012AcinarUnit : public AbstractAcinarUnit
 {
@@ -79,7 +84,7 @@ public:
      * @param tStart The starting time
      * @param tEnd The ending time
      */
-    virtual void ComputeExceptFlow(double tStart, double tEnd) {};
+    virtual void ComputeExceptFlow(double tStart, double tEnd);
 
     /**
      * Update the flow to the acinus across a time interval.
@@ -89,8 +94,7 @@ public:
      * @param tStart The starting time
      * @param tEnd The ending time
      */
-    virtual void UpdateFlow(double tStart, double tEnd) {};
-
+    virtual void UpdateFlow(double tStart, double tEnd);
 
 
     /** Set the air flow
@@ -112,7 +116,7 @@ public:
     /** Return the airway pressure
      * @return Airway pressure
      */
-    double GetAirwayPressure(){return 0.0;};
+    double GetAirwayPressure();
 
     /** Set the pleural pressure
      * @param pressure new value
@@ -144,6 +148,12 @@ public:
      */
     void SetUndeformedVolume(double v0);
 
+    /**
+     * Calculates the static recoil pressure for the current stretch
+     */
+    double CalculateStaticRecoilPressure(double lambda);
+
+
 private:
     /** The flow into the acinar unit */
     double mQ;
@@ -157,14 +167,8 @@ private:
     /** The current air pressure in the acinar duct */
     double mPaw;
 
-    /** The air pressure in the acinar duct at the previous timestep */
-    double mPawOld;
-
     /** The current pleural pressure (Pa) */
     double mPpl;
-
-    /** The pleural pressure at the previous timestep (Pa)*/
-    double mPplOld;
 
     /** The resistance of the terminal bronchiole entering the acinus */
     double mRaw;
@@ -195,12 +199,7 @@ private:
     /**
      * @return gamma
      */
-    double CalculateGamma();
-
-    /**
-     * @return The acinar tissue compliance, C_a (dV/dPe)
-     */
-    double CalculateAcinarTissueCompliance();
+    double CalculateGamma(double lambda);
 };
 
 

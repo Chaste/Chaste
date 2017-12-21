@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,9 +55,11 @@ public:
      *
      * @param rAirwaysMesh A mesh containing the airway tree to analyze
      * @param rootIndex The index of the inlet node (trachea entrance)
+     * @param radiusOnEdge Whether airway radii are defined element wise or nodally.
      */
     AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
-                               unsigned rootIndex=0u);
+                               unsigned rootIndex = 0u,
+                               bool radiusOnEdge = false);
 
     /**
      * Destructor
@@ -213,6 +215,9 @@ private:
 
     /** Allows easy traversal of the airway tree */
     AirwayTreeWalker mWalker;
+
+    /** Flag indicating whether airway radii are defined nodally or on elements */
+    bool mRadiusOnEdge;
 
     /** An easy access list of airway branches */
     std::vector<AirwayBranch*> mBranches;
@@ -419,9 +424,6 @@ private:
      * @param pBranch The current branch
      */
     void RecursivelyCalculateUpstreamPoiseuilleResistances(AirwayBranch* pBranch);
-
-
 };
-
 
 #endif // AIRWAY_PROPERTIES_CALCULATOR

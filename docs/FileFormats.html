@@ -1,4 +1,4 @@
- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>Chaste File Formats</title>
@@ -19,17 +19,19 @@
   <dd>
     This extension is used as a flexible format for several purposes.
     <ul>
-    <li>Simulation statistics. The structure of each file varies depending on the data they contain. The structure should be described by comments in the methods which write these data.<br>
+    <li>Simulation statistics. The structure of each file varies depending on the data they contain. The structure should be described by comments in the methods which write these data.<br/>
     An example is the <tt>CellAgesWriter</tt> class:
         <ul>
-        <li> The output is a single value [current simulation time], followed by a tab, followed by a sequence of space-separated values.
-        <li> This sequence has the form '...[location index] [x-pos] [y-pos] [z-pos] [cell age] ...' where [y-pos] and [z-pos] are included for 2 and 3 dimensional simulations, respectively.</li>
+        <li>The output is a single value [current simulation time], followed by a tab, followed by a sequence of space-separated values.</li>
+        <li>This sequence has the form '...[location index] [x-pos] [y-pos] [z-pos] [cell age] ...' where [y-pos] and [z-pos] are included for 2 and 3 dimensional simulations, respectively.</li>
         </ul>
+    </li>
     <li>Also used for the fixed-width space-separated column data file format, written by the <tt>ColumnDataWriter</tt> class, and compatible with <a href="http://www.gnuplot.info/">Gnuplot</a>.
         <ul>
         <li>First line is a header, of the form <tt>Name1(units1) Name2(units2) ... NameN(unitsN)</tt>.</li>
         <li>Subsequent lines give the data. Columns are padded with spaces to a fixed width, determined by the <tt>precision</tt> argument to the writer constructor.</li>
         </ul>
+    </li>
     </ul>
     They are all, however, data files with a similar structure suitable for plotting with <a href="http://www.gnuplot.info/">Gnuplot</a>.
   </dd>
@@ -190,7 +192,7 @@
   </dd>
   <dt>.pts</dt>
   <dd>
-    Meshalyzer (used for visualisation) nodes format. First line is <tt>&lt;number of nodes&gt</tt>. Following lines are the nodal coordinates.
+    Meshalyzer (used for visualisation) nodes format. First line is <tt>&lt;number of nodes&gt;</tt>. Following lines are the nodal coordinates.
   </dd>
   <dt>.tri</dt>
   <dd>
@@ -219,7 +221,7 @@
   <dt>*.dat</dt>
   <dd>
     General format of results files written by cell writer classes, which include a range of different properties of cells at each printing timestep. These take different 
-    formats but, as a representative example, the file <tt>cellareas.dat</tt> (which is written using the class <tt>CellAgesWriter</tt>) consists of space-separated lines of the form 
+    formats but, as a representative example, the file <tt>cellages.dat</tt> (which is written using the class <tt>CellAgesWriter</tt>) consists of space-separated lines of the form 
     <tt>[time] [location index] [cell 0 x-pos] [cell 0 y-pos] [cell 0 z-pos] [cell 0 age] [cell 1 x-pos] [cell 1 y-pos] [cell 1 z-pos] [cell 1 age]...</tt>. Note that if 
     VTK output is switched on, then cell writer objects also output VTK data for the cell population at each printing timestep.
   </dd>
@@ -280,6 +282,6 @@
   </dd>
 </dl>
 
-  </body>
+</body>
 </html>
  

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,11 +78,10 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
 
     // increment the iterator
     this->mMapIterator++;
-    if(this->mMapIterator==this->mQuadPointToDataAtQuadPointMap.end())
+    if (this->mMapIterator==this->mQuadPointToDataAtQuadPointMap.end())
     {
         this->mMapIterator = this->mQuadPointToDataAtQuadPointMap.begin();
     }
-
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
@@ -98,9 +97,9 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
     this->AssembleSystem(true,false);
 
     // integrate contraction models
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-        iter != this->mQuadPointToDataAtQuadPointMap.end();
-        iter++)
+    for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+         iter != this->mQuadPointToDataAtQuadPointMap.end();
+         iter++)
     {
         AbstractContractionModel* p_contraction_model = iter->second.ContractionModel;
         double stretch = iter->second.Stretch;
@@ -111,8 +110,6 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
     // solve
     ELASTICITY_SOLVER::Solve();
 }
-
-
 
 template class ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
 template class ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;

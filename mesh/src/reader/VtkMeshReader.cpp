@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-
 #ifdef CHASTE_VTK
 
 #include "VtkMeshReader.hpp"
@@ -70,7 +68,7 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
 
     // Check file exists
     mVtuFile.open(pathBaseName.c_str());
-    if ( !mVtuFile.is_open() )
+    if (!mVtuFile.is_open())
     {
         EXCEPTION("Could not open VTU file: " + pathBaseName);
     }
@@ -107,17 +105,17 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     vtkCellTypes* cell_types = vtkCellTypes::New();
     mpVtkUnstructuredGrid->GetCellTypes(cell_types);
 
-    if(cell_types->GetNumberOfTypes() > 1)
+    if (cell_types->GetNumberOfTypes() > 1)
     {
         mNumCableElementAttributes = 1;
-        for(unsigned cell_id = 0; cell_id < num_cells; ++cell_id)
+        for (unsigned cell_id = 0; cell_id < num_cells; ++cell_id)
         {
-            if(mpVtkUnstructuredGrid->GetCellType(cell_id) == mVtkCellType)
+            if (mpVtkUnstructuredGrid->GetCellType(cell_id) == mVtkCellType)
             {
                 ++mNumElements;
                 assert(mNumCableElements == 0); //We expect all the simplices first and then the cables at the end of the array
             }
-            else if(mpVtkUnstructuredGrid->GetCellType(cell_id) == VTK_LINE)
+            else if (mpVtkUnstructuredGrid->GetCellType(cell_id) == VTK_LINE)
             {
                 ++mNumCableElements;
             }
@@ -285,24 +283,18 @@ unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaceAttributes() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
 {
-    mNodesRead=0;
-    mElementsRead=0;
-    mFacesRead=0;
-    mBoundaryFacesRead=0;
-    mBoundaryFacesSkipped=0;
-    mCableElementsRead=0;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Initialize()
-{
-    mpVtkUnstructuredGrid->Initialize();
+    mNodesRead = 0;
+    mElementsRead = 0;
+    mFacesRead = 0;
+    mBoundaryFacesRead = 0;
+    mBoundaryFacesSkipped = 0;
+    mCableElementsRead = 0;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextNode()
 {
-    if ( mNodesRead >= mNumNodes )
+    if (mNodesRead >= mNumNodes)
     {
         EXCEPTION( "Trying to read data for a node that doesn't exist" );
     }
@@ -321,7 +313,7 @@ std::vector<double> VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextNode()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
 {
-    if ( mElementsRead >= mNumElements )
+    if (mElementsRead >= mNumElements)
     {
         EXCEPTION( "Trying to read data for an element that doesn't exist" );
     }
@@ -348,7 +340,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
 {
-    if ( mCableElementsRead >=  mNumCableElements )
+    if (mCableElementsRead >=  mNumCableElements)
     {
         EXCEPTION( "Trying to read data for a cable element that doesn't exist" );
     }
@@ -374,7 +366,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
 {
-    if ( mBoundaryFacesRead >= mNumFaces)
+    if (mBoundaryFacesRead >= mNumFaces)
     {
         EXCEPTION( "Trying to read data for a boundary element that doesn't exist");
     }
@@ -430,7 +422,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std
 {
     vtkCellData *p_cell_data = mpVtkUnstructuredGrid->GetCellData();
 
-    if ( !p_cell_data->HasArray(dataName.c_str()) )
+    if (!p_cell_data->HasArray(dataName.c_str()))
     {
         EXCEPTION("No cell data '" + dataName + "'");
     }
@@ -453,7 +445,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std
 {
     vtkCellData *p_cell_data = mpVtkUnstructuredGrid->GetCellData();
 
-    if ( !p_cell_data->HasArray(dataName.c_str()) )
+    if (!p_cell_data->HasArray(dataName.c_str()))
     {
         EXCEPTION("No cell data '" + dataName + "'");
     }
@@ -482,7 +474,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, st
 {
     vtkPointData *p_point_data = mpVtkUnstructuredGrid->GetPointData();
 
-    if ( !p_point_data->HasArray(dataName.c_str()) )
+    if (!p_point_data->HasArray(dataName.c_str()))
     {
         EXCEPTION("No point data '" + dataName + "'");
     }
@@ -506,7 +498,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, st
 {
    vtkPointData *p_point_data = mpVtkUnstructuredGrid->GetPointData();
 
-    if ( !p_point_data->HasArray(dataName.c_str()) )
+    if (!p_point_data->HasArray(dataName.c_str()))
     {
         EXCEPTION("No point data '" + dataName + "'");
     }
@@ -536,10 +528,7 @@ vtkUnstructuredGrid* VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::OutputMeshAsVtkUnstru
     return mpVtkUnstructuredGrid;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class VtkMeshReader<1,1>;
 template class VtkMeshReader<1,2>;
 template class VtkMeshReader<1,3>;

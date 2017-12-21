@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,12 +48,11 @@ DistributedQuadraticMesh<DIM>::~DistributedQuadraticMesh()
 {
 }
 
-
 template<unsigned DIM>
 void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rAbsMeshReader)
 {
     TrianglesMeshReader<DIM, DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<DIM, DIM>*>(&rAbsMeshReader);
-    assert(p_mesh_reader != NULL);
+    assert(p_mesh_reader != nullptr);
 
     unsigned order_of_elements = 1;
     if (p_mesh_reader)
@@ -67,7 +66,7 @@ void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<D
     {
         EXCEPTION("Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
     }
-    this->mMeshIsLinear=false;
+    this->mMeshIsLinear = false;
     DistributedTetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(*p_mesh_reader);
     assert(this->GetNumBoundaryElements() > 0u);
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);
@@ -75,15 +74,10 @@ void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<D
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class DistributedQuadraticMesh<1>;
 template class DistributedQuadraticMesh<2>;
 template class DistributedQuadraticMesh<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

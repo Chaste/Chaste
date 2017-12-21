@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -329,7 +329,6 @@ public:
      * @param value  value to set it to.
      */
     void SetParameter(const std::string& rParameterName, double value);
-
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeCell)

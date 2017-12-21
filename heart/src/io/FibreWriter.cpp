@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,7 +67,7 @@ void FibreWriter<DIM>::WriteAllAxi(const std::vector< c_vector<double, DIM> >& f
         }
         else
         {
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 *p_axi_file << fibres[i][j] << "\t";
             }
@@ -101,15 +101,15 @@ void FibreWriter<DIM>::WriteAllOrtho(const std::vector< c_vector<double, DIM> >&
         else
         {
             //The ascii file is row-major
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 *p_file << fibres[i][j] << "\t";
             }
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 *p_file << second[i][j] << "\t";
             }
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 *p_file << third[i][j] << "\t";
             }
@@ -139,18 +139,13 @@ out_stream FibreWriter<DIM>::OpenFileAndWriteHeader(const std::string& rFileName
     return p_fibre_file;
 }
 
-
 template<unsigned DIM>
 void FibreWriter<DIM>::SetWriteFileAsBinary()
 {
     mFileIsBinary = true;
 }
 
+// Explicit instantiation
 template class FibreWriter<1>;
 template class FibreWriter<2>;
 template class FibreWriter<3>;
-
-
-
-
-

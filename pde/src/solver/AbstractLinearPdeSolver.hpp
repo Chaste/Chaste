@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,10 +64,10 @@ public:
      * @param pMesh the mesh
      */
     AbstractLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
-        : mpLinearSystem(NULL),
+        : mpLinearSystem(nullptr),
           mpMesh(pMesh)
     {
-        assert(pMesh!=NULL);
+        assert(pMesh!=nullptr);
     }
 
     /**
@@ -90,7 +90,7 @@ public:
      * @param initialSolution Initial solution (defaults to NULL) for PETSc
      *  to use as a template.
      */
-    virtual void InitialiseForSolve(Vec initialSolution = NULL);
+    virtual void InitialiseForSolve(Vec initialSolution = nullptr);
 
     /**
      * The static and dynamic Solve() implementations both call this
@@ -148,15 +148,15 @@ public:
     }
 };
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem == NULL)
+    if (this->mpLinearSystem == nullptr)
     {
-        unsigned preallocation= PROBLEM_DIM * mpMesh->CalculateMaximumNodeConnectivityPerProcess();
+        unsigned preallocation = PROBLEM_DIM * mpMesh->CalculateMaximumNodeConnectivityPerProcess();
 
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-        if (initialSolution == NULL)
+        if (initialSolution == nullptr)
         {
             /*
              * Static problem, create linear system. The following ensures

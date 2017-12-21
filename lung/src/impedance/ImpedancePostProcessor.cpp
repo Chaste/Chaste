@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ ImpedancePostProcessor::ImpedancePostProcessor(std::vector<double>& rFrequencies
 {
     assert(mrFrequencies.size() == mrImpedances.size());
 
-    if( (std::find(mrFrequencies.begin(), mrFrequencies.end(), 5.0 ) == mrFrequencies.end()) ||
+    if ((std::find(mrFrequencies.begin(), mrFrequencies.end(), 5.0 ) == mrFrequencies.end()) ||
         (std::find(mrFrequencies.begin(), mrFrequencies.end(), 20.0) == mrFrequencies.end()))
     {
         EXCEPTION("Impedance post processor requires data points at 5 Hz & 20 Hz");
@@ -61,12 +61,12 @@ double ImpedancePostProcessor::GetR5MinusR20()
 
     for (unsigned freq_index = 0; freq_index < mrFrequencies.size(); ++freq_index)
     {
-        if(mrFrequencies[freq_index] == 5.0)
+        if (mrFrequencies[freq_index] == 5.0)
         {
             R5 = real(mrImpedances[freq_index]);
         }
 
-        if(mrFrequencies[freq_index] == 20.0)
+        if (mrFrequencies[freq_index] == 20.0)
         {
             R20 = real(mrImpedances[freq_index]);
         }
@@ -83,11 +83,11 @@ double ImpedancePostProcessor::GetResonantFrequency()
 
     for (unsigned freq_index = 0; freq_index < mrFrequencies.size(); ++freq_index)
     {
-        if(imag(mrImpedances[freq_index]) <= 0.0)
+        if (imag(mrImpedances[freq_index]) <= 0.0)
         {
             lower_bound_index = freq_index;
         }
-        else if(imag(mrImpedances[freq_index]) > 0.0)
+        else if (imag(mrImpedances[freq_index]) > 0.0)
         {
             upper_bound_index = freq_index;
             break;
@@ -109,11 +109,11 @@ double ImpedancePostProcessor::GetAx()
 
     unsigned freq_index = 0u;
 
-    while(mrFrequencies[freq_index] <= fres)
+    while (mrFrequencies[freq_index] <= fres)
     {
-        if(mrFrequencies[freq_index] >= 5)
+        if (mrFrequencies[freq_index] >= 5)
         {
-            if(mrFrequencies[freq_index+1] <= fres)
+            if (mrFrequencies[freq_index+1] <= fres)
             {
                 ax_integral += (mrFrequencies[freq_index+1] - mrFrequencies[freq_index])*(imag(mrImpedances[freq_index+1]) + imag(mrImpedances[freq_index]))/2.0;
             }
@@ -133,9 +133,9 @@ double ImpedancePostProcessor::GetRrs()
 {
     double rrs_integral = 0.0;
 
-    for(unsigned freq_index = 0; freq_index < mrFrequencies.size(); ++freq_index)
+    for (unsigned freq_index = 0; freq_index < mrFrequencies.size(); ++freq_index)
     {
-        if(mrFrequencies[freq_index] >= 5 && freq_index+1 < mrFrequencies.size())
+        if (mrFrequencies[freq_index] >= 5 && freq_index+1 < mrFrequencies.size())
         {
             rrs_integral += (mrFrequencies[freq_index+1] - mrFrequencies[freq_index])*(real(mrImpedances[freq_index+1]) + real(mrImpedances[freq_index]))/2.0;
         }

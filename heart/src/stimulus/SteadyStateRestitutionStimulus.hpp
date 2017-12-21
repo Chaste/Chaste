@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,7 +85,6 @@ public:
      * @param numberOfPulses  The number of pulses to perform at each pacing cycle length
      */
     SteadyStateRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses);
-
 };
 
 #include "SerializationExportWrapper.hpp"

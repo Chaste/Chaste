@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,7 +67,7 @@ public:
                                                                          unsigned domainIndex)
     {
         // Have we got space for this domain?
-        if ( mCache.size() <= domainIndex )
+        if (mCache.size() <= domainIndex)
         {
             // Not a pretty line! Initialises every new entry with an UNSIGNED_UNSET and a zero matrix.
             mCache.resize(domainIndex+1, std::pair<unsigned, c_matrix<double,SPACE_DIM,SPACE_DIM> >

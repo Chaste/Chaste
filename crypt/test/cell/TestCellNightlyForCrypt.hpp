@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -64,7 +65,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModelAndMutationAPCONEHIT() throw(Exception)
+    void TestWithWntCellCycleModelAndMutationAPCONEHIT()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
@@ -138,7 +139,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModelAndMutationBetaCat() throw(Exception)
+    void TestWithWntCellCycleModelAndMutationBetaCat()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
@@ -213,7 +214,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModelAndMutationAPC2() throw(Exception)
+    void TestWithWntCellCycleModelAndMutationAPC2()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 

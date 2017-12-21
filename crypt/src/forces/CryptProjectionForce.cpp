@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 #include "IsNan.hpp"
+#include "StemCellProliferativeType.hpp"
 
 CryptProjectionForce::CryptProjectionForce()
     : GeneralisedLinearSpringForce<2>(),
@@ -254,7 +255,7 @@ void CryptProjectionForce::AddForceContribution(AbstractCellPopulation<2>& rCell
     UpdateNode3dLocationMap(rCellPopulation);
 
     // Throw an exception message if not using a MeshBasedCellPopulation
-    if (dynamic_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("CryptProjectionForce is to be used with a subclass of MeshBasedCellPopulation only");
     }

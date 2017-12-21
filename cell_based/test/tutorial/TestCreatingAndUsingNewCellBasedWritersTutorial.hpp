@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "CellLabel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -222,7 +223,7 @@ class TestCreatingAndUsingNewCellBasedWritersTutorial : public AbstractCellBased
 {
 public:
 
-    void TestOffLatticeSimulationWithMotileCellPropertyAndWriters() throw(Exception)
+    void TestOffLatticeSimulationWithMotileCellPropertyAndWriters()
     {
         /*
          * We begin by creating a {{{NodeBasedCellPopulation}}}, just as in [wiki:UserTutorials/CreatingAndUsingANewCellProperty].
@@ -245,7 +246,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPropertyCollection collection;
             if (RandomNumberGenerator::Instance()->ranf() < 0.2)

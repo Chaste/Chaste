@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ double CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(Ce
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    assert(SPACE_DIM == 2);
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
 
     unsigned global_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     double x = pCellPopulation->GetLocationOfCellCentre(pCell)[0];

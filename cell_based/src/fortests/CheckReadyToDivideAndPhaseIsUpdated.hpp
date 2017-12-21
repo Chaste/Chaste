@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include <cmath>
-#include "AbstractCellCycleModel.hpp"
+#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
 /**
@@ -48,11 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cxx-test classes (not source code) as it includes TS_ASSERT
  * calls.
  *
- * @param pModel Pointer to the cell-cycle model
+ * @param pModel Pointer to the cell-cycle model (note must be a phase based model)
  * @param g1Duration Correct duration of the G1 phase, to test against
  * @param g2Duration Correct duration of the G1 phase, to test against
  */
-void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
+void CheckReadyToDivideAndPhaseIsUpdated(AbstractPhaseBasedCellCycleModel* pModel,
                                          double g1Duration,
                                          double g2Duration=DBL_MAX)
 {
@@ -125,5 +126,48 @@ void CheckReadyToDivideAndPhaseIsUpdated(AbstractCellCycleModel* pModel,
         TS_ASSERT_EQUALS(pModel->ReadyToDivide(), true);
     }
 }
+
+/**
+ * A helper method that is called in cell-cycle model tests
+ * to check that a cell is progressing through the cell cycle
+ * correctly. This is a method which should only be called by
+ * cxx-test classes (not source code) as it includes TS_ASSERT
+ * calls.
+ *
+ * @param pModel Pointer to the cell-cycle model (note must be a simple non phase based model)
+ * @param cellCycleDuration Correct duration of the cell cycle phase, to test against
+ */
+void CheckReadyToDivideIsUpdated(AbstractSimpleCellCycleModel* pModel,
+                                 double cellCycleDuration)
+{
+    double age = pModel->GetAge();
+
+    const double CCDTOL = 1e-5; // how accurate the expected CCD duration is
+
+    // If the CCD duration is incorrect, print out the mismatch
+    if ((pModel->GetCellCycleDuration() != DOUBLE_UNSET) &&
+        (fabs(pModel->GetCellCycleDuration() - cellCycleDuration) > CCDTOL))
+    {
+        std::cout << "CCD duration mismatch: actual = " << pModel->GetCellCycleDuration()
+                  << ", expected = " << cellCycleDuration
+                  << std::endl;
+    }
+
+    // Check ReadyToDivide is updated correctly.
+    if (pModel->GetCell()->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+    {
+        // If the cell is differentiated, then it must be in G0 phase and must never divide
+        TS_ASSERT_EQUALS(pModel->ReadyToDivide(), false);
+    }
+    else if (age < cellCycleDuration)
+    {
+        TS_ASSERT_EQUALS(pModel->ReadyToDivide(), false);
+    }
+    else
+    {
+        TS_ASSERT_EQUALS(pModel->ReadyToDivide(), true);
+    }
+}
+
 
 #endif /*CHECKREADYTODIVIDEANDPHASEISUPDATED_HPP_*/

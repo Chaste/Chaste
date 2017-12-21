@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,8 +48,12 @@ class TestPottsMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestPottsMeshGeneratorIn2dFromBottomLeft() throw(Exception)
+    void TestPottsMeshGeneratorIn2dFromBottomLeft()
     {
+        // Coverage
+        //TS_ASSERT_THROWS_NOTHING(PottsMeshGenerator<2> empty_generator());
+    ///\todo Line above is not valid code.  What does it cover?
+
         PottsMeshGenerator<2> generator(9, 3, 3, 5, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
 
         // Create mesh
@@ -135,7 +139,7 @@ public:
         }
     }
 
-    void TestPottsMeshGenerator2dInCentre() throw(Exception)
+    void TestPottsMeshGenerator2dInCentre()
     {
         PottsMeshGenerator<2> generator(6, 2, 2, 7, 2, 2); //should have a gap of one on the left right and bottom and 2 on the top
 
@@ -223,7 +227,7 @@ public:
         }
     }
 
-    void TestPottsMeshGenerator3dFromBottomLeft() throw(Exception)
+    void TestPottsMeshGenerator3dFromBottomLeft()
     {
         PottsMeshGenerator<3> generator(4, 2, 2, 4, 2, 2, 6, 2, 2, true); // last bool makes elements start in bottom left
 
@@ -321,7 +325,7 @@ public:
         }
     }
 
-    void TestPottsMeshGenerator3dInCentre() throw(Exception)
+    void TestPottsMeshGenerator3dInCentre()
     {
         PottsMeshGenerator<3> generator(6, 2, 2, 4, 1, 2, 4, 1, 2); //should have a gap of one on all sides
 
@@ -347,12 +351,12 @@ public:
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
 
-            if ( (p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[0] >= 5.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] >= 3.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] >= 3.0) )
+            if ((p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[0] >= 5.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] >= 3.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] >= 3.0))
             {
                 TS_ASSERT_EQUALS(num_containing_elements,0u);
             }
@@ -416,7 +420,7 @@ public:
         }
     }
 
-    void TestGenerator3dLarge() throw (Exception)
+    void TestGenerator3dLarge()
     {
         // Create a simple 3D PottsMesh
         unsigned domain_size = 10;
@@ -438,12 +442,12 @@ public:
 
             bool is_boundary_node;
 
-            if ( (p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[0] >= domain_size - 1.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[1] >= domain_size - 1.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
-                 (p_mesh->GetNode(node_index)->rGetLocation()[2] >= domain_size - 1.0) )
+            if ((p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[0] >= domain_size - 1.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[1] >= domain_size - 1.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] <= 0.0) ||
+                (p_mesh->GetNode(node_index)->rGetLocation()[2] >= domain_size - 1.0))
             {
                 TS_ASSERT_EQUALS(num_containing_elements,0u);
                 is_boundary_node = true;

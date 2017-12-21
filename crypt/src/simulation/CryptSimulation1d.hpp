@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulationBoundaryCondition.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "CryptCentreBasedDivisionRule.hpp"
 
 /**
  * A 1D crypt simulation object. The model is a simplified version of a 2D crypt model
@@ -77,18 +78,6 @@ private:
 
     /** Helper member that is a static cast of the cell population. */
     MeshBasedCellPopulation<1>* mpStaticCastCellPopulation;
-
-    /**
-     * Calculates the new locations of a dividing cell's cell centres.
-     * Moves the dividing node a bit and returns co-ordinates for the new node.
-     * It does this by picking a random direction (0->2PI) and placing the parent
-     * and daughter in opposing directions on this axis.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return daughter_coords the coordinates for the daughter cell.
-     */
-    c_vector<double, 1> CalculateCellDivisionVector(CellPtr pParentCell);
 
 public:
 

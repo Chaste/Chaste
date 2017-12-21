@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractPottsUpdateRule<DIM>::AbstractPottsUpdateRule()
+    : AbstractUpdateRule<DIM>()
 {
 }
 
@@ -46,22 +47,13 @@ AbstractPottsUpdateRule<DIM>::~AbstractPottsUpdateRule()
 }
 
 template<unsigned DIM>
-void AbstractPottsUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParamsFile)
-{
-    std::string update_type = GetIdentifier();
-
-    *rParamsFile << "\t\t<" << update_type << ">\n";
-    OutputUpdateRuleParameters(rParamsFile);
-    *rParamsFile << "\t\t</" << update_type << ">\n";
-}
-
-template<unsigned DIM>
 void AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
-    // No parameters to output
+    // Call method on direct parent class
+    AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class AbstractPottsUpdateRule<1>;
 template class AbstractPottsUpdateRule<2>;
 template class AbstractPottsUpdateRule<3>;

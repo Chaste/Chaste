@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 """, re.MULTILINE)
 
-current_notice="""Copyright (c) 2005-2016, University of Oxford.
+current_notice="""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -135,14 +135,11 @@ cpp_notice_to_add = cpp_current_notice + "\n\n"
 replacement_notice = current_notice.replace("\nThis file is part of Chaste.\n", r"\1")
 
 output_notice=current_notice.replace("\nThis file is part of Chaste.\n", "")
-boost_normal_distribution_notice = """/* boost random/normal_distribution.hpp header file
- *
- * Copyright Jens Maurer 2000-2001
- * Copyright Steven Watanabe 2010-2011
+boost_random_distribution_notice = """
  * Distributed under the Boost Software License, Version 1.0. (See
  * accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
- *"""
+ """
 pycml_notice=" Processed by pycml - CellML Tools in Python"
 xsd2_notice="// Copyright (C) 2005-2007 Code Synthesis Tools CC"
 xsd3_notice="// Copyright (C) 2005-2008 Code Synthesis Tools CC"
@@ -190,7 +187,7 @@ py_lgpl_notice = """# This library is free software; you can redistribute it and
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 2.1 of the License, or (at your option) any later version.
-# 
+#
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -210,7 +207,7 @@ def CheckForCopyrightNotice(findStrOrRe, fileIn):
 
 def UpdateFile(oldFilePath, newFilePath):
     """Replace the contents of oldFilePath with newFilePath.
-    
+
     This removes the old file and renames the new to match, but also
     transfers permissions etc.
     """
@@ -243,7 +240,7 @@ def HeadAppendStringInFile(appendString, filePath):
     UpdateFile(filePath, tempName)
     print 'Notice: applied copyright notice in ', filePath
 
-   
+
 def InspectFile(fileName):
     file_in = open(fileName)
     if fileName[-21:] == 'CheckForCopyrights.py':
@@ -256,11 +253,11 @@ def InspectFile(fileName):
         #print 'Found current notice in '+file_name
         valid_notice=True
     if (CheckForCopyrightNotice(pycml_notice, file_in) or
-        CheckForCopyrightNotice(boost_normal_distribution_notice, file_in) or
+        CheckForCopyrightNotice(boost_random_distribution_notice, file_in) or
         CheckForCopyrightNotice(xsd2_notice, file_in) or
         CheckForCopyrightNotice(xsd3_notice, file_in) or
         CheckForCopyrightNotice(triangle_notice, file_in) or
-        CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or 
+        CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
         CheckForCopyrightNotice(py_lgpl_notice, file_in)):
         #print 'Found 3rd party notice in '+file_name
@@ -269,10 +266,10 @@ def InspectFile(fileName):
             return False
         else:
             return True
-    
+
     if valid_notice:
         return True
-    
+
     if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
@@ -281,7 +278,7 @@ def InspectFile(fileName):
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
             return False
-        
+
     if CheckForCopyrightNotice(deprecated_notice_GPL, file_in):
         print 'Found deprecated GPL copyright notice for', fileName
         if apply_update:
@@ -290,7 +287,7 @@ def InspectFile(fileName):
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
             return False
-    
+
     print 'Found no copyright notice for', fileName
     if apply_new:
         if fileName[-3:] == '.py':
@@ -310,11 +307,11 @@ if __name__ == '__main__':
     exts = ['.cpp', '.hpp', '.py', '.java']
 
     # SCons files
-    # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice) 
+    # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
     named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
 
-    dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
+    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
     startchar_ignores = ['_', '.']
     exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
 
@@ -322,10 +319,10 @@ if __name__ == '__main__':
     apply_new = '-new' in sys.argv
 
     chaste_dir = '.'
-    if '-dir' in sys.argv: 
+    if '-dir' in sys.argv:
         i = sys.argv.index('-dir')
         chaste_dir = os.path.realpath(sys.argv[i+1])
-    
+
     num_no_copyrights = 0
     num_copyrights = 0
     chaste_dir_len = len(os.path.join(chaste_dir, ''))
@@ -358,7 +355,7 @@ if __name__ == '__main__':
         print
         print "The next line is for the benefit of the test summary scripts."
         print "Failed",num_no_copyrights,"of",num_no_copyrights+num_copyrights,"tests"
-    
+
         # Return a non-zero exit code if orphans were found
         sys.exit(num_no_copyrights)
     else:

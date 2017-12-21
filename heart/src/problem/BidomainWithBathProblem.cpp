@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,11 +58,7 @@ BidomainWithBathProblem<DIM>::~BidomainWithBathProblem()
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(BidomainWithBathProblem)
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class BidomainWithBathProblem<1>;
 template class BidomainWithBathProblem<2>;
 template class BidomainWithBathProblem<3>;
-

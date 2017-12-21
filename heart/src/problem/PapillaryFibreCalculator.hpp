@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -106,7 +106,6 @@ public:
      *  @return A fibre vector for each element
      */
      std::vector<c_vector<double,3> > CalculateFibreOrientations();
-
 };
 
 // PUBLIC METHODS
@@ -128,7 +127,7 @@ std::vector<c_vector<double,3> > PapillaryFibreCalculator::CalculateFibreOrienta
 
    // Calculate eigenvalues
    std::vector<c_vector<double,3> > fibre_orientations(mrMesh.GetNumElements());
-   for(unsigned i=0; i<fibre_orientations.size(); i++)
+   for (unsigned i=0; i<fibre_orientations.size(); i++)
    {
        fibre_orientations[i] = CalculateEigenvectorForSmallestNonzeroEigenvalue(mSmoothedStructureTensors[i]);
    }
@@ -182,7 +181,7 @@ void PapillaryFibreCalculator::GetRadiusVectors()
 
 void PapillaryFibreCalculator::ConstructStructureTensors()
 {
-    for(unsigned i=0;i<mRadiusVectors.size();i++)
+    for (unsigned i=0;i<mRadiusVectors.size();i++)
     {
         mStructureTensors[i] = outer_prod(mRadiusVectors[i],mRadiusVectors[i]);
     }

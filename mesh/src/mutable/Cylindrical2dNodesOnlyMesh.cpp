@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,10 +45,20 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
 
 void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, bool isPeriodic)
 {
-    if (cutOffLength < mWidth)
+    // Ensure that the width is a multiple of cut-off length
+    if (fmod( mWidth,cutOffLength ) > 1e-14)
     {
-        EXCEPTION("Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
+        EXCEPTION("The periodic width must be a multiple of cut off length.");
     }
+    else if (mWidth/cutOffLength == 2.0)
+    {
+        // A width of two boxes gives different simulation results as some connections are considered twice.
+        EXCEPTION( "The periodic domain width cannot be 2*CutOffLength." );
+    }
+
+    // We force the domain to the periodic width
+    domainSize[0] = 0;
+    domainSize[1] = mWidth;
 
     NodesOnlyMesh<2>::SetUpBoxCollection(cutOffLength, domainSize, PETSC_DECIDE, true);    // Only difference is that this "true" makes the boxes periodic.
 
@@ -86,8 +96,15 @@ void Cylindrical2dNodesOnlyMesh::SetNode(unsigned nodeIndex, ChastePoint<2> poin
     }
     else if (x_coord < 0.0)
     {
-        // Move point to the right
-        point.SetCoordinate(0, x_coord + mWidth);
+        double new_x_coord = x_coord + mWidth;
+        double fudge_factor = 1e-14;
+        // This is to ensure that the position is never equal to mWidth, which would be outside the box domain.
+        // This is due to the fact that mWidth-1e-16=mWidth
+        if (new_x_coord > mWidth-fudge_factor)
+        {
+            new_x_coord = mWidth-fudge_factor;
+        }
+        point.SetCoordinate(0, new_x_coord);
     }
 
     // Update the node's location
@@ -125,6 +142,29 @@ c_vector<double, 2> Cylindrical2dNodesOnlyMesh::GetVectorFromAtoB(const c_vector
         vector[0] += mWidth;
     }
     return vector;
+}
+
+// Refresh mesh -> Check and then move if outside box
+void Cylindrical2dNodesOnlyMesh::RefreshMesh()
+{
+
+    // Check if the x values are in the domain, if not, get the fmod and relocate.
+    unsigned num_nodes = mNodes.size();
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        double& x_location = (mNodes[i]->rGetModifiableLocation())[0];
+        if (x_location < 0.0)
+        {
+            x_location = fmod(x_location, mWidth) + mWidth;
+        }
+        else if (x_location >= mWidth)
+        {
+            x_location = fmod(x_location, mWidth);
+        }
+    }
+
+    // Now run the base class method
+    NodesOnlyMesh<2>::RefreshMesh();
 }
 
 // Serialization for Boost >= 1.36

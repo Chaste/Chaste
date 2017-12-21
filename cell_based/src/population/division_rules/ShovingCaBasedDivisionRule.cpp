@@ -1,0 +1,203 @@
+/*
+
+Copyright (c) 2005-2017, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+#include "ShovingCaBasedDivisionRule.hpp"
+#include "RandomNumberGenerator.hpp"
+
+template<unsigned SPACE_DIM>
+void ShovingCaBasedDivisionRule<SPACE_DIM>::IsNodeOnBoundary(unsigned numNeighbours)
+{
+    // This logic currently only works for Moore neighbourhood in 2D
+    bool is_central_node = false;
+    if (SPACE_DIM == 2)
+    {
+        if (numNeighbours == 8)
+        {
+            is_central_node = true;
+        }
+    }
+    else // Currently not tested in 3D
+    {
+        NEVER_REACHED;
+    }
+    if (!is_central_node)
+    {
+        EXCEPTION("Cells reaching the boundary of the domain. Make the Potts mesh larger.");
+    }
+}
+
+template<unsigned SPACE_DIM>
+bool ShovingCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+{
+    return true;
+}
+
+template<unsigned SPACE_DIM>
+unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellPtr pNewCell,
+    CellPtr pParentCell,
+    CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+{
+    // Get node index corresponding to the parent cell
+    unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
+
+    PottsMesh<SPACE_DIM>* p_static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
+
+    // Get the set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
+    unsigned num_neighbours = neighbouring_node_indices.size();
+
+    // Check cell is not on the boundary
+    IsNodeOnBoundary(num_neighbours);
+
+    std::vector<double> neighbouring_node_propensities;
+    std::vector<unsigned> neighbouring_node_indices_vector;
+
+    double total_propensity = 0.0;
+
+    // Select neighbour at random
+    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+         neighbour_iter != neighbouring_node_indices.end();
+         ++neighbour_iter)
+    {
+        neighbouring_node_indices_vector.push_back(*neighbour_iter);
+
+        double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+
+        neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
+        total_propensity += propensity_dividing_into_neighbour;
+    }
+    assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
+
+    for (unsigned i=0; i<num_neighbours; i++)
+    {
+        neighbouring_node_propensities[i] /= total_propensity;
+    }
+
+     // Sample random number to specify which move to make
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+    double random_number = p_gen->ranf();
+
+    double total_probability = 0.0;
+    unsigned daughter_node_index = UNSIGNED_UNSET;
+
+    unsigned counter;
+    for (counter=0; counter < num_neighbours; counter++)
+    {
+        total_probability += neighbouring_node_propensities[counter];
+        if (total_probability >= random_number)
+        {
+            // Divide the parent cell to this neighbour location
+            daughter_node_index = neighbouring_node_indices_vector[counter];
+            break;
+        }
+    }
+    // This loop should always break as sum(neighbouring_node_propensities) = 1
+
+    assert(daughter_node_index != UNSIGNED_UNSET);
+    assert(daughter_node_index < p_static_cast_mesh->GetNumNodes());
+
+    // If daughter node is occupied then move the cell in the direction of counter
+    if (!(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell)))
+    {
+        std::list<std::pair<unsigned,unsigned> > cell_moves;
+
+        bool is_neighbour_occupied = true;
+        int max_moves = 1000;
+        int move_number = 0;
+        unsigned current_node_index = parent_node_index;
+        unsigned target_node_index = daughter_node_index;
+        while (is_neighbour_occupied && move_number < max_moves)
+        {
+            move_number++;
+            current_node_index = target_node_index;
+
+            std::set<unsigned> neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(current_node_index);
+
+            // Check cell is not on the boundary
+            IsNodeOnBoundary(neighbouring_node_indices.size());
+
+            // Select the appropriate neighbour
+            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            for (unsigned i=0; i<counter; i++)
+            {
+                ++neighbour_iter;
+            }
+            assert(neighbour_iter != neighbouring_node_indices.end());
+
+            target_node_index = *neighbour_iter;
+
+            std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
+
+            cell_moves.push_back(new_move);
+
+            // If target node is unoccupied move the cell on the current node to the target node and stop shoving cells
+            if (rCellPopulation.IsSiteAvailable(target_node_index, pNewCell))
+            {
+                is_neighbour_occupied = false;
+            }
+
+            // If target node is occupied then keep shoving the cells out of the way
+            current_node_index = target_node_index;
+
+        }
+        assert(move_number<max_moves);
+
+        // Do moves to free up the daughter node index
+        for (std::list<std::pair<unsigned, unsigned> >::reverse_iterator reverse_iter = cell_moves.rbegin();
+             reverse_iter != cell_moves.rend();
+             ++reverse_iter)
+        {
+            assert(rCellPopulation.IsSiteAvailable(reverse_iter->second, pNewCell));
+            assert(!(rCellPopulation.IsSiteAvailable(reverse_iter->first, pNewCell)));
+
+            // Move cell from first() to second()
+            rCellPopulation.MoveCellInLocationMap(rCellPopulation.GetCellUsingLocationIndex(reverse_iter->first), reverse_iter->first, reverse_iter->second);
+        }
+
+        // Check daughter site is now free
+        assert(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell));
+
+    }
+    return daughter_node_index;
+}
+
+// Explicit instantiation
+template class ShovingCaBasedDivisionRule<1>;
+template class ShovingCaBasedDivisionRule<2>;
+template class ShovingCaBasedDivisionRule<3>;
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShovingCaBasedDivisionRule)

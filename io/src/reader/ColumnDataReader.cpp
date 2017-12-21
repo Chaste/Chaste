@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,7 +71,7 @@ ColumnDataReader::ColumnDataReader(const std::string& rDirectory,
     else
     {
         // Add a trailing slash if needed
-        if ( !(*(rDirectory.end()-1) == '/'))
+        if (!(*(rDirectory.end()-1) == '/'))
         {
             directory = rDirectory + "/";
         }
@@ -422,10 +422,10 @@ void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col
         }
         else
         {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
            //  Clang Objective C++ (on Mac OSX) treats reading very small numbers (<2e-308) as an error but other compilers just round to zero
            d_value = 0.0;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
         }
     }
     mValues.push_back(d_value);

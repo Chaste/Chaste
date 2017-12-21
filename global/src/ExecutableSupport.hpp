@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -106,6 +106,14 @@ public:
      * @param pArgv  pointer to the argument list
      */
     static void StandardStartup(int* pArgc, char*** pArgv);
+
+    /**
+     * Call InitializePetsc, then ShowParallelLaunching. Omit ShowCopyright.
+     *
+     * @param pArgc  pointer to the number of arguments
+     * @param pArgv  pointer to the argument list
+     */
+    static void StartupWithoutShowingCopyright(int* pArgc, char*** pArgv);
 
     /**
      * Display an error message to the user, on stderr.

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -157,7 +157,7 @@ void DynamicVentilationProblem::Solve()
                 mAcinarMap[(*iter)->GetIndex()]->SetFlow(fluxes[boundary_element_index]);
 
                 double resistance = 0.0;
-                if(fluxes[boundary_element_index] != 0.0)
+                if (fluxes[boundary_element_index] != 0.0)
                 {
                     resistance = std::fabs(pressures[(*iter)->GetIndex()]/fluxes[boundary_element_index]);
                 }
@@ -166,12 +166,12 @@ void DynamicVentilationProblem::Solve()
             }
         }
 
-        if((time_stepper.GetTotalTimeStepsTaken() % mSamplingTimeStepMultiple) == 0u)
+        if ((time_stepper.GetTotalTimeStepsTaken() % mSamplingTimeStepMultiple) == 0u)
         {
             progress_reporter.Update(time_stepper.GetNextTime());
 
 #ifdef CHASTE_VTK
-            if(mWriteVtkOutput)
+            if (mWriteVtkOutput)
             {
                 std::ostringstream suffix_name;
                 suffix_name <<  "_" << std::setw(6) << std::setfill('0') << time_stepper.GetTotalTimeStepsTaken()/mSamplingTimeStepMultiple;
@@ -195,13 +195,12 @@ void DynamicVentilationProblem::Solve()
 #endif //CHASTE_VTK
         }
 
-
         mCurrentTime = time_stepper.GetNextTime();
         time_stepper.AdvanceOneTimeStep();
     }
 
 #ifdef CHASTE_VTK
-    if(mWriteVtkOutput)
+    if (mWriteVtkOutput)
     {
         vtk_writer.WriteFilesUsingMesh(mrMesh);
     }

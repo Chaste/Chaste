@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -221,7 +221,7 @@ void OdeSystemInformation<My2dOde>::Initialise()
 class TestSolvingOdesTutorial: public CxxTest::TestSuite
 {
 public:
-    void TestSolvingOdes() throw(Exception)
+    void TestSolvingOdes()
     {
         /* First, create an instance of the ODE class to be solved. */
         MyOde my_ode;

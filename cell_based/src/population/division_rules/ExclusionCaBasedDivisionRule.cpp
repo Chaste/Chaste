@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,22 +37,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned SPACE_DIM>
-bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
-        CellPtr pParentCell,
-        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
-        {
+bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+{
     bool is_room = false;
 
-    //Get node index corresponding to this cell
+    // Get node index corresponding to this cell
     unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
     // Get the set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM> *>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
+    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
 
     // Iterate through the neighbours to see if there are any available sites
     for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            neighbour_iter != neighbouring_node_indices.end();
-            ++neighbour_iter)
+         neighbour_iter != neighbouring_node_indices.end();
+         ++neighbour_iter)
     {
         if (rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell))
         {
@@ -62,16 +60,11 @@ bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
     }
 
     return is_room;
-        }
+}
 
 template<unsigned SPACE_DIM>
-unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
-        CellPtr pNewCell,
-        CellPtr pParentCell,
-        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
-        {
-    // Check there is room to divide This will always pass as
-    // IsRoomToDivide is called before CalculateDaughterNodeIndex in the simulator.solve() method
+unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+{
     if (!IsRoomToDivide(pParentCell,rCellPopulation))
     {
         EXCEPTION("Trying to divide when there is no room to divide, check your division rule");
@@ -94,10 +87,10 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
 
     double total_propensity = 0.0;
 
-    // Select Neighbour at random
+    // Select neighbour at random
     for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            neighbour_iter != neighbouring_node_indices.end();
-            ++neighbour_iter)
+         neighbour_iter != neighbouring_node_indices.end();
+         ++neighbour_iter)
     {
         neighbouring_node_indices_vector.push_back(*neighbour_iter);
 
@@ -111,7 +104,7 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
         neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
         total_propensity += propensity_dividing_into_neighbour;
     }
-    assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
+    assert(total_propensity > 0); // If this trips the cell can't divide, so we need to include this in the IsSiteAvailable() method
 
     for (unsigned i=0; i<num_neighbours; i++)
     {

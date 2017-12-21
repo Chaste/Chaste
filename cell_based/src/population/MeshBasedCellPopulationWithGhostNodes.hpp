@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -149,6 +149,15 @@ public:
     virtual ~MeshBasedCellPopulationWithGhostNodes();
 
     /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a shared pointer to mrMesh.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
      * Overridden GetNeighbouringLocationIndices() method.
      *
      * Given a cell, returns the set of location indices corresponding to neighbouring cells.
@@ -159,14 +168,10 @@ public:
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
-     * Overridden UpdateNodeLocation() method.
-     *
-     * Update the location of each node in the cell population given
-     * a time step over which to integrate the equations of motion.
-     *
-     * @param dt  time step
+     * Applies the appropriate force to each ghost node in the population.
+     * Called by AbstractNumericalMethod.
      */
-    void UpdateNodeLocations(double dt);
+    void ApplyGhostForces();
 
     /**
      * @return mIsGhostNode.
@@ -190,13 +195,6 @@ public:
      */
     std::set<unsigned> GetGhostNodeIndices();
 
-    /**
-     * Update the GhostNode positions using the spring force model with rest length=1.
-     * Forces are applied to ghost nodes from connected ghost and normal nodes.
-     *
-     * @param dt
-     */
-    void UpdateGhostPositions(double dt);
 
     /**
      * Update mIsGhostNode if required by a remesh.
@@ -221,12 +219,11 @@ public:
      * Add a new cell to the cell population and update mIsGhostNode.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell  - this is required for
      *  mesh-based cell populations
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
 
     /**
      * Overridden OpenWritersFiles() method.

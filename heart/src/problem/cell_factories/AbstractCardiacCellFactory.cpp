@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,9 @@ void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::FinaliseCellCreation(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::FillInCellularTransmuralAreas()
 {
-    //implemented in subclasses
+    EXCEPTION("To get here you have probably asked for Epi/Mid/Endo CellularHeterogeneities in your HeartConfig "
+              "options or configuration .xml file, to use this you will need to provide a method"
+              " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -133,10 +135,8 @@ HeartGeometryInformation<SPACE_DIM>* AbstractCardiacCellFactory<ELEMENT_DIM,SPAC
     }
     return mpHeartGeometryInformation;
 }
-/////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////
 
+// Explicit instantiation
 template class AbstractCardiacCellFactory<1,1>;
 template class AbstractCardiacCellFactory<1,2>;
 template class AbstractCardiacCellFactory<1,3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ public:
      * Test that the matrix is calculated correctly on the cannonical triangle.
      * Tests against the analytical solution calculated by hand.
      */
-    void TestAssembler()  throw(Exception)
+    void TestAssembler()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);
@@ -166,7 +166,7 @@ public:
         // For these nodes, it can be shown that the integral of the corresponding
         // basis function is zero, i.e. \intgl_{canonical element} \phi_i dV = 0.0  for i=0,1,2, phi_i the
         // i-th QUADRATIC basis.
-        for(unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; i++)
         {
             TS_ASSERT_DELTA(vec_repl[3*i],   g1*0.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl[3*i+1], g2*0.0, 1e-8);
@@ -176,7 +176,7 @@ public:
         // For these nodes, it can be shown that the integral of the corresponding
         // basis function is 1/6, i.e. \intgl_{canonical element} \phi_i dV = 1/6  for i=3,4,5, phi_i the
         // i-th QUADRATIC basis.
-        for(unsigned i=3; i<6; i++)
+        for (unsigned i=3; i<6; i++)
         {
             TS_ASSERT_DELTA(vec_repl[3*i],   g1/6.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl[3*i+1], g2/6.0, 1e-8);
@@ -202,7 +202,7 @@ public:
         assembler.Assemble();
 
         ReplicatableVector vec_repl2(vec2);
-        for(unsigned i=3; i<6; i++)
+        for (unsigned i=3; i<6; i++)
         {
             TS_ASSERT_DELTA(vec_repl2[3*i],   10.0/6.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl2[3*i+1], 20.0/6.0, 1e-8);

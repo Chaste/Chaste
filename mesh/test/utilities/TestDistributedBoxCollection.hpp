@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef TESTBOXCOLLECTION_HPP_
-#define TESTBOXCOLLECTION_HPP_
+#ifndef TESTDISTRIBUTEDBOXCOLLECTION_HPP_
+#define TESTDISTRIBUTEDBOXCOLLECTION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -71,24 +71,18 @@ private:
         double box_width = 1.0;
 
         DistributedBoxCollection<DIM> box_collection(box_width, domain_size);
-        box_collection.SetupHaloBoxes();
 
 
         // Put a node in each local box.
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            if (box_collection.GetBoxOwnership(i))
+            if (box_collection.IsBoxOwned(i))
             {
                 // Create a new node and add it to the box.
-                c_vector<double, 2*DIM> locations = box_collection.rGetBox(i).rGetMinAndMaxValues();
-                c_vector<double, DIM> node_location;
-                for (unsigned d=0; d<DIM; d++)
-                {
-                    node_location[d] = (locations[2*d+1] + locations[2*d]) / 2.0;
-                }
+                c_vector<double, DIM> node_location = zero_vector<double>(DIM);
                 box_collection.rGetBox(i).AddNode(new Node<DIM>(i, node_location));
             }
-            if (box_collection.GetHaloBoxOwnership(i))
+            if (box_collection.IsHaloBox(i))
             {
                 TS_ASSERT_THROWS_NOTHING(box_collection.rGetHaloBox(i));
             }
@@ -108,18 +102,17 @@ private:
         // Tidy up.
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            if (box_collection.GetBoxOwnership(i))
+            if (box_collection.IsBoxOwned(i))
             {
                 std::set<Node<DIM>* > nodes = box_collection.rGetBox(i).rGetNodesContained();
                 for (typename std::set<Node<DIM>* >::iterator node_iter = nodes.begin();
-                        node_iter != nodes.end();
-                        ++node_iter)
+                     node_iter != nodes.end();
+                     ++node_iter)
                 {
                     delete (*node_iter);
                 }
             }
         }
-
     }
 
     template<unsigned DIM>
@@ -142,8 +135,6 @@ private:
         double box_width = 1.0;
 
         DistributedBoxCollection<DIM> box_collection(box_width, domain_size);
-
-        box_collection.SetupHaloBoxes();
 
         // Work out how many rows of boxes I have.
         std::vector<unsigned> stacks_vector;
@@ -246,20 +237,9 @@ private:
 
 public:
 
-    void TestBox() throw (Exception)
+    void TestBox()
     {
-        c_vector<double, 2*2> box_size;
-        box_size(0) = -0.1; // min x
-        box_size(1) = 1.1; // max x
-        box_size(2) = -0.1; // min y
-        box_size(3) = 1.1; // max y
-
-        Box<2> test_box(box_size);
-        c_vector<double, 2*2> returned_min_max_values = test_box.rGetMinAndMaxValues();
-        for (unsigned i=0; i<4; i++)
-        {
-            TS_ASSERT_EQUALS(returned_min_max_values(i), box_size(i));
-        }
+        Box<2> test_box;
 
         c_vector<double, 2> node_location;
         node_location(0) = 0.5;
@@ -279,7 +259,7 @@ public:
     }
 
 
-    void TestBoxGeneration1d() throw (Exception)
+    void TestBoxGeneration1d()
     {
         // Create a mesh
         TetrahedralMesh<1,1> mesh;
@@ -297,13 +277,13 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 box_collection.rGetBox(box_index).AddNode(mesh.GetNode(i));
             }
         }
 
-        TS_ASSERT_EQUALS(0u, box_collection.CalculateCoordinateIndices(0)[0]);
+        TS_ASSERT_EQUALS(0u, box_collection.CalculateGridIndices(0)[0]);
 
         // The expected number of boxes is 5.
         // However, if there are more processes than required then the top-most processes will be
@@ -326,18 +306,18 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumLocalBoxes(), local_rows);
 
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
 
-        if (box_collection.GetBoxOwnership(1))
+        if (box_collection.IsBoxOwned(1))
         {
-            std::set<unsigned> local_boxes_to_box_1 = box_collection.GetLocalBoxes(1);
+            std::set<unsigned>& local_boxes_to_box_1 = box_collection.rGetLocalBoxes(1);
             std::set<unsigned> correct_answer_1;
             correct_answer_1.insert(0); // Halo below
             correct_answer_1.insert(1);
@@ -345,9 +325,9 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_1, correct_answer_1);
         }
 
-        if (box_collection.GetBoxOwnership(4))
+        if (box_collection.IsBoxOwned(4))
         {
-            std::set<unsigned> local_boxes_to_box_4 = box_collection.GetLocalBoxes(4);
+            std::set<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
             std::set<unsigned> correct_answer_4;
             correct_answer_4.insert(3); // Halo below
             correct_answer_4.insert(4);
@@ -385,7 +365,7 @@ public:
 
 
     // very simple test
-    void TestAddElement() throw(Exception)
+    void TestAddElement()
     {
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0);
@@ -397,23 +377,23 @@ public:
 
         DistributedBoxCollection<1> box_collection(width, domain_size);
 
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
             box_collection.rGetBox(0).AddElement(mesh.GetElement(0));
             TS_ASSERT_EQUALS(box_collection.rGetBox(0).rGetElementsContained().size(), 1u);
             TS_ASSERT_EQUALS(*(box_collection.rGetBox(0).rGetElementsContained().begin()), mesh.GetElement(0));
         }
-        if (box_collection.GetBoxOwnership(1))
+        if (box_collection.IsBoxOwned(1))
         {
             TS_ASSERT_EQUALS(box_collection.rGetBox(1).rGetElementsContained().size(), 0u);
         }
-        if (box_collection.GetBoxOwnership(2))
+        if (box_collection.IsBoxOwned(2))
         {
             TS_ASSERT_EQUALS(box_collection.rGetBox(2).rGetElementsContained().size(), 0u);
         }
     }
 
-    void TestSetupAllLocalBoxes2d() throw(Exception)
+    void TestSetupAllLocalBoxes2d()
     {
         double width = 1.0;
 
@@ -442,9 +422,9 @@ public:
 
         box_collection.SetupAllLocalBoxes();
 
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
@@ -453,9 +433,9 @@ public:
             correct_answer_0.insert(5); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
-        if (box_collection.GetBoxOwnership(3))
+        if (box_collection.IsBoxOwned(3))
         {
-            std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
             std::set<unsigned> correct_answer_3;
             correct_answer_3.insert(3);
             correct_answer_3.insert(2);
@@ -463,9 +443,9 @@ public:
             correct_answer_3.insert(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
         }
-        if (box_collection.GetBoxOwnership(5))
+        if (box_collection.IsBoxOwned(5))
         {
-            std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
             std::set<unsigned> correct_answer_5;
             correct_answer_5.insert(0);
             correct_answer_5.insert(1);
@@ -478,9 +458,9 @@ public:
             correct_answer_5.insert(10);
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
         }
-        if (box_collection.GetBoxOwnership(10))
+        if (box_collection.IsBoxOwned(10))
         {
-            std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
             correct_answer_10.insert(5); // Halo below 9
             correct_answer_10.insert(6); // Halo below 10
@@ -500,10 +480,8 @@ public:
     }
 
 
-    void TestSetupAllLocalBoxes2dPeriodic() throw(Exception)
+    void TestSetupAllLocalBoxes2dPeriodic()
     {
-        EXIT_IF_PARALLEL;
-
         double width = 1.0;
 
         c_vector<double, 2*2> domain_size;
@@ -512,14 +490,27 @@ public:
         domain_size(2) = 0;
         domain_size(3) = 3.0;
 
+        Warnings::Instance()->QuietDestroy();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+
         DistributedBoxCollection<2> box_collection(width, domain_size, true); // So periodic in X
 
-        assert(box_collection.GetNumBoxes()==12); // 4 * 3 boxes altogether
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
+                             "There are more processes than convenient for the domain/mesh/box size.  The domain size has been swollen.");
+            Warnings::Instance()->QuietDestroy();
+        }
+        // Number of slices is 3, unless there are more than 3 processes.
+        // Hence the expected number of boxes is 12, but will grow with the number of processes.
+        unsigned expected_number_boxes = 4u * std::max(3u, PetscTools::GetNumProcs());
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), expected_number_boxes); // 4 * 3 boxes altogether, normally
 
         box_collection.SetupAllLocalBoxes();
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
@@ -530,9 +521,9 @@ public:
             correct_answer_0.insert(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
-        if (box_collection.GetBoxOwnership(3))
+        if (box_collection.IsBoxOwned(3))
         {
-            std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
             std::set<unsigned> correct_answer_3;
             correct_answer_3.insert(0);
             correct_answer_3.insert(2);
@@ -542,9 +533,9 @@ public:
             correct_answer_3.insert(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
         }
-        if (box_collection.GetBoxOwnership(5))
+        if (box_collection.IsBoxOwned(5))
         {
-            std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
             std::set<unsigned> correct_answer_5;
             correct_answer_5.insert(0);
             correct_answer_5.insert(1);
@@ -557,9 +548,9 @@ public:
             correct_answer_5.insert(10);
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
         }
-        if (box_collection.GetBoxOwnership(10))
+        if (box_collection.IsBoxOwned(10))
         {
-            std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
             correct_answer_10.insert(5);
             correct_answer_10.insert(6);
@@ -567,11 +558,18 @@ public:
             correct_answer_10.insert(9);
             correct_answer_10.insert(10);
             correct_answer_10.insert(11);
+            if (PetscTools::GetNumProcs() > 3u)
+            {
+                // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
+                correct_answer_10.insert(13); // Halo above 9
+                correct_answer_10.insert(14); // Halo above 10
+                correct_answer_10.insert(15); // Halo above 11
+            }
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
-        if (box_collection.GetBoxOwnership(11))
+        if (box_collection.IsBoxOwned(11))
         {
-            std::set<unsigned> local_boxes_to_box_11 = box_collection.GetLocalBoxes(11);
+            std::set<unsigned>& local_boxes_to_box_11 = box_collection.rGetLocalBoxes(11);
             std::set<unsigned> correct_answer_11;
             correct_answer_11.insert(4);
             correct_answer_11.insert(6);
@@ -579,12 +577,19 @@ public:
             correct_answer_11.insert(8);
             correct_answer_11.insert(10);
             correct_answer_11.insert(11);
-            TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
+            if (PetscTools::GetNumProcs() > 3u)
+            {
+                // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
+                correct_answer_11.insert(14); // Halo above 10
+                correct_answer_11.insert(15); // Halo above 11
+                correct_answer_11.insert(12); // Halo above 8 (Periodic in x)
+            }
+           TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
         }
     }
 
 
-    void TestSetupAllLocalBoxes3d() throw(Exception)
+    void TestSetupAllLocalBoxes3d()
     {
         if (PetscTools::GetNumProcs() > 2)
         {
@@ -606,9 +611,9 @@ public:
         assert(box_collection.GetNumBoxes()==24); // 4 * 3 * 2 boxes altogether
 
         box_collection.SetupAllLocalBoxes();
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
@@ -621,9 +626,9 @@ public:
             correct_answer_0.insert(17);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
-        if (box_collection.GetBoxOwnership(3))
+        if (box_collection.IsBoxOwned(3))
         {
-            std::set<unsigned> local_boxes_to_box_3 = box_collection.GetLocalBoxes(3);
+            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
             std::set<unsigned> correct_answer_3;
             correct_answer_3.insert(3);
             correct_answer_3.insert(2);
@@ -635,9 +640,9 @@ public:
             correct_answer_3.insert(19);
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
         }
-        if (box_collection.GetBoxOwnership(5))
+        if (box_collection.IsBoxOwned(5))
         {
-            std::set<unsigned> local_boxes_to_box_5 = box_collection.GetLocalBoxes(5);
+            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
             std::set<unsigned> correct_answer_5;
             correct_answer_5.insert(0);
             correct_answer_5.insert(1);
@@ -660,9 +665,9 @@ public:
 
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
         }
-        if (box_collection.GetBoxOwnership(19))
+        if (box_collection.IsBoxOwned(19))
         {
-            std::set<unsigned> local_boxes_to_box_19 = box_collection.GetLocalBoxes(19);
+            std::set<unsigned>& local_boxes_to_box_19 = box_collection.rGetLocalBoxes(19);
             std::set<unsigned> correct_answer_19;
             correct_answer_19.insert(2);
             correct_answer_19.insert(3);
@@ -678,9 +683,9 @@ public:
             correct_answer_19.insert(23);
             TS_ASSERT_EQUALS(local_boxes_to_box_19, correct_answer_19);
         }
-        if (box_collection.GetBoxOwnership(22))
+        if (box_collection.IsBoxOwned(22))
         {
-            std::set<unsigned> local_boxes_to_box_22 = box_collection.GetLocalBoxes(22);
+            std::set<unsigned>& local_boxes_to_box_22 = box_collection.rGetLocalBoxes(22);
             std::set<unsigned> correct_answer_22;
             correct_answer_22.insert(5);
             correct_answer_22.insert(6);
@@ -696,7 +701,6 @@ public:
             correct_answer_22.insert(23);
             TS_ASSERT_EQUALS(local_boxes_to_box_22, correct_answer_22);
         }
-
     }
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
@@ -705,7 +709,7 @@ public:
     //
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
-    void TestSetupHaloBoxes1d2d3d() throw (Exception)
+    void TestSetupHaloBoxes1d2d3d()
     {
         unsigned num_procs = PetscTools::GetNumProcs();
         DoSetupHaloBoxes<1>(num_procs);
@@ -713,7 +717,7 @@ public:
         DoSetupHaloBoxes<3>(num_procs);
     }
 
-    void TestUpdateHaloBoxes1d2d3d() throw (Exception)
+    void TestUpdateHaloBoxes1d2d3d()
     {
         unsigned num_procs = PetscTools::GetNumProcs();
         DoUpdateHaloBoxes<1>(num_procs);
@@ -731,7 +735,7 @@ public:
     //
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
-    void TestPairsReturned1d() throw (Exception)
+    void TestPairsReturned1d()
     {
         std::vector< ChastePoint<1>* > points(5);
         points[0] = new ChastePoint<1>(0.2);
@@ -757,12 +761,10 @@ public:
         box_collection.SetupLocalBoxesHalfOnly();
         TS_ASSERT_THROWS_THIS(box_collection.SetupLocalBoxesHalfOnly(), "Local Boxes Are Already Set");
 
-        box_collection.SetupHaloBoxes();
-
         for (unsigned i=0; i<nodes.size(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 box_collection.IsOwned(nodes[i]);
                 TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
@@ -772,8 +774,7 @@ public:
         }
 
         std::vector< std::pair<Node<1>*, Node<1>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
-        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
@@ -796,7 +797,11 @@ public:
                 neighbours_should_be[3].insert(2);
                 neighbours_should_be[4] = std::set<unsigned>();
 
-                TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                for (unsigned i=0; i<nodes.size(); i++)
+                {
+                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
+                    TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+                }
 
                 std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
                 pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
@@ -825,7 +830,15 @@ public:
                         neighbours_should_be[2].insert(3);
                         neighbours_should_be[3].insert(2);
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                        unsigned nodes_on_this_process[4] = {0,1,2,3};
+
+                        for (unsigned i=0; i<4; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
@@ -840,7 +853,16 @@ public:
                     {
                         neighbours_should_be[4] = std::set<unsigned>();
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                        unsigned nodes_on_this_process[1] = {4};
+
+                        for (unsigned i=0; i<1; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
+
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
                     }
@@ -870,7 +892,15 @@ public:
                         neighbours_should_be[2].insert(3);
                         neighbours_should_be[3].insert(2);
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                        unsigned nodes_on_this_process[4] = {0,1,2,3};
+
+                        for (unsigned i=0; i<4; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
                         pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
@@ -883,14 +913,25 @@ public:
                     }
                     case 1:
                     {
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                        // no nodes on this process
+
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
                     }
                     case 2:
                     {
                         neighbours_should_be[4] = std::set<unsigned>();
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+
+                        unsigned nodes_on_this_process[1] = {4};
+
+                        for (unsigned i=0; i<1; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
+
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
                     }
@@ -918,7 +959,7 @@ public:
         }
     }
 
-    void TestBoxGeneration2d() throw (Exception)
+    void TestBoxGeneration2d()
     {
         if (PetscTools::GetNumProcs() > 3)
         {
@@ -945,7 +986,7 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 box_collection.rGetBox(box_index).AddNode(mesh.GetNode(i));
             }
@@ -955,9 +996,9 @@ public:
 
         // Have checked that all the local boxes are calculated correctly on a 5 by 6 grid - here we
         // hardcode a few checks on the 6 by 6 grid.
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1);
@@ -965,9 +1006,9 @@ public:
             correct_answer_0.insert(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
-        if (box_collection.GetBoxOwnership(4))
+        if (box_collection.IsBoxOwned(4))
         {
-            std::set<unsigned> local_boxes_to_box_4 = box_collection.GetLocalBoxes(4);
+            std::set<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
             std::set<unsigned> correct_answer_4;
             correct_answer_4.insert(4);
             correct_answer_4.insert(5);
@@ -976,9 +1017,9 @@ public:
             correct_answer_4.insert(11);
             TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
         }
-        if (box_collection.GetBoxOwnership(10))
+        if (box_collection.IsBoxOwned(10))
         {
-            std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
+            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
             correct_answer_10.insert(10);
             correct_answer_10.insert(11);
@@ -987,9 +1028,9 @@ public:
             correct_answer_10.insert(17);
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
-        if (box_collection.GetBoxOwnership(35))
+        if (box_collection.IsBoxOwned(35))
         {
-            std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
+            std::set<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
             std::set<unsigned> correct_answer_35;
             correct_answer_35.insert(35);
             TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
@@ -1030,7 +1071,7 @@ public:
      * calculations.  Note that failure of this test on a given architecture implies
      * the failure of node-based cell simulations
      */
-    void TestLargeBoxCollection2d() throw (Exception)
+    void TestLargeBoxCollection2d()
     {
         double cut_off_length = 1e-3;
 
@@ -1060,7 +1101,7 @@ public:
 
     }
 
-    void TestPairsReturned2d() throw (Exception)
+    void TestPairsReturned2d()
     {
         std::vector< ChastePoint<2>* > points(10);
         points[0] = new ChastePoint<2>(0.2, 3.7);
@@ -1089,14 +1130,12 @@ public:
         domain_size(3) = 4.0; // so 4*4 boxes
 
         DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
-
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 TS_ASSERT(box_collection.IsOwned(nodes[i]));
                 TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
@@ -1106,9 +1145,8 @@ public:
         }
 
         std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         // Put these into a set as they are easier to compare as they are ordered
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
@@ -1162,7 +1200,11 @@ public:
                 neighbours_should_be[8].insert(7);
                 neighbours_should_be[9] = std::set<unsigned>();
 
-                TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                for (unsigned i=0; i<nodes.size(); i++)
+                {
+                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
+                    TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+                }
 
                 std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                 pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
@@ -1232,7 +1274,15 @@ public:
                         neighbours_should_be[8].insert(6);
                         neighbours_should_be[8].insert(7);
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                        unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
+
+                        for (unsigned i=0; i<7; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
@@ -1268,8 +1318,16 @@ public:
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
-                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+
+                        unsigned nodes_on_this_process[2] = {0,1};
+
+                        for (unsigned i=0; i<2; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         break;
                     }
@@ -1325,7 +1383,15 @@ public:
                         neighbours_should_be[8].insert(6);
                         neighbours_should_be[8].insert(7);
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+                        unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
+
+                        for (unsigned i=0; i<7; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
@@ -1365,8 +1431,15 @@ public:
                         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
                         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
 
-                        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
-                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+                        unsigned nodes_on_this_process[2] = {0,1};
+
+                        for (unsigned i=0; i<2; i++)
+                        {
+                            unsigned node_index = nodes_on_this_process[i];
+                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
+                                                           neighbours_should_be[node_index].end());
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                        }
 
                         break;
                     }
@@ -1391,7 +1464,7 @@ public:
 
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            if (box_collection.GetBoxOwnership(i) )
+            if (box_collection.IsBoxOwned(i) )
             {
                 TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
             }
@@ -1404,7 +1477,7 @@ public:
         }
     }
 
-    void TestPairsReturned3d() throw (Exception)
+    void TestPairsReturned3d()
     {
         if (PetscTools::GetNumProcs() > 3)
         {
@@ -1436,12 +1509,11 @@ public:
 
         DistributedBoxCollection<3> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 // Check the box collection knows which nodes it should own.
                 TS_ASSERT(box_collection.IsOwned(nodes[i]));
@@ -1450,7 +1522,7 @@ public:
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
             // Add as a halo if appropriate.
-            if (box_collection.GetHaloBoxOwnership(box_index))
+            if (box_collection.IsHaloBox(box_index))
             {
                 box_collection.rGetHaloBox(box_index).AddNode(nodes[i]);
             }
@@ -1459,7 +1531,7 @@ public:
         // Make sure there is exactly one node in each box.
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            if (box_collection.GetBoxOwnership(i))
+            if (box_collection.IsBoxOwned(i))
             {
                 TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 1u);
             }
@@ -1471,7 +1543,7 @@ public:
         {
             for (unsigned j=0; j<nodes.size(); j++)
             {
-                if((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
+                if ((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
                 {
                     neighbours_should_be[i].insert(j);
                     neighbours_should_be[j].insert(i);
@@ -1480,9 +1552,8 @@ public:
         }
 
         std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes, pairs_returned_vector);
 
         std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
@@ -1524,7 +1595,7 @@ public:
             }
         }
         // Node 13 should be in box 13
-        if (box_collection.GetBoxOwnership(13))
+        if (box_collection.IsBoxOwned(13))
         {
             // And check that others are not pairs
             std::vector<unsigned> not_pairs_of_13;
@@ -1561,9 +1632,10 @@ public:
         // Check the neighbour lists
         for (unsigned i=0; i<nodes.size(); i++)
         {
-            if (box_collection.GetBoxOwnership(i))
+            if (box_collection.IsBoxOwned(i))
             {
-                TS_ASSERT_EQUALS(neighbours_should_be[i], neighbours_returned[i]);
+                std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
+                TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
             }
         }
 
@@ -1574,7 +1646,7 @@ public:
         }
     }
 
-    void TestSplitNeighbourCalculation() throw (Exception)
+    void TestSplitNeighbourCalculation()
     {
         std::vector<Node<2>* > nodes;
         for (unsigned j=0; j<3; j++)
@@ -1596,12 +1668,12 @@ public:
 
         DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
+
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 // Check the box collection knows which nodes it should own.
                 TS_ASSERT(box_collection.IsOwned(nodes[i]));
@@ -1610,58 +1682,87 @@ public:
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
             // Add as a halo if appropriate.
-            if (box_collection.GetHaloBoxOwnership(box_index))
+            if (box_collection.IsHaloBox(box_index))
             {
                 box_collection.rGetHaloBox(box_index).AddNode(nodes[i]);
             }
         }
 
         std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateInteriorNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateInteriorNodePairs(nodes,pairs_returned_vector);
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
-        {
-            pairs_returned.insert(pairs_returned_vector[i]);
-        }
+        /* On 2 processes only neighbours of the base layer of boxes should have been calculated,
+         * however there are no interior boxes on any processor as the bottom row is counted as a boundary! see #2677
+         */
 
-        /* On 2 processes only neighbours of the base layer of boxes should have been calculated */
+        // Here nodes 0-5 are on process 0 and 6-8 are on process 1
         if (PetscTools::GetNumProcs() == 2)
         {
             if (PetscTools::AmMaster())
             {
-                std::set<unsigned> neighbours_of_0 = neighbours_returned[0];
+                std::vector<unsigned> neighbours_of_0 = nodes[0]->rGetNeighbours();
                 std::set<unsigned> neighbours_should_be;
                 neighbours_should_be.insert(1);
                 neighbours_should_be.insert(3);
                 neighbours_should_be.insert(4);
-
-                /* The set for node 5 should be empty*/
-                TS_ASSERT_EQUALS(neighbours_returned[5].size(), 0u);
+                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end());
+                // This assert wasn't included and this test did nothing need to look at why it doensn't pass
+                //TS_ASSERT_EQUALS(neighbours_of_0, expected);
             }
 
+            // Check all nodes are empty!!!
+            if (PetscTools::GetMyRank() == 0)
+            {
+                for (unsigned i=0; i<6; i++)
+                {
+                   TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+            if (PetscTools::GetMyRank() == 1)
+            {
+                for (unsigned i=6; i<9; i++)
+                {
+                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
         }
 
         /* On 3 processes nothing should have been calculated as no boxes are interior*/
         if (PetscTools::GetNumProcs() == 3)
         {
-            for (std::map<unsigned, std::set<unsigned> >::iterator iter = neighbours_returned.begin();
-                    iter != neighbours_returned.end();
-                    ++iter)
+            // Note can only check on nodes owned by the process as NodeAttributed isn't set up on all nodes.
+            if (PetscTools::GetMyRank() == 0)
             {
-                TS_ASSERT_EQUALS(iter->second.size(), 0u);
+                for (unsigned i=0; i<3; i++)
+                {
+                   TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
             }
+            if (PetscTools::GetMyRank() == 1)
+            {
+                for (unsigned i=3; i<6; i++)
+                {
+                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+            if (PetscTools::GetMyRank() == 2)
+            {
+                for (unsigned i=6; i<9; i++)
+                {
+                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
+                }
+            }
+
         }
 
-        box_collection.CalculateBoundaryNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateBoundaryNodePairs(nodes,pairs_returned_vector);
 
         if (PetscTools::GetNumProcs() == 2)
         {
             if (PetscTools::AmMaster())
             {
-                std::set<unsigned> neighbours_of_4 = neighbours_returned[4];
+                std::vector<unsigned> neighbours_of_4 = nodes[4]->rGetNeighbours();
                 std::set<unsigned> neighbours_should_be;
                 neighbours_should_be.insert(0);
                 neighbours_should_be.insert(1);
@@ -1672,7 +1773,8 @@ public:
                 neighbours_should_be.insert(7);
                 neighbours_should_be.insert(8);
 
-                TS_ASSERT_EQUALS(neighbours_of_4, neighbours_should_be);
+                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end());
+                TS_ASSERT_EQUALS(neighbours_of_4, expected);
             }
         }
         /* Test the all node neighbours have been calculated on 3 processes */
@@ -1680,7 +1782,7 @@ public:
         {
             if (PetscTools::GetMyRank() == 1)
             {
-                std::set<unsigned> neighbours_of_4 = neighbours_returned[4];
+                std::vector<unsigned> neighbours_of_4 = nodes[4]->rGetNeighbours();
                 std::set<unsigned> neighbours_should_be;
                 neighbours_should_be.insert(0);
                 neighbours_should_be.insert(1);
@@ -1691,7 +1793,8 @@ public:
                 neighbours_should_be.insert(7);
                 neighbours_should_be.insert(8);
 
-                TS_ASSERT_EQUALS(neighbours_of_4, neighbours_should_be);
+                std::vector<unsigned> expected(neighbours_should_be.begin(), neighbours_should_be.end());
+                TS_ASSERT_EQUALS(neighbours_of_4, expected);
             }
         }
         // Avoid memory leak
@@ -1701,7 +1804,7 @@ public:
         }
     }
 
-    void TestPairsReturned2dPeriodic() throw (Exception)
+    void TestPairsReturned2dPeriodic()
     {
         EXIT_IF_PARALLEL;
 
@@ -1743,9 +1846,8 @@ public:
         }
 
         std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-        std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
@@ -1807,7 +1909,11 @@ public:
         neighbours_should_be[9].insert(0);
         neighbours_should_be[9].insert(1);
 
-        TS_ASSERT_EQUALS(neighbours_should_be, neighbours_returned);
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
+            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+        }
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
         pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
@@ -1850,7 +1956,7 @@ public:
     }
 
 
-    void TestBoxGeneration3d() throw (Exception)
+    void TestBoxGeneration3d()
     {
         // Create a mesh
         TetrahedralMesh<3,3> mesh;
@@ -1870,12 +1976,11 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u * std::max(4u, PetscTools::GetNumProcs()));
         box_collection.SetupLocalBoxesHalfOnly();
-        box_collection.SetupHaloBoxes();
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
-            if (box_collection.GetBoxOwnership(box_index))
+            if (box_collection.IsBoxOwned(box_index))
             {
                 box_collection.rGetBox(box_index).AddNode(mesh.GetNode(i));
             }
@@ -1883,9 +1988,9 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u * std::max(4u, PetscTools::GetNumProcs()));
 
-        if (box_collection.GetBoxOwnership(0))
+        if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
+            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1);
@@ -1901,9 +2006,9 @@ public:
         {
             // If there are more processors, then there are more slices and hence more boxes.
             // We won't test for that here - there is a 2-d equivalent test.
-            if (box_collection.GetBoxOwnership(13))
+            if (box_collection.IsBoxOwned(13))
             {
-                std::set<unsigned> local_boxes_to_box_13 = box_collection.GetLocalBoxes(13);
+                std::set<unsigned>& local_boxes_to_box_13 = box_collection.rGetLocalBoxes(13);
                 std::set<unsigned> correct_answer_13;
                 correct_answer_13.insert(5);
                 correct_answer_13.insert(6);
@@ -1929,9 +2034,9 @@ public:
                 TS_ASSERT_EQUALS(local_boxes_to_box_13, correct_answer_13);
             }
 
-            if (box_collection.GetBoxOwnership(34))
+            if (box_collection.IsBoxOwned(34))
             {
-                std::set<unsigned> local_boxes_to_box_34 = box_collection.GetLocalBoxes(34);
+                std::set<unsigned>& local_boxes_to_box_34 = box_collection.rGetLocalBoxes(34);
                 std::set<unsigned> correct_answer_34;
                 correct_answer_34.insert(26);
                 correct_answer_34.insert(34);
@@ -1947,9 +2052,9 @@ public:
                 TS_ASSERT_EQUALS(local_boxes_to_box_34, correct_answer_34);
             }
 
-            if (box_collection.GetBoxOwnership(35))
+            if (box_collection.IsBoxOwned(35))
             {
-                std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
+                std::set<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
                 std::set<unsigned> correct_answer_35;
                 correct_answer_35.insert(35);
                 if (PetscTools::GetNumProcs() == 3)
@@ -1993,7 +2098,7 @@ public:
         }
     }
 
-    void TestArchivingDistributedBoxCollection() throw(Exception)
+    void TestArchivingDistributedBoxCollection()
     {
          FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
          std::string archive_file = "box_collection.arch";
@@ -2054,7 +2159,7 @@ public:
          }
     }
 
-    void TestLoadBalanceFunction() throw (Exception)
+    void TestLoadBalanceFunction()
     {
         // This test is designed for 3 process environment. Tests that an equal spread of load results
         // in an equal spread of the domain size between processes.
@@ -2123,7 +2228,7 @@ public:
      * can encounter problems of domain shrinking to zero size at the next load balance. This test
      * makes sure that this cannot happen.
      */
-    void TestLoadBalanceMaintainsMinimumLocalRegion() throw (Exception)
+    void TestLoadBalanceMaintainsMinimumLocalRegion()
     {
         if (PetscTools::GetNumProcs() == 3)
         {
@@ -2150,7 +2255,7 @@ public:
         }
     }
 
-    void TestGetDistributionOfNodes() throw (Exception)
+    void TestGetDistributionOfNodes()
     {
         double cut_off_length = 1.0;
 
@@ -2164,7 +2269,7 @@ public:
 
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            if (box_collection.GetBoxOwnership(i))
+            if (box_collection.IsBoxOwned(i))
             {
                 // Add the same number of nodes as the box index.
                 for (unsigned k=0; k<i; k++)
@@ -2179,7 +2284,7 @@ public:
         int counter = 0;
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            if (box_collection.GetBoxOwnership(i))
+            if (box_collection.IsBoxOwned(i))
             {
                 TS_ASSERT_EQUALS(local_distribution[counter], (int)i);
                 counter++;
@@ -2194,4 +2299,4 @@ public:
     }
 };
 
-#endif /*TESTBOXCOLLECTION_HPP_*/
+#endif /*TESTDISTRIBUTEDBOXCOLLECTION_HPP_*/

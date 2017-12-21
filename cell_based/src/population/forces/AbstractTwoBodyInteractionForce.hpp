@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,7 +103,10 @@ public:
     /**
      * Calculates the force between two nodes.
      *
-     * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode()
+     * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode().
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node
@@ -126,6 +129,15 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputForceParameters(out_stream& rParamsFile);
+
+    /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     *
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
 #endif /*ABSTRACTTWOBODYINTERACTIONFORCE_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -72,7 +72,7 @@ class TestCellPopulationCountWriters : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellMutationStatesCountWriter() throw (Exception)
+    void TestCellMutationStatesCountWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -80,7 +80,7 @@ public:
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 5u);
         std::vector<unsigned> location_indices;
         location_indices.push_back(7);
@@ -118,7 +118,7 @@ public:
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellmutationstates_twice.dat").CompareFiles();
     }
 
-    void TestCellMutationStatesCountWriterArchiving() throw (Exception)
+    void TestCellMutationStatesCountWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -141,7 +141,7 @@ public:
        }
     }
 
-    void TestCellProliferativePhasesCountWriters() throw (Exception)
+    void TestCellProliferativePhasesCountWriters()
     {
         EXIT_IF_PARALLEL;
 
@@ -154,7 +154,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
@@ -185,7 +185,7 @@ public:
         FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellcyclephases_twice.dat").CompareFiles();
     }
 
-    void TestCellProliferativePhasesCountWriterArchiving() throw (Exception)
+    void TestCellProliferativePhasesCountWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -208,7 +208,7 @@ public:
        }
     }
 
-    void TestCellProliferativeTypesCountWriters() throw (Exception)
+    void TestCellProliferativeTypesCountWriters()
     {
         EXIT_IF_PARALLEL;
 
@@ -221,7 +221,7 @@ public:
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
@@ -255,7 +255,7 @@ public:
         FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellPopulationCountWriters/celltypes_twice.dat").CompareFiles();
     }
 
-    void TestCellProliferativeTypesCountWriterArchiving() throw (Exception)
+    void TestCellProliferativeTypesCountWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);

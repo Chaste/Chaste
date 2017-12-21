@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,7 +57,7 @@ class TestRegions : public CxxTest::TestSuite
 {
 public:
 
-    void TestCuboidCreationAndContained() throw(Exception)
+    void TestCuboidCreationAndContained()
     {
         //3D case
         ChastePoint<3> point_a(-3, -3, -3);
@@ -125,15 +125,18 @@ public:
 //        TS_ASSERT_EQUALS(cuboid_3_2.DoesContain(two_d_point_out), false);
 //        TS_ASSERT_EQUALS(cuboid_3_1.DoesContain(one_d_point_out), false);
 
-        ChastePoint<3> upper=cuboid_a_b.rGetUpperCorner();
+        ChastePoint<3> upper = cuboid_a_b.rGetUpperCorner();
         c_vector<double, 3> diff_upper = upper.rGetLocation() - point_b.rGetLocation();
-        TS_ASSERT_DELTA(norm_2(diff_upper),0.0,1e-10);
-        ChastePoint<3> lower=cuboid_a_b.rGetLowerCorner();
+        TS_ASSERT_DELTA(norm_2(diff_upper), 0.0, 1e-10);
+        ChastePoint<3> lower = cuboid_a_b.rGetLowerCorner();
         c_vector<double, 3> diff_lower = lower.rGetLocation() - point_a.rGetLocation();
-        TS_ASSERT_DELTA(norm_2(diff_lower),0.0,1e-10);
+        TS_ASSERT_DELTA(norm_2(diff_lower), 0.0, 1e-10);
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(cuboid_a_b.Destroy());
     }
 
-    void TestNodesList() throw(Exception)
+    void TestNodesList()
     {
         ChastePoint<3> point_a(-3, -3, -3);
         ChastePoint<3> point_b(3, 3, 3);
@@ -162,7 +165,7 @@ public:
 
     }
 
-    void TestEllipsoidCreationAndContained() throw(Exception)
+    void TestEllipsoidCreationAndContained()
     {
         ChastePoint<3> centre_3D(0, 0, 0);
         ChastePoint<3> radii_3D(2, 4, 6);
@@ -222,7 +225,7 @@ public:
 
     }
 
-    void TestArchivingRegions() throw(Exception)
+    void TestArchivingRegions()
     {
         EXIT_IF_PARALLEL;
 

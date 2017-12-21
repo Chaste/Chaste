@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -404,7 +404,7 @@ public:
         }
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleSolver() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleSolver()
     {
         double wnt_level = 1.0;
         boost::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
@@ -460,7 +460,7 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][21], 1.0, 1e-3);
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleSolverWithAPCSingleHit() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleSolverWithAPCSingleHit()
     {
         double wnt_level = 1.0;
         boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
@@ -511,7 +511,7 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][21], 1.0, 1e-3);
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleSolverWithBetaCateninHit() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleSolverWithBetaCateninHit()
     {
         double wnt_level = 1.0;
         boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
@@ -562,7 +562,7 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][21], 1, 1e-3);
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleSolverWithAPCDoubleHit() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleSolverWithAPCDoubleHit()
     {
         double wnt_level = 1.0;
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
@@ -618,7 +618,7 @@ public:
      * VanLeeuwen2009WntSwatCellCycleModel go negative in a crypt simulation
      * (see ticket #629).
      */
-    void TestVanLeeuwen2009WntOdeSolutionDoesNotGoNegative() throw (Exception)
+    void TestVanLeeuwen2009WntOdeSolutionDoesNotGoNegative()
     {
         double time_of_each_run = 0.01; // for each run
 

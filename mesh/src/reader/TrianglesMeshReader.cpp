@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,14 +79,14 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
       mReadContainingElementOfBoundaryElement(readContainingElementForBoundaryElements),
       mFilesAreBinary(false),
       mMeshIsHexahedral(false),
-      mNodeFileReadBuffer(NULL),
-      mElementFileReadBuffer(NULL),
-      mFaceFileReadBuffer(NULL),
+      mNodeFileReadBuffer(nullptr),
+      mElementFileReadBuffer(nullptr),
+      mFaceFileReadBuffer(nullptr),
       mNodePermutationDefined(false)
 {
     // Only linear and quadratic elements
     assert(orderOfElements==1 || orderOfElements==2);
-    if ( mOrderOfBoundaryElements == 2 &&  mReadContainingElementOfBoundaryElement)
+    if (mOrderOfBoundaryElements == 2 &&  mReadContainingElementOfBoundaryElement)
     {
         EXCEPTION("Boundary element file should not have containing element info if it is quadratic");
     }
@@ -96,9 +96,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        #define COVERAGE_IGNORE
-        assert(SPACE_DIM==ELEMENT_DIM);
-        #undef COVERAGE_IGNORE
+        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerElement = (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2;
     }
 
@@ -108,9 +106,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     }
     else
     {
-        #define COVERAGE_IGNORE
-        assert(SPACE_DIM==ELEMENT_DIM);
-        #undef COVERAGE_IGNORE
+        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerBoundaryElement = ELEMENT_DIM*(ELEMENT_DIM+1)/2;
     }
 
@@ -152,7 +148,6 @@ unsigned TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() cons
     return mNumCableElements;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes() const
 {
@@ -170,7 +165,6 @@ unsigned TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElementAttribut
 {
     return mNumCableElementAttributes;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::Reset()
@@ -282,7 +276,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
     {
         ret_indices.resize(mNodesPerBoundaryElement);
 
-        assert(ELEMENT_DIM != 0); //Covered in earlier exception, but needed in loop guard here.
+        assert(ELEMENT_DIM != 0); // LCOV_EXCL_LINE //Covered in earlier exception, but needed in loop guard here.
         do
         {
             face_data.AttributeValue = 1.0; // If an attribute is not read this stays as one, otherwise overwritten.
@@ -354,13 +348,13 @@ std::vector<double> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigne
     }
 
     // Put the file stream pointer to the right location
-    if ( index > mNodesRead )
+    if (index > mNodesRead)
     {
         // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
         // to seek from the current position rather than from the start of the file
         mNodesFile.seekg( mNodeItemWidth*(index-mNodesRead), std::ios_base::cur);
     }
-    else if ( mNodesRead != index )
+    else if (mNodesRead != index)
     {
         mNodesFile.seekg(mNodeFileDataStart + mNodeItemWidth*index, std::ios_base::beg);
     }
@@ -383,13 +377,13 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementData(unsigned
     }
 
     // Put the file stream pointer to the right location
-    if ( index > mElementsRead )
+    if (index > mElementsRead)
     {
         // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
         // to seek from the current position rather than from the start of the file
         mElementsFile.seekg( mElementItemWidth*(index-mElementsRead), std::ios_base::cur);
     }
-    else if ( mElementsRead != index )
+    else if (mElementsRead != index)
     {
         mElementsFile.seekg(mElementFileDataStart + mElementItemWidth*index, std::ios_base::beg);
     }
@@ -413,7 +407,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned in
 
     /*
      *
-    if ( index > mFacesRead )
+    if (index > mFacesRead)
     {
         // This would be a monotonic (but non-contiguous) read. But we don't actually read faces with this access pattern.
         ///\todo Revisit #1930?
@@ -422,7 +416,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned in
     else
     */
     // Put the file stream pointer to the right location
-    if ( mFacesRead != index )
+    if (mFacesRead != index)
     {
         mFacesFile.seekg(mFaceFileDataStart + mFaceItemWidth*index, std::ios_base::beg);
     }
@@ -456,7 +450,7 @@ std::vector<unsigned> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetContaining
     }
 
     // Put the file stream pointer to the right location
-    if ( index > mNclItemsRead )
+    if (index > mNclItemsRead)
     {
         // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
         // to seek from the current position rather than from the start of the file
@@ -667,12 +661,12 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
         else if (element_extras == "HEX")
         {
             mMeshIsHexahedral = true;
-            if ( ELEMENT_DIM == 2 )
+            if (ELEMENT_DIM == 2)
             {
                 mNodesPerElement = 4;
                 mNodesPerBoundaryElement = 2;
             }
-            if ( ELEMENT_DIM == 3 )
+            if (ELEMENT_DIM == 3)
             {
                 mNodesPerElement = 8;
                 mNodesPerBoundaryElement = 4;
@@ -721,7 +715,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     if (mFilesAreBinary)
     {
         mElementFileDataStart = mElementsFile.tellg(); // Record the position of the first byte after the header.
-        mElementItemWidth = mNodesPerElement*sizeof(unsigned) +  extra_attributes*sizeof(double) ;
+        mElementItemWidth = mNodesPerElement*sizeof(unsigned) +  extra_attributes*sizeof(double);
     }
 
     /*
@@ -810,7 +804,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
         unsigned num_nodes_in_file;
         ncl_header_line >> num_nodes_in_file >> mMaxContainingElements;
 
-        if ( mNumNodes != num_nodes_in_file )
+        if (mNumNodes != num_nodes_in_file)
         {
             EXCEPTION("NCL file does not contain the correct number of nodes for mesh");
         }
@@ -938,7 +932,7 @@ std::string TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMeshFileBaseName()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1);    // LCOV_EXCL_LINE
     mNumFaceAttributes = 0;
     if (!mOneDimBoundary.empty())
     {
@@ -1019,7 +1013,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::SetReadBufferSize(unsigned buf
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::SetNodePermutation(std::vector<unsigned>& rPermutationVector)
 {
-    if ( !mFilesAreBinary )
+    if (!mFilesAreBinary)
     {
         // It would be too inefficient otherwise...
         EXCEPTION("Permuted read can only be used with binary files since it requires random access to the node file.");
@@ -1033,13 +1027,12 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::SetNodePermutation(std::vector
         mInversePermutationVector[mPermutationVector[index]]=index;
     }
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::HasNodePermutation()
 {
     return(mNodePermutationDefined);
 }
-
-
 
 /**
 * @return the node permutation if a node permutation has been applied to this reader (or an empty permutation)
@@ -1050,10 +1043,7 @@ const std::vector<unsigned>& TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::rGetNo
     return mPermutationVector;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class TrianglesMeshReader<0,1>;
 template class TrianglesMeshReader<1,1>;
 template class TrianglesMeshReader<1,2>;

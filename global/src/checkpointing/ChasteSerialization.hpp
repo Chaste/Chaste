@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,30 +53,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/access.hpp>
 
 /**
- * Only Boost 1.37 and above can properly handle serialization of dynamically
- * loaded objects.  We define a convenience macro for code to test if this is
- * possible.
- *
- * \todo #2417 Mac OS X doesn't appear to be able to checkpoint dynamically loaded
- * models, so that functionality is switched off here.
+ * Check for versions of Boost we don't support at all.
  */
 #include <boost/version.hpp>
-#ifndef CHASTE_CAN_CHECKPOINT_DLLS
-#ifndef __APPLE__
-#if BOOST_VERSION >= 103700
-#define CHASTE_CAN_CHECKPOINT_DLLS
-#endif //Recent BOOST_VERSION
-#endif //Not APPLE
-#endif
-
-/**
- * Also check for versions of Boost we don't support at all.
- */
-#if BOOST_VERSION < 103700
-#error "Chaste doesn't support versions of Boost earlier than 1.37."
+#if BOOST_VERSION < 103800
+#error "Chaste doesn't support versions of Boost earlier than 1.38."
 #elif BOOST_VERSION == 104100
 // There's a bug in 1.41 with shared_ptr support; see e.g. http://sourceforge.net/apps/trac/easystroke/ticket/21
 #error "Chaste won't work with Boost 1.41 due to a bug in its serialization library."
+#endif
+
+/**
+ * \todo #2417 Mac OS X doesn't appear to be able to checkpoint dynamically loaded
+ * models, so that functionality is switched off here.
+ */
+#ifndef CHASTE_CAN_CHECKPOINT_DLLS
+#ifndef __APPLE__
+#define CHASTE_CAN_CHECKPOINT_DLLS
+#endif //Not APPLE
 #endif
 
 /**

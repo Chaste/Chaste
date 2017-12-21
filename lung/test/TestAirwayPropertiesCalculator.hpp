@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,14 +43,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "AirwayPropertiesCalculator.hpp"
 
-#include "Debug.hpp"
-
 class TestAirwayPropertiesCalculator : public CxxTest::TestSuite
 {
 public:
 
 
-    void TestBranchProperties() throw(Exception)
+    void TestBranchProperties()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002");
@@ -83,7 +81,7 @@ public:
         // Test that an index has been assigned to each branch sequentially
         std::vector<AirwayBranch*> branches = properties_calculator.GetBranches();
         TS_ASSERT_EQUALS(branches.size(), 123893u);
-        for(unsigned branch_idx = 0 ; branch_idx < branches.size() ; branch_idx++)
+        for (unsigned branch_idx = 0 ; branch_idx < branches.size() ; branch_idx++)
         {
             TS_ASSERT_EQUALS(branch_idx, branches[branch_idx]->GetIndex());
         }
@@ -94,7 +92,7 @@ public:
     }
 
 
-    void TestOrders() throw(Exception)
+    void TestOrders()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
@@ -126,7 +124,7 @@ public:
         TS_ASSERT_EQUALS(properties_calculator.GetBranchGeneration(branches[4]), 2u);
     }
 
-    void TestSubtreeProperties() throw(Exception)
+    void TestSubtreeProperties()
     {
         // Load test mesh
         TetrahedralMesh<1, 3> mesh;
@@ -181,7 +179,7 @@ public:
         TS_ASSERT_DELTA(branch_centroids[1][2], 0.0, 1e-6);
     }
 
-    void TestUpstreamProperties() throw(Exception)
+    void TestUpstreamProperties()
     {
         // Load test mesh
         TetrahedralMesh<1, 3> mesh;

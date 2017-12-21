@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "CellPropertyRegistry.hpp"
-#include "Exception.hpp"
 
 SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
     : mCurrentHypoxicDuration(0.0),
@@ -48,12 +46,12 @@ SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel()
     mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
 }
 
-double SimpleOxygenBasedCellCycleModel::GetCurrentHypoxicDuration()
+double SimpleOxygenBasedCellCycleModel::GetCurrentHypoxicDuration() const
 {
     return mCurrentHypoxicDuration;
 }
 
-double SimpleOxygenBasedCellCycleModel::GetCurrentHypoxiaOnsetTime()
+double SimpleOxygenBasedCellCycleModel::GetCurrentHypoxiaOnsetTime() const
 {
     return mCurrentHypoxiaOnsetTime;
 }
@@ -71,7 +69,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
         // Get cell's oxygen concentration
         double oxygen_concentration = mpCell->GetCellData()->GetItem("oxygen");
 
-        AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
+        AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase();
 
         if (mCurrentCellCyclePhase == G_ONE_PHASE)
         {
@@ -86,38 +84,33 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
     }
 }
 
+SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel)
+   : AbstractSimplePhaseBasedCellCycleModel(rModel),
+     mCurrentHypoxicDuration(rModel.mCurrentHypoxicDuration),
+     mCurrentHypoxiaOnsetTime(rModel.mCurrentHypoxiaOnsetTime),
+     mHypoxicConcentration(rModel.mHypoxicConcentration),
+     mQuiescentConcentration(rModel.mQuiescentConcentration),
+     mCriticalHypoxicDuration(rModel.mCriticalHypoxicDuration)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     *
+     * Note that mG1Duration is (re)set as soon as InitialiseDaughterCell()
+     * is called on the new cell-cycle model.
+     */
+}
+
 AbstractCellCycleModel* SimpleOxygenBasedCellCycleModel::CreateCellCycleModel()
 {
-    // Create a new cell-cycle model
-    SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide,
-     * mCurrentHypoxicDuration, mCurrentHypoxiaOnsetTime) will already have been
-     * correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetHypoxicConcentration(mHypoxicConcentration);
-    p_model->SetQuiescentConcentration(mQuiescentConcentration);
-    p_model->SetCriticalHypoxicDuration(mCriticalHypoxicDuration);
-    p_model->SetCurrentHypoxiaOnsetTime(mCurrentHypoxiaOnsetTime);
-
-    return p_model;
+    return new SimpleOxygenBasedCellCycleModel(*this);
 }
 
 void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
@@ -158,7 +151,7 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
     }
 }
 
-double SimpleOxygenBasedCellCycleModel::GetHypoxicConcentration()
+double SimpleOxygenBasedCellCycleModel::GetHypoxicConcentration() const
 {
     return mHypoxicConcentration;
 }
@@ -170,7 +163,7 @@ void SimpleOxygenBasedCellCycleModel::SetHypoxicConcentration(double hypoxicConc
     mHypoxicConcentration = hypoxicConcentration;
 }
 
-double SimpleOxygenBasedCellCycleModel::GetQuiescentConcentration()
+double SimpleOxygenBasedCellCycleModel::GetQuiescentConcentration() const
 {
     return mQuiescentConcentration;
 }
@@ -182,7 +175,7 @@ void SimpleOxygenBasedCellCycleModel::SetQuiescentConcentration(double quiescent
     mQuiescentConcentration = quiescentConcentration;
 }
 
-double SimpleOxygenBasedCellCycleModel::GetCriticalHypoxicDuration()
+double SimpleOxygenBasedCellCycleModel::GetCriticalHypoxicDuration() const
 {
     return mCriticalHypoxicDuration;
 }
@@ -206,7 +199,7 @@ void SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream&
     *rParamsFile << "\t\t\t<CriticalHypoxicDuration>" << mCriticalHypoxicDuration << "</CriticalHypoxicDuration>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

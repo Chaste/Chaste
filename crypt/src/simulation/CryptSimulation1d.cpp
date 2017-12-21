@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,64 +52,13 @@ CryptSimulation1d::CryptSimulation1d(AbstractCellPopulation<1>& rCellPopulation,
         MAKE_PTR_ARGS(CryptSimulationBoundaryCondition<1>, p_bc, (&rCellPopulation));
         AddCellPopulationBoundaryCondition(p_bc);
     }
+
+    MAKE_PTR(CryptCentreBasedDivisionRule<1>, p_centre_div_rule);
+    mpStaticCastCellPopulation->SetCentreBasedDivisionRule(p_centre_div_rule);
 }
 
 CryptSimulation1d::~CryptSimulation1d()
 {
-}
-
-c_vector<double, 1> CryptSimulation1d::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    // Location of parent and daughter cells
-    c_vector<double, 1> parent_coords = mpStaticCastCellPopulation->GetLocationOfCellCentre(pParentCell);
-    c_vector<double, 1> daughter_coords;
-
-    // Get separation parameter
-    double separation = mpStaticCastCellPopulation->GetMeinekeDivisionSeparation();
-
-    // Make a random direction vector of the required length
-    c_vector<double, 1> random_vector;
-
-    /*
-     * Pick a random direction and move the parent cell backwards by 0.5*separation
-     * in that direction and return the position of the daughter cell 0.5*separation
-     * forwards in that direction.
-     */
-
-    double random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
-    random_vector(0) = 0.5*separation*random_direction;
-    c_vector<double, 1> proposed_new_parent_coords = parent_coords - random_vector;
-    c_vector<double, 1> proposed_new_daughter_coords = parent_coords + random_vector;
-
-    if (   (proposed_new_parent_coords(0) >= 0.0)
-        && (proposed_new_daughter_coords(0) >= 0.0))
-    {
-        // We are not too close to the bottom of the cell population, so move parent
-        parent_coords = proposed_new_parent_coords;
-        daughter_coords = proposed_new_daughter_coords;
-    }
-    else
-    {
-        proposed_new_daughter_coords = parent_coords + 2.0*random_vector;
-        while (proposed_new_daughter_coords(0) < 0.0)
-        {
-            double fresh_random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
-            random_vector(0) = 0.5*separation*fresh_random_direction;
-            proposed_new_daughter_coords = parent_coords + random_vector;
-        }
-        daughter_coords = proposed_new_daughter_coords;
-    }
-
-    assert(daughter_coords(0) >= 0.0); // to make sure dividing cells stay in the cell population
-    assert(parent_coords(0) >= 0.0);   // to make sure dividing cells stay in the cell population
-
-    // Set the parent to use this location
-    ChastePoint<1> parent_coords_point(parent_coords);
-
-    unsigned node_index = mpStaticCastCellPopulation->GetLocationIndexUsingCell(pParentCell);
-    mrCellPopulation.SetNode(node_index, parent_coords_point);
-
-    return daughter_coords;
 }
 
 void CryptSimulation1d::OutputSimulationParameters(out_stream& rParamsFile)

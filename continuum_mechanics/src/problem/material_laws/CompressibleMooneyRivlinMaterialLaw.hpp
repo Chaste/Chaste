@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,8 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractIsotropicCompressibleMaterialLaw.hpp"
 #include "Exception.hpp"
-
-
 
 /**
  *  CompressibleMooneyRivlinMaterialLaw
@@ -153,8 +151,6 @@ public:
         return    mC1*I1*msMinusOneOverDimension*(msMinusOneOverDimension - 1)*pow(I3,msMinusOneOverDimension - 2)
                 + 0.5*mC3*pow(I3,-1.5);
     }
-
-
 
     /**
      * @return the second derivative d^2W/dI2dI3.

@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -406,6 +406,17 @@ class Gcc(BuildType):
         else:
             self._compiler_type = 'gcc'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
+            if self.GetCompilerVersion() >= 7:
+                self._cc_flags.extend(['-Wimplicit-fallthrough'])
+
+    def GetCompilerVersion(self):
+        """Get the major version number of the compiler being used."""
+        version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
+        try:
+            return int(version_str.split('.')[0])
+        except:
+            return 0
+
 
 class GccDebug(Gcc):
     """
@@ -469,7 +480,7 @@ class Coverage(GccDebug):
             s = 'Output unrecognised'
         else:
             if status.startswith('ignore_'):
-                s = 'Unterminated COVERAGE_IGNORE block. '
+                s = 'Unterminated LCOV_EXCL_START block. '
                 status = status[7:]
             else:
                 s = ''
@@ -618,7 +629,7 @@ class GoogleProfile(GccDebug):
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
         import socket
-        if socket.getfqdn().startswith('scoop'):
+        if os.path.exists('/usr/lib/libprofiler.so'):
             preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so '
         else:
             preload_hack = ''
@@ -794,7 +805,7 @@ class MemoryTesting(GccDebug):
         leaks = re.compile(r'==\d+== LEAK SUMMARY:')
         lost = re.compile(r'==\d+==\s+(definitely|indirectly|possibly) lost: ([0-9,]+) bytes in ([0-9,]+) blocks')
         petsc = re.compile(r'\[0]Total space allocated (\d+) bytes')
-        uninit = re.compile(r'==\d+== (Conditional jump or move depends on uninitialised value\(s\)|Use of uninitialised value)')
+        uninit = re.compile(r'==\d+== (Conditional jump or move depends on uninitialised value\(s\)|Use of uninitialised value|.*uninitialised byte\(s\))')
         open_files = re.compile(r'==(\d+)== Open (?:file descriptor|AF_UNIX socket) (?![012])(\d+): (?!(?:/home/bob/eclipse/lockfile|/dev/urandom))(.*)')
         orte_init = re.compile(r'==(\d+)==    (?:by|at) .*(: orte_init)?.*')
         test_killed = 'Test killed due to exceeding time limit'
@@ -1006,6 +1017,7 @@ class Intel(BuildType):
                                        #Following doesn't seem to play
                                        '-we810', #810: conversion from "double" to "unsigned int" may lose significant bits
                                        '-wr11021', # ipo warning unresolved symbols in third party libraries (usually!)
+                                       '-wr1478',  # #2811 turn off deprecation warnings for std::auto_ptr \todo: revisit when XSD 3.3 is dropped
                                        ])
             elif (version == 10 or version == 11):
                 self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable.
@@ -1116,7 +1128,8 @@ class CrayHpc(BuildType):
         self.tools['mpicxx'] = 'CC'
         self.build_dir = 'crayhpc'
         self._cc_flags = [
-            #'-O3', # Default is similar to -O2. Or try -O3 for more.
+            '-DNDEBUG',
+            '-O3',
             '-h nomessage=940', #940: A "return" statement is missing from the end of a non-void function.
             '-h nomessage=1254', #1254: The environment variable "CPATH" is not supported.
         ]

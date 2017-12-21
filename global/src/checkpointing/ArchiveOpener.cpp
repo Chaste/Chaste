@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include <sstream>
-#include <iostream>
+#include <fstream>
 
 #include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
@@ -57,10 +57,10 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-    : mpCommonStream(NULL),
-      mpPrivateStream(NULL),
-      mpCommonArchive(NULL),
-      mpPrivateArchive(NULL)
+    : mpCommonStream(nullptr),
+      mpPrivateStream(nullptr),
+      mpCommonArchive(nullptr),
+      mpPrivateArchive(nullptr)
 {
     // Figure out where things live
     ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
@@ -92,9 +92,7 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
         else
         {
             // We don't understand the exception, so we shouldn't continue
-#define COVERAGE_IGNORE
-            throw boost_exception;
-#undef COVERAGE_IGNORE
+            throw boost_exception; // LCOV_EXCL_LINE
         }
     }
 
@@ -114,7 +112,7 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
 template<>
 ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::~ArchiveOpener()
 {
-    ProcessSpecificArchive<boost::archive::text_iarchive>::Set(NULL);
+    ProcessSpecificArchive<boost::archive::text_iarchive>::Set(nullptr);
     delete mpPrivateArchive;
     delete mpPrivateStream;
     delete mpCommonArchive;
@@ -132,10 +130,10 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-    : mpCommonStream(NULL),
-      mpPrivateStream(NULL),
-      mpCommonArchive(NULL),
-      mpPrivateArchive(NULL)
+    : mpCommonStream(nullptr),
+      mpPrivateStream(nullptr),
+      mpCommonArchive(nullptr),
+      mpPrivateArchive(nullptr)
 {
     // Check for user error
     if (procId != PetscTools::GetMyRank())
@@ -172,13 +170,13 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
 #else
         mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
 #endif
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         if (!mpCommonStream->is_open())
         {
             delete mpCommonStream;
             EXCEPTION("Failed to open dummy archive file '/dev/null' for writing");
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     mpCommonArchive = new boost::archive::text_oarchive(*mpCommonStream);
 
@@ -198,7 +196,7 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
 template<>
 ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::~ArchiveOpener()
 {
-    ProcessSpecificArchive<boost::archive::text_oarchive>::Set(NULL);
+    ProcessSpecificArchive<boost::archive::text_oarchive>::Set(nullptr);
     delete mpPrivateArchive;
     delete mpPrivateStream;
     delete mpCommonArchive;

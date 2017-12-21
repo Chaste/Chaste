@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ class TestConvergenceEfficiency : public CxxTest::TestSuite
 {
 
 public:
-    void Test3DSpace10Efficiency() throw(Exception)
+    void Test3DSpace10Efficiency()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -76,7 +76,6 @@ public:
         TS_ASSERT_EQUALS(tester.MeshNum, 3u);
         HeartConfig::Instance()->Reset();
     }
-
 };
 
 #endif /*TESTCONVERGENCEEFFICIENCY_HPP_*/

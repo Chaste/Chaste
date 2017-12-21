@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ class TestOdeBasedCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestTysonNovakCellCycleModel() throw(Exception)
+    void TestTysonNovakCellCycleModel()
     {
         // Set up
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -107,7 +107,13 @@ public:
         p_solver->Initialise();
 
         TysonNovakCellCycleModel* p_other_cell_model = new TysonNovakCellCycleModel(p_solver);
+
+        // Coverage of GetOdeSolver()
+        boost::shared_ptr<AbstractCellCycleModelOdeSolver> p_solver_from_model = p_other_cell_model->GetOdeSolver();
+        TS_ASSERT_EQUALS(p_solver_from_model->GetSizeOfOdeSystem(), 6u);
+
         p_other_cell_model->SetBirthTime(p_simulation_time->GetTime());
+
         // Timestep for non-adaptive solvers defaults to 0.0001
         TS_ASSERT_EQUALS(p_other_cell_model->GetDt(), 0.0001);
         p_other_cell_model->SetDt(0.1/60.0);
@@ -156,15 +162,24 @@ public:
         TS_ASSERT_DELTA(other_proteins[4], 0.67083371879876, 1e-2);
         TS_ASSERT_DELTA(other_proteins[5], 0.95328206604519, 2e-2);
 
+        TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),true);
+
         // For coverage, we also test TysonNovakCellCycleModel methods for a mutant cell
         p_cell_model->ResetForDivision();
+
+        TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),false);
 
         TysonNovakCellCycleModel* p_cell_model2 = static_cast<TysonNovakCellCycleModel*> (p_cell_model->CreateCellCycleModel());
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mutation);
-
         CellPtr p_stem_cell_2(new Cell(p_mutation, p_cell_model2));
+
+        TS_ASSERT_EQUALS(p_cell_model2->ReadyToDivide(),false);
+
         p_stem_cell_2->SetCellProliferativeType(p_stem_type);
+
+        TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(),false);
+        TS_ASSERT_EQUALS(p_cell_model2->ReadyToDivide(),false);
 
         // Test the cell is ready to divide at the right time
         for (unsigned i=0; i<num_timesteps/2; i++)
@@ -196,6 +211,20 @@ public:
         TS_ASSERT_DELTA(proteins[3], 1.40562614481544, 1e-1);
         TS_ASSERT_DELTA(proteins[4], 0.67083371879876, 1e-2);
         TS_ASSERT_DELTA(proteins[5], 0.9662, 1e-2);
+
+        // Coverage of AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly()
+        std::vector<double> test_results(6);
+        for (unsigned i=0; i<6; i++)
+        {
+            test_results[i] = (double)i;
+        }
+        p_cell_model->SetProteinConcentrationsForTestsOnly(1.0, test_results);
+        proteins = p_cell_model->GetProteinConcentrations();
+
+        for (unsigned i=0; i<6; i++)
+        {
+            TS_ASSERT_DELTA(proteins[i], test_results[i], 1e-6);
+        }
     }
 
     /**
@@ -206,7 +235,7 @@ public:
      * conditions, since the oscillatory solution computed using the Chaste
      * ODE solver is not stable.
      */
-    void TestTysonNovakCellCycleModelSolver() throw(Exception)
+    void TestTysonNovakCellCycleModelSolver()
     {
         // Set up simulation time
         unsigned num_timesteps = 100000;
@@ -260,7 +289,7 @@ public:
          */
     }
 
-    void TestAlarcon2004OxygenBasedCellCycleModel() throw(Exception)
+    void TestAlarcon2004OxygenBasedCellCycleModel()
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();

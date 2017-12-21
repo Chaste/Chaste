@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -433,16 +433,15 @@ public:
      */
     void SetNodeForAverageOfPhiZeroed(unsigned node);
 
-
     /**
-     *  @return the tissue object. Can only be called after Initialise()
+     * @return the tissue object. Can only be called after Initialise()
      */
     ExtendedBidomainTissue<DIM>* GetExtendedBidomainTissue();
 
     /**
-     *  Print out time and max/min of the intracellular potential of the two cells and phi_e values at current time.
+     * Print out time and max/min of the intracellular potential of the two cells and phi_e values at current time.
      *
-     *  @param time  current time.
+     * @param time  current time.
      */
     void WriteInfo(double time);
 
@@ -466,7 +465,7 @@ public:
      * Note that it does the job by calling the method in the parent class.
      * This implies that the extra variable must be in the first cell (not the second)
      * because the generic method to write extra variables only looks into the first cell factory.
-     * TODO: write a specific method for extended problems that looks in both cell factories
+     * \todo write a specific method for extended problems that looks in both cell factories
      *
      * @param time  the current time
      * @param voltageVec  the solution vector to write
@@ -478,7 +477,6 @@ public:
      * Checks that a suitable method of resolving the singularity is being used.
      */
     void PreSolveChecks();
-
 
     /**
      * @return whether this is a problem with bath or not
@@ -492,7 +490,6 @@ public:
      * @param hasBath whether we want the problem to have bath or not.
      */
     void SetHasBath(bool hasBath);
-
 };
 
 #include "SerializationExportWrapper.hpp" // Must be last

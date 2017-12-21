@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 
@@ -64,7 +65,7 @@ public:
      * \todo When vertex-based cell population code is added to cell_based folder, move this
      *       test to TestWntConcentration.hpp
      */
-    void TestWntConcentrationWithVertexBasedCellPopulation() throw(Exception)
+    void TestWntConcentrationWithVertexBasedCellPopulation()
     {
         // Make some nodes
         std::vector<Node<2>*> nodes;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
+    assert(SPACE_DIM==2 || SPACE_DIM==3); // LCOV_EXCL_LINE
     VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
 
     // Loop over elements of voronoi_tesselation
@@ -81,21 +81,25 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<EL
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a NodeBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a PottsBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("VoronoiDataWriter cannot be used with a VertexBasedCellPopulation");
 }
 
 // Explicit instantiation

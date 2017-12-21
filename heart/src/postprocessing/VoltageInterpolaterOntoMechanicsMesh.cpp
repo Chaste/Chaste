@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,7 +87,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     std::vector<double> interpolated_voltages(rMechanicsMesh.GetNumNodes());
     Vec voltage_coarse = NULL;
 
-    for(unsigned time_step=0; time_step<num_timesteps; time_step++)
+    for (unsigned time_step=0; time_step<num_timesteps; time_step++)
     {
         for (unsigned var_index = 0; var_index < rVariableNames.size(); var_index++)
         {
@@ -97,12 +97,12 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
             ReplicatableVector voltage_repl(voltage);
 
             // interpolate
-            for(unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+            for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
             {
                 double interpolated_voltage = 0;
 
                 Element<DIM,DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
-                for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+                for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
                 {
                     unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
                     interpolated_voltage += voltage_repl[global_node_index]*mesh_pair.rGetElementsAndWeights()[i].Weights(node_index);
@@ -111,7 +111,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
                 interpolated_voltages[i] = interpolated_voltage;
             }
 
-            if(voltage_coarse!=NULL)
+            if (voltage_coarse != NULL)
             {
                 PetscTools::Destroy(voltage_coarse);
             }
@@ -123,7 +123,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
         p_writer->AdvanceAlongUnlimitedDimension();
     }
 
-    if(voltage_coarse!=NULL)
+    if (voltage_coarse != NULL)
     {
         PetscTools::Destroy(voltage);
         PetscTools::Destroy(voltage_coarse);
@@ -144,10 +144,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     HeartConfig::Instance()->SetOutputDirectory(config_directory);
 }
 
-///////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////
-
+// Explicit instantiation
 template class VoltageInterpolaterOntoMechanicsMesh<1>;
 template class VoltageInterpolaterOntoMechanicsMesh<2>;
 template class VoltageInterpolaterOntoMechanicsMesh<3>;

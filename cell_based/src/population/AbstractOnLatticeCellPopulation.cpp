@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,10 +115,25 @@ void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_st
     AbstractCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////
+template<unsigned DIM>
+double AbstractOnLatticeCellPopulation<DIM>::GetDefaultTimeStep()
+{
+    return 0.1;
+}
 
+template<unsigned DIM>
+const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > AbstractOnLatticeCellPopulation<DIM>::GetUpdateRuleCollection() const
+{
+    return mUpdateRuleCollection;
+}
+
+template<unsigned DIM>
+void AbstractOnLatticeCellPopulation<DIM>::RemoveAllUpdateRules()
+{
+    mUpdateRuleCollection.clear();
+}
+
+// Explicit instantiation
 template class AbstractOnLatticeCellPopulation<1>;
 template class AbstractOnLatticeCellPopulation<2>;
 template class AbstractOnLatticeCellPopulation<3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,7 +95,39 @@ public:
     }
 };
 
+class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
+{
+private:
+    c_matrix<double,2,2> mTensor;
 
+public:
+    SimpleConductivityModifier()
+        : AbstractConductivityModifier<2,2>(),
+          mTensor(zero_matrix<double>(2,2))
+          // Conductivity tensors are diagonal, so we can only need to do the diagonal if we initialise our tensor with the above line
+    {
+    }
+
+    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
+    {
+        // Increase by factor of two for element 1
+        if (elementIndex == 1)
+        {
+            for ( unsigned dim=0; dim<2; dim++)
+            {
+                mTensor(dim,dim) = 2.0*rOriginalConductivity(dim,dim);
+            }
+        }
+        else
+        {
+            for ( unsigned dim=0; dim<2; dim++)
+            {
+                mTensor(dim,dim) = rOriginalConductivity(dim,dim);
+            }
+        }
+        return mTensor;
+    }
+};
 class TestBidomainTissue : public CxxTest::TestSuite
 {
 public:
@@ -165,7 +197,7 @@ public:
     }
 
 
-    void TestBidomainTissueWithHeterogeneousConductivitiesDistributed() throw (Exception)
+    void TestBidomainTissueWithHeterogeneousConductivitiesDistributed()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -180,17 +212,8 @@ public:
 
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
 
-        // METIS_LIBRARY partition ensures that we have never own all the elements (even when there are as few as 2 processes)
-        // DUMB and PARMETIS_LIBRARY may allow single process to see all the elements because it's a very small mesh
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        DistributedTetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Check that if we're in parallel no single process owns every element (to ensure that the conductivities
-        // really are distributed).
-        if (PetscTools::IsParallel())
-        {
-            TS_ASSERT_DIFFERS( mesh.GetNumElements(), mesh.GetNumLocalElements() );
-        }
 
         std::vector<ChasteCuboid<3> > heterogeneity_area;
         std::vector< c_vector<double,3> > intra_conductivities;
@@ -255,7 +278,38 @@ public:
 
     }
 
-    void TestBidomainTissueWithHeterogeneousConductivitiesEllipsoid() throw (Exception)
+    void TestBidomainTissueConductivityModifier()
+    {
+        HeartConfig::Instance()->Reset();
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
+        cell_factory.SetMesh(&mesh);
+
+        //2D tissue
+        BidomainTissue<2>  bidomain_tissue(&cell_factory);
+
+        // Do conductivity modifier here too (for coverage)
+        SimpleConductivityModifier conductivity_modifier;  // Defined above
+        bidomain_tissue.SetConductivityModifier( &conductivity_modifier );
+
+        // intracellular
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(0u)(0,0),1.75);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(1u)(0,0),3.5); // modified
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(2u)(1,1),1.75);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetIntracellularConductivityTensor(3u)(0,0),1.75);
+
+
+        //sigma_e
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(0u)(0,0),7.0);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(1u)(0,0),14.0); // modified
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(2u)(1,1),7.0);
+        TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(3u)(0,0),7.0);
+    }
+
+    void TestBidomainTissueWithHeterogeneousConductivitiesEllipsoid()
     {
         HeartConfig::Instance()->Reset();
 
@@ -390,9 +444,9 @@ public:
                 const c_matrix<double, 3, 3>& intra_tensor_after_archiving = p_bidomain_tissue->rGetIntracellularConductivityTensor(0);
                 const c_matrix<double, 3, 3>& extra_tensor_after_archiving = dynamic_cast<BidomainTissue<3>*>(p_bidomain_tissue)->rGetExtracellularConductivityTensor(0); //Naughty Gary using dynamic cast, but only for testing...
 
-                for(unsigned i=0; i<3; i++)
+                for (unsigned i=0; i<3; i++)
                 {
-                    for(unsigned j=0; j<3; j++)
+                    for (unsigned j=0; j<3; j++)
                     {
                         TS_ASSERT_DELTA(intra_tensor_before_archiving(i,j), intra_tensor_after_archiving(i,j), 1e-9);
                         TS_ASSERT_DELTA(extra_tensor_before_archiving(i,j), extra_tensor_after_archiving(i,j), 1e-9);

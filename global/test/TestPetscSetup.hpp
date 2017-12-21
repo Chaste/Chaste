@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -112,7 +112,7 @@ public:
         Warnings::QuietDestroy();
     }
 
-    void TestDivideOneByZero() throw(Exception)
+    void TestDivideOneByZero()
     {
         double one = 1.0;
         double zero = 0.0;
@@ -131,7 +131,7 @@ public:
 #endif
     }
 
-    void TestDivideZeroByZero() throw(Exception)
+    void TestDivideZeroByZero()
     {
         double zero = 0.0;
         double ans;

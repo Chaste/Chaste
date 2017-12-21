@@ -7,6 +7,68 @@
 
 <h1>Chaste Release Notes</h1>
 
+
+
+<h2>Release 2017.1 (changes since Release 3.4)</h2>
+
+
+<h3>Headline features</h3>
+<ul><li>Chaste's build system has moved from <tt>scons</tt> to <tt>cmake</tt> (although <tt>scons</tt> will work with this release, it may not be supported in future).
+</li><li>Chaste now uses C++11 rather than C++98, and users and developers can begin to use the new features introduced in C++11.
+</li><li>We have updated support for dependencies and new compilers, up to gcc 7.2, intel 17 and clang 5.0. Chaste 2017.1 is compatible with all Ubuntus up to 17.10 that are still in support.
+</li><li>We have changed our version control system (from <tt>svn</tt> to <tt>git</tt>), which allows users more flexibility in choosing the stability of their Chaste version. Releases such as this are the most stable, but a host of other options now available, and listed at <a  href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/ExternalDeveloperGuide">ChasteGuides/ExternalDeveloperGuide</a>. The repository is mirrored at <a  href="https://github.com/Chaste/Chaste">https://github.com/Chaste/Chaste</a>.
+</li><li>Chaste no longer supports cmake &lt; 2.8.12, scons, PETSc &lt; 3.4, Boost &lt; 1.54, HDF5 &lt; 1.8.11, XSD &lt; 3.3, Xerces &lt; 3.1.1, Sundials &lt; 2.5.0, and VTK &lt; 5.8, as these were dropped with Ubuntu 12.04.
+</li></ul>
+
+<h3>New functionality &amp; code changes</h3>
+
+
+<h4>Cell-based</h4>
+<ul><li>Member variables have been added to <tt>NodeAttributes</tt> to store neighbouring nodes, speeding up node-based simulations by a factor of between 2 and 3.
+</li><li>Improvements to vertex robustness and speed:
+  <ul><li>The method <tt>GetShortAxisOfElement()</tt> has made more robust to cell size.
+  </li><li>A member variable <tt>mDistanceForT3SwapChecking</tt> has been added to <tt>MutableVertexMesh</tt>, which can be used to speed up vertex model simulations with a free boundary.
+  </li><li>The restriction on vertex displacements at each timestep of vertex model simulations has been made optional by the addition of a member variable <tt>mRestrictVertexMovement</tt> to <tt>VertexBasedCellPopulation</tt>.
+  </li></ul></li><li>Some cell-cycle models have been renamed (<tt>AbstractSimpleGenerationBasedCellCycleModel</tt> to <tt>AbstractSimpleGenerationalCellCycleModel</tt>, <tt>ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel</tt> to <tt>ExponentialG1GenerationalCellCycleModel</tt>, <tt>FixedDurationGenerationBasedCellCycleModel</tt> to <tt>FixedG1GenerationalCellCycleModel</tt>, <tt>GammaDistributedStochasticDurationCellCycleModel</tt> to <tt>GammaG1CellCycleModel</tt>, <tt>StochasticDurationCellCycleModel</tt> to <tt>UniformCellCycleModel</tt>, <tt>StochasticDurationGenerationBasedCellCycleModel</tt> to <tt>UniformG1GenerationalCellCycleModel</tt>).
+</li><li>The cell-cycle model hierarchy has been refactored to allow models with no phase, with new classes <tt>AbstractOdeBasedPhaseBasedCellCycleModel</tt>, <tt>AbstractPhaseBasedCellCycleModel</tt>, <tt>BernoulliTrialCellCycleModel</tt>, <tt>FixedSequenceCellCycleModel</tt>, and <tt>NoCellCycleModel</tt> added.
+</li><li><tt>DiagonalVertexBasedDivisionRule</tt> has been renamed to <tt>FixedVertexBasedDivisionRule</tt>, and new cell division rules <tt>AbstractCentreBasedDivisionRule</tt>, <tt>FixedCentreBasedDivisionRule</tt>, <tt>RandomDirectionCentreBasedDivisionRule</tt>, and <tt>ShovingCaBasedDivisionRule</tt> have been added.
+</li><li>Several methods for adding and removing update rules have changed location and name (e.g. <tt>AddUpdateRule()</tt>, <tt>RemoveAllUpdateRules()</tt> and <tt>GetUpdateRuleCollection()</tt>).
+</li><li>Off-lattice models now allow for numerical integration schemes other than Forward Euler to be specified (see <tt>AbstractNumericalMethod</tt> and subclass).
+</li><li>A bug relating to archiving of cell-based simulations has been fixed.
+</li><li>Node attributes are now correctly copied upon mesh creation and cell division events in centre-based models.
+</li><li>A new class <tt>CellDataWriter</tt> and method <tt>OffLatticeSimulation::rGetForceCollection()</tt> have been added.
+</li><li>Labelled cells now by default have the default damping constant, not the mutant damping constant.
+</li><li>To streamline the cell-based code, the methods <tt>GetDefaultTimeStep()</tt>, <tt>WriteCellPopulationDataToVisualizerSetupFile()</tt>, <tt>WriterForceDataToVisualizerSetupFile()</tt>, <tt>CopySrnModelVariables()</tt> and <tt>SimulationSetupHook()</tt> have been added.
+</li><li>Target area modifiers are now permitted on non-vertex-based models.
+</li><li>A profiling test has been added for 3D node-based simulations.
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>The <tt>CellProperties</tt> postprocessing class can now return the times at which peak voltages occurred during each action potential.
+</li><li>Mesh partitioning now defaults to parMETIS:
+  <ul><li>Use of METIS for mesh partitioning is deprecated - the code will drop through to parMETIS with a warning.
+  </li><li>When the PETSc/partitioner is not available the code will also drop through to parMETIS with a warning (previously the drop-through in this case was to a dumb mesh partition).
+  </li></ul></li><li>HDF5 output changes:
+  <ul><li><tt>Hdf5DataWriter</tt> can now cache writes (to whole chunks), improving performance with high-latency I/O systems (i.e. in HPC systems). It can be enabled in cardiac problems with <tt>SetUseHdf5DataWriterCache()</tt>.
+  </li><li>HDF5 writer chunk size &amp; alignment parameters can now be set from cardiac problems using <tt>&lt;whatever&gt;Problem.SetHdf5DataWriterTargetChunkSizeAndAlignment(...)</tt>. This is useful, for example, on a striped filesystem where setting this method with the stripe size (in bytes) will mean chunks fit into and align with the stripes, resulting in best performance.
+  </li></ul></li><li>A bug in the <tt>CellProperties</tt> APD calculation has been fixed, it was reporting spuriously large action potential durations in the event that a sub-threshold AP preceded a super-threshold AP.
+</li><li>Some extra <tt>NodeAttributes</tt> been added (see "Cell-based" above) which have increased the memory footprint of large tissue simulations by about 0.5%, unlikely to be a problem for anyone, but mentioned here in case!
+</li><li>We are unable to support and distribute a cardiac "standalone" executable.  Users who rely on it should understand that this functionality is still available but that the executable must be compiled from source.
+</li></ul>
+
+<h4>Core</h4>
+<ul><li>The box collection classes have been refactored:
+  <ul><li><tt>BoxCollection</tt> renamed to <tt>ObsoleteBoxCollection</tt>, which will be deprecated once functionality (including arbitrary periodicity) has been included in the default class (<tt>DistributedBoxCollection</tt>).
+  </li><li>Methods <tt>GetLocalBoxes()</tt> have been renamed <tt>rGetLocalBoxes()</tt>.
+  </li></ul></li><li>A Chaste docker file has been added.
+</li><li>The <tt>Identifiable-&gt;GetIdentifier()</tt> method has been made more robust to segmentation faults.
+</li></ul>
+
+<h3>Future Plans</h3>
+<p>
+  From now on we intend to follow the Ubuntu 6 monthly release schedule, tagging our <tt>master</tt> branch once it contains support for the latest Ubuntu.
+</p>
+
 <h2>Release 3.4 (changes since Release 3.3)</h2>
 
 <h3>Headline features</h3>
@@ -18,10 +80,14 @@
 </li><li>The CMake builder has been extended to support compilation on Windows, Linux and Mac OS X with a range of compilers.  This is part of a planned migration to a unified build system on all platforms. 
 </li></ul>
 
-<h4 id="Cardiac">Cardiac</h4>
+
+
+<h4>Cardiac</h4>
 <ul><li>A new class <tt>AbstractCvodeCellWithDataClamp</tt> allows the 'data clamp' proposed by <a href="http://www.ncbi.nlm.nih.gov/pubmed/15142755">Dokos &amp; Lovell (2004)</a> to be applied to any CellML model. Models inheriting from this class can be generated with <tt>ConvertCellModel.py --cvode-data-clamp</tt>.
 </li><li>This is the last release of Chaste for which a pre-built cardiac <em>standalone executable</em> can be bundled.
-</li></ul><h4 id="Cell-based">Cell-based</h4>
+</li></ul>
+
+<h4>Cell-based</h4>
 <ul><li>We have improved functionality for outputting results of cellular automaton (CA) and cellular Potts model simulations, as well as cell-based simulations on periodic domains, to VTK.
 </li><li>We have extended functionality for CA simulations, including a new location "switching" rule and division rule class hierarchies.
 </li><li>Each cell now contains a "subcellular reaction network model" as well as a cell-cycle model.  This mainly affects users of the <tt>DeltaNotchCellCycleModel</tt> class, which is now implemented using the <tt>DeltaNotchSrnModel</tt>, allowing the model to be coupled with any of the cell cycle models (see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials/CreatingAndUsingANewSrnModel">UserTutorials/CreatingAndUsingANewSrnModel</a> for details).

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,12 +81,13 @@ public:
     virtual unsigned GetNumberOfAcini();
 
     /**
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param time The current time in seconds
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
      */
-    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode);
+    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode)=0;
 
     /**
      * Default constructor.
@@ -107,8 +108,6 @@ public:
      * @return  the mesh used to create the acinar.
      */
     AbstractTetrahedralMesh<1,3>* GetMesh();
-
 };
 
 #endif /*ABSTRACTACINARUNITFACTORY_HPP_*/
-

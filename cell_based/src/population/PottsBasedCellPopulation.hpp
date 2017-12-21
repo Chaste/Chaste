@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,15 +39,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
-#include "AbstractPottsUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 #include "MutableMesh.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
-
-template<unsigned DIM>
-class AbstractPottsUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
@@ -85,9 +82,6 @@ private:
      */
     MutableMesh<DIM,DIM>* mpMutableMesh;
 
-    /** The update rules used to determine the new location of the cells. */
-    std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > mUpdateRuleCollection;
-
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
 
@@ -112,7 +106,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-#define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
 
         /*
@@ -120,13 +113,10 @@ private:
          * of the PottsMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpElementTessellation;
-        mpElementTessellation = NULL;
+        mpElementTessellation = nullptr;
 
-        archive & mUpdateRuleCollection;
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
-
-#undef COVERAGE_IGNORE
     }
 
     /**
@@ -188,6 +178,15 @@ public:
      * @return const reference to mrMesh (used in archiving).
      */
     const PottsMesh<DIM>& rGetMesh() const;
+
+    /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
      * Get a particular PottsElement.
@@ -254,11 +253,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  this parameter is not yet used in this class (see #1737)
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -355,25 +353,6 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
-     * Add an update rule to be used in this simulation (use this to set up the Hamiltonian).
-     *
-     * @param pUpdateRule pointer to an update rule
-     */
-    void AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the update rules
-     */
-    void RemoveAllUpdateRules();
-
-    /**
-     * Get the collection of update rules to be used in this simulation.
-     *
-     * @return the update rule collection
-     */
-    const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
-
-    /**
      * Outputs CellPopulation parameters to file
      *
      * As this method is pure virtual, it must be overridden
@@ -426,6 +405,33 @@ public:
      * @return the Mutable Mesh
      */
     MutableMesh<DIM,DIM>* GetMutableMesh();
+
+    /**
+     * Overridden AddUpdateRule() method.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
 };
 
 #include "SerializationExportWrapper.hpp"

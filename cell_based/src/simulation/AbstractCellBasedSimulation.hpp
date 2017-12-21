@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,11 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "CellBasedPdeHandler.hpp"
 #include "AbstractCellKiller.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "AbstractForce.hpp"
 #include "RandomNumberGenerator.hpp"
+
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
 
 /**
  * An abstract cell-based simulation class. This class contains common functionality
@@ -102,7 +104,6 @@ private:
         archive & mCellKillers;
         archive & mSimulationModifiers;
         archive & mSamplingTimestepMultiple;
-        archive & mpCellBasedPdeHandler;
     }
 
 protected:
@@ -171,11 +172,6 @@ protected:
     unsigned mSamplingTimestepMultiple;
 
     /**
-     * Pointer to a CellBasedPdeHandler object.
-     */
-    CellBasedPdeHandler<SPACE_DIM>* mpCellBasedPdeHandler;
-
-    /**
      * Writes out special information about the mesh to the visualizer.
      */
     virtual void WriteVisualizerSetupFile()
@@ -198,19 +194,6 @@ protected:
      * @return the number of births that occurred.
      */
     virtual unsigned DoCellBirth();
-
-    /**
-     * Method for determining how cell division occurs. This method returns a vector
-     * which is then passed into the CellPopulation method AddCell().
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return a vector containing information on cell division.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell)=0;
 
     /**
      * During a simulation time step, process any cell sloughing or death
@@ -244,8 +227,9 @@ protected:
 
     /**
      * Update the cell locations and topology (connectivity) of the cell population. This method
-     * is called within the main time loop of Solve() and is pure virtual in the parent class,
-     * so must be overridden.
+     * is called within the main time loop of Solve() .
+     *
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * In the case of an OffLatticeSimulation, the method computes the force acting on each node
      * (corresponding to a cell in centre-based models and to a vertex in vertex-based models)
@@ -265,11 +249,12 @@ protected:
      * Helper method to output additional simulations parameters and information defined in
      * subclasses to file.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputAdditionalSimulationSetup(out_stream& rParamsFile)
-    {
-    }
+    virtual void OutputAdditionalSimulationSetup(out_stream& rParamsFile)=0;
 
 public:
 
@@ -291,18 +276,6 @@ public:
      * This frees the cell population if it was created by de-serialization.
      */
     virtual ~AbstractCellBasedSimulation();
-
-    /**
-     * Set mpCellBasedPdeHandler
-     *
-     * @param pCellBasedPdeHandler pointer to a CellBasedPdeHandler object
-     */
-    void SetCellBasedPdeHandler(CellBasedPdeHandler<SPACE_DIM>* pCellBasedPdeHandler);
-
-    /**
-     * @return mpCellBasedPdeHandler
-     */
-    CellBasedPdeHandler<SPACE_DIM>* GetCellBasedPdeHandler();
 
     /**
      * Get a node's location (ONLY FOR TESTING).

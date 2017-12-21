@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -182,7 +182,6 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBou
     mBoundaryElements[SolveBoundaryElementMapping(elementIndex)]->CalculateWeightedDirection(rWeightedDirection, rJacobianDeterminant );
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 {
@@ -202,7 +201,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
             boundary_element_node_indices.insert( (*face_iter)->GetNodeGlobalIndex(i) );
         }
 
-        Node<SPACE_DIM>* p_opposite_node = NULL;
+        Node<SPACE_DIM>* p_opposite_node = nullptr;
         Node<SPACE_DIM>* p_representative_node = (*face_iter)->GetNode(0);
           for (typename Node<SPACE_DIM>::ContainingElementIterator element_iter = p_representative_node->ContainingElementsBegin();
              element_iter != p_representative_node->ContainingElementsEnd();
@@ -228,7 +227,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
                 break;
             }
         }
-        assert(p_opposite_node != NULL);
+        assert(p_opposite_node != nullptr);
 
         // Vector from centroid of face to opposite node
         c_vector<double, SPACE_DIM> into_mesh = p_opposite_node->rGetLocation() - (*face_iter)->CalculateCentroid();
@@ -245,7 +244,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1);     // LCOV_EXCL_LINE
 
     for (unsigned node_index=0; node_index<=width; node_index++)
     {
@@ -277,8 +276,8 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsign
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
 
     //Construct the nodes
     unsigned node_index=0;
@@ -381,16 +380,13 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
     this->RefreshMesh();
 }
 
-
-
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned width,
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3);
-    assert(ELEMENT_DIM == 3);
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3);     // LCOV_EXCL_LINE
     //Construct the nodes
 
     unsigned node_index = 0;
@@ -595,9 +591,9 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(d
         //Note here that in ELEMENT_DIM > 1 cases there may be a zero height or depth - in which case we don't need to use relative comparisons
         // Doing relative comparisons with zero is okay - if we avoid division by zero.
         // However, it's best not to test whether " fabs( 0.0 - 0.0) > DBL_EPSILON*0.0 "
-        if (  fabs (actual_width_x - width) > DBL_EPSILON*width
+        if (fabs (actual_width_x - width) > DBL_EPSILON*width
             ||( height!= 0.0 &&  fabs (actual_width_y - height) > DBL_EPSILON*height)
-            ||( depth != 0.0 &&  fabs (actual_width_z - depth) > DBL_EPSILON*depth ) )
+            ||( depth != 0.0 &&  fabs (actual_width_z - depth) > DBL_EPSILON*depth ))
         {
             EXCEPTION("Space step does not divide the size of the mesh");
         }
@@ -622,7 +618,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
         unsigned dimension, double spaceStep,
         double width, double height, double depth)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
     if (dimension >= SPACE_DIM)
     {
         EXCEPTION("Cannot split on non-existent dimension");
@@ -724,7 +720,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
     if (this->mNodes.size() == 0u)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         /*
          * Coverage of this block requires a mesh regular slab mesh with the number of
          * elements in the primary dimension less than (num_procs - 1), e.g. a 1D mesh
@@ -736,7 +732,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
         // This process owns no nodes and thus owns none of the mesh
         return (1u);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case
@@ -843,7 +839,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMesh(Abstract
     {
         Node<SPACE_DIM>* p_node =  rOtherMesh.GetNode(i);
         assert(!p_node->IsDeleted());
-        c_vector<double, SPACE_DIM> location=p_node->rGetLocation();
+        const c_vector<double, SPACE_DIM>& location=p_node->rGetLocation();
         bool is_boundary=p_node->IsBoundaryNode();
 
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location, is_boundary);
@@ -1039,13 +1035,12 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIn
     EXCEPTION(ss.str());
 }
 
-
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
-                                                                                         std::set<unsigned> testElements)
+                                                                                                 std::set<unsigned> testElements)
 {
     assert(testElements.size() > 0);
+    EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE // CalculateInterpolationWeights hits an assertion otherwise
 
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;
@@ -1072,10 +1067,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
     return closest_index;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractTetrahedralMesh<1,1>;
 template class AbstractTetrahedralMesh<1,2>;
 template class AbstractTetrahedralMesh<1,3>;

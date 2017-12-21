@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSyscalls.hpp"
 
 HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
-  : mpMesh(NULL),
+  : mpMesh(nullptr),
     mMeshFilename("mesh"),
     mDomainWidth(numNodesAlongWidth*scaleFactor),
     mNumCellWidth(numNodesAlongWidth), //*1 because cells are considered to be size one
@@ -115,12 +115,12 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
             double y = y0 + vertical_spacing*(double)i;
 
             // Avoid floating point errors which upset OffLatticeSimulation
-            if ( (y<0.0) && (y>-1e-12) )
+            if ((y<0.0) && (y>-1e-12))
             {
                 // Difficult to cover - just corrects floating point errors that have occurred from time to time!
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 y = 0.0;
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
             }
 
             (*p_node_file) << node++ << "\t" << x << "\t" << y << "\t" << boundary << std::endl;

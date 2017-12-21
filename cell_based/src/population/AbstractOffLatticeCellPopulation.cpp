@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,6 +52,15 @@ AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCell
 {
 }
 
+// LCOV_EXCL_START
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocations(double dt)
+{
+  // This method is deprecated by the NumericalMethod class hierarchy; the only population that calls this method is the NodeBasedCellPopulationWithBuskeUpdate.
+  NEVER_REACHED;
+}
+// LCOV_EXCL_STOP
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDampingConstantNormal(double dampingConstantNormal)
 {
@@ -100,10 +109,7 @@ void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulat
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractOffLatticeCellPopulation<1,1>;
 template class AbstractOffLatticeCellPopulation<1,2>;
 template class AbstractOffLatticeCellPopulation<2,2>;

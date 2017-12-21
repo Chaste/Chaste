@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -155,9 +155,9 @@ def coverage_ignore(src_file):
         fp = open(os.path.join(src_file['dir'], src_file['file']))
         code = True
         for line in fp:
-            if line.find('#define COVERAGE_IGNORE') != -1:
+            if line.find('// LCOV_EXCL_START') != -1:
                 code = False
-            elif line.find('#undef COVERAGE_IGNORE') != -1:
+            elif line.find('// LCOV_EXCL_STOP') != -1:
                 code = True
             if code and (line.startswith('template') or line.startswith('class ')):
                 ignore = False
@@ -184,11 +184,11 @@ for src_file in src_files:
         for line in lines:
             count, line_no, src_line = line.split(':', 2)
             count, line_no = count.strip(), line_no.strip()
-            if src_line.find('#define COVERAGE_IGNORE') != -1:
+            if src_line.find('// LCOV_EXCL_START') != -1:
                 ignore = True
                 out_file.write("%9s:%5s:%s" % ('ignored', line_no, src_line))
                 break
-            elif src_line.find('#undef COVERAGE_IGNORE') != -1:
+            elif src_line.find('// LCOV_EXCL_STOP') != -1:
                 ignore = False
                 out_file.write("%9s:%5s:%s" % ('ignored', line_no, src_line))
                 break
@@ -223,10 +223,11 @@ for src_file in src_files:
                             (src_line_stripped.startswith('return') and
                              src_line_stripped[6] in [';', ' ']) or
                             src_line_stripped.startswith('TERMINATE(') or
-                            (src_line_stripped.startswith('assert(DIM') or
-                             src_line_stripped.startswith('assert(ELEM_DIM') or
-                             src_line_stripped.startswith('assert(SPACE_DIM') or
-                             src_line_stripped.startswith('assert(ELEMENT_DIM')) or
+                            src_line_stripped.startswith('assert(DIM') or
+                            src_line_stripped.startswith('assert(ELEM_DIM') or
+                            src_line_stripped.startswith('assert(SPACE_DIM') or
+                            src_line_stripped.startswith('assert(ELEMENT_DIM') or
+                            src_line_stripped.startswith('EXCEPT_IF_NOT(ELEMENT_DIM') or
                             src_line_stripped.startswith('#') or
                             src_line_stripped.startswith('EXPORT_TEMPLATE') or
                             src_line_stripped.startswith('template class ') or

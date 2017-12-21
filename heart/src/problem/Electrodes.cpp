@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -129,15 +129,12 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
     }
 }
 
-
-
 template<unsigned DIM>
 boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > Electrodes<DIM>::GetBoundaryConditionsContainer()
 {
     //assert(mAreActive);
     return mpBoundaryConditionsContainer;
 }
-
 
 template<unsigned DIM>
 bool Electrodes<DIM>::SwitchOff(double time)
@@ -181,13 +178,12 @@ void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionI
     c_vector<double,DIM> weighted_direction;
     double jacobian_determinant;
 
-
     for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
              = mpMesh->GetBoundaryElementIteratorBegin();
          iter != mpMesh->GetBoundaryElementIteratorEnd();
          iter++)
     {
-        if ( mpMesh->CalculateDesignatedOwnershipOfBoundaryElement( (*iter)->GetIndex() ))
+        if (mpMesh->CalculateDesignatedOwnershipOfBoundaryElement((*iter)->GetIndex()))
         {
             if (fabs((*iter)->CalculateCentroid()[dimensionIndex] - lowerValue) < 1e-6)
             {
@@ -203,7 +199,7 @@ void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionI
         }
     }
 
-    if(DIM==3)
+    if (DIM == 3)
     {
         // if the dimension of the face is 1, the mapping is from the face to the canonical element [0,1], so the
         // jacobian_determinants used above will be exactly the areas of the faces
@@ -229,15 +225,10 @@ void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionI
     }
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Electrodes<1>;
 template class Electrodes<2>;
 template class Electrodes<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

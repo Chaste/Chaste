@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Timer.hpp"
 #include "TetrahedralMesh.hpp"
+#include "Warnings.hpp"
 
 #include "petscao.h"
 #include <parmetis.h>
@@ -76,13 +77,13 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
       mTotalNumElements(0u),
       mTotalNumBoundaryElements(0u),
       mTotalNumNodes(0u),
-      mpSpaceRegion(NULL),
-      mMetisPartitioning(partitioningMethod)
+      mpSpaceRegion(nullptr),
+      mPartitioning(partitioningMethod)
 {
     if (ELEMENT_DIM == 1 && (partitioningMethod != DistributedTetrahedralMeshPartitionType::GEOMETRIC))
     {
         //No METIS partition is possible - revert to DUMB
-        mMetisPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
     }
 }
 
@@ -99,7 +100,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(DistributedVectorFactory* pFactory)
 {
     AbstractMesh<ELEMENT_DIM,SPACE_DIM>::SetDistributedVectorFactory(pFactory);
-    mMetisPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
+    mPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -110,8 +111,21 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     std::set<unsigned>& rElementsOwned,
     std::vector<unsigned>& rProcessorsOffset)
 {
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::METIS_LIBRARY)
+    {
+        WARNING("METIS partitioning is deprecated.  Switching to parMETIS");
+        mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
+    }
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && !PetscTools::HasParMetis())
+    {
+        // The following warning can only be reproduced on machines which do not have the PETSc/parMETIS interface.
+// LCOV_EXCL_START
+        WARNING("PETSc/parMETIS partitioning requires PETSc to be configured with parMETIS as an option.  Current install has PETSc and parMETIS installed independently.  Switching to parMETIS");
+        mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
+// LCOV_EXCL_STOP
+    }
     ///\todo #1293 add a timing event for the partitioning
-    if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
+    if (mPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
     {
         /*
          *  With ParMetisLibraryNodeAndElementPartitioning we compute the element partition first
@@ -124,15 +138,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         /*
          *  Otherwise we compute the node partition and then we work out element distribution
          */
-        if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::METIS_LIBRARY && PetscTools::IsParallel())
-        {
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset);
-        }
-        else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
+        if (mPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
             NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset);
         }
-        else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::GEOMETRIC && PetscTools::IsParallel())
+        else if (mPartitioning==DistributedTetrahedralMeshPartitionType::GEOMETRIC && PetscTools::IsParallel())
         {
             if (!mpSpaceRegion)
             {
@@ -145,13 +155,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(*this, rNodesOwned);
         }
 
-        if ( rMeshReader.HasNclFile() )
+        if (rMeshReader.HasNclFile())
         {
             // Form a set of all the element indices we are going to own
             // (union of the sets from the lines in the NCL file)
-            for ( std::set<unsigned>::iterator iter=rNodesOwned.begin();
-                  iter!=rNodesOwned.end();
-                  ++iter )
+            for (std::set<unsigned>::iterator iter = rNodesOwned.begin();
+                 iter != rNodesOwned.end();
+                 ++iter)
             {
                 std::vector<unsigned> containing_elements = rMeshReader.GetContainingElementIndices( *iter );
                 rElementsOwned.insert( containing_elements.begin(), containing_elements.end() );
@@ -161,11 +171,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             // Then read all the data into a node_index set
             std::set<unsigned> node_index_set;
 
-            for ( std::set<unsigned>::iterator iter=rElementsOwned.begin();
-                  iter!=rElementsOwned.end();
-                  ++iter )
+            for (std::set<unsigned>::iterator iter = rElementsOwned.begin();
+                 iter != rElementsOwned.end();
+                 ++iter)
             {
-                ElementData element_data = rMeshReader.GetElementData( *iter );
+                ElementData element_data = rMeshReader.GetElementData(*iter);
                 node_index_set.insert( element_data.NodeIndices.begin(), element_data.NodeIndices.end() );
             }
 
@@ -206,7 +216,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             }
         }
 
-        if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
+        if (mPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
             PetscTools::Barrier();
             if (PetscTools::AmMaster())
@@ -243,7 +253,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     this->mElements.reserve(elements_owned.size());
     this->mNodes.reserve(nodes_owned.size());
 
-    if ( rMeshReader.IsFileFormatBinary() )
+    if (rMeshReader.IsFileFormatBinary())
     {
         ///\todo #1930 We should use a reader set iterator for this bit now.
         ///\todo #1730 and we should be able to combine ASCII branch
@@ -253,13 +263,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
                       node_it != rMeshReader.GetNodeIteratorEnd();
                       ++node_it)
         {
-            //Loop over wholly-owned nodes
+            // Loop over wholly-owned nodes
             unsigned global_node_index = node_it.GetIndex();
             coords = *node_it;
             RegisterNode(global_node_index);
             Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, coords, false);
 
-//Node attributes in binary format are not yet supported, see #1730
+// Node attributes in binary format are not yet supported, see #1730
 //            for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
 //            {
 //                double attribute = rMeshReader.GetNodeAttributes()[i];
@@ -269,10 +279,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             this->mNodes.push_back(p_node);
         }
         for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_it = rMeshReader.GetNodeIteratorBegin(halo_nodes_owned);
-                      node_it != rMeshReader.GetNodeIteratorEnd();
-                      ++node_it)
+             node_it != rMeshReader.GetNodeIteratorEnd();
+             ++node_it)
         {
-            //Loop over halo-owned nodes
+            // Loop over halo-owned nodes
             unsigned global_node_index = node_it.GetIndex();
             coords = *node_it;
             RegisterHaloNode(global_node_index);
@@ -414,7 +424,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     }
     PetscTools::ReplicateException(false);
 
-    if (mMetisPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
+    if (mPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
     {
         assert(this->mNodePermutation.size() != 0);
         // If we are partitioning (and permuting) a mesh, we need to be certain that we aren't doing it twice
@@ -425,7 +435,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
         unsigned num_owned;
         unsigned rank = PetscTools::GetMyRank();
-        if ( !PetscTools::AmTopMost() )
+        if (!PetscTools::AmTopMost())
         {
             num_owned =  proc_offsets[rank+1]-proc_offsets[rank];
         }
@@ -497,7 +507,7 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() co
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedTetrahedralMeshPartitionType::type DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetPartitionType() const
 {
-    return mMetisPartitioning;
+    return mPartitioning;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -520,7 +530,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std:
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM>*  DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetProcessRegion()
 {
-    if (mpSpaceRegion == NULL)
+    if (mpSpaceRegion == nullptr)
     {
         EXCEPTION("Trying to get unset mpSpaceRegion");
     }
@@ -686,7 +696,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);
+    assert(ELEMENT_DIM == 1);     // LCOV_EXCL_LINE
 
      //Check that there are enough nodes to make the parallelisation worthwhile
     if (width==0)
@@ -695,7 +705,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -722,7 +732,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     else    // use a default partition.
     {
         //Use dumb partition so that archiving doesn't permute anything
-        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
         mTotalNumNodes=width+1;
         mTotalNumBoundaryElements=2u;
         mTotalNumElements=width;
@@ -732,8 +742,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
-            //It's a short mesh and this process owns no nodes
-            return;
+            // It's a short mesh and this process owns no nodes.
+            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+            return;  //LCOV_EXCL_LINE
         }
 
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
@@ -754,7 +765,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
             //Allow for a halo node
             hi_node++;
         }
-        Node<SPACE_DIM>* p_old_node=NULL;
+        Node<SPACE_DIM>* p_old_node=nullptr;
         for (unsigned node_index=lo_node; node_index<hi_node; node_index++)
         {
             // create node or halo-node
@@ -803,8 +814,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (height==0)
     {
@@ -812,7 +823,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -839,7 +850,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
     else
     {
         //Use dumb partition so that archiving doesn't permute anything
-        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
 
         mTotalNumNodes=(width+1)*(height+1);
         mTotalNumBoundaryElements=(width+height)*2;
@@ -854,9 +865,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*y_partition.GetLocalOwnership());
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
-            //It's a short mesh and this process owns no nodes
-            return;
+            // It's a short mesh and this process owns no nodes.
+            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+            return;  //LCOV_EXCL_LINE
         }
+
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
          * higher numbered process may have dropped out of this construction altogether
          * (because is has no local ownership)
@@ -1006,8 +1019,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         unsigned height,
         unsigned depth)
 {
-    assert(SPACE_DIM == 3);
-    assert(ELEMENT_DIM == 3);
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == 3);     // LCOV_EXCL_LINE
     //Check that there are enough nodes to make the parallelisation worthwhile
     if (depth==0)
     {
@@ -1015,7 +1028,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
     }
 
     // Hook to pick up when we are using a geometric partition.
-    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
         if (!mpSpaceRegion)
         {
@@ -1042,7 +1055,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
     else
     {
         //Use dumb partition so that archiving doesn't permute anything
-        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
 
         mTotalNumNodes=(width+1)*(height+1)*(depth+1);
         mTotalNumBoundaryElements=((width*height)+(width*depth)+(height*depth))*4;//*2 for top-bottom, *2 for tessellating each unit square
@@ -1058,8 +1071,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*(height+1)*z_partition.GetLocalOwnership());
         if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
         {
-            return;
+            // It's a short mesh and this process owns no nodes.
+            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+            return;  //LCOV_EXCL_LINE
         }
+
         /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
          * higher numbered process may have dropped out of this construction altogether
          * (because is has no local ownership)
@@ -1297,7 +1313,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Metis works with triangles and tetras
 
     const unsigned num_elements = rMeshReader.GetNumElements();
     const unsigned num_procs = PetscTools::GetNumProcs();
@@ -1330,7 +1346,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
     boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
 
-    if ( rMeshReader.IsFileFormatBinary() && first_local_element > 0)
+    if (rMeshReader.IsFileFormatBinary() && first_local_element > 0)
     {
         // Advance the file pointer to the first element before the ones I own.
         rMeshReader.GetElementData(first_local_element - 1);
@@ -1417,7 +1433,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //                             options, &edgecut, local_partition, &communicator);
 
     Timer::Reset();
-    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
+    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
                          &n_constraints, &n_subdomains, tpwgts.get(), &ubvec_value,
                          options, &edgecut, local_partition.get(), &communicator);
     //Timer::Print("ParMETIS PartKway");
@@ -1500,7 +1516,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
              * For each node in this element, check whether it hasn't been assigned to another processor yet.
              * If so, assign it to the owner of the element. Otherwise, consider it halo.
              */
-            if ( global_node_partition[*node_it] == UNASSIGNED_NODE )
+            if (global_node_partition[*node_it] == UNASSIGNED_NODE)
             {
                 if (element_owner == local_proc_index)
                 {
@@ -1606,13 +1622,14 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
         my_minimum_point=my_box.rGetLowerCorner();
         my_maximum_point=my_box.rGetUpperCorner();
     }
+    // LCOV_EXCL_START
     catch (Exception& e)
     {
-#define COVERAGE_IGNORE
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
+
     }
+    // LCOV_EXCL_STOP
 
     PetscTools::ReplicateException(false);
 
@@ -1715,17 +1732,13 @@ typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator Di
     return mHaloNodes.end();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class DistributedTetrahedralMesh<1,1>;
 template class DistributedTetrahedralMesh<1,2>;
 template class DistributedTetrahedralMesh<1,3>;
 template class DistributedTetrahedralMesh<2,2>;
 template class DistributedTetrahedralMesh<2,3>;
 template class DistributedTetrahedralMesh<3,3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

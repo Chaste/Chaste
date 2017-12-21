@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacElectroMechanicsProblemLong : public CxxTest::TestSuite
 {
 public:
-    void Test2dHardcodedResult() throw(Exception)
+    void Test2dHardcodedResult()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -80,7 +80,7 @@ public:
         MechanicsEventHandler::Report();
     }
 
-    void Test2dVariableFibres() throw(Exception)
+    void Test2dVariableFibres()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -115,7 +115,7 @@ public:
 
 //        // fibres going from (1,0) at X=0 to (1,1)-direction at X=1
 //        // the fibres file was created with the code (inside a class that owns a mesh)
-//        for(unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
+//        for (unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
 //        {
 //            double X = mechanics_mesh.GetElement(elem_index)->CalculateCentroid()[0];
 //            double theta = M_PI*X/4;
@@ -138,9 +138,7 @@ public:
         MechanicsEventHandler::Report();
     }
 
-
-
-    void Test3d() throw(Exception)
+    void Test3d()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
@@ -195,7 +193,7 @@ public:
      * * Copy output
        cp /tmp/$USER/testoutput/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad
      */
-    void TestTwistingCube() throw(Exception)
+    void TestTwistingCube()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
@@ -227,8 +225,6 @@ public:
                                                   &problem_defn,
                                                   "TestCardiacElectroMech3dTwistingCube");
 
-
-
         problem.Solve();
 
         // verified that it twists by visualising, some hardcoded values here..
@@ -259,7 +255,7 @@ public:
 
 
     // longer running, finer-mesh version of TestWithCompressibleApproach() in TestCardiacElectroMechanicsProblem.hpp
-    void TestWithCompressibleApproachLong() throw(Exception)
+    void TestWithCompressibleApproachLong()
     {
         HeartEventHandler::Disable();
 
@@ -290,7 +286,7 @@ public:
     // runs 5 different 3d tests with fibres read to be in various directions, and
     // checks contraction occurs in the right directions (and bulging occurs in the
     // other directions)
-    void TestFibreRead() throw(Exception)
+    void TestFibreRead()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory(-5000*1000);
 
@@ -332,7 +328,7 @@ public:
         *p_Y1_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Y2_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Z_file  << mechanics_mesh.GetNumElements() << "\n";
-        for(unsigned i=0; i<mechanics_mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); i++)
         {
             //double X = mechanics_mesh.GetElement(i)->CalculateCentroid()(0);
             *p_X_file  << "1 0 0 0 1 0 0 0 1\n";
@@ -389,9 +385,9 @@ public:
         }
 
         // test the two results are identical
-        for(unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
+        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
         {
-            for(unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; j++)
             {
                 TS_ASSERT_DELTA(r_deformed_position_no_fibres[i](j), r_deformed_position_fibres_alongX[i](j), 1e-8);
             }
@@ -457,9 +453,9 @@ public:
 
 
         // test the two results are identical
-        for(unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
+        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
         {
-            for(unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; j++)
             {
                 TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[i](j), r_deformed_position_fibres_alongY2[i](j), 1e-8);
             }
@@ -508,7 +504,7 @@ public:
     }
 
 
-//    void Test3dWithNoble98SacAndImpact() throw(Exception)
+//    void Test3dWithNoble98SacAndImpact()
 //    {
 //        // zero stimuli
 //        PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 3> cell_factory(0);
@@ -532,9 +528,9 @@ public:
 //             ++iter)
 //        {
 //            c_vector<double,3> centroid =(*iter)->CalculateCentroid();
-//            if (    (fabs(centroid[1])<1e-4)
+//            if ((fabs(centroid[1])<1e-4)
 //                 && (centroid[0] < 0.05)
-//                 && (centroid[2] < 0.05) )
+//                 && (centroid[2] < 0.05))
 //            {
 //                BoundaryElement<2,3>* p_element = *iter;
 //                impact_region.push_back(p_element);

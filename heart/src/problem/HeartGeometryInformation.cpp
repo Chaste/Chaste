@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -104,7 +104,6 @@ HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (AbstractTetrahedr
     mNumberOfSurfacesProvided = 3;
 }
 
-
 template<unsigned SPACE_DIM>
 HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (std::string nodeHeterogeneityFileName)
 {
@@ -118,27 +117,27 @@ HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (std::string nodeH
         EXCEPTION("Could not open heterogeneities file (" << nodeHeterogeneityFileName << ")");
     }
 
-    while(!heterogeneity_file.eof())
+    while (!heterogeneity_file.eof())
     {
         int value;
 
         heterogeneity_file >> value;
 
-        // format error (for example read a double), or value not equal to 0, 1, or 2.
-        if( (heterogeneity_file.fail() && !heterogeneity_file.eof()) || value < 0 || value > 2)
+        // Format error (for example read a double), or value not equal to 0, 1, or 2.
+        if ((heterogeneity_file.fail() && !heterogeneity_file.eof()) || value < 0 || value > 2)
         {
             heterogeneity_file.close();
             EXCEPTION("A value in the heterogeneities file (" << nodeHeterogeneityFileName
                << ") is out of range (or not an integer). It should be epi = 0, mid = 1, endo = 2");
         }
 
-        if(!heterogeneity_file.eof())
+        if (!heterogeneity_file.eof())
         {
-            if(value==0)
+            if (value==0)
             {
                 mLayerForEachNode.push_back(EPI);
             }
-            else if(value==1)
+            else if (value==1)
             {
                 mLayerForEachNode.push_back(MID);
             }
@@ -173,7 +172,6 @@ void HeartGeometryInformation<SPACE_DIM>::ProcessLine(
     }
 }
 
-
 template<unsigned SPACE_DIM>
 void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
         const std::string& rSurfaceFileName,
@@ -206,7 +204,7 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
 
         getline(file_stream, line);
     }
-    while(!file_stream.eof());
+    while (!file_stream.eof());
     file_stream.close();
 
     // Make vector big enough
@@ -215,7 +213,7 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
     if (mpMesh->rGetNodePermutation().empty())
     {
         // Copy the node indexes from the set to the vector as they are
-        for(std::set<unsigned>::iterator node_index_it=surface_original_node_index_set.begin();
+        for (std::set<unsigned>::iterator node_index_it=surface_original_node_index_set.begin();
             node_index_it != surface_original_node_index_set.end();
             node_index_it++)
         {
@@ -225,7 +223,7 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
     else
     {
         // Copy the original node indices from the set to the vector applying the permutation
-        for(std::set<unsigned>::iterator node_index_it=surface_original_node_index_set.begin();
+        for (std::set<unsigned>::iterator node_index_it=surface_original_node_index_set.begin();
             node_index_it != surface_original_node_index_set.end();
             node_index_it++)
         {
@@ -233,8 +231,6 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
         }
     }
 }
-
-
 
 template<unsigned SPACE_DIM>
 HeartRegionType HeartGeometryInformation<SPACE_DIM>::GetHeartRegion(unsigned nodeIndex) const
@@ -266,14 +262,15 @@ HeartRegionType HeartGeometryInformation<SPACE_DIM>::GetHeartRegion(unsigned nod
         }
     }
 
-    return UNKNOWN;
+    NEVER_REACHED;
+    return UNKNOWN; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>
 double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex)
 {
     // General case where you provide 3 surfaces: LV, RV, epicardium
-    if ( mNumberOfSurfacesProvided == 3)
+    if (mNumberOfSurfacesProvided == 3)
     {
         HeartRegionType node_region = GetHeartRegion(nodeIndex);
         switch(node_region)
@@ -297,7 +294,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
                 break;
 
             case UNKNOWN:
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 std::cerr << "Wrong distances node: " << nodeIndex << "\t"
                           << "Epi " << mDistMapEpicardium[nodeIndex] << "\t"
                           << "RV " << mDistMapRightVentricle[nodeIndex] << "\t"
@@ -307,7 +304,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
                 // Make wall_thickness=0 as in Martin's code
                 return 0.0;
                 break;
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
 
             default:
                 NEVER_REACHED;
@@ -321,7 +318,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
 
     // gcc wants to see a return statement at the end of the method.
     NEVER_REACHED;
-    return 0.0;
+    return 0.0; // LCOV_EXCL_LINE
 }
 
 template<unsigned SPACE_DIM>
@@ -359,7 +356,7 @@ void HeartGeometryInformation<SPACE_DIM>::DetermineLayerForEachNode(double epiFr
     }
 
     mLayerForEachNode.resize(mpMesh->GetNumNodes());
-    for(unsigned i=0; i<mpMesh->GetNumNodes(); i++)
+    for (unsigned i=0; i<mpMesh->GetNumNodes(); i++)
     {
         double position = CalculateRelativeWallPosition(i);
         if (position<endoFraction)
@@ -377,7 +374,6 @@ void HeartGeometryInformation<SPACE_DIM>::DetermineLayerForEachNode(double epiFr
     }
 }
 
-
 template<unsigned SPACE_DIM>
 void HeartGeometryInformation<SPACE_DIM>::WriteLayerForEachNode(std::string outputDir, std::string file)
 {
@@ -387,13 +383,13 @@ void HeartGeometryInformation<SPACE_DIM>::WriteLayerForEachNode(std::string outp
         out_stream p_file = handler.OpenOutputFile(file);
 
         assert(mLayerForEachNode.size()>0);
-        for(unsigned i=0; i<mpMesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mpMesh->GetNumNodes(); i++)
         {
-            if(mLayerForEachNode[i]==EPI)
+            if (mLayerForEachNode[i]==EPI)
             {
                 *p_file << "0\n";
             }
-            else if(mLayerForEachNode[i]==MID)
+            else if (mLayerForEachNode[i]==MID)
             {
                 *p_file << "1\n";
             }
@@ -407,7 +403,6 @@ void HeartGeometryInformation<SPACE_DIM>::WriteLayerForEachNode(std::string outp
     }
     PetscTools::Barrier("HeartGeometryInformation::WriteLayerForEachNode"); // Make other processes wait until we're done
 }
-
 
 template<unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBoxOfSurface(
@@ -426,17 +421,17 @@ ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBo
         unsigned global_index=rSurfaceNodes[surface_index];
         if (mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(global_index) )
         {
-            c_vector<double, SPACE_DIM> position = mpMesh->GetNode(global_index)->rGetLocation();
+            const c_vector<double, SPACE_DIM>& r_position = mpMesh->GetNode(global_index)->rGetLocation();
             //Update max/min
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-                if (position[i] < my_minimum_point[i])
+                if (r_position[i] < my_minimum_point[i])
                 {
-                    my_minimum_point[i] = position[i];
+                    my_minimum_point[i] = r_position[i];
                 }
-                if (position[i] > my_maximum_point[i])
+                if (r_position[i] > my_maximum_point[i])
                 {
-                    my_maximum_point[i] = position[i];
+                    my_maximum_point[i] = r_position[i];
                 }
             }
         }
@@ -448,18 +443,12 @@ ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBo
     MPI_Allreduce(&my_minimum_point[0], &global_minimum_point[0], SPACE_DIM, MPI_DOUBLE, MPI_MIN, PETSC_COMM_WORLD);
     MPI_Allreduce(&my_maximum_point[0], &global_maximum_point[0], SPACE_DIM, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
 
-
     ChastePoint<SPACE_DIM> min(global_minimum_point);
     ChastePoint<SPACE_DIM> max(global_maximum_point);
 
     return ChasteCuboid<SPACE_DIM>(min, max);
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
-//template class HeartGeometryInformation<1>;
 template class HeartGeometryInformation<2>;
 template class HeartGeometryInformation<3>;

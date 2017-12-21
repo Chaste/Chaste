@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
@@ -70,7 +70,7 @@ class TestArchiveCell: public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestArchivingOfCell() throw(Exception)
+    void TestArchivingOfCell()
     {
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
@@ -86,7 +86,7 @@ public:
             boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
             // Create cell-cycle model
-            FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
 
             // Create SRN
             Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
@@ -148,7 +148,7 @@ public:
 
             // Create another cell
             boost::shared_ptr<AbstractCellProperty> p_another_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            FixedDurationGenerationBasedCellCycleModel* p_another_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_another_cell_model = new FixedG1GenerationalCellCycleModel();
             Goldbeter1991SrnModel* p_another_srn_model = new Goldbeter1991SrnModel();
             CellPtr p_another_cell(new Cell(p_another_healthy_state, p_another_cell_model, p_another_srn_model, false, collection));
             boost::shared_ptr<AbstractCellProperty> p_another_vec_data(new CellVecData);
@@ -201,7 +201,7 @@ public:
             TS_ASSERT_EQUALS(p_simulation_time->GetTimeStep(), 0.5);
 
             TS_ASSERT_EQUALS(p_cell->GetAge(), 0.5);
-            TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
+            TS_ASSERT_EQUALS(static_cast<FixedG1GenerationalCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
             TS_ASSERT(dynamic_cast<Goldbeter1991SrnModel*>(p_cell->GetSrnModel()));
             TS_ASSERT_EQUALS(p_cell->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 

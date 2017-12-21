@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,11 +78,11 @@ def usage():
 
 def KillTest(pid=None, exe=None):
     """Kill off a running test, specified either by pid or by name, or both.
-    
+
     First, recursively kill pid and all its children.  Then check all running
     processes to see if they are instances of exe, and recursively kill them
     if so.
-    
+
     Requires 'easy_install psutil' to function.
     """
     # Recursive kill of pid and its children, killing innermost first
@@ -108,10 +108,10 @@ def KillTest(pid=None, exe=None):
 
 def GetTestNameFromLogFilePath(logFilePath):
     """Figure out what name to display for a test suite based on the results log path.
-    
+
     Except for special infrastructure tests, the log file will always live at
     <component>/build/<build_dir>/<relative_path>.log.  We return the test name
-    <component>/test/<relative_path>, with all occurrences of os.sep replaced by '-'. 
+    <component>/test/<relative_path>, with all occurrences of os.sep replaced by '-'.
     """
     #We used to do: os.path.splitext(os.path.basename(logfile))[0]
     path_no_ext = os.path.splitext(logFilePath)[0]
@@ -146,7 +146,7 @@ class TestKillerTimer(object):
             self.extraTimer.join()
         # Wait for the main timer to finish
         self.mainTimer.join()
-    
+
     def GetCpuTime(self, process):
         """Recursively compute the total CPU time used by a process and its children."""
         cpu_time = sum(process.get_cpu_times())
@@ -274,7 +274,7 @@ if __name__ == '__main__':
 # Builder function for running via SCons
 def get_build_function(build, run_time_flags='', test_time_limit=0):
     """Return a function that can be used as a Builder by SCons."""
-    
+
     def build_function(target, source, env):
         # Set up the environment from env['ENV']
         # Python tests need PYTHONPATH set from env['ENV']['PYTHONPATH'] and env['PYINCPATH']

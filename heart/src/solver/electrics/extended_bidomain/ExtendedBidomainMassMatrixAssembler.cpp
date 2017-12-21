@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,12 +71,7 @@ c_matrix<double,3*(DIM+1),3*(DIM+1)> ExtendedBidomainMassMatrixAssembler<DIM>::C
     return ret;
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class ExtendedBidomainMassMatrixAssembler<1>;
 template class ExtendedBidomainMassMatrixAssembler<2>;
 template class ExtendedBidomainMassMatrixAssembler<3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -519,8 +519,6 @@ public:
          */
         inline bool IsAllowedNode();
     };
-
-
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractMesh)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,12 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CryptSimulation2d.hpp"
-#include "WntConcentration.hpp"
-#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
-#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
+#include "CellAncestor.hpp"
 #include "CellBetaCateninWriter.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
+#include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
+#include "WntConcentration.hpp"
 
 CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
                                      bool deleteCellPopulationInDestructor,
@@ -53,8 +55,8 @@ CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
      * This is to catch NodeBasedCellPopulations as AbstactOnLatticeBasedCellPopulations are caught in
      * the OffLatticeSimulation constructor.
      */
-    if ( (dynamic_cast<VertexBasedCellPopulation<2>*>(&rCellPopulation) == NULL)
-         &&(dynamic_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation) == NULL) )
+    if ((dynamic_cast<VertexBasedCellPopulation<2>*>(&rCellPopulation) == nullptr)
+        && (dynamic_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation) == nullptr))
     {
         EXCEPTION("CryptSimulation2d is to be used with MeshBasedCellPopulation or VertexBasedCellPopulation (or subclasses) only");
     }
@@ -62,6 +64,14 @@ CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
     if (dynamic_cast<MeshBasedCellPopulation<2>*>(&mrCellPopulation))
     {
         mUsingMeshBasedCellPopulation = true;
+
+        MAKE_PTR(CryptCentreBasedDivisionRule<2>, p_centre_div_rule);
+        static_cast<MeshBasedCellPopulation<2>*>(&mrCellPopulation)->SetCentreBasedDivisionRule(p_centre_div_rule);
+    }
+    else // VertexBasedCellPopulation
+    {
+        MAKE_PTR(CryptVertexBasedDivisionRule<2>, p_vertex_div_rule);
+        static_cast<VertexBasedCellPopulation<2>*>(&mrCellPopulation)->SetVertexBasedDivisionRule(p_vertex_div_rule);
     }
 
     if (!mDeleteCellPopulationInDestructor)
@@ -74,91 +84,6 @@ CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
 
 CryptSimulation2d::~CryptSimulation2d()
 {
-}
-
-c_vector<double, 2> CryptSimulation2d::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    if (mUsingMeshBasedCellPopulation)
-    {
-        // Location of parent and daughter cells
-        c_vector<double, 2> parent_coords = mrCellPopulation.GetLocationOfCellCentre(pParentCell);
-        c_vector<double, 2> daughter_coords;
-
-        // Get separation parameter
-        double separation =
-            static_cast<MeshBasedCellPopulation<2>*>(&mrCellPopulation)->GetMeinekeDivisionSeparation();
-
-        // Make a random direction vector of the required length
-        c_vector<double, 2> random_vector;
-
-        /*
-         * Pick a random direction and move the parent cell backwards by 0.5*separation
-         * in that direction and return the position of the daughter cell 0.5*separation
-         * forwards in that direction.
-         */
-        double random_angle = RandomNumberGenerator::Instance()->ranf();
-        random_angle *= 2.0*M_PI;
-
-        random_vector(0) = 0.5*separation*cos(random_angle);
-        random_vector(1) = 0.5*separation*sin(random_angle);
-
-        c_vector<double, 2> proposed_new_parent_coords = parent_coords - random_vector;
-        c_vector<double, 2> proposed_new_daughter_coords = parent_coords + random_vector;
-
-        if ((proposed_new_parent_coords(1) >= 0.0) && (proposed_new_daughter_coords(1) >= 0.0))
-        {
-            // We are not too close to the bottom of the cell population, so move parent
-            parent_coords = proposed_new_parent_coords;
-            daughter_coords = proposed_new_daughter_coords;
-        }
-        else
-        {
-            proposed_new_daughter_coords = parent_coords + 2.0*random_vector;
-            while (proposed_new_daughter_coords(1) < 0.0)
-            {
-                random_angle = RandomNumberGenerator::Instance()->ranf();
-                random_angle *= 2.0*M_PI;
-
-                random_vector(0) = separation*cos(random_angle);
-                random_vector(1) = separation*sin(random_angle);
-                proposed_new_daughter_coords = parent_coords + random_vector;
-            }
-            daughter_coords = proposed_new_daughter_coords;
-        }
-
-        assert(daughter_coords(1) >= 0.0); // to make sure dividing cells stay in the cell population
-        assert(parent_coords(1) >= 0.0);   // to make sure dividing cells stay in the cell population
-
-        // Set the parent to use this location
-        ChastePoint<2> parent_coords_point(parent_coords);
-
-        unsigned node_index = mrCellPopulation.GetLocationIndexUsingCell(pParentCell);
-        mrCellPopulation.SetNode(node_index, parent_coords_point);
-
-        return daughter_coords;
-    }
-    else // using a VertexBasedCellPopulation
-    {
-        // Let's check we're a VertexBasedCellPopulation when we're in debug mode...
-        assert(dynamic_cast<VertexBasedCellPopulation<2>*>(&(this->mrCellPopulation)));
-
-        VertexBasedCellPopulation<2>* p_vertex_population = dynamic_cast<VertexBasedCellPopulation<2>*>(&(this->mrCellPopulation));
-        c_vector<double, 2> axis_of_division = p_vertex_population->
-                GetVertexBasedDivisionRule()->CalculateCellDivisionVector(pParentCell, *p_vertex_population);
-
-        // We don't need to prescribe how 'stem' cells divide if Wnt is present
-        bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();
-        if (!is_wnt_included)
-        {
-            WntConcentration<2>::Destroy();
-            if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
-            {
-                axis_of_division(0) = 1.0;
-                axis_of_division(1) = 0.0;
-            }
-        }
-        return axis_of_division;
-    }
 }
 
 void CryptSimulation2d::SetupSolve()
@@ -195,6 +120,9 @@ void CryptSimulation2d::SetBottomCellAncestors()
      * We use a different height threshold depending on which type of cell
      * population we are using, a MeshBasedCellPopulationWithGhostNodes or
      * a VertexBasedCellPopulation.
+     *
+     * \todo Make this threshold height a member variable and set it in the constructor,
+     *       depending on the cell population type; this would allow us to remove mUsingMeshBasedCellPopulation
      */
     double threshold_height = 1.0;
     if (mUsingMeshBasedCellPopulation)

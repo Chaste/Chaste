@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,6 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSystemInformation.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
 
+#include <boost/math/tools/roots.hpp>
+#include <boost/bind.hpp>
+#include <iomanip>
 
 //#include "PetscSetupAndFinalize.hpp"
 
@@ -90,12 +93,52 @@ void OdeSystemInformation<MySigmoidalOde>::Initialise()
     this->mInitialised = true;
 }
 
+//Class to benchmark swan solution against
+class MySwanOde : public AbstractOdeSystem
+{
+public:
+    MySwanOde(double raw, double a, double b, double xi) : AbstractOdeSystem(1)
+    {
+        mpSystemInfo = OdeSystemInformation<MySwanOde>::Instance();
+        mRaw = raw;
+        mA = a;
+        mB = b;
+        mXi = xi;
+    }
+
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY,
+                              std::vector<double>& rDY)
+    {
+        double pleural_pressure = -750 - 250*sin(2*M_PI*(time - 0.25));
+
+        double V0 = 1/1e3;
+        double lambda = std::pow(rY[0]/V0, 1.0/3.0);
+
+        double gamma = (3.0/4.0)*(3*mA + mB)*(lambda*lambda - 1)*(lambda*lambda - 1);
+        double Pe = mXi*std::exp(gamma)/(2.0*lambda)*(3*mA + mB)*(lambda*lambda -1);
+
+        rDY[0] = 1/mRaw*(-Pe - pleural_pressure);
+    }
+
+    double mRaw, mA, mB, mXi;
+};
+
+template<>
+void OdeSystemInformation<MySwanOde>::Initialise()
+{
+    this->mVariableNames.push_back("V");
+    this->mVariableUnits.push_back("dimensionless");
+    this->mInitialConditions.push_back(2.3918/1e3);
+
+    this->mInitialised = true;
+}
+
 
 class TestAcinarUnitModels: public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleBalloonAcinarUnitInspiration() throw (Exception)
+    void TestSimpleBalloonAcinarUnitInspiration()
     {
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
@@ -103,6 +146,12 @@ public:
         double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
 
         SimpleBalloonAcinarUnit acinus;
+
+        // Coverage
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+        acinus.SetStretchRatio(15.3);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+
         acinus.SetAirwayPressure(0.0);
         acinus.SetPleuralPressure(0.0);
         acinus.SetFlow(0.0);
@@ -155,16 +204,25 @@ public:
         TS_ASSERT_DELTA(ode_volume, -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(acinus.GetVolume(), -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(flow_integral, -compliance*pleural_pressure, 1e-8);
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
-    void TestSimpleBalloonExplicitAcinarUnitInspiration() throw (Exception)
-   {
+    void TestSimpleBalloonExplicitAcinarUnitInspiration()
+    {
        double viscosity = 1.92e-5;               //Pa s
        double terminal_airway_radius = 0.05;   //m
        double terminal_airway_length  = 0.02;   //m
        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
 
        SimpleBalloonExplicitAcinarUnit acinus;
+
+       // Coverage
+       TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+       acinus.SetStretchRatio(15.3);
+       TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+
        acinus.SetAirwayPressure(0.0);
        acinus.SetPleuralPressure(0.0);
        acinus.SetFlow(0.0);
@@ -194,8 +252,6 @@ public:
 
            //Solve the acinar problem coupled to a single bronchiole
            acinus.SetPleuralPressure(pleural_pressure);
-
-           //acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
            acinus.ComputeExceptFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
 
            double airway_pressure = acinus.GetAirwayPressure();
@@ -216,11 +272,12 @@ public:
 
            time_stepper.AdvanceOneTimeStep();
        }
+
+       // Coverage
+       TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
    }
 
-
-
-    void TestSigmoidalAcinarUnitInspiration() throw (Exception)
+    void TestSigmoidalAcinarUnitInspiration()
     {
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
@@ -233,6 +290,12 @@ public:
         double d = 300; //Pa (3.8 cmH2O)
 
         SigmoidalAcinarUnit acinus;
+
+        // Coverage
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+        acinus.SetStretchRatio(15.3);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 0.0, 1e-6);
+
         acinus.SetA(a);
         acinus.SetB(b);
         acinus.SetC(c);
@@ -248,7 +311,7 @@ public:
         TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);   //With no pressure change we expect no flow
         TS_ASSERT_DELTA(acinus.GetVolume(), 0.0, 1e-2); //With no pressure change we expect no volume change
 
-        //Setup corresponding ODE for testing.
+        // Setup corresponding ODE for testing
         MySigmoidalOde my_ode(terminal_airway_resistance,a,b,c,d);
         BackwardEulerIvpOdeSolver euler_solver(1);
         std::vector<double> initial_condition;
@@ -276,112 +339,63 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
-
-    void TestSwan2012AcinarUnitCalculateMethods() throw(Exception)
+    void TestSwan2012AcinarUnit()
     {
         Swan2012AcinarUnit acinus;
 
-        acinus.SetAirwayPressure(0.0);
-        acinus.SetAirwayPressure(0.0);
-        acinus.SetPleuralPressure(-490);
-        acinus.SetPleuralPressure(-490);
+        // Coverage
+        TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);
+        TS_ASSERT_DELTA(acinus.GetStretchRatio(), 1.26, 1e-6);
+
+        // Test against corresponding ODE
+        double viscosity = 1.92e-5;               //Pa s
+        double terminal_airway_radius = 0.005;   //m
+        double terminal_airway_length  = 0.02;   //m
+        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
+
         acinus.SetFlow(0.0);
-        acinus.SetTerminalBronchioleResistance(1.0); //Determine appropriate values
-
-        double V0 = 4.0;
-
-        acinus.SetStretchRatio(1.0);
-        acinus.SetUndeformedVolume(V0);
-        TS_ASSERT_DELTA(acinus.GetVolume(), V0, 1e-6);
-
-        double lambda = 1.4;
-        acinus.SetStretchRatio(lambda);
-        TS_ASSERT_DELTA(acinus.GetVolume(), V0*lambda*lambda*lambda, 1e-6);
-        TS_ASSERT_DELTA(acinus.CalculateDerivativeVolumeByStrain(), 3*V0*lambda*lambda, 1e-6);
-
-        TS_ASSERT_DELTA(acinus.GetStretchRatio(), lambda, 1e-6);
-
-        double gamma = (3.0/4.0)*(3*0.433 - 0.611)*(lambda*lambda - 1)*(lambda*lambda - 1);
-        TS_ASSERT_DELTA(acinus.CalculateGamma(), gamma, 1e-6);
-
-        double xi = 2500;
-        double dPedLambda = (3.0*xi/2.0)*(3*0.433 - 0.611)*(3*0.433 - 0.611)*(lambda*lambda - 1)*(lambda*lambda - 1)*std::exp(gamma) +
-                             (xi/2.0)*(3*0.433 - 0.611)*(lambda*lambda + 1)*std::exp(gamma)/(lambda*lambda);
-
-        TS_ASSERT_DELTA(acinus.CalculateDerivativeStaticRecoilPressureByStrain(), dPedLambda, 1e-6);
-        TS_ASSERT_DELTA(acinus.CalculateAcinarTissueCompliance(), 3*V0*lambda*lambda/dPedLambda, 1e-6);
-
-        //There are for coverage until the swan acinar model is updated to use the Coleman numerical method
-        acinus.ComputeExceptFlow(0.0,0.0);
-        acinus.UpdateFlow(0.0,0.0);
-        acinus.GetAirwayPressure();
-
-    }
-
-    void TestSwan2012AcinarUnitInspiration() throw(Exception)
-    {
-        double viscosity = 1.92e-8;
-        double terminal_airway_radius = 0.5; //mm
-        double terminal_airway_length = 1.0;  //mm
-        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/SmallPow(terminal_airway_radius, 4);
-        double airway_pressure = 0.0;
-
-        Swan2012AcinarUnit acinus;
-
         acinus.SetAirwayPressure(0.0);
-        acinus.SetAirwayPressure(0.0);
-        acinus.SetPleuralPressure(-0.49);
-        acinus.SetPleuralPressure(-0.49);
-        acinus.SetFlow(0.0);
-        acinus.SetStretchRatio(1.259921049894873);                          //cube root(2) (corresponds to 2x volume), standard for FRC
-        acinus.SetUndeformedVolume(0.5);                                    //Arbitrary
-        acinus.SetTerminalBronchioleResistance(terminal_airway_resistance); //Determine appropriate values
+        acinus.SetPleuralPressure(0.0);
+        acinus.SetUndeformedVolume(1/1e3);
+        acinus.SetStretchRatio(std::pow(2, 1.0/3.0));
+        acinus.SetTerminalBronchioleResistance(terminal_airway_resistance);
 
-        acinus.SolveAndUpdateState(0.0, 0.2);
-        TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6); //With no pressure change we expect no flow
-        TS_ASSERT_DELTA(acinus.GetVolume(), 1.0, 1e-2); //With no pressure change we expect no volume change
+        MySwanOde my_ode(terminal_airway_resistance, 0.433, -0.611, 2500);
+        BackwardEulerIvpOdeSolver euler_solver(1);
+        std::vector<double> initial_condition;
+        initial_condition.push_back(2/1e3);
+        OdeSolution solutions = euler_solver.Solve(&my_ode, initial_condition, 0, 2, 0.001, 0.001);
 
-        //Sinussoidal inspiration followed by fixed pleural pressure
-        TimeStepper time_stepper(0.0, 2, 0.005);
-        double old_compliance = DBL_MAX;
-        double old_flow = DBL_MAX;
-        double old_pressure = DBL_MAX;
-        double flow_integral = 0.0;
-        double pleural_pressure;
+        TimeStepper time_stepper(0.0, 2.0, 0.001);
+
+        unsigned i = 0;
         while (!time_stepper.IsTimeAtEnd())
         {
-            if(time_stepper.GetNextTime() <= 1.0) //breath in
-            {
-                pleural_pressure = -0.49 - 2.4*(1 + sin((M_PI/2)*(time_stepper.GetNextTime() - 1)));
-                acinus.SetPleuralPressure(pleural_pressure);
-                acinus.SetAirwayPressure(airway_pressure);
+            double pleural_pressure = -750 - 250*sin(2*M_PI*(time_stepper.GetNextTime() - 0.25));
 
-                TS_ASSERT_DELTA(flow_integral, acinus.GetVolume() - 1.0, 1e-2); //Check for conservation of volume
+            TS_ASSERT_DELTA(acinus.GetVolume(), solutions.rGetSolutions()[i][0], 1e-5);
+            ++i;
 
-                acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
+            acinus.SetPleuralPressure(pleural_pressure);
+            acinus.ComputeExceptFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
 
-                airway_pressure = acinus.GetFlow()*terminal_airway_resistance;
-                flow_integral += acinus.GetFlow()*(time_stepper.GetNextTime() - time_stepper.GetTime());
+            double airway_pressure = acinus.GetAirwayPressure();
+            double flow = -airway_pressure/terminal_airway_resistance;
 
-                TS_ASSERT_LESS_THAN(acinus.CalculateAcinarTissueCompliance(), old_compliance); //Check compliance monotonicity
-                old_compliance = acinus.CalculateAcinarTissueCompliance();
-            }
-            else //constant pleural pressure
-            {
-                acinus.SetAirwayPressure(airway_pressure);
-                //acinus.SetPleuralPressure(pleural_pressure); ///\todo This test isn't correct with this line commented, but fails if uncommented. Need to investigate
-                acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
-                airway_pressure = acinus.GetFlow()*terminal_airway_resistance;
+            acinus.SetFlow(flow);
+            acinus.UpdateFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
 
-                TS_ASSERT_LESS_THAN_EQUALS(acinus.GetFlow(), old_flow);
-                TS_ASSERT_LESS_THAN_EQUALS(airway_pressure, old_pressure);
-                old_flow = acinus.GetFlow();
-                old_pressure = airway_pressure;
-            }
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
+        TS_ASSERT_THROWS_NOTHING(acinus.SolveAndUpdateState(0.0, 1.0));
     }
 };
 #endif /*_TESTACINARUNITMODELS_HPP_*/

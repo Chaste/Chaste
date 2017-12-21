@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ class TestMonodomainStiffnessMatrixAssembler : public CxxTest::TestSuite
 {
 public:
 
-    void TestMonodomainStiffnessMatrixAssembler1d() throw(Exception)
+    void TestMonodomainStiffnessMatrixAssembler1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;
@@ -72,20 +72,20 @@ public:
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
 
-        for(unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
-                if(i>0 && i<mesh.GetNumNodes()-1)
+                if (i>0 && i<mesh.GetNumNodes()-1)
                 {
                     // All rows except first and last should look like
                     // [0, .., 0, -sigma/h, 2*sigma/h, -sigma/h, 0, .., 0]
-                    if(j==i)
+                    if (j==i)
                     {
                         TS_ASSERT_DELTA(value, 2*sigma/h, 1e-5);
                     }
-                    else if(j==i+1 || j+1==i)
+                    else if (j==i+1 || j+1==i)
                     {
                         TS_ASSERT_DELTA(value, -sigma/h, 1e-5);
                     }
@@ -94,14 +94,14 @@ public:
                         TS_ASSERT_DELTA(value, 0.0, 1e-5);
                     }
                 }
-                if(i==0)
+                if (i==0)
                 {
                     // top row: [sigma/h, -sigma/h, 0, .., 0]
-                    if(j==i)
+                    if (j==i)
                     {
                         TS_ASSERT_DELTA(value, sigma/h, 1e-5);
                     }
-                    else if(j==i+1)
+                    else if (j==i+1)
                     {
                         TS_ASSERT_DELTA(value, -sigma/h, 1e-5);
                     }
@@ -110,14 +110,14 @@ public:
                         TS_ASSERT_DELTA(value, 0.0, 1e-5);
                     }
                 }
-                if(i+1==mesh.GetNumNodes())
+                if (i+1==mesh.GetNumNodes())
                 {
                     // bottom row: [0, .., 0, -sigma/h, sigma/h]
-                    if(j==i)
+                    if (j==i)
                     {
                         TS_ASSERT_DELTA(value, sigma/h, 1e-5);
                     }
-                    else if(j+1==i)
+                    else if (j+1==i)
                     {
                         TS_ASSERT_DELTA(value, -sigma/h, 1e-5);
                     }
@@ -132,7 +132,6 @@ public:
 
         PetscTools::Destroy(mat);
     }
-
 };
 
 #endif /* TESTMONODOMAINSTIFFNESSMATRIX_HPP_ */

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem
     /////////////////////////////////////////
     // set up LHS matrix (and mass matrix)
     /////////////////////////////////////////
-    if(computeMatrix)
+    if (computeMatrix)
     {
         mpMonodomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpMonodomainAssembler->AssembleMatrix();
@@ -113,7 +113,6 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLi
     mpMonodomainTissue->SolveCellSystems(currentSolution, time, time+dt/2.0, true);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::FollowingSolveLinearSystem(Vec currentSolution)
 {
@@ -122,7 +121,6 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::FollowingSolveLin
     double dt = PdeSimulationTime::GetPdeTimeStep();
     mpMonodomainTissue->SolveCellSystems(currentSolution, time + dt/2, PdeSimulationTime::GetNextTime(), true);
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
@@ -136,7 +134,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolv
     AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
-    if(HeartConfig::Instance()->GetUseAbsoluteTolerance())
+    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
     {
         this->mpLinearSystem->SetAbsoluteTolerance(HeartConfig::Instance()->GetAbsoluteTolerance());
     }
@@ -165,8 +163,6 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolv
                          local_size, local_size);
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::OperatorSplittingMonodomainSolver(
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
@@ -194,22 +190,16 @@ OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~OperatorSplittingMono
     delete mpMonodomainAssembler;
     delete mpNeumannSurfaceTermsAssembler;
 
-    if(mVecForConstructingRhs)
+    if (mVecForConstructingRhs)
     {
         PetscTools::Destroy(mVecForConstructingRhs);
         PetscTools::Destroy(mMassMatrix);
     }
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class OperatorSplittingMonodomainSolver<1,1>;
 template class OperatorSplittingMonodomainSolver<1,2>;
 template class OperatorSplittingMonodomainSolver<1,3>;
 template class OperatorSplittingMonodomainSolver<2,2>;
 template class OperatorSplittingMonodomainSolver<3,3>;
-

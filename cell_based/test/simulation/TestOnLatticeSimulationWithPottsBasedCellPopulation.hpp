@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,8 +46,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "CellLabel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
+#include "NoCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -95,7 +97,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -114,7 +116,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
@@ -125,7 +127,7 @@ public:
             "OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
     }
 
-    void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
+    void TestPottsMonolayerWithNoBirthOrDeath()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -133,25 +135,28 @@ public:
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Create cells
+        // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
         std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
+
+        // Test that the member mDt has been initialised correctly
+        TS_ASSERT_DELTA(simulator.GetDt(), 0.1, 1e-6);
+
         simulator.SetOutputDirectory("TestSimplePottsMonolayer");
         simulator.SetEndTime(0.1);
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -164,7 +169,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
         // Now remove the update rules and check nothing happens when the simulator runs again
-        simulator.RemoveAllPottsUpdateRules();
+        simulator.RemoveAllUpdateRules();
         simulator.SetEndTime(0.2);
         simulator.Solve();
 
@@ -172,7 +177,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
     }
 
-    void TestPottsMonolayerWithNonRandomSweep() throw (Exception)
+    void TestPottsMonolayerWithNonRandomSweep()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -183,7 +188,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
@@ -197,15 +202,15 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
 
-    void TestPottsMonolayerWithDeath() throw (Exception)
+    void TestPottsMonolayerWithDeath()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -216,7 +221,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
@@ -230,9 +235,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Create cell killer and pass in to simulation
         c_vector<double,2> point = zero_vector<double>(2);
@@ -253,7 +258,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 14u);
     }
 
-    void TestPottsMonolayerWithBirth() throw (Exception)
+    void TestPottsMonolayerWithBirth()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -264,7 +269,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_stem_type);
 
         // Create cell population
@@ -279,9 +284,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -294,7 +299,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsMonolayerCellSorting() throw (Exception)
+    void TestPottsMonolayerCellSorting()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -305,7 +310,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
@@ -326,7 +331,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
         p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -334,7 +339,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -364,7 +369,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestPottsMonolayerCellSortingPeriodic() throw (Exception)
+    void TestPottsMonolayerCellSortingPeriodic()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -375,7 +380,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
@@ -396,7 +401,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
         p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -404,7 +409,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -433,7 +438,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
+    void TestPottsSpheroidWithNoBirthOrDeath()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -444,7 +449,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
@@ -458,9 +463,9 @@ public:
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<3>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(8);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<3>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -473,7 +478,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsChemotaxis() throw (Exception)
+    void TestPottsChemotaxis()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -484,7 +489,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Create cell population
@@ -499,11 +504,11 @@ public:
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<3>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(8);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<3>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
         MAKE_PTR(ChemotaxisPottsUpdateRule<3>, p_chemotaxis_update_rule);
-        simulator.AddPottsUpdateRule(p_chemotaxis_update_rule);
+        simulator.AddUpdateRule(p_chemotaxis_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -516,7 +521,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestRandomIterationOverUpdateRules() throw (Exception)
+    void TestRandomIterationOverUpdateRules()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -527,7 +532,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_stem_type);
 
         // Create cell population
@@ -543,9 +548,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -558,7 +563,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsSpheroidCellSorting() throw (Exception)
+    void TestPottsSpheroidCellSorting()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -573,7 +578,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Randomly label some cells
@@ -594,7 +599,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<3>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(element_size*element_size*element_size);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<3>, p_differential_adhesion_update_rule);
         p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -602,7 +607,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -647,7 +652,7 @@ public:
 
     c_vector<unsigned, 6> mNodes; // TO check after save and load.
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -658,7 +663,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_stem_type);
 
         // Create cell population
@@ -673,9 +678,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -700,7 +705,7 @@ public:
         TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), mNodes[5]);
     }
 
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -711,7 +716,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_stem_type);
 
         // Create cell population
@@ -726,9 +731,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -737,7 +742,7 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 

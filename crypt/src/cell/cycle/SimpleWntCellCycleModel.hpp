@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,14 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIMPLEWNTCELLCYCLEMODEL_HPP_
 #define SIMPLEWNTCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "WntConcentration.hpp"
 
 /**
  * Simple Wnt-dependent cell-cycle model.
  */
-class SimpleWntCellCycleModel : public AbstractSimpleCellCycleModel
+class SimpleWntCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
 private:
 
@@ -58,7 +58,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
 
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         archive & *p_gen;
@@ -95,7 +95,7 @@ protected:
     /**
      * @return the Wnt level experienced by the cell.
      */
-    double GetWntLevel();
+    double GetWntLevel() const;
 
     /**
      * @return the type of Wnt concentration (LINEAR, RADIAL, EXPONENTIAL or NONE).
@@ -106,7 +106,7 @@ protected:
     /**
      * Stochastically set the G1 duration. The G1 duration is taken
      * from a normal distribution whose mean is the G1 duration given
-     * in AbstractCellCycleModel for the cell type and whose standard deviation
+     * in AbstractPhaseBasedCellCycleModel, for the cell type, and whose standard deviation
      * is 1.
      *
      * Called on cell creation at the start of a simulation, and for both
@@ -114,10 +114,25 @@ protected:
      */
     void SetG1Duration();
 
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel.
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the cell cycle model to copy.
+     */
+    SimpleWntCellCycleModel(const SimpleWntCellCycleModel& rModel);
+
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is now set in the AbstractCellCycleModel class.
+     * Constructor - just a default, mBirthTime is now set in the AbstractPhaseBasedCellCycleModel class.
      * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called.
      */
     SimpleWntCellCycleModel();
@@ -135,9 +150,16 @@ public:
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
+     *
      * @return the new cell-cycle model
      */
     virtual AbstractCellCycleModel* CreateCellCycleModel();
+
+    /**
+     * @return mUseCellProliferativeTypeDependentG1Duration
+     */
+    bool GetUseCellProliferativeTypeDependentG1Duration() const;
+
 
     /**
      * Set whether Whether the duration of the G1 phase is dependent on cell type
@@ -154,7 +176,7 @@ public:
     /**
      * @return mWntStemThreshold
      */
-    double GetWntStemThreshold();
+    double GetWntStemThreshold() const;
 
     /**
      * Set mWntStemThreshold.
@@ -166,7 +188,7 @@ public:
     /**
      * @return mWntTransitThreshold
      */
-    double GetWntTransitThreshold();
+    double GetWntTransitThreshold() const;
 
     /**
      * Set mWntTransitThreshold.
@@ -178,7 +200,7 @@ public:
     /**
      * @return mWntLabelledThreshold
      */
-    double GetWntLabelledThreshold();
+    double GetWntLabelledThreshold() const;
 
     /**
      * Set mWntLabelledThreshold.
@@ -188,7 +210,7 @@ public:
     void SetWntLabelledThreshold(double wntLabelledThreshold);
 
     /**
-     * Outputs cell-cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

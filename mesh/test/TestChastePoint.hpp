@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -144,8 +144,6 @@ public:
         c_vector<double, 1> location;
         location[0] = 34.0;
         ChastePoint<1> point(location);
-        TS_ASSERT_EQUALS(point[0], 34.0);
-
         TS_ASSERT_EQUALS(point[0], 34.0);
     }
 

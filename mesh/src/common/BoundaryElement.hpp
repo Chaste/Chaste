@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,8 +53,8 @@ class BoundaryElement : public AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM
 {
 protected:
     /**
-     *  (Protected) constructor that does take in nodes. Only available
-     *  to subclasses. Calling code should use one of the other constructors.
+     * (Protected) constructor that does take in nodes. Only available
+     * to subclasses. Calling code should use one of the other constructors.
      */
     BoundaryElement();
 

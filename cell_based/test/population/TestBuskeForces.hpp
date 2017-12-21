@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -58,25 +58,27 @@ class TestBuskeForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestBuskeAdhesiveForceMethods() throw (Exception)
+    void TestBuskeAdhesiveForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 20.0);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
+        mesh.GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -98,7 +100,7 @@ public:
         TS_ASSERT_DELTA(buske_adhesive_force.GetCutOffLength(), 1.5, 1e-6);
         TS_ASSERT_DELTA(buske_adhesive_force.GetAdhesionEnergyParameter(), 1.0, 1e-6);
 
-        buske_adhesive_force.SetCutOffLength(DBL_MAX);
+        buske_adhesive_force.SetCutOffLength(5.0);
         buske_adhesive_force.SetAdhesionEnergyParameter(200);
 
         // Test node force calculation
@@ -128,28 +130,39 @@ public:
 
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
-    void TestBuskeElasticForceMethods() throw (Exception)
+    void TestBuskeElasticForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        HoneycombMeshGenerator generator(2, 1, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 10.0));
 
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 20.0);
         mesh.GetNode(0)->SetRadius(1.0);
         mesh.GetNode(1)->SetRadius(1.0);
+        mesh.GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -171,7 +184,7 @@ public:
         TS_ASSERT_DELTA(buske_elastic_force.GetCutOffLength(), 1.5, 1e-6);
         TS_ASSERT_DELTA(buske_elastic_force.GetDeformationEnergyParameter(), 1.0, 1e-6);
 
-        buske_elastic_force.SetCutOffLength(DBL_MAX);
+        buske_elastic_force.SetCutOffLength(5.0);
         buske_elastic_force.SetDeformationEnergyParameter(4.0/3.0);
 
         // Test node force calculation
@@ -202,10 +215,19 @@ public:
 
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
-    void TestBuskeMixedForceMethods() throw (Exception)
+    void TestBuskeMixedForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -223,7 +245,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -267,7 +289,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceMethods() throw (Exception)
+    void TestBuskeCompressionForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -285,7 +307,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -333,7 +355,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceWithMultipleCells() throw (Exception)
+    void TestBuskeCompressionForceWithMultipleCells()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -354,7 +376,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -444,7 +466,7 @@ public:
         }
     }
 
-    void TestBuskeAdhesiveForceArchiving() throw (Exception)
+    void TestBuskeAdhesiveForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
@@ -486,7 +508,7 @@ public:
         }
     }
 
-    void TestBuskeElasticForceArchiving() throw (Exception)
+    void TestBuskeElasticForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
@@ -528,7 +550,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceArchiving() throw (Exception)
+    void TestBuskeCompressionForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);

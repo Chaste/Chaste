@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -132,8 +132,6 @@ public:
      *  @param odeTimestep the ODE timestep
      */
     virtual void Solve(double time, double nextTime, double odeTimestep)=0;
-
-
 
     /**
      *  Compute the deformation gradient, and stretch in the fibre direction, for each element in the mesh.

@@ -2,7 +2,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -182,7 +182,8 @@ def make_xml_binder():
                        'leq', 'geq', 'lt', 'gt', 'eq', 'neq',
                        'rem',
                        'ci', 'cn', 'apply', 'piecewise', 'piece',
-                       'sin', 'cos', 'tan', 'arcsin', 'arccos', 'arctan']:
+                       'sin', 'cos', 'tan', 'arcsin', 'arccos', 'arctan',
+                       'csymbol']:
         exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % (mathml_elt, mathml_elt)
     binder.set_binding_class(NSS[u'm'], "and_", mathml_and)
     binder.set_binding_class(NSS[u'm'], "or_", mathml_or)
@@ -456,20 +457,27 @@ class cellml_model(element_base):
             var = None
         return var
     
-    def get_variables_by_ontology_term(self, term):
+    def get_variables_by_ontology_term(self, term, transitive=False):
         """Return a list of variables annotated with the given ontology term.
         
-        The annotations have the same form as for oxmeta name annotations (see
-        get_variable_by_oxmeta_name).  However, here we are not restricted to
-        namespace, and no check is done on the number of results returned.
+        The annotations have the same form as for oxmeta name annotations (see get_variable_by_oxmeta_name).
+        However, here we are not restricted to namespace, and no check is done on the number of results returned.
         
-        The given term must be a (prefixed_name, nsuri) tuple.
+        :param term: must be a (prefixed_name, nsuri) tuple.
+        :param transitive: if True, look not just for direct annotations but also for terms belonging to
+        the class given by prefixed_name, searching transitively along rdf:type predicates.
         """
         assert isinstance(term, tuple)
         assert len(term) == 2
-        named_vars = cellml_metadata.find_variables(self, ('bqbiol:is', NSS['bqbiol']), term)
-        category_vars = cellml_metadata.find_variables(self, ('bqbiol:isVersionOf', NSS['bqbiol']), term)
-        return named_vars + category_vars
+        vars = []
+        if transitive:
+            terms = cellml_metadata.transitive_subjects(term)
+        else:
+            terms = [term]
+        for term in terms:
+            vars.extend(cellml_metadata.find_variables(self, ('bqbiol:is', NSS['bqbiol']), term))
+            vars.extend(cellml_metadata.find_variables(self, ('bqbiol:isVersionOf', NSS['bqbiol']), term))
+        return vars
     
     def get_variable_by_cmeta_id(self, cmeta_id):
         """
@@ -2562,9 +2570,13 @@ class cellml_units(Colourable, element_base):
         self._cml_quotients = {}
         self._cml_hash = None
         return
-    
+
     def __repr__(self):
         return '<cellml_units %s @ 0x%x>' % (self.name, id(self))
+
+    def __contains__(self, item):
+        """Prevent the default implementation using Amara's __iter__ to give unexpected results."""
+        return False
 
     @property
     def _hash_tuple(self):
@@ -4088,7 +4100,9 @@ class mathml_constructor(mathml):
                 # Unknown or unexpected element
                 raise UnitsError(self, u''.join([
                     u'Unsupported element "', elt.localName, '".']))
-        if not return_set:
+        if return_set:
+            assert isinstance(u, UnitsSet)
+        else:
             u = u.extract()
         return u
 
@@ -4204,6 +4218,8 @@ class mathml_cn(mathml, mathml_units_mixin_tokens):
         if not return_set:
             u = self._cml_units.extract()
         else:
+            if not isinstance(self._cml_units, UnitsSet):
+                self._cml_units = UnitsSet([self._cml_units], expression=self)
             u = self._cml_units
         return u
 
@@ -4253,6 +4269,8 @@ class mathml_ci(mathml, mathml_units_mixin_tokens):
         if not return_set:
             u = self._cml_units.extract()
         else:
+            if not isinstance(self._cml_units, UnitsSet):
+                self._cml_units = UnitsSet([self._cml_units], expression=self)
             u = self._cml_units
         return u
     
@@ -6166,6 +6184,26 @@ class mathml_arctan(mathml_operator, mathml_units_mixin_set_operands):
         if len(ops) != 1:
             self.wrong_number_of_operands(len(ops), [1])
         return math.atan(self.eval(ops[0]))
+
+
+class mathml_csymbol(mathml_operator, mathml_units_mixin):
+    """Class representing the MathML <csymbol> operator.
+    
+    This is used to represent special-case operations that are treated uniquely by the code generation phase.
+    """
+    def evaluate(self):
+        raise NotImplementedError
+
+    def _set_in_units(self, units, no_act=False):
+        """Set the units of the application of this operator, adding a conversion if needed."""
+        app = self.xml_parent
+        defn_units = app.get_units().extract()
+        if defn_units != units:
+            self._add_units_conversion(app, defn_units, units, no_act)
+        # Store the units
+        if not no_act:
+            app._cml_units = units
+        return
 
 
 ## Don't export module imports to people who do "from pycml import *"

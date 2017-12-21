@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayGenerator : public CxxTest::TestSuite
 {
 public:
-    void TestCreatePointCloud() throw(Exception)
+    void TestCreatePointCloud()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -107,7 +107,7 @@ public:
 #endif
     }
 
-    void TestCreatePointCloudOtherMethods() throw(Exception)
+    void TestCreatePointCloudOtherMethods()
             {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -135,7 +135,7 @@ public:
 #endif
             }
 
-    void TestSplitPointCloud() throw(Exception)
+    void TestSplitPointCloud()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -180,7 +180,7 @@ public:
 #endif
     }
 
-    void TestAddInitialApex() throw(Exception)
+    void TestAddInitialApex()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -212,7 +212,7 @@ public:
     }
 
 
-    void TestInsertBranch() throw(Exception)
+    void TestInsertBranch()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -257,7 +257,7 @@ public:
 #endif
     }
 
-    void TestGrowApex() throw(Exception)
+    void TestGrowApex()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -322,7 +322,7 @@ public:
 #endif
     }
 
-    void TestInvalidateClosestPoint() throw(Exception)
+    void TestInvalidateClosestPoint()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -353,7 +353,7 @@ public:
 #endif
     }
 
-    void TestGrowTerminalLengthApex() throw(Exception)
+    void TestGrowTerminalLengthApex()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -382,7 +382,7 @@ public:
 #endif
     }
 //
-//    void xxxTestGrowTerminalPointsApex() throw(Exception)
+//    void xxxTestGrowTerminalPointsApex()
 //    {
 //#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //        EXIT_IF_PARALLEL;
@@ -408,7 +408,7 @@ public:
 //
 //
 //
-    void TestCheckAngleAndLength() throw(Exception)
+    void TestCheckAngleAndLength()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -471,7 +471,7 @@ public:
 #endif
     }
 
-    void TestOutsideHostVolume() throw(Exception)
+    void TestOutsideHostVolume()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -495,7 +495,7 @@ public:
 #endif
     }
 
-    void TestGenerate() throw(Exception)
+    void TestGenerate()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -536,7 +536,7 @@ public:
 #endif
     }
 
-    void TestHorsfieldOrder() throw(Exception)
+    void TestHorsfieldOrder()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -616,7 +616,7 @@ public:
     }
 
 
-    void TestGenerateDecomposedAirways() throw(Exception)
+    void TestGenerateDecomposedAirways()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -686,7 +686,7 @@ public:
     #endif
     }
 
-    void TestEndBranchDistanceLimit() throw(Exception)
+    void TestEndBranchDistanceLimit()
     {
     #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -706,11 +706,10 @@ public:
         //sqrt(dx^2 + dy^2 + dz^2) where dx = dy = dz = 200.0
         double lobe_bound_size = sqrt(120000);
 
-        for(unsigned generation_number = 0; generation_number < generations.size(); ++generation_number)
+        for (unsigned generation_number = 0; generation_number < generations.size(); ++generation_number)
         {
             double scale_distance_limit = lobe_bound_size/30; //30 is the expected total number of generations
             TS_ASSERT_DELTA(generations[generation_number].GetDistributionRadius(), std::max(lobe_bound_size - scale_distance_limit*generation_number, 5.0), 1e-1);
-
         }
 
         double origin[3] = {0.0, 1.0, 0.0};
@@ -729,7 +728,7 @@ public:
 
         //Check that the number of distributed points becomes less with each generation
         unsigned previous_assigned_points = assigned_points;
-        for(unsigned generation_number = 1; generation_number < generations.size(); ++generation_number)
+        for (unsigned generation_number = 1; generation_number < generations.size(); ++generation_number)
         {
             generator.AddInitialApex(origin, direction, parent_direction, 10.0, generation_number);
 
@@ -766,7 +765,5 @@ private:
     }
 #endif
 };
-
-
 
 #endif /* TESTAIRWAYGENERATOR_HPP_ */

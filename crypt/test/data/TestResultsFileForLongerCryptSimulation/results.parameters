@@ -17,6 +17,10 @@
 		<OutputMeshInVtk>0</OutputMeshInVtk>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<CentreBasedDivisionRule>
+			<CryptCentreBasedDivisionRule-2-2>
+			</CryptCentreBasedDivisionRule-2-2>
+		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
@@ -67,5 +71,13 @@
 		<UseJiggledBottomCells>1</UseJiggledBottomCells>
 		</CryptSimulationBoundaryCondition-2>
 	</CellPopulationBoundaryConditions>
+
+	<NumericalMethod>
+		<ForwardEulerNumericalMethod-2-2>
+			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
+			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
+			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
+		</ForwardEulerNumericalMethod-2-2>
+	</NumericalMethod>
 
 </Chaste>

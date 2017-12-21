@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ class TestCellLabel : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellLabelMethods() throw (Exception)
+    void TestCellLabelMethods()
     {
         MAKE_PTR(CellLabel, p_label);
         TS_ASSERT_EQUALS(p_label->GetCellCount(), 0u);
@@ -85,7 +85,7 @@ public:
         TS_ASSERT(const_label.IsSame(p_other_label.get()));
     }
 
-    void TestCellPropertyRegistry() throw(Exception)
+    void TestCellPropertyRegistry()
     {
         boost::shared_ptr<AbstractCellProperty> p_property1(
                 CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -122,7 +122,7 @@ public:
         delete p_registry;
     }
 
-    void TestCellPropertyOrdering() throw(Exception)
+    void TestCellPropertyOrdering()
     {
         CellPropertyRegistry* p_instance = CellPropertyRegistry::Instance();
         p_instance->Clear();
@@ -145,11 +145,12 @@ public:
         TS_ASSERT_EQUALS(properties[0]->IsType<WildTypeCellMutationState>(), true);
         TS_ASSERT_EQUALS(properties[1]->IsType<ApcOneHitCellMutationState>(), true);
         TS_ASSERT_EQUALS(properties[2]->IsType<ApoptoticCellProperty>(), true);
+        TS_ASSERT_EQUALS((boost::static_pointer_cast<ApoptoticCellProperty>(properties[2]))->GetColour(), 6u);
         TS_ASSERT_EQUALS(properties[3]->IsType<CellLabel>(), true);
         p_instance->Clear();
     }
 
-    void TestArchiveCellLabel() throw(Exception)
+    void TestArchiveCellLabel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "label.arch";
@@ -194,7 +195,7 @@ public:
         }
     }
 
-    void TestArchiveCellPropertyRegistry() throw(Exception)
+    void TestArchiveCellPropertyRegistry()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "property.arch";

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "DiscreteSystemForceCalculator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -56,14 +56,14 @@ class TestDiscreteSystemForceCalculator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestPrivateMethods() throw (Exception)
+    void TestPrivateMethods()
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
@@ -146,13 +146,13 @@ public:
         TS_ASSERT_DELTA(-M_PI + 5.0*M_PI/6.0, calculated_extremal_angles[4], 1e-4);
     }
 
-    void TestCalculateExtremalNormalForces() throw (Exception)
+    void TestCalculateExtremalNormalForces()
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
@@ -212,7 +212,7 @@ public:
         }
     }
 
-    void TestCalculateWriteResultsToFile() throw (Exception)
+    void TestCalculateWriteResultsToFile()
     {
         std::string output_directory = "TestDiscreteSystemForceCalculator";
 
@@ -221,7 +221,7 @@ public:
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
         MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
 
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
@@ -255,6 +255,33 @@ public:
         simulator.SetEndTime(0.05);
         simulator.SetOutputDirectory(output_directory+"_rerun");
         simulator.Solve();
+    }
+
+    void TestAllCases()
+    {
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        TS_ASSERT_DELTA(mesh.GetAngleBetweenNodes(2,0), -0.75*M_PI, 1e-12);
+        TS_ASSERT_DELTA(mesh.GetAngleBetweenNodes(2,1), -0.5*M_PI, 1e-12);
+
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        std::vector<CellPtr> cells;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        force_collection.push_back(p_force);
+
+        DiscreteSystemForceCalculator calculator(cell_population, force_collection);
+
+        double epsilon = 0.5*M_PI;
+        calculator.SetEpsilon(epsilon);
+
+        TS_ASSERT_THROWS_NOTHING(calculator.GetSamplingAngles(2));
     }
 };
 

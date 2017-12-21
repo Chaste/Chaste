@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,10 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SimpleTargetAreaModifier.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
 SimpleTargetAreaModifier<DIM>::SimpleTargetAreaModifier()
-    : AbstractTargetAreaModifier<DIM>()
+    : AbstractTargetAreaModifier<DIM>(),
+      mGrowthDuration(DOUBLE_UNSET)
 {
 }
 
@@ -52,27 +55,37 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-    double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
-
-    // If the cell is differentiated then its G1 duration is infinite
-    if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
+    double growth_duration = mGrowthDuration;
+    if (growth_duration == DOUBLE_UNSET)
     {
-        // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
-        g1_duration = pCell->GetCellCycleModel()->GetTransitCellG1Duration();
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == nullptr)
+        {
+            EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
+        }
+        AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
+
+        growth_duration = p_model->GetG1Duration();
+
+        // If the cell is differentiated then its G1 duration is infinite
+        if (growth_duration == DBL_MAX)
+        {
+            // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
+            growth_duration = p_model->GetTransitCellG1Duration();
+        }
     }
 
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {
         // Age of cell when apoptosis begins
-        if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < g1_duration)
+        if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < growth_duration)
         {
-            cell_target_area *= 0.5*(1 + (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime())/g1_duration);
+            cell_target_area *= 0.5*(1 + (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime())/growth_duration);
         }
 
-        // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-        cell_target_area = cell_target_area - 0.5*cell_target_area/(pCell->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
+        // The target area of an apoptotic cell decreases linearly to zero
+        double time_spent_apoptotic = SimulationTime::Instance()->GetTime() - pCell->GetStartOfApoptosisTime();
 
-        // Don't allow a negative target area
+        cell_target_area *= 1.0 - 0.5/(pCell->GetApoptosisTime())*time_spent_apoptotic;
         if (cell_target_area < 0)
         {
             cell_target_area = 0;
@@ -82,10 +95,10 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     {
         double cell_age = pCell->GetAge();
 
-        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
-        if (cell_age < g1_duration)
+        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the prescribed duration
+        if (cell_age < growth_duration)
         {
-            cell_target_area *= 0.5*(1 + cell_age/g1_duration);
+            cell_target_area *= 0.5*(1 + cell_age/growth_duration);
         }
         else
         {
@@ -108,9 +121,24 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
+double SimpleTargetAreaModifier<DIM>::GetGrowthDuration()
+{
+    return mGrowthDuration;
+}
+
+template<unsigned DIM>
+void SimpleTargetAreaModifier<DIM>::SetGrowthDuration(double growthDuration)
+{
+    assert(growthDuration >= 0.0);
+    mGrowthDuration = growthDuration;
+}
+
+template<unsigned DIM>
 void SimpleTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
-    // No parameters to output, so just call method on direct parent class
+    *rParamsFile << "\t\t\t<GrowthDuration>" << mGrowthDuration << "</GrowthDuration>\n";
+
+    // Next, call method on direct parent class
     AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 

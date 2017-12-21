@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -137,10 +137,7 @@ double ChastePoint<0>::operator[] (unsigned i) const
     EXCEPTION("Zero-dimensional point has no data");
 }
 
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class ChastePoint<1>;
 template class ChastePoint<2>;
 template class ChastePoint<3>;
@@ -148,4 +145,3 @@ template class ChastePoint<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(ChastePoint)
-

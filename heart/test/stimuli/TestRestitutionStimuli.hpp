@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -114,7 +114,7 @@ private:
 
 public:
 
-    void TestS1S2StimulusSetup(void) throw (Exception)
+    void TestS1S2StimulusSetup(void)
     {
         double magnitude = 50;
         double duration_of_stimulus = 5;
@@ -138,7 +138,7 @@ public:
         TS_ASSERT_EQUALS(stimulus.GetNumS2FrequencyValues(),s2_periods.size());
     }
 
-    void TestSteadyStateRestitutionCellStimulusSetup(void) throw (Exception)
+    void TestSteadyStateRestitutionCellStimulusSetup(void)
     {
         double magnitude = 50;
         double duration_of_stimulus = 5;
@@ -160,7 +160,7 @@ public:
     }
 
 
-    void TestArchivingS1S2Stimulus(void) throw(Exception)
+    void TestArchivingS1S2Stimulus(void)
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;
@@ -206,7 +206,7 @@ public:
         }
     }
 
-    void TestArchivingSteadyStateStimulus(void) throw(Exception)
+    void TestArchivingSteadyStateStimulus(void)
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;
@@ -254,9 +254,6 @@ public:
             delete p_loaded_stim;
         }
     }
-
-
 };
-
 
 #endif //_TESTRESTITUTIONCELLSTIMULI_HPP_

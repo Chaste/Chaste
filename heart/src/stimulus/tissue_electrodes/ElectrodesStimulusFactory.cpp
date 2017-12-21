@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,12 +55,11 @@ ElectrodesStimulusFactory<DIM>::ElectrodesStimulusFactory(std::vector<std::pair<
       mrEnds(rEnds),
       mGroundSecondElectrode(false)
 {
-
-    if ( ( rElectrodePairs.size() != rStimulusMagnitudes.size() ) ||
-       ( rElectrodePairs.size() != rDurations.size() ) ||
-       ( rElectrodePairs.size() != rPeriods.size() ) ||
-       ( rElectrodePairs.size() != rStarts.size() ) ||
-       ( rElectrodePairs.size() != rEnds.size() ) )
+    if ((rElectrodePairs.size() != rStimulusMagnitudes.size()) ||
+        (rElectrodePairs.size() != rDurations.size()) ||
+        (rElectrodePairs.size() != rPeriods.size()) ||
+        (rElectrodePairs.size() != rStarts.size()) ||
+        (rElectrodePairs.size() != rEnds.size()))
     {
         EXCEPTION ("Vector of electrode pairs and vector of stimulation paremeters must have the same size");
     }
@@ -84,11 +83,11 @@ void ElectrodesStimulusFactory<DIM>::CheckForElectrodesIntersection()
         {
             for (unsigned pair_index = 0; pair_index <mrElectrodePairs.size(); pair_index++)
             {
-                if ( mrElectrodePairs[pair_index].first->DoesContain( this->mpMesh->GetNode(global_node_index)->GetPoint() ) )
+                if (mrElectrodePairs[pair_index].first->DoesContain( this->mpMesh->GetNode(global_node_index)->GetPoint()))
                 {
                     nodes_in_all_electrodes.push_back( this->mpMesh->GetNode(global_node_index)->GetIndex() );
                 }
-                if ( mrElectrodePairs[pair_index].second->DoesContain( this->mpMesh->GetNode(global_node_index)->GetPoint() ) )
+                if (mrElectrodePairs[pair_index].second->DoesContain( this->mpMesh->GetNode(global_node_index)->GetPoint()))
                 {
                     nodes_in_all_electrodes.push_back( this->mpMesh->GetNode(global_node_index)->GetIndex() );
                 }
@@ -197,15 +196,15 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
          node_iter != this->mpMesh->GetNodeIteratorEnd();
          ++node_iter)
     {
-        if ( pRegion->DoesContain( (*node_iter).GetPoint() ) )
+        if (pRegion->DoesContain((*node_iter).GetPoint()))
         {
             unsigned node_index = node_iter->GetIndex();
             assert(node_index < this->mpMesh->GetNumNodes());
             double contribution_of_this_node = 0.0;
-            //loop over the elements where this node is contained
-            for(std::set<unsigned>::iterator iter = this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().begin();
-                iter != this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().end();
-                ++iter)
+            // Loop over the elements where this node is contained
+            for (std::set<unsigned>::iterator iter = this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().begin();
+                 iter != this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().end();
+                 ++iter)
             {
                 Element<DIM,DIM>* p_element = this->mpMesh->GetElement(*iter);
 
@@ -253,11 +252,7 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
     return ret;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ElectrodesStimulusFactory<1>;
 template class ElectrodesStimulusFactory<2>;
 template class ElectrodesStimulusFactory<3>;
-

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SmartPointers.hpp"
 #include "FakePetscSetup.hpp"
@@ -254,7 +254,7 @@ public:
      *
      * We now test that our new cell population boundary condition is implemented correctly.
      */
-    void TestMyBoundaryCondition() throw(Exception)
+    void TestMyBoundaryCondition()
     {
         /* We first create a {{{MeshBasedCellPopulation}}} using the helper
          * classes {{{HoneycombMeshGenerator}}} and {{{CellsGenerator}}},
@@ -264,7 +264,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -326,14 +326,14 @@ public:
      * We now provide a test demonstrating how {{{MyBoundaryCondition}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyBoundaryCondition() throw(Exception)
+    void TestOffLatticeSimulationWithMyBoundaryCondition()
     {
         /* Once again we create a {{{MeshBasedCellPopulation}}}. */
         HoneycombMeshGenerator generator(7, 7, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);

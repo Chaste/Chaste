@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ public:
      * This tests the HDF5 to VTK converter using a 3D example
      * taken from a bidomain simulation.
      */
-    void TestBidomainVtkConversion3D() throw(Exception)
+    void TestBidomainVtkConversion3D()
     {
 #ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_bidomain";
@@ -172,7 +172,7 @@ public:
      * This tests the HDF5 to VTK converter in parallel using a 2D example
      * taken from a monodomain simulation.
      */
-    void TestMonodomainParallelVtkConversion2D() throw(Exception)
+    void TestMonodomainParallelVtkConversion2D()
     {
 #ifdef CHASTE_VTK // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string working_directory = "TestHdf5ToVtkConverter_monodomain2D";
@@ -255,13 +255,11 @@ public:
 #endif //CHASTE_VTK
     }
 
-
-
     /**
      * This tests the HDF5 to .txt converter using a 3D example
      * taken from a bidomain simulation.
      */
-    void TestBidomainTxtConversion3D() throw(Exception)
+    void TestBidomainTxtConversion3D()
     {
         std::string working_directory = "TestHdf5ToTxtConverter_bidomain";
 
@@ -296,7 +294,7 @@ public:
         }
     }
 
-    void TestMonodomainMeshalyzerConversion() throw(Exception)
+    void TestMonodomainMeshalyzerConversion()
     {
         // Firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
         // as that is where the reader reads from.
@@ -319,7 +317,7 @@ public:
                        "heart/test/data/Monodomain1d/MonodomainLR91_1d_times.info").CompareFiles();
     }
 
-    void TestBidomainMeshalyzerConversion() throw(Exception)
+    void TestBidomainMeshalyzerConversion()
     {
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
@@ -351,7 +349,7 @@ public:
     }
 
     // This test covers the case when the hdf5 file contains 3 variables (e.g., after solving a problem with PROBLEM_DIM=3)
-    void TestMeshalyzerConversion3Variables() throw(Exception)
+    void TestMeshalyzerConversion3Variables()
     {
         /*
          * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
@@ -387,7 +385,7 @@ public:
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
-    void TestMeshalyzerConversionLotsOfVariables() throw(Exception)
+    void TestMeshalyzerConversionLotsOfVariables()
     {
         std::string output_dir = "TestHdf5Converters_TestMeshalyzerConversionLotsOfVariables";
 
@@ -429,9 +427,9 @@ public:
     }
 
     /**
-    * This tests the HDF5 to XDMF converter
-    */
-    void TestHdf5ToXdmfConverter() throw(Exception)
+     * This tests the HDF5 to XDMF converter
+     */
+    void TestHdf5ToXdmfConverter()
     {
 #ifndef _MSC_VER
         std::string working_directory = "TestHdf5Converters_TestHdf5ToXdmfConverter";

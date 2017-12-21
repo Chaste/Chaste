@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTSRN_HPP_
-#define ABSTRACTSRN_HPP_
+#ifndef ABSTRACTSRNMODEL_HPP_
+#define ABSTRACTSRNMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
@@ -53,20 +53,19 @@ typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * The AbstractSrnModel contains basic information to all sub-cellular reaction network (SRN) models.
- * It handles assignment of a Cell.
  *
  * SRN models are noncopyable since cells are noncopyable.
  *
- * \todo #2752 Thoroughly document this class (including, for example, what SRN stands for!)
+ * \todo #2752 Thoroughly document this class
  */
-class AbstractSrnModel : public Identifiable, boost::noncopyable
+class AbstractSrnModel : public Identifiable
 {
 private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the object and its member variables.
+     * Archive the SRN model and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -80,9 +79,17 @@ private:
 
         // DO NOT archive & mpCell; -- The SrnModel is only ever archived from the Cell
         // which knows this and it is handled in the load_construct of Cell.
-        // doesn't seem to be anything we need to archive here...
         archive & mSimulatedToTime;
     }
+
+    /**
+     * Prevent copy-assignment of this class, or its subclasses.
+     * Note that we do not define this method, therefore statements like "AbstractSrnModel new = old;" will not compile.
+     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateSrnModel.
+     *
+     * @return the new SRN model.
+     */
+    AbstractSrnModel& operator=(const AbstractSrnModel&);
 
 protected:
 
@@ -96,6 +103,20 @@ protected:
      */
     double mSimulatedToTime;
 
+    /**
+     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the SRN model to copy.
+     */
+    AbstractSrnModel(const AbstractSrnModel& rModel);
+
 public:
 
     /**
@@ -107,7 +128,7 @@ public:
     /**
      * Base class with virtual methods needs a virtual destructor. The destructor
      * does not delete mpCell. Instead, the cell takes responsibility for deleting
-     * the cell-cycle model when it is destroyed.
+     * the SRN model when it is destroyed.
      */
     virtual ~AbstractSrnModel();
 
@@ -118,13 +139,12 @@ public:
      */
     void SetCell(CellPtr pCell);
 
-    ///\todo #2752 remove in favour of copy-constructors
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This method will be called precisely once per cell set up in the initial
      * cell population. It is not called on cell division; use ResetForDivision(),
-     * CreateCellCycleModel() and InitialiseDaughterCell() for that.
+     * CreateSrnModel() and InitialiseDaughterCell() for that.
      *
      * By the time this is called, a CellPopulation will have been set up, so the model
      * can know where its cell is located in space. If relevant to the simulation,
@@ -135,13 +155,13 @@ public:
     /**
      * Initialise the new daughter cell's SRN model after a cell division.
      *
-     * This is called by Cell::Divide once the new cell object
+     * This is called by Cell::Divide() once the new cell object
      * has been fully created, to perform any initialisation of the
      * SRN which requires access to the cell.
      *
      * Note that much initialisation can be performed using the
      * combination of ResetForDivision() (called on the parent prior to
-     * division) and CreateCellCycleModel() (called on the reset
+     * division) and CreateSrnModel() (called on the reset
      * parent to create the new cell-cycle model object).
      */
     virtual void InitialiseDaughterCell();
@@ -161,12 +181,13 @@ public:
     /**
      * @return the time the SRN simulated has run to.
      */
-    double GetSimulatedToTime();
+    double GetSimulatedToTime() const;
 
     /**
      * Simulate the SRN to the current time.
      *
-     * This should be overridden for each SRN type i.e. ODE based.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      */
     virtual void SimulateToCurrentTime()=0;
 
@@ -182,8 +203,9 @@ public:
 
     /**
      * Builder method to create new instances of the SRN model.
-     * Each concrete subclass must implement this method to create an
-     * instance of that subclass.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * This method is called by Cell::Divide() to create a SRN
      * model for the daughter cell.  Note that the parent SRN
@@ -192,7 +214,9 @@ public:
      * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
-     * @return new SRN model
+     * Copy constructors are used to set all the member variables in the appropriate classes.
+     *
+     *  @return new srn model
      */
     virtual AbstractSrnModel* CreateSrnModel()=0;
 
@@ -217,4 +241,4 @@ public:
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)
 
-#endif /* ABSTRACTSRN_HPP_ */
+#endif /* ABSTRACTSRNMODEL_HPP_ */

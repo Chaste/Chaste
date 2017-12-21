@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,7 +78,7 @@ private:
 public:
 
     // This test covers the case when the hdf5 file contains more than 3 variables
-    void TestCmguiConversionLotsOfVariables() throw(Exception)
+    void TestCmguiConversionLotsOfVariables()
     {
         std::string output_dir = "TestHdf5ToCmguiConversionManyVariables";
 
@@ -109,7 +109,7 @@ public:
                        "heart/test/data/many_variables/CmguiValidScript.com").CompareFiles();
     }
 
-    void TestMonodomainCmguiConversion3D() throw(Exception)
+    void TestMonodomainCmguiConversion3D()
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_monodomain";
 
@@ -141,7 +141,7 @@ public:
                                "heart/test/data/CmguiData/monodomain/monodomain3dValidScript.com").CompareFiles();
     }
 
-    void TestBidomainCmguiConversion3D() throw(Exception)
+    void TestBidomainCmguiConversion3D()
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_bidomain";
 
@@ -169,7 +169,7 @@ public:
                                "heart/test/data/CmguiData/bidomain/cube_2mm_12_elements_1.exnode").CompareFiles();
     }
 
-    void TestBidomainWithBathCmguiConversion1D() throw(Exception)
+    void TestBidomainWithBathCmguiConversion1D()
     {
         std::string working_directory = "TestBidomainWithBathCmguiConversion1D";
 
@@ -211,7 +211,7 @@ public:
                                                "heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d_1.exnode").CompareFiles();
     }
 
-    void TestMonodomainCmguiConversion2D() throw(Exception)
+    void TestMonodomainCmguiConversion2D()
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_monodomain2D";
 
@@ -241,7 +241,7 @@ public:
                                                "heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements_1.exnode").CompareFiles();
     }
 
-    void TestBidomainCmguiConversion1D() throw(Exception)
+    void TestBidomainCmguiConversion1D()
     {
         std::string working_directory = "TestHdf5ToCmguiConverter_bidomain1D";
 
@@ -270,7 +270,7 @@ public:
                                                "heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements_1.exnode").CompareFiles();
     }
 
-    void TestCmguiConversion1DWith3Variables() throw(Exception)
+    void TestCmguiConversion1DWith3Variables()
     {
         std::string working_directory = "TestHdf5ToCmguiConverter3Vars";
 
@@ -304,7 +304,7 @@ public:
                                                "heart/test/data/CmguiData/extended_bidomain/3_vars_25.exnode").CompareFiles();
     }
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         std::string directory = "TestHdf5ConverterExceptions";
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * We don't have any member variables yet, but let's make things easy for the future.
+     * Save/load our member variables.
      *
      * @param archive the archive
      * @param version the current version of this class

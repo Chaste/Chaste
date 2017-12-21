@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,7 @@ void AbstractIvpOdeSolver::SolveAndUpdateStateVariable(AbstractOdeSystem* pAbstr
                                                        double endTime,
                                                        double timeStep)
 {
-    if (   (pAbstractOdeSystem->rGetStateVariables().size()!=pAbstractOdeSystem->GetNumberOfStateVariables())
+    if ((pAbstractOdeSystem->rGetStateVariables().size()!=pAbstractOdeSystem->GetNumberOfStateVariables())
         || (pAbstractOdeSystem->rGetStateVariables().size()==0) )
     {
         EXCEPTION("SolveAndUpdateStateVariable() called but the state variable vector in the ODE system is not set up");

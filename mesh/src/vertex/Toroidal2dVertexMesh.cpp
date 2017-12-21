@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -153,7 +153,8 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
     // Create four copies of each node
     for (unsigned index=0; index<num_nodes; index++)
     {
-        c_vector<double, 2> location = GetNode(index)->rGetLocation();
+        c_vector<double, 2> location;
+        location = GetNode(index)->rGetLocation();
 
         // Node copy at original location
         Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
@@ -186,11 +187,12 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         bool element_straddles_left_right_boundary = false;
         bool element_straddles_top_bottom_boundary = false;
 
-        c_vector<double, 2> this_node_location = elem_iter->GetNode(0)->rGetLocation();
+        const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
         for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
         {
-            c_vector<double, 2> next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
-            c_vector<double, 2> vector = next_node_location - this_node_location;
+            const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
+            c_vector<double, 2> vector;
+            vector = r_next_node_location - r_this_node_location;
 
             if (fabs(vector[0]) > 0.5*mWidth)
             {

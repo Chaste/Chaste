@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ private :
     }
 public:
 
-    void TestWith1dData(void) throw (Exception)
+    void TestWith1dData(void)
     {
         // firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestVoltageInterpolater1d,
         // as that is where the interpolater reads and writes to
@@ -101,7 +101,7 @@ public:
         // The number of times is 1000, no point going through them all
         // only go through every 100th (note the "i+=100" in the for loop)
         assert(fine_reader.GetUnlimitedDimensionValues().size()==1001u);
-        for(unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i+=100)
+        for (unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i+=100)
         {
             fine_reader.GetVariableOverNodes(voltage_fine, "V", i);
             coarse_reader.GetVariableOverNodes(voltage_coarse, "V", i);
@@ -119,7 +119,7 @@ public:
 
             // check fine_repl[10] != fine_repl[11] *for some time*, else the above
             // check is invalid
-            if(fabs(fine_repl[10] - fine_repl[11]) > 1e-6)
+            if (fabs(fine_repl[10] - fine_repl[11]) > 1e-6)
             {
                 invalid = false;
             }
@@ -132,7 +132,7 @@ public:
     }
 
     // the data in this test came from TestCardiacElectroMechanicsProblem::TestImplicitNhs2dOneMechanicsElement()
-    void TestWith2dData(void) throw (Exception)
+    void TestWith2dData(void)
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestVoltageInterpolater2d,
         // as that is where the interpolater reads and writes to
@@ -177,7 +177,7 @@ public:
         PetscTools::Destroy(voltage_fine);
     }
 
-    void TestWithMultipleVariables1D() throw (Exception)
+    void TestWithMultipleVariables1D()
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestWithMultipleVariables1D,
         // as that is where the interpolater reads and writes to
@@ -217,7 +217,7 @@ public:
         bool invalid_2 = true;//see below
 
         TS_ASSERT_EQUALS(fine_reader.GetUnlimitedDimensionValues().size(), 101u);
-        for(unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i++)
+        for (unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i++)
         {
             fine_reader.GetVariableOverNodes(voltage_fine, "V", i);
             fine_reader.GetVariableOverNodes(phi_e_fine, "Phi_e", i);
@@ -249,7 +249,7 @@ public:
 
             // check fine_repl[10] != fine_repl[11] *for some time*, else the above
             // check is invalid
-            if( (fabs(fine_repl[10] - fine_repl[11]) > 1e-6) )
+            if ((fabs(fine_repl[10] - fine_repl[11]) > 1e-6))
             {
                 invalid_1 = false;
             }

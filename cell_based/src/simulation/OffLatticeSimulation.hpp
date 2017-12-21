@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedSimulation.hpp"
 #include "AbstractForce.hpp"
 #include "AbstractCellPopulationBoundaryCondition.hpp"
+#include "AbstractNumericalMethod.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -46,14 +47,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * Run an off-lattice 2D or 3D cell-based simulation using a cell-centre-
- * or vertex-based cell population.
+ * Run an off-lattice 2D or 3D cell-based simulation using an off-lattice
+ * cell population.
  *
  * In cell-centre-based cell populations, each cell is represented by a
  * single node (corresponding to its centre), and connectivity is defined
  * either by a Delaunay triangulation or a radius of influence. In vertex-
  * based cell populations, each cell is represented by a polytope
  * (corresponding to its membrane) with a variable number of vertices.
+ * Alternative cell populations may be defined by the user.
  *
  * The OffLatticeSimulation is constructed with a CellPopulation, which
  * updates the correspondence between each Cell and its spatial representation
@@ -72,6 +74,7 @@ private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+    friend class TestOffLatticeSimulation;
     friend class TestOffLatticeSimulationWithNodeBasedCellPopulation;
 
     /**
@@ -86,6 +89,7 @@ private:
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mForceCollection;
         archive & mBoundaryConditions;
+        archive & mpNumericalMethod;
     }
 
 protected:
@@ -96,6 +100,9 @@ protected:
     /** List of boundary conditions. */
     std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
 
+    /** The numerical method to use in this simulation. Defaults to the explicit forward Euler method. */
+    boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
+
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
      *
@@ -104,36 +111,24 @@ protected:
     virtual void UpdateCellLocationsAndTopology();
 
     /**
-     * Moves each node to a new position for this timestep by
-     * calling the CellPopulation::UpdateNodeLocations() method then
-     * applying any boundary conditions.
+     * Sends nodes back to the positions given in the input map. Used after a failed step
+     * when adaptivity is turned on.
      *
+     * @param oldNodeLoctions A map linking nodes to their old positions.
      */
-    virtual void UpdateNodePositions();
+    void RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
+
+    /**
+     * Applies any boundary conditions.
+     *
+     * @param oldNodeLoctions Mapping between node indices and old node locations
+     */
+    void ApplyBoundaries(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
 
     /**
      * Overridden SetupSolve() method to clear the forces applied to the nodes.
      */
     virtual void SetupSolve();
-
-    /**
-     * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.
-     * This method returns a vector which is then passed into the CellPopulation method AddCell().
-     * This method may be overridden by subclasses.
-     *
-     * For a centre-based cell population, this method calculates the new locations of the cell
-     * centres of a dividing cell, moves the parent cell and returns the location of
-     * the daughter cell. The new locations are found by picking a random direction
-     * and placing the parent and daughter in opposing directions along this axis.
-     *
-     * For a vertex-based cell population, the method calls the AbstractVertexBasedDivisionRule which
-     * is a member of the cell population.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return a vector containing information on cell division.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Overridden WriteVisualizerSetupFile() method.
@@ -163,7 +158,7 @@ public:
     void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
 
     /**
-     * Method to remove all the Forces
+     * Remove all the forces.
      */
     void RemoveAllForces();
 
@@ -180,22 +175,39 @@ public:
     void RemoveAllCellPopulationBoundaryConditions();
 
     /**
-     * Overridden OutputAdditionalSimulationSetup method to output the force and cell
-     * population boundary condition information.
+     * Set the numerical method to be used in this simulation (use this to solve the mechanics system).
+     *
+     * @param pNumericalMethod pointer to a numerical method object
+     */
+    void SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
+
+    /**
+     * @return the current numerical method.
+     */
+    const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
+
+    /**
+     * Overridden OutputAdditionalSimulationSetup() method.
+     *
+     * Output any force, boundary condition or numerical method information.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
 
     /**
-     * Outputs simulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSimulationParameters(out_stream& rParamsFile);
+
+    /**
+     * Directly access the forces attached to this simulation, to allow their manipulation after archiving.
+     *
+     * @return mForceCollection the vector of pointers to forces attached to this simulation
+     */
+    const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& rGetForceCollection() const;
 };
 
 // Serialization for Boost >= 1.36
@@ -229,8 +241,8 @@ inline void load_construct_data(
     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population;
     ar >> p_cell_population;
 
-    // Invoke inplace constructor to initialise instance, last two variables set extra
-    // member variables to be deleted as they are loaded from archive and to not initialise sells.
+    // Invoke inplace constructor to initialise instance, middle two variables set extra
+    // member variables to be deleted as they are loaded from archive and to not initialise cells.
     ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false);
 }
 }

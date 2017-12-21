@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -128,7 +128,6 @@ c_matrix<double,3*(ELEMENT_DIM+1),3*(ELEMENT_DIM+1)>
     return ret;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainAssembler(
                                 AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
@@ -144,10 +143,7 @@ ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>::~ExtendedBidomainAssembler()
 {
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ExtendedBidomainAssembler<1,1>;
 template class ExtendedBidomainAssembler<2,2>;
 template class ExtendedBidomainAssembler<3,3>;

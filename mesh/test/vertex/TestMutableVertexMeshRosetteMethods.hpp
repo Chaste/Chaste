@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -214,7 +214,7 @@ private:
 
 public:
 
-    void TestSetAndGetMethods() throw (Exception)
+    void TestSetAndGetMethods()
     {
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
@@ -240,7 +240,7 @@ public:
         delete p_mesh;
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         // Set archiving location
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -342,7 +342,7 @@ public:
         }
     }
 
-    void TestHandleHighOrderJunctions() throw (Exception)
+    void TestHandleHighOrderJunctions()
     {
         /*
          * We test the method HandleHighOrderJunctions by calling IdentifySwapType on a mesh with suitable nodes,
@@ -399,7 +399,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(mesh.IdentifySwapType(p_node_0, p_node_5));
     }
 
-    void TestPerformRosetteRankIncrease() throw (Exception)
+    void TestPerformRosetteRankIncrease()
     {
         // Create the standard five-cell rosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
@@ -472,7 +472,7 @@ public:
         delete p_mesh;
     }
 
-    void TestPerformProtorosetteResolution() throw (Exception)
+    void TestPerformProtorosetteResolution()
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructProtorosette();
@@ -557,7 +557,7 @@ public:
         delete p_mesh;
     }
 
-    void TestPerformRosetteRankDecrease() throw (Exception)
+    void TestPerformRosetteRankDecrease()
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
@@ -616,7 +616,7 @@ public:
         delete p_mesh;
     }
 
-    void TestCheckForRosettes() throw (Exception)
+    void TestCheckForRosettes()
     {
         // Let us first create reference meshes for four and five cell rosettes
         MutableVertexMesh<2,2>* p_ref_rosette = ConstructFiveCellRosette();
@@ -637,7 +637,7 @@ public:
         p_protorosette->CheckForRosettes();
 
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes(), p_rosette->GetNumNodes());
-        for( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_rosette->GetNode(node_idx);
             Node<2>* current_node = p_rosette->GetNode(node_idx);
@@ -647,7 +647,7 @@ public:
         }
 
         TS_ASSERT_EQUALS(p_ref_protorosette->GetNumNodes(), p_protorosette->GetNumNodes());
-        for( unsigned node_idx = 0 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 0 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_protorosette->GetNode(node_idx);
             Node<2>* current_node = p_protorosette->GetNode(node_idx);
@@ -668,7 +668,7 @@ public:
 
         // In the rosette mesh, all nodes should remain in the same place, except the new one
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes() + 1, p_rosette->GetNumNodes());
-        for( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_rosette->GetNode(node_idx);
             Node<2>* current_node = p_rosette->GetNode(node_idx);
@@ -679,7 +679,7 @@ public:
 
         // In the protorosette mesh, all nodes should remain in the same place, except node 0 and the new one
         TS_ASSERT_EQUALS(p_ref_protorosette->GetNumNodes() + 1, p_protorosette->GetNumNodes());
-        for( unsigned node_idx = 1 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
+        for ( unsigned node_idx = 1 ; node_idx < p_ref_protorosette->GetNumNodes() ; node_idx++ )
         {
             Node<2>* current_ref_node = p_ref_protorosette->GetNode(node_idx);
             Node<2>* current_node = p_protorosette->GetNode(node_idx);
@@ -694,7 +694,7 @@ public:
         delete p_protorosette;
     }
 
-    void TestEnsureCoverangeWhenCheckingForRosettes() throw (Exception)
+    void TestEnsureCoverangeWhenCheckingForRosettes()
     {
         /**
          * When checking for set intersections, there is a 50/50 chance of the correct element being selected first.
@@ -719,7 +719,7 @@ public:
         }
     }
 
-    void TestPerformProtorosetteFormationInIdentifySwapType() throw (Exception)
+    void TestPerformProtorosetteFormationInIdentifySwapType()
     {
         MutableVertexMesh<2, 2>* p_mesh = this->ConstructT1Scenario();
 

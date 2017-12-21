@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -99,8 +99,6 @@ protected:
     // the parent AbstractAssemblerSolverHybrid assumes natural Neumann BCs and uses a
     // NaturalNeumannSurfaceTermAssembler for assembling this part of the vector.
 
-
-
     /**
      * Delegate to AbstractAssemblerSolverHybrid::SetupGivenLinearSystem.
      *
@@ -133,7 +131,7 @@ public:
      *
      * @param initialSolution initialSolution (used in base class version of this method)
      */
-    void InitialiseForSolve(Vec initialSolution = NULL);
+    void InitialiseForSolve(Vec initialSolution = nullptr);
 };
 
 #endif /*SIMPLELINEARELLIPTICSOLVER_HPP_*/

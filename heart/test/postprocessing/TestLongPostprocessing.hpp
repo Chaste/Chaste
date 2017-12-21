@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,7 @@ class TestLongPostprocessing : public CxxTest::TestSuite
 public:
 
 
-    void Test2DSimulations() throw(Exception)
+    void Test2DSimulations()
     {
         double conductivity_scale = 1;
         double h = 0.01; // cm
@@ -196,8 +196,6 @@ public:
             }
         }// close for loop
     }//close void Test2dSimulations
-
 };
 
 #endif /* TESTLONGPOSTPROCESSING_HPP_ */
-

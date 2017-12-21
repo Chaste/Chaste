@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,22 +48,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = An example showing how to simulate cell sorting due to differential adhesion in a vertex-based model =
  *
- * EMPTYLINE
- *
  * == Introduction ==
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to simulate a growing cell monolayer culture
  * comprising two distinct cell types, which exhibit differential adhesion. We encountered a
  * similar implementation in the second test in the TestRunningPottsBasedSimulationsTutorial,
  * which used a cellular Potts model of cell interactions; here we use a vertex-based model.
  *
- * EMPTYLINE
- *
  * == The test ==
- *
- * EMPTYLINE
  *
  * As in previous tutorials, we begin by including the necessary header files. We have
  * encountered these files already. Recall that often, either {{{CheckpointArchiveTypes.hpp}}}
@@ -74,8 +66,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "CellLabel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellVolumesWriter.hpp"
@@ -115,7 +108,7 @@ public:
      * second test in the TestRunningPottsBasedSimulationsTutorial, which implements a similar
      * simulation using a cellular Potts model.
      */
-    void TestVertexBasedDifferentialAdhesionSimulation() throw (Exception)
+    void TestVertexBasedDifferentialAdhesionSimulation()
     {
         /* First we create a regular vertex mesh. Here we choose to set the value of the cell rearrangement threshold. */
         HoneycombVertexMeshGenerator generator(5, 5);
@@ -128,7 +121,7 @@ public:
          * the effect of this on the cell sorting process. */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to

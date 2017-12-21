@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,25 +54,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/shared_ptr.hpp>
 
 #include <boost/foreach.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
 
 #include "AbstractMesh.hpp"
+#include "TetrahedralMesh.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Identifiable.hpp"
 #include "AbstractCellPopulationCountWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
 
-// These #includes are needed for SetDefaultCellMutationStateAndProliferativeTypeOrdering()
-#include "WildTypeCellMutationState.hpp"
-#include "ApcOneHitCellMutationState.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-#include "DefaultCellProliferativeType.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
 
 /**
  * An abstract facade class encapsulating a cell population.
@@ -233,6 +225,48 @@ public:
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
     /**
+     * @return a shared to a tetrahedral mesh, for use with a PDE modifier.
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier()=0;
+
+    /**
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+
+    /**
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0)=0;
+
+    /**
      * @return reference to mCells.
      */
     std::list<CellPtr>& rGetCells();
@@ -291,23 +325,37 @@ public:
     virtual bool IsCellAssociatedWithADeletedLocation(CellPtr pCell)=0;
 
     /**
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     *
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
      * Add a new cell to the cell population.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  a vector providing information regarding how the cell division should occur
-     *     (for cell-centre cell populations, this vector is the position of the daughter cell; for vertex cell populations it
-     *      can be used by any subclass of CellBasedSimulation to as a means of dictating the axis along which
-     *      the parent cell divides)
      * @param pParentCell pointer to a parent cell (if required)
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
-    virtual CellPtr AddCell(CellPtr pNewCell,
-                            const c_vector<double,SPACE_DIM>& rCellDivisionVector,
-                            CellPtr pParentCell=CellPtr())=0;
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr())=0;
+
+    /**
+     * @return a default value for the time step to use when simulating
+     * the cell population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * Note that the time step can be reset by calling SetDt() on the
+     * simulation object used to simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep()=0;
 
     class Iterator; // Forward declaration; see below
 
@@ -324,6 +372,9 @@ public:
     /**
      * Remove the Nodes (for cell-centre) or VertexElements (for cell-vertex) which
      * have been marked as deleted and update the correspondence with Cells.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      */
@@ -423,7 +474,7 @@ public:
      *
      * @return whether there is a cell attached.
      */
-    bool IsCellAttachedToLocationIndex(unsigned index);
+    virtual bool IsCellAttachedToLocationIndex(unsigned index);
 
     /**
      * Set the cell corresponding to a given location index.
@@ -567,24 +618,30 @@ public:
     virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Accept a cell population writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pPopulationWriter the population writer.
      */
     virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Accept a cell population count writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Accept a cell writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
@@ -607,6 +664,22 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile)=0;
+
+    /**
+     * Empty hook method to provide the ability to specify some additional property
+     * of a cell-based simulation object.
+     *
+     * This method is called immediately prior to calling SetupSolve() within the
+     * Solve() method in AbstractCellBasedSimulation.
+     *
+     * This method can be overridden, for example, to add a T2SwapCellKiller to the
+     * simulation object in the case of a VertexBasedCellPopulation. This functionality
+     * avoids the need for static or dynamic casts to specific cell population types
+     * within simulation methods.
+     *
+     * @param pSimulation pointer to a cell-based simulation object
+     */
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation);
 
     /**
      * @return mOutputResultsForChasteVisualizer

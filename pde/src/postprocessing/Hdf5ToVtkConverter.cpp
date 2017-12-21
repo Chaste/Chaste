@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
     if (parallelVtk)
     {
         // If it's not a distributed mesh, then we might want to give a warning and back-off
-        if (p_distributed_mesh == NULL)
+        if (p_distributed_mesh == nullptr)
         {
             WARNING("Can only write parallel VTK from a DistributedTetrahedralMesh - writing sequential VTK instead");
             parallelVtk = false;
@@ -159,17 +159,14 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
         ///\todo What if the mesh has been scaled, translated or rotated?
         // Note that the next line will throw if the mesh has not been read from file
         std::string original_file = this->mpMesh->GetMeshFileBaseName();
-        std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+        std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
             = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
         vtk_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
     }
 #endif //CHASTE_VTK
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToVtkConverter<1,1>;
 template class Hdf5ToVtkConverter<1,2>;
 template class Hdf5ToVtkConverter<2,2>;

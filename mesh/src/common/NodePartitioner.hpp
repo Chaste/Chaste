@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,22 +58,6 @@ public:
       */
      static void DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                   std::set<unsigned>& rNodesOwned);
-
-    /**
-     * Specialised method to compute a parallel partitioning of a given mesh
-     * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning
-     *
-     * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodePermutation is the vector to be filled with node permutation information.
-     * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
-     * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
-     *
-     */
-    static void MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                         std::vector<unsigned>& rNodePermutation,
-                                         std::set<unsigned>& rNodesOwned,
-                                         std::vector<unsigned>& rProcessorsOffset);
-
 
     /**
      * Method to compute a parallel partitioning of a given mesh.

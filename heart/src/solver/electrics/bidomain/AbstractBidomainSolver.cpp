@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,20 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
-    if (this->mpLinearSystem != NULL)
-    {
-        return;
-    }
+    // The base class method that calls this function will only call it with a null linear system
+    assert(this->mpLinearSystem == NULL);
 
     // linear system created here
-    AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>::InitialiseForSolve(initialSolution);
+    AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>::InitialiseForSolve(initialSolution);
 
     if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
     {
 #ifdef TRACE_KSP
         if (PetscTools::AmMaster())
         {
-            std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() <<"\n";
+            std::cout << "Using absolute tolerance: " << mpConfig->GetAbsoluteTolerance() << "\n";
         }
 #endif
         this->mpLinearSystem->SetAbsoluteTolerance(mpConfig->GetAbsoluteTolerance());
@@ -65,7 +63,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 #ifdef TRACE_KSP
         if (PetscTools::AmMaster())
         {
-            std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() <<"\n";
+            std::cout << "Using relative tolerance: " << mpConfig->GetRelativeTolerance() << "\n";
         }
 #endif
         this->mpLinearSystem->SetRelativeTolerance(mpConfig->GetRelativeTolerance());
@@ -73,36 +71,12 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 
     this->mpLinearSystem->SetKspType(HeartConfig::Instance()->GetKSPSolver());
 
-    /// \todo: block preconditioners only make sense in Bidomain... Add some warning/error message
-    if(std::string("twolevelsblockdiagonal") == std::string(HeartConfig::Instance()->GetKSPPreconditioner()))
-    {
-        /// \todo: #1082 only works if you know about the whole mesh.
-        TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = dynamic_cast<TetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(this->mpMesh);
-        if (p_mesh && PetscTools::IsSequential())
-        {
-            boost::shared_ptr<std::vector<PetscInt> > p_bath_nodes(new std::vector<PetscInt>());
+    // Note that twolevelblockdiagonal was never finished.  It was a preconditioner specific to the Parabolic-Parabolic formulation of Bidomain
+    // Two levels block diagonal only worked in serial with TetrahedralMesh.
+    assert(std::string(HeartConfig::Instance()->GetKSPPreconditioner()) != std::string("twolevelsblockdiagonal"));
+    this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
 
-            for(unsigned node_index=0; node_index<this->mpMesh->GetNumNodes(); node_index++)
-            {
-                if (HeartRegionCode::IsRegionBath( this->mpMesh->GetNode(node_index)->GetRegion() ))
-                {
-                    p_bath_nodes->push_back(node_index);
-                }
-            }
-
-            this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner(), p_bath_nodes);
-        }
-        else
-        {
-            TERMINATE("Two levels block diagonal only works with TetrahedralMesh and p=1");
-        }
-    }
-    else
-    {
-        this->mpLinearSystem->SetPcType(HeartConfig::Instance()->GetKSPPreconditioner());
-    }
-
-    if (mRowForAverageOfPhiZeroed==INT_MAX)
+    if (mRowForAverageOfPhiZeroed == INT_MAX)
     {
         // not applying average(phi)=0 constraint, so matrix is symmetric
         this->mpLinearSystem->SetMatrixIsSymmetric(true);
@@ -116,10 +90,10 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
         this->mpLinearSystem->SetMatrixIsSymmetric(false);
     }
 
-    this->mpLinearSystem->SetUseFixedNumberIterations(HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(), HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
+    this->mpLinearSystem->SetUseFixedNumberIterations(
+        HeartConfig::Instance()->GetUseFixedNumberIterationsLinearSolver(),
+        HeartConfig::Instance()->GetEvaluateNumItsEveryNSolves());
 }
-
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec existingSolution)
@@ -150,7 +124,6 @@ Vec AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() const
 
     return null_basis;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec existingSolution)
@@ -246,17 +219,16 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCondition(
     int mpi_ret = MPI_Allreduce(&local_sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
     assert(mpi_ret == MPI_SUCCESS);
 
-    if(fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
+    if (fabs(global_sum)>1e-6) // magic number! sum should really be a sum of zeros and exactly zero though anyway (or a-a+b-b+c-c.. etc in the case of electrodes)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         // shouldn't ever reach this line but useful to have the error printed out if you do
         //std::cout << "Sum of b_{2i+1} = " << global_sum << " (should be zero for compatibility)\n";
         EXCEPTION("Linear system does not satisfy compatibility constraint!");
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 #endif
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractBidomainSolver(
@@ -355,7 +327,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
      *  Explicitly checking it in non-production builds.
      */
 #ifndef NDEBUG
-    if(computeMatrix)
+    if (computeMatrix)
     {
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
              iter != this->mpMesh->GetNodeIteratorEnd();
@@ -401,13 +373,13 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
         {
             PetscInt index = 2*iter->GetIndex(); // assumes Vm and Phie are interleaved
 
-            if(computeMatrix)
+            if (computeMatrix)
             {
                 // put 1.0 on the diagonal
                 PetscMatTools::SetElement(this->mpLinearSystem->rGetLhsMatrix(), index, index, 1.0);
             }
 
-            if(computeVector)
+            if (computeVector)
             {
                 // zero rhs vector entry
                 PetscVecTools::SetElement(this->mpLinearSystem->rGetRhsVector(), index, 0.0);
@@ -416,10 +388,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
     }
 }
 
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class AbstractBidomainSolver<1,1>;
 template class AbstractBidomainSolver<2,2>;
 template class AbstractBidomainSolver<3,3>;

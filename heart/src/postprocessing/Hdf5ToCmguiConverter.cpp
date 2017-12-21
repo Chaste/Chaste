@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -178,7 +178,7 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
         ///\todo What if the mesh has been scaled, translated or rotated?
         // Note that the next line will throw if the mesh has not been read from file
         std::string original_file=this->mpMesh->GetMeshFileBaseName();
-        std::auto_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
+        std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > p_original_mesh_reader
             = GenericMeshReader<ELEMENT_DIM, SPACE_DIM>(original_file);
         cmgui_mesh_writer.WriteFilesUsingMeshReader(*p_original_mesh_reader);
     }
@@ -220,10 +220,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
     }
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToCmguiConverter<1,1>;
 template class Hdf5ToCmguiConverter<1,2>;
 template class Hdf5ToCmguiConverter<2,2>;

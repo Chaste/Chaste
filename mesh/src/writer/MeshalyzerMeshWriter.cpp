@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -190,8 +190,6 @@ MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::~MeshalyzerMeshWriter()
 {
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteMetaFile()
 {
@@ -340,7 +338,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
          ++iter)
     {
-        if ( this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
+        if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
             for (unsigned i=0; i<this->mNodesPerElement; i++)
             {
@@ -370,7 +368,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
              iter != this->mpDistributedMesh->GetBoundaryElementIteratorEnd();
              ++iter)
         {
-            if ( this->mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement((*iter)->GetIndex()))
+            if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement((*iter)->GetIndex()))
             {
                 for (unsigned i=0; i<ELEMENT_DIM; i++)
                 {
@@ -413,10 +411,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesFooter()
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MeshalyzerMeshWriter<1,1>;
 template class MeshalyzerMeshWriter<1,2>;
 template class MeshalyzerMeshWriter<1,3>;

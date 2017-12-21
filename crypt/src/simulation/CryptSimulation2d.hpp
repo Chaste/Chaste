@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,6 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "CryptSimulationBoundaryCondition.hpp"
+#include "CryptCentreBasedDivisionRule.hpp"
+#include "CryptVertexBasedDivisionRule.hpp"
 
 /**
  * A 2D crypt simulation object. For more details on the crypt geometry, see the
@@ -79,26 +81,6 @@ protected:
      * (if not, then we are assumed to be using a VertexBasedCellPopulation).
      */
     bool mUsingMeshBasedCellPopulation;
-
-    /**
-     * In the case of a MeshBasedCellPopulationWithGhostNodes, this method
-     * calculates the new locations of a dividing cell's cell centres. The
-     * node correspond to the dividing cell is moved a bit and the co-ordinates
-     * of the new node are returned. This is done by drawing a random
-     * direction (0->2PI) and placing the parent and daughter nodes in
-     * opposing directions along this axis.
-     *
-     * In the case of a VertexBasedCellPopulation, by default this method
-     * calls the AbstractVertexBasedDivisionRule. If the parent cell is a stem cell, then
-     * this method returns the vector (0,1). This is then used by the
-     * VertexBasedCellPopulation method AddCell() as the axis along which
-     * the cell divides.
-     *
-     * @param pParentCell the parent cell
-     *
-     * @return daughter_coords the coordinates for the daughter cell.
-     */
-    c_vector<double, 2> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
      * Overridden SetupSolve() method.

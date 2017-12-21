@@ -1,7 +1,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,10 +130,14 @@ class CellMLTranslator(object):
     ###########################
     # Various language tokens #
     ###########################
-    STMT_END = ';'        # End of statement
-    EQ_ASSIGN = ' = '     # Assignment operator
-    COMMENT_START = '// ' # Start of a 1 line comment
+    STMT_END = ';'                 # End of statement
+    EQ_ASSIGN = ' = '              # Assignment operator
+    COMMENT_START = '// '          # Start of a 1 line comment
     DOXYGEN_COMMENT_START = '//! ' # Start of a 1 line Doxygen comment
+    LOGICAL_AND = ' && '
+    LOGICAL_OR = ' || '
+    LOGICAL_TRUE = ' true '
+    ASSERT = 'EXCEPT_IF_NOT'       # Start of an assertion statement
 
     # Variable types
     TYPE_DOUBLE = 'double '
@@ -514,7 +518,9 @@ class CellMLTranslator(object):
                      self.v_index, ')')
         self.open_block()
         self.writeln('mpStimulus = stim;\n')
-        for var in self.state_vars:
+        
+        for i, var in enumerate(self.state_vars):
+            self.writeln('// Y[', str(i), ']:')
             self.writeln('mVariableNames.push_back("', var.name, '");')
             self.writeln('mVariableUnits.push_back("', var.units, '");')
             init_val = getattr(var, u'initial_value', None)
@@ -733,9 +739,18 @@ class CellMLTranslator(object):
         elif op.localName == u'diff':
             # ODE occuring on the RHS
             self.write(self.code_name(op.dependent_variable, ode=True))
+        elif op.localName == u'csymbol':
+            self.output_special(expr, paren)
         else:
             # Unrecognised operator
             self.error(["Unsupported operator element " + str(op.localName)], xml=expr)
+
+    def output_special(self, expr, paren):
+        """Output a special-case operation, represented by a csymbol element.
+        
+        This needs to be implemented by subclasses if supported.
+        """
+        self.error(["Special-case operators are not supported by this translator."], xml=expr)
 
     def output_function(self, func_name, args, paren, reciprocal=False):
         """Output a function call with name func_name and arguments args.
@@ -952,6 +967,11 @@ class CellMLTranslator(object):
         Generate a dictionary mapping tables to their index variables.
         """
         doc = self.doc
+        # Remove xml:base to work around Amara bug!
+        for elt in [doc, doc.model]:
+            if u'base' in getattr(elt, 'xml_attributes', {}):
+                print 'Delete base from', repr(elt)
+                del elt.xml_attributes[u'base']
         # Get list of suitable expressions
         doc.lookup_tables = doc.xml_xpath(u"//*[@lut:possible='yes']")
         doc.lookup_tables.sort(cmp=element_path_cmp)
@@ -1254,7 +1274,7 @@ class CellMLTranslator(object):
                     nodes_used.update(var_nodes)
                 self.output_table_index_checking(key, idx)
                 if self.config.options.check_lt_bounds:
-                    self.writeln('#define COVERAGE_IGNORE', indent=False)
+                    self.writeln('// LCOV_EXCL_START', indent=False)
                     self.writeln('if (_oob_', idx, ')')
                     if time_name is None:
                         dump_state_args = 'rY'
@@ -1262,7 +1282,7 @@ class CellMLTranslator(object):
                         dump_state_args = 'rY, ' + time_name
                     self.writeln('EXCEPTION(DumpState("', self.var_display_name(key[-1]),
                                  ' outside lookup table range", ', dump_state_args,'));', indent_offset=1)
-                    self.writeln('#undef COVERAGE_IGNORE', indent=False)
+                    self.writeln('// LCOV_EXCL_STOP', indent=False)
                 self.output_table_index_generation_code(key, idx)
         self.writeln()
         return nodes_used
@@ -1276,13 +1296,13 @@ class CellMLTranslator(object):
             self.writeln('bool _oob_', idx, self.EQ_ASSIGN, 'false', self.STMT_END)
             self.writeln('if (', varname, '>', max, ' || ', varname, '<', min, ')')
             self.open_block()
-            self.writeln('#define COVERAGE_IGNORE', indent=False)
+            self.writeln('// LCOV_EXCL_START', indent=False)
             if self.constrain_table_indices:
                 self.writeln('if (', varname, '>', max, ') ', varname, self.EQ_ASSIGN, max, self.STMT_END)
                 self.writeln('else ', varname, self.EQ_ASSIGN, min, self.STMT_END)
             else:
                 self.writeln('_oob_', idx, self.EQ_ASSIGN, 'true', self.STMT_END)
-            self.writeln('#undef COVERAGE_IGNORE', indent=False)
+            self.writeln('// LCOV_EXCL_STOP', indent=False)
             self.close_block(blank_line=False)
     
     def output_table_index_generation_code(self, key, idx):
@@ -1516,6 +1536,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_state_assignments(assign_rY=False, nodeset=nodeset)
             self.writeln()
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
+            table_index_nodes_used.update(self.output_data_table_lookups(nodeset - table_index_nodes_used))
             # Output equations
             self.output_comment('Mathematics')
             self.output_equations(nodeset - table_index_nodes_used)
@@ -1910,7 +1931,17 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.writeln('this->mVectorOutputNames[', i, ']', self.EQ_ASSIGN, '"', name, '"', self.STMT_END)
                 vector_outputs = cellml_metadata.find_variables(self.model, prop, name)
                 assert len(vector_outputs) > 0
-                vector_outputs.sort(key=lambda v: self.var_display_name(v))
+                if name == 'state_variable':
+                    # Special case to ensure the ordering as an output matches the state vector in the ODE system
+                    def get_state_index(v):
+                        """Find the index of the state variable corresponding to this variable, which may be units converted."""
+                        v = v.get_source_variable(recurse=True)
+                        if v.get_type() is VarTypes.Computed:
+                            v = v.get_dependencies()[0].get_dependencies()[0]
+                        return self.state_vars.index(v)
+                    vector_outputs.sort(key=get_state_index)
+                else:
+                    vector_outputs.sort(key=lambda v: self.var_display_name(v))
                 self.writeln('this->mVectorOutputsInfo[', i, '].resize(', len(vector_outputs), ');')
                 for j, output in enumerate(vector_outputs):
                     self.writeln('this->mVectorOutputsInfo[', i, '][', j, ']', self.EQ_ASSIGN,
@@ -1951,7 +1982,130 @@ class CellMLToChasteTranslator(CellMLTranslator):
     def output_extra_constructor_content(self):
         """Hook for subclasses to add further content to the constructor."""
         pass
-    
+
+    # Methods for interpolating on data files, used by Functional Curation
+
+    def output_data_tables(self):
+        """Output the data for interpolated lookups by output_special."""
+        if hasattr(self.model, '_cml_interp_exprs'):
+            # We do have data tables, but PE may have moved them, so rescan the whole model just in case!
+            # This also ensures that self.model._cml_interp_exprs lists expressions in the order in which they (may) need to
+            # be evaluated, in case one table uses the value looked up from another.
+            self.model._cml_interp_exprs[:] = []
+            def find_tables(expr):
+                if hasattr(expr, '_cml_interp_data'):
+                    self.model._cml_interp_exprs.append(expr)
+                for elt in expr.xml_element_children():
+                    find_tables(elt)
+            for expr in self.model.get_assignments():
+                if isinstance(expr, mathml_apply):
+                    find_tables(expr)
+        for i, expr in enumerate(getattr(self.model, '_cml_interp_exprs', [])):
+            name = expr._cml_interp_table_name = '_data_table_' + str(i)
+            data = expr._cml_interp_data
+            self.output_array_definition(name, data[1])
+            # Set variable names for use in other data-table methods
+            expr._cml_interp_table_index = '_data_table_index_' + str(i)
+            expr._cml_interp_table_factor = '_data_table_factor_' + str(i)
+            # Calculate and cache the inverse of the table step
+            expr._cml_interp_step_inverse = "%.17g" % (1.0 / (data[0,1] - data[0,0]))
+
+    def output_data_table_lookups(self, nodeset):
+        """Output the index and factor generation code for any data tables used in the given nodeset.
+        
+        We may also use the equations within nodeset to calculate the value(s) of the independent variable(s),
+        and return a set containing just those nodes so used, so we can avoid recalculating them later.
+        """
+        nodes_used = set()
+        for expr in getattr(self.model, '_cml_interp_exprs', []):
+            top_expr = expr
+            piecewises = []
+            while not (isinstance(top_expr, mathml_apply) and top_expr.is_top_level()):
+                if isinstance(top_expr.xml_parent, mathml_piecewise):
+                    piecewises.append((top_expr.xml_parent, top_expr))
+                top_expr = top_expr.xml_parent
+            if top_expr in nodeset:
+                # Code to calculate the independent variable (it may have a units conversion for instance)
+                indep_expr = expr.operands().next()
+                vars_used = self._vars_in(indep_expr)
+                for piecewise, child in piecewises:
+                    # We may also need to calculate variables used in the bounds check below
+                    for piece in getattr(piecewise, u'piece', []):
+                        vars_used.update(self._vars_in(child_i(piece, 2)))
+                indep_nodes_used = self.calculate_extended_dependencies(vars_used, prune=nodes_used)
+                self.output_equations(indep_nodes_used)
+                nodes_used.update(indep_nodes_used)
+                indep_var = expr._cml_interp_table_index + '_raw'
+                self.writeln(self.TYPE_CONST_DOUBLE, indep_var, self.EQ_ASSIGN, nl=False)
+                self.output_expr(indep_expr, paren=False)
+                self.writeln(self.STMT_END, indent=False)
+                # Code to check we're within the table bounds.
+                # We need to take account of any piecewise expressions we are within.
+                data = expr._cml_interp_data
+                def process_piecewise(piecewises):
+                    if len(piecewises) == 0:
+                        # Base case
+                        self.write('(%s >= %.17g' % (indep_var, data[0,0]), self.LOGICAL_AND,
+                                   '%s <= %.17g)' % (indep_var, data[0,-1]))
+                    else:
+                        piecewise, piece_or_otherwise = piecewises.pop()
+                        needs_operator = False
+                        for piece in getattr(piecewise, u'piece', []):
+                            if needs_operator:
+                                self.write(self.LOGICAL_OR)
+                            if piece is piece_or_otherwise:
+                                # This is the branch that the interpolate occurs in
+                                self.write('(')
+                                self.output_expr(child_i(piece, 2), paren=True)
+                                self.write(self.LOGICAL_AND)
+                                process_piecewise(piecewises)
+                                self.write(')')
+                            else:
+                                self.output_expr(child_i(piece, 2), paren=True)
+                            needs_operator = True
+                        if hasattr(piecewise, u'otherwise'):
+                            if needs_operator:
+                                self.write(self.LOGICAL_OR)
+                            if piecewise.otherwise is piece_or_otherwise:
+                                process_piecewise(piecewises)
+                            else:
+                                self.write(self.LOGICAL_TRUE) # TODO: Think about this some more!
+                self.writeln(self.ASSERT, '(', nl=False)
+                process_piecewise(piecewises)
+                self.writeln(')', self.STMT_END)
+                # Output the index & factor generation code
+                offset_over_step = "(%s - %.17g)*%s" % (indep_var, data[0,0], expr._cml_interp_step_inverse)
+                self.writeln(self.TYPE_CONST_UNSIGNED, expr._cml_interp_table_index, self.EQ_ASSIGN,
+                             self.fast_floor(offset_over_step), self.STMT_END)
+                self.writeln(self.TYPE_CONST_DOUBLE, expr._cml_interp_table_factor, self.EQ_ASSIGN,
+                             offset_over_step, ' - ', expr._cml_interp_table_index, self.STMT_END)
+        return nodes_used
+
+    def output_special(self, expr, paren):
+        """Output a special-case operation, represented by a csymbol element.
+        
+        The only operation currently supported is a table lookup on hardcoded data.
+        """
+        assert expr.operator().definitionURL == u'https://chaste.cs.ox.ac.uk/nss/protocol/interp'
+        self.open_paren(paren)
+        self.write(expr._cml_interp_table_name, '[', expr._cml_interp_table_index, '] + ',
+                   expr._cml_interp_table_factor, ' * (',
+                   expr._cml_interp_table_name, '[1+'+expr._cml_interp_table_index, ']-',
+                   expr._cml_interp_table_name, '[',expr._cml_interp_table_index, '])')
+        self.close_paren(paren)
+
+    # The following three will need overriding in non-C++ translators
+
+    def output_array_definition(self, array_name, array_data):
+        """Output code to create and fill a fixed-size 1d array."""
+        self.writeln('const static double ', array_name, '[] = {', ', '.join(map(lambda f: "%.17g" % f, array_data)), '};')
+
+    def fast_floor(self, arg):
+        """Return code to compute the floor of an argument as an integer quickly, typically by casting."""
+        return "(unsigned)(%s)" % arg
+
+    # Normal lookup table methods
+
     def output_chaste_lut_methods(self):
         """
         Output lookup table declarations & methods, if not using a separate class,
@@ -2012,13 +2166,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.close_block()
             # And check the indexes
             if self.config.options.check_lt_bounds:
-                self.writeln('#define COVERAGE_IGNORE', indent=False)
+                self.writeln('// LCOV_EXCL_START', indent=False)
                 self.writeln('bool CheckIndex', idx, '(double& ', varname, ')')
                 self.open_block()
                 self.output_table_index_checking(key, idx, call_method=False)
                 self.writeln('return _oob_', idx, self.STMT_END)
                 self.close_block(blank_line=False)
-                self.writeln('#undef COVERAGE_IGNORE\n', indent=False)
+                self.writeln('// LCOV_EXCL_STOP\n', indent=False)
     
     def output_table_index_checking(self, key, idx, call_method=True):
         """Override base class method to call the methods on the lookup table class if needed."""
@@ -2132,7 +2286,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Private data
         self.writeln('private:', indent_level=0)
         self.writeln('/** The single instance of the class */')
-        self.writeln('static std::auto_ptr<', self.lt_class_name, '> mpInstance;\n')
+        self.writeln('static std::shared_ptr<', self.lt_class_name, '> mpInstance;\n')
         if self.row_lookup_method:
             self.output_lut_row_lookup_memory()
         self.output_lut_declarations()
@@ -2140,7 +2294,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.set_indent(0)
         self.writeln('};\n')
         # Define the instance pointer
-        self.writeln('std::auto_ptr<', self.lt_class_name, '> ', self.lt_class_name, '::mpInstance;')
+        self.writeln('std::shared_ptr<', self.lt_class_name, '> ', self.lt_class_name, '::mpInstance;')
         self.writeln()
         return
 
@@ -2509,6 +2663,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.output_state_assignments(assign_rY=assign_rY, nodeset=all_nodes)
         self.writeln()
         table_index_nodes_used = self.calculate_lookup_table_indices(all_nodes|extra_table_nodes, self.code_name(self.free_vars[0]))
+        table_index_nodes_used.update(self.output_data_table_lookups(all_nodes - table_index_nodes_used))
         self.output_comment('Mathematics')
         #907: Declare dV/dt
         if dvdt:
@@ -3128,7 +3283,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         def output_var(vector, var):
             self.writeln('this->m', vector, 'Names.push_back("', self.var_display_name(var), '");')
             self.writeln('this->m', vector, 'Units.push_back("', var.units, '");')
-        for var in self.state_vars:
+        for i, var in enumerate(self.state_vars):
+            self.output_comment('rY[', str(i) ,']:')
             output_var('Variable', var)
             init_val = getattr(var, u'initial_value', None)
             if init_val is None:
@@ -3140,12 +3296,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('this->mInitialConditions.push_back(', init_val, ');',
                        init_comm, '\n')
         # Model parameters
-        for var in self.cell_parameters:
+        for i,var in enumerate(self.cell_parameters):
             if var.get_type() == VarTypes.Constant:
+                self.output_comment('mParameters[', str(i), ']:')
                 output_var('Parameter', var)
                 self.writeln()
         # Derived quantities
-        for var in self.derived_quantities:
+        for i,var in enumerate(self.derived_quantities):
+            self.output_comment('Derived Quantity index [', str(i), ']:')
             output_var('DerivedQuantity', var)
             self.writeln()
         self.output_model_attributes()
@@ -3500,6 +3658,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # Separate class for lookup tables?
         if self.use_lookup_tables and self.separate_lut_class:
             self.output_lut_class()
+        self.output_data_tables()
         # Start cell model class
         self.writeln_hpp('class ', self.class_name, self.class_inheritance)
         self.open_block(subsidiary=True)
@@ -4590,6 +4749,10 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     STMT_END = ''
     COMMENT_START = '# '
     DOXYGEN_COMMENT_START = '## '
+    LOGICAL_AND = ' and '
+    LOGICAL_OR = ' or '
+    LOGICAL_TRUE = ' True '
+    ASSERT = 'assert '
     TYPE_DOUBLE = ''
     TYPE_CONST_DOUBLE = ''
     TYPE_VOID = ''
@@ -4607,7 +4770,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     binary_ops.update({'rem': '%'})
     nary_ops = CellMLToChasteTranslator.nary_ops.copy()
     nary_ops.update({'and': 'and', 'or': 'or'})
-    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log', 'exp': 'math.exp',
+    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log10', 'exp': 'math.exp',
                     'floor': 'math.floor', 'ceiling': 'math.ceil',
                     'factorial': 'factorial', # Needs external definition
                     'not': 'not',
@@ -4710,7 +4873,17 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         for name in vector_names:
             vector_outputs = cellml_metadata.find_variables(self.model, prop, name)
             assert len(vector_outputs) > 0
-            vector_outputs.sort(key=lambda v: self.var_display_name(v))
+            if name == 'state_variable':
+                # Special case to ensure the ordering as an output matches the state vector in the ODE system
+                def get_state_index(v):
+                    """Find the index of the state variable corresponding to this variable, which may be units converted."""
+                    v = v.get_source_variable(recurse=True)
+                    if v.get_type() is VarTypes.Computed:
+                        v = v.get_dependencies()[0].get_dependencies()[0]
+                    return self.state_vars.index(v)
+                vector_outputs.sort(key=get_state_index)
+            else:
+                vector_outputs.sort(key=lambda v: self.var_display_name(v))
             self._vector_outputs[name] = vector_outputs
         # Find model parameters that can be set from the protocol
         self.cell_parameters = filter(
@@ -4889,8 +5062,9 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         # Do the calculations
         self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.free_vars[0]), self.EQ_ASSIGN, 'self.freeVariable')
         self.output_state_assignments(nodeset, 'self.state')
+        nodes_used = self.output_data_table_lookups(nodeset)
         self.output_comment('Mathematics computing outputs of interest')
-        self.output_equations(nodeset)
+        self.output_equations(nodeset - nodes_used)
         self.writeln()
         # Put the results in a list to be returned to the caller
         self.writeln('outputs = self._outputs')
@@ -4975,6 +5149,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('cimport fc.sundials.sundials as Sundials')
         self.writeln('from fc.utility.error_handling import ProtocolError')
         self.writeln()
+        self.output_data_tables()
 
     def output_bottom_boilerplate(self):
         """Output file content occurring after the model equations, i.e. the model class."""
@@ -5074,7 +5249,9 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.open_block()
         self.writeln('cdef np.ndarray[Sundials.realtype, ndim=1] parameters = self.parameters')
         self.param_vector_name = 'parameters'
+        self.TYPE_CONST_UNSIGNED = 'cdef unsigned '
         self.output_get_outputs_content()
+        del self.TYPE_CONST_UNSIGNED
         self.param_vector_name = 'self.parameters'
         self.close_block()
     
@@ -5098,15 +5275,28 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
             if var in nodeset:
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var), ' = (<Sundials.N_VectorContent_Serial>y.content).data[', i, ']')
         self.writeln()
+        self.TYPE_CONST_UNSIGNED = 'cdef unsigned '
+        nodes_used = self.output_data_table_lookups(nodeset)
+        del self.TYPE_CONST_UNSIGNED
+        self.writeln()
         self.output_comment('Mathematics')
-        self.output_equations(nodeset)
+        self.output_equations(nodeset - nodes_used)
         self.writeln()
         # Assign to derivatives vector
         for i, var in enumerate(self.state_vars):
             self.writeln('(<Sundials.N_VectorContent_Serial>ydot.content).data[', i, '] = ', self.code_name(var, True))
         self.param_vector_name = 'self.parameters'
         self.close_block()
-        
+
+    def output_array_definition(self, array_name, array_data):
+        """Output code to create and fill a fixed-size 1d array."""
+        self.writeln('cdef Sundials.realtype[', len(array_data), ']', array_name)
+        self.writeln(array_name, '[:] = [', ', '.join(map(lambda f: "%.17g" % f, array_data)), ']')
+
+    def fast_floor(self, arg):
+        """Return code to compute the floor of an argument as an integer quickly, typically by casting."""
+        return "int(%s)" % arg
+
     def write_setup_py(self):
         """Write our subsidiary setup.py file for building the extension."""
         self.out2.write("""
@@ -6076,6 +6266,9 @@ class ConfigurationStore(object):
         # Find the stimulus current, if it exists for this kind of model (some are self-excitatory)
         if not self.doc.model.is_self_excitatory():
             self.i_stim_var = self._find_var('membrane_stimulus_current', self.i_stim_definitions)
+            if self.i_stim_var.get_type() == VarTypes.Mapped:
+                print >>sys.stderr, "Mapped variable specified as stimulus; using its source instead."
+                self.i_stim_var = self.i_stim_var.get_source_variable(recurse=True)
             DEBUG('config', 'Found stimulus', self.i_stim_var)
             if not self.i_stim_var:
                 # No match :(

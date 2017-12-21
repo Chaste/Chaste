@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,23 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Box.hpp"
 
-/////////////////////////////////////////////////////////////////////////////
-// Box methods
-/////////////////////////////////////////////////////////////////////////////
-
-
-template<unsigned DIM>
-Box<DIM>::Box(c_vector<double, 2*DIM>& rMinAndMaxValues)
-{
-    mMinAndMaxValues = rMinAndMaxValues;
-}
-
-template<unsigned DIM>
-c_vector<double, 2*DIM>& Box<DIM>::rGetMinAndMaxValues()
-{
-    return mMinAndMaxValues;
-}
-
 template<unsigned DIM>
 void Box<DIM>::AddNode(Node<DIM>* pNode)
 {
@@ -81,15 +64,15 @@ void Box<DIM>::AddElement(Element<DIM,DIM>* pElement)
     mElementsContained.insert(pElement);
 }
 
+///\todo #2308 there are no methods to remove or clear elements
+
 template<unsigned DIM>
 std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
 {
     return mElementsContained;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class Box<1>;
 template class Box<2>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -140,21 +140,21 @@ public:
             // avoid infinite loops
             if (counter > 15)
             {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
                 EXCEPTION("Newton method diverged in CardiacNewtonSolver::Solve()");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             }
         }
         while (norm_of_update > eps);
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 #ifndef NDEBUG
         if (norm_of_residual > 2e-10)
         { //This line is for correlation - in case we use norm_of_residual as convergence criterion
             WARN_ONCE_ONLY("Newton iteration terminated because update vector norm is small, but residual norm is not small.");
         }
 #endif // NDEBUG
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
 protected:

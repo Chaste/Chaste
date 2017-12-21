@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "VolumeTrackingModifier.hpp"
 #include "ContactInhibitionCellCycleModel.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
@@ -380,7 +380,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),8u);
     }
 
-    void TestVolumeTrackedOffLatticeSimulationArchiving() throw (Exception)
+    void TestVolumeTrackedOffLatticeSimulationArchiving()
     {
         EXIT_IF_PARALLEL;
 

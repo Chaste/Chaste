@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPapillaryFibreCalculatorLong : public CxxTest::TestSuite
 {
 public:
-    void TestGetFibreOrientationsOnCylinder(void) throw(Exception)
+    void TestGetFibreOrientationsOnCylinder(void)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cylinder_14748_elem");
         TetrahedralMesh<3,3> mesh;
@@ -58,7 +58,7 @@ public:
         PapillaryFibreCalculator calculator(mesh);
         std::vector<c_vector<double,3> > fibre_orientations = calculator.CalculateFibreOrientations();
 
-        for(unsigned i=0; i<fibre_orientations.size(); i++)
+        for (unsigned i=0; i<fibre_orientations.size(); i++)
         {
             TS_ASSERT_DELTA(fibre_orientations[i](0), 0.0, 0.02);
             TS_ASSERT_DELTA(fibre_orientations[i](1), 0.0, 0.02);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,6 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "WntCellCycleModel.hpp"
 
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+
 WntCellCycleModel::WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractWntOdeBasedCellCycleModel(pOdeSolver)
 {
@@ -55,52 +58,42 @@ WntCellCycleModel::WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOde
 WntCellCycleModel::~WntCellCycleModel()
 {}
 
+WntCellCycleModel::WntCellCycleModel(const WntCellCycleModel& rModel)
+   : AbstractWntOdeBasedCellCycleModel(rModel)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     * Create the new cell-cycle model's ODE system and use the current
+     * values of the state variables in mpOdeSystem as an initial condition.
+     *
+     * The member variables mDivideTime and mG2PhaseStartTime are
+     * initialized in the AbstractOdeBasedPhaseBasedCellCycleModel
+     * constructor.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
+    assert(rModel.GetOdeSystem());
+    double wnt_level = rModel.GetWntLevel();
+    SetOdeSystem(new WntCellCycleOdeSystem(wnt_level, rModel.mpCell->GetMutationState()));
+    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+}
+
 AbstractCellCycleModel* WntCellCycleModel::CreateCellCycleModel()
 {
     // Create a new cell-cycle model
-    WntCellCycleModel* p_model = new WntCellCycleModel(mpOdeSolver);
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mDt, mpOdeSolver)
-     * will already have been correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetDivideTime(mDivideTime);
-    p_model->SetFinishedRunningOdes(mFinishedRunningOdes);
-    p_model->SetG2PhaseStartTime(mG2PhaseStartTime);
-    p_model->SetLastTime(mLastTime);
-
-    /*
-     * Create the new cell-cycle model's ODE system and use the current values
-     * of the state variables in mpOdeSystem as an initial condition.
-     */
-    assert(mpOdeSystem);
-    double wnt_level = GetWntLevel();
-    p_model->SetOdeSystem(new WntCellCycleOdeSystem(wnt_level, mpCell->GetMutationState()));
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
-
-    return p_model;
+    return new WntCellCycleModel(*this);
 }
 
 void WntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     double beta_catenin_level = mpOdeSystem->rGetStateVariables()[6] + mpOdeSystem->rGetStateVariables()[7];
 
@@ -130,8 +123,8 @@ void WntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel(
 
 void WntCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
     double wnt_level = GetWntLevel();
 
     mpOdeSystem = new WntCellCycleOdeSystem(wnt_level, mpCell->GetMutationState());
@@ -153,9 +146,7 @@ void WntCellCycleModel::AdjustOdeParameters(double currentTime)
 
 void WntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractWntOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

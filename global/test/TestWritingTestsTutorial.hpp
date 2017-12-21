@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,10 +83,10 @@ public:
     }
 /*
  * This second test shows some of the other {{{TS_ASSERT}}} macros that are available.
- * The {{{throw (Exception)}} part of the signature is there to make sure that full details of any
+ * The {{{}} part of the signature is there to make sure that full details of any
  * uncaught exceptions are reported.
  */
-    void TestSomeOtherStuff() throw (Exception)
+    void TestSomeOtherStuff()
     {
         TS_ASSERT(1==1); // however, it is better to use TS_ASSERT_EQUALS, below
         TS_ASSERT_EQUALS((true||false), true);
@@ -116,12 +116,19 @@ public:
 };
 /*
  *
- * To run this code, copy it into a file (`TestWritingTests.hpp`, say, in the directory `global/test/`),
- * and run, either by running
+ * To run this code, first copy it into a file, say, called `TestWritingTests.hpp` in the directory `global/test/`.
+ * Second, add the full name of your new file to the relevant continuous test pack, say `[path/to/Chaste]/global/test/ContinuousTestPack.txt`.
+ * Third, from the command line, run
 {{{
 #!sh
-scons global/test/TestWritingTests.hpp
+cd [path/to/ChasteBuild]
+ccmake [path/to/Chaste]
 }}}
- * from the command line, or by creating a new "Make Target" in Eclipse using the above command.
+ * Then press `c` to configure, `e` to exit, and `g` to generate. Finally, run
+{{{
+#!sh
+make global
+ctest -V -R TestWritingTests
+}}}
  */
 #endif /*TESTWRITINGTESTTUTORIAL_HPP_*/

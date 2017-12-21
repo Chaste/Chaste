@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -194,13 +194,6 @@ public:
     void Reset();
 
     /**
-     * Deletes the vtkUnstructuredGrid and vtkGeometryFilter in preparation for deletion of the mesh reader (should)
-     * not be called if the vtkUnstructuredGrid is still required elsewhere, e.g. in an AdaptiveTetrahedralMesh or an
-     * AdaptiveBidomainProblem.
-     */
-    void Initialize();
-
-    /**
      * @return a vector of the coordinates of each node in turn
      */
     std::vector<double> GetNextNode();
@@ -259,7 +252,6 @@ public:
      * @return a pointer to #mpVtkUnstructuredGrid
      */
     vtkUnstructuredGrid* OutputMeshAsVtkUnstructuredGrid();
-
 };
 
 #endif/*CHASTE_VTK*/

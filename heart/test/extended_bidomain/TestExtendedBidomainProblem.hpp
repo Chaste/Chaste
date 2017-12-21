@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,8 +59,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 
-
-
 class ICC_Cell_factory : public AbstractCardiacCellFactory<1>
 {
 public:
@@ -110,7 +108,7 @@ class TestExtendedBidomainProblem: public CxxTest::TestSuite
 
 public:
 
-    void SetupParameters() throw (Exception)
+    void SetupParameters()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(5.0));
@@ -129,7 +127,7 @@ public:
      *
      * All the parameters are chosen to replicate the same conditions as in his code.
      */
-    void TestExtendedProblemVsMartincCode() throw (Exception)
+    void TestExtendedProblemVsMartincCode()
     {
         SetupParameters();
 
@@ -199,7 +197,7 @@ public:
     }
 
     // Test the functionality for outputting the values of requested cell state variables
-    void TestExtendedBidomainProblemPrintsMultipleVariables() throw (Exception)
+    void TestExtendedBidomainProblemPrintsMultipleVariables()
     {
         // Get the singleton in a clean state
         HeartConfig::Instance()->Reset();

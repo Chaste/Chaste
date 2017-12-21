@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,10 +59,23 @@ public:
     /**
      * Creates a remeshed version of the underlying mesh.
      *
+     * This version attempts to balance the mesh in such a way as to minimise the
+     * condition number matrices resulting from Poiseuille based network flow problems.
+     *
      * @param rOutputMesh The mesh object to be written to.
      * @param maximumResistance The maximum allowed resistance of an element
      */
     void Remesh(MutableMesh<1,3>& rOutputMesh, double maximumResistance);
+
+    /**
+     * Creates a remeshed version of the underlying mesh.
+     *
+     * This version simply removes all intermediate, non bifurcation, nodes.
+     *
+     * @param rOutputMesh The mesh object to be written to.
+     * @param maximumResistance The maximum allowed resistance of an element
+     */
+    void Remesh(MutableMesh<1,3>& rOutputMesh);
 
 private:
     /**
@@ -85,4 +98,5 @@ private:
      */
     AirwayPropertiesCalculator mCalculator;
 };
+
 #endif //  AIRWAY_REMESHER_HPP_

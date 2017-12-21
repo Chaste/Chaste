@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "AirwayTreeWalker.hpp"
 #include "AirwayPropertiesCalculator.hpp"
-//#include "Debug.hpp"
 
 AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
@@ -46,6 +45,7 @@ AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshD
       mDensity(1.15),
       mLengthScaling(1.0),
       mDynamicResistance(false),
+      mPerGenerationDynamicResistance(false),
       mRadiusOnEdge(false),
       mNodesInGraphOrder(true)
 {
@@ -90,7 +90,7 @@ AbstractVentilationProblem::Initialise()
         assert( iter->rGetElementAttributes()[SEGMENT_LENGTH] == length);
 
         // Check for intermediate nodes
-        if ( walker.GetChildElementIndices(&*iter).size() == 1u)
+        if (walker.GetChildElementIndices(&*iter).size() == 1u)
         {
             intermediate_nodes = true;
         }
@@ -103,7 +103,7 @@ AbstractVentilationProblem::Initialise()
         for (std::vector<AirwayBranch*>::iterator branch_it=branches.begin(); branch_it != branches.end(); branch_it++)
         {
             std::list<Element<1,3>* > branch_elements = (*branch_it)->GetElements();
-            if ( branch_elements.size() > 1u)
+            if (branch_elements.size() > 1u)
             {
                 double branch_length = (*branch_it)->GetLength();
 
@@ -159,7 +159,7 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
     length *= mLengthScaling;
 
     double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-    if ( usePedley )
+    if (usePedley)
     {
         /* Pedley et al. 1970
          * http://dx.doi.org/10.1016/0034-5687(70)90094-0
@@ -180,10 +180,18 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
          *
          * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
          */
-        double segment_length = rElement.rGetElementAttributes()[SEGMENT_LENGTH] * mLengthScaling;
+        std::vector<double>& r_attributes = rElement.rGetElementAttributes();
+        double segment_length = r_attributes [SEGMENT_LENGTH] * mLengthScaling;
         double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
-        double c = 1.85;
-        double z = (c/4.0) * sqrt(reynolds_number * radius / segment_length);
+        double pedley_c = 1.85;
+        if (mPerGenerationDynamicResistance)
+        {
+            pedley_c = r_attributes[PEDLEY_CORRECTION];
+        }
+        // assert(mDynamicResistance);
+
+        double z = (pedley_c/4.0) * sqrt(reynolds_number * radius / segment_length);
+
         // Pedley's method will only increase the resistance
         if (z > 1.0)
         {
@@ -338,3 +346,44 @@ void AbstractVentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
     rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
 }
 #endif // CHASTE_VTK
+
+
+void AbstractVentilationProblem::SetPerGenerationDynamicResistance()
+{
+    mDynamicResistance = true;
+    mPerGenerationDynamicResistance = true;
+
+    AirwayTreeWalker walker(mMesh, mOutletNodeIndex);
+    /*
+     * According to van Ertbruggen 2005 DOI: 10.1152/japplphysiol.00795.2004 equation 3,
+     * Pedley's original correction used a value
+     * gamma =  0.327
+     * which is equivalent to C/(4*sqrt(2)) = 1.85/(4*sqrt(2)) in Pedley's notation.
+     * van Ertbruggen's generational-based gamma's vary between 0.162 and 0.566 (Fig. 8B).
+     * Ismail et al. 2013 DOI: 10.1002/cnm.2577 table 2 tabulates:
+     * Generation: 0     1     2     3     4     5     6     7     >7
+     * Gamma:      0.162 0.239 0.244 0.295 0.175 0.303 0.356 0.566 0.327
+     */
+    double per_generation_pedley[9] =
+            {0.162, 0.239, 0.244, 0.295, 0.175, 0.303, 0.356, 0.566, 0.327};
+
+    // Convert from gamma to C
+    for (unsigned i=0; i<9; i++)
+    {
+        per_generation_pedley[i] *= 4.0*sqrt(2.0);
+    }
+    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+         iter != mMesh.GetElementIteratorEnd();
+         ++iter)
+    {
+        unsigned gen = walker.GetElementGeneration((*iter).GetIndex());
+        // Add an attribute for Pedley and check it's in the correct place
+        double pedley_c = per_generation_pedley[8]; // Lowest possible by default for deep branches
+        if (gen < 8)
+        {
+            pedley_c = per_generation_pedley[gen];
+        }
+        iter->AddElementAttribute(pedley_c);
+        assert( iter->rGetElementAttributes()[PEDLEY_CORRECTION] == pedley_c);
+    }
+}

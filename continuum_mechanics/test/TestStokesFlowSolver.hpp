@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,7 +60,7 @@ public:
      * Dirichlet BC applied on three sides, zero-stress on the other (so pressure is fully defined)
      * Just two elements.
      */
-    void TestStokesExactSolutionSimple() throw(Exception)
+    void TestStokesExactSolutionSimple()
     {
         for (unsigned run=0; run<2; run++)
         {
@@ -100,7 +100,7 @@ public:
 
             StokesFlowSolver<2> solver(mesh, problem_defn, "SimpleStokesFlow");
 
-            if(run==1)
+            if (run==1)
             {
                 // see comment above TS_ASSERTs, below
                 solver.SetKspAbsoluteTolerance(1e-12);
@@ -137,7 +137,7 @@ public:
     // For this flow: sigma = mu(grad u + (grad u)^T) - pI = mu*0 - pI = -pI
     // Again, exact solution is in FEM space so would work, up to
     // linear solve tolerance, with 1 element
-    void TestStokesExactSolutionLessSimple() throw(Exception)
+    void TestStokesExactSolutionLessSimple()
     {
         // Set up a mesh on [0 1]x[0 1]
         unsigned num_elem = 3;
@@ -202,7 +202,7 @@ public:
      * Solution is u = [y(1-y), 0], p = 2(1-x) + const
      * Dirichlet BC applied on all four sides
      */
-    void TestStokesWithImposedPipeCondition() throw(Exception)
+    void TestStokesWithImposedPipeCondition()
     {
         // Note: we could have num_elem=1 and test still pass, as FE solution is the same as the true
         // solution (analytic soln is in the FE space, ignoring linear solve errors.
@@ -295,7 +295,7 @@ public:
     // For this flow: sigma = mu(grad u + (grad u)^T) - pI = mu*0 - pI = -pI
     // Again, exact solution is in FEM space so would work, up to
     // linear solve tolerance, with 1 element
-    void TestStokesExactSolutionNonzeroNeumann() throw(Exception)
+    void TestStokesExactSolutionNonzeroNeumann()
     {
         // Set up a mesh on [0 1]x[0 1]
         unsigned num_elem = 3;
@@ -385,14 +385,11 @@ public:
         }
     }
 
-
-
-
     /*
      * Solution is u = [20xy^3, 5x^4-5y^4], p = 60x^2y-20y^3+const.
      * Dirichlet BC applied on all 4 sides so pressure is not fully defined.
      */
-    void TestConvergenceWithAnalyticSolution() throw(Exception)
+    void TestConvergenceWithAnalyticSolution()
     {
         unsigned num_runs = 4;
         std::vector<double> L_inf_error_flow(num_runs, -1.0);
@@ -400,7 +397,7 @@ public:
         std::vector<unsigned> num_elem(num_runs);
 
         // set up a mesh on [-1 1]x[-1 1]
-        for(unsigned run=0; run<num_runs; run++)
+        for (unsigned run=0; run<num_runs; run++)
         {
             num_elem[run] = SmallPow(2u, run+1u);
             QuadraticMesh<2> mesh(2.0/num_elem[run], 2.0, 2.0);
@@ -482,7 +479,7 @@ public:
         }
 
         std::cout << "Num_elements Linf_error_flow Linf_error_p\n";
-        for(unsigned i=0; i<num_runs; i++)
+        for (unsigned i=0; i<num_runs; i++)
         {
             std::cout << num_elem[i] << " " << L_inf_error_flow[i] << " " << L_inf_error_p[i] << "\n";
         }
@@ -500,7 +497,7 @@ public:
         double res_flow[5] = { 1.51032, 0.250461, 0.0368664, 0.00464591, 0.000625753 };
         double res_p[5] = { 14.3527, 5.12699, 1.95504, 0.576949, 0.155241};
         assert(num_runs <= 5);
-        for(unsigned i=0; i<num_runs; i++)
+        for (unsigned i=0; i<num_runs; i++)
         {
             TS_ASSERT_DELTA( L_inf_error_flow[i], res_flow[i], 1e-3);
             TS_ASSERT_DELTA( L_inf_error_p[i], res_p[i], 1e-3);
@@ -511,7 +508,7 @@ public:
     // Using this top to compare with independently written code.
     // Alternatively, could use u=1-x^4 on the top (with geometry [-1,1]^2)
     // and compare with plots in Andy Wathen's fluids FEM book
-    void TestStokesWithLidDrivenCavity() throw(Exception)
+    void TestStokesWithLidDrivenCavity()
     {
         unsigned num_elem = 5;
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -575,7 +572,7 @@ public:
         std::vector<c_vector<double,2> >& r_flow = solver.rGetVelocities();
         std::vector<double>& r_pressures = solver.rGetPressures();
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             min_u = std::min(min_u, r_flow[i](0));
             max_u = std::max(max_u, r_flow[i](0));
@@ -601,11 +598,11 @@ public:
         TS_ASSERT_DELTA(max_v,  0.075, 5e-3);
 
         // find a node in the interior for which u and v both not small
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
-            if(fabs(x-0.3)<1e-6 && fabs(y-0.6)<1e-6)
+            if (fabs(x-0.3)<1e-6 && fabs(y-0.6)<1e-6)
             {
                 //at this node raf's solver returns (-0.033649 0.04652)
                 TS_ASSERT_DELTA(r_flow[i](0), -0.035, 1e-3);
@@ -619,7 +616,7 @@ public:
 
 
     // solve problem for which solution is u=(x,y,-2z), p=const.
-    void TestStokesSimple3d() throw(Exception)
+    void TestStokesSimple3d()
     {
         unsigned num_elem = 2;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
@@ -677,7 +674,7 @@ public:
         double value;
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            if(first)
+            if (first)
             {
                 value = r_pressures[i];
                 first = false;
@@ -689,7 +686,7 @@ public:
         }
     }
 
-    void TestStokesWithLidDrivenCavity3d() throw(Exception)
+    void TestStokesWithLidDrivenCavity3d()
     {
         unsigned num_elem = 5;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
@@ -739,12 +736,12 @@ public:
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double z = mesh.GetNode(i)->rGetLocation()[2];
-            if((fabs(x-0.6)<1e-6) && (fabs(y-0.6)<1e-6) && (fabs(z-0.6)<1e-6))
+            if ((fabs(x-0.6)<1e-6) && (fabs(y-0.6)<1e-6) && (fabs(z-0.6)<1e-6))
             {
                 TS_ASSERT_DELTA(r_solution[i](0), -8.5990e-03, 1e-4);
                 TS_ASSERT_DELTA(r_solution[i](1),  1.1331e-04, 1e-5);

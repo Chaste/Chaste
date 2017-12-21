@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,14 +60,15 @@ class PerformanceTester
 protected:
     static const double mMeshWidth;//=0.2;//cm
 public:
-    PerformanceTester()
+    PerformanceTester(const std::string& rTestName)
     : OdeTimeStep(0.0025),
       PdeTimeStep(0.0025),
       MeshNum(2u),
       KspAtol(5e-5),
       //RelativeConvergenceCriterion(1e-4),
       SimTime(8.0),
-      PrintingTimeStep(0.04)
+      PrintingTimeStep(0.04),
+      mTestName(rTestName)
     {
     }
 
@@ -78,7 +79,7 @@ public:
         HeartConfig::Instance()->SetUseAbsoluteTolerance(KspAtol);
 
         // Create the meshes on which the test will be based
-        const std::string mesh_dir = "PerformanceMesh/";
+        const std::string mesh_dir = mTestName+"Mesh/";
         OutputFileHandler output_file_handler(mesh_dir);
 
         unsigned prev_mesh_num=9999;
@@ -104,7 +105,7 @@ public:
         CARDIAC_PROBLEM cardiac_problem(&cell_factory);
 
         HeartConfig::Instance()->SetMeshFileName(output_file_handler.GetOutputDirectoryFullPath()+mesh_filename);
-        HeartConfig::Instance()->SetOutputDirectory ("Performance");
+        HeartConfig::Instance()->SetOutputDirectory (mTestName);
         HeartConfig::Instance()->SetOutputFilenamePrefix ("Results");
 
 //        cardiac_problem.SetLinearSolverRelativeTolerance(KspRtol);
@@ -160,9 +161,9 @@ public:
     double PrintingTimeStep;
 
 private:
+    std::string mTestName;
     unsigned mNumNodes;
     unsigned mNumElements;
-
 };
 
 ///Set static const on instantiation

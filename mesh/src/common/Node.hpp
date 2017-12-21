@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -279,12 +279,53 @@ public:
     void AddBoundaryElement(unsigned index);
 
     /**
+     * Add a neighbour to this node's vector of neighbouring node  indices.
+     *
+     * @param index of the node to add.
+     */
+    void AddNeighbour(unsigned index);
+
+    /**
+     * Clear this node's vector of neighbour indices.
+     */
+    void ClearNeighbours();
+
+    /**
+     * Remove duplicates from the vector of node neighbour indices.
+     */
+    void RemoveDuplicateNeighbours();
+
+    /**
+     * Check whether the node neighbours collection is empty.
+     *
+     * @return whether this node has any neighbours.
+     */
+    bool NeighboursIsEmpty();
+
+    /**
+     * Sets a flag to indicate that the neighbours of this node have/have not been updated.
+     *
+     * @param flag whether the neighbours are set up or not.
+     */
+    void SetNeighboursSetUp(bool flag);
+
+    /**
+     * @return a flag to indicate that the neighbours of this node have/have not been updated.
+     */
+    bool GetNeighboursSetUp();
+
+    /**
+     * @return this node's vector of neighbour indices.
+     */
+    std::vector<unsigned>& rGetNeighbours();
+
+    /**
      * @return a set of indices of elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * @return a vector containing the node attributes.
+     * @return a vector containing the node attributes. An exception is thrown if the node has no attributes.
      */
     std::vector<double>& rGetNodeAttributes();
 
@@ -325,9 +366,9 @@ public:
 
     /**
      * Add a contribution to the force applied to this node.
-     * @param forceContribution the force vector to add to mAppliedForce
+     * @param rForceContribution the force vector to add to mAppliedForce
      */
-    void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution);
 
     /**
      * @return whether this node is a particle or not
@@ -341,7 +382,7 @@ public:
     void SetIsParticle(bool isParticle);
 
     /**
-     * @return the radius of this node.
+     * @return the radius of this node. An exception is thrown if the node has no attributes.
      */
     double GetRadius();
 

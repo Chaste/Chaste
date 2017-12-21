@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,7 +101,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(0), 2, 1e-4);
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
@@ -130,7 +130,7 @@ public:
         TS_ASSERT_DELTA(vector[1], 0.0000, 1e-4);
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
@@ -159,7 +159,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(6, 6);
@@ -350,7 +350,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(4)->GetIndex(), 43u);
     }
 
-    void TestTessellationConstructor() throw (Exception)
+    void TestTessellationConstructor()
     {
         // Create a simple Cylindrical2dMesh, the Delaunay triangulation
         unsigned cells_across = 3;
@@ -359,11 +359,8 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
 
-
         TrianglesMeshWriter<2,2> mesh_writer("TestVertexMeshWriters", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
-
-
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
         TS_ASSERT_EQUALS(p_delaunay_mesh->CheckIsVoronoi(), true);
@@ -434,7 +431,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), sqrt(3.0)/12.0, 1e-6);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "cylindrical_vertex_mesh_base.arch";
@@ -525,7 +522,7 @@ public:
         }
     }
 
-    void TestCylindricalReMesh() throw (Exception)
+    void TestCylindricalReMesh()
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -544,7 +541,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
     }
 
-    void TestCylindricalReMeshAfterDelete() throw (Exception)
+    void TestCylindricalReMeshAfterDelete()
     {
         // Create mesh
         unsigned num_cells_across = 6;

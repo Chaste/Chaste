@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,8 +45,8 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
                                                        unsigned numElementsY,
                                                        unsigned numRelaxationSteps,
                                                        double elementTargetArea)
-        : mpMesh(NULL),
-          mpTorMesh(NULL),
+        : mpMesh(nullptr),
+          mpTorMesh(nullptr),
           mNumElementsX(numElementsX),
           mNumElementsY(numElementsY),
           mNumRelaxationSteps(numRelaxationSteps),
@@ -147,9 +147,9 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         Node<2>* p_node_to_copy = mpMesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
-        bool                copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        unsigned copy_index = p_node_to_copy->GetIndex();
+        bool copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        const c_vector<double, 2>& copy_location = p_node_to_copy->rGetLocation();
 
         // There should not be any 'gaps' in node numbering, but we will assert just to make sure
         assert(copy_index < mpMesh->GetNumNodes());
@@ -221,12 +221,11 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         Node<2>* p_node_to_copy = p_temp_mesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
-        unsigned            copy_index       = p_node_to_copy->GetIndex();
-        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
-        bool                copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+        unsigned copy_index = p_node_to_copy->GetIndex();
+        const c_vector<double, 2>& copy_location = p_node_to_copy->rGetLocation();
 
         // No nodes should be boundary nodes
-        assert(!copy_is_boundary);
+        assert(!p_node_to_copy->IsBoundaryNode());
 
         // There should not be any 'gaps' in node numbering, but we will assert just to make sure
         assert(copy_index < p_temp_mesh->GetNumNodes());
@@ -281,15 +280,15 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
     // First loop is to calculate the correct offset, min_x_y
     for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
     {
-        c_vector<double, 2> this_node_location = mpTorMesh->GetNode(node_idx)->rGetLocation();
+        const c_vector<double, 2>& r_this_node_location = mpTorMesh->GetNode(node_idx)->rGetLocation();
 
-        if(this_node_location[0] < min_x_y[0])
+        if (r_this_node_location[0] < min_x_y[0])
         {
-            min_x_y[0] = this_node_location[0];
+            min_x_y[0] = r_this_node_location[0];
         }
-        if(this_node_location[1] < min_x_y[1])
+        if (r_this_node_location[1] < min_x_y[1])
         {
-            min_x_y[1] = this_node_location[1];
+            min_x_y[1] = r_this_node_location[1];
         }
     }
 
@@ -582,12 +581,12 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
                     for (unsigned node_idx = 0; node_idx < nodes.size(); node_idx++)
                     {
                         // Grab the existing node location
-                        c_vector<double, 2> existing_node_location = nodes[node_idx]->rGetLocation();
+                        const c_vector<double, 2>& r_existing_node_location = nodes[node_idx]->rGetLocation();
 
                         // Equality here is determined entirely on coincidence of position
-                        if ( fabs(existing_node_location[0] - p_this_node->rGetLocation()[0]) < DBL_EPSILON )
+                        if (fabs(r_existing_node_location[0] - p_this_node->rGetLocation()[0]) < DBL_EPSILON)
                         {
-                            if ( fabs(existing_node_location[1] - p_this_node->rGetLocation()[1]) < DBL_EPSILON )
+                            if (fabs(r_existing_node_location[1] - p_this_node->rGetLocation()[1]) < DBL_EPSILON)
                             {
                                 // If the nodes match, return the existing node index
                                 existing_node_idx = node_idx;
@@ -659,12 +658,12 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
                     for (unsigned node_idx = 0 ; node_idx < nodes.size() ; node_idx++)
                     {
                         // Grab the existing node location
-                        c_vector<double, 2> existing_node_location = nodes[node_idx]->rGetLocation();
+                        const c_vector<double, 2>& r_existing_node_location = nodes[node_idx]->rGetLocation();
 
                         // Equality here is determined entirely on coincidence of position
-                        if ( fabs(existing_node_location[0] - vertex_location[0]) < DBL_EPSILON )
+                        if (fabs(r_existing_node_location[0] - vertex_location[0]) < DBL_EPSILON)
                         {
-                            if ( fabs(existing_node_location[1] - vertex_location[1]) < DBL_EPSILON )
+                            if (fabs(r_existing_node_location[1] - vertex_location[1]) < DBL_EPSILON)
                             {
                                 // If the locations match, tag the node as being on the boundary
                                 nodes[node_idx]->SetAsBoundaryNode(true);
@@ -690,12 +689,12 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()
 {
     // Validate inputs
-    if ( (mNumElementsX < 2) || (mNumElementsY < 2) )
+    if ((mNumElementsX < 2) || (mNumElementsY < 2))
     {
         EXCEPTION("Need at least 2 by 2 cells");
     }
 
-    if ( mElementTargetArea <= 0.0 )
+    if (mElementTargetArea <= 0.0)
     {
         EXCEPTION("Specified target area must be strictly positive");
     }
@@ -785,7 +784,7 @@ void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<doub
 
 std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh
     unsigned num_elems = mpMesh->GetNumElements();
@@ -829,7 +828,7 @@ std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 
 double VoronoiVertexMeshGenerator::GetAreaCoefficientOfVariation()
 {
-    assert(mpMesh != NULL);
+    assert(mpMesh != nullptr);
 
     // Number of elements in the mesh, and check there are at least two
     unsigned num_elems = mpMesh->GetNumElements();

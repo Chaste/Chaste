@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,7 +89,7 @@ public:
      * Overridden VisitCell() method.
      *
      * Visit a cell and write the protein concentrations associated with its cell-cycle model,
-     * if its cell-cycle model is a subclass of AbstractOdeBasedCellCycleModel.
+     * if its cell-cycle model is a subclass of AbstractOdeBasedPhaseBasedCellCycleModel.
      *
      * Outputs a line of space-separated values of the form:
      * ...[location index] [protein 1 conc] [protein 2 conc] ... [protein n conc] ...
@@ -99,7 +99,7 @@ public:
      *
      * Note that the "protein concentrations" refer to the solution of the ODE system that is
      * present in the cell-cycle model. If the cell-cycle model does not inherit from
-     * AbstractOdeBasedCellCycleModel, then an exception is thrown.
+     * AbstractOdeBasedPhaseBasedCellCycleModel, then an exception is thrown.
      *
      * @param pCell a pointer to a cell
      * @param pCellPopulation a pointer to the cell population owning the cell

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -202,7 +202,7 @@ public:
         TS_ASSERT_THROWS_THIS(node.RemoveBoundaryElement(256),"Tried to remove an index which was not in the set");
     }
 
-    void TestNodeWithAttributes() throw (Exception)
+    void TestNodeWithAttributes()
     {
         Node<3> node(0, false, 0.0, 1.0, 2.0);
 
@@ -228,6 +228,8 @@ public:
 
         TS_ASSERT_EQUALS(node.IsParticle(), false);
 
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), true);
+
         // Check that we can correctly set each of the attributes.
         node.AddNodeAttribute(1.0);
         TS_ASSERT_EQUALS(node.GetNumNodeAttributes(), 1u);
@@ -252,6 +254,17 @@ public:
         TS_ASSERT_EQUALS(node.IsParticle(), false);
         node.SetIsParticle(true);
         TS_ASSERT_EQUALS(node.IsParticle(), true);
+
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), true);
+        node.AddNeighbour(1u);
+        node.AddNeighbour(1u);
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), false);
+        TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 2u);
+        node.RemoveDuplicateNeighbours();
+        TS_ASSERT_EQUALS(node.rGetNeighbours().size(), 1u);
+        node.ClearNeighbours();
+        TS_ASSERT_EQUALS(node.NeighboursIsEmpty(), true);
+
 
         node.SetRadius(1.6);
         TS_ASSERT_DELTA(node.GetRadius(), 1.6, 1e-4);
@@ -309,7 +322,6 @@ public:
             delete p_node_1d;
         }
     }
-
 };
 
 #endif //_TESTNODE_HPP_

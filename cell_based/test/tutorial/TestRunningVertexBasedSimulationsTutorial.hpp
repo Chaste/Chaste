@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 /* The next header file defines the cell cycle model. */
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 /* The next two header files define a helper class for generating suitable meshes: one planar and one periodic. */
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
@@ -115,7 +115,7 @@ public:
     * In the first test, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells, using a mutable vertex mesh. Each cell is assigned a stochastic cell-cycle model.
     */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /* First, we generate a vertex mesh. To create a {{{MutableVertexMesh}}}, we can use
         * the {{{HoneycombVertexMeshGenerator}}}. This generates a honeycomb-shaped mesh,
@@ -128,14 +128,14 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
-        * of cell model required (here {{{StochasticDurationCellCycleModel}}})
+        * of cell model required (here {{{UniformG1GenerationalCellCycleModel}}})
         * and the dimension. We create an empty vector of cells and pass this into the
         * method along with the mesh. The second argument represents the size of that the vector
         * {{{cells}}} should become - one cell for each element, the third argument specifies
         * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
@@ -207,7 +207,7 @@ public:
     * boundary which cells can't pass through and a cell killer which removes cells once they leave
     * a region. As before each cell is assigned a stochastic cell-cycle model.
     */
-    void TestPeriodicMonolayer() throw(Exception)
+    void TestPeriodicMonolayer()
     {
         /* First, we generate a periodic vertex mesh. To create a {{{Cylindrical2dVertexMesh}}}, we can use
          * the {{{CylindricalHoneycombVertexMeshGenerator}}}. This generates a honeycomb-shaped mesh,
@@ -222,7 +222,7 @@ public:
         * This is exactly the same as the above test. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.

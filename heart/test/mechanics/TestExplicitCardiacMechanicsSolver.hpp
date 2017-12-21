@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,9 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 #include "ReplicatableVector.hpp"
 
-//#include "Debug.hpp"
-
-
 // some useful typedefs
 typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleExplicitSolver2d;
 typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleExplicitSolver3d;
@@ -58,7 +55,7 @@ typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2
 class TestExplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 {
 public:
-    void TestWithSimpleContractionModel() throw(Exception)
+    void TestWithSimpleContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
@@ -113,7 +110,7 @@ public:
 
     // with stretch (and stretch-rate) independent contraction models the implicit and explicit schemes
     // are identical
-    void TestCompareImplicitAndExplicitWithStretchIndependentContractionModel() throw(Exception)
+    void TestCompareImplicitAndExplicitWithStretchIndependentContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
 
@@ -148,14 +145,14 @@ public:
         impl_solver.Initialise();
 
         double dt = 0.25;
-        for(double t=0; t<3; t+=dt)
+        for (double t=0; t<3; t+=dt)
         {
             expl_solver.Solve(t,t+dt,dt);
             impl_solver.Solve(t,t+dt,dt);
 
             // computations should be identical
             TS_ASSERT_EQUALS(expl_solver.GetNumNewtonIterations(), impl_solver.GetNumNewtonIterations());
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 1e-9);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 1e-9);
@@ -170,7 +167,7 @@ public:
 
 
     // with stretch-dependent contraction models the implicit and explicit schemes can be similar
-    void TestCompareImplicitAndExplicitWithStretchDependentContractionModel() throw(Exception)
+    void TestCompareImplicitAndExplicitWithStretchDependentContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
 
@@ -213,7 +210,7 @@ public:
         double t1 = 0.25; // to be quite quick (min stretch ~=0.88), make this 5/4 (?) say for min stretch < 0.7
         double dt = 0.025;
 
-        for(double t=t0; t<t1; t+=dt)
+        for (double t=t0; t<t1; t+=dt)
         {
             //std::cout << "\n **** t = " << t << " ****\n" << std::flush;
 
@@ -228,7 +225,7 @@ public:
             impl_solver.WriteCurrentSpatialSolution("solution","nodes",counter);
 
             // the solutions turn out to be very close to each other
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 2e-3);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 2e-3);
@@ -258,7 +255,7 @@ public:
     }
 
     // cover all other contraction model options which are allowed but not been used in a test so far
-    void TestCoverage() throw(Exception)
+    void TestCoverage()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -336,7 +333,7 @@ public:
         delete p_pair_wrong;
     }
 
-    void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)
+    void TestCrossFibreTensionWithSimpleContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
@@ -369,7 +366,7 @@ public:
         y[2] = -0.0077;
         y[3] = 0.0;
 
-        for(unsigned i=0; i < tension_fractions.size();i++)
+        for (unsigned i=0; i < tension_fractions.size();i++)
         {
             problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 
@@ -422,7 +419,7 @@ public:
      *
      * Therefore nothing should happen!
      */
-    void TestIsotropicCrossFibreTensions() throw(Exception)
+    void TestIsotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -512,7 +509,7 @@ public:
      * This time we will make x (fibres) and z (sheet-normal) contract,
      * and y will not contract (so nodes will expand out for y, shrink in for x,z).
      */
-    void TestAnisotropicCrossFibreTensions() throw(Exception)
+    void TestAnisotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -595,11 +592,10 @@ public:
             TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](2), z[node], 1e-3);
         }
 
-        // tidy up memory
+        // Tidy up memory
         delete p_fine_mesh;
         delete p_pair;
     }
-
 };
 
 #endif /*TESTEXPLICITCARDIACMECHANICSSOLVER_HPP_*/

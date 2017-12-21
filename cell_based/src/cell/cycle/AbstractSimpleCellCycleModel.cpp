@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,12 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractSimpleCellCycleModel.hpp"
-#include "Exception.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 
 AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel()
+    : AbstractCellCycleModel(),
+      mCellCycleDuration(DOUBLE_UNSET)
 {
 }
 
@@ -47,77 +45,59 @@ AbstractSimpleCellCycleModel::~AbstractSimpleCellCycleModel()
 {
 }
 
+AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel(const AbstractSimpleCellCycleModel& rModel)
+    : AbstractCellCycleModel(rModel),
+      mCellCycleDuration(rModel.mCellCycleDuration)
+{
+    /*
+     * Initialize only the member variable defined in this class.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     *
+     * Note that mCellCycleDuration is (re)set as soon as
+     * InitialiseDaughterCell() is called on the new cell-cycle model.
+     */
+}
+
 void AbstractSimpleCellCycleModel::Initialise()
 {
-    SetG1Duration();
+    SetCellCycleDuration();
 }
 
 void AbstractSimpleCellCycleModel::InitialiseDaughterCell()
 {
     AbstractCellCycleModel::InitialiseDaughterCell();
-    SetG1Duration();
+    SetCellCycleDuration();
 }
 
-void AbstractSimpleCellCycleModel::SetG1Duration()
+bool AbstractSimpleCellCycleModel::ReadyToDivide()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    if (!mReadyToDivide)
     {
-        mG1Duration = GetStemCellG1Duration();
+        if (GetAge() >= mCellCycleDuration )
+        {
+            mReadyToDivide = true;
+        }
     }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration();
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mG1Duration = DBL_MAX;
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
+    return mReadyToDivide;
 }
 
 void AbstractSimpleCellCycleModel::ResetForDivision()
 {
     AbstractCellCycleModel::ResetForDivision();
-    mBirthTime = SimulationTime::Instance()->GetTime();
-    SetG1Duration();
+    SetCellCycleDuration();
 }
 
-void AbstractSimpleCellCycleModel::UpdateCellCyclePhase()
+double AbstractSimpleCellCycleModel::GetCellCycleDuration() const
 {
-    double time_since_birth = GetAge();
-    assert(time_since_birth >= 0);
-
-    if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mCurrentCellCyclePhase = G_ZERO_PHASE;
-    }
-    else if (time_since_birth < GetMDuration())
-    {
-        mCurrentCellCyclePhase = M_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration)
-    {
-        mCurrentCellCyclePhase = G_ONE_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration())
-    {
-        mCurrentCellCyclePhase = S_PHASE;
-    }
-    else if (time_since_birth < GetMDuration() + mG1Duration + GetSDuration() + GetG2Duration())
-    {
-        mCurrentCellCyclePhase = G_TWO_PHASE;
-    }
+    return mCellCycleDuration;
 }
 
 void AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }

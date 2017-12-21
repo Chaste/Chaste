@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -198,7 +198,7 @@ public:
 //
 // Definition of static member variables
 //
-std::auto_ptr<HeartConfig> HeartConfig::mpInstance;
+boost::shared_ptr<HeartConfig> HeartConfig::mpInstance;
 
 //
 // Methods
@@ -300,10 +300,12 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     map["cp31"].schema = "ChasteParameters_3_1.xsd";
     map["cp33"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
     map["cp33"].schema = "ChasteParameters_3_3.xsd";
-    // We use 'cp' as prefix for the latest version to avoid having to change saved
+    map["cp34"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
+    map["cp34"].schema = "ChasteParameters_3_4.xsd";
+   // We use 'cp' as prefix for the latest version to avoid having to change saved
     // versions for comparison at every release.
-    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
-    map["cp"].schema = "ChasteParameters_3_4.xsd";
+    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1";
+    map["cp"].schema = "ChasteParameters_2017_1.xsd";
 
     cp::ChasteParameters(*p_parameters_file, *mpParameters, map);
 
@@ -366,7 +368,7 @@ void HeartConfig::CopySchema(const std::string& rToDirectory)
     // in a situation where it can handle EXCEPTION()s nicely, e.g.
     // TRY_IF_MASTER(CopySchema(...));
 
-    std::string schema_name("ChasteParameters_3_4.xsd");
+    std::string schema_name("ChasteParameters_2017_1.xsd");
     FileFinder schema_location("heart/src/io/" + schema_name, RelativeTo::ChasteSourceRoot);
     if (!schema_location.Exists())
     {
@@ -403,6 +405,7 @@ void HeartConfig::SetDefaultSchemaLocations()
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"] = root_dir + "ChasteParameters_3_1.xsd";
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"] = root_dir + "ChasteParameters_3_3.xsd";
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"] = root_dir + "ChasteParameters_3_4.xsd";
+    mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1"] = root_dir + "ChasteParameters_2017_1.xsd";
 }
 
 unsigned HeartConfig::GetVersionFromNamespace(const std::string& rNamespaceUri)
@@ -500,12 +503,16 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
         {
             XmlTransforms::SetDefaultVisualizer(p_doc.get(), p_root_elt);
         }
-        if (version < 3004) // Not the latest release
+        if (version < 3004) // Not the latest in release 3.4
         {
             XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4");
         }
+        if (version < 2017001) // Not the latest release
+        {
+            XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1");
+        }
         // Parse DOM to object model
-        std::auto_ptr<cp::chaste_parameters_type> p_params(cp::ChasteParameters(*p_doc, ::xml_schema::flags::dont_initialize, props));
+        boost::shared_ptr<cp::chaste_parameters_type> p_params(cp::ChasteParameters(*p_doc, ::xml_schema::flags::dont_initialize, props));
         // Get rid of the DOM stuff
         p_doc.reset();
 
@@ -546,7 +553,7 @@ FileFinder HeartConfig::GetParametersFilePath()
 void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::chaste_parameters_type> pResumeParameters)
 {
     // Check for user foolishness
-    if ( (pResumeParameters->ResumeSimulation()->SpaceDimension() != HeartConfig::Instance()->GetSpaceDimension())
+    if ((pResumeParameters->ResumeSimulation()->SpaceDimension() != HeartConfig::Instance()->GetSpaceDimension())
          ||(pResumeParameters->ResumeSimulation()->Domain() != HeartConfig::Instance()->GetDomain()))
     {
         EXCEPTION("Problem type and space dimension should match when restarting a simulation.");
@@ -829,7 +836,7 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
 
             ionicModels.push_back(ionic_model_region.IonicModel());
         }
-        else if(ionic_model_region.Location().EpiLayer().present() || ionic_model_region.Location().MidLayer().present() || ionic_model_region.Location().EndoLayer().present() )
+        else if (ionic_model_region.Location().EpiLayer().present() || ionic_model_region.Location().MidLayer().present() || ionic_model_region.Location().EndoLayer().present() )
         {
             ///\todo When this is implemented, then we require an example in ChasteParametersFullFormat.xml
             EXCEPTION("Definition of transmural layers is not yet supported for defining different ionic models, please use cuboids instead");
@@ -840,7 +847,6 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
         }
     }
 }
-
 
 bool HeartConfig::IsMeshProvided() const
 {
@@ -953,9 +959,9 @@ double HeartConfig::GetInterNodeSpace() const
             break;
         default:
             NEVER_REACHED;
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             return 0.0; //To fool the compiler
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 }
 
@@ -1100,7 +1106,7 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
             }
             rStimuliApplied.push_back( stim );
         }
-        else if(stimulus.Location().EpiLayer().present() || stimulus.Location().MidLayer().present() || stimulus.Location().EndoLayer().present() )
+        else if (stimulus.Location().EpiLayer().present() || stimulus.Location().MidLayer().present() || stimulus.Location().EndoLayer().present() )
         {
             EXCEPTION("Definition of transmural layers is not yet supported for specifying stimulated areas, please use cuboids instead");
         }
@@ -1110,7 +1116,6 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
         }
     }
 }
-
 
 template<unsigned DIM>
 void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
@@ -1130,7 +1135,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
             = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
 
     bool user_supplied_negative_value = false;
-    bool user_asking_for_transmural_layers = false;
+    mUserAskedForCellularTransmuralHeterogeneities = false; // overwritten with true below if necessary
     bool user_asked_for_cuboids_or_ellipsoids = false;
     unsigned counter_of_heterogeneities = 0;
 
@@ -1165,7 +1170,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         {
             mEpiFraction  =  ht.Location().EpiLayer().get();
 
-            user_asking_for_transmural_layers = true;
+            mUserAskedForCellularTransmuralHeterogeneities = true;
             if (mEpiFraction <0)
             {
                 user_supplied_negative_value=true;
@@ -1176,7 +1181,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         {
             mEndoFraction  =  ht.Location().EndoLayer().get();
 
-            user_asking_for_transmural_layers = true;
+            mUserAskedForCellularTransmuralHeterogeneities = true;
             if (mEndoFraction <0)
             {
                 user_supplied_negative_value=true;
@@ -1187,7 +1192,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         {
             mMidFraction  =  ht.Location().MidLayer().get();
 
-            user_asking_for_transmural_layers = true;
+            mUserAskedForCellularTransmuralHeterogeneities = true;
             if (mMidFraction <0)
             {
                 user_supplied_negative_value=true;
@@ -1222,10 +1227,7 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         counter_of_heterogeneities++;
     }
 
-    //set the flag for request of transmural layers
-    mUserAskedForCellularTransmuralHeterogeneities = user_asking_for_transmural_layers;
-
-    if ( mUserAskedForCellularTransmuralHeterogeneities )
+    if (mUserAskedForCellularTransmuralHeterogeneities )
     {
         // cuboids/ellipsoids and layers at the same time are not yet supported
         if (user_asked_for_cuboids_or_ellipsoids )
@@ -1364,7 +1366,6 @@ void HeartConfig::GetConductivityHeterogeneities(
             GetExtracellularConductivities(extra_conductivities);
             rExtraConductivities.push_back(extra_conductivities);
         }
-
     }
 }
 
@@ -1646,9 +1647,9 @@ const char* HeartConfig::GetKSPSolver() const
         case cp::ksp_solver_type::chebychev :
             return "chebychev";
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     EXCEPTION("Unknown ksp solver");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 }
 
 const char* HeartConfig::GetKSPPreconditioner() const
@@ -1676,9 +1677,9 @@ const char* HeartConfig::GetKSPPreconditioner() const
             return "none";
 
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     EXCEPTION("Unknown ksp preconditioner");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 }
 
 DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning() const
@@ -1695,9 +1696,9 @@ DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning()
         case cp::mesh_partitioning_type::petsc :
             return DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION;
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     EXCEPTION("Unknown mesh partitioning type");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 }
 
 bool HeartConfig::IsAdaptivityParametersPresent() const
@@ -2015,7 +2016,7 @@ void HeartConfig::SetDefaultIonicModel(const cp::ionic_models_available_type& rI
 
 void HeartConfig::SetSlabDimensions(double x, double y, double z, double inter_node_space)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2027,7 +2028,7 @@ void HeartConfig::SetSlabDimensions(double x, double y, double z, double inter_n
 
 void HeartConfig::SetSheetDimensions(double x, double y, double inter_node_space)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2039,7 +2040,7 @@ void HeartConfig::SetSheetDimensions(double x, double y, double inter_node_space
 
 void HeartConfig::SetFibreLength(double x, double inter_node_space)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2051,7 +2052,7 @@ void HeartConfig::SetFibreLength(double x, double inter_node_space)
 
 void HeartConfig::SetMeshFileName(std::string meshPrefix, cp::media_type fibreDefinition)
 {
-    if ( ! mpParameters->Simulation()->Mesh().present())
+    if (!mpParameters->Simulation()->Mesh().present())
     {
         XSD_CREATE_WITH_FIXED_ATTR(cp::mesh_type, mesh_to_load, "cm");
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
@@ -2196,7 +2197,7 @@ void HeartConfig::SetOutputFilenamePrefix(const std::string& rOutputFilenamePref
 
 void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVariables)
 {
-    if ( ! mpParameters->Simulation()->OutputVariables().present())
+    if (!mpParameters->Simulation()->OutputVariables().present())
     {
         cp::output_variables_type variables_requested;
         mpParameters->Simulation()->OutputVariables().set(variables_requested);
@@ -2204,7 +2205,7 @@ void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVari
 
     XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)&
         var_type_sequence = mpParameters->Simulation()->OutputVariables()->Var();
-    //Erase or create a sequence
+    // Erase or create a sequence
     var_type_sequence.clear();
 
     for (unsigned i=0; i<rOutputVariables.size(); i++)
@@ -2400,12 +2401,12 @@ void HeartConfig::CheckTimeSteps() const
         EXCEPTION("Printing time-step should not be smaller than PDE time-step");
     }
 
-    if ( !Divides(GetPdeTimeStep(), GetPrintingTimeStep()) )
+    if (!Divides(GetPdeTimeStep(), GetPrintingTimeStep()))
     {
         EXCEPTION("Printing time-step should be a multiple of PDE time step");
     }
 
-    if ( GetOdeTimeStep() > GetPdeTimeStep() )
+    if (GetOdeTimeStep() > GetPdeTimeStep())
     {
         EXCEPTION("Ode time-step should not be greater than PDE time-step");
     }
@@ -2417,13 +2418,12 @@ void HeartConfig::CheckTimeSteps() const
             EXCEPTION("Checkpoint time-step should be positive");
         }
 
-        if ( !Divides(GetPrintingTimeStep(), GetCheckpointTimestep()) )
+        if (!Divides(GetPrintingTimeStep(), GetCheckpointTimestep()))
         {
             EXCEPTION("Checkpoint time-step should be a multiple of printing time-step");
         }
     }
 }
-
 
 void HeartConfig::SetUseRelativeTolerance(double relativeTolerance)
 {
@@ -2450,22 +2450,22 @@ void HeartConfig::SetKSPSolver(const char* kspSolver, bool warnOfChange)
     }
 
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
-    if ( strcmp(kspSolver, "gmres") == 0)
+    if (strcmp(kspSolver, "gmres") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::gmres);
         return;
     }
-    if ( strcmp(kspSolver, "cg") == 0)
+    if (strcmp(kspSolver, "cg") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::cg);
         return;
     }
-    if ( strcmp(kspSolver, "symmlq") == 0)
+    if (strcmp(kspSolver, "symmlq") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::symmlq);
         return;
     }
-    if ( strcmp(kspSolver, "chebychev") == 0)
+    if (strcmp(kspSolver, "chebychev") == 0)
     {
         mpParameters->Numerical().KSPSolver().set(cp::ksp_solver_type::chebychev);
         return;
@@ -2477,47 +2477,47 @@ void HeartConfig::SetKSPSolver(const char* kspSolver, bool warnOfChange)
 void HeartConfig::SetKSPPreconditioner(const char* kspPreconditioner)
 {
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
-    if ( strcmp(kspPreconditioner, "jacobi") == 0)
+    if (strcmp(kspPreconditioner, "jacobi") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::jacobi);
         return;
     }
-    if ( strcmp(kspPreconditioner, "bjacobi") == 0)
+    if (strcmp(kspPreconditioner, "bjacobi") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::bjacobi);
         return;
     }
-    if ( strcmp(kspPreconditioner, "hypre") == 0)
+    if (strcmp(kspPreconditioner, "hypre") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::hypre);
         return;
     }
-    if ( strcmp(kspPreconditioner, "ml") == 0)
+    if (strcmp(kspPreconditioner, "ml") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ml);
         return;
     }
-    if ( strcmp(kspPreconditioner, "spai") == 0)
+    if (strcmp(kspPreconditioner, "spai") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::spai);
         return;
     }
-    if ( strcmp(kspPreconditioner, "twolevelsblockdiagonal") == 0)
+    if (strcmp(kspPreconditioner, "twolevelsblockdiagonal") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::twolevelsblockdiagonal);
         return;
     }
-    if ( strcmp(kspPreconditioner, "blockdiagonal") == 0)
+    if (strcmp(kspPreconditioner, "blockdiagonal") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::blockdiagonal);
         return;
     }
-    if ( strcmp(kspPreconditioner, "ldufactorisation") == 0)
+    if (strcmp(kspPreconditioner, "ldufactorisation") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::ldufactorisation);
         return;
     }
-    if ( strcmp(kspPreconditioner, "none") == 0)
+    if (strcmp(kspPreconditioner, "none") == 0)
     {
         mpParameters->Numerical().KSPPreconditioner().set(cp::ksp_preconditioner_type::none);
         return;
@@ -2529,22 +2529,22 @@ void HeartConfig::SetKSPPreconditioner(const char* kspPreconditioner)
 void HeartConfig::SetMeshPartitioning(const char* meshPartioningMethod)
 {
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
-    if ( strcmp(meshPartioningMethod, "dumb") == 0)
+    if (strcmp(meshPartioningMethod, "dumb") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::dumb);
         return;
     }
-    if ( strcmp(meshPartioningMethod, "metis") == 0)
+    if (strcmp(meshPartioningMethod, "metis") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::metis);
         return;
     }
-    if ( strcmp(meshPartioningMethod, "parmetis") == 0)
+    if (strcmp(meshPartioningMethod, "parmetis") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::parmetis);
         return;
     }
-    if ( strcmp(meshPartioningMethod, "petsc") == 0)
+    if (strcmp(meshPartioningMethod, "petsc") == 0)
     {
         mpParameters->Numerical().MeshPartitioning().set(cp::mesh_partitioning_type::petsc);
         return;
@@ -2807,8 +2807,6 @@ void HeartConfig::SetUseStateVariableInterpolation(bool useStateVariableInterpol
     }
 }
 
-
-
 bool HeartConfig::HasDrugDose() const
 {
     return mpParameters->Physiological().ApplyDrug().present();
@@ -2884,8 +2882,6 @@ void HeartConfig::SetIc50Value(const std::string& rCurrentName, double ic50, dou
         ic50_seq.push_back(ic50_elt);
     }
 }
-
-
 
 void HeartConfig::SetUseMassLumping(bool useMassLumping)
 {
@@ -3087,19 +3083,19 @@ void XmlTransforms::SetDefaultVisualizer(xercesc::DOMDocument* pDocument,
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation of the templated functions
 /////////////////////////////////////////////////////////////////////
-#define COVERAGE_IGNORE //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
+// LCOV_EXCL_START //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
 /**
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 template void HeartConfig::GetIonicModelRegions<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
 template void HeartConfig::GetStimuli<3u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*) ;
+template void HeartConfig::GetCellHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
 template void HeartConfig::GetConductivityHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
 
 template void HeartConfig::GetIonicModelRegions<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
 template void HeartConfig::GetStimuli<2u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*) ;
+template void HeartConfig::GetCellHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
 template void HeartConfig::GetConductivityHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
 
 template void HeartConfig::GetIonicModelRegions<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
@@ -3118,7 +3114,7 @@ template void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<Chas
  * \endcond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-#undef COVERAGE_IGNORE //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
+// LCOV_EXCL_STOP //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
 
 
 // Serialization for Boost >= 1.36

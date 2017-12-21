@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPetscMatTools : public CxxTest::TestSuite
 {
 public:
-    void TestEqualityCheck() throw (Exception)
+    void TestEqualityCheck()
     {
         Mat matrix1;
         Mat matrix2;
@@ -81,7 +81,7 @@ public:
         PetscTools::Destroy(matrix2);
     }
 
-    void TestSymmetryCheck() throw (Exception)
+    void TestSymmetryCheck()
     {
         Mat matrix;
         const unsigned size = 10u;
@@ -106,7 +106,7 @@ public:
         PetscTools::Destroy(matrix);
     }
 
-    void TestZeroRowsAndColumnsWithValueOnDiagonal() throw (Exception)
+    void TestZeroRowsAndColumnsWithValueOnDiagonal()
     {
         Mat matrix;
         const unsigned size = 5u;
@@ -136,9 +136,9 @@ public:
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(matrix, lo, hi);
 
-        for(int i=lo; i<hi; i++)
+        for (int i=lo; i<hi; i++)
         {
-            for(unsigned j=0; j<size; j++)
+            for (unsigned j=0; j<size; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(matrix, i, j), correct_mat[i][j], 1e-12);
             }
@@ -148,7 +148,7 @@ public:
     }
 
 
-    void TestTurnOffVariableAllocationError() throw (Exception)
+    void TestTurnOffVariableAllocationError()
     {
         Mat matrix;
         const unsigned size = 5u;

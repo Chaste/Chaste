@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,8 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _ABSTRACTLINEARELLIPTICPDE_HPP_
 
 #include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
+#include <boost/serialization/base_object.hpp>
 
+#include "AbstractLinearPde.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "ChastePoint.hpp"
 #include "Node.hpp"
@@ -56,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Parabolic PDEs are be derived from this (AbstractLinearParabolicPde)
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractLinearEllipticPde
+class AbstractLinearEllipticPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -71,6 +72,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & boost::serialization::base_object<AbstractLinearPde<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
@@ -79,6 +81,7 @@ public:
      * Constructor.
      */
     AbstractLinearEllipticPde()
+        : AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>()
     {}
 
     /**
@@ -132,22 +135,16 @@ public:
     virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<SPACE_DIM>& rNode);
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractLinearEllipticPde)
-
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeConstantInUSourceTermAtNode(const Node<SPACE_DIM>& rNode)
 {
-    return ComputeConstantInUSourceTerm(rNode.GetPoint(), NULL);
+    return ComputeConstantInUSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<SPACE_DIM>& rNode)
 {
-    return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), NULL);
+    return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 #endif //_ABSTRACTLINEARELLIPTICPDE_HPP_

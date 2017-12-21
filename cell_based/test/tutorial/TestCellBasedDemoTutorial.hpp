@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,7 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "RandomCellKiller.hpp"
 #include "RepulsionForce.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -113,7 +113,7 @@ public:
      * In the first test, we run a simple vertex-based simulation of an epithelial monolayer.
      * Each cell in the simulation is assigned a simple stochastic cell-cycle model, the cells will divide randomly and never stop proliferating.
      */
-    void TestVertexBasedMonolayer() throw (Exception)
+    void TestVertexBasedMonolayer()
     {
         /* The first thing we define is a 2D (specified by the <2,2>) mesh which holds the spatial information of the simulation. To do this we use one of a
          * number of {{{MeshGenerators}}}.*/
@@ -121,12 +121,15 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the proliferative
-         * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{StochasticDurationCellCycleModel}}} where
-         * each cell is given a division time, drawn from a uniform distribution, when it is created. For a vertex simulation
+         * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{UniformG1GenerationalCellCycleModel}}} where
+         * each cell is given a division time, drawn from a uniform distribution when it is created.
+         * (Note that here we need to use a phase based cell cycle model so that we can use the target area modifiers which are needed by the vertex
+         * based simulations).
+         * For a vertex simulation
          * we need as may cells as elements in the mesh.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells together.
@@ -144,7 +147,7 @@ public:
         simulator.SetSamplingTimestepMultiple(200);
         simulator.SetEndTime(20.0);
 
-        /* In order to specify how cells move around we create a "shared pointer" to a
+        /* To specify how cells move around, we create a "shared pointer" to a
          * {{{Force}}} object and pass it to the {{{OffLatticeSimulation}}}. This is done using the MAKE_PTR macro as follows.
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
@@ -195,7 +198,7 @@ public:
      * in which cells are represented by overlapping spheres (actually circles, since we're
      * in 2D).
      */
-    void TestNodeBasedMonolayer() throw (Exception)
+    void TestNodeBasedMonolayer()
     {
         /* We now need to create a {{{NodesOnlyMesh}}} we do this by first creating a {{{MutableMesh}}}
          * and passing this to a helper method {{{ConstructNodesWithoutMesh}}} along with a interaction cut off length
@@ -209,7 +212,7 @@ public:
         /* We create the cells as before, only this time we need one cell per node.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type); //**Changed**//
 
         /* This time we create a {{{NodeBasedCellPopulation}}} as we are using a {{{NodesOnlyMesh}}}.*/
@@ -262,7 +265,7 @@ public:
      * in which cells are represented by their centres and a Voronoi tessellation is used to
      * find nearest neighbours.
      */
-    void TestMeshBasedMonolayer() throw (Exception)
+    void TestMeshBasedMonolayer()
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.*/
         HoneycombMeshGenerator generator(2, 2);
@@ -271,7 +274,7 @@ public:
         /* We create the same number of cells as the previous test.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         /* This time we create a {{{MeshBasedCellPopulation}}} as we are using a {{{MutableMesh}}}.*/
@@ -313,7 +316,7 @@ public:
      * correspond to cells but are sometimes needed when using a Voronoi tessellation. We
      * will discuss ghost nodes in more detail in subsequent cell-based tutorials.
      */
-    void TestMeshBasedMonolayerWithGhostNodes() throw (Exception)
+    void TestMeshBasedMonolayerWithGhostNodes()
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.
          * Here we pass an extra argument to the {{{HoneycombMeshGenerator}}} which adds another 2 rows of
@@ -366,18 +369,18 @@ public:
      * We next show how to modify the previous test to implement a periodic boundary to the
      * left and right of the domain.
      */
-    void TestMeshBasedMonolayerPeriodic() throw (Exception)
+    void TestMeshBasedMonolayerPeriodic()
     {
         /* We now want to impose periodic boundaries on the domain. To do this we create a {{{Cylindrical2dMesh}}}
          * using a {{{CylindricalHoneycombMeshGenerator}}}.*/
         CylindricalHoneycombMeshGenerator generator(5, 2, 2); //**Changed**//
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh(); //**Changed**//
 
-        /* Again we create one cell for each non ghost node. Note that we have changed back to using a {{{StochasticDurationCellCycleModel}}}.*/
+        /* Again we create one cell for each non ghost node. Note that we have changed back to using a {{{UniformG1GenerationalCellCycleModel}}}.*/
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator; //**Changed**//
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator; //**Changed**//
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* We use the same {{{CellPopulation}}}, {{{CellBasedSimulation}}} (only changing the output directory and end time) and {{{Force}}} as before and run the simulation.*/
@@ -411,7 +414,7 @@ public:
      * We next show how to modify the previous test to include one
      * or more 'obstructions' within the domain.
      */
-    void TestMeshBasedMonolayerPeriodicSolidBottomBoundary() throw (Exception)
+    void TestMeshBasedMonolayerPeriodicSolidBottomBoundary()
     {
         /* We make the same {{{Mesh}}}, {{{Cells}}}, {{{CellPopulation}}},
          * {{{CellBasedSimulation}}} and forces as before, all we change is the output directory.*/
@@ -421,8 +424,8 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_stem_type);
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_stem_type); //**Changed**//
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
@@ -448,7 +451,7 @@ public:
 
         /* The next two lines are for test purposes only and are not part of this tutorial.
          */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 20u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
     /*
@@ -460,7 +463,7 @@ public:
      * In the final test we show how to modify the earlier tests (using off lattice models) to implement a 'Potts-based' simulation,
      * in which cells are represented by collections of sites on a fixed lattice.
      */
-    void TestPottsBasedMonolayer() throw (Exception)
+    void TestPottsBasedMonolayer()
     {
         /* In common with the off lattice simulations we begin by creating a mesh. Here we use the {{{PottsMeshGenerator}}}
          * class to generate a {{{PottsMesh}}} each element in the mesh is a collection of lattice sites (represented by nodes at their centres).
@@ -473,7 +476,7 @@ public:
         /* We generate one cell for each element as in vertex based simulations.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* As we have a {{{PottsMesh}}} we use a {{{PottsBasedCellPopulation}}}. Note here we also change the
@@ -494,11 +497,11 @@ public:
          * This is analogous to {{{Forces}}} in earlier examples.
          */
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule); //**Changed**//
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule); //**Changed**//
+        simulator.AddUpdateRule(p_volume_constraint_update_rule); //**Changed**//
         MAKE_PTR(SurfaceAreaConstraintPottsUpdateRule<2>, p_surface_area_update_rule); //**Changed**//
-        simulator.AddPottsUpdateRule(p_surface_area_update_rule); //**Changed**//
+        simulator.AddUpdateRule(p_surface_area_update_rule); //**Changed**//
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule); //**Changed**//
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule); //**Changed**//
+        simulator.AddUpdateRule(p_adhesion_update_rule); //**Changed**//
 
         /* We can add {{{CellKillers}}} as before.*/
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));

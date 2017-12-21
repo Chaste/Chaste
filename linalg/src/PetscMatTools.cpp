@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,8 +79,15 @@ void PetscMatTools::SwitchWriteMode(Mat matrix)
 void PetscMatTools::Display(Mat matrix)
 {
     //Give full precision, scientific notation
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPushFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#else
     PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#endif
     MatView(matrix,PETSC_VIEWER_STDOUT_WORLD);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPopFormat(PETSC_VIEWER_STDOUT_WORLD);
+#endif
 }
 
 void PetscMatTools::SetRow(Mat matrix, PetscInt row, double value)
@@ -173,7 +180,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
     }
     */
 #elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , NULL, NULL);
+    MatZeroRows(matrix, rRows.size(), rows, diagonalValue , nullptr, nullptr);
 #else
     MatZeroRows(matrix, rRows.size(), rows, diagonalValue);
 #endif
@@ -204,9 +211,9 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         MatGetRow(matrix, row, &num_cols, &cols, PETSC_NULL);
 
         // see which of these cols are in the list of cols to be zeroed
-        for(PetscInt i=0; i<num_cols; i++)
+        for (PetscInt i=0; i<num_cols; i++)
         {
-            if(std::binary_search(rowColIndices.begin(), rowColIndices.end(), cols[i]))
+            if (std::binary_search(rowColIndices.begin(), rowColIndices.end(), cols[i]))
             {
                 cols_to_zero_per_row[row-lo].push_back(cols[i]);
             }
@@ -221,11 +228,11 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
     {
         unsigned num_cols_to_zero_this_row = cols_to_zero_per_row[row-lo].size();
 
-        if(num_cols_to_zero_this_row>0)
+        if (num_cols_to_zero_this_row>0)
         {
             PetscInt* cols_to_zero = new PetscInt[num_cols_to_zero_this_row];
             double* zeros = new double[num_cols_to_zero_this_row];
-            for(unsigned i=0; i<num_cols_to_zero_this_row; i++)
+            for (unsigned i=0; i<num_cols_to_zero_this_row; i++)
             {
                 cols_to_zero[i] = cols_to_zero_per_row[row-lo][i];
                 zeros[i] = 0.0;

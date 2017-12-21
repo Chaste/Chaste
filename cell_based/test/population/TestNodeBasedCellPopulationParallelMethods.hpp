@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -89,7 +89,7 @@ private:
         mpNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mpNodesOnlyMesh->GetNumNodes());
 
         mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpNodesOnlyMesh, cells);
@@ -109,7 +109,7 @@ private:
     }
 public:
 
-    void TestGetCellAndNodePair() throw (Exception)
+    void TestGetCellAndNodePair()
     {
         unsigned node_index = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
 
@@ -121,7 +121,7 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetLocationIndexUsingCell(p_returned_cell), node_index);
     }
 
-    void TestAddNodeAndCellsToSend() throw (Exception)
+    void TestAddNodeAndCellsToSend()
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -137,7 +137,7 @@ public:
         TS_ASSERT_EQUALS(node_left_index, index_of_node_to_send);
     }
 
-    void TestSendAndReceiveCells() throw (Exception)
+    void TestSendAndReceiveCells()
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -148,10 +148,6 @@ public:
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
 
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses();
 
         if (!PetscTools::AmTopMost())
@@ -168,10 +164,9 @@ public:
             unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
             TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
         }
-#endif
     }
 
-    void TestSendAndReceiveCellsNonBlocking() throw (Exception)
+    void TestSendAndReceiveCellsNonBlocking()
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -182,10 +177,6 @@ public:
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
         TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
 
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         mpNodeBasedCellPopulation->NonBlockingSendCellsToNeighbourProcesses();
 
         mpNodeBasedCellPopulation->GetReceivedCells();
@@ -204,10 +195,9 @@ public:
             unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
             TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
         }
-#endif
     }
 
-    void TestUpdateCellProcessLocation() throw (Exception)
+    void TestUpdateCellProcessLocation()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -227,10 +217,6 @@ public:
                 ChastePoint<3> point(new_location);
                 mpNodesOnlyMesh->GetNode(1)->SetPoint(point);
             }
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
             mpNodeBasedCellPopulation->UpdateCellProcessLocation();
 
             if (PetscTools::AmMaster())
@@ -246,16 +232,11 @@ public:
                 AbstractMesh<3,3>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
                 TS_ASSERT_DELTA(node_iter->rGetLocation()[2], 1.6, 1e-4);
             }
-#endif
         }
     }
 
-    void TestRefreshHaloCells() throw (Exception)
+    void TestRefreshHaloCells()
     {
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         // Set up the halo boxes and nodes.
         mpNodeBasedCellPopulation->Update();
 
@@ -274,15 +255,10 @@ public:
         {
            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
         }
-#endif
     }
 
-    void TestUpdateWithLoadBalanceDoesntThrow() throw (Exception)
+    void TestUpdateWithLoadBalanceDoesntThrow()
     {
-#if BOOST_VERSION < 103700
-        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
-                              "Parallel cell-based Chaste requires Boost >= 1.37");
-#else
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
@@ -293,17 +269,16 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mLoadBalanceFrequency, 50u);
 
         TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->Update());
-#endif
     }
 
-    void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)
+    void TestGetCellUsingLocationIndexWithHaloCell()
     {
         boost::shared_ptr<Node<3> > p_node(new Node<3>(10, false, 0.0, 0.0, 0.0));
 
         // Create a cell.
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_type);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
         CellPtr p_cell(new Cell(p_state, p_model));
 
@@ -313,7 +288,7 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetCellUsingLocationIndex(10), p_cell);
     }
 
-    void TestNodeBasedCellPopulationOutputInParallel() throw (Exception)
+    void TestNodeBasedCellPopulationOutputInParallel()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -330,7 +305,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -418,7 +393,6 @@ public:
             delete nodes[i];
         }
     }
-
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONPARALLELMETHODS_HPP_*/

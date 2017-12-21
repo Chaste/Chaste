@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,73 +37,70 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template <unsigned SPACE_DIM>
-    ChasteCuboid<SPACE_DIM>::ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, ChastePoint<SPACE_DIM>& rUpperPoint)
-        : mLowerCorner(rLowerPoint),
-          mUpperCorner(rUpperPoint)
+ChasteCuboid<SPACE_DIM>::ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, ChastePoint<SPACE_DIM>& rUpperPoint)
+    : mLowerCorner(rLowerPoint),
+    mUpperCorner(rUpperPoint)
+{
+    for (unsigned dim=0; dim<SPACE_DIM; dim++)
     {
-        for (unsigned dim=0; dim<SPACE_DIM; dim++)
+        if (mLowerCorner[dim] > mUpperCorner[dim])
         {
-            if (mLowerCorner[dim] > mUpperCorner[dim])
-            {
-                EXCEPTION("Attempt to create a cuboid with MinCorner greater than MaxCorner in some dimension");
-            }
+            EXCEPTION("Attempt to create a cuboid with MinCorner greater than MaxCorner in some dimension");
         }
     }
+}
 
 template <unsigned SPACE_DIM>
-    bool ChasteCuboid<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const
+bool ChasteCuboid<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const
+{
+    for (unsigned dim=0; dim<SPACE_DIM; dim++)
     {
-        for (unsigned dim=0; dim<SPACE_DIM; dim++)
+        if (rPointToCheck[dim] < mLowerCorner[dim] - 100*DBL_EPSILON
+            || mUpperCorner[dim] + 100* DBL_EPSILON < rPointToCheck[dim])
         {
-            if (rPointToCheck[dim] < mLowerCorner[dim] - 100*DBL_EPSILON
-                || mUpperCorner[dim] + 100* DBL_EPSILON < rPointToCheck[dim])
-            {
-                return false;
-            }
+            return false;
         }
-        return true;
     }
+    return true;
+}
 
 template <unsigned SPACE_DIM>
-    const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetUpperCorner() const
+const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetUpperCorner() const
+{
+    return mUpperCorner;
+}
+
+template <unsigned SPACE_DIM>
+const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetLowerCorner() const
+{
+    return mLowerCorner;
+}
+
+template <unsigned SPACE_DIM>
+double ChasteCuboid<SPACE_DIM>::GetWidth(unsigned rDimension) const
+{
+    assert(rDimension<SPACE_DIM);
+    return mUpperCorner[rDimension] - mLowerCorner[rDimension];
+}
+
+template <unsigned SPACE_DIM>
+unsigned ChasteCuboid<SPACE_DIM>::GetLongestAxis() const
+{
+    unsigned axis = 0;
+    double max_dimension = 0.0;
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
-        return mUpperCorner;
-    }
-
-template <unsigned SPACE_DIM>
-    const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetLowerCorner() const
-    {
-        return mLowerCorner;
-    }
-
-template <unsigned SPACE_DIM>
-    double ChasteCuboid<SPACE_DIM>::GetWidth(unsigned rDimension) const
-    {
-        assert(rDimension<SPACE_DIM);
-        return mUpperCorner[rDimension] - mLowerCorner[rDimension];
-    }
-
-template <unsigned SPACE_DIM>
-     unsigned ChasteCuboid<SPACE_DIM>::GetLongestAxis() const
-     {
-        unsigned axis=0;
-        double max_dimension = 0.0;
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        double dimension =  mUpperCorner[i] - mLowerCorner[i];
+        if (dimension > max_dimension)
         {
-            double dimension =  mUpperCorner[i] - mLowerCorner[i];
-            if ( dimension > max_dimension)
-            {
-                axis=i;
-                max_dimension = dimension;
-            }
+            axis=i;
+            max_dimension = dimension;
         }
-        return axis;
-     }
+    }
+    return axis;
+}
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ChasteCuboid<1>;
 template class ChasteCuboid<2>;
 template class ChasteCuboid<3>;

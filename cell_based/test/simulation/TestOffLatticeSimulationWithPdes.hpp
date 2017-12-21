@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,9 +52,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellKiller.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "SimpleUniformSourcePde.hpp"
-#include "CellwiseSourcePde.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "UniformSourceEllipticPde.hpp"
+#include "CellwiseSourceEllipticPde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -62,13 +64,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "FunctionalBoundaryCondition.hpp"
-#include "AveragedSourcePde.hpp"
-#include "VolumeDependentAveragedSourcePde.hpp"
+#include "AveragedSourceEllipticPde.hpp"
+#include "VolumeDependentAveragedSourceEllipticPde.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "CellPopulationAreaWriter.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "EllipticBoxDomainPdeModifier.hpp"
+#include "EllipticGrowingDomainPdeModifier.hpp"
+#include "RadialCellDataDistributionWriter.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
@@ -98,6 +103,8 @@ double bc_func(const ChastePoint<2>& p)
     return value;
 }
 
+///\todo move into cell_based/test/cell_based_pde
+///\todo merge content into TestSimulationsWith*DomainPdeModifier and remove this test suite
 class TestOffLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
@@ -112,7 +119,7 @@ public:
      * Secondly, test that cells' hypoxic durations are correctly updated when a
      * nutrient distribution is prescribed.
      */
-    void TestUpdateAtEndOfTimeStep() throw(Exception)
+    void TestUpdateAtEndOfTimeStep()
     {
         EXIT_IF_PARALLEL;
 
@@ -152,17 +159,15 @@ public:
         simulator.SetOutputDirectory("TestUpdateAtEndOfTimeStepMethod");
         simulator.SetEndTime(2.0/120.0);
 
-        // Set up PDE and pass to simulation via handler
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create PDE and boundary condition objects
+        MAKE_PTR(SimplePdeForTesting, p_pde);
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        SimplePdeForTesting pde;
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         /*
          * Create a force law and pass it to the simulation. Use an extremely small
@@ -208,7 +213,7 @@ public:
         }
     }
 
-    void TestWithOxygen() throw(Exception)
+    void TestWithOxygen()
     {
         EXIT_IF_PARALLEL;
 
@@ -245,16 +250,18 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
-        // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Output the PDE solution at each time step
+        p_pde_modifier->SetOutputSolutionAtPdeNodes(true);
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.SetOutputDirectory("OffLatticeSimulationWithOxygen");
         simulator.SetEndTime(0.5);
@@ -279,7 +286,7 @@ public:
      * Note: if the previous test is changed we need to update the file
      * this test refers to.
      */
-    void TestVisualizerOutput() throw (Exception)
+    void TestVisualizerOutput()
     {
         EXIT_IF_PARALLEL;
 
@@ -302,7 +309,7 @@ public:
         FileComparison(results_dir + "/results.vizsetup", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizsetup").CompareFiles();
     }
 
-    void TestWithPointwiseSource() throw(Exception)
+    void TestWithPointwiseSource()
     {
         EXIT_IF_PARALLEL;
 
@@ -352,17 +359,15 @@ public:
         simulator.SetOutputDirectory("OffLatticeSimulationWithPdes");
         simulator.SetEndTime(0.5);
 
-        // Set up PDE and pass to simulation via handler
-        CellwiseSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -383,7 +388,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
     }
 
-    void TestWithPointwiseTwoSource() throw(Exception)
+    void TestWithPointwiseTwoSource()
     {
         EXIT_IF_PARALLEL;
 
@@ -433,25 +438,15 @@ public:
         simulator.SetOutputDirectory("OffLatticeSimulationWithPointwiseSource");
         simulator.SetEndTime(0.5);
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Set up first PDE and pass to handler
-        CellwiseSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        // Set up second PDE and pass to handler
-        CellwiseSourcePde<2> pde2(cell_population, -0.8);
-        ConstBoundaryCondition<2> bc2(0.0);
-        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, true);
-        pde_and_bc2.SetDependentVariableName("dunno");
-        pde_handler.AddPdeAndBc(&pde_and_bc2);
-
-        // Pass PDE handler to simulation
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -471,11 +466,9 @@ public:
         TS_ASSERT_DELTA(node_5_location[1], 1.1422, 1e-4);
         CellPtr p_cell_at_5 = simulator.rGetCellPopulation().GetCellUsingLocationIndex(5);
         TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
-        TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("dunno"), 0.0000, 1e-4);
-        TS_ASSERT_LESS_THAN(p_cell_at_5->GetCellData()->GetItem("dunno"), p_cell_at_5->GetCellData()->GetItem("oxygen"));
     }
 
-    void TestSpheroidStatistics() throw (Exception)
+    void TestSpheroidStatistics()
     {
         EXIT_IF_PARALLEL;
 
@@ -514,23 +507,26 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
+        typedef RadialCellDataDistributionWriter<2,2> RadWriter;
+        MAKE_PTR(RadWriter, p_radial_writer);
+        p_radial_writer->SetVariableName("oxygen");
+        p_radial_writer->SetNumRadialBins(5);
+        cell_population.AddPopulationWriter(p_radial_writer);
+
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestSpheroidStatistics");
         simulator.SetEndTime(1.0/120.0);
 
-        // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetWriteAverageRadialPdeSolution("oxygen", 5);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -571,17 +567,14 @@ public:
         OutputFileHandler handler("TestSpheroidStatistics", false);
 
         std::string areas_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellpopulationareas.dat";
-        FileComparison( areas_results_file, "cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").CompareFiles();
+        FileComparison(areas_results_file, "cell_based/test/data/TestSpheroidStatistics/cellpopulationareas.dat").CompareFiles();
 
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0/";
-        NumericFileComparison comparison(results_dir + "/radial_dist.dat", "cell_based/test/data/TestSpheroidStatistics/radial_dist.dat");
+        NumericFileComparison comparison(results_dir + "radial_dist.dat", "cell_based/test/data/TestSpheroidStatistics/radial_dist.dat");
         TS_ASSERT(comparison.CompareFiles(5e-3));
-
-        // Coverage
-        TS_ASSERT_THROWS_NOTHING(pde_handler.WriteAverageRadialPdeSolution(SimulationTime::Instance()->GetTime()));
     }
 
-    void TestCoarseSourceMesh() throw(Exception)
+    void TestCoarseSourceMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -618,28 +611,31 @@ public:
         simulator.SetOutputDirectory("TestCoarseSourceMesh");
         simulator.SetEndTime(0.05);
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, -0.5));
 
-        // Set up second PDE and pass to handler
-        AveragedSourcePde<2> pde2(cell_population, -0.5);
-        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc, false);
-        pde_and_bc2.SetDependentVariableName("dunno");
-        pde_handler.AddPdeAndBc(&pde_and_bc2);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
-        // Pass PDE handler to simulation
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 10.0));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
+
+        simulator.AddSimulationModifier(p_pde_modifier);
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier2, (p_pde2, p_bc, false, p_cuboid, 10.0));
+        p_pde_modifier2->SetDependentVariableName("dunno");
+        p_pde_modifier2->SetBcsOnBoxBoundary(false);
+
+        simulator.AddSimulationModifier(p_pde_modifier2);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -656,7 +652,7 @@ public:
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
 
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
@@ -668,26 +664,15 @@ public:
         c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
 
-        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
-        simulator.GetCellBasedPdeHandler()->InitialiseCellPdeElementMap();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
-            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
-            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
-        }
-
         // Run cell-based simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         TS_ASSERT(p_coarse_mesh != NULL);
 
-        ReplicatableVector pde_solution0(simulator.GetCellBasedPdeHandler()->GetPdeSolution("oxygen"));
-        ReplicatableVector pde_solution1(simulator.GetCellBasedPdeHandler()->GetPdeSolution("dunno"));
+        ReplicatableVector pde_solution0(p_pde_modifier->GetSolution());
+        ReplicatableVector pde_solution1(p_pde_modifier2->GetSolution());
 
-        TS_ASSERT_EQUALS(pde_solution0.GetSize(),pde_solution1.GetSize());
+        TS_ASSERT_EQUALS(pde_solution0.GetSize(), pde_solution1.GetSize());
 
         // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
         for (unsigned i=0; i<pde_solution0.GetSize(); i++)
@@ -716,7 +701,7 @@ public:
             cell_iter != cell_population.End();
             ++cell_iter)
         {
-            unsigned elem_index = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh()->GetContainingElementIndex(cell_population.GetLocationOfCellCentre(*cell_iter));
+            unsigned elem_index = p_pde_modifier->GetFeMesh()->GetContainingElementIndex(cell_population.GetLocationOfCellCentre(*cell_iter));
             Element<2,2>* p_element = p_coarse_mesh->GetElement(elem_index);
 
             double max0 = std::max(pde_solution0[p_element->GetNodeGlobalIndex(0)], pde_solution0[p_element->GetNodeGlobalIndex(1)]);
@@ -742,7 +727,7 @@ public:
         }
     }
 
-    void TestCoarseSourceMeshWithGhostNodes() throw(Exception)
+    void TestCoarseSourceMeshWithGhostNodes()
     {
         EXIT_IF_PARALLEL;
 
@@ -752,7 +737,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
@@ -770,40 +755,26 @@ public:
         simulator.SetOutputDirectory("TestCoarseSourceMeshWithGhostNodes");
         simulator.SetEndTime(0.05);
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
-        // Pass PDE handler to simulation
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
-
-        TetrahedralMesh<2,2>* p_coarse_mesh = pde_handler.GetCoarsePdeMesh();
-
-        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
-        simulator.GetCellBasedPdeHandler()->InitialiseCellPdeElementMap();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
-            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
-            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
-        }
 
         // Run cell-based simulation
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
@@ -819,7 +790,7 @@ public:
         }
     }
 
-    void TestArchivingWithSimplePde() throw (Exception)
+    void TestArchivingWithSimplePde()
     {
         EXIT_IF_PARALLEL;
 
@@ -856,16 +827,15 @@ public:
         simulator.SetOutputDirectory("OffLatticeSimulationWithPdesSaveAndLoad");
         simulator.SetEndTime(0.2);
 
-        // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -898,8 +868,8 @@ public:
         TS_ASSERT_DELTA(node_15_location[1], 2.6052, 1e-4);
 
         // Test the CellData result
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9604, 1e-4);
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9579, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9605, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9582, 1e-4);
 
         // Tidy up
         delete p_simulator;
@@ -909,7 +879,7 @@ public:
      * This test demonstrates how to archive a OffLatticeSimulation
      * in the case where the PDE has the cell population as a member variable.
      */
-    void TestArchivingWithCellwisePde() throw (Exception)
+    void TestArchivingWithCellwisePde()
     {
         EXIT_IF_PARALLEL;
 
@@ -949,17 +919,15 @@ public:
         simulator.SetOutputDirectory(output_directory);
         simulator.SetEndTime(end_time);
 
-        // Set up PDE and pass to simulation via handler
-        CellwiseSourcePde<2> pde(cell_population, -0.03);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -985,7 +953,7 @@ public:
         delete p_simulator;
     }
 
-    void Test3DOffLatticeSimulationWithPdes() throw(Exception)
+    void Test3DOffLatticeSimulationWithPdes()
     {
         EXIT_IF_PARALLEL;
 
@@ -998,14 +966,14 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> generator;
         generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Set some model parameters for the cell-cycle model
         for (unsigned index=0; index < cells.size(); index++)
         {
-            cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
-            cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
+            static_cast<FixedG1GenerationalCellCycleModel*>(cells[index]->GetCellCycleModel())->SetTransitCellG1Duration(8.0);
+            static_cast<FixedG1GenerationalCellCycleModel*>(cells[index]->GetCellCycleModel())->SetStemCellG1Duration(8.0);
         }
 
         // Set up cell population
@@ -1017,17 +985,15 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(0.1);
 
-        // Set up PDE and pass to simulation via handler
-        SimpleUniformSourcePde<3> pde(-0.03);
-        ConstBoundaryCondition<3> bc(1.0);
-        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (-0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
-        CellBasedPdeHandler<3> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
@@ -1048,7 +1014,7 @@ public:
      * del squared C = 1 on the unit disc, with boundary condition C=t on r=1,
      * which has analytic solution C = t - 0.25*(1-r^2).
      */
-    void TestWithBoundaryConditionVaryingInTime() throw(Exception)
+    void TestWithBoundaryConditionVaryingInTime()
     {
         EXIT_IF_PARALLEL;
 
@@ -1081,17 +1047,15 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestUpdateAtEndOfTimeStepMethod");
 
-        // Create PDE and pass to simulation via handler
-        SimplePdeForTesting pde;
-        FunctionalBoundaryCondition<2> functional_bc(&bc_func);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &functional_bc, false);
-        pde_and_bc.SetDependentVariableName("oxygen");
+        // Create PDE and boundary condition objects
+        MAKE_PTR(SimplePdeForTesting, p_pde);
+        MAKE_PTR_ARGS(FunctionalBoundaryCondition<2>, p_functional_bc, (&bc_func));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_functional_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         double end_time = 0.5;
         simulator.SetEndTime(end_time);
@@ -1115,7 +1079,7 @@ public:
         }
     }
 
-    void TestOffLatticeSimulationWithPdesParameterOutputMethods() throw (Exception)
+    void TestOffLatticeSimulationWithPdesParameterOutputMethods()
     {
         EXIT_IF_PARALLEL;
 
@@ -1125,7 +1089,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         // Create a cell population
@@ -1136,14 +1100,15 @@ public:
         simulator.SetEndTime(0.5);
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
-        // Set up PDE and pass to simulation via handler
-        CellwiseSourcePde<2> pde(cell_population, -0.03);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+        p_pde_modifier->SetDependentVariableName("oxygen");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -1162,64 +1127,7 @@ public:
         ///\todo check output of simulator.OutputSimulationSetup();
     }
 
-    void TestNodeBasedWithoutCoarseMeshThrowsException() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-        TetrahedralMesh<2,2> temp_mesh;
-        temp_mesh.ConstructFromMeshReader(mesh_reader);
-        temp_mesh.Scale(5.0,1.0);
-
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
-
-        // Set up cells
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-            p_model->SetDimension(2);
-
-            CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(p_diff_type);
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*18.0;
-            p_cell->SetBirthTime(birth_time);
-
-            cells.push_back(p_cell);
-        }
-
-        // Set up cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestNodeBasedCellPopulationWithpoutCoarseMeshThrowsException");
-        simulator.SetEndTime(0.01);
-
-        // Set up PDE and pass to simulation via handler
-        AveragedSourcePde<2> pde(cell_population, -1.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
-
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
-
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
-
-        TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
-    }
-
-    void TestNodeBasedWithCoarseMesh() throw(Exception)
+    void TestNodeBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1238,7 +1146,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1257,21 +1165,21 @@ public:
         simulator.SetOutputDirectory("TestNodeBasedCellPopulationWithCoarseMeshPDE");
         simulator.SetEndTime(0.01);
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -1302,7 +1210,7 @@ public:
 
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -1312,19 +1220,9 @@ public:
         // Test that the two centres match
         c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
-
-        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
-        {
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
-            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
-            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
-        }
     }
 
-    void TestVertexBasedWithCoarseMesh() throw(Exception)
+    void TestVertexBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1334,7 +1232,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
@@ -1345,21 +1243,21 @@ public:
         simulator.SetOutputDirectory("TestVertexBasedCellPopulationWithCoarseMeshPDE");
         simulator.SetEndTime(0.01);
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Create PDE and boundary condition objects (zero uptake to check analytic solution)
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        //pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
@@ -1371,7 +1269,7 @@ public:
 
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -1397,19 +1295,9 @@ public:
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
-
-        // Test FindCoarseElementContainingCell() and initialisation of mCellPdeElementMap
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
-        {
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
-            TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
-            TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
-        }
     }
 
-    void TestVolumeDependentAveragedPde() throw(Exception)
+    void TestVolumeDependentAveragedPde()
     {
         EXIT_IF_PARALLEL;
 
@@ -1433,7 +1321,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1447,35 +1335,31 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        c_vector<double,2> centre_of_mesh;
-        centre_of_mesh[0] = 5.0;
-        centre_of_mesh[1] = 5.0;
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased");
         simulator.SetEndTime(0.01);
 
-        // Set up PDE and pass to simulation via handler (uniform uptake at each cell)
-        VolumeDependentAveragedSourcePde<2> pde(cell_population, -0.01);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Create PDE and boundary condition objects (uniform uptake at each cell)
+        MAKE_PTR_ARGS(VolumeDependentAveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.01));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         simulator.Solve();
 
-        TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
+        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         // Check the correct cell density is in each element
         unsigned num_elements_in_coarse_mesh = p_coarse_mesh->GetNumElements();
@@ -1491,7 +1375,7 @@ public:
             ++cell_iter)
         {
             // Get containing element
-            unsigned containing_element_index = simulator.GetCellBasedPdeHandler()->mCellPdeElementMap[*cell_iter];
+            unsigned containing_element_index = p_pde_modifier->mCellPdeElementMap[*cell_iter];
             cells_in_each_coarse_element[containing_element_index] += 1;
         }
 
@@ -1501,14 +1385,14 @@ public:
             double det;
             p_coarse_mesh->GetElement(i)->CalculateJacobian(jacobian, det);
             double element_volume = p_coarse_mesh->GetElement(i)->GetVolume(det);
-            double uptake_rate = pde.GetUptakeRateForElement(i);
+            double uptake_rate = p_pde->GetUptakeRateForElement(i);
             double expected_uptake = 0.9*0.9*(cells_in_each_coarse_element[i]/element_volume);
 
             TS_ASSERT_DELTA(uptake_rate, expected_uptake, 1e-4);
         }
     }
 
-    void TestCoarsePdeSolutionOnNodeBased1d() throw(Exception)
+    void TestCoarsePdeSolutionOnNodeBased1d()
     {
         EXIT_IF_PARALLEL;
 
@@ -1525,7 +1409,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(1);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1542,23 +1426,21 @@ public:
         OffLatticeSimulation<1> simulator(cell_population);
         simulator.SetEndTime(0.01);
 
-        // Set up PDE and pass to simulation via handler
-        AveragedSourcePde<1> pde(cell_population, -1.0);
-        ConstBoundaryCondition<1> bc(0.0);
-        PdeAndBoundaryConditions<1> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, -1.0));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (0.0));
 
-        CellBasedPdeHandler<1> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-
-        unsigned num_nodes = 8; //pow(2,3);
-        double mesh_size = 2.0/(double)(num_nodes-1);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         ChastePoint<1> lower(0.0);
         ChastePoint<1> upper(2.0);
-        ChasteCuboid<1> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(mesh_size, cuboid, true);
+        MAKE_PTR_ARGS(ChasteCuboid<1>, p_cuboid, (lower, upper));
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+
+        simulator.AddSimulationModifier(p_pde_modifier);
+
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased1d");
 
         // Solve the system
@@ -1571,7 +1453,7 @@ public:
         }
     }
 
-    void TestCoarsePdeSolutionOnNodeBased2d() throw(Exception)
+    void TestCoarsePdeSolutionOnNodeBased2d()
     {
         EXIT_IF_PARALLEL;
 
@@ -1589,7 +1471,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1603,31 +1485,27 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        c_vector<double,2> centre_of_mesh;
-        centre_of_mesh[0] = 5.0;
-        centre_of_mesh[1] = 5.0;
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased2d");
         simulator.SetEndTime(0.01);
 
-        // Set up PDE and pass to simulation via handler (uniform uptake at each cell)
-        AveragedSourcePde<2> pde(cell_population, -0.01);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, -0.01));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
+        ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
 
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 10.0));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         simulator.Solve();
@@ -1637,7 +1515,7 @@ public:
         TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem("nutrient"), 0.9589, 1e-4);
     }
 
-    void TestCoarsePdeSolutionOnNodeBased3d() throw(Exception)
+    void TestCoarsePdeSolutionOnNodeBased3d()
     {
         EXIT_IF_PARALLEL;
 
@@ -1655,7 +1533,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(3);
 
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -1669,31 +1547,27 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        c_vector<double,3> centre_of_mesh;
-        centre_of_mesh[0] = 5.0;
-        centre_of_mesh[1] = 5.0;
-        centre_of_mesh[2] = 5.0;
-
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarsePdeSolutionOnNodeBased3d");
         simulator.SetEndTime(0.01);
 
-        // Set up PDE and pass to simulation via handler (uniform uptake at each cell)
-        AveragedSourcePde<3> pde(cell_population, -0.01);
-        ConstBoundaryCondition<3> bc(1.0);
-        PdeAndBoundaryConditions<3> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Create PDE and boundary condition objects
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, -0.01));
+        MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
-        CellBasedPdeHandler<3> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        ChastePoint<3> lower(0.0, 0.0, 0.0);
-        ChastePoint<3> upper(50.0, 50.0, 50.0);
-        ChasteCuboid<3> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-        simulator.SetCellBasedPdeHandler(&pde_handler);
+        // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
+        c_vector<double,3> centroid = cell_population.GetCentroidOfCellPopulation();
+        ChastePoint<3> lower(centroid(0)-25.0, centroid(1)-25.0, centroid(2)-25.0);
+        ChastePoint<3> upper(centroid(0)+25.0, centroid(1)+25.0, centroid(2)+25.0);
+        MAKE_PTR_ARGS(ChasteCuboid<3>, p_cuboid, (lower, upper));
+
+        // Create a PDE modifier and set the name of the dependent variable in the PDE
+        MAKE_PTR_ARGS(EllipticBoxDomainPdeModifier<3>, p_pde_modifier, (p_pde, p_bc, false, p_cuboid, 10.0));
+        p_pde_modifier->SetDependentVariableName("nutrient");
+        p_pde_modifier->SetBcsOnBoxBoundary(false);
+
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Solve the system
         simulator.Solve();

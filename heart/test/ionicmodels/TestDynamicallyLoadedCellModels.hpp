@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,6 +115,8 @@ private:
         OdeSolution solution2 = pCell->Compute(0.0, 60.0);
         solution2.WriteToFile("TestIonicModels", "DynamicallyLoadableLr91GetIIonic", "ms", 100, false, 4);
 
+        // For coverage
+        TS_ASSERT_DELTA(pCell->GetIntracellularCalciumConcentration(), 0.0012, 1e-4);
         TS_ASSERT_DELTA(pCell->GetIIonic(), 1.9411, tolerance);
     }
 
@@ -149,7 +151,7 @@ public:
      * This test demonstrates the easiest way to load a single cell model from CellML,
      * using the CellMLLoader class.
      */
-    void TestCellmlLoaderClass() throw(Exception)
+    void TestCellmlLoaderClass()
     {
         FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
         // Stimulus to use for simulation, so it matches other tests in this suite
@@ -164,7 +166,15 @@ public:
             p_cell->SetStimulusFunction(p_stimulus);
             SimulateLr91AndCompare(p_cell.get());
 
-            // We can't now call LoadCvodeCell on this loader
+            // Are sources from the conversion preserved?
+            FileFinder cpp_file(handler.GetRelativePath() + "/LuoRudy1991.cpp", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(cpp_file.Exists());
+            TS_ASSERT(cpp_file.IsNewerThan(cellml_file));
+            FileFinder hpp_file(handler.GetRelativePath() + "/LuoRudy1991.hpp", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(hpp_file.Exists());
+            TS_ASSERT(hpp_file.IsNewerThan(cellml_file));
+
+           // We can't now call LoadCvodeCell on this loader
 #ifdef CHASTE_CVODE
             TS_ASSERT_THROWS_THIS(loader.LoadCvodeCell(),
                                   "You cannot call both LoadCvodeCell and LoadCardiacCell on the same CellMLLoader.");
@@ -191,7 +201,7 @@ public:
      * This is based on TestOdeSolverForLR91WithDelayedSimpleStimulus from
      * TestIonicModels.hpp.
      */
-    void TestDynamicallyLoadedLr91() throw(Exception)
+    void TestDynamicallyLoadedLr91()
     {
         // Load the cell model dynamically
         std::string model_name = "libDynamicallyLoadableLr91.";
@@ -207,7 +217,7 @@ public:
         RunLr91Test(*p_loader2);
     }
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         // Try loading a .so that doesn't exist
         std::string file_name = "non-existent-file-we-hope";
@@ -221,7 +231,7 @@ public:
                                   "Failed to load cell creation function from .so file");
     }
 
-    void TestCellmlConverter() throw(Exception)
+    void TestCellmlConverter()
     {
         // Copy CellML file into output dir
         std::string dirname = "TestCellmlConverter";
@@ -303,7 +313,7 @@ public:
         }
     }
 
-    void TestCellmlConverterWithOptions() throw(Exception)
+    void TestCellmlConverterWithOptions()
     {
         // Copy CellML file into output dir
         std::string dirname = "TestCellmlConverterWithOptions";
@@ -357,7 +367,7 @@ public:
 #endif
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
         // Check the previous test has left us a .so file

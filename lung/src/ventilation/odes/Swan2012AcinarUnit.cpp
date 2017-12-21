@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,17 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Swan2012AcinarUnit.hpp"
+#include "MathsCustomFunctions.hpp"
 #include <cmath>
 #include <iostream>
-
 
 Swan2012AcinarUnit::Swan2012AcinarUnit() : mQ(0.0),
                                            mLambda(1.26),
                                            mDt(-1),
                                            mPaw(0.0),
-                                           mPawOld(0.0),
                                            mPpl(0.0),
-                                           mPplOld(0.0),
                                            mRaw(0.0),
                                            mA(0.433),
                                            mB(-0.611),
@@ -67,20 +65,26 @@ void Swan2012AcinarUnit::SetTimestep(double dt)
 
 void Swan2012AcinarUnit::SolveAndUpdateState(double tStart, double tEnd)
 {
-    //Update stretch component
-    double dPe = (mPaw - mPawOld) - (mPpl - mPplOld);
-    double dLambda_dPe = 1.0/CalculateDerivativeStaticRecoilPressureByStrain();
 
-    mLambda = mLambda + dLambda_dPe*dPe;
+}
 
-    //Update flow
-    double c_a = CalculateAcinarTissueCompliance(); //Need to incorporate Ca(CW) too
+void Swan2012AcinarUnit::ComputeExceptFlow(double tStart, double tEnd)
+{
+    double Pe = CalculateStaticRecoilPressure(mLambda);
 
+    mPaw = Pe + mPpl;
+}
+
+void Swan2012AcinarUnit::UpdateFlow(double tStart, double tEnd)
+{
     double dt = tEnd - tStart;
-    double nu = (mPaw - mPawOld)/dt;
-    double beta = (mPpl - mPplOld)/dt;
+    double compliance_factor = CalculateDerivativeStaticRecoilPressureByStrain();
 
-    mQ = c_a*(nu - beta) + (mQ - c_a*(nu - beta))*std::exp(-dt/(mRaw*c_a));
+    mQ = (1 - std::exp(-dt*compliance_factor/mRaw))*mQ*mRaw/compliance_factor/dt;
+
+    double V = GetVolume();
+    V += dt*mQ;
+    mLambda = std::pow(V/mV0, 1.0/3.0);
 }
 
 void Swan2012AcinarUnit::SetFlow(double flow)
@@ -95,13 +99,16 @@ double Swan2012AcinarUnit::GetFlow()
 
 void Swan2012AcinarUnit::SetAirwayPressure(double pressure)
 {
-    mPawOld = mPaw;
     mPaw = pressure;
+}
+
+double Swan2012AcinarUnit::GetAirwayPressure()
+{
+    return mPaw;
 }
 
 void Swan2012AcinarUnit::SetPleuralPressure(double pressure)
 {
-    mPplOld = mPpl;
     mPpl = pressure;
 }
 
@@ -138,18 +145,18 @@ double Swan2012AcinarUnit::CalculateDerivativeVolumeByStrain()
 
 double Swan2012AcinarUnit::CalculateDerivativeStaticRecoilPressureByStrain()
 {
-    double gamma = CalculateGamma();
+    double gamma = CalculateGamma(mLambda);
     return ((3.0*mXi/2.0)*(3*mA + mB)*(3*mA + mB)*(mLambda*mLambda - 1)*(mLambda*mLambda - 1)*std::exp(gamma) +
-            (mXi/2.0)*(3*mA + mB)*(mLambda*mLambda + 1)*std::exp(gamma)/(mLambda*mLambda));
+            (mXi/2.0)*(3*mA + mB)*(mLambda*mLambda + 1)*std::exp(gamma)/(mLambda*mLambda))/CalculateDerivativeVolumeByStrain();
 }
 
-double Swan2012AcinarUnit::CalculateGamma()
+double Swan2012AcinarUnit::CalculateGamma(double lambda)
 {
-    return (3.0/4.0)*(3*mA + mB)*(mLambda*mLambda - 1)*(mLambda*mLambda - 1);
+    return (3.0/4.0)*(3*mA + mB)*(lambda*lambda - 1)*(lambda*lambda - 1);
 }
 
-double Swan2012AcinarUnit::CalculateAcinarTissueCompliance()
+double Swan2012AcinarUnit::CalculateStaticRecoilPressure(double lambda)
 {
-    return CalculateDerivativeVolumeByStrain()/CalculateDerivativeStaticRecoilPressureByStrain();
+    double gamma = CalculateGamma(lambda);
+    return mXi*std::exp(gamma)/(2.0*lambda)*(3*mA + mB)*(lambda*lambda -1);
 }
-

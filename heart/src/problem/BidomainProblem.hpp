@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -230,8 +230,6 @@ public:
      * Checks that a suitable method of resolving the singularity is being used.
      */
     void PreSolveChecks();
-
-
 
     /**
      *  Called at beginning of each time step in the main time-loop in

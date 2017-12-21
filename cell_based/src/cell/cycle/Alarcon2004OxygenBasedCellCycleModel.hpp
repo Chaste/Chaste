@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,17 +41,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "AbstractOdeBasedCellCycleModel.hpp"
+#include "AbstractOdeBasedPhaseBasedCellCycleModel.hpp"
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 
 /**
  * Oxygen-dependent ODE-based cell-cycle model.
  *
- *
- *
  * Published by Alarcon et al. (doi:10.1016/j.jtbi.2004.04.016).
  */
-class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedCellCycleModel
+class Alarcon2004OxygenBasedCellCycleModel : public AbstractOdeBasedPhaseBasedCellCycleModel
 {
 private:
 
@@ -66,7 +64,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractOdeBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractOdeBasedPhaseBasedCellCycleModel>(*this);
     }
 
     /**
@@ -75,6 +73,23 @@ private:
      * @param currentTime  the time up to which the system will be solved.
      */
     void AdjustOdeParameters(double currentTime);
+
+protected:
+
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel.
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the cell cycle model to copy.
+     */
+    Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel);
 
 public:
 
@@ -112,7 +127,7 @@ public:
     void Initialise();
 
     /**
-     * Outputs cell cycle model parameters to files.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

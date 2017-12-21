@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,7 +105,7 @@ public:
      *
      * Let us now run a simulation with mechano-electric feedback (MEF), and with different boundary conditions.
      */
-    void TestWithMef() throw(Exception)
+    void TestWithMef()
     {
         /* If we want to use MEF, where the stretch (in the fibre-direction) couples back to the cell
          * model and is used in stretch-activated channels (SACs), we can't just let Chaste convert
@@ -154,10 +154,10 @@ public:
         fixed_nodes.push_back(0);
         fixed_node_locations.push_back(zero_vector<double>(2));
 
-        for(unsigned i=1; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
-            if(fabs(X) < 1e-6) // ie, if X==0
+            if (fabs(X) < 1e-6) // ie, if X==0
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -262,7 +262,7 @@ public:
         Vec voltage = PetscTools::CreateVec(electrics_mesh.GetNumNodes());
         reader.GetVariableOverNodes(voltage, "V", num_timesteps-1);
         ReplicatableVector voltage_repl(voltage);
-        for(unsigned i=0; i<voltage_repl.GetSize(); i++)
+        for (unsigned i=0; i<voltage_repl.GetSize(); i++)
         {
             TS_ASSERT_DELTA(voltage_repl[i], -81.9080, 1e-3);
         }
@@ -278,7 +278,7 @@ public:
      *
      * Next, we run a simulation on a 2d annulus, with an internal pressure applied.
      */
-    void TestAnnulusWithInternalPressure() throw (Exception)
+    void TestAnnulusWithInternalPressure()
     {
         /* The following should require little explanation now */
         TetrahedralMesh<2,2> electrics_mesh;
@@ -295,7 +295,7 @@ public:
 
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];

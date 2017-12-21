@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -104,7 +104,7 @@ class TestPerElementWriter : public CxxTest::TestSuite
 
 public:
 
-    void TestPerElement() throw (Exception)
+    void TestPerElement()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(2, 3, 4);
@@ -120,7 +120,6 @@ public:
         NumericFileComparison(handler.GetOutputDirectoryFullPath() + "/centroid_indexed.dat",
                               "mesh/test/data/TestUtilities/centroid_indexed.dat").CompareFiles();
     }
-
 };
 
 #endif //_TESTPERELEMENTWRITER_HPP_

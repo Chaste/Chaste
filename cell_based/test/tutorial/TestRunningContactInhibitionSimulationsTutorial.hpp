@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /*
- * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimpleCellCycleModel}}}.
+ * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractCellCycleModel}}}.
  * The duration of the G1 phase depends on the deviation from a 'target' volume (or area/length in 2D/1D): if a cell's volume is
  * lower than a given fraction of its target volume, the G1 phase continues.
  * This model of cell-cycle progression allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
@@ -99,8 +99,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CellMutationStatesCountWriter.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -239,7 +240,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
-         * is defined by a {{{StochasticDurationCellCycleModel}}}. */
+         * is defined by a {{{UniformCellCycleModel}}}. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -248,9 +249,8 @@ public:
         {
             if (i==1)
             {
-                StochasticDurationCellCycleModel* p_cycle_model = new StochasticDurationCellCycleModel();
+                UniformCellCycleModel* p_cycle_model = new UniformCellCycleModel();
                 p_cycle_model->SetBirthTime(-14.0);
-                p_cycle_model->SetStemCellG1Duration(1.0);
 
                 CellPtr p_cell(new Cell(p_state, p_cycle_model));
                 p_cell->SetCellProliferativeType(p_stem_type);

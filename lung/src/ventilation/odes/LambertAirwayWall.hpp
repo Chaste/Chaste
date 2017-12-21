@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -117,7 +117,7 @@ public:
      */
     void SetRi(double Ri);
 
-private:
+
     /** The airway radius at zero transpulmonary pressure */
     double mRi;
 
@@ -135,6 +135,9 @@ private:
 
     /** The parameter n2 */
     double mN2;
+
+
+private:
 
     /** The pressure inside the airway */
     double mAirwayPressure;

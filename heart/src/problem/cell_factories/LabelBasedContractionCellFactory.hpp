@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -111,9 +111,9 @@ public:
                 NEVER_REACHED;
             }
         }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         return NULL;  //This is included to appease compilers which analysis the NEVER_REACHED branch as not returning a pointer
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 };
 

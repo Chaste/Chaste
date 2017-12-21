@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
     /////////////////////////////////////////
     // set up LHS matrix (and mass matrix)
     /////////////////////////////////////////
-    if(computeMatrix)
+    if (computeMatrix)
     {
         mpMonodomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpMonodomainAssembler->AssembleMatrix();
@@ -73,7 +73,6 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
 
             this->mpLinearSystem->FinalisePrecondMatrix();
         }
-
     }
 
     HeartEventHandler::BeginEvent(HeartEventHandler::ASSEMBLE_RHS);
@@ -120,7 +119,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
     /////////////////////////////////////////
     // apply correction term
     /////////////////////////////////////////
-    if(mpMonodomainCorrectionTermAssembler)
+    if (mpMonodomainCorrectionTermAssembler)
     {
         mpMonodomainCorrectionTermAssembler->SetVectorToAssemble(this->mpLinearSystem->rGetRhsVector(), false/*don't zero vector!*/);
         // don't need to set current solution
@@ -130,8 +129,6 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
     // finalise
     this->mpLinearSystem->FinaliseRhsVector();
 }
-
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
@@ -145,7 +142,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolu
     AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
-    if(HeartConfig::Instance()->GetUseAbsoluteTolerance())
+    if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
     {
         this->mpLinearSystem->SetAbsoluteTolerance(HeartConfig::Instance()->GetAbsoluteTolerance());
     }
@@ -200,7 +197,7 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
     pTissue->SetCacheReplication(false);
     mVecForConstructingRhs = NULL;
 
-    if(HeartConfig::Instance()->GetUseStateVariableInterpolation())
+    if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
         mpMonodomainCorrectionTermAssembler
             = new MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
@@ -219,26 +216,21 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainSolver()
     delete mpMonodomainAssembler;
     delete mpNeumannSurfaceTermsAssembler;
 
-    if(mVecForConstructingRhs)
+    if (mVecForConstructingRhs)
     {
         PetscTools::Destroy(mVecForConstructingRhs);
         PetscTools::Destroy(mMassMatrix);
     }
 
-    if(mpMonodomainCorrectionTermAssembler)
+    if (mpMonodomainCorrectionTermAssembler)
     {
         delete mpMonodomainCorrectionTermAssembler;
     }
 }
 
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class MonodomainSolver<1,1>;
 template class MonodomainSolver<1,2>;
 template class MonodomainSolver<1,3>;
 template class MonodomainSolver<2,2>;
 template class MonodomainSolver<3,3>;
-

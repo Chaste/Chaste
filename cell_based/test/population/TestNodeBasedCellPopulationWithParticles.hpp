@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "TetrahedralMesh.hpp"
@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -78,7 +80,7 @@ public:
      * 0 to be associated with node 1 instead of node 0, and Validate() throws an
      * exception. We then set node 0 to be a particle node, and Validate() passes.
      */
-    void TestValidateNodeBasedCellPopulationWithParticles() throw(Exception)
+    void TestValidateNodeBasedCellPopulationWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -93,7 +95,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
@@ -133,7 +135,7 @@ public:
     }
 
     // Test with particles, checking that the Iterator doesn't loop over particles
-    void TestNodeBasedCellPopulationWithParticlesSetup() throw(Exception)
+    void TestNodeBasedCellPopulationWithParticlesSetup()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -150,7 +152,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
@@ -203,7 +205,7 @@ public:
         TS_ASSERT_EQUALS(counter + particle_indices.size(), mesh.GetNumNodes());
     }
 
-    void TestCellPopulationIteratorWithNoCells() throw(Exception)
+    void TestCellPopulationIteratorWithNoCells()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -225,7 +227,7 @@ public:
 
         // Create a single cell
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, cell_location_indices.size());
         cells[0]->StartApoptosis();
 
@@ -291,7 +293,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, cell_location_indices.size());
         cells[27]->StartApoptosis();
 
@@ -391,7 +393,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, cell_location_indices.size());
         cells[27]->StartApoptosis();
 
@@ -404,7 +406,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(0);
@@ -412,7 +414,7 @@ public:
         c_vector<double,2> new_location = zero_vector<double>(2);
         new_location[0] = 0.3433453454443;
         new_location[0] = 0.3435346344234;
-        cell_population.AddCell(p_new_cell, new_location, cell_population.rGetCells().front() /*random choice of parent*/);
+        cell_population.AddCell(p_new_cell, cell_population.rGetCells().front()); // random choice of parent
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
@@ -425,7 +427,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 70u);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model2 = new FixedG1GenerationalCellCycleModel();
         CellPtr p_new_cell2(new Cell(p_state, p_model2));
         p_new_cell2->SetCellProliferativeType(p_stem_type);
         p_new_cell2->SetBirthTime(0);
@@ -433,165 +435,14 @@ public:
         c_vector<double,2> new_location2 = zero_vector<double>(2);
         new_location2[0] = 0.6433453454443;
         new_location2[0] = 0.6435346344234;
-        cell_population.AddCell(p_new_cell2, new_location2, cell_population.rGetCells().front() /*random choice of parent*/);
+        cell_population.AddCell(p_new_cell2, cell_population.rGetCells().front()); // random choice of parent
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
     }
 
-    void TestUpdateNodeLocations() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
-        HoneycombMeshGenerator generator(3, 3, 1);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
-
-        // Convert this to a NodesOnlyMesh
-        MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
-
-        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
-
-        CellPropertyRegistry::Instance()->Clear();
-        RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
-
-        // Set up cells
-        std::vector<CellPtr> cells;
-        cells.clear();
-        unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
-        cells.reserve(num_cells);
-
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            double y = 0.0;
-            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
-            {
-                y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
-            }
-
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
-            p_cell_cycle_model->SetDimension(2);
-
-            double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
-            double typical_stem_cycle_time = p_cell_cycle_model->GetAverageStemCellCycleTime();
-
-            unsigned generation;
-            if (y <= 0.3)
-            {
-                generation = 0;
-            }
-            else if (y < 2.0)
-            {
-                generation = 1;
-            }
-            else if (y < 3.0)
-            {
-                generation = 2;
-            }
-            else if (y < 4.0)
-            {
-                generation = 3;
-            }
-            else
-            {
-                generation = 4;
-            }
-            p_cell_cycle_model->SetGeneration(generation);
-
-            boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-            boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-
-            CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
-
-            if (y <= 0.3)
-            {
-                p_cell->SetCellProliferativeType(p_stem_type);
-            }
-            else
-            {
-                p_cell->SetCellProliferativeType(p_transit_type);
-                if (y >= 4.0 && p_cell_cycle_model->CanCellTerminallyDifferentiate())
-                {
-                    p_cell->SetCellProliferativeType(p_diff_type);
-                }
-            }
-
-            double birth_time = -p_random_num_gen->ranf();
-            if (y <= 0.3)
-            {
-                birth_time *= typical_stem_cycle_time; // hours
-            }
-            else
-            {
-                birth_time *= typical_transit_cycle_time; // hours
-            }
-            p_cell->SetBirthTime(birth_time);
-
-            if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
-            {
-                cells.push_back(p_cell);
-            }
-        }
-
-        NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, location_indices);
-
-        // Make up some forces
-        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            c_vector<double, 2> force;
-            old_posns[i][0] = cell_population.GetNode(i)->rGetLocation()[0];
-            old_posns[i][1] = cell_population.GetNode(i)->rGetLocation()[1];
-
-            force[0] = i*0.01;
-            force[1] = 2*i*0.01;
-
-            cell_population.GetNode(i)->ClearAppliedForce();
-            cell_population.GetNode(i)->AddAppliedForceContribution(force);
-        }
-
-        // Call method
-        double time_step = 0.01;
-        cell_population.UpdateNodeLocations(time_step);
-
-        // Check that cells locations were correctly updated
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            unsigned i = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
-            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
-        }
-
-        // Check that particles were correctly updated
-        // First, create a set of node indices corresponding to particles
-        std::set<unsigned> node_indices;
-        std::set<unsigned> particle_indices;
-
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            node_indices.insert(p_mesh->GetNode(i)->GetIndex());
-        }
-
-        std::set_difference(node_indices.begin(), node_indices.end(),
-                            location_indices.begin(), location_indices.end(),
-                            std::inserter(particle_indices, particle_indices.begin()));
-
-        // Second, loop over all particles
-        for (std::set<unsigned>::iterator it=particle_indices.begin();
-             it!=particle_indices.end();
-             it++)
-        {
-            TS_ASSERT_DELTA(cell_population.GetNode(*it)->rGetLocation()[0], old_posns[*it][0] +   (*it)*0.01*0.01, 1e-9);
-            TS_ASSERT_DELTA(cell_population.GetNode(*it)->rGetLocation()[1], old_posns[*it][1] + 2*(*it)*0.01*0.01, 1e-9);
-        }
-    }
-
-    void TestCellPopulationWritersIn3dWithParticles() throw(Exception)
+    void TestCellPopulationWritersIn3dWithParticles()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -630,7 +481,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>()); // coverage
@@ -711,7 +562,7 @@ public:
         }
     }
 
-    void TestArchivingCellPopulation() throw (Exception)
+    void TestArchivingCellPopulation()
     {
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
@@ -736,7 +587,7 @@ public:
 
             // Create cells
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             // Create a cell population

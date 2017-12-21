@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,10 +80,10 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
          * to the other processes.  Therefore, to avoid deadlock, we share this potential for error between
          * processes and throw an exception.
          */
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
         EXCEPTION("No cells were assigned some process in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     unsigned ownership_range_low = mpDistributedVectorFactory->GetLow();
     mCellsDistributed.resize(num_local_nodes);
@@ -164,7 +164,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     }
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
-    if(HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
+    if (HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
     {
         mFibreFilePathNoExtension = HeartConfig::Instance()->GetMeshName();
     }
@@ -296,14 +296,15 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
             assert(hetero_intra_conductivities.size()==0);
             hetero_intra_conductivities.resize(num_local_elements, intra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &r_bad_alloc)
         {
-#define COVERAGE_IGNORE
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw r_bad_alloc;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -324,7 +325,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                if ( conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid) )
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
@@ -404,13 +405,13 @@ AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetC
     // First search the halo
     if ((node_position=mHaloGlobalToLocalIndexMap.find(globalIndex)) != mHaloGlobalToLocalIndexMap.end())
     {
-        //Found a halo node
+        // Found a halo node
         return mHaloCellsDistributed[node_position->second];
     }
     // Then search the owned node
-    if ( mpDistributedVectorFactory->IsGlobalIndexLocal(globalIndex)  )
+    if (mpDistributedVectorFactory->IsGlobalIndexLocal(globalIndex))
     {
-        //Found an owned node
+        // Found an owned node
         return mCellsDistributed[globalIndex - mpDistributedVectorFactory->GetLow()];
     }
     // Not here
@@ -462,7 +463,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage)
 {
-    if(mHasPurkinje)
+    if (mHasPurkinje)
     {
         // can't do Purkinje and operator splitting
         assert(!updateVoltage);
@@ -511,7 +512,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                     {
                         // Try an 'emergency' reset if this is a CVODE cell.
                         // See #2594 for why we think this may be necessary.
-                        if(dynamic_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local]))
+                        if (dynamic_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local]))
                         {
                             // Reset the CVODE cell, this leads to a call to CVodeReInit.
                             static_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local])->ResetSolver();
@@ -599,19 +600,19 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
             }
         }
-        catch (Exception&)
+        // LCOV_EXCL_START
+        catch (Exception& e)
         {
             ///\todo #2017 This code will be needed in the future, not being covered now.
             /// Add a test which covers this, e.g.  by doing a simulation with a bad stimulus for one of the
             /// Purkinje cells - stimulating with the wrong choice of sign say.
 
             NEVER_REACHED;
-            //PetscTools::ReplicateException(true);
-            //throw e;
+            PetscTools::ReplicateException(true);
+            throw e;
         }
+        // LCOV_EXCL_STOP
     }
-
-
 
     PetscTools::ReplicateException(false);
     HeartEventHandler::EndEvent(HeartEventHandler::SOLVE_ODES);
@@ -692,7 +693,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
     }
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-    if ( mDoCacheReplication )
+    if (mDoCacheReplication)
     {
         ReplicateCaches();
     }
@@ -785,11 +786,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetConductivityModifier(Abstr
     mpConductivityModifier = pModifier;
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractCardiacTissue<1,1>;
 template class AbstractCardiacTissue<1,2>;
 template class AbstractCardiacTissue<1,3>;

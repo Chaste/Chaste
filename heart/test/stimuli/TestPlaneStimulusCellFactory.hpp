@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPlaneStimulusCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestBasicContructor() throw (Exception)
+    void TestBasicContructor()
     {
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(2,2,2);
@@ -89,9 +89,9 @@ public:
             delete p_cell1;
             delete p_cell2;
         }
-
     }
-    void TestHeartGeometryIntoCellFactory() throw(Exception)
+
+    void TestHeartGeometryIntoCellFactory()
     {
         TetrahedralMesh<2,2> mesh;
         //This mesh will have 6 nodes per face, spaced by 1

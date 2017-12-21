@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestBidomainWithBathAndFibresTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestSimulation() throw(Exception)
+    void TestSimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorialWithBathAndFibres");

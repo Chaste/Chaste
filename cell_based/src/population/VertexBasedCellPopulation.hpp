@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,14 +38,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
-#include "AbstractVertexBasedDivisionRule.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned DIM> class AbstractVertexBasedDivisionRule; // Circular definition thing.
+template<unsigned DIM>
+class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
 
 /**
  * A facade class encapsulating a vertex-based cell population.
@@ -96,6 +96,12 @@ private:
     std::vector< unsigned > mCellIdsOfT2Swaps;
 
     /**
+     * Whether to restrict the vertex movement if vertex displacement is larger than
+     * the cell rearrangement threshold.
+     */
+    bool mRestrictVertexMovement;
+
+    /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
@@ -120,6 +126,7 @@ private:
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
         archive & mOutputCellRearrangementLocations;
         archive & mpVertexBasedDivisionRule;
+        archive & mRestrictVertexMovement;
     }
 
     /**
@@ -242,11 +249,15 @@ public:
     unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
-     * Overridden UpdateNodeLocations() method.
+     * Checks whether a given node displacement violates the movement threshold
+     * for this population. If so, a stepSizeException is generated that contains
+     * a warning/error message and a suggested smaller dt that should avoid the problem.
      *
-     * @param dt the time step
+     * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
+     * @param rDisplacement Movement vector of the node at this time step
+     * @param dt Current time step size
      */
-    void UpdateNodeLocations(double dt);
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt);
 
     /**
      * Overridden SetNode() method.
@@ -273,14 +284,10 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  if this vector has any non-zero component, then it is used as the axis
-     *     along which the parent cell divides
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell,
-                    const c_vector<double,DIM>& rCellDivisionVector,
-                    CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -435,11 +442,46 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
-     * @return a tetrahedral mesh using the nodes in the VertexMesh
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh using the nodes in the VertexMesh
      * as well as an additional node at the centre of each VertexElement.
-     * This method only works in 2D.
+     * At present, this method only works in 2D.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshUsingVertexMesh();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
+     * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
+     *
+     * @param pdeNodeIndex inedx of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
 
     /**
      * @return The Vertex division rule that is currently being used.
@@ -452,6 +494,56 @@ public:
      * @param pVertexBasedDivisionRule  pointer to the new division rule
      */
     void SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule);
+
+    /**
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 0.002 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
+     * simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep();
+
+    /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     *
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+
+    /**
+     * Overridden SimulationSetupHook() method.
+     *
+     * Hook method to add a T2SwapCellKiller to a simulation object, which is always
+     * required in the case of a VertexBasedCellPopulation. This functionality avoids
+     * the need for static or dynamic casts to specific cell population types within
+     * simulation methods.
+     *
+     * Note: In order to inhibit T2 swaps, the user needs to set the threshold for T2
+     * swaps in the MutableVertexMesh object mrMesh to 0, using the SetT2Threshold() method.
+     *
+     * @param pSimulation pointer to a cell-based simulation object
+     */
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
+
+    /**
+     * Get the value of the mRestrictVertexMovement boolean.
+     *
+     * @return True if vertex movement is restricted at each timestep.
+     */
+    bool GetRestrictVertexMovementBoolean();
+
+    /**
+     * Set the value of the mRestrictVertexMovement boolean.
+     *
+     * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
+     */
+    void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,18 +38,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 CellCycleModelOdeHandler::CellCycleModelOdeHandler(double lastTime,
                                                    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : mDt(DOUBLE_UNSET),
-      mpOdeSystem(NULL),
+      mpOdeSystem(nullptr),
       mpOdeSolver(pOdeSolver),
-      mLastTime(lastTime)
+      mLastTime(lastTime),
+      mFinishedRunningOdes(false)
 {
 }
 
 CellCycleModelOdeHandler::~CellCycleModelOdeHandler()
 {
-    if (mpOdeSystem != NULL)
+    if (mpOdeSystem != nullptr)
     {
         delete mpOdeSystem;
     }
+}
+
+CellCycleModelOdeHandler::CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler)
+    : mDt(rHandler.mDt),
+      mpOdeSystem(rHandler.mpOdeSystem),
+      mpOdeSolver(rHandler.mpOdeSolver),
+      mLastTime(rHandler.mLastTime),
+      mFinishedRunningOdes(rHandler.mFinishedRunningOdes)
+{
 }
 
 void CellCycleModelOdeHandler::SetOdeSystem(AbstractOdeSystem* pOdeSystem)
@@ -123,4 +133,18 @@ void CellCycleModelOdeHandler::SetStateVariables(const std::vector<double>& rSta
 {
     assert(mpOdeSystem);
     mpOdeSystem->SetStateVariables(rStateVariables);
+}
+
+std::vector<double> CellCycleModelOdeHandler::GetProteinConcentrations() const
+{
+    assert(mpOdeSystem != nullptr);
+    return mpOdeSystem->rGetStateVariables();
+}
+
+void CellCycleModelOdeHandler::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
+{
+    assert(mpOdeSystem != nullptr);
+    assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
+    mLastTime = lastTime;
+    mpOdeSystem->SetStateVariables(proteinConcentrations);
 }

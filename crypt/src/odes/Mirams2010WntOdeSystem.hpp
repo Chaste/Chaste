@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -177,7 +177,7 @@ inline void save_construct_data(
     const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
 
-    const std::vector<double> state_variables = t->rGetConstStateVariables();
+    const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 

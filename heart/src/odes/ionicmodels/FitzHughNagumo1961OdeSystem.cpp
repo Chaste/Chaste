@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,9 +88,6 @@ double FitzHughNagumo1961OdeSystem::GetIIonic(const std::vector<double>* pStateV
     double fake_ionic_current = membrane_V*(membrane_V-mAlpha)*(1-membrane_V)-recovery_variable;
     return fake_ionic_current;
 }
-
-
-
 
 template<>
 void OdeSystemInformation<FitzHughNagumo1961OdeSystem>::Initialise(void)

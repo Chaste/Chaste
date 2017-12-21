@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -283,9 +283,9 @@ public:
         /// \todo: this is very naughty. Must be checked in parallel as well.
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(linear_system.rGetLhsMatrix(), lo, hi);
-        for(int row=lo; row<hi; row++)
+        for (int row=lo; row<hi; row++)
         {
-            if(row<SIZE-1)
+            if (row<SIZE-1)
             {
                 for (int column=0; column<row; column++)
                 {
@@ -300,7 +300,7 @@ public:
                 }
             }
 
-            if(row==SIZE-1)
+            if (row==SIZE-1)
             {
                 for (int column=0; column<SIZE; column++)
                 {
@@ -886,21 +886,21 @@ public:
 
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(r_mat, lo, hi);
-        for(int i=lo; i<hi; i++)
+        for (int i=lo; i<hi; i++)
         {
-            if(i==0 || i==1 || i==4 || i==5)
+            if (i==0 || i==1 || i==4 || i==5)
             {
                 unsigned col_one = i;
                 unsigned col_minus_one = i+2;
 
-                for(unsigned j=0; j<2*SIZE; j++)
+                for (unsigned j=0; j<2*SIZE; j++)
                 {
                     double val = 0.0;
-                    if(j==col_one)
+                    if (j==col_one)
                     {
                         val = 1.0;
                     }
-                    if(j==col_minus_one)
+                    if (j==col_minus_one)
                     {
                         val = -1.0;
                     }
@@ -909,7 +909,7 @@ public:
             }
             else
             {
-                for(unsigned j=0; j<2*SIZE; j++)
+                for (unsigned j=0; j<2*SIZE; j++)
                 {
                     TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), 2.0, 1e-12);
                 }

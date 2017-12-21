@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,11 +88,13 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("CellPopulationElementWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    EXCEPTION("CellPopulationElementWriter cannot be used with a NodeBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

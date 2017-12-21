@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,8 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "MassMatrixAssembler.hpp"
 #include "TrianglesMeshReader.hpp"
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////
 //
@@ -96,9 +94,9 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret;
-        for(unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
         {
-            for(unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
+            for (unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
             {
                 ret(i,j) = mVal1;
             }
@@ -115,9 +113,9 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
-        for(unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
         {
-            for(unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+            for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
             {
                 ret(i,j) = mVal2;
             }
@@ -132,9 +130,9 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
-        for(unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
         {
-            for(unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+            for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
             {
                 ret(i,j) = mVal3;
             }
@@ -150,7 +148,7 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret;
-        for(unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
         {
             ret(i) = mVal4;
         }
@@ -164,7 +162,7 @@ public:
             Element<DIM,DIM>* pElement)
     {
         c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
-        for(unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
         {
             ret(i) = mVal5;
         }
@@ -172,8 +170,7 @@ public:
     }
 };
 
-// Doesn't over-ride any methods, so should return a zero matrix. (Note: can't create
-// vectors).
+// Doesn't over-ride any non-compulsory methods, so should return a zero matrix.
 class ZeroMatrixAssembler : public AbstractContinuumMechanicsAssembler<1,false,true>
 {
 public:
@@ -181,9 +178,15 @@ public:
         : AbstractContinuumMechanicsAssembler<1,false,true>(pMesh)
     {
     }
+    c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
+        c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
+        c_matrix<double, 1, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
+        c_vector<double,1>& rX,
+        Element<1,1>* pElement)
+    {
+        return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
+    }
 };
-
-
 
 template<unsigned DIM>
 class MyMatrixAssembler : public AbstractContinuumMechanicsAssembler<DIM,false,true>
@@ -211,12 +214,20 @@ public:
     {
         return outer_prod(rLinearPhi,rLinearPhi);
     }
+    c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
+        c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
+        c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
+        c_vector<double,DIM>& rX,
+        Element<DIM,DIM>* pElement)
+    {
+        return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
+    }
 };
 
 class TestAbstractContinuumMechanicsAssembler : public CxxTest::TestSuite
 {
 public:
-    void TestAssemblers1d() throw (Exception)
+    void TestAssemblers1d()
     {
         double h=0.1;
         QuadraticMesh<1> mesh(h,h); // require a one-element mesh
@@ -239,12 +250,12 @@ public:
         PetscMatTools::Finalise(mat);
 
         ReplicatableVector vec_repl(vec);
-        for(unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; i++)
         {
             // spatial vars
             TS_ASSERT_DELTA( vec_repl[2*i], 111*h, 1e-8 );
         }
-        for(unsigned i=0; i<2; i++)
+        for (unsigned i=0; i<2; i++)
         {
             // non-dummy pressure vars
             TS_ASSERT_DELTA( vec_repl[2*i+1], 222*h, 1e-8 );
@@ -265,7 +276,7 @@ public:
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<6; j++)
+            for (unsigned j=0; j<6; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix[i][j], 1e-8 );
             }
@@ -277,7 +288,7 @@ public:
         PetscMatTools::Finalise(mat);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<5; j++)
+            for (unsigned j=0; j<5; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), 0.0, 1e-8 );
             }
@@ -300,7 +311,7 @@ public:
     }
 
     // same to main part of TestAssemblers1d except 2d
-    void TestAssemblers2d() throw (Exception)
+    void TestAssemblers2d()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2d_single_triangular_element_quadratic",2,2,false);
@@ -317,12 +328,12 @@ public:
         PetscMatTools::Finalise(mat);
 
         ReplicatableVector vec_repl(vec);
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA( vec_repl[3*i  ], 111*0.5, 1e-8 );
             TS_ASSERT_DELTA( vec_repl[3*i+1], 111*0.5, 1e-8 );
         }
-        for(unsigned i=0; i<mesh.GetNumVertices(); i++)
+        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
         {
             TS_ASSERT_DELTA( vec_repl[3*i+2], 222*0.5, 1e-8 );
         }
@@ -330,9 +341,9 @@ public:
         // set up correct matrix: disp-disp entries have value 2h, disp-pressure entries
         // have val 3h, and pressure-pressure entries have value 4h....
         c_matrix<double,18,18> correct_matrix;
-        for(unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; i++)
         {
-            for(unsigned j=0; j<6; j++)
+            for (unsigned j=0; j<6; j++)
             {
                 correct_matrix(3*i,  3*j)   = 2.0*0.5; // 0.5 is area of triangle
                 correct_matrix(3*i+1,3*j)   = 2.0*0.5; // 0.5 is area of triangle
@@ -350,9 +361,9 @@ public:
 
         //...except for the fact that any entry corresponding to pressure on an non-internal node
         //will have value 0
-        for(unsigned i=3; i<6; i++)
+        for (unsigned i=3; i<6; i++)
         {
-            for(unsigned j=0; j<18; j++)
+            for (unsigned j=0; j<18; j++)
             {
                 correct_matrix(3*i+2,j) = 0.0;
                 correct_matrix(j,3*i+2) = 0.0;
@@ -363,7 +374,7 @@ public:
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<18; j++)
+            for (unsigned j=0; j<18; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix(i,j), 1e-8 );
             }
@@ -374,7 +385,7 @@ public:
     }
 
     // same as main part of TestAssemblers1d except 3d
-    void TestAssemblers3d() throw (Exception)
+    void TestAssemblers3d()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -394,13 +405,13 @@ public:
 
         ReplicatableVector vec_repl(vec);
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA( vec_repl[4*i  ], 111, 1e-8 );
             TS_ASSERT_DELTA( vec_repl[4*i+1], 111, 1e-8 );
             TS_ASSERT_DELTA( vec_repl[4*i+2], 111, 1e-8 );
         }
-        for(unsigned i=0; i<mesh.GetNumVertices(); i++)
+        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
         {
             TS_ASSERT_DELTA( vec_repl[4*i+3], 222, 1e-8 );
         }
@@ -408,9 +419,9 @@ public:
         c_matrix<double,40,40> correct_matrix;
         // set up correct matrix: disp-disp entries have value 5, disp-pressure entries
         // have val 10, and pressure-pressure entries have value 15....
-        for(unsigned i=0; i<10; i++)
+        for (unsigned i=0; i<10; i++)
         {
-            for(unsigned j=0; j<10; j++)
+            for (unsigned j=0; j<10; j++)
             {
                 correct_matrix(4*i,  4*j)   = 5;
                 correct_matrix(4*i+1,4*j)   = 5;
@@ -436,9 +447,9 @@ public:
 
         //...except for the fact that any entry corresponding to pressure on an non-internal node
         //will have value 0
-        for(unsigned i=4; i<10; i++)
+        for (unsigned i=4; i<10; i++)
         {
-            for(unsigned j=0; j<40; j++)
+            for (unsigned j=0; j<40; j++)
             {
                 correct_matrix(4*i+3,j) = 0.0;
                 correct_matrix(j,4*i+3) = 0.0;
@@ -449,7 +460,7 @@ public:
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<34; j++)
+            for (unsigned j=0; j<34; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix(i,j), 1e-8 );
             }
@@ -459,7 +470,7 @@ public:
         PetscTools::Destroy(mat);
     }
 
-    void TestWithMassMatrixInPressurePressureBlock() throw(Exception)
+    void TestWithMassMatrixInPressurePressureBlock()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
         TetrahedralMesh<2,2> linear_mesh;
@@ -496,7 +507,7 @@ public:
         MatGetOwnershipRange(mat2, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<4; j++)
+            for (unsigned j=0; j<4; j++)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat2,i,j), correct_matrix[i][j], 1e-5 );
             }
@@ -505,9 +516,9 @@ public:
         MatGetOwnershipRange(mat1, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            for(unsigned j=0; j<3*quadratic_mesh.GetNumNodes(); j++)
+            for (unsigned j=0; j<3*quadratic_mesh.GetNumNodes(); j++)
             {
-                if(i%3==2 && j%3==2 && (i-2)/3<4 && (j-2)/3<4) // the pressure-pressure block, excl pressure values at non-vertices
+                if (i%3==2 && j%3==2 && (i-2)/3<4 && (j-2)/3<4) // the pressure-pressure block, excl pressure values at non-vertices
                 {
 
                     TS_ASSERT_DELTA( PetscMatTools::GetElement(mat1,i,j), correct_matrix[(i-2)/3][(j-2)/3], 1e-5 );
@@ -523,7 +534,7 @@ public:
         PetscTools::Destroy(mat2);
     }
 
-    void TestAbstractContinuumMechanicsAssemblerMeshType() throw(Exception)
+    void TestAbstractContinuumMechanicsAssemblerMeshType()
     {
         TetrahedralMesh<2,2> mesh;
         TS_ASSERT_THROWS_CONTAINS(MyMatrixAssembler<2> assembler2d(&mesh),

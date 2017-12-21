@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -208,8 +208,5 @@ public:
         // MUST be called every timestep, in case the bcc was reset.
     }
 };
-
-
-
 
 #endif /*ABSTRACTBIDOMAINSOLVER_HPP_*/

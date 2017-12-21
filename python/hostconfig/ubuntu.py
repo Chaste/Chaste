@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,16 @@ if ubuntu_ver == 'Trusty':
 else:
     ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
-if ubuntu_ver >= [16,04]:
+if ubuntu_ver >= [17,10]:
+    petsc_ver = 3.7
+    petsc_path = '/usr/lib/petscdir/3.7.6/'
+elif ubuntu_ver >= [17,04]:
+    petsc_ver = 3.7
+    petsc_path = '/usr/lib/petscdir/3.7.5/'
+elif ubuntu_ver >= [16,10]:
+    petsc_ver = 3.7
+    petsc_path = '/usr/lib/petscdir/3.7.3/'
+elif ubuntu_ver >= [16,04]:
     petsc_ver = 3.6
     petsc_path = '/usr/lib/petscdir/3.6.2/'
 elif ubuntu_ver >= [14,04]:
@@ -196,7 +205,7 @@ def Configure(prefs, build):
         vtk_version = vtk_include_path[len(vtk_base):]
         other_includepaths.append(vtk_include_path)
         if vtk_version[0] == '6':
-            vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources']
+            vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources','FiltersGeneral']
             vtk_ver = map(int, vtk_version.split('.')[:2])
             if vtk_ver >= [6,2]:
                 vtk_libs[2:2] = ['IOParallelXML']

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ template<unsigned DIM>
 void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
-    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
+    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr);
 
     NodeBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation);
 
@@ -76,7 +76,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
         Node<DIM>* p_node_i = rCellPopulation.GetNode(node_index);
 
         // Get the location of this node
-        c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+        const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
 
         // Get the radius of this cell
         double radius_of_cell_i = p_node_i->GetRadius();
@@ -95,10 +95,10 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
             Node<DIM>* p_node_j = rCellPopulation.GetNode(*iter);
 
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+            const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
             // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
-            unit_vector = node_j_location - node_i_location;
+            unit_vector = r_node_j_location - r_node_i_location;
 
             // Calculate the distance between the two nodes
             double dij = norm_2(unit_vector);

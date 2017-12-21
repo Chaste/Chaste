@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Chaste tutorials. */
 #include "HoneycombMeshGenerator.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellMutationStatesCountWriter.hpp"
@@ -167,7 +167,7 @@ public:
      *
      * We begin by testing that our new cell mutation state is implemented correctly.
      */
-    void TestP53GainOfFunctionCellMutationState() throw(Exception)
+    void TestP53GainOfFunctionCellMutationState()
     {
         /* We begin by testing that some of the base class methods work correctly.
          * We typically use shared pointers to create and access cell mutation states, as
@@ -246,7 +246,7 @@ public:
      * We conclude with a brief test demonstrating how {{{P53GainOfFunctionCellMutationState}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithP53GainOfFunctionCellMutationState() throw(Exception)
+    void TestOffLatticeSimulationWithP53GainOfFunctionCellMutationState()
     {
         /* We use the {{{HoneycombMeshGenerator}}} to create a honeycomb mesh covering a
          * circular domain of given radius, as follows. */
@@ -258,7 +258,7 @@ public:
 
         /* Next, we create some cells, as follows. */
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         /* We now assign the mutation to the 11th and 51st cells.*/

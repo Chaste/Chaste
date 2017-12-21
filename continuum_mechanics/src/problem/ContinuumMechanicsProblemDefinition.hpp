@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -258,8 +258,6 @@ public:
     void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                                  double normalPressure);
 
-
-
     /**
      * Set traction (Neumann) boundary conditions. This version says that pressures should be applied
      * on surfaces in the DEFORMED body in the outward normal direction, and here the pressure is specified
@@ -343,8 +341,6 @@ public:
     {
         return mVerboseDuringSolve;
     }
-
 };
-
 
 #endif // CONTINUUMMECHANICSPROBLEMDEFINITION_HPP_

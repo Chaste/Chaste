@@ -4,7 +4,7 @@
 # the 'bin' directory in the path given in the TEXTTEST_ROOT environment variable.
 #
 
-FIND_PROGRAM( TEXTTEST_PY NAMES texttest.py texttest_release.py
+FIND_PROGRAM( TEXTTEST_PY NAMES texttest.py texttest_release.py texttest
               HINTS $ENV{TEXTTEST_ROOT}/bin
 			  PATHS /usr/local/texttest-3.19/bin
 			  		/usr/local/bin

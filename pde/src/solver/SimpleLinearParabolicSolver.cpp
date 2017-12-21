@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,7 +63,6 @@ c_vector<double,1*(ELEMENT_DIM+1)> SimpleLinearParabolicSolver<ELEMENT_DIM,SPACE
             + PdeSimulationTime::GetPdeTimeStepInverse() * mpParabolicPde->ComputeDuDtCoefficientFunction(rX) * rU(0)) * rPhi;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SimpleLinearParabolicSolver<ELEMENT_DIM,SPACE_DIM>::SimpleLinearParabolicSolver(
                             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
@@ -76,10 +75,7 @@ SimpleLinearParabolicSolver<ELEMENT_DIM,SPACE_DIM>::SimpleLinearParabolicSolver(
     this->mMatrixIsConstant = true;
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class SimpleLinearParabolicSolver<1,1>;
 template class SimpleLinearParabolicSolver<2,2>;
 template class SimpleLinearParabolicSolver<3,3>;

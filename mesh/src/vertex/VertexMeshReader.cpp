@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -181,7 +181,6 @@ ElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
     return element_data;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWithFaces()
 {
@@ -350,9 +349,7 @@ void VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextLineFromStream(std::ifstre
     while (line_is_blank);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class VertexMeshReader<1,1>;
 template class VertexMeshReader<1,2>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -332,8 +332,6 @@ static const char CmguiCoordinatesFileHeader2DQuadratic[] = " 1) coordinates, co
        Value indices:     1\n\
        Scale factor indices:   6\n";
 
-
-
 /**
  * Header for element base file in 1D (.exelem), this comes after the definition of the number of fields
  * Note that in 1D the simplex doesn't seem to work, we use Lagrange instead
@@ -660,9 +658,7 @@ public:
     virtual ~CmguiMeshWriter()
     {}
 
-
     // A method called CompareCmguiFiles() has been removed, please use FileComparison class instead.
-
 };
 
 #endif /*CMGUIWRITER_HPP_*/

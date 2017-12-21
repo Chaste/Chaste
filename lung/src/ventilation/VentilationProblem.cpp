@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VentilationProblem.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
-//#include "Timer.hpp"
 
 /**
  * Helper function for varying terminal fluxes in order to match terminal pressure boundary conditions
@@ -59,17 +57,14 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mFluxGivenAtInflow(false),
       mFluxGivenAtOutflow(false),
-      mTerminalInteractionMatrix(NULL),
+      mTerminalInteractionMatrix(nullptr),
       mNumNonZeroesPerRow(25u), //See note in header definition
-      mTerminalFluxChangeVector(NULL),
-      mTerminalPressureChangeVector(NULL),
-      mTerminalKspSolver(NULL)
+      mTerminalFluxChangeVector(nullptr),
+      mTerminalPressureChangeVector(nullptr),
+      mTerminalKspSolver(nullptr)
 {
     Initialise();
 }
-
-
-
 
 void VentilationProblem::Initialise()
 {
@@ -80,7 +75,6 @@ void VentilationProblem::Initialise()
         WARNING("Nodes in this mesh do not appear in graph order.  Some solvers may be inefficient.");
     }
 }
-
 
 VentilationProblem::~VentilationProblem()
 {
@@ -112,16 +106,15 @@ void VentilationProblem::SolveDirectFromFlux()
     {
         // Unset internal fluxes
         for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
-                  iter != mMesh.GetElementIteratorEnd();
-                  ++iter)
+             iter != mMesh.GetElementIteratorEnd();
+             ++iter)
         {
             // Note that this won't reset the root
-            if ( !((*iter).GetNode(0)->IsBoundaryNode()) && !((*iter).GetNode(1)->IsBoundaryNode()) )
+            if (!((*iter).GetNode(0)->IsBoundaryNode()) && !((*iter).GetNode(1)->IsBoundaryNode()))
             {
                 mFlux[ (*iter).GetIndex() ] = 0.0;
             }
         }
-
     }
     bool some_flux_zero;
     bool all_flux_zero;
@@ -181,7 +174,7 @@ void VentilationProblem::SetupIterativeSolver()
 {
     //double start = Timer::GetElapsedTime();
     mNumNonZeroesPerRow = std::min(mNumNonZeroesPerRow, mMesh.GetNumBoundaryNodes()-1);
-    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, NULL, &mTerminalInteractionMatrix);
+    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, nullptr, &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
 
@@ -235,7 +228,7 @@ void VentilationProblem::SetupIterativeSolver()
     VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
 
     KSPCreate(PETSC_COMM_SELF, &mTerminalKspSolver);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix);
 #else
     KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
@@ -279,7 +272,6 @@ void VentilationProblem::FillInteractionMatrix(bool redoExisting)
         }
         else
         {
-            ///\todo Does this make so much difference?
             for (unsigned i=0; i<indices.size(); i++)
             {
                 MatSetValue(mTerminalInteractionMatrix, indices[i], indices[i], parent_resistance, ADD_VALUES);
@@ -332,7 +324,7 @@ ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure
 void VentilationProblem::SolveFromPressureWithSnes()
 {
     assert( !mFluxGivenAtInflow );  // It's not a direct solve
-    if (mTerminalInteractionMatrix == NULL)
+    if (mTerminalInteractionMatrix == nullptr)
     {
         SetupIterativeSolver();
     }
@@ -343,7 +335,7 @@ void VentilationProblem::SolveFromPressureWithSnes()
     // Set the residual creation function (direct solve flux->pressure followed by pressure matching)
     SNESSetFunction(snes, mTerminalPressureChangeVector /*residual*/ , &ComputeSnesResidual, this);
     // The approximate Jacobian has been precomputed so we are going to wing it
-    SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ NULL, this);
+    SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ nullptr, this);
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x
     SNESSetLagJacobian(snes, -1 /*Never rebuild Jacobian*/);
 #else
@@ -396,7 +388,7 @@ void VentilationProblem::SolveFromPressureWithSnes()
 
 void VentilationProblem::SolveIterativelyFromPressure()
 {
-    if (mTerminalInteractionMatrix == NULL)
+    if (mTerminalInteractionMatrix == nullptr)
     {
         SetupIterativeSolver();
     }
@@ -445,8 +437,6 @@ void VentilationProblem::SolveIterativelyFromPressure()
         KSPSolve(mTerminalKspSolver, mTerminalPressureChangeVector, mTerminalFluxChangeVector);
         double* p_terminal_flux_change_vector;
         VecGetArray(mTerminalFluxChangeVector, &p_terminal_flux_change_vector);
-
-
 
         for (unsigned terminal=0; terminal<num_terminals; terminal++)
         {
@@ -498,7 +488,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
             SolveDirectFromFlux();
         }
     }
-    if(!converged)
+    if (!converged)
     {
         NEVER_REACHED;
     }
@@ -552,8 +542,6 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     mFlux[edge_index] = flux;
 }
 
-
-
 void VentilationProblem::Solve()
 {
     if (mFluxGivenAtInflow && !mFluxGivenAtOutflow)
@@ -565,9 +553,7 @@ void VentilationProblem::Solve()
         SolveIterativelyFromPressure();
         //SolveFromPressureWithSnes();
     }
-
 }
-
 
 void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges,
                                                          std::vector<double>& rPressuresOnNodes)
@@ -575,10 +561,3 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
     rFluxesOnEdges = mFlux;
     rPressuresOnNodes = mPressure;
 }
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTONLATTICECELLPOPULATION_HPP_
 
 #include "AbstractCellPopulation.hpp"
+#include "AbstractUpdateRule.hpp"
 
 /**
  * An abstract class for on-lattice cell populations.
@@ -58,11 +59,18 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellPopulation<DIM> >(*this);
+        archive & mUpdateRuleCollection;
         archive & mUpdateNodesInRandomOrder;
         archive & mIterateRandomlyOverUpdateRuleCollection;
     }
 
 protected:
+
+    /**
+     * The update rules used to determine the new location of the cells.
+     * These rules specify how individual cells move into free spaces.
+     */
+    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -169,11 +177,45 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
-     * Outputs CellPopulation parameters to file
+     * Outputs parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+
+    /**
+     * Overridden GetDefaultTimeStep() method.
+     *
+     * @return a default value for the time step to use
+     * when simulating the cell population.
+     *
+     * A hard-coded value of 0.1 is returned. However, note that the time
+     * step can be reset by calling SetDt() on the simulation object used to
+     * simulate the cell population.
+     */
+    virtual double GetDefaultTimeStep();
+
+    /**
+     * Add an update rule to be used with this population.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)=0;
+
+    /**
+     * Remove any update rules previously passed to this population.
+     */
+    virtual void RemoveAllUpdateRules();
+
+    /**
+     * Get the collection of update rules to be used with this population.
+     *
+     * @return the update rule collection
+     */
+    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
 };
 
 #endif /*ABSTRACTONLATTICECELLPOPULATION_HPP_*/

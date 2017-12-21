@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,15 +54,14 @@ class TestPerformanceOfAssembly : public CxxTest::TestSuite
 {
 public:
 
-
-    void TestPerf() throw(Exception)
+    void TestPerfAssembly()
     {
-        // write headings
+        // Write headings
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2>::DisplayHeadings();
         HeartEventHandler::Headings();
 
-        // base line
-        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester;
+        // Base line
+        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester("TestPerAssembly");
         tester.SimTime=0.0025;
 
         for (unsigned mesh_num=0; mesh_num<3; mesh_num++)
@@ -71,7 +70,6 @@ public:
             tester.Run();
             HeartEventHandler::Report();
         }
-
     }
 };
 

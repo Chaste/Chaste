@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,9 +58,9 @@ AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
 
 Element<1,3>* AirwayTreeWalker::GetParentElement(Element<1,3>* pElement)
 {
-    if(mParentElementMap.count(pElement->GetIndex()) == 0)
+    if (mParentElementMap.count(pElement->GetIndex()) == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     return mMesh.GetElement(mParentElementMap[pElement->GetIndex()]);
@@ -73,9 +73,9 @@ unsigned AirwayTreeWalker::GetParentElementIndex(Element<1,3>* pElement)
 
 Element<1,3>* AirwayTreeWalker::GetParentElement(unsigned index)
 {
-    if(mParentElementMap.count(index) == 0)
+    if (mParentElementMap.count(index) == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     return mMesh.GetElement(mParentElementMap[index]);
@@ -101,7 +101,7 @@ std::vector<Element<1,3>* > AirwayTreeWalker::GetChildElements(Element<1,3>* pEl
 {
     std::vector<Element<1,3>* > child_elements;
 
-    for(unsigned i = 0; i < mChildElementsMap[pElement->GetIndex()].size(); ++i)
+    for (unsigned i = 0; i < mChildElementsMap[pElement->GetIndex()].size(); ++i)
     {
         child_elements.push_back(mMesh.GetElement(mChildElementsMap[pElement->GetIndex()][i]));
     }
@@ -127,24 +127,24 @@ unsigned AirwayTreeWalker::GetDistalNodeIndex(Element<1,3>* pElement)
 
 void AirwayTreeWalker::ProcessElement(Element<1,3>* pElement, Node<3>* pParentNode)
 {
-    for(unsigned node_index = 0; node_index < pElement->GetNumNodes(); ++node_index)
+    for (unsigned node_index = 0; node_index < pElement->GetNumNodes(); ++node_index)
     {
         Node<3>* p_current_node = pElement->GetNode(node_index);
 
-        if(p_current_node != pParentNode) //Prevent moving back up the tree
+        if (p_current_node != pParentNode) //Prevent moving back up the tree
         {
             mDistalNodeMap[pElement->GetIndex()] = p_current_node->GetIndex();
-            if( pParentNode->GetIndex() > p_current_node->GetIndex() )
+            if (pParentNode->GetIndex() > p_current_node->GetIndex() )
             {
                 mNodesAreGraphOrdered = false;
             }
-            for(Node<3>::ContainingElementIterator ele_iter = p_current_node->ContainingElementsBegin();
+            for (Node<3>::ContainingElementIterator ele_iter = p_current_node->ContainingElementsBegin();
                 ele_iter != p_current_node->ContainingElementsEnd();
                 ++ele_iter)
             {
                 Element<1,3>* p_child_element = mMesh.GetElement(*ele_iter);
 
-                if(p_child_element != pElement) //Prevent moving back up the tree
+                if (p_child_element != pElement) //Prevent moving back up the tree
                 {
                     mParentElementMap[p_child_element->GetIndex()] = pElement->GetIndex();
                     mChildElementsMap[pElement->GetIndex()].push_back(p_child_element->GetIndex());
@@ -211,51 +211,49 @@ unsigned AirwayTreeWalker::GetMaxElementStrahlerOrder()
     return std::max_element(mElementStrahlerOrder.begin(), mElementStrahlerOrder.end(), less_than_predicate)->second;
 }
 
-
-
 void AirwayTreeWalker::CalculateElementProperties(Element<1,3>* pElement)
 {
     Element<1,3>* p_parent_element = GetParentElement(pElement);
 
     //pre-order traversal calculations
-    if(p_parent_element == NULL)
+    if (p_parent_element == nullptr)
     {
         mElementGenerations[pElement->GetIndex()] = 0u;
     }
-    else if(GetNumberOfChildElements(p_parent_element) == 1u)
+    else if (GetNumberOfChildElements(p_parent_element) == 1u)
     {
         mElementGenerations[pElement->GetIndex()] = mElementGenerations[p_parent_element->GetIndex()];
     }
-    else //if(GetNumberOfChildElements(p_parent_element) > 1u)
+    else //if (GetNumberOfChildElements(p_parent_element) > 1u)
     {
         mElementGenerations[pElement->GetIndex()] = mElementGenerations[p_parent_element->GetIndex()] + 1;
     }
 
     //Process children
     std::vector<Element<1,3>* > child_eles = GetChildElements(pElement);
-    for(unsigned i = 0; i < child_eles.size(); ++i)
+    for (unsigned i = 0; i < child_eles.size(); ++i)
     {
         CalculateElementProperties(child_eles[i]);
     }
 
     //post-order traversal calculations
-    if(GetNumberOfChildElements(pElement) == 0u)
+    if (GetNumberOfChildElements(pElement) == 0u)
     {
         mElementHorsfieldOrder[pElement->GetIndex()] = 1u;
         mElementStrahlerOrder[pElement->GetIndex()] = 1u;
     }
-    else if(GetNumberOfChildElements(pElement) == 1u)
+    else if (GetNumberOfChildElements(pElement) == 1u)
     {
         mElementHorsfieldOrder[pElement->GetIndex()] = mElementHorsfieldOrder[child_eles[0]->GetIndex()];
         mElementStrahlerOrder[pElement->GetIndex()] = mElementStrahlerOrder[child_eles[0]->GetIndex()];
     }
-    else //if(GetNumberOfChildElements(pElement) > 1u)
+    else //if (GetNumberOfChildElements(pElement) > 1u)
     {
         {
             unsigned new_horsfield_order = 0;
-            for(unsigned i = 0; i < child_eles.size(); ++i)
+            for (unsigned i = 0; i < child_eles.size(); ++i)
             {
-                if(mElementHorsfieldOrder[child_eles[i]->GetIndex()] > new_horsfield_order)
+                if (mElementHorsfieldOrder[child_eles[i]->GetIndex()] > new_horsfield_order)
                 {
                     new_horsfield_order = mElementHorsfieldOrder[child_eles[i]->GetIndex()];
                 }
@@ -266,13 +264,13 @@ void AirwayTreeWalker::CalculateElementProperties(Element<1,3>* pElement)
 
         {
             unsigned new_strahler_order = 0;
-            for(unsigned i = 0; i < child_eles.size(); ++i)
+            for (unsigned i = 0; i < child_eles.size(); ++i)
             {
-                if(mElementStrahlerOrder[child_eles[i]->GetIndex()] > new_strahler_order)
+                if (mElementStrahlerOrder[child_eles[i]->GetIndex()] > new_strahler_order)
                 {
                     new_strahler_order = mElementStrahlerOrder[child_eles[i]->GetIndex()];
                 }
-                else if(mElementStrahlerOrder[child_eles[i]->GetIndex()] == new_strahler_order)
+                else if (mElementStrahlerOrder[child_eles[i]->GetIndex()] == new_strahler_order)
                 {
                     new_strahler_order++;
                 }

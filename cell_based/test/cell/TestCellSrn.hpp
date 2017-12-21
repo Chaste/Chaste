@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
 #include "SmartPointers.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -71,7 +71,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         // Create a cell-cycle model
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
         CellPtr p_tn_cell(new Cell(p_healthy_state, p_cell_model, p_srn_model, false, CellPropertyCollection()));
         p_tn_cell->SetCellProliferativeType(p_transit_type);
@@ -101,11 +101,11 @@ public:
         TS_ASSERT_DELTA(X, 0.0067, 1e-4);
 
         // Indirect access to state vector
-        C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[0];
+        C = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetProteinConcentrations()[0];
         TS_ASSERT_DELTA(C, 0.5470, 1e-4);
-        M = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[1];
+        M = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetProteinConcentrations()[1];
         TS_ASSERT_DELTA(M, 0.2936, 1e-4);
-        X = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetStateVariables()[2];
+        X = dynamic_cast<Goldbeter1991SrnModel*>(p_tn_cell->GetSrnModel())->GetProteinConcentrations()[2];
         TS_ASSERT_DELTA(X, 0.0067, 1e-4);
 
         std::cout << "Finished ODE - " << "C : " << C << ", M : " << M  << ", X : " << X << std::endl;

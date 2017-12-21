@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,27 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool AbstractHdf5Access::DoesDatasetExist(const std::string& rDatasetName)
 {
-#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8
     // This is a nice method for testing existence, introduced in HDF5 1.8.0
     htri_t dataset_status = H5Lexists(mFileId, rDatasetName.c_str(), H5P_DEFAULT);
     return (dataset_status>0);
-#else
-    bool result=false;
-    // This is not a nice way of doing it because the error stack produces a load of 'HDF failed' output.
-    // The "TRY" macros are a convenient way to temporarily turn the error stack off.
-    H5E_BEGIN_TRY
-    {
-        hid_t dataset_id = H5Dopen(mFileId, rDatasetName.c_str());
-        if (dataset_id>0)
-        {
-            H5Dclose(dataset_id);
-            result = true;
-        }
-    }
-    H5E_END_TRY;
-
-    return result;
-#endif
 }
 
 void AbstractHdf5Access::SetUnlimitedDatasetId()
@@ -77,7 +59,7 @@ void AbstractHdf5Access::SetUnlimitedDatasetId()
 
     if (DoesDatasetExist(mDatasetName + "_Unlimited"))
     {
-        mUnlimitedDatasetId = H5Dopen(mFileId, (mDatasetName + "_Unlimited").c_str());
+        mUnlimitedDatasetId = H5Dopen(mFileId, (mDatasetName + "_Unlimited").c_str(), H5P_DEFAULT);
         hid_t name_attribute_id = H5Aopen_name(mUnlimitedDatasetId, "Name");
         hid_t unit_attribute_id = H5Aopen_name(mUnlimitedDatasetId, "Unit");
 
@@ -102,7 +84,7 @@ void AbstractHdf5Access::SetUnlimitedDatasetId()
     {
         mUnlimitedDimensionName = "Time";
         mUnlimitedDimensionUnit = "msec";
-        mUnlimitedDatasetId = H5Dopen(mFileId, mUnlimitedDimensionName.c_str());
+        mUnlimitedDatasetId = H5Dopen(mFileId, mUnlimitedDimensionName.c_str(), H5P_DEFAULT);
     }
     else
     {

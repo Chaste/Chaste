@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
     KSPGetPC(rKspObject, &mPetscPCObject);
 
     Mat system_matrix, dummy;
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     KSPGetOperators(rKspObject, &system_matrix, &dummy);
 #else
     MatStructure flag;
@@ -111,7 +111,7 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
     // Odd number of local rows: impossible if V_m and phi_e for each node are stored in the same processor.
     if ((num_rows%2 != 0) || (num_local_rows%2 != 0))
     {
-        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation.");
+        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation."); // LCOV_EXCL_LINE
     }
 
     // Allocate memory
@@ -244,15 +244,15 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
 void PCLDUFactorisation::PCLDUFactorisationSetUp()
 {
     // These options will get read by PCSetFromOptions
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-//     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+//     PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+//     PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+//     PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
     /*
      * Set up preconditioner for block A11
      */
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     // Attempt to emulate SAME_PRECONDITIONER below
     PCSetReusePreconditioner(mPCContext.PC_amg_A11, PETSC_TRUE);
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock);
@@ -267,7 +267,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
 
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
     {
@@ -276,15 +276,16 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     // Stop supressing error
     PetscPopErrorHandler();
 
-    //PCHYPRESetType(mPCContext.PC_amg_A11, "euclid");
-    PetscOptionsSetValue("-pc_hypre_type", "euclid");
-    PetscOptionsSetValue("-pc_hypre_euclid_levels", "0");
-
-//     PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
-//     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-//     PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<=5)
+    PetscTools::SetOption("-pc_hypre_type", "euclid");
+    PetscTools::SetOption("-pc_hypre_euclid_levels", "0");
+#else
+    /* euclid was removed in 3.6. Use the previously-commented-out alternative */
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+#endif
 
 ////////
 //    PCSetType(mPCContext.PC_amg_A11, PCKSP);
@@ -311,7 +312,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
      * Set up amg preconditioner for block A22
      */
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     // Attempt to emulate SAME_PRECONDITIONER below
     PCSetReusePreconditioner(mPCContext.PC_amg_A22, PETSC_TRUE);
     PCSetOperators(mPCContext.PC_amg_A22, mPCContext.A22_matrix_subblock, mPCContext.A22_matrix_subblock);
@@ -324,16 +325,16 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
 ////////
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
     // Stop supressing error
     PetscPopErrorHandler();
 
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
-    //    PetscOptionsSetValue("-pc_hypre_boomeramg_interp_type","ext+i");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    //    PetscTools::SetOption("-pc_hypre_boomeramg_interp_type","ext+i");
 
 ////////
 //    PCSetType(mPCContext.PC_amg_A22, PCKSP);
@@ -370,7 +371,7 @@ PetscErrorCode PCLDUFactorisationApply(void* pc_context, Vec x, Vec y)
 
     // Cast the pointer to a PC context to our defined type
     PCLDUFactorisation::PCLDUFactorisationContext* block_diag_context = (PCLDUFactorisation::PCLDUFactorisationContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Split vector x into two. x = [x1 x2]'

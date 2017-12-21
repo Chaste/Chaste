@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,20 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCASWITCHINGUPDATERULE_HPP_
 #define ABSTRACTCASWITCHINGUPDATERULE_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-
-#include "PottsBasedCellPopulation.hpp"
+#include "AbstractUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 class PottsBasedCellPopulation; // Circular definition
 
 /**
- * An abstract Ca Switching update rule class, for use in cell-based simulations
- * using the cellular automata model.
+ * An abstract CA 'switching' update rule class, for use in CA simulations.
  */
 template<unsigned DIM>
-class AbstractCaSwitchingUpdateRule : public Identifiable
+class AbstractCaSwitchingUpdateRule : public AbstractUpdateRule<DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -63,6 +60,7 @@ class AbstractCaSwitchingUpdateRule : public Identifiable
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
     }
 
 public:
@@ -91,26 +89,14 @@ public:
                                                unsigned neighbourNodeIndex,
                                                CaBasedCellPopulation<DIM>& rCellPopulation,
                                                double dt,
-                                               double deltaX) = 0;
-    /**
-     * Output update rule to file. Call OutputUpdateRuleParameters() to output
-     * all member variables to file.
-     *
-     * @param rParamsFile a file stream
-     */
-    void OutputUpdateRuleInfo(out_stream& rParamsFile);
+                                               double deltaX)=0;
 
     /**
-     * Output switching update rule parameters to file.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile a file stream
      */
-    virtual void OutputSwitchingUpdateRuleParameters(out_stream& rParamsFile)=0;
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
-
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCaSwitchingUpdateRule)
 
 #endif /*ABSTRACTCASWITCHINGUPDATERULE_HPP_*/

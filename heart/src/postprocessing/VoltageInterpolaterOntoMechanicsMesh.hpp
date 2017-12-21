@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,19 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-
-
 #ifndef VOLTAGEINTERPOLATERONTOMECHANICSMESH_HPP_
 #define VOLTAGEINTERPOLATERONTOMECHANICSMESH_HPP_
-
 
 #include <vector>
 #include <string>
 #include "UblasIncludes.hpp"
 #include "TetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
-
 
 /**
  *  Very simple one-method class which can be used to convert the voltage from an electrics

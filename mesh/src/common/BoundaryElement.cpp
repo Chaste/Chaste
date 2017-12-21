@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,13 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement()
-    : AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>()
-{
-}
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
@@ -60,7 +53,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(unsigned index, Node<SPACE_DIM>* pNode)
     : AbstractTetrahedralElement<ELEMENT_DIM,SPACE_DIM>(index)
 {
-    assert(ELEMENT_DIM == 0);
+    assert(ELEMENT_DIM == 0);     // LCOV_EXCL_LINE
 
     // Store Node pointer
     this->mNodes.push_back(pNode);
@@ -114,11 +107,7 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex,
     this->mNodes[rIndex]->AddBoundaryElement(this->mIndex);
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class BoundaryElement<0,1>;
 template class BoundaryElement<0,2>;
 template class BoundaryElement<1,2>;

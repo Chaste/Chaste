@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,7 @@ public:
         double y = pNode->rGetLocation()[1];
         double z = pNode->rGetLocation()[2];
 
-        if ( (x<0.15+1e-6) && (y<0.15+1e-6) && (z<0.15+1e-6) )
+        if ((x<0.15+1e-6) && (y<0.15+1e-6) && (z<0.15+1e-6))
         {
             return new CellTenTusscher2006EpiFromCellMLBackwardEuler(mpSolver, mpStimulus);
         }
@@ -181,15 +181,15 @@ private:
 
         std::vector<double> activation_times(mesh.GetNumNodes(), -1.0);
         std::vector<double> last_negative_voltage(mesh.GetNumNodes(), 1.0);
-        for(unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double V = voltage_repl[i];
-                if(V > 0 && activation_times[i] < 0.0)
+                if (V > 0 && activation_times[i] < 0.0)
                 {
                     double old = last_negative_voltage[i];
                     assert(old < 0);
@@ -228,7 +228,7 @@ private:
         }
         out_stream p_diag_file = handler.OpenOutputFile(output_file1.str());
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             c_vector<double, 3> position =  mesh.GetNode(i)->rGetLocation();
             c_vector<double, 3>  projected_diagonal = unit_diagonal*inner_prod(unit_diagonal, position);
@@ -238,7 +238,7 @@ private:
             {
                 double distance = norm_2(position);
                 (*p_diag_file) << distance<<"\t"<< activation_times[i]<<"\t"<<off_diagonal<<"\n";
-                if( fabs(position[0]-2.0) < 1e-8)
+                if (fabs(position[0]-2.0) < 1e-8)
                 {
                     std::cout << "h, dt = " << h << ", " << dt << "\n\t";
                     std::cout << "activation_times[" << i << "] = " << activation_times[i] << "\n";
@@ -251,15 +251,15 @@ private:
         output_file << "activation" << "_h" << h << "_dt" << dt << ".dat";
         out_stream p_file = handler.OpenOutputFile(output_file.str());
 
-        for(unsigned i=0; i<activation_times.size(); i++)
+        for (unsigned i=0; i<activation_times.size(); i++)
         {
             *p_file << activation_times[i] << "\n";
         }
         p_file->close();
 
-        for(unsigned i=0; i<activation_times.size(); i++)
+        for (unsigned i=0; i<activation_times.size(); i++)
         {
-            if(activation_times[i] < 0.0)
+            if (activation_times[i] < 0.0)
             {
                 std::cout << "\n\n\n**Some nodes unactivated**\n\n\n";
                 output_file << "__error";
@@ -277,7 +277,7 @@ private:
     }
 
 public:
-    void TestRunOnCoarsestMesh() throw(Exception)
+    void TestRunOnCoarsestMesh()
     {
         // run with h=0.05 and dt=0.01.  SVI is turned on
         Run(0.05, 0.01, 40, true);
@@ -290,7 +290,7 @@ public:
         NumericFileComparison num_comp(output_file, base_file);
         TS_ASSERT(num_comp.CompareFiles(1.5e-3)); //Absolute difference of 1.5 microsecond is tolerated
     }
-    void donotTestRunOtherSvi() throw(Exception)
+    void donotTestRunOtherSvi()
     {
         /* To reproduce Code A panel of
          *  Figure 1 Pathmanathan et al. == Figure 2 Niederer et al.
@@ -309,7 +309,7 @@ public:
         Run(0.01, 0.01, 50, true);
     }
 
-    void donotTestRunAllIci() throw(Exception)
+    void donotTestRunAllIci()
     {
         /* This produces Pathmanathan et al. Figure 1 panel B "ICI"
          *

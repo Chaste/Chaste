@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ void Node<SPACE_DIM>::CommonConstructor(unsigned index, bool isBoundaryNode)
     mIsBoundaryNode = isBoundaryNode;
     mIsInternal = false;
     mIsDeleted = false;
-    mpNodeAttributes = NULL;
+    mpNodeAttributes = nullptr;
 }
 
 template<unsigned SPACE_DIM>
@@ -129,7 +129,6 @@ void Node<SPACE_DIM>::SetAsBoundaryNode(bool value)
     mIsBoundaryNode = value;
 }
 
-
 template<unsigned SPACE_DIM>
 ChastePoint<SPACE_DIM> Node<SPACE_DIM>::GetPoint() const
 {
@@ -202,7 +201,7 @@ unsigned Node<SPACE_DIM>::GetNumNodeAttributes()
 template<unsigned SPACE_DIM>
 bool Node<SPACE_DIM>::HasNodeAttributes()
 {
-    return (mpNodeAttributes != NULL);
+    return (mpNodeAttributes != nullptr);
 }
 
 template<unsigned SPACE_DIM>
@@ -222,11 +221,11 @@ void Node<SPACE_DIM>::ClearAppliedForce()
 }
 
 template<unsigned SPACE_DIM>
-void Node<SPACE_DIM>::AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution)
+void Node<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
     ConstructNodeAttributes();
 
-    mpNodeAttributes->AddAppliedForceContribution(forceContribution);
+    mpNodeAttributes->AddAppliedForceContribution(rForceContribution);
 }
 
 template<unsigned SPACE_DIM>
@@ -322,13 +321,73 @@ unsigned Node<SPACE_DIM>::GetNumBoundaryElements() const
 }
 
 //////////////////////////////////////////////////////////////////////////
+// Tracking neighbours of the node
+//////////////////////////////////////////////////////////////////////////
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::AddNeighbour(unsigned index)
+{
+    ConstructNodeAttributes();
+
+    return mpNodeAttributes->AddNeighbour(index);
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::ClearNeighbours()
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->ClearNeighbours();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::RemoveDuplicateNeighbours()
+{
+    CheckForNodeAttributes();
+
+    mpNodeAttributes->RemoveDuplicateNeighbours();
+}
+
+template<unsigned SPACE_DIM>
+bool Node<SPACE_DIM>::NeighboursIsEmpty()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->NeighboursIsEmpty();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::SetNeighboursSetUp(bool flag)
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->SetNeighboursSetUp(flag);
+};
+
+template<unsigned SPACE_DIM>
+bool Node<SPACE_DIM>::GetNeighboursSetUp()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->GetNeighboursSetUp();
+};
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned>& Node<SPACE_DIM>::rGetNeighbours()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->rGetNeighbours();
+};
+
+//////////////////////////////////////////////////////////////////////////
 // Methods dealing with some node flags (deleted, region)
 //////////////////////////////////////////////////////////////////////////
 
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::CheckForNodeAttributes() const
 {
-    if (mpNodeAttributes == NULL)
+    if (mpNodeAttributes == nullptr)
     {
         EXCEPTION("Node has no attributes associated with it. Construct attributes first");
     }
@@ -337,7 +396,7 @@ void Node<SPACE_DIM>::CheckForNodeAttributes() const
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::ConstructNodeAttributes()
 {
-    if (mpNodeAttributes == NULL)
+    if (mpNodeAttributes == nullptr)
     {
         mpNodeAttributes = new NodeAttributes<SPACE_DIM>();
     }
@@ -387,11 +446,7 @@ unsigned Node<SPACE_DIM>::GetRegion() const
     return region;
 }
 
-
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class Node<1>;
 template class Node<2>;
 template class Node<3>;

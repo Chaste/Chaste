@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -140,6 +140,14 @@ public:
      * @return index of new node
      */
     unsigned AddNode(Node<2>* pNewNode);
+
+    /**
+     * Overridden RefreshMesh() method.
+     *
+     * If the location is outside the domain width, move it to
+     * within the boundary
+     */
+    void RefreshMesh();
 };
 
 namespace boost

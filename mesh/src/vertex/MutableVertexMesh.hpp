@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,6 +101,14 @@ protected:
     std::vector<unsigned> mDeletedElementIndices;
 
     /**
+     * Distance for T3 swap checking. At each time step we check for each boundary node whether
+     * it intersects with any boundary elements (cells) whose centroids lie within this distance
+     * to the node. Note that T3 swaps may not be resolved correctly if this distance is chosen
+     * too small, while large values for mDistanceForT3SwapChecking may slow down the simulation.
+     */
+    double mDistanceForT3SwapChecking;
+
+    /**
      * Locations of T1 swaps (the mid point of the moving nodes), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT1Swaps().
      */
@@ -145,7 +153,7 @@ protected:
      * @return whether we need to check for, and implement, any further local remeshing operations
      *                   (true if any swaps are performed).
      */
-    bool CheckForSwapsFromShortEdges();
+    virtual bool CheckForSwapsFromShortEdges();
 
     /**
      * Helper method for ReMesh().
@@ -338,6 +346,7 @@ protected:
         archive & mCheckForInternalIntersections;
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
+        archive & mDistanceForT3SwapChecking;
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
@@ -472,6 +481,23 @@ public:
      * @return mRosetteResolutionProbabilityPerTimestep
      */
     double GetRosetteResolutionProbabilityPerTimestep() const;
+
+    /**
+     * Set distance for T3 swap checking. At each time step we check for each boundary node whether
+     * it intersects with any boundary elements (cells) whose centroids lie within this distance
+     * to the node. Note that T3 swaps may not be resolved correctly if this distance is chosen
+     * too small, while large values for mDistanceForT3SwapChecking may slow down the simulation.
+     *
+     * @param distanceForT3SwapChecking
+     */
+    void SetDistanceForT3SwapChecking( double distanceForT3SwapChecking );
+
+    /**
+     * Get Distance for T3 swap checking.
+     *
+     * @return mDistanceForT3SwapChecking
+     */
+    double GetDistanceForT3SwapChecking() const;
 
     /**
      * @return the number of Nodes in the mesh.

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -143,7 +143,5 @@ public:
         return false;
     }
 };
-
-
 
 #endif /*NASH2004CONTRACTIONMODEL_HPP_*/

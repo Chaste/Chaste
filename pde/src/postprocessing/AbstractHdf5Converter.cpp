@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,9 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 herr_t op_func (hid_t loc_id,
                 const char *name,
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
                 const H5L_info_t *info,
-#endif
                 void *operator_data);
 
 
@@ -168,13 +166,7 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
     /*
      * Begin HDF5 iteration, calls a method that populates mDatasetNames.
      */
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-    //std::cout << "HDF5 1.8.x or above detected.\n";
-    H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &mDatasetNames);
-#else
-    //std::cout << "HDF5 1.6.x  detected.\n";
-    H5Giterate(file, "/", NULL, op_func, &mDatasetNames);
-#endif
+    H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, nullptr, op_func, &mDatasetNames);
 
     H5Fclose(file);
 
@@ -189,9 +181,9 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
         // it is longer than the ending we are looking for ("_Unlimited") ...
         // ... AND it ends with the string we are looking for,
         // then erase it.
-        if ( (*(iter) == "Time") ||
-             ( ( iter->length() > ending.length() ) &&
-               ( 0 == iter->compare(iter->length() - ending.length(), ending.length(), ending) ) ) )
+        if ((*(iter) == "Time") ||
+            ((iter->length() > ending.length()) &&
+            (0 == iter->compare(iter->length() - ending.length(), ending.length(), ending))))
         {
             iter = mDatasetNames.erase(iter);
         }
@@ -212,9 +204,7 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
  * This was based on a couple of HDF5 example files.
  */
 herr_t op_func (hid_t loc_id, const char *name,
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
                 const H5L_info_t *info,
-#endif
                 void *operator_data)
 {
     std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
@@ -224,7 +214,6 @@ herr_t op_func (hid_t loc_id, const char *name,
      * The name of the object is passed to this function by
      * the Library.
      */
-#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
     H5O_info_t infobuf;
     H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
     switch (infobuf.type)
@@ -238,22 +227,6 @@ herr_t op_func (hid_t loc_id, const char *name,
 //          case H5O_TYPE_NAMED_DATATYPE:
 //              printf ("  Datatype: %s\n", name);
 //              break;
-#else // HDF5 1.6.x
-    H5G_stat_t statbuf;
-    H5Gget_objinfo (loc_id, name, 0, &statbuf);
-    switch (statbuf.type)
-    {
-//        case H5G_GROUP:
-//            printf ("  Group: %s\n", name);
-//            break;
-        case H5G_DATASET:
-            //printf ("  Dataset: %s\n", name);
-            p_dataset_names->push_back(name);
-            break;
-//        case H5G_TYPE:
-//            printf ("  Datatype: %s\n", name);
-//            break;
-#endif
         default:
             NEVER_REACHED;
             // If you ever do reach here, it means that an HDF5 file you are trying to convert contains
@@ -263,11 +236,7 @@ herr_t op_func (hid_t loc_id, const char *name,
     return 0;
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractHdf5Converter<1,1>;
 template class AbstractHdf5Converter<1,2>;
 template class AbstractHdf5Converter<2,2>;

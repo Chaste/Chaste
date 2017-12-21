@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,7 +89,7 @@ public:
         }
     }
 
-    void TestTensorException() throw (Exception)
+    void TestTensorException()
     {
         c_vector<double, 1> constant_conductivities_1d(Create_c_vector(2.1));
         c_vector<double, 2> constant_conductivities_2d(Create_c_vector(2.1, 0.8));
@@ -113,7 +113,7 @@ public:
 
     }
 
-    void TestFibreOrientationFileExceptions() throw (Exception)
+    void TestFibreOrientationFileExceptions()
     {
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructCuboid(1,1,1);
@@ -177,7 +177,6 @@ public:
             axi_tensors.SetFibreOrientationFile(file);
             TS_ASSERT_THROWS_THIS(axi_tensors.Init(&mesh),  "The size of the fibre file does not match the number of elements in the mesh"); //Mesh has 6 elements
         }
-
     }
 
     void TestFibreOrientationTensor3D()
@@ -244,7 +243,6 @@ public:
             TS_ASSERT_DELTA(ortho_tensors[tensor_index](2,1), axi_tensors[tensor_index](2,1), 1e-5);
             TS_ASSERT_DELTA(ortho_tensors[tensor_index](2,2), axi_tensors[tensor_index](2,2), 1e-5);
         }
-
     }
 
     void TestFibreOrientationAxisymmetric3D()
@@ -544,7 +542,6 @@ public:
             TS_ASSERT_DELTA(axi_tensors[element_index](2,1), 0.0, tol);
             TS_ASSERT_DELTA(axi_tensors[element_index](2,2), g_l, tol);
         }
-
     }
 };
 

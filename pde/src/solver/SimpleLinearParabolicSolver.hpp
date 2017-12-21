@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -99,8 +99,6 @@ protected:
     // Note: does not have to provide a ComputeVectorSurfaceTerm for surface integrals,
     // the parent AbstractAssemblerSolverHybrid assumes natural Neumann BCs and uses a
     // NaturalNeumannSurfaceTermAssembler for assembling this part of the vector.
-
-
 
     /**
      * Delegate to AbstractAssemblerSolverHybrid::SetupGivenLinearSystem.

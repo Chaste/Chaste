@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,6 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSoluti
                          local_size, local_size);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
         Vec currentSolution,
@@ -111,7 +110,7 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
     double Cm  = HeartConfig::Instance()->GetCapacitance();
 
-    if(!(this->mBathSimulation))
+    if (!(this->mBathSimulation))
     {
         for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
              index!= dist_vec_matrix_based.End();
@@ -132,7 +131,7 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
              ++index)
         {
 
-            if ( !HeartRegionCode::IsRegionBath( this->mpMesh->GetNode(index.Global)->GetRegion() ))
+            if (!HeartRegionCode::IsRegionBath( this->mpMesh->GetNode(index.Global)->GetRegion()))
             {
                 double V = distributed_current_solution_vm[index];
                 double F = - Am*this->mpBidomainTissue->rGetIionicCacheReplicated()[index.Global]
@@ -173,7 +172,7 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     /////////////////////////////////////////
     // apply correction term
     /////////////////////////////////////////
-    if(mpBidomainCorrectionTermAssembler)
+    if (mpBidomainCorrectionTermAssembler)
     {
         mpBidomainCorrectionTermAssembler->SetVectorToAssemble(this->mpLinearSystem->rGetRhsVector(), false/*don't zero vector!*/);
         // don't need to set current solution
@@ -184,19 +183,18 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
 
     this->mpBoundaryConditions->ApplyDirichletToLinearProblem(*(this->mpLinearSystem), computeMatrix);
 
-    if(this->mBathSimulation)
+    if (this->mBathSimulation)
     {
         this->mpLinearSystem->FinaliseLhsMatrix();
         this->FinaliseForBath(computeMatrix,true);
     }
 
-    if(computeMatrix)
+    if (computeMatrix)
     {
         this->mpLinearSystem->FinaliseLhsMatrix();
     }
     this->mpLinearSystem->FinaliseRhsVector();
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
@@ -211,7 +209,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
     mVecForConstructingRhs = NULL;
 
     // create assembler
-    if(bathSimulation)
+    if (bathSimulation)
     {
         mpBidomainAssembler = new BidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
     }
@@ -223,7 +221,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
 
     mpBidomainNeumannSurfaceTermAssembler = new BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pBoundaryConditions);
 
-    if(HeartConfig::Instance()->GetUseStateVariableInterpolation())
+    if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
         mpBidomainCorrectionTermAssembler
             = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
@@ -242,23 +240,19 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::~BidomainSolver()
     delete mpBidomainAssembler;
     delete mpBidomainNeumannSurfaceTermAssembler;
 
-    if(mVecForConstructingRhs)
+    if (mVecForConstructingRhs)
     {
         PetscTools::Destroy(mVecForConstructingRhs);
         PetscTools::Destroy(mMassMatrix);
     }
 
-    if(mpBidomainCorrectionTermAssembler)
+    if (mpBidomainCorrectionTermAssembler)
     {
         delete mpBidomainCorrectionTermAssembler;
     }
 }
 
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class BidomainSolver<1,1>;
 template class BidomainSolver<2,2>;
 template class BidomainSolver<3,3>;
-

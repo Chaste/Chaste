@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLCYCLEMODELODEHANDLER_HPP_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "ChasteSerialization.hpp"
 #include "AbstractOdeSystem.hpp"
@@ -45,8 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * This class contains the functionality for running ODEs as part of a cell cycle
- * model.  It is designed to be used as an additional base class for models which
- * require this functionality.
+ * or SRN model.  It is designed to be used as an additional base class for models
+ * which require this functionality.
  */
 class CellCycleModelOdeHandler
 {
@@ -67,9 +68,27 @@ private:
         archive & mpOdeSolver;
         archive & mLastTime;
         archive & mDt;
+        archive & mFinishedRunningOdes;
     }
 
+    /**
+     * Prevent copy-assignment of this class, or its subclasses.
+     * Note that we do not define this method, therefore statements like "CellCycleModelOdeHandler new = old;" will not compile.
+     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateCellCycleModel
+     * and CreateSrnModel.
+     *
+     * @return the new ODE handler.
+     */
+    CellCycleModelOdeHandler& operator=(const AbstractCellCycleModelOdeSolver&);
+
 protected:
+
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel and CreateSrnModel.
+     *
+     * @param rHandler ODE handler to copy.
+     */
+    CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler);
 
     /**
      * Timestep to use when solving the ODE system.
@@ -85,6 +104,11 @@ protected:
 
     /** The last time the ODE system was evaluated. */
     double mLastTime;
+
+    /**
+     * Whether the model is currently in a delay (not solving ODEs).
+     */
+    bool mFinishedRunningOdes;
 
     /**
      * Solves the ODE system to a given time.
@@ -163,6 +187,22 @@ public:
      * @param rStateVariables vector containing values for the state variables
      */
     void SetStateVariables(const std::vector<double>& rStateVariables);
+
+    /**
+     * @return the protein concentrations at the current time (useful for tests)
+     *
+     * NB: Will copy the vector - you can't use this to modify the concentrations.
+     */
+    std::vector<double> GetProteinConcentrations() const;
+
+    /**
+     * Sets the protein concentrations and time when the model was last evaluated - should only be called by tests
+     *
+     * @param lastTime the SimulationTime at which the protein concentrations apply
+     * @param proteinConcentrations a standard vector of doubles of protein concentrations
+     *
+     */
+    void SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations);
 };
 
 #endif /*CELLCYCLEMODELODEHANDLER_HPP_*/

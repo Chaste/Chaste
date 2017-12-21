@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -251,7 +251,7 @@ public:
             }
         }
 
-        if ( num_rows_owned == MATRIX_SIZE)
+        if (num_rows_owned == MATRIX_SIZE)
         {
             MatSetValues(matrix,
                          num_rows_owned,

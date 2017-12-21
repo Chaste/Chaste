@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,10 +48,10 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
       mAreLocalBoxesSet(false),
       mCalculateNodeNeighbours(true)
 {
-    // Periodicity only works in 2d and in serial.
+    // Periodicity only works in 2d
     if (isPeriodicInX)
     {
-        assert(DIM==2 && PetscTools::IsSequential());
+        assert(DIM==2);    // LCOV_EXCL_LINE
     }
 
     // If the domain size is not 'divisible' (i.e. fmod(width, box_size) > 0.0) we swell the domain to enforce this.
@@ -87,37 +87,26 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         mNumBoxesEachDirection(DIM-1) = PetscTools::GetNumProcs();
     }
 
-    // Make a distributed vectory factory to split the rows of boxes between processes.
+    // Make a distributed vector factory to split the rows of boxes between processes.
     mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
     // Calculate how many boxes in a row / face. A useful piece of data in the class.
-    mNumBoxesInAFace = 1;
-    for (unsigned i=1; i<DIM; i++)
+    mNumBoxes = 1u;
+    for (unsigned dim=0; dim<DIM; dim++)
     {
-        mNumBoxesInAFace *= mNumBoxesEachDirection(i-1);
+        mNumBoxes *= mNumBoxesEachDirection(dim);
     }
 
-    unsigned num_boxes = mNumBoxesInAFace * (mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow());
+    mNumBoxesInAFace = mNumBoxes / mNumBoxesEachDirection(DIM-1);
+
+    unsigned num_local_boxes = mNumBoxesInAFace * GetNumLocalRows();
 
     mMinBoxIndex = mpDistributedBoxStackFactory->GetLow() * mNumBoxesInAFace;
     mMaxBoxIndex = mpDistributedBoxStackFactory->GetHigh() * mNumBoxesInAFace - 1;
 
-    /*
-     * The location of the Boxes doesn't matter as it isn't actually used so we don't bother to work it out.
-     * The reason it isn't used is because this class works out which box a node lies in without refernece to actual
-     * box locations, only their global index within the collection.
-     */
-    c_vector<double, 2*DIM> arbitrary_location;
-    for (unsigned i=0; i<num_boxes; i++)
-    {
-        Box<DIM> new_box(arbitrary_location);
-        mBoxes.push_back(new_box);
-
-        unsigned global_index = mMinBoxIndex + i;
-        mBoxesMapping[global_index] = mBoxes.size() - 1;
-    }
-
-    mNumBoxes = mNumBoxesInAFace * mNumBoxesEachDirection(DIM-1);
+    // Create the correct number of boxes and set up halos
+    mBoxes.resize(num_local_boxes);
+    SetupHaloBoxes();
 }
 
 template<unsigned DIM>
@@ -143,34 +132,32 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupHaloBoxes()
 {
     // Get top-most and bottom-most value of Distributed Box Stack.
-    unsigned Hi = mpDistributedBoxStackFactory->GetHigh();
-    unsigned Lo = mpDistributedBoxStackFactory->GetLow();
+    unsigned hi = mpDistributedBoxStackFactory->GetHigh();
+    unsigned lo = mpDistributedBoxStackFactory->GetLow();
 
-    // If I am not the top-most process, add halo structures to the right.
+    // If I am not the top-most process, add halo structures above.
     if (!PetscTools::AmTopMost())
     {
         for (unsigned i=0; i < mNumBoxesInAFace; i++)
         {
-            c_vector<double, 2*DIM> arbitrary_location; // See comment in constructor.
-            Box<DIM> new_box(arbitrary_location);
+            Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
 
-            unsigned global_index = Hi * mNumBoxesInAFace + i;
+            unsigned global_index = hi * mNumBoxesInAFace + i;
             mHaloBoxesMapping[global_index] = mHaloBoxes.size()-1;
             mHalosRight.push_back(global_index - mNumBoxesInAFace);
         }
     }
 
-    // If I am not the bottom-most process, add halo structures to the left.
+    // If I am not the bottom-most process, add halo structures below.
     if (!PetscTools::AmMaster())
     {
         for (unsigned i=0; i< mNumBoxesInAFace; i++)
         {
-            c_vector<double, 2*DIM> arbitrary_location; // See comment in constructor.
-            Box<DIM> new_box(arbitrary_location);
+            Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
 
-            unsigned global_index = (Lo - 1) * mNumBoxesInAFace + i;
+            unsigned global_index = (lo - 1) * mNumBoxesInAFace + i;
             mHaloBoxesMapping[global_index] = mHaloBoxes.size() - 1;
 
             mHalosLeft.push_back(global_index  + mNumBoxesInAFace);
@@ -212,13 +199,13 @@ unsigned DistributedBoxCollection<DIM>::GetNumLocalRows() const
 }
 
 template<unsigned DIM>
-bool DistributedBoxCollection<DIM>::GetBoxOwnership(unsigned globalIndex)
+bool DistributedBoxCollection<DIM>::IsBoxOwned(unsigned globalIndex)
 {
     return (!(globalIndex<mMinBoxIndex) && !(mMaxBoxIndex<globalIndex));
 }
 
 template<unsigned DIM>
-bool DistributedBoxCollection<DIM>::GetHaloBoxOwnership(unsigned globalIndex)
+bool DistributedBoxCollection<DIM>::IsHaloBox(unsigned globalIndex)
 {
     bool is_halo_right = ((globalIndex > mMaxBoxIndex) && !(globalIndex > mMaxBoxIndex + mNumBoxesInAFace));
     bool is_halo_left = ((globalIndex < mMinBoxIndex) && !(globalIndex < mMinBoxIndex - mNumBoxesInAFace));
@@ -235,20 +222,37 @@ bool DistributedBoxCollection<DIM>::IsInteriorBox(unsigned globalIndex)
 }
 
 template<unsigned DIM>
-unsigned DistributedBoxCollection<DIM>::CalculateGlobalIndex(c_vector<unsigned, DIM> coordinateIndices)
+unsigned DistributedBoxCollection<DIM>::CalculateGlobalIndex(c_vector<unsigned, DIM> gridIndices)
 {
-    unsigned containing_box_index = 0;
-    for (unsigned i=0; i<DIM; i++)
-    {
-        unsigned temp = 1;
-        for (unsigned j=0; j<i; j++)
-        {
-            temp *= mNumBoxesEachDirection(j);
-        }
-        containing_box_index += temp*coordinateIndices[i];
-    }
+    ///\todo #2308 etc. We need to make allowance for periodicity here...
+    unsigned global_index;
 
-    return containing_box_index;
+    switch (DIM)
+    {
+        case 1:
+        {
+            global_index = gridIndices(0);
+            break;
+        }
+        case 2:
+        {
+            global_index = gridIndices(0) +
+                           gridIndices(1) * mNumBoxesEachDirection(0);
+            break;
+        }
+        case 3:
+        {
+            global_index = gridIndices(0) +
+                           gridIndices(1) * mNumBoxesEachDirection(0) +
+                           gridIndices(2) * mNumBoxesEachDirection(0) * mNumBoxesEachDirection(1);
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
+    return global_index;
 }
 
 template<unsigned DIM>
@@ -259,14 +263,13 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(Node<DIM>* pNode)
     return CalculateContainingBox(location);
 }
 
-
 template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
     // The node must lie inside the boundary of the box collection
     for (unsigned i=0; i<DIM; i++)
     {
-        if ( (rLocation[i] < mDomainSize(2*i)) || !(rLocation[i] < mDomainSize(2*i+1)) )
+        if ((rLocation[i] < mDomainSize(2*i)) || !(rLocation[i] < mDomainSize(2*i+1)))
         {
             EXCEPTION("The point provided is outside all of the boxes");
         }
@@ -303,32 +306,31 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
 }
 
 template<unsigned DIM>
-c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateCoordinateIndices(unsigned globalIndex)
+c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateGridIndices(unsigned globalIndex)
 {
-    c_vector<unsigned, DIM> indices;
+    c_vector<unsigned, DIM> grid_indices;
 
-    switch(DIM)
+    switch (DIM)
     {
         case 1:
         {
-            indices[0]=globalIndex;
+            grid_indices(0) = globalIndex;
             break;
         }
         case 2:
         {
-            unsigned remainder=globalIndex % mNumBoxesEachDirection(0);
-            indices[0]=remainder;
-            indices[1]=(unsigned)(globalIndex/mNumBoxesEachDirection(0));
+            unsigned num_x = mNumBoxesEachDirection(0);
+            grid_indices(0) = globalIndex % num_x;
+            grid_indices(1) = (globalIndex - grid_indices(0)) / num_x;
             break;
         }
-
         case 3:
         {
-            unsigned remainder1=globalIndex % (mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1));
-            unsigned remainder2=remainder1 % mNumBoxesEachDirection(0);
-            indices[0]=remainder2;
-            indices[1]=((globalIndex-indices[0])/mNumBoxesEachDirection(0))%mNumBoxesEachDirection(1);
-            indices[2]=((globalIndex-indices[0]-mNumBoxesEachDirection(0)*indices[1])/(mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1)));
+            unsigned num_x = mNumBoxesEachDirection(0);
+            unsigned num_xy = mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1);
+            grid_indices(0) = globalIndex % num_x;
+            grid_indices(1) = (globalIndex % num_xy - grid_indices(0)) / num_x;
+            grid_indices(2) = globalIndex / num_xy;
             break;
         }
         default:
@@ -337,20 +339,26 @@ c_vector<unsigned, DIM> DistributedBoxCollection<DIM>::CalculateCoordinateIndice
         }
     }
 
-    return indices;
+    return grid_indices;
 }
 
 template<unsigned DIM>
 Box<DIM>& DistributedBoxCollection<DIM>::rGetBox(unsigned boxIndex)
 {
-    assert(!(boxIndex<mMinBoxIndex) && !(mMaxBoxIndex<boxIndex));
-    return mBoxes[boxIndex-mMinBoxIndex];
+    // Check first for local ownership
+    if (!(boxIndex<mMinBoxIndex) && !(mMaxBoxIndex<boxIndex))
+    {
+        return mBoxes[boxIndex-mMinBoxIndex];
+    }
+
+    // If normal execution reaches this point then the box does not belong to the process so we will check for a halo box
+    return rGetHaloBox(boxIndex);
 }
 
 template<unsigned DIM>
 Box<DIM>& DistributedBoxCollection<DIM>::rGetHaloBox(unsigned boxIndex)
 {
-    assert(GetHaloBoxOwnership(boxIndex));
+    assert(IsHaloBox(boxIndex));
 
     unsigned local_index = mHaloBoxesMapping.find(boxIndex)->second;
 
@@ -385,6 +393,12 @@ template<unsigned DIM>
 double DistributedBoxCollection<DIM>::GetBoxWidth() const
 {
     return mBoxWidth;
+}
+
+template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::GetIsPeriodicInX() const
+{
+    return mIsPeriodicInX;
 }
 
 template<unsigned DIM>
@@ -539,51 +553,51 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     bool right = (global_index%mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1);
                     bool top = !(global_index < mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1) - mNumBoxesEachDirection(0));
                     bool bottom = (global_index < mNumBoxesEachDirection(0));
-                    bool bottom_proc = (CalculateCoordinateIndices(global_index)[1] == mpDistributedBoxStackFactory->GetLow());
+                    bool bottom_proc = (CalculateGridIndices(global_index)[1] == mpDistributedBoxStackFactory->GetLow());
 
                     // Insert the current box
                     local_boxes.insert(global_index);
 
                     // If we're on the bottom of the process boundary, but not the bottom of the domain add boxes below
-                    if(!bottom && bottom_proc)
+                    if (!bottom && bottom_proc)
                     {
                         local_boxes.insert(global_index - mNumBoxesEachDirection(0));
-                        if(!left)
+                        if (!left)
                         {
                             local_boxes.insert(global_index - mNumBoxesEachDirection(0) - 1);
                         }
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert(global_index - mNumBoxesEachDirection(0) + 1);
                         }
                     }
 
                     // If we're not at the top of the domain insert boxes above
-                    if(!top)
+                    if (!top)
                     {
                         local_boxes.insert(global_index + mNumBoxesEachDirection(0));
 
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert(global_index + mNumBoxesEachDirection(0) + 1);
                         }
-                        if(!left)
+                        if (!left)
                         {
                             local_boxes.insert(global_index + mNumBoxesEachDirection(0) - 1);
                         }
-                        else if ( (global_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX) ) // If we're on the left edge but its periodic include the box on the far right and up one.
+                        else if ((global_index % mNumBoxesEachDirection(0) == 0) && (mIsPeriodicInX)) // If we're on the left edge but its periodic include the box on the far right and up one.
                         {
                             local_boxes.insert(global_index +  2 * mNumBoxesEachDirection(0) - 1);
                         }
                     }
 
                     // If we're not on the far right hand side inseryt box to the right
-                    if(!right)
+                    if (!right)
                     {
                         local_boxes.insert(global_index + 1);
                     }
                     // If we're on the right edge but it's periodic include the box on the far left of the domain
-                    else if ( (global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX) )
+                    else if ((global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1) && (mIsPeriodicInX))
                     {
                         local_boxes.insert(global_index - mNumBoxesEachDirection(0) + 1);
                         // If we're also not on the top-most row, then insert the box above- on the far left of the domain
@@ -615,51 +629,51 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     bool right = (global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0) - 1);
                     bool front = (global_index < num_boxes_xy);
                     bool back = !(global_index < num_boxes_xy*mNumBoxesEachDirection(2) - num_boxes_xy);
-                    bool proc_front = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStackFactory->GetLow());
-                    bool proc_back = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStackFactory->GetHigh()-1);
+                    bool proc_front = (CalculateGridIndices(global_index)[2] == mpDistributedBoxStackFactory->GetLow());
+                    bool proc_back = (CalculateGridIndices(global_index)[2] == mpDistributedBoxStackFactory->GetHigh()-1);
 
                     // Insert the current box
                     local_boxes.insert(global_index);
 
                     // If we're not on the front face, add appropriate boxes on the closer face
-                    if(!front)
+                    if (!front)
                     {
                         // If we're not on the top of the domain
-                        if(!top)
+                        if (!top)
                         {
                             local_boxes.insert( global_index - num_boxes_xy + mNumBoxesEachDirection(0) );
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy + mNumBoxesEachDirection(0) - 1);
                             }
-                            if(!right)
+                            if (!right)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy + mNumBoxesEachDirection(0) + 1);
                             }
                         }
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert( global_index - num_boxes_xy + 1);
                         }
 
                         // If we are on the front of the process we have to add extra boxes as they are halos.
-                        if(proc_front)
+                        if (proc_front)
                         {
                             local_boxes.insert( global_index - num_boxes_xy );
 
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy - 1);
                             }
-                            if(!bottom)
+                            if (!bottom)
                             {
                                 local_boxes.insert( global_index - num_boxes_xy - mNumBoxesEachDirection(0));
 
-                                if(!left)
+                                if (!left)
                                 {
                                     local_boxes.insert( global_index - num_boxes_xy - mNumBoxesEachDirection(0) - 1);
                                 }
-                                if(!right)
+                                if (!right)
                                 {
                                     local_boxes.insert( global_index - num_boxes_xy - mNumBoxesEachDirection(0) + 1);
                                 }
@@ -667,62 +681,62 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 
                         }
                     }
-                    if(!right)
+                    if (!right)
                     {
                         local_boxes.insert( global_index + 1);
                     }
                     // If we're not on the very top add boxes above
-                    if(!top)
+                    if (!top)
                     {
                         local_boxes.insert( global_index + mNumBoxesEachDirection(0));
 
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert( global_index + mNumBoxesEachDirection(0) + 1);
                         }
-                        if(!left)
+                        if (!left)
                         {
                             local_boxes.insert( global_index + mNumBoxesEachDirection(0) - 1);
                         }
                     }
 
                     // If we're not on the back add boxes behind
-                    if(!back)
+                    if (!back)
                     {
                         local_boxes.insert(global_index + num_boxes_xy);
 
-                        if(!right)
+                        if (!right)
                         {
                             local_boxes.insert(global_index + num_boxes_xy + 1);
                         }
-                        if(!top)
+                        if (!top)
                         {
                             local_boxes.insert(global_index + num_boxes_xy + mNumBoxesEachDirection(0));
-                            if(!right)
+                            if (!right)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy + mNumBoxesEachDirection(0) + 1);
                             }
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy + mNumBoxesEachDirection(0) - 1);
                             }
                         }
                         // If we are on the back proc we should make sure we get everything in the face further back
-                        if(proc_back)
+                        if (proc_back)
                         {
-                            if(!left)
+                            if (!left)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy - 1);
                             }
-                            if(!bottom)
+                            if (!bottom)
                             {
                                 local_boxes.insert(global_index + num_boxes_xy - mNumBoxesEachDirection(0));
 
-                                if(!left)
+                                if (!left)
                                 {
                                     local_boxes.insert(global_index + num_boxes_xy - mNumBoxesEachDirection(0) - 1);
                                 }
-                                if(!right)
+                                if (!right)
                                 {
                                     local_boxes.insert(global_index + num_boxes_xy - mNumBoxesEachDirection(0) + 1);
                                 }
@@ -740,8 +754,6 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
         mAreLocalBoxesSet=true;
     }
 }
-
-
 
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
@@ -804,7 +816,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 }
                 else // Add Periodic Box if needed
                 {
-                    if(mIsPeriodicInX)
+                    if (mIsPeriodicInX)
                     {
                         local_boxes.insert(i+M-1);
                     }
@@ -817,7 +829,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 }
                 else // Add Periodic Box if needed
                 {
-                    if(mIsPeriodicInX)
+                    if (mIsPeriodicInX)
                     {
                         local_boxes.insert(i-M+1);
                     }
@@ -837,39 +849,39 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 
                 // add the four corner boxes
 
-                if ( (!is_xmin[i]) && (!is_ymin[i]) )
+                if ((!is_xmin[i]) && (!is_ymin[i]))
                 {
                     local_boxes.insert(i-1-M);
                 }
-                if ( (!is_xmin[i]) && (!is_ymax[i]) )
+                if ((!is_xmin[i]) && (!is_ymax[i]))
                 {
                     local_boxes.insert(i-1+M);
                 }
-                if ( (!is_xmax[i]) && (!is_ymin[i]) )
+                if ((!is_xmax[i]) && (!is_ymin[i]))
                 {
                     local_boxes.insert(i+1-M);
                 }
-                if ( (!is_xmax[i]) && (!is_ymax[i]) )
+                if ((!is_xmax[i]) && (!is_ymax[i]))
                 {
                     local_boxes.insert(i+1+M);
                 }
 
-                // Add Periodic Corner Boxes if needed
-                if(mIsPeriodicInX)
+                // Add periodic corner boxes if needed
+                if (mIsPeriodicInX)
                 {
-                    if( (is_xmin[i]) && (!is_ymin[i]) )
+                    if ((is_xmin[i]) && (!is_ymin[i]))
                     {
                         local_boxes.insert(i-1);
                     }
-                    if ( (is_xmin[i]) && (!is_ymax[i]) )
+                    if ((is_xmin[i]) && (!is_ymax[i]))
                     {
                         local_boxes.insert(i-1+2*M);
                     }
-                    if ( (is_xmax[i]) && (!is_ymin[i]) )
+                    if ((is_xmax[i]) && (!is_ymin[i]))
                     {
                         local_boxes.insert(i+1-2*M);
                     }
-                    if ( (is_xmax[i]) && (!is_ymax[i]) )
+                    if ((is_xmax[i]) && (!is_ymax[i]))
                     {
                         local_boxes.insert(i+1);
                     }
@@ -1015,42 +1027,42 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 
                 // finally, the 8 corners are left
 
-                if ( (!is_xmin[i]) && (!is_ymin[i]) && (!is_zmin[i]) )
+                if ((!is_xmin[i]) && (!is_ymin[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i-1-M-M*N);
                 }
 
-                if ( (!is_xmin[i]) && (!is_ymin[i]) && (!is_zmax[i]) )
+                if ((!is_xmin[i]) && (!is_ymin[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i-1-M+M*N);
                 }
 
-                if ( (!is_xmin[i]) && (!is_ymax[i]) && (!is_zmin[i]) )
+                if ((!is_xmin[i]) && (!is_ymax[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i-1+M-M*N);
                 }
 
-                if ( (!is_xmin[i]) && (!is_ymax[i]) && (!is_zmax[i]) )
+                if ((!is_xmin[i]) && (!is_ymax[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i-1+M+M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymin[i]) && (!is_zmin[i]) )
+                if ((!is_xmax[i]) && (!is_ymin[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i+1-M-M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymin[i]) && (!is_zmax[i]) )
+                if ((!is_xmax[i]) && (!is_ymin[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i+1-M+M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymax[i]) && (!is_zmin[i]) )
+                if ((!is_xmax[i]) && (!is_ymax[i]) && (!is_zmin[i]))
                 {
                     local_boxes.insert(i+1+M-M*N);
                 }
 
-                if ( (!is_xmax[i]) && (!is_ymax[i]) && (!is_zmax[i]) )
+                if ((!is_xmax[i]) && (!is_ymax[i]) && (!is_zmax[i]))
                 {
                     local_boxes.insert(i+1+M+M*N);
                 }
@@ -1065,7 +1077,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 }
 
 template<unsigned DIM>
-std::set<unsigned> DistributedBoxCollection<DIM>::GetLocalBoxes(unsigned boxIndex)
+std::set<unsigned>& DistributedBoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
 {
     // Make sure the box is locally owned
     assert(!(boxIndex < mMinBoxIndex) && !(mMaxBoxIndex<boxIndex));
@@ -1077,7 +1089,7 @@ bool DistributedBoxCollection<DIM>::IsOwned(Node<DIM>* pNode)
 {
     unsigned index = CalculateContainingBox(pNode);
 
-    return GetBoxOwnership(index);
+    return IsBoxOwned(index);
 }
 
 template<unsigned DIM>
@@ -1085,7 +1097,7 @@ bool DistributedBoxCollection<DIM>::IsOwned(c_vector<double, DIM>& location)
 {
     unsigned index = CalculateContainingBox(location);
 
-    return GetBoxOwnership(index);
+    return IsBoxOwned(index);
 }
 
 template<unsigned DIM>
@@ -1125,98 +1137,128 @@ void DistributedBoxCollection<DIM>::SetCalculateNodeNeighbours(bool calculateNod
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
-    rNodeNeighbours.clear();
 
     // Create an empty neighbours set for each node
     for (unsigned i=0; i<rNodes.size(); i++)
     {
-        unsigned node_index = rNodes[i]->GetIndex();
-
-        // Get the box containing this node
+        // Get the box containing this node as only nodes on this process have NodeAttributes
+        // and therefore Neighbours setup.
         unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-        if (GetBoxOwnership(box_index))
+        if (IsBoxOwned(box_index))
         {
-            rNodeNeighbours[node_index] = std::set<unsigned>();
+            rNodes[i]->ClearNeighbours();
         }
     }
 
-    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-            map_iter != mBoxesMapping.end();
-            ++map_iter)
+    for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        // Get the box global index
-        unsigned box_index = map_iter->first;
+        AddPairsFromBox(box_index, rNodePairs);
+    }
 
-        AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+    if (mCalculateNodeNeighbours)
+    {
+        for (unsigned i = 0; i < rNodes.size(); i++)
+        {
+            // Get the box containing this node as only nodes on this process have NodeAttributes
+            // and therefore Neighbours setup.
+            unsigned box_index = CalculateContainingBox(rNodes[i]);
+
+            if (IsBoxOwned(box_index))
+            {
+                rNodes[i]->RemoveDuplicateNeighbours();
+            }
+        }
     }
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
-    rNodeNeighbours.clear();
 
     // Create an empty neighbours set for each node
     for (unsigned i=0; i<rNodes.size(); i++)
     {
-        unsigned node_index = rNodes[i]->GetIndex();
-
-        // Get the box containing this node
+        // Get the box containing this node as only nodes on this process have NodeAttributes
+        // and therefore Neighbours setup.
         unsigned box_index = CalculateContainingBox(rNodes[i]);
 
-        if (GetBoxOwnership(box_index))
+        if (IsBoxOwned(box_index))
         {
-            rNodeNeighbours[node_index] = std::set<unsigned>();
+            rNodes[i]->ClearNeighbours();
+            rNodes[i]->SetNeighboursSetUp(false);
         }
     }
 
-    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-            map_iter != mBoxesMapping.end();
-            ++map_iter)
+    for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        // Get the box global index
-        unsigned box_index = map_iter->first;
-
         if (IsInteriorBox(box_index))
         {
-            AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+            AddPairsFromBox(box_index, rNodePairs);
+        }
+    }
+
+    if (mCalculateNodeNeighbours)
+    {
+        for (unsigned i = 0; i < rNodes.size(); i++)
+        {
+            // Get the box containing this node as only nodes on this process have NodeAttributes
+            // and therefore Neighbours setup.
+            unsigned box_index = CalculateContainingBox(rNodes[i]);
+
+            if (IsBoxOwned(box_index))
+            {
+                rNodes[i]->RemoveDuplicateNeighbours();
+                rNodes[i]->SetNeighboursSetUp(true);
+            }
         }
     }
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
-    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-            map_iter != mBoxesMapping.end();
-            ++map_iter)
+    for (unsigned box_index=mMinBoxIndex; box_index<=mMaxBoxIndex; box_index++)
     {
-        // Get the box global index
-        unsigned box_index = map_iter->first;
-
         if (!IsInteriorBox(box_index))
         {
-            AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+            AddPairsFromBox(box_index, rNodePairs);
+        }
+    }
+
+    if (mCalculateNodeNeighbours)
+    {
+        for (unsigned i = 0; i < rNodes.size(); i++)
+        {
+            // Get the box containing this node as only nodes on this process have NodeAttributes
+            // and therefore Neighbours setup.
+            unsigned box_index = CalculateContainingBox(rNodes[i]);
+
+            if (IsBoxOwned(box_index))
+            {
+                rNodes[i]->RemoveDuplicateNeighbours();
+                rNodes[i]->SetNeighboursSetUp(true);
+            }
         }
     }
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
+                                                    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     // Get the box
-    Box<DIM> box = rGetBox(boxIndex);
+    Box<DIM>& r_box = rGetBox(boxIndex);
 
     // Get the set of nodes in this box
-    std::set< Node<DIM>* >& r_contained_nodes = box.rGetNodesContained();
+    const std::set< Node<DIM>* >& r_contained_nodes = r_box.rGetNodesContained();
 
     // Get the local boxes to this box
-    std::set<unsigned> local_boxes_indices = GetLocalBoxes(boxIndex);
+    const std::set<unsigned>& local_boxes_indices = rGetLocalBoxes(boxIndex);
 
     // Loop over all the local boxes
     for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
@@ -1226,9 +1268,9 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vect
         Box<DIM>* p_neighbour_box;
 
         // Establish whether box is locally owned or halo.
-        if (GetBoxOwnership(*box_iter))
+        if (IsBoxOwned(*box_iter))
         {
-            p_neighbour_box = &mBoxes[mBoxesMapping[*box_iter]];
+            p_neighbour_box = &mBoxes[*box_iter - mMinBoxIndex];
         }
         else // Assume it is a halo.
         {
@@ -1255,25 +1297,13 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vect
                 unsigned node_index = (*node_iter)->GetIndex();
 
                 // If we're in the same box, then take care not to store the node pair twice
-                if (*box_iter == boxIndex)
-                {
-                    if (other_node_index > node_index)
-                    {
-                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
-                        if (mCalculateNodeNeighbours)
-                        {
-                            rNodeNeighbours[node_index].insert(other_node_index);
-                            rNodeNeighbours[other_node_index].insert(node_index);
-                        }
-                    }
-                }
-                else
+                if (*box_iter != boxIndex || other_node_index > node_index)
                 {
                     rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
                     if (mCalculateNodeNeighbours)
                     {
-                        rNodeNeighbours[node_index].insert(other_node_index);
-                        rNodeNeighbours[other_node_index].insert(node_index);
+                        (*node_iter)->AddNeighbour(other_node_index);
+                        (*neighbour_node_iter)->AddNeighbour(node_index);
                     }
                 }
 
@@ -1287,22 +1317,18 @@ std::vector<int> DistributedBoxCollection<DIM>::CalculateNumberOfNodesInEachStri
 {
     std::vector<int> cell_numbers(mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow(), 0);
 
-    for (std::map<unsigned, unsigned>::iterator iter = mBoxesMapping.begin();
-            iter != mBoxesMapping.end();
-            ++iter)
+    for (unsigned global_index=mMinBoxIndex; global_index<=mMaxBoxIndex; global_index++)
     {
-        c_vector<unsigned, DIM> coords = CalculateCoordinateIndices(iter->first);
-        unsigned location_in_vector = coords[DIM-1]-mpDistributedBoxStackFactory->GetLow();
-
-        cell_numbers[location_in_vector] += mBoxes[iter->second].rGetNodesContained().size();
+        c_vector<unsigned, DIM> coords = CalculateGridIndices(global_index);
+        unsigned location_in_vector = coords[DIM-1] - mpDistributedBoxStackFactory->GetLow();
+        unsigned local_index = global_index - mMinBoxIndex;
+        cell_numbers[location_in_vector] += mBoxes[local_index].rGetNodesContained().size();
     }
 
     return cell_numbers;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
+///////// Explicit instantiation///////
 
 template class DistributedBoxCollection<1>;
 template class DistributedBoxCollection<2>;

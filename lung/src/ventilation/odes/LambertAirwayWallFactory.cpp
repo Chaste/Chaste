@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,22 +48,42 @@ const double LambertAirwayWallFactory::mN2[] = {10.0,10.0,10.0,10.0,10.0,10.0,10
 
 const double LambertAirwayWallFactory::mMaxGeneration = 16;
 
-LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWalker(NULL), mUseStrahlerOrder(useStrahlerOrder)
+LambertAirwayWallFactory::LambertAirwayWallFactory(bool useStrahlerOrder) : mpWalker(nullptr), mUseStrahlerOrder(useStrahlerOrder)
 {}
 
 LambertAirwayWallFactory::~LambertAirwayWallFactory()
 {
-    if(mpWalker)
+    if (mpWalker)
     {
         delete mpWalker;
     }
+}
+
+double LambertAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
+{
+    return mAlpha0[generation];
+}
+
+double LambertAirwayWallFactory::GetAlpha0PrimeForGeneration(unsigned generation)
+{
+    return mAlpha0Prime[generation];
+}
+
+double LambertAirwayWallFactory::GetN1ForGeneration(unsigned generation)
+{
+    return mN1[generation];
+}
+
+double LambertAirwayWallFactory::GetN2ForGeneration(unsigned generation)
+{
+    return mN2[generation];
 }
 
 LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
 {
     unsigned order = 0;
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         order = mpWalker->GetElementStrahlerOrder(pElement);
     }
@@ -71,7 +91,6 @@ LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<
     {
         order = mpWalker->GetElementHorsfieldOrder(pElement);
     }
-
 
     //We linearly interpolate the generation data on to the corresponding order
     double generation_factor = (mMaxOrder - order)*mMaxGeneration/(mMaxOrder-1);
@@ -115,7 +134,7 @@ void LambertAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
 
     mpWalker = new AirwayTreeWalker(*pMesh, 0u);
 
-    if(mUseStrahlerOrder)
+    if (mUseStrahlerOrder)
     {
         mMaxOrder = mpWalker->GetMaxElementStrahlerOrder();
     }

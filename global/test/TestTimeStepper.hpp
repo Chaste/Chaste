@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -147,7 +147,7 @@ public:
         TS_ASSERT_THROWS_THIS(stepper.AdvanceOneTimeStep(), "TimeStepper incremented beyond end time.");
     }
 
-    void TestEnforceConstantTimeStep() throw(Exception)
+    void TestEnforceConstantTimeStep()
     {
         TimeStepper stepper(0.0, 1.0, 0.3); // timestep does not divide, but no checking
 
@@ -183,7 +183,7 @@ public:
         TS_ASSERT_EQUALS(counter,10u);
     }
 
-    void TestAdditionalSteppingPoints() throw(Exception)
+    void TestAdditionalSteppingPoints()
     {
         {
             std::vector<double> additional_times_bad_order;
@@ -222,7 +222,7 @@ public:
         TS_ASSERT_EQUALS(stepper.GetTotalTimeStepsTaken(),10u);
     }
 
-    void TestResetTimeStep() throw(Exception)
+    void TestResetTimeStep()
     {
         double timestep = 0.1;
         TimeStepper stepper(0.0, 0.5, timestep, false);
@@ -261,7 +261,7 @@ public:
         TS_ASSERT_EQUALS(stepper.IsTimeAtEnd(), true);
     }
 
-    void TestWithLargerStartTime() throw(Exception)
+    void TestWithLargerStartTime()
     {
         // Abstracted from AbstractDynamicLinearPdeSolver
         TimeStepper pde_stepper(16384.1, 16384.2, 0.01, true);
@@ -272,7 +272,7 @@ public:
         }
     }
 
-    void TestWithLargeEndTime() throw(Exception)
+    void TestWithLargeEndTime()
     {
         TimeStepper stepper(0.01*999999999, 1e7, 0.01, true);
         TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), 1u);
@@ -284,7 +284,7 @@ public:
         TS_ASSERT_EQUALS(stepper.GetTotalTimeStepsTaken(), 1u);
     }
 
-    void TestWithSingleTimeStep() throw(Exception)
+    void TestWithSingleTimeStep()
     {
         TimeStepper stepper(4.02, 4.04, 0.02, true);
         TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), 1u);
@@ -301,7 +301,7 @@ public:
      * Adding further information to the error message clearly changes the optimisations it applies,
      * and fixes the problem!
      */
-    void TestIntelProductionFoolishness() throw(Exception)
+    void TestIntelProductionFoolishness()
     {
         TimeStepper stepper(5.0, 10.0, 0.01, true);
         TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), 500u);
@@ -320,8 +320,6 @@ public:
         }
         TS_ASSERT_EQUALS(stepper.GetTotalTimeStepsTaken(), 500u);
     }
-
-
 
     void TestArchiveTimeStepper()
     {
@@ -381,7 +379,6 @@ public:
             delete p_stepper;
         }
     }
-
 };
 
 #endif /*TESTTIMESTEPPER_HPP_*/

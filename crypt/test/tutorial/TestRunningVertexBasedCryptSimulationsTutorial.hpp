@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,27 +41,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
-#ifndef TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_
-#define TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_
+#ifndef TESTRUNNINGVERTEXBASEDCRYPTSIMULATIONSTUTORIAL_HPP_
+#define TESTRUNNINGVERTEXBASEDCRYPTSIMULATIONSTUTORIAL_HPP_
 
 /*
  * = Examples showing how to create, run and visualize vertex-based simulations on periodic meshes with different cell-cycle models =
  *
- * EMPTYLINE
- *
  * == Introduction ==
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
  * This mechanical model was originally proposed by T. Nagai and H. Honda ("A dynamic cell model for
  * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
  *
- * EMPTYLINE
- *
  * == The test ==
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -84,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * one with fixed cell-cycle times and one
  * where the cell-cycle time depends on the Wnt concentration.
  */
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -120,7 +112,7 @@ public:
      * give each cell a fixed cell-cycle model, and enforce sloughing at the top of
      * the crypt.
      */
-    void TestVertexBasedCrypt() throw(Exception)
+    void TestVertexBasedCrypt()
     {
         /* Create a cylindrical mesh, and get the cell location indices. To enforce
          * periodicity at the left and right hand sides of the mesh, we use a subclass
@@ -132,7 +124,7 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CryptCellsGenerator` helper class, which is templated over the type
-         * of cell model required (here {{{FixedDurationGenerationBasedCellCycleModel}}})
+         * of cell model required (here {{{FixedG1GenerationalCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method along with the mesh. The third argument 'true' indicates that the cells
          * should be assigned random birth times, to avoid synchronous division. The
@@ -142,7 +134,7 @@ public:
          * 1, 2, 3 and 4, respectively.
          */
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 1.0, 2.0, 3.0, 4.0);
 
         /* Create a cell population, as before. */
@@ -203,7 +195,7 @@ public:
      * whilst those above this Wnt threshold are defined to be differentiated. The cell cycle length of
      * transit cells is then assigned randomly from a uniform distribution.
      */
-    void TestVertexBasedCryptWithSimpleWntCellCycleModel() throw(Exception)
+    void TestVertexBasedCryptWithSimpleWntCellCycleModel()
     {
         /* Create a cylindrical mesh, and get the cell location indices, as before. */
         CylindricalHoneycombVertexMeshGenerator generator(6, 9);
@@ -265,4 +257,4 @@ public:
     */
 };
 
-#endif /* TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_ */
+#endif /* TESTRUNNINGVERTEXBASEDCRYPTSIMULATIONSTUTORIAL_HPP_ */

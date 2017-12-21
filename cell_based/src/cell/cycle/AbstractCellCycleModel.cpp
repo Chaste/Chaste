@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,21 +37,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 AbstractCellCycleModel::AbstractCellCycleModel()
     : mBirthTime(SimulationTime::Instance()->GetTime()),
-      mCurrentCellCyclePhase(M_PHASE),
-      mG1Duration(DOUBLE_UNSET),
       mReadyToDivide(false),
-      mDimension(UNSIGNED_UNSET),
-      mMinimumGapDuration(0.01), // an educated guess
-      // Default parameter values all have units of hours.
-      mStemCellG1Duration(14.0),
-      mTransitCellG1Duration(2.0),
-      mSDuration(5.0),               // apparently between 5-6 hours normally
-      mG2Duration(4.0),              // apparently 3-4 hours normally
-      mMDuration(1.0)               // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
+      mDimension(UNSIGNED_UNSET)
 {
 }
 
 AbstractCellCycleModel::~AbstractCellCycleModel()
+{
+}
+
+AbstractCellCycleModel::AbstractCellCycleModel(const AbstractCellCycleModel& rModel)
+    : mBirthTime(rModel.mBirthTime),
+      mReadyToDivide(rModel.mReadyToDivide),
+      mDimension(rModel.mDimension)
 {
 }
 
@@ -70,7 +68,7 @@ void AbstractCellCycleModel::SetCell(CellPtr pCell)
 
 CellPtr AbstractCellCycleModel::GetCell()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     return mpCell;
 }
 
@@ -89,141 +87,30 @@ double AbstractCellCycleModel::GetAge()
     return SimulationTime::Instance()->GetTime() - mBirthTime;
 }
 
-CellCyclePhase AbstractCellCycleModel::GetCurrentCellCyclePhase()
-{
-    return mCurrentCellCyclePhase;
-}
-
 void AbstractCellCycleModel::ResetForDivision()
 {
     assert(mReadyToDivide);
-    mCurrentCellCyclePhase = M_PHASE;
     mReadyToDivide = false;
-}
-
-double AbstractCellCycleModel::GetG1Duration()
-{
-    return mG1Duration;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Getter methods
-///////////////////////////////////////////////////////////////////////
-
-double AbstractCellCycleModel::GetStemCellG1Duration()
-{
-    return mStemCellG1Duration;
-}
-
-double AbstractCellCycleModel::GetTransitCellG1Duration()
-{
-    return mTransitCellG1Duration;
-}
-
-double AbstractCellCycleModel::GetSG2MDuration()
-{
-    return mSDuration + mG2Duration + mMDuration;
-}
-
-double AbstractCellCycleModel::GetSDuration()
-{
-    return mSDuration;
-}
-
-double AbstractCellCycleModel::GetG2Duration()
-{
-    return mG2Duration;
-}
-
-double AbstractCellCycleModel::GetMDuration()
-{
-    return mMDuration;
-}
-
-///////////////////////////////////////////////////////////////////////
-// Setter methods
-///////////////////////////////////////////////////////////////////////
-
-void AbstractCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
-{
-    assert(stemCellG1Duration > 0.0);
-    mStemCellG1Duration = stemCellG1Duration;
-}
-void AbstractCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
-{
-    assert(transitCellG1Duration > 0.0);
-    mTransitCellG1Duration = transitCellG1Duration;
-}
-void AbstractCellCycleModel::SetSDuration(double SDuration)
-{
-    assert(SDuration > 0.0);
-    mSDuration = SDuration;
-}
-void AbstractCellCycleModel::SetG2Duration(double G2Duration)
-{
-    assert(G2Duration > 0.0);
-    mG2Duration = G2Duration;
-}
-void AbstractCellCycleModel::SetMDuration(double MDuration)
-{
-    assert(MDuration > 0.0);
-    mMDuration = MDuration;
-}
-
-bool AbstractCellCycleModel::ReadyToDivide()
-{
-    assert(mpCell != NULL);
-
-    if (!mReadyToDivide)
-    {
-        UpdateCellCyclePhase();
-        if ( (mCurrentCellCyclePhase != G_ZERO_PHASE) &&
-             (GetAge() >= GetMDuration() + GetG1Duration() + GetSDuration() + GetG2Duration()) )
-        {
-            mReadyToDivide = true;
-        }
-    }
-    return mReadyToDivide;
+    mBirthTime = SimulationTime::Instance()->GetTime();
 }
 
 void AbstractCellCycleModel::SetDimension(unsigned dimension)
 {
-    if (dimension != 1 && dimension !=2 && dimension != 3)
+    if (dimension != 1 && dimension !=2 && dimension != 3 && dimension != UNSIGNED_UNSET)
     {
-        EXCEPTION("Dimension must be 1, 2 or 3");
+        EXCEPTION("Dimension must be 1, 2, 3 or UNSIGNED_UNSET");
     }
     mDimension = dimension;
 }
 
-unsigned AbstractCellCycleModel::GetDimension()
+unsigned AbstractCellCycleModel::GetDimension() const
 {
     return mDimension;
-}
-
-double AbstractCellCycleModel::GetAverageTransitCellCycleTime()
-{
-    return mTransitCellG1Duration + GetSG2MDuration();
-}
-
-double AbstractCellCycleModel::GetAverageStemCellCycleTime()
-{
-    return mStemCellG1Duration + GetSG2MDuration();
 }
 
 bool AbstractCellCycleModel::CanCellTerminallyDifferentiate()
 {
     return true;
-}
-
-void AbstractCellCycleModel::SetMinimumGapDuration(double minimumGapDuration)
-{
-    assert(minimumGapDuration > 0.0);
-    mMinimumGapDuration = minimumGapDuration;
-}
-
-double AbstractCellCycleModel::GetMinimumGapDuration()
-{
-    return mMinimumGapDuration;
 }
 
 void AbstractCellCycleModel::OutputCellCycleModelInfo(out_stream& rParamsFile)
@@ -237,9 +124,5 @@ void AbstractCellCycleModel::OutputCellCycleModelInfo(out_stream& rParamsFile)
 
 void AbstractCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<StemCellG1Duration>" << mStemCellG1Duration << "</StemCellG1Duration>\n";
-    *rParamsFile << "\t\t\t<TransitCellG1Duration>" << mTransitCellG1Duration << "</TransitCellG1Duration>\n";
-    *rParamsFile << "\t\t\t<SDuration>" << mSDuration << "</SDuration>\n";
-    *rParamsFile << "\t\t\t<G2Duration>" << mG2Duration << "</G2Duration>\n";
-    *rParamsFile << "\t\t\t<MDuration>" << mMDuration << "</MDuration>\n";
+ // None to output
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVector.hpp"
 #include "ReplicatableVector.hpp"
 
-
-
 template<unsigned DIM>
 ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem(
             AbstractCardiacCellFactory<DIM>* pCellFactory, AbstractCardiacCellFactory<DIM>* pSecondCellFactory, bool hasBath)
@@ -76,7 +74,6 @@ ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem()
     mFixedExtracellularPotentialNodes.resize(0);
 }
 
-
 template<unsigned DIM>
 Vec ExtendedBidomainProblem<DIM>::CreateInitialCondition()
 {
@@ -107,19 +104,19 @@ Vec ExtendedBidomainProblem<DIM>::CreateInitialCondition()
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::ProcessExtracellularStimulus()
 {
-    if ( mpExtracellularStimulusFactory == NULL )//user has not passed in any extracellular stimulus in any form
+    if (mpExtracellularStimulusFactory == NULL) // user has not passed in any extracellular stimulus in any form
     {
         mpExtracellularStimulusFactory = new AbstractStimulusFactory<DIM>();
-        //create one (with default implementation to zero stimulus everywhere)
+        // Create one (with default implementation to zero stimulus everywhere)
     }
 
-    assert(mpExtracellularStimulusFactory);//should be created by now, either above or by the user...
+    assert(mpExtracellularStimulusFactory); // should be created by now, either above or by the user...
     mpExtracellularStimulusFactory->SetMesh(this->mpMesh);//so, set the mesh into it.
     mpExtracellularStimulusFactory->SetCompatibleExtracellularStimulus();//make sure compatibility condition will be valid
 
     std::vector<AbstractChasteRegion<DIM>* > grounded_regions = mpExtracellularStimulusFactory->GetRegionsToBeGrounded();
 
-    if ( (mUserSuppliedExtracellularStimulus) && grounded_regions.size() > 0 ) //we check for grunded nodes here
+    if ((mUserSuppliedExtracellularStimulus) && grounded_regions.size() > 0) //we check for grunded nodes here
     {
         std::vector<unsigned> grounded_indices;
         for (unsigned global_node_index = 0; global_node_index < this->mpMesh->GetNumNodes(); global_node_index++)
@@ -128,7 +125,7 @@ void ExtendedBidomainProblem<DIM>::ProcessExtracellularStimulus()
             {
                 for (unsigned region_index = 0; region_index <grounded_regions.size(); region_index++)
                 {
-                    if ( grounded_regions[region_index]->DoesContain( this->mpMesh->GetNode(global_node_index)->GetPoint() ) )
+                    if (grounded_regions[region_index]->DoesContain(this->mpMesh->GetNode(global_node_index)->GetPoint()))
                     {
                         grounded_indices.push_back( this->mpMesh->GetNode(global_node_index)->GetIndex() );
                     }
@@ -345,14 +342,14 @@ void ExtendedBidomainProblem<DIM>::DefineWriterColumns(bool extending)
 {
     if (!extending)
     {
-        if ( this->mNodesToOutput.empty() )
+        if (this->mNodesToOutput.empty())
         {
-            //Set writer to output all nodes
-            this->mpWriter->DefineFixedDimension( this->mpMesh->GetNumNodes() );
+            // Set writer to output all nodes
+            this->mpWriter->DefineFixedDimension(this->mpMesh->GetNumNodes());
         }
 //        else
 //        {
-//            //Output only the nodes indicted
+//            // Output only the nodes indicted
 //            this->mpWriter->DefineFixedDimension( this->mNodesToOutput, this->mpMesh->GetNumNodes() );
 //        }
         //mNodeColumnId = mpWriter->DefineVariable("Node", "dimensionless");
@@ -443,17 +440,13 @@ bool ExtendedBidomainProblem<DIM>::GetHasBath()
     return mHasBath;
 }
 
-
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::SetHasBath(bool hasBath)
 {
     mHasBath = hasBath;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ExtendedBidomainProblem<1>;
 template class ExtendedBidomainProblem<2>;
 template class ExtendedBidomainProblem<3>;

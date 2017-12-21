@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,7 @@ private:
          * of the VertexMesh class, so instead we delete mpVoronoiTessellation.
          */
         delete mpVoronoiTessellation;
-        mpVoronoiTessellation = NULL;
+        mpVoronoiTessellation = nullptr;
 
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
@@ -94,8 +94,6 @@ private:
     }
 
 protected:
-#define COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
-
     /**
      * Pointer to a VertexMesh object that stores the Voronoi tessellation that is dual to
      * mrMesh. The tessellation is created by calling CreateVoronoiTessellation() and can
@@ -145,8 +143,6 @@ protected:
     /** Node pairs for force calculations. */
     std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
 
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
-
     /**
      * Update mIsGhostNode if required by a remesh.
      *
@@ -161,8 +157,6 @@ protected:
     virtual void Validate();
 
 public:
-#define COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
-
     /**
      * Create a new cell population facade from a mesh and collection of cells.
      *
@@ -193,7 +187,7 @@ public:
     virtual ~MeshBasedCellPopulation();
 
     /**
-     * @return reference to  mrMesh.
+     * @return reference to mrMesh.
      */
     MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh();
 
@@ -201,6 +195,15 @@ public:
      * @return const reference to mrMesh (used in archiving).
      */
     const MutableMesh<ELEMENT_DIM, SPACE_DIM>& rGetMesh() const;
+
+    /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a shared pointer to mpMutableMesh.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();
@@ -270,13 +273,12 @@ public:
      * Add a new cell to the cell population and update mIsGhostNode.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell - this is required for
      *  mesh-based cell populations
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
 
     /**
      * Overridden WriteResultsToFiles() method.
@@ -424,6 +426,15 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension);
+
+    /**
+     * Overridden WriteDataToVisualizerSetupFile() method.
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     *
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 
     /**
      * Iterator over edges in the mesh, which correspond to springs between cells.
@@ -584,7 +595,6 @@ public:
     void SetRestLength(unsigned indexA, unsigned indexB, double restLength);
 
 };
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(MeshBasedCellPopulation)

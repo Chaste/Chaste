@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,14 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 103700
-#include "ObjectCommunicator.hpp"
-#endif
 
+#include "ObjectCommunicator.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "BoxCollection.hpp"
 
 /**
  * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.
@@ -57,7 +53,6 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
 {
     friend class TestNodeBasedCellPopulation;
     friend class TestNodeBasedCellPopulationParallelMethods;
-    friend class TestBoxCollection;
 
 protected:
 
@@ -74,9 +69,6 @@ private:
 
     /** Node pairs for force calculations. */
     std::vector< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
-
-    /** Indices of neighbours of local nodes. */
-    std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
 
     /** Whether to delete the nodes-only mesh (taken in one of the constructors, defaults to false). */
     bool mDeleteMesh;
@@ -217,7 +209,6 @@ private:
 
 protected:
 
-#undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
     /**
      * Update mIsParticle if required by a remesh.
      *
@@ -289,6 +280,15 @@ public:
      * @return const reference to mrMesh (used in archiving).
      */
     const NodesOnlyMesh<DIM>& rGetMesh() const;
+
+    /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh whose nodes match those of the NodesOnlyMesh.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
      * @return the number of nodes in the cell population.
@@ -454,13 +454,12 @@ public:
      * Add a new cell to the cell population and update the vector of cell radii in the NodesOnlyMesh.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell - this is required for
      *  node-based cell populations
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
 
     /**
      * Overridden GetVolumeOfCell() method.

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,32 +38,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
 #include <fstream>
 
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "GammaDistributedStochasticDurationCellCycleModel.hpp"
-#include "ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
-#include "SimpleOxygenBasedCellCycleModel.hpp"
-#include "StochasticOxygenBasedCellCycleModel.hpp"
-#include "ContactInhibitionCellCycleModel.hpp"
-#include "OutputFileHandler.hpp"
-#include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "WildTypeCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "BernoulliTrialCellCycleModel.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
+#include "CellCycleTimesGenerator.hpp"
 #include "CellLabel.hpp"
-#include "SmartPointers.hpp"
+#include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
+#include "ContactInhibitionCellCycleModel.hpp"
+#include "Debug.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ExponentialG1GenerationalCellCycleModel.hpp"
 #include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "FixedSequenceCellCycleModel.hpp"
+#include "GammaG1CellCycleModel.hpp"
+#include "NoCellCycleModel.hpp"
+#include "OutputFileHandler.hpp"
+#include "SimpleOxygenBasedCellCycleModel.hpp"
+#include "SmartPointers.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "StochasticOxygenBasedCellCycleModel.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -71,12 +77,333 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSimpleCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
-
-    void TestFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestNoCellCycleModel()
     {
-        TS_ASSERT_THROWS_NOTHING(FixedDurationGenerationBasedCellCycleModel model3);
+        // Test constructor
+        TS_ASSERT_THROWS_NOTHING(NoCellCycleModel cell_cycle_model);
 
-        FixedDurationGenerationBasedCellCycleModel* p_stem_model = new FixedDurationGenerationBasedCellCycleModel;
+        // Test methods
+        NoCellCycleModel* p_model = new NoCellCycleModel;
+        TS_ASSERT_DELTA(p_model->GetAverageStemCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_DELTA(p_model->GetAverageTransitCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_EQUALS(p_model->ReadyToDivide(), false);
+
+        // Test the cell-cycle model works correctly with a cell
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
+        CellPtr p_cell(new Cell(p_healthy_state, p_model));
+        p_cell->SetCellProliferativeType(p_stem_type);
+        p_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        for (unsigned i = 0; i < 10; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
+        }
+    }
+
+    void TestFixedSequenceCellCycleModelMethods()
+    {
+        CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+
+        // Set up the required singleton
+        // Make sure we can generate this model
+        TS_ASSERT_THROWS_NOTHING(FixedSequenceCellCycleModel cell_model);
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+
+        // Get a pointer to a cell cycle model of this kind
+        FixedSequenceCellCycleModel* p_stem_model = new FixedSequenceCellCycleModel;
+
+        // Test set and get method for the rate parameter
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.5, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 2.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 2.0, 1e-10);
+
+        p_stem_model->SetRate(10.0);
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 10.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 0.1, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 0.1, 1e-10);
+
+        p_stem_model->SetRate(0.25);
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.25, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 4.0, 1e-10);
+
+        p_stem_model->SetRate(0.25);
+        p_cell_cycle_times_generator->SetRandomSeed(0);
+
+        TS_ASSERT_THROWS_THIS(p_cell_cycle_times_generator->GetNextCellCycleTime(),
+                              "When using FixedSequenceCellCycleModel one must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
+                              " before the start of the simulation.");
+
+        p_cell_cycle_times_generator->GenerateCellCycleTimeSequence();
+
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetTransitCellG1Duration(8.0),
+                              "This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
+
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetStemCellG1Duration(8.0),
+                              "This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
+
+        TS_ASSERT_THROWS_THIS(p_stem_model->SetRate(8.0),
+                              "You cannot reset the rate after cell cycle times are created.");
+
+        TS_ASSERT_THROWS_THIS(p_cell_cycle_times_generator->GenerateCellCycleTimeSequence(),
+                              "Trying to generate the cell cycle times twice. Need to call CellCycleTimesGenerator::Destroy() first.");
+        // When we set the rate parameter we also reset the TransitCellG1Duration and StemCellG1Duration such that
+        // average cell cycle times are calculated correctly
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetAverageTransitCellCycleTime(), 14.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetAverageStemCellCycleTime(), 14.0, 1e-10);
+
+        // Make a stem cell with the model
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
+        p_stem_cell->InitialiseCellCycleModel();
+
+        // Make another cell cycle model of this kind and give it to a transit cell
+        FixedSequenceCellCycleModel* p_transit_model = new FixedSequenceCellCycleModel;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+
+        // And finally a cell cycle model for a differentiated cell
+        FixedSequenceCellCycleModel* p_diff_model = new FixedSequenceCellCycleModel;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        // The random times should be the same across platforms (We won't bother testing the distributions)
+        double exponentially_generated_g1 = 3.4590;
+        TS_ASSERT_DELTA(p_stem_model->GetG1Duration(), exponentially_generated_g1, 1e-4);
+        TS_ASSERT_EQUALS(p_diff_model->GetG1Duration(), DBL_MAX);
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
+        for (unsigned i = 0; i < 100; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+
+            // The actual testing of the cell cycle model
+            // The numbers for the G1 durations below are taken from the first random number generated
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, exponentially_generated_g1);
+            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132); // any old number
+        }
+
+        // Check that cell division correctly resets the cell cycle phase
+        TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+
+        p_stem_model->ResetForDivision();
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
+
+        FixedSequenceCellCycleModel* p_stem_model2 = static_cast<FixedSequenceCellCycleModel*>(p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+
+        CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
+        p_stem_cell2->SetCellProliferativeType(p_stem_type);
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+        CellCycleTimesGenerator::Destroy();
+    }
+
+    void TestArchiveFixedSequenceCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "FixedSequenceCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+        double fixed_sequence_test_number = 0.0;
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new FixedSequenceCellCycleModel;
+            static_cast<FixedSequenceCellCycleModel*>(p_model)->SetRate(13.42);
+
+            CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+
+            p_cell_cycle_times_generator->SetRandomSeed(12u);
+            p_cell_cycle_times_generator->GenerateCellCycleTimeSequence();
+
+            p_cell_cycle_times_generator->GetNextCellCycleTime();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            fixed_sequence_test_number = p_cell_cycle_times_generator->GetNextCellCycleTime();
+
+            delete p_model;
+            SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
+            CellCycleTimesGenerator::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+            TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetNextCellCycleTime(), fixed_sequence_test_number, 1e-6);
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(static_cast<FixedSequenceCellCycleModel*>(p_model2)->GetRate(), 13.42, 1e-12);
+
+            // Avoid memory leaks
+            delete p_model2;
+            CellCycleTimesGenerator::Destroy();
+        }
+    }
+
+    void TestCellCycleTimesGeneratorSingleton()
+    {
+        // how to test this: first, test that it is a singleton, then a test for all methods, then a test for fixed sequence
+        {
+            CellCycleTimesGenerator::Instance();
+            CellCycleTimesGenerator::Instance()->SetRate(298.0);
+        }
+
+        {
+            CellCycleTimesGenerator::Instance();
+            TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetRate(), 298.0, 1e-7)
+        }
+
+        // well, looks like it's a singleton, why not test the methods next
+
+        CellCycleTimesGenerator::Instance()->SetRate(87.0);
+        TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetRate(), 87.0, 1e-7);
+
+        CellCycleTimesGenerator::Destroy();
+        TS_ASSERT_DELTA(CellCycleTimesGenerator::Instance()->GetRate(), 1.0 / 2.0, 1e-7);
+
+        CellCycleTimesGenerator::Instance()->SetRate(45.0);
+        TS_ASSERT_EQUALS(CellCycleTimesGenerator::Instance()->GetRandomSeed(), 0u);
+        CellCycleTimesGenerator::Instance()->SetRandomSeed(78u);
+        TS_ASSERT_EQUALS(CellCycleTimesGenerator::Instance()->GetRandomSeed(), 78u);
+
+        CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence();
+
+        std::vector<double> random_sequence;
+
+        for (unsigned index = 0u; index < 10; index++)
+        {
+            double next_random_number = CellCycleTimesGenerator::Instance()->GetNextCellCycleTime();
+            random_sequence.push_back(next_random_number);
+            if (index > 0)
+            {
+                assert(next_random_number != random_sequence[index - 1]);
+            }
+        }
+        CellCycleTimesGenerator::Destroy();
+
+        CellCycleTimesGenerator::Instance()->SetRate(45.0);
+        CellCycleTimesGenerator::Instance()->SetRandomSeed(78u);
+
+        RandomNumberGenerator::Instance()->Reseed(12u);
+
+        CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence();
+
+        RandomNumberGenerator::Instance()->Reseed(13u);
+
+        for (unsigned index = 0u; index < 10; index++)
+        {
+            unsigned my_seed = 13u * index;
+            RandomNumberGenerator::Instance()->Reseed(my_seed);
+            double my_rate = double(index) * 0.5 + 1.0; //make sure we don't accidentally set a rate of 0, gives nasty boost errors.
+            RandomNumberGenerator::Instance()->ExponentialRandomDeviate(my_rate);
+            double next_cell_cycle_time = CellCycleTimesGenerator::Instance()->GetNextCellCycleTime();
+            TS_ASSERT_DELTA(next_cell_cycle_time, random_sequence[index], 1e-7);
+        }
+        CellCycleTimesGenerator::Destroy();
+    }
+
+    void TestBernoulliTrialCellCycleModel()
+    {
+        TS_ASSERT_THROWS_NOTHING(BernoulliTrialCellCycleModel cell_model3);
+
+        BernoulliTrialCellCycleModel* p_diff_model = new BernoulliTrialCellCycleModel;
+        BernoulliTrialCellCycleModel* p_transit_model = new BernoulliTrialCellCycleModel;
+
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(), 0.1, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 1.0, 1e-9);
+
+        // Change parameters for this model
+        p_transit_model->SetDivisionProbability(0.5);
+        p_transit_model->SetMinimumDivisionAge(0.1);
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(), 0.5, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+        p_transit_cell->InitialiseCellCycleModel();
+
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        unsigned num_steps = 100;
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
+
+        for (unsigned i = 0; i < num_steps; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+
+            // The division time below is taken from the first random number generated
+            if (i < 33)
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), true);
+            }
+            TS_ASSERT_EQUALS(p_diff_cell->ReadyToDivide(), false);
+        }
+        TS_ASSERT_DELTA(p_transit_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+        TS_ASSERT_DELTA(p_diff_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+
+        // Check that cell division correctly resets the cell cycle phase
+        CellPtr p_transit_cell2 = p_transit_cell->Divide();
+        BernoulliTrialCellCycleModel* p_transit_model2 = static_cast<BernoulliTrialCellCycleModel*>(p_transit_cell2->GetCellCycleModel());
+
+        TS_ASSERT_EQUALS(p_transit_model2->ReadyToDivide(), false);
+        TS_ASSERT_DELTA(p_transit_model2->GetDivisionProbability(), 0.5, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageTransitCellCycleTime(), 2.0, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageStemCellCycleTime(), 2.0, 1e-9);
+    }
+
+    void TestFixedG1GenerationalCellCycleModel()
+    {
+        TS_ASSERT_THROWS_NOTHING(FixedG1GenerationalCellCycleModel model3);
+
+        FixedG1GenerationalCellCycleModel* p_stem_model = new FixedG1GenerationalCellCycleModel;
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -92,10 +419,10 @@ public:
         unsigned num_steps = 100; //Per cycle
         unsigned num_cycles = 2;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(
-            num_cycles*(p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()),
-            num_cycles*num_steps);
+            num_cycles * (p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()),
+            num_cycles * num_steps);
 
-        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(),M_PHASE);
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_stem_model->GetGeneration(), 0u);
         TS_ASSERT_EQUALS(p_stem_model->GetMaxTransitGenerations(), 3u);
         TS_ASSERT_EQUALS(p_stem_model->CanCellTerminallyDifferentiate(), true);
@@ -106,7 +433,7 @@ public:
 
         TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType(), p_stem_type);
 
-        FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel;
+        FixedG1GenerationalCellCycleModel* p_transit_model = new FixedG1GenerationalCellCycleModel;
 
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
         p_transit_cell->SetCellProliferativeType(p_transit_type);
@@ -115,7 +442,7 @@ public:
         TS_ASSERT_EQUALS(p_transit_cell->GetCellProliferativeType(), p_transit_type);
         TS_ASSERT_EQUALS(p_transit_model->GetGeneration(), 0u);
 
-        FixedDurationGenerationBasedCellCycleModel* p_diff_model = new FixedDurationGenerationBasedCellCycleModel;
+        FixedG1GenerationalCellCycleModel* p_diff_model = new FixedG1GenerationalCellCycleModel;
 
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
         p_diff_cell->SetCellProliferativeType(p_diff_type);
@@ -124,8 +451,8 @@ public:
         TS_ASSERT_EQUALS(p_diff_cell->GetCellProliferativeType(), p_diff_type);
         TS_ASSERT_EQUALS(p_diff_model->GetGeneration(), 0u);
 
-        //First cycle
-        for (unsigned i=0; i<num_steps; i++)
+        // First cycle
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -140,9 +467,9 @@ public:
 
         double hepa_one_cell_birth_time = p_simulation_time->GetTime();
 
-        FixedDurationGenerationBasedCellCycleModel* p_hepa_one_model = new FixedDurationGenerationBasedCellCycleModel;
+        FixedG1GenerationalCellCycleModel* p_hepa_one_model = new FixedG1GenerationalCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_hepa_one_model->SetStemCellG1Duration(8.0);
         p_hepa_one_model->SetTransitCellG1Duration(8.0);
 
@@ -150,8 +477,8 @@ public:
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
-        //Second cycle
-        for (unsigned i=0; i<num_steps; i++)
+        // Second cycle
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -160,7 +487,7 @@ public:
 
         TS_ASSERT_DELTA(p_hepa_one_model->GetAge() + hepa_one_cell_birth_time, p_simulation_time->GetTime(), 1e-9);
 
-        // Test Get and Set Methods
+        // Test get and set methods
         TS_ASSERT_DELTA(p_stem_model->GetSDuration(), 5.0, 1e-9);
         TS_ASSERT_DELTA(p_stem_model->GetG2Duration(), 4.0, 1e-9);
         TS_ASSERT_DELTA(p_stem_model->GetMDuration(), 1.0, 1e-9);
@@ -180,21 +507,21 @@ public:
         TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 9.4, 1e-9);
     }
 
-    void TestStochasticDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestUniformG1GenerationalCellCycleModel()
     {
-        TS_ASSERT_THROWS_NOTHING(StochasticDurationGenerationBasedCellCycleModel cell_model3);
+        TS_ASSERT_THROWS_NOTHING(UniformG1GenerationalCellCycleModel cell_model3);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_stem_model = new StochasticDurationGenerationBasedCellCycleModel;
+        UniformG1GenerationalCellCycleModel* p_stem_model = new UniformG1GenerationalCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(1.0);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_transit_model = new StochasticDurationGenerationBasedCellCycleModel;
+        UniformG1GenerationalCellCycleModel* p_transit_model = new UniformG1GenerationalCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_transit_model->SetTransitCellG1Duration(1.0);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_diff_model = new StochasticDurationGenerationBasedCellCycleModel;
+        UniformG1GenerationalCellCycleModel* p_diff_model = new UniformG1GenerationalCellCycleModel;
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -216,9 +543,9 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         unsigned num_steps = 100;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(
-                        4.0*(p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()), 2*num_steps);
+            4.0 * (p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()), 2 * num_steps);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -226,40 +553,42 @@ public:
             // random numbers generated
             CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 3.19525);
             CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 2.18569);
-            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132); // any old number
         }
 
-        StochasticDurationGenerationBasedCellCycleModel* p_hepa_one_model = new StochasticDurationGenerationBasedCellCycleModel;
+        UniformG1GenerationalCellCycleModel* p_hepa_one_model = new UniformG1GenerationalCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_hepa_one_model->SetStemCellG1Duration(1.0);
 
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
-        for (unsigned i=0; i< num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 3.86076);
         }
     }
 
-    void TestStochasticDurationCellCycleModel() throw(Exception)
+    void TestUniformCellCycleModel()
     {
-        TS_ASSERT_THROWS_NOTHING(StochasticDurationCellCycleModel cell_model3);
+        TS_ASSERT_THROWS_NOTHING(UniformCellCycleModel cell_model3);
 
-        StochasticDurationCellCycleModel* p_stem_model = new StochasticDurationCellCycleModel;
+        UniformCellCycleModel* p_stem_model = new UniformCellCycleModel;
 
-        // Change G1 duration for this model
-        p_stem_model->SetStemCellG1Duration(8.0);
+        // Change min and max cell cycle duration for this model
+        p_stem_model->SetMinCellCycleDuration(18.0);
+        p_stem_model->SetMaxCellCycleDuration(20.0);
 
-        StochasticDurationCellCycleModel* p_transit_model = new StochasticDurationCellCycleModel;
+        UniformCellCycleModel* p_transit_model = new UniformCellCycleModel;
 
-        // Change G1 duration for this model
-        p_stem_model->SetTransitCellG1Duration(8.0);
+        // Use default min and max cell cycle duration for this model
+        p_transit_model->SetMinCellCycleDuration(12.0);
+        p_transit_model->SetMaxCellCycleDuration(14.0);
 
-        StochasticDurationCellCycleModel* p_diff_model = new StochasticDurationCellCycleModel;
+        UniformCellCycleModel* p_diff_model = new UniformCellCycleModel;
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -281,38 +610,44 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         unsigned num_steps = 100;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(
-                        4.0*(p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()), 2*num_steps);
+            4.0 * (p_stem_model->GetAverageStemCellCycleTime()), 2 * num_steps);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
-            // The numbers for the G1 durations below are taken from the first three
+            // The numbers for the cell cycle durations below are taken from the first three
             // random numbers generated
-            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 9.09763);
-            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 3.18569);
-            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+            CheckReadyToDivideIsUpdated(p_stem_model, 19.09763);
+            CheckReadyToDivideIsUpdated(p_transit_model, 13.18569);
+            CheckReadyToDivideIsUpdated(p_diff_model, 132); // any old number
         }
 
-        StochasticDurationCellCycleModel* p_hepa_one_model = new StochasticDurationCellCycleModel;
+        // Check with a mutation.
+        UniformCellCycleModel* p_hepa_one_model = new UniformCellCycleModel;
+
+        // Use default Min and Max cell cycle duration for this model
+        p_hepa_one_model->SetMinCellCycleDuration(14.0);
+        p_hepa_one_model->SetMaxCellCycleDuration(16.0);
+
         CellPtr p_hepa_one_cell(new Cell(p_healthy_state, p_hepa_one_model));
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
-        for (unsigned i=0; i< num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
-            CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 15.4304);
+            CheckReadyToDivideIsUpdated(p_hepa_one_model, 15.43038);
         }
     }
 
-    void TestGammaDistributedStochasticDurationCellCycleModel() throw(Exception)
+    void TestGammaG1CellCycleModel()
     {
-        TS_ASSERT_THROWS_NOTHING(GammaDistributedStochasticDurationCellCycleModel cell_model);
+        TS_ASSERT_THROWS_NOTHING(GammaG1CellCycleModel cell_model);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
-        GammaDistributedStochasticDurationCellCycleModel* p_stem_model = new GammaDistributedStochasticDurationCellCycleModel;
+        GammaG1CellCycleModel* p_stem_model = new GammaG1CellCycleModel;
         p_stem_model->SetShape(3.517);
         p_stem_model->SetScale(2.986);
 
@@ -324,7 +659,7 @@ public:
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
-        GammaDistributedStochasticDurationCellCycleModel* p_transit_model = new GammaDistributedStochasticDurationCellCycleModel;
+        GammaG1CellCycleModel* p_transit_model = new GammaG1CellCycleModel;
         p_transit_model->SetShape(3.5);
         p_transit_model->SetScale(2.9);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -332,7 +667,7 @@ public:
         p_transit_cell->SetCellProliferativeType(p_transit_type);
         p_transit_cell->InitialiseCellCycleModel();
 
-        GammaDistributedStochasticDurationCellCycleModel* p_diff_model = new GammaDistributedStochasticDurationCellCycleModel;
+        GammaG1CellCycleModel* p_diff_model = new GammaG1CellCycleModel;
         p_diff_model->SetShape(3.5);
         p_diff_model->SetScale(2.9);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -346,35 +681,40 @@ public:
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
             // The numbers for the G1 durations below are taken from the first three random numbers generated
             CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 3.61046);
             CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 3.8511);
-            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132); // any old number
         }
 
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
-        GammaDistributedStochasticDurationCellCycleModel* p_stem_model2 = static_cast <GammaDistributedStochasticDurationCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+
+        p_stem_model->ResetForDivision();
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
+
+        GammaG1CellCycleModel* p_stem_model2 = static_cast<GammaG1CellCycleModel*>(p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+
         CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
         p_stem_cell2->SetCellProliferativeType(p_stem_type);
-        p_stem_cell2->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
-    void TestExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestExponentialG1GenerationalCellCycleModel()
     {
         // Make sure we can generate this model
-        TS_ASSERT_THROWS_NOTHING(ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel cell_model);
+        TS_ASSERT_THROWS_NOTHING(ExponentialG1GenerationalCellCycleModel cell_model);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         // Get a pointer to a cell cycle model of this kind
-        ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_stem_model =
-                new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
+        ExponentialG1GenerationalCellCycleModel* p_stem_model = new ExponentialG1GenerationalCellCycleModel;
 
         // Test set and get method for the rate parameter
         TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.5, 1e-10);
@@ -410,7 +750,7 @@ public:
         p_stem_cell->InitialiseCellCycleModel();
 
         // Make another cell cycle model of this kind and give it to a transit cell
-        ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_transit_model = new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
+        ExponentialG1GenerationalCellCycleModel* p_transit_model = new ExponentialG1GenerationalCellCycleModel;
         p_transit_model->SetRate(1.0);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
@@ -418,7 +758,7 @@ public:
         p_transit_cell->InitialiseCellCycleModel();
 
         // And finally a cell cycle model for a differentiated cell
-        ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_diff_model = new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
+        ExponentialG1GenerationalCellCycleModel* p_diff_model = new ExponentialG1GenerationalCellCycleModel;
         p_diff_model->SetRate(200.0);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
@@ -426,34 +766,41 @@ public:
         p_diff_cell->InitialiseCellCycleModel();
 
         // The random times should be the same across platforms (We won't bother testing the distributions)
-        TS_ASSERT_DELTA(p_stem_model->GetG1Duration(), 3.1834, 1e-4);
-        TS_ASSERT_DELTA(p_transit_model->GetG1Duration(),0.8985, 1e-4);
+        double exponentially_generated_g1 = 3.4590;
+        TS_ASSERT_DELTA(p_stem_model->GetG1Duration(), exponentially_generated_g1, 1e-4);
+        double second_exponentially_generated_g1 = 1.3666;
+        TS_ASSERT_DELTA(p_transit_model->GetG1Duration(), second_exponentially_generated_g1, 1e-4);
         TS_ASSERT_EQUALS(p_diff_model->GetG1Duration(), DBL_MAX);
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
             // The actual testing of the cell cycle model
-            // The numbers for the G1 durations below are taken from the first three random numbers generated
-            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model,3.1834);
-            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 0.8985);
-            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+            // The numbers for the G1 durations below are taken from the first two random numbers generated
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, exponentially_generated_g1);
+            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, second_exponentially_generated_g1);
+            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132); // any old number
         }
 
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
-        ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_stem_model2 =
-                static_cast <ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+
+        p_stem_model->ResetForDivision();
+        TS_ASSERT_EQUALS(p_stem_model->GetCurrentCellCyclePhase(), M_PHASE);
+
+        ExponentialG1GenerationalCellCycleModel* p_stem_model2 = static_cast<ExponentialG1GenerationalCellCycleModel*>(p_stem_model->CreateCellCycleModel());
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
+
         CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
         p_stem_cell2->SetCellProliferativeType(p_stem_type);
-        p_stem_cell2->InitialiseCellCycleModel();
         TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
-    void TestSimpleOxygenBasedCellCycleModel() throw(Exception)
+    void TestSimpleOxygenBasedCellCycleModel()
     {
         // Check that mCurrentHypoxiaOnsetTime and mCurrentHypoxicDuration are updated correctly
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -506,7 +853,7 @@ public:
 
         unsigned num_steps = 100;
         p_simulation_time->SetStartTime(0.0);
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(4.0*18.0, num_steps);
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(4.0 * 18.0, num_steps);
 
         TS_ASSERT_THROWS_NOTHING(SimpleOxygenBasedCellCycleModel model);
 
@@ -535,12 +882,12 @@ public:
         // Check that the cell cycle phase and ready to divide
         // are updated correctly
         TS_ASSERT_EQUALS(p_hepa_one_model->ReadyToDivide(), false);
-        TS_ASSERT_EQUALS(p_hepa_one_model->GetCurrentCellCyclePhase(),M_PHASE);
+        TS_ASSERT_EQUALS(p_hepa_one_model->GetCurrentCellCyclePhase(), M_PHASE);
 
         TS_ASSERT_EQUALS(p_diff_model->ReadyToDivide(), false);
-        TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(),G_ZERO_PHASE);
+        TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(), G_ZERO_PHASE);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -554,7 +901,7 @@ public:
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_hepa_one_cell->ReadyToDivide(), true);
         CellPtr p_hepa_one_cell2 = p_hepa_one_cell->Divide();
-        SimpleOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast <SimpleOxygenBasedCellCycleModel*>(p_hepa_one_cell2->GetCellCycleModel());
+        SimpleOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast<SimpleOxygenBasedCellCycleModel*>(p_hepa_one_cell2->GetCellCycleModel());
 
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -563,7 +910,7 @@ public:
         SimulationTime::Destroy();
         p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetStartTime(0.0);
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0*p_hepa_one_model2->GetCriticalHypoxicDuration(), num_steps);
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0 * p_hepa_one_model2->GetCriticalHypoxicDuration(), num_steps);
 
         // Create a cell with a simple oxygen-based cell-cycle model
         SimpleOxygenBasedCellCycleModel* p_cell_model = new SimpleOxygenBasedCellCycleModel;
@@ -575,10 +922,10 @@ public:
         p_apoptotic_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
 
         // Force the cell to be apoptotic
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             TS_ASSERT(!(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>())
-                        || p_simulation_time->GetTime() >= p_cell_model->GetCriticalHypoxicDuration());
+                      || p_simulation_time->GetTime() >= p_cell_model->GetCriticalHypoxicDuration());
             p_simulation_time->IncrementTimeOneStep();
 
             // Note that we need to pass in the updated G1 duration
@@ -590,7 +937,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentHypoxicDuration(), 2.04);
     }
 
-    void TestContactInhibitionCellCycleModel() throw(Exception)
+    void TestContactInhibitionCellCycleModel()
     {
         // Check that mQuiescentVolumeFraction and mEquilibriumVolume are updated correctly
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -603,7 +950,7 @@ public:
         p_model->SetTransitCellG1Duration(8.0);
 
         TS_ASSERT_THROWS_THIS(p_model->UpdateCellCyclePhase(),
-            "The member variables mQuiescentVolumeFraction and mEquilibriumVolume have not yet been set.");
+                              "The member variables mQuiescentVolumeFraction and mEquilibriumVolume have not yet been set.");
 
         p_model->SetQuiescentVolumeFraction(0.5);
         p_model->SetEquilibriumVolume(1.0);
@@ -650,7 +997,7 @@ public:
 
         unsigned num_steps = 100;
         p_simulation_time->SetStartTime(0.0);
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0*24.0, num_steps);
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0 * 24.0, num_steps);
 
         // Create cell-cycle models and cells
         ContactInhibitionCellCycleModel* p_hepa_one_model = new ContactInhibitionCellCycleModel;
@@ -678,12 +1025,12 @@ public:
 
         // Check that the cell cycle phase and ready to divide are updated correctly
         TS_ASSERT_EQUALS(p_hepa_one_model->ReadyToDivide(), false);
-        TS_ASSERT_EQUALS(p_hepa_one_model->GetCurrentCellCyclePhase(),M_PHASE);
+        TS_ASSERT_EQUALS(p_hepa_one_model->GetCurrentCellCyclePhase(), M_PHASE);
 
         TS_ASSERT_EQUALS(p_diff_model->ReadyToDivide(), false);
-        TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(),G_ZERO_PHASE);
+        TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(), G_ZERO_PHASE);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -695,14 +1042,17 @@ public:
 
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_hepa_one_cell->ReadyToDivide(), true);
-        CellPtr p_hepa_one_cell2 = p_hepa_one_cell->Divide();
-        ContactInhibitionCellCycleModel* p_hepa_one_model2 = static_cast <ContactInhibitionCellCycleModel*>(p_hepa_one_cell2->GetCellCycleModel());
 
+        CellPtr p_hepa_one_cell2 = p_hepa_one_cell->Divide();
+        ContactInhibitionCellCycleModel* p_hepa_one_model2 = static_cast<ContactInhibitionCellCycleModel*>(p_hepa_one_cell2->GetCellCycleModel());
+
+        TS_ASSERT_EQUALS(p_hepa_one_model->ReadyToDivide(), false);
+        TS_ASSERT_EQUALS(p_hepa_one_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_hepa_one_model2->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
-    void TestStochasticOxygenBasedCellCycleModel() throw(Exception)
+    void TestStochasticOxygenBasedCellCycleModel()
     {
         // Check that mCurrentHypoxiaOnsetTime and mCurrentHypoxicDuration are updated correctly
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -732,8 +1082,8 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         // Set up oxygen_concentration
-        double lo_oxygen_concentration=0.0;
-        double hi_oxygen_concentration=1.0;
+        double lo_oxygen_concentration = 0.0;
+        double hi_oxygen_concentration = 1.0;
 
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_stem_type);
@@ -767,7 +1117,7 @@ public:
 
         unsigned num_steps = 100;
         p_simulation_time->SetStartTime(0.0);
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(4.0*18.0, num_steps);
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(4.0 * 18.0, num_steps);
 
         TS_ASSERT_THROWS_NOTHING(StochasticOxygenBasedCellCycleModel model);
 
@@ -797,7 +1147,7 @@ public:
         TS_ASSERT_EQUALS(p_diff_model->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(), G_ZERO_PHASE);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -813,7 +1163,7 @@ public:
         p_hepa_one_cell->Divide();
 
         // Check that cell division correctly resets the cell cycle phase
-        StochasticOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast <StochasticOxygenBasedCellCycleModel*> (p_hepa_one_model->CreateCellCycleModel());
+        StochasticOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast<StochasticOxygenBasedCellCycleModel*>(p_hepa_one_model->CreateCellCycleModel());
         CellPtr p_hepa_one_cell2(new Cell(p_state, p_hepa_one_model2));
         p_hepa_one_cell2->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell2->GetCellData()->SetItem("oxygen", hi_oxygen_concentration);
@@ -825,7 +1175,7 @@ public:
         SimulationTime::Destroy();
         p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetStartTime(0.0);
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0*p_hepa_one_model2->GetCriticalHypoxicDuration(), num_steps);
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0 * p_hepa_one_model2->GetCriticalHypoxicDuration(), num_steps);
 
         // Create a cell with a simple oxygen-based cell-cycle model
         StochasticOxygenBasedCellCycleModel* p_cell_model = new StochasticOxygenBasedCellCycleModel;
@@ -836,10 +1186,10 @@ public:
         p_apoptotic_cell->InitialiseCellCycleModel();
 
         // Force the cell to be apoptotic
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; i++)
         {
             TS_ASSERT(!(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>())
-                        || p_simulation_time->GetTime() >= p_cell_model->GetCriticalHypoxicDuration());
+                      || p_simulation_time->GetTime() >= p_cell_model->GetCriticalHypoxicDuration());
             p_simulation_time->IncrementTimeOneStep();
 
             // Note that we need to pass in the updated G1 duration
@@ -855,6 +1205,7 @@ public:
 
         // Coverage
         p_cell_model2->SetMinimumGapDuration(1e20);
+        TS_ASSERT_DELTA(p_cell_model2->GetMinimumGapDuration(), 1e20, 1e-4);
 
         CellPtr p_cell2(new Cell(p_state, p_cell_model2));
         p_cell2->SetCellProliferativeType(p_stem_type);
@@ -863,17 +1214,17 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
-    void TestArchiveFixedDurationGenerationBasedCellCycleModel() throw (Exception)
+    void TestArchiveNoCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "FixedDurationGenerationBasedCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NoCellCycleModel.arch";
 
         {
             // We must set up SimulationTime to avoid memory leaks
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new FixedDurationGenerationBasedCellCycleModel;
+            AbstractCellCycleModel* const p_model = new NoCellCycleModel;
 
             p_model->SetDimension(2);
             p_model->SetBirthTime(-1.0);
@@ -901,7 +1252,102 @@ public:
             // Check private data has been restored correctly
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
-            TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(p_model2->ReadyToDivide(), false);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
+    void TestArchiveBernoulliTrialCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BernoulliTrialCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new BernoulliTrialCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+            static_cast<BernoulliTrialCellCycleModel*>(p_model)->SetDivisionProbability(0.5);
+            static_cast<BernoulliTrialCellCycleModel*>(p_model)->SetMinimumDivisionAge(0.1);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_DELTA(static_cast<BernoulliTrialCellCycleModel*>(p_model2)->GetDivisionProbability(), 0.5, 1e-9);
+            TS_ASSERT_DELTA(static_cast<BernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
+    void TestArchiveFixedG1GenerationalCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "FixedG1GenerationalCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new FixedG1GenerationalCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(static_cast<AbstractPhaseBasedCellCycleModel*>(p_model2)->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
 
             // Avoid memory leaks
@@ -909,10 +1355,10 @@ public:
         }
     }
 
-    void TestArchiveStochasticDurationGenerationBasedCellCycleModel()
+    void TestArchiveUniformG1GenerationalCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StochasticDurationGenerationBasedCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "UniformG1GenerationalCellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
         double random_number_test = 0.0;
@@ -922,9 +1368,9 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new StochasticDurationGenerationBasedCellCycleModel;
+            AbstractCellCycleModel* const p_model = new UniformG1GenerationalCellCycleModel;
             p_model->SetDimension(2);
-            p_model->SetTransitCellG1Duration(1.0);
+            static_cast<UniformG1GenerationalCellCycleModel*>(p_model)->SetTransitCellG1Duration(1.0);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -956,10 +1402,10 @@ public:
         }
     }
 
-    void TestArchiveStochasticDurationCellCycleModel()
+    void TestArchiveUniformCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StochasticDurationCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "UniformCellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
         double random_number_test = 0.0;
@@ -969,8 +1415,10 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new StochasticDurationCellCycleModel;
+            AbstractCellCycleModel* const p_model = new UniformCellCycleModel;
             p_model->SetDimension(2);
+            dynamic_cast<UniformCellCycleModel*>(p_model)->SetMinCellCycleDuration(1.0);
+            dynamic_cast<UniformCellCycleModel*>(p_model)->SetMaxCellCycleDuration(2.0);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -980,8 +1428,8 @@ public:
             delete p_model;
             SimulationTime::Destroy();
 
-           random_number_test = RandomNumberGenerator::Instance()->ranf();
-           RandomNumberGenerator::Destroy();
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -995,17 +1443,21 @@ public:
 
             input_arch >> p_model2;
 
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_DELTA(dynamic_cast<UniformCellCycleModel*>(p_model2)->GetMinCellCycleDuration(), 1.0, 1e-5);
+            TS_ASSERT_DELTA(dynamic_cast<UniformCellCycleModel*>(p_model2)->GetMaxCellCycleDuration(), 2.0, 1e-5);
+
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Avoid memory leaks
             delete p_model2;
-       }
+        }
     }
 
-    void TestArchiveGammaDistributedStochasticDurationCellCycleModel()
+    void TestArchiveGammaG1CellCycleModel()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GammaDistributedStochasticDurationCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GammaG1CellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
         double random_number_test = 0.0;
@@ -1015,9 +1467,9 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new GammaDistributedStochasticDurationCellCycleModel;
-            static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model)->SetShape(2.45);
-            static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model)->SetScale(13.42);
+            AbstractCellCycleModel* const p_model = new GammaG1CellCycleModel;
+            static_cast<GammaG1CellCycleModel*>(p_model)->SetShape(2.45);
+            static_cast<GammaG1CellCycleModel*>(p_model)->SetScale(13.42);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1027,8 +1479,8 @@ public:
             delete p_model;
             SimulationTime::Destroy();
 
-           random_number_test = RandomNumberGenerator::Instance()->ranf();
-           RandomNumberGenerator::Destroy();
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -1045,19 +1497,18 @@ public:
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Check private data has been restored correctly
-            TS_ASSERT_DELTA(static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model2)->GetShape(), 2.45, 1e-12);
-            TS_ASSERT_DELTA(static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model2)->GetScale(), 13.42, 1e-12);
+            TS_ASSERT_DELTA(static_cast<GammaG1CellCycleModel*>(p_model2)->GetShape(), 2.45, 1e-12);
+            TS_ASSERT_DELTA(static_cast<GammaG1CellCycleModel*>(p_model2)->GetScale(), 13.42, 1e-12);
 
             // Avoid memory leaks
             delete p_model2;
-       }
+        }
     }
 
-    void TestArchiveExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel()
+    void TestArchiveExponentialG1GenerationalCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() +
-                "ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ExponentialG1GenerationalCellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
         double random_number_test = 0.0;
@@ -1067,8 +1518,8 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
-            static_cast<ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*>(p_model)->SetRate(13.42);
+            AbstractCellCycleModel* const p_model = new ExponentialG1GenerationalCellCycleModel;
+            static_cast<ExponentialG1GenerationalCellCycleModel*>(p_model)->SetRate(13.42);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1078,8 +1529,8 @@ public:
             delete p_model;
             SimulationTime::Destroy();
 
-           random_number_test = RandomNumberGenerator::Instance()->ranf();
-           RandomNumberGenerator::Destroy();
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -1096,14 +1547,14 @@ public:
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Check private data has been restored correctly
-            TS_ASSERT_DELTA(static_cast<ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*>(p_model2)->GetRate(), 13.42, 1e-12);
+            TS_ASSERT_DELTA(static_cast<ExponentialG1GenerationalCellCycleModel*>(p_model2)->GetRate(), 13.42, 1e-12);
 
             // Avoid memory leaks
             delete p_model2;
-       }
+        }
     }
 
-    void TestArchiveSimpleOxygenBasedCellCycleModel() throw (Exception)
+    void TestArchiveSimpleOxygenBasedCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SimpleOxygenBasedCellCycleModel.arch";
@@ -1151,7 +1602,7 @@ public:
         }
     }
 
-    void TestArchiveStochasticOxygenBasedCellCycleModel() throw (Exception)
+    void TestArchiveStochasticOxygenBasedCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StochasticOxygenBasedCellCycleModel.arch";
@@ -1173,7 +1624,7 @@ public:
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->SetCurrentHypoxiaOnsetTime(3.1);
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->GenerateStochasticG2Duration();
 
-            TS_ASSERT_DELTA(p_model->GetG2Duration(), 3.0822, 1e-4);
+            TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->GetG2Duration(), 3.0822, 1e-4);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1198,8 +1649,7 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_DELTA(p_model2->GetG2Duration(), 3.0822, 1e-4);
-
+            TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetG2Duration(), 3.0822, 1e-4);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetHypoxicConcentration(), 0.8, 1e-6);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetQuiescentConcentration(), 0.7, 1e-6);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetCriticalHypoxicDuration(), 2.5, 1e-6);
@@ -1212,7 +1662,7 @@ public:
         }
     }
 
-    void TestArchiveContactInhibitionCellCycleModel() throw (Exception)
+    void TestArchiveContactInhibitionCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ContactInhibitionCellCycleModel.arch";
@@ -1250,11 +1700,11 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 1u);
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.5, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.5, 1e-12);
 
+            TS_ASSERT_EQUALS(static_cast<AbstractPhaseBasedCellCycleModel*>(p_model2)->GetCurrentCellCyclePhase(), M_PHASE);
             TS_ASSERT_DELTA(static_cast<ContactInhibitionCellCycleModel*>(p_model2)->GetQuiescentVolumeFraction(), 0.5, 1e-6);
             TS_ASSERT_DELTA(static_cast<ContactInhibitionCellCycleModel*>(p_model2)->GetEquilibriumVolume(), 1.0, 1e-6);
 
@@ -1268,9 +1718,41 @@ public:
         std::string output_directory = "TestCellCycleModelOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        // Test with FixedDurationGenerationBasedCellCycleModel
-        FixedDurationGenerationBasedCellCycleModel fixed_duration_generation_based_cell_cycle_model;
-        TS_ASSERT_EQUALS(fixed_duration_generation_based_cell_cycle_model.GetIdentifier(), "FixedDurationGenerationBasedCellCycleModel");
+        // Test with NoCellCycleModel
+        NoCellCycleModel no_model;
+        TS_ASSERT_EQUALS(no_model.GetIdentifier(), "NoCellCycleModel");
+
+        out_stream no_model_parameter_file = output_file_handler.OpenOutputFile("no_model_results.parameters");
+        no_model.OutputCellCycleModelParameters(no_model_parameter_file);
+        no_model_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("no_model_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/no_model_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with BernoulliTrialCellCycleModel
+        BernoulliTrialCellCycleModel random_division_cell_cycle_model;
+        TS_ASSERT_EQUALS(random_division_cell_cycle_model.GetIdentifier(), "BernoulliTrialCellCycleModel");
+
+        out_stream random_division_parameter_file = output_file_handler.OpenOutputFile("random_division_results.parameters");
+        random_division_cell_cycle_model.OutputCellCycleModelParameters(random_division_parameter_file);
+        random_division_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("random_division_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/random_division_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with FixedG1GenerationalCellCycleModel
+        FixedG1GenerationalCellCycleModel fixed_duration_generation_based_cell_cycle_model;
+        TS_ASSERT_EQUALS(fixed_duration_generation_based_cell_cycle_model.GetIdentifier(), "FixedG1GenerationalCellCycleModel");
 
         out_stream fixed_duration_generation_based_parameter_file = output_file_handler.OpenOutputFile("fixed_duration_generation_based_results.parameters");
         fixed_duration_generation_based_cell_cycle_model.OutputCellCycleModelParameters(fixed_duration_generation_based_parameter_file);
@@ -1280,39 +1762,39 @@ public:
             FileFinder generated_file = output_file_handler.FindFile("fixed_duration_generation_based_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/fixed_duration_generation_based_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with StochasticDurationGenerationBasedCellCycleModel
-        StochasticDurationGenerationBasedCellCycleModel stochastic_duration_generation_based_cell_cycle_model;
-        TS_ASSERT_EQUALS(stochastic_duration_generation_based_cell_cycle_model.GetIdentifier(), "StochasticDurationGenerationBasedCellCycleModel");
+        // Test with UniformG1GenerationalCellCycleModel
+        UniformG1GenerationalCellCycleModel uniform_distributed_generation_based_cell_cycle_model;
+        TS_ASSERT_EQUALS(uniform_distributed_generation_based_cell_cycle_model.GetIdentifier(), "UniformG1GenerationalCellCycleModel");
 
-        out_stream stochastic_duration_generation_based_parameter_file = output_file_handler.OpenOutputFile("stochastic_duration_generation_based_results.parameters");
-        stochastic_duration_generation_based_cell_cycle_model.OutputCellCycleModelParameters(stochastic_duration_generation_based_parameter_file);
-        stochastic_duration_generation_based_parameter_file->close();
+        out_stream uniform_distributed_generation_based_parameter_file = output_file_handler.OpenOutputFile("uniform_distributed_generation_based_results.parameters");
+        uniform_distributed_generation_based_cell_cycle_model.OutputCellCycleModelParameters(uniform_distributed_generation_based_parameter_file);
+        uniform_distributed_generation_based_parameter_file->close();
 
         {
-            FileFinder generated_file = output_file_handler.FindFile("stochastic_duration_generation_based_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_duration_generation_based_results.parameters",
+            FileFinder generated_file = output_file_handler.FindFile("uniform_distributed_generation_based_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/uniform_distributed_generation_based_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with StochasticDurationCellCycleModel
-        StochasticDurationCellCycleModel stochastic_duration_cell_cycle_model;
-        TS_ASSERT_EQUALS(stochastic_duration_cell_cycle_model.GetIdentifier(), "StochasticDurationCellCycleModel");
+        // Test with UniformCellCycleModel
+        UniformCellCycleModel uniform_distributed_cell_cycle_model;
+        TS_ASSERT_EQUALS(uniform_distributed_cell_cycle_model.GetIdentifier(), "UniformCellCycleModel");
 
-        out_stream stochastic_duration_parameter_file = output_file_handler.OpenOutputFile("stochastic_duration_results.parameters");
-        stochastic_duration_cell_cycle_model.OutputCellCycleModelParameters(stochastic_duration_parameter_file);
-        stochastic_duration_parameter_file->close();
+        out_stream uniform_distributed_parameter_file = output_file_handler.OpenOutputFile("uniform_distributed_results.parameters");
+        uniform_distributed_cell_cycle_model.OutputCellCycleModelParameters(uniform_distributed_parameter_file);
+        uniform_distributed_parameter_file->close();
 
         {
-            FileFinder generated_file = output_file_handler.FindFile("stochastic_duration_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_duration_results.parameters",
+            FileFinder generated_file = output_file_handler.FindFile("uniform_distributed_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/uniform_distributed_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
@@ -1328,7 +1810,7 @@ public:
             FileFinder generated_file = output_file_handler.FindFile("simple_oxygen_based_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/simple_oxygen_based_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
@@ -1344,7 +1826,7 @@ public:
             FileFinder generated_file = output_file_handler.FindFile("stochastic_oxygen_based_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/stochastic_oxygen_based_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
@@ -1362,32 +1844,32 @@ public:
             FileFinder generated_file = output_file_handler.FindFile("contact_inhibition_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/contact_inhibition_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with GammaDistributedStochasticDurationCellCycleModel
-        GammaDistributedStochasticDurationCellCycleModel gamma_cell_cycle_model;
-        gamma_cell_cycle_model.SetShape(0.85);
-        gamma_cell_cycle_model.SetScale(1.23);
-        TS_ASSERT_EQUALS(gamma_cell_cycle_model.GetIdentifier(), "GammaDistributedStochasticDurationCellCycleModel");
+        // Test with GammaG1CellCycleModel
+        GammaG1CellCycleModel gamma_distributed_cell_cycle_model;
+        gamma_distributed_cell_cycle_model.SetShape(0.85);
+        gamma_distributed_cell_cycle_model.SetScale(1.23);
+        TS_ASSERT_EQUALS(gamma_distributed_cell_cycle_model.GetIdentifier(), "GammaG1CellCycleModel");
 
-        out_stream gamma_parameter_file = output_file_handler.OpenOutputFile("gamma_results.parameters");
-        gamma_cell_cycle_model.OutputCellCycleModelParameters(gamma_parameter_file);
-        gamma_parameter_file->close();
+        out_stream gamma_distributed_parameter_file = output_file_handler.OpenOutputFile("gamma_distributed_results.parameters");
+        gamma_distributed_cell_cycle_model.OutputCellCycleModelParameters(gamma_distributed_parameter_file);
+        gamma_distributed_parameter_file->close();
 
         {
-            FileFinder generated_file = output_file_handler.FindFile("gamma_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/gamma_results.parameters",
+            FileFinder generated_file = output_file_handler.FindFile("gamma_distributed_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/gamma_distributed_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        // Test with ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel
-        ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel exponential_cell_cycle_model;
+        // Test with ExponentialG1GenerationalCellCycleModel
+        ExponentialG1GenerationalCellCycleModel exponential_cell_cycle_model;
         exponential_cell_cycle_model.SetRate(1.23);
-        TS_ASSERT_EQUALS(exponential_cell_cycle_model.GetIdentifier(), "ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel");
+        TS_ASSERT_EQUALS(exponential_cell_cycle_model.GetIdentifier(), "ExponentialG1GenerationalCellCycleModel");
 
         out_stream exponential_parameter_file = output_file_handler.OpenOutputFile("exponential_results.parameters");
         exponential_cell_cycle_model.OutputCellCycleModelParameters(exponential_parameter_file);
@@ -1397,9 +1879,28 @@ public:
             FileFinder generated_file = output_file_handler.FindFile("exponential_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/exponential_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
+            FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
+
+        // Test with FixedSequenceCellCycleModel
+        FixedSequenceCellCycleModel fixed_sequence_cell_cycle_model;
+        fixed_sequence_cell_cycle_model.SetRate(1.23);
+        TS_ASSERT_EQUALS(fixed_sequence_cell_cycle_model.GetIdentifier(), "FixedSequenceCellCycleModel");
+
+        out_stream fixed_sequence_parameter_file = output_file_handler.OpenOutputFile("fixed_sequence_results.parameters");
+        fixed_sequence_cell_cycle_model.OutputCellCycleModelParameters(fixed_sequence_parameter_file);
+        fixed_sequence_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("fixed_sequence_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/fixed_sequence_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        CellCycleTimesGenerator::Destroy();
     }
 };
 

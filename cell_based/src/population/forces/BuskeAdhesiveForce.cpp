@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "BuskeAdhesiveForce.hpp"
-#include "IsNan.hpp"
 
 template<unsigned DIM>
 BuskeAdhesiveForce<DIM>::BuskeAdhesiveForce()
@@ -61,7 +60,7 @@ c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsign
                                                                           AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
-    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
+    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr);
 
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
@@ -70,11 +69,11 @@ c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsign
     Node<DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
 
     // Get the node locations
-    c_vector<double, DIM> node_a_location = p_node_a->rGetLocation();
-    c_vector<double, DIM> node_b_location = p_node_b->rGetLocation();
+    const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
+    const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();
 
     // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
-    c_vector<double, DIM> unit_vector = node_b_location - node_a_location;
+    c_vector<double, DIM> unit_vector = r_node_b_location - r_node_a_location;
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_vector);

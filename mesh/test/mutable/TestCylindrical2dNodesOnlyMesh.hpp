@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds = p_mesh->CalculateBoundingBox();
@@ -96,13 +96,16 @@ public:
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5),
-                              "Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
+                              "The periodic width must be a multiple of cut off length.");
+
+        TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0),
+                              "The periodic domain width cannot be 2*CutOffLength.");
 
         // Avoid memory leak
         delete p_mesh;
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -146,7 +149,7 @@ public:
         delete p_mesh;
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -186,7 +189,7 @@ public:
         delete p_mesh;
     }
 
-    void TestAddNode() throw (Exception)
+    void TestAddNode()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -242,45 +245,81 @@ public:
         delete p_mesh;
     }
 
-    void TestConstuctingBoxCollection() throw (Exception)
+    void TestRefreshMesh()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
+        // Create generating mesh
+        HoneycombMeshGenerator generator(4, 4);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a Cylindrical2dNodesOnlyMesh
+        double periodic_width = 4.0;
+        Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
+
+        //Check some node positions
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 3.0, 1e-6);
+
+        p_mesh->Translate(2.0,0.0);
+
+        //Check nodes moved correctly
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 1.0, 1e-6);
+
+        p_mesh->Translate(-2.0,0.0);
+
+        //Check nodes moved periodically
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->rGetLocation()[0], 3.0, 1e-6);
+
+        // Avoid memory leak
+        delete p_mesh;
+    }
+
+    void TestConstuctingBoxCollection()
     {
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
 
-        double cut_off = 2.0; // Need to have a cut off larger than the width in Cylindrical2dNodesOnlyMesh
-        double periodic_width = 2.0;
+        double cut_off = 1.0;
+        double periodic_width = 3.0;
         /*
          * Nodes chosen so to test the cases that the domain width in x is
-         * "divisible" by the cut_off, the y-dimension is not "divisible"..
-         * This adds an extra box in the x dimennsion.
+         * "divisible" by the cut_off, the y-dimension is not "divisible".
+         * Note all nodes need to lie between 0 and periodic_width
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, -1.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 1.0, -1.1));
-        nodes.push_back(new Node<2>(2, false, 0.0, 1.1));
+        nodes.push_back(new Node<2>(0, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 1.1));
+        nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
         nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 2.5, 1.0));
 
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(nodes, cut_off);
 
-        // Call SetupBoxCollection method not called unless EnlargeBoxCollection is called
+        // Call SetupBoxCollection method not called unless EnlargeBoxCollection is called so we call manually
         c_vector<double, 2*2> domain_size;
-        domain_size[0]=-1.0;
-        domain_size[1]=1.1; // Add extra box in x and contains nodes 1 and 3
-        domain_size[2]=-2.0;
-        domain_size[3]=2.5;
+        domain_size[0] = 0.0;
+        domain_size[1] = 3.3;
+        domain_size[2] = 0.0;
+        domain_size[3] = 2.0;
         p_mesh->SetUpBoxCollection(cut_off,domain_size);
 
         DistributedBoxCollection<2>* p_box_collection = p_mesh->GetBoxCollection();
 
         TS_ASSERT(p_box_collection != NULL);
 
-        // 5x5x1 box collection
+        // 3x2x1 box collection
         TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), 6u);
 
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(0)), 2u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(1)), 1u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(2)), 2u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(3)), 3u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(0)), 1u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(1)), 4u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(2)), 3u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(3)), 4u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(4)), 5u);
+
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -291,7 +330,7 @@ public:
     }
 
     // NB This checks that periodicity is maintained through archiving...
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -308,7 +347,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
 

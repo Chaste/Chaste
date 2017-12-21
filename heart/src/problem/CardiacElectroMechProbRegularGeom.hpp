@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,11 +101,11 @@ public:
 
         this->mpProblemDefinition = new ElectroMechanicsProblemDefinition<DIM>(*(this->mpMechanicsMesh));
 
-        // fix the nodes on x=0
+        // Fix the nodes on x=0
         std::vector<unsigned> fixed_nodes;
-        for(unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); i++)
         {
-            if( fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 fixed_nodes.push_back(i);
             }

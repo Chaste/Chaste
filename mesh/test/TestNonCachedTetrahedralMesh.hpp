@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,27 +87,19 @@ public:
     {
         // TetrahedralMesh with Jacobian caching
         unsigned cached_mem_usage;
-        Timer::Reset();
         {
             TetrahedralMesh<3,3> mesh;
             mesh.ConstructCuboid(30,30,30);
             cached_mem_usage = GetMemoryUsage();
         }
-        double cached_construction_time = Timer::GetElapsedTime();
 
         // No caching
         unsigned non_cached_mem_usage;
-        Timer::Reset();
         {
             NonCachedTetrahedralMesh<3,3> mesh;
             mesh.ConstructCuboid(30,30,30);
             non_cached_mem_usage = GetMemoryUsage();
         }
-        double non_cached_construction_time = Timer::GetElapsedTime();
-
-        // Constructing the non cached object should be quicker
-        // Note: this does occasionally fail, due to other activity on the machine, so we allow some slack
-        TS_ASSERT_LESS_THAN( non_cached_construction_time, cached_construction_time * 1.2 );
 
         // compare mem usage
         TS_ASSERT( cached_mem_usage >= non_cached_mem_usage );
@@ -268,7 +260,6 @@ public:
             delete p_mesh2;
         }
     }
-
 };
 
 #endif /*TESTNONCACHEDTETRAHEDRALMESH_HPP_*/

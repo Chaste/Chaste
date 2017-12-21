@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -208,19 +208,19 @@ public:
     std::vector<double>& rGetParameters(AbstractParameterisedSystem<VECTOR>* pOdeSystem);
 
     /**
-    * Write the data to a file.
-    *
-    * @param directoryName  the directory in which to write the data to file
-    * @param baseResultsFilename  the name of the file in which to write the data
-    * @param timeUnits  name of the units of time used
-    * @param stepsPerRow  the solution to the ODE system is written to file every
-    *                    this number of timesteps (defaults to 1)
-    * @param cleanDirectory  whether to clean the directory (defaults to true)
-    * @param precision the precision with which to write the data (i.e. exactly
-    *    how many digits to display after the decimal point).  Defaults to 8.
-    *    Must be between 2 and 20 (inclusive).
-    * @param includeDerivedQuantities  whether to include parameters and derived quantities in the output.
-    */
+     * Write the data to a file.
+     *
+     * @param directoryName  the directory in which to write the data to file
+     * @param baseResultsFilename  the name of the file in which to write the data
+     * @param timeUnits  name of the units of time used
+     * @param stepsPerRow  the solution to the ODE system is written to file every
+     *                    this number of timesteps (defaults to 1)
+     * @param cleanDirectory  whether to clean the directory (defaults to true)
+     * @param precision the precision with which to write the data (i.e. exactly
+     *    how many digits to display after the decimal point).  Defaults to 8.
+     *    Must be between 2 and 20 (inclusive).
+     * @param includeDerivedQuantities  whether to include parameters and derived quantities in the output.
+     */
     void WriteToFile(std::string directoryName,
                      std::string baseResultsFilename,
                      std::string timeUnits,

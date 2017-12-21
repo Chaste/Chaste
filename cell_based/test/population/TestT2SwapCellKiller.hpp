@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "ArchiveOpener.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "VertexMeshWriter.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "T2SwapCellKiller.hpp"
@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "SmartPointers.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -65,7 +67,7 @@ public:
      * This tests the the killer method CheckAndLabelCellsForApoptosisOrDeath()
      * method for performing T2 swaps (element removal).
      */
-    void TestKillerForT2Swap() throw(Exception)
+    void TestKillerForT2Swap()
     {
         // Make 6 nodes to assign to four elements
         std::vector<Node<2>*> nodes;
@@ -108,7 +110,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -195,7 +197,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(),4u);
     }
 
-    void TestKillerForT2SwapInSimulation() throw(Exception)
+    void TestKillerForT2SwapInSimulation()
     {
         /**
          * This is performs a single T2 swap in a simulation and tests that the cells and vertex elements are
@@ -245,7 +247,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -315,7 +317,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(),3u);
     }
 
-    void TestKillerForMultipleT2Swaps() throw(Exception)
+    void TestKillerForMultipleT2Swaps()
     {
         /**
          * Create a mesh comprising ten nodes contained in six elements, two of which are small triangles,
@@ -388,7 +390,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -469,7 +471,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 6u);
     }
 
-    void TestKillerForMultipleT2SwapInSimulation() throw(Exception)
+    void TestKillerForMultipleT2SwapInSimulation()
     {
         /**
          * We conduct the same test as before, but now within an OffLatticeSimulation. We make sure that
@@ -537,7 +539,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -599,7 +601,7 @@ public:
     /**
      * This tests that T1 swaps rearrange to form a triangular element for a T2 swap
      */
-    void TestPrepareForT2Swap() throw(Exception)
+    void TestPrepareForT2Swap()
     {
         /*
          * Create a mesh comprising eight nodes contained in four trapezium elements and a central
@@ -721,7 +723,7 @@ public:
          */
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -762,14 +764,14 @@ public:
         }
     }
 
-    void TestT2SwapCellKillerException() throw (Exception)
+    void TestT2SwapCellKillerException()
     {
         // Create a cell population whose type should not be used with a T2SwapCellKiller
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> population(*p_mesh, cells);
@@ -779,7 +781,7 @@ public:
             "A T2SwapCellKiller should only be used together with a VertexBasedCellPopulation.");
     }
 
-    void TestArchivingOfT2SwapCellKiller() throw (Exception)
+    void TestArchivingOfT2SwapCellKiller()
     {
         // Set up singleton classes
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -792,7 +794,7 @@ public:
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);

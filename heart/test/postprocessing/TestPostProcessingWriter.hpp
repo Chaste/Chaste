@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ class TestPostProcessingWriter : public CxxTest::TestSuite
     }
 
 public:
-    void TestWriterMethods() throw(Exception)
+    void TestWriterMethods()
     {
         FileFinder test_dir = GetPath("TestPostProcessingWriter_WriterMethods");
 
@@ -147,7 +147,7 @@ public:
         TS_ASSERT(comp4.CompareFiles(1e-12));
     }
 
-    void TestApdWritingWithNoApdsPresent() throw(Exception)
+    void TestApdWritingWithNoApdsPresent()
     {
         FileFinder output_dir = GetPath("TestPostProcessingWriter_ApdWritingWithNoApdsPresent");
 
@@ -175,7 +175,7 @@ public:
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
 
-    void TestPostProcessWriting() throw (Exception)
+    void TestPostProcessWriting()
     {
         FileFinder test_dir = GetPath("TestPostProcessingWriter_PostProcessWriting");
         CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "Monodomain1d/MonodomainLR91_1d");
@@ -286,7 +286,7 @@ public:
 
     }
 
-    void TestExtractNodeTracesWithNodePermutation() throw (Exception)
+    void TestExtractNodeTracesWithNodePermutation()
     {
         HeartConfig::Instance()->Reset();
         FileFinder output_dir = GetPath("TestPostProcessingWriter_ExtractNodeTracesWithNodePermutation");
@@ -334,7 +334,7 @@ public:
         TS_ASSERT(comp_phie.CompareFiles(1e-3));
     }
 
-    void TestWritingEads() throw (Exception)
+    void TestWritingEads()
     {
         HeartConfig::Instance()->Reset();
         FileFinder output_dir = GetPath("TestPostProcessingWriter_WritingEads");
@@ -354,7 +354,7 @@ public:
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
 
-    void TestSwitchingOutputFormat() throw (Exception)
+    void TestSwitchingOutputFormat()
     {
         HeartConfig::Instance()->Reset();
         FileFinder test_dir = GetPath("TestPostProcessingWriter_SwitchingOutputFormat");
@@ -414,7 +414,7 @@ public:
 
     // This test checks that the APD map is put into the HDF5 file.
     // NB The dataset and variable name are Apd_60_minus_30_Map here...
-    void TestHdfOutput() throw(Exception)
+    void TestHdfOutput()
     {
         HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_AddingToHdf5", RelativeTo::ChasteTestOutput);
@@ -468,7 +468,7 @@ public:
         PetscTools::Destroy(data);
     }
 
-    void TestVtkOutput() throw (Exception)
+    void TestVtkOutput()
     {
 #ifdef CHASTE_VTK
         HeartConfig::Instance()->Reset();
@@ -534,7 +534,7 @@ public:
 #endif
     }
 
-    void TestDifferentNumberOfPaces() throw (Exception)
+    void TestDifferentNumberOfPaces()
     {
         HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_DifferentNumberOfPaces", RelativeTo::ChasteTestOutput);

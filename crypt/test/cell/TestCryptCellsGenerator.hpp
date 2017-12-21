@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ class TestCryptCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCryptCellsGeneratorWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithFixedG1GenerationalCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -73,7 +73,7 @@ public:
         double y2 = 2.0;
         double y3 = 3.0;
 
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> generator;
         generator.Generate(cells, p_mesh, location_indices, true, y0, y1, y2, y3);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -82,7 +82,7 @@ public:
         for (unsigned i=0; i<cells.size(); i++)
         {
             double height = p_mesh->GetNode(i)->rGetLocation()[1];
-            unsigned generation = static_cast<FixedDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
+            unsigned generation = static_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
 
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
 
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithUniformG1GenerationalCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -125,7 +125,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> generator;
         generator.Generate(cells, p_mesh, location_indices, false);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -139,7 +139,7 @@ public:
         for (unsigned i=0; i<cells.size(); i++)
         {
             double height = p_mesh->GetNode(i)->rGetLocation()[1];
-            unsigned generation = static_cast<StochasticDurationGenerationBasedCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
+            unsigned generation = static_cast<UniformG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
 
             if (height <= y0)
             {
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithTysonNovakCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithTysonNovakCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -207,7 +207,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithWntCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithWntCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -241,7 +241,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithSimpleWntCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithSimpleWntCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -264,7 +264,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithStochasticWntCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithStochasticWntCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -298,7 +298,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithStochasticDurationGenerationBasedCellCycleModelAndVertexMesh() throw(Exception)
+    void TestCryptCellsGeneratorWithUniformG1GenerationalCellCycleModelAndVertexMesh()
       {
           // Create mesh
           unsigned crypt_width = 4;
@@ -313,10 +313,10 @@ public:
 
           // Create cells
           std::vector<CellPtr> fixed_cells, stochastic_cells;
-          CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> fixed_cells_generator;
+          CryptCellsGenerator<FixedG1GenerationalCellCycleModel> fixed_cells_generator;
           fixed_cells_generator.Generate(fixed_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
-          CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> stochastic_cells_generator;
+          CryptCellsGenerator<UniformG1GenerationalCellCycleModel> stochastic_cells_generator;
           stochastic_cells_generator.Generate(stochastic_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
           TS_ASSERT_EQUALS(fixed_cells.size(), p_mesh->GetNumElements());
@@ -326,8 +326,8 @@ public:
           for (unsigned i=0; i<fixed_cells.size(); i++)
           {
               double height = p_mesh->GetCentroidOfElement(i)[1];
-              unsigned fixed_generation = static_cast<FixedDurationGenerationBasedCellCycleModel*>(fixed_cells[i]->GetCellCycleModel())->GetGeneration();
-              unsigned stochastic_generation = static_cast<StochasticDurationGenerationBasedCellCycleModel*>(stochastic_cells[i]->GetCellCycleModel())->GetGeneration();
+              unsigned fixed_generation = static_cast<FixedG1GenerationalCellCycleModel*>(fixed_cells[i]->GetCellCycleModel())->GetGeneration();
+              unsigned stochastic_generation = static_cast<UniformG1GenerationalCellCycleModel*>(stochastic_cells[i]->GetCellCycleModel())->GetGeneration();
 
               if (height <= y0)
               {
@@ -357,7 +357,7 @@ public:
           }
       }
 
-      void TestCryptCellsGeneratorWithSimpleWntCellCycleModelAndVertexMesh() throw(Exception)
+      void TestCryptCellsGeneratorWithSimpleWntCellCycleModelAndVertexMesh()
       {
           // Create mesh
           unsigned crypt_width = 4;

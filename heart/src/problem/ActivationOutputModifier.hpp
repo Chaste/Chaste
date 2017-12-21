@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,6 +73,12 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
+    /**
+     * Archive the output modifier, never used directly - boost uses this.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {

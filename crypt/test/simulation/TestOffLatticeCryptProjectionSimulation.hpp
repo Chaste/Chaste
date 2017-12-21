@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,36 +38,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
 
 #include "CheckpointArchiveTypes.hpp"
 
-#include "OffLatticeSimulation.hpp"
-#include "HoneycombMeshGenerator.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
+#include "CellBasedEventHandler.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "SimpleWntCellCycleModel.hpp"
 #include "CryptProjectionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "HoneycombMeshGenerator.hpp"
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
-#include "RandomCellKiller.hpp"
-#include "RadialSloughingCellKiller.hpp"
-#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NumericFileComparison.hpp"
-#include "CellBasedEventHandler.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "StochasticWntCellCycleModel.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "RadialSloughingCellKiller.hpp"
+#include "RandomCellKiller.hpp"
+#include "SimpleWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
+#include "StochasticWntCellCycleModel.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
 #include "CellCycleModelProteinConcentrationsWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
 
 // Cell population writers
-#include "CellProliferativePhasesCountWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -75,18 +75,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestOffLatticeCryptProjectionSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
-
-    void TestOutputStatistics() throw(Exception)
+    void TestOutputStatistics()
     {
-        EXIT_IF_PARALLEL;    // defined in PetscTools
+        EXIT_IF_PARALLEL; // defined in PetscTools
 
         // Set up mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableMesh<2, 2>* p_mesh = generator.GetMesh();
 
-        double crypt_length = (double)num_cells_depth *sqrt(3.0)/2.0;
+        double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -119,7 +118,7 @@ public:
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        TS_ASSERT_DELTA(simulator.GetDt(), 1.0/120.0, 1e-12);
+        TS_ASSERT_DELTA(simulator.GetDt(), 1.0 / 120.0, 1e-12);
 
         // Run cell-based simulation
         TS_ASSERT_EQUALS(simulator.GetOutputDirectory(), "OffLatticeSimulationWritingProteins");
@@ -151,7 +150,7 @@ public:
      * depends on a radial Wnt gradient, and the crypt projection model spring
      * system, and store the results for use in later archiving tests.
      */
-    void TestOffLatticeSimulationWithCryptProjectionSpringSystem() throw (Exception)
+    void TestOffLatticeSimulationWithCryptProjectionSpringSystem()
     {
         double a = 0.2;
         double b = 2.0;
@@ -164,23 +163,23 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableMesh<2, 2>* p_mesh = generator.GetMesh();
 
-        double crypt_length = (double)num_cells_depth *sqrt(3.0)/2.0;
+        double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-        ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
-        double width_of_mesh = (num_cells_width/(num_cells_width+2.0*thickness_of_ghost_layer))*(bounding_box.GetWidth(0));
-        double height_of_mesh = (num_cells_depth/(num_cells_depth+2.0*thickness_of_ghost_layer))*(bounding_box.GetWidth(1));
+        ChasteCuboid<2> bounding_box = p_mesh->CalculateBoundingBox();
+        double width_of_mesh = (num_cells_width / (num_cells_width + 2.0 * thickness_of_ghost_layer)) * (bounding_box.GetWidth(0));
+        double height_of_mesh = (num_cells_depth / (num_cells_depth + 2.0 * thickness_of_ghost_layer)) * (bounding_box.GetWidth(1));
 
-        p_mesh->Translate(-width_of_mesh/2, -height_of_mesh/2);
+        p_mesh->Translate(-width_of_mesh / 2, -height_of_mesh / 2);
 
         // To start off with, set up all cells to have TransitCellProliferativeType
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); i++)
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
             p_model->SetDimension(2);
@@ -190,9 +189,8 @@ public:
             p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
 
-            double birth_time = - RandomNumberGenerator::Instance()->ranf()*
-                                  ( p_model->GetTransitCellG1Duration()
-                                   +p_model->GetSG2MDuration());
+            double birth_time = -RandomNumberGenerator::Instance()->ranf() * (p_model->GetTransitCellG1Duration()
+                                                                              + p_model->GetSG2MDuration());
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -213,8 +211,8 @@ public:
         crypt_projection_simulator.AddForce(p_force);
 
         // Create a radial cell killer and pass it in to the cell-based simulation
-        c_vector<double,2> centre = zero_vector<double>(2);
-        double crypt_radius = pow(crypt_length/a, 1.0/b);
+        c_vector<double, 2> centre = zero_vector<double>(2);
+        double crypt_radius = pow(crypt_length / a, 1.0 / b);
 
         MAKE_PTR_ARGS(RadialSloughingCellKiller, p_killer, (&crypt, centre, crypt_radius));
         crypt_projection_simulator.AddCellKiller(p_killer);
@@ -238,13 +236,13 @@ public:
         distance_between(1) = node_a_location[1] - node_b_location[1];
         // Note that this distance varies based on the quality of the original honeycomb mesh,
         // the precision of the machine and the optimisation level
-        TS_ASSERT_DELTA(norm_2(distance_between), 6.6770, 4.0e-3);
+        TS_ASSERT_DELTA(norm_2(distance_between), 6.1701, 4.0e-3);
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(257)), 0.7757, 2e-3);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(503)), 0.8876, 1e-3);
-      // Tidy up
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(257)), 0.7777, 2e-3);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(503)), 0.8598, 1e-3);
+        // Tidy up
         WntConcentration<2>::Destroy();
     }
 };

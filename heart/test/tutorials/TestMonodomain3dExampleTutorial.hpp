@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ public:
         double y = pNode->rGetLocation()[1];
         double z = pNode->rGetLocation()[2];
 
-        if ( (x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6) )
+        if ((x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6))
         {
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
         }
@@ -94,10 +94,10 @@ public:
 };
 
 /* Now define the test */
-class TestMonodomain3dExample : public CxxTest::TestSuite
+class TestMonodomain3dExampleTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
         /* HOW_TO_TAG Cardiac/Problem definition
          * Generate a slab (cuboid) mesh rather than read a mesh in, and pass it to solver
@@ -150,7 +150,7 @@ public:
          * simulation however (hence the boolean being set to false).
          */
         bool partial_output = false;
-        if(partial_output)
+        if (partial_output)
         {
             std::vector<unsigned> nodes_to_be_output;
             nodes_to_be_output.push_back(0);
@@ -161,8 +161,7 @@ public:
 
         /* `SetWriteInfo` is a useful method that means that the min/max voltage is
          * printed as the simulation runs (useful for verifying that cells are stimulated
-         * and the wave propagating, for example) (although note scons does buffer output
-         * before printing to screen) */
+         * and the wave propagating, for example) */
         monodomain_problem.SetWriteInfo();
 
         /* Finally, call `Initialise` and `Solve` as before */

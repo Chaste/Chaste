@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,8 +54,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 #include "MutableMesh.hpp"
 #include "ChasteCuboid.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
@@ -66,7 +67,7 @@ class TestCryptProjectionForce : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCryptProjectionForceMethods() throw (Exception)
+    void TestCryptProjectionForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -93,7 +94,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
 
             if (i==4 || i==5)
@@ -243,7 +244,7 @@ public:
      * \todo WntBasedChemotaxis should be possible in other force laws. If/when
      * this is implemented, this test should be moved to somewhere more appropriate.
      */
-    void TestCryptProjectionForceWithWntBasedChemotaxis() throw (Exception)
+    void TestCryptProjectionForceWithWntBasedChemotaxis()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -272,7 +273,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(-10.0);
@@ -332,7 +333,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCryptProjectionForceWithArchiving() throw (Exception)
+    void TestCryptProjectionForceWithArchiving()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
 
@@ -353,7 +354,7 @@ public:
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+                FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
                 p_cell->SetCellProliferativeType(p_stem_type);
                 p_cell->SetBirthTime(-50.0);
@@ -414,7 +415,7 @@ private:
 
         for (unsigned i=0; i<rLocationIndices.size(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPtr p_cell;
             if (i==60)
@@ -460,7 +461,7 @@ private:
 
 public:
 
-    void TestForceCollection() throw (Exception)
+    void TestForceCollection()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -495,7 +496,8 @@ public:
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
         {
-            c_vector<double,2> old_point = p_mesh->GetNode(59)->rGetLocation();
+            c_vector<double,2> old_point;
+            old_point = p_mesh->GetNode(59)->rGetLocation();
             ChastePoint<2> new_point;
             new_point.rGetLocation()[0] = old_point[0]+0.5;
             new_point.rGetLocation()[1] = old_point[1];
@@ -548,7 +550,7 @@ public:
         FileComparison( projection_force_results_dir + "projection_results.parameters", "crypt/test/data/TestForcesForCrypt/projection_results.parameters").CompareFiles();
     }
 
-    void TestCryptProjectionForceWithNodeBasedCellPopulation() throw (Exception)
+    void TestCryptProjectionForceWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -565,7 +567,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);

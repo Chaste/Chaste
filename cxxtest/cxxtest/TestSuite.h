@@ -12,7 +12,7 @@
 #include <cxxtest/Descriptions.h>
 #include <cxxtest/ValueTraits.h>
 
-#include "global/src/Exception.hpp"
+#include "Exception.hpp"
 
 #ifdef _CXXTEST_HAVE_STD
 #   include <stdexcept>

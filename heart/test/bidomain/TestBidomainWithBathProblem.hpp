@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,7 +67,7 @@ public:
         HeartConfig::Reset();
     }
 
-    void TestLabellingNodes() throw (Exception)
+    void TestLabellingNodes()
     {
         HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
@@ -106,7 +106,7 @@ public:
     }
 
 
-    void TestFailsIfNoBathElements() throw (Exception)
+    void TestFailsIfNoBathElements()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
@@ -122,7 +122,7 @@ public:
         HeartEventHandler::EndEvent(HeartEventHandler::EVERYTHING);
     }
 
-    void TestCheckForBathElementsNoDeadlock() throw (Exception)
+    void TestCheckForBathElementsNoDeadlock()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("bidomain_bath");
@@ -154,7 +154,7 @@ public:
     }
 
 
-    void TestBathIntracellularStimulation() throw (Exception)
+    void TestBathIntracellularStimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(10.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d");
@@ -171,10 +171,10 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // set the x<0.25 and x>0.75 regions as the bath region
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
-            if( (x<0.25) || (x>0.75) )
+            if ((x<0.25) || (x>0.75))
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
@@ -189,16 +189,16 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test V = 0 for all bath nodes
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            if(HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath
+            if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath
             {
                 TS_ASSERT_DELTA(sol_repl[2*i], 0.0, 1e-12);
             }
         }
 
         // test symmetry of V and phi_e
-        for(unsigned i=0; i<=(mesh.GetNumNodes()-1)/2; i++)
+        for (unsigned i=0; i<=(mesh.GetNumNodes()-1)/2; i++)
         {
             unsigned opposite = mesh.GetNumNodes()-i-1;
             TS_ASSERT_DELTA(sol_repl[2*i], sol_repl[2*opposite], 2e-3);      // V
@@ -215,7 +215,7 @@ public:
     // throughout the domain (with a Neumann boundary condition on x=1 and a dirichlet boundary
     // condition (ie grounding) on x=0), so the exact solution can be calculated and compared
     // against.
-    void Test1dProblemOnlyBathGroundedOneSide() throw (Exception)
+    void Test1dProblemOnlyBathGroundedOneSide()
     {
         HeartConfig::Instance()->SetSimulationDuration(0.5);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBathOnlyBath");
@@ -229,7 +229,7 @@ public:
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
             mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
@@ -241,7 +241,7 @@ public:
         ConstBoundaryCondition<1>* p_zero_stim = new ConstBoundaryCondition<1>(0.0);
 
         // loop over boundary elements and set (sigma\gradphi).n = 1.0 on RHS edge
-        for(TetrahedralMesh<1,1>::BoundaryElementIterator iter
+        for (TetrahedralMesh<1,1>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
@@ -271,7 +271,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test phi = x*boundary_val/sigma (solution of phi''=0, phi(0)=0, sigma*phi'(1)=boundary_val
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double bath_cond = HeartConfig::Instance()->GetBathConductivity();
             double x = mesh.GetNode(i)->rGetLocation()[0];
@@ -280,7 +280,7 @@ public:
         }
     }
 
-    void Test2dBathIntracellularStimulation() throw (Exception)
+    void Test2dBathIntracellularStimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2d");
@@ -325,7 +325,7 @@ public:
         delete p_mesh;
     }
 
-    void Test2dBathInputFluxEqualsOutputFlux() throw (Exception)
+    void Test2dBathInputFluxEqualsOutputFlux()
     {
         HeartConfig::Instance()->SetSimulationDuration(3.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dFluxCompare");
@@ -392,7 +392,7 @@ public:
         delete p_mesh;
     }
 
-    void Test2dBathMultipleBathConductivities() throw (Exception)
+    void Test2dBathMultipleBathConductivities()
     {
         HeartConfig::Instance()->SetSimulationDuration(2.0);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dMultipleBathConductivities");
@@ -429,21 +429,21 @@ public:
         {
             double x = iter->CalculateCentroid()[0];
             double y = iter->CalculateCentroid()[1];
-            if( (x>0.3) && (x<0.6) && (y>0.3) && (y<0.6) )
+            if ((x>0.3) && (x<0.6) && (y>0.3) && (y<0.6))
             {
                 iter->SetAttribute(0);
             }
             else
             {
-                if (y<0.2)
+                if (y < 0.2)
                 {
                     iter->SetAttribute(2);
                 }
-                else if (y<0.7)
+                else if (y < 0.7)
                 {
                     iter->SetAttribute(3);
                 }
-                else if (y<0.9)
+                else if (y < 0.9)
                 {
                     iter->SetAttribute(4);
                 }
@@ -516,7 +516,7 @@ public:
     }
 
 
-    void Test2dBathGroundedElectrodeStimulusSwitchesOnOff() throw (Exception)
+    void Test2dBathGroundedElectrodeStimulusSwitchesOnOff()
     {
         // Total execution time is 5 ms. Electrodes are on in [1.0, 3.0]
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dGroundedOnOff");
@@ -693,7 +693,7 @@ public:
         delete p_mesh;
     }
 
-    void TestArchivingBidomainProblemWithElectrodes(void) throw(Exception)
+    void TestArchivingBidomainProblemWithElectrodes(void)
     {
         std::string archive_dir = "BidomainWithElectrodesArchiving";
 
@@ -737,7 +737,7 @@ public:
             {
                 double x = r_mesh.GetElement(i)->CalculateCentroid()[0];
                 double y = r_mesh.GetElement(i)->CalculateCentroid()[1];
-                if ( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
+                if (sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02)
                 {
                     TS_ASSERT(HeartRegionCode::IsRegionBath(r_mesh.GetElement(i)->GetUnsignedAttribute()));
                 }
@@ -802,7 +802,7 @@ public:
         delete p_mesh;
     }
 
-    void TestSettingElectrodesOnResumedSimulation(void) throw(Exception)
+    void TestSettingElectrodesOnResumedSimulation(void)
     {
         std::string archive_dir = "BidomainWithElectrodesArchiving";
 
@@ -879,7 +879,7 @@ public:
         delete p_mesh;
     }
 
-    void TestArchivingMeshFileWithAttributes() throw (Exception)
+    void TestArchivingMeshFileWithAttributes()
     {
         std::string archive_dir = "TestArchivingMeshFileWithAttributes";
 
@@ -963,7 +963,7 @@ public:
             {
                 if (p_mesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(i))
                 {
-                    if ( expected_node_regions[i] == 'T')
+                    if (expected_node_regions[i] == 'T')
                     {
                          TS_ASSERT(HeartRegionCode::IsRegionTissue( p_mesh->GetNode(i)->GetRegion() ));
                     }
@@ -979,7 +979,7 @@ public:
         }
     }
 
-    void TestSwitchesOffAtCorrectTime() throw(Exception)
+    void TestSwitchesOffAtCorrectTime()
     {
         // zero stim cell factory
         c_vector<double,2> centre;
@@ -1019,7 +1019,7 @@ public:
         delete p_mesh1;
     }
 
-    void TestBidomainWithBathCanOutputVariables() throw(Exception)
+    void TestBidomainWithBathCanOutputVariables()
     {
         HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");

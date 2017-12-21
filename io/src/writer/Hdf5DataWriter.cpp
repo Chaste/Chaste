@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,8 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                                const std::string& rBaseName,
                                bool cleanDirectory,
                                bool extendData,
-                               std::string datasetName)
+                               std::string datasetName,
+                               bool useCache)
     : AbstractHdf5Access(rDirectory, rBaseName, datasetName),
       mrVectorFactory(rVectorFactory),
       mCleanDirectory(cleanDirectory),
@@ -71,12 +72,16 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mNeedExtend(false),
       mUseMatrixForIncompleteData(false),
       mCurrentTimeStep(0),
-      mSinglePermutation(NULL),
-      mDoublePermutation(NULL),
-      mSingleIncompleteOutputMatrix(NULL),
-      mDoubleIncompleteOutputMatrix(NULL),
+      mSinglePermutation(nullptr),
+      mDoublePermutation(nullptr),
+      mSingleIncompleteOutputMatrix(nullptr),
+      mDoubleIncompleteOutputMatrix(nullptr),
       mUseOptimalChunkSizeAlgorithm(true),
-      mNumberOfChunks(0u)
+      mNumberOfChunks(0),
+      mChunkTargetSize(0x20000), // 128 K
+      mAlignment(0), // No alignment
+      mUseCache(useCache),
+      mCacheFirstTimeStep(0u)
 {
     mChunkSize[0] = 0;
     mChunkSize[1] = 0;
@@ -118,7 +123,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             // Where to find the file
             assert(mCleanDirectory==false);
 
-            mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
+            mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str(), H5P_DEFAULT);
             hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
             //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
             hsize_t dataset_max_sizes[DATASET_DIMS];
@@ -148,7 +153,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             hid_t attribute_type  = H5Aget_type(attribute_id);
             hid_t attribute_space = H5Aget_space(attribute_id);
             hsize_t attr_dataspace_dim;
-            H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, NULL);
+            H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, nullptr);
             unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
             assert(num_columns == mDatasetDims[2]); // I think...
 
@@ -184,18 +189,19 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             // How many time steps have been written so far?
             hid_t timestep_dataspace = H5Dget_space(mUnlimitedDatasetId);
             hsize_t num_timesteps;
-            H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, NULL);
+            H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, nullptr);
             H5Sclose(timestep_dataspace);
             mCurrentTimeStep = (long)num_timesteps - 1;
+            mCacheFirstTimeStep = mCurrentTimeStep + 1;
 
             // Incomplete data?
             attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
             if (attribute_id < 0)
             {
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
                 // Old format, before we added the attribute.
                 EXCEPTION("Extending old-format files isn't supported.");
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
             }
             else
             {
@@ -245,6 +251,15 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                 H5Dclose(mUnlimitedDatasetId);
                 H5Fclose(mFileId);
                 EXCEPTION("Unable to extend an incomplete data file at present.");
+            }
+
+            // Record chunk dimensions (useful for cached write mode)
+            hid_t dcpl = H5Dget_create_plist(mVariablesDatasetId); // get dataset creation property list
+            H5Pget_chunk(dcpl, DATASET_DIMS, mChunkSize );
+            if (mUseCache)
+            {
+                // Reserve space. Enough for one chunk in the time dimension.
+                mDataCache.reserve(mChunkSize[0]*mNumberOwned*mDatasetDims[2]);
             }
 
             // Done
@@ -307,30 +322,30 @@ void Hdf5DataWriter::OpenFile()
     }
     else
     {
-        // Do chunk size calculation now as it lets us optimise the size of the B tree (via H5Pset_istore_k), see:
-        // http://hdf-forum.184993.n3.nabble.com/size-of-quot-write-operation-quot-with-pHDF5-td2636129.html#a2647633
-        SetChunkSize();
         hid_t fcpl = H5Pcreate(H5P_FILE_CREATE);
-        if (mNumberOfChunks>64) // Default parameter is 32, so don't go lower than that
-        {
-            H5Pset_istore_k(fcpl, (mNumberOfChunks+1)/2);
-        }
         /*
-         * Align objects to disk block size. Useful for striped filesystem e.g. Lustre
-         * Ideally this should match the chunk size (see "target_size_in_bytes" below).
+         * Align objects to multiples of some number of bytes. Useful for
+         * striped filesystem e.g. Lustre. Ideally this should match the chunk
+         * size (see SetTargetChunkSize).
          */
-        // H5Pset_alignment(fapl, 0, 1024*1024); // Align to 1 M blocks
+        if (mAlignment != 0)
+        {
+            H5Pset_alignment(fapl, 0, mAlignment);
+        }
 
         /*
          * The stripe size can be set on the directory just before creation of the H5
          * file, and set back to normal just after, so that the H5 file inherits these
          * settings, by uncommenting the lines below. Adjust the command for your
          * specific filesystem!
+         *
+         * A simpler solution (where supported) might be to use an environment variable, e.g.
+         * export MPICH_MPIIO_HINTS="*.h5:striping_factor=48:striping_unit=1048576"
          */
         /*
         std::string command;
         // Turn on striping for directory, which the newly created HDF5 file will inherit.
-        if ( PetscTools::AmMaster() )
+        if (PetscTools::AmMaster())
         {
             // Increase stripe count
             command = "lfs setstripe --size 1M --count -1 "; // -1 means use all OSTs
@@ -345,7 +360,7 @@ void Hdf5DataWriter::OpenFile()
 
         /*
         // Turn off striping so other output files stay unstriped.
-        if ( PetscTools::AmMaster() )
+        if (PetscTools::AmMaster())
         {
             // Use one stripe
             command = "lfs setstripe --size 1M --count 1 ";
@@ -446,8 +461,8 @@ void Hdf5DataWriter::DefineFixedDimensionUsingMatrix(const std::vector<unsigned>
     ComputeIncompleteOffset();
 
     // Make sure we've not done it already
-    assert(mSingleIncompleteOutputMatrix == NULL);
-    assert(mDoubleIncompleteOutputMatrix == NULL);
+    assert(mSingleIncompleteOutputMatrix == nullptr);
+    assert(mDoubleIncompleteOutputMatrix == nullptr);
     PetscTools::SetupMat(mSingleIncompleteOutputMatrix,   mFileFixedDimensionSize,   mDataFixedDimensionSize, 2,  mNumberOwned,  mHi - mLo);
     PetscTools::SetupMat(mDoubleIncompleteOutputMatrix, 2*mFileFixedDimensionSize, 2*mDataFixedDimensionSize, 4,  2*mNumberOwned, 2*(mHi - mLo));
 
@@ -592,17 +607,21 @@ void Hdf5DataWriter::EndDefineMode()
     dataset_max_dims[1] = mDatasetDims[1];
     dataset_max_dims[2] = mDatasetDims[2];
 
-    // If we didn't already do the chunk calculation (e.g. we're adding a dataset to an existing H5 file)
-    if (mNumberOfChunks==0)
+    // Set chunk dimensions for the new dataset
+    SetChunkSize();
+
+    if (mUseCache)
     {
-        SetChunkSize();
+        // Reserve space. Enough for one chunk in the time dimension.
+        mDataCache.reserve(mChunkSize[0]*mNumberOwned*mDatasetDims[2]);
     }
 
     // Create chunked dataset and clean up
     hid_t cparms = H5Pcreate (H5P_DATASET_CREATE);
     H5Pset_chunk( cparms, DATASET_DIMS, mChunkSize);
     hid_t filespace = H5Screate_simple(DATASET_DIMS, mDatasetDims, dataset_max_dims);
-    mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace, cparms);
+    mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace,
+                                    H5P_DEFAULT, cparms, H5P_DEFAULT);
     SetMainDatasetRawChunkCache(); // Set large cache (even though parallel drivers don't currently use it!)
     H5Sclose(filespace);
     H5Pclose(cparms);
@@ -610,7 +629,7 @@ void Hdf5DataWriter::EndDefineMode()
     // Create dataspace for the name, unit attribute
     const unsigned MAX_STRING_SIZE = 100;
     hsize_t columns[1] = {mVariables.size()};
-    hid_t colspace = H5Screate_simple(1, columns, NULL);
+    hid_t colspace = H5Screate_simple(1, columns, nullptr);
 
     // Create attribute for variable names
     char* col_data = (char*) malloc(mVariables.size() * sizeof(char) * MAX_STRING_SIZE);
@@ -626,7 +645,8 @@ void Hdf5DataWriter::EndDefineMode()
     // Create the type 'string'
     hid_t string_type = H5Tcopy(H5T_C_S1);
     H5Tset_size(string_type, MAX_STRING_SIZE );
-    hid_t attr = H5Acreate(mVariablesDatasetId, "Variable Details", string_type, colspace, H5P_DEFAULT);
+    hid_t attr = H5Acreate(mVariablesDatasetId, "Variable Details", string_type, colspace,
+                           H5P_DEFAULT, H5P_DEFAULT);
 
     // Write to the attribute
     H5Awrite(attr, string_type, col_data);
@@ -638,8 +658,9 @@ void Hdf5DataWriter::EndDefineMode()
 
     // Create "boolean" attribute telling the data to be incomplete or not
     columns[0] = 1;
-    colspace = H5Screate_simple(1, columns, NULL);
-    attr = H5Acreate(mVariablesDatasetId, "IsDataComplete", H5T_NATIVE_UINT, colspace, H5P_DEFAULT);
+    colspace = H5Screate_simple(1, columns, nullptr);
+    attr = H5Acreate(mVariablesDatasetId, "IsDataComplete", H5T_NATIVE_UINT, colspace,
+                     H5P_DEFAULT, H5P_DEFAULT);
 
     // Write to the attribute - note that the native boolean is not predictable
     unsigned is_data_complete = mIsDataComplete ? 1 : 0;
@@ -653,8 +674,9 @@ void Hdf5DataWriter::EndDefineMode()
         // We need to write a map
         // Create "unsigned" attribute with the map
         columns[0] = mFileFixedDimensionSize;
-        colspace = H5Screate_simple(1, columns, NULL);
-        attr = H5Acreate(mVariablesDatasetId, "NodeMap", H5T_NATIVE_UINT, colspace, H5P_DEFAULT);
+        colspace = H5Screate_simple(1, columns, nullptr);
+        attr = H5Acreate(mVariablesDatasetId, "NodeMap", H5T_NATIVE_UINT, colspace,
+                         H5P_DEFAULT, H5P_DEFAULT);
 
         // Write to the attribute
         H5Awrite(attr, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
@@ -688,17 +710,20 @@ void Hdf5DataWriter::EndDefineMode()
         //   - a new attribute "Name" has been added to the Unlimited Dataset to allow it to assign
         //     any name to the unlimited variable. Which can then be easily read by Hdf5DataReader.
 
-        mUnlimitedDatasetId = H5Dcreate(mFileId, (mDatasetName + "_Unlimited").c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
+        mUnlimitedDatasetId = H5Dcreate(mFileId, (mDatasetName + "_Unlimited").c_str(), H5T_NATIVE_DOUBLE, time_filespace,
+                                        H5P_DEFAULT, time_cparms, H5P_DEFAULT);
 
         // Create the dataspace for the attribute
         hsize_t one = 1;
-        hid_t one_column_space = H5Screate_simple(1, &one, NULL);
+        hid_t one_column_space = H5Screate_simple(1, &one, nullptr);
 
         // Create an attribute for the time unit
-        hid_t unit_attr = H5Acreate(mUnlimitedDatasetId, "Unit", string_type, one_column_space, H5P_DEFAULT);
+        hid_t unit_attr = H5Acreate(mUnlimitedDatasetId, "Unit", string_type, one_column_space,
+                                    H5P_DEFAULT, H5P_DEFAULT);
 
         // Create an attribute for the time name
-        hid_t name_attr = H5Acreate(mUnlimitedDatasetId, "Name", string_type, one_column_space, H5P_DEFAULT);
+        hid_t name_attr = H5Acreate(mUnlimitedDatasetId, "Name", string_type, one_column_space,
+                                    H5P_DEFAULT, H5P_DEFAULT);
 
         // Copy the unit to a string MAX_STRING_SIZE long and write it
         char unit_string[MAX_STRING_SIZE];
@@ -727,12 +752,13 @@ void Hdf5DataWriter::EndDefineMode()
     hid_t long_string_type = H5Tcopy(H5T_C_S1);
     H5Tset_size(long_string_type, MAX_PROVENANCE_STRING_SIZE );
     hsize_t prov_columns[1] = {1};
-    hid_t provenance_space = H5Screate_simple(1, prov_columns, NULL);
+    hid_t provenance_space = H5Screate_simple(1, prov_columns, nullptr);
     char* provenance_data = (char*) malloc(sizeof(char) * MAX_PROVENANCE_STRING_SIZE);
     assert( ChasteBuildInfo::GetProvenanceString().length() < MAX_PROVENANCE_STRING_SIZE);
 
     strcpy(provenance_data,  ChasteBuildInfo::GetProvenanceString().c_str());
-    hid_t prov_attr = H5Acreate(mVariablesDatasetId, "Chaste Provenance", long_string_type, provenance_space, H5P_DEFAULT);
+    hid_t prov_attr = H5Acreate(mVariablesDatasetId, "Chaste Provenance", long_string_type, provenance_space,
+                                H5P_DEFAULT, H5P_DEFAULT);
 
     // Write to the attribute
     H5Awrite(prov_attr, long_string_type, provenance_data);
@@ -758,13 +784,27 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         EXCEPTION("Vector size doesn't match fixed dimension");
     }
 
+    if (mUseCache)
+    {
+        if (mDatasetDims[2] != 1 )
+        {
+            //Covered by TestHdf5DataWriterMultipleColumnsCachedFails
+            EXCEPTION("Cached writes must write all variables at once.");
+        }
+        if (!mIsUnlimitedDimensionSet)
+        {
+            //Covered by TestHdf5DataWriterSingleColumnsCachedFails
+            EXCEPTION("Cached writes require an unlimited dimension.");
+        }
+    }
+
     // Make sure that everything is actually extended to the correct dimension.
     PossiblyExtend();
 
     Vec output_petsc_vector;
 
     // Decide what to write
-    if (mSinglePermutation == NULL)
+    if (mSinglePermutation == nullptr)
     {
         // No permutation - just write
         output_petsc_vector = petscVector;
@@ -779,31 +819,43 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         MatMult(mSinglePermutation, petscVector, output_petsc_vector);
     }
 
-    // Define a dataset in memory for this process
-    hid_t memspace=0;
+    // Define memspace and hyperslab
+    hid_t memspace, hyperslab_space;
     if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned};
-        memspace = H5Screate_simple(1, v_size, NULL);
-    }
+        memspace = H5Screate_simple(1, v_size, nullptr);
 
-    // Select hyperslab in the file
-    hsize_t count[DATASET_DIMS] = {1, mNumberOwned, 1};
-    hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(variableID)};
-    hid_t file_dataspace = H5Dget_space(mVariablesDatasetId);
+        hsize_t count[DATASET_DIMS] = {1, mNumberOwned, 1};
+        hsize_t offset_dims[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(variableID)};
+
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset_dims, nullptr, count, nullptr);
+    }
+    else
+    {
+        memspace = H5Screate(H5S_NULL);
+        hyperslab_space = H5Screate(H5S_NULL);
+    }
 
     // Create property list for collective dataset
     hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
     H5Pset_dxpl_mpio(property_list_id, H5FD_MPIO_COLLECTIVE);
-
-    H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, offset_dims, NULL, count, NULL);
 
     double* p_petsc_vector;
     VecGetArray(output_petsc_vector, &p_petsc_vector);
 
     if (mIsDataComplete)
     {
-        H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector);
+        if (mUseCache)
+        {
+            //Covered by TestHdf5DataWriterSingleColumnCached
+            mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned);
+        }
+        else
+        {
+            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector);
+        }
     }
     else
     {
@@ -817,7 +869,16 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
 
             double* p_petsc_vector_incomplete;
             VecGetArray(output_petsc_vector, &p_petsc_vector_incomplete);
-            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, p_petsc_vector_incomplete);
+
+            if (mUseCache)
+            {
+                //Covered by TestHdf5DataWriterSingleIncompleteUsingMatrixCached
+                mDataCache.insert(mDataCache.end(), p_petsc_vector_incomplete, p_petsc_vector_incomplete+mNumberOwned);
+            }
+            else
+            {
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector_incomplete);
+            }
         }
         else
         {
@@ -828,18 +889,23 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
                 local_data[i] = p_petsc_vector[ mIncompleteNodeIndices[mOffset+i]-mLo ];
 
             }
-            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, local_data.get());
+            if (mUseCache)
+            {
+                //Covered by TestHdf5DataWriterFullFormatIncompleteCached
+                mDataCache.insert(mDataCache.end(), local_data.get(), local_data.get()+mNumberOwned);
+            }
+            else
+            {
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
+            }
         }
     }
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
+    H5Sclose(memspace);
+    H5Sclose(hyperslab_space);
     H5Pclose(property_list_id);
-    H5Sclose(file_dataspace);
-    if (mNumberOwned !=0)
-    {
-        H5Sclose(memspace);
-    }
 
     if (petscVector != output_petsc_vector)
     {
@@ -861,6 +927,20 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     }
 
     const unsigned NUM_STRIPES=variableIDs.size();
+
+    if (mUseCache)
+    {
+        if (NUM_STRIPES != mDatasetDims[2])
+        {
+            //Covered by TestHdf5DataWriterFullFormatStripedIncompleteCached
+            EXCEPTION("Cached writes must write all variables at once.");
+        }
+        if (!mIsUnlimitedDimensionSet)
+        {
+            //Covered by TestHdf5DataWriterStripedNoTimeCachedFails
+            EXCEPTION("Cached writes require an unlimited dimension.");
+        }
+    }
 
     int firstVariableID=variableIDs[0];
 
@@ -887,7 +967,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     Vec output_petsc_vector;
 
     // Decide what to write
-    if (mDoublePermutation == NULL)
+    if (mDoublePermutation == nullptr)
     {
         // No permutation - just write
         output_petsc_vector = petscVector;
@@ -901,22 +981,26 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         // Apply the permutation matrix
         MatMult(mDoublePermutation, petscVector, output_petsc_vector);
     }
-    // Define a dataset in memory for this process
-    hid_t memspace=0;
-    if (mNumberOwned !=0)
+    // Define memspace and hyperslab
+    hid_t memspace, hyperslab_space;
+    if (mNumberOwned != 0)
     {
         hsize_t v_size[1] = {mNumberOwned*NUM_STRIPES};
-        memspace = H5Screate_simple(1, v_size, NULL);
+        memspace = H5Screate_simple(1, v_size, nullptr);
+
+        hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(firstVariableID)};
+        hsize_t stride[DATASET_DIMS] = {1, 1, 1};//we are imposing contiguous variables, hence the stride is 1 (3rd component)
+        hsize_t block_size[DATASET_DIMS] = {1, mNumberOwned, 1};
+        hsize_t number_blocks[DATASET_DIMS] = {1, 1, NUM_STRIPES};
+
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, stride, number_blocks, block_size);
     }
-
-    // Select hyperslab in the file
-    hsize_t start[DATASET_DIMS] = {mCurrentTimeStep, mOffset, (unsigned)(firstVariableID)};
-    hsize_t stride[DATASET_DIMS] = {1, 1, 1};//we are imposing contiguous variables, hence the stride is 1 (3rd component)
-    hsize_t block_size[DATASET_DIMS] = {1, mNumberOwned, 1};
-    hsize_t number_blocks[DATASET_DIMS] = {1, 1, NUM_STRIPES};
-
-    hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
-    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, stride, number_blocks, block_size);
+    else
+    {
+        memspace = H5Screate(H5S_NULL);
+        hyperslab_space = H5Screate(H5S_NULL);
+    }
 
     // Create property list for collective dataset write, and write! Finally.
     hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
@@ -927,7 +1011,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     if (mIsDataComplete)
     {
-        H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector);
+        if (mUseCache)
+        {
+            // Covered by TestHdf5DataWriterStripedCached
+            mDataCache.insert(mDataCache.end(), p_petsc_vector, p_petsc_vector+mNumberOwned*NUM_STRIPES);
+        }
+        else
+        {
+            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector);
+        }
     }
     else
     {
@@ -944,7 +1036,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                 double* p_petsc_vector_incomplete;
                 VecGetArray(output_petsc_vector, &p_petsc_vector_incomplete);
 
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector_incomplete);
+                if (mUseCache)
+                {
+                    //Covered by TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached
+                    mDataCache.insert(mDataCache.end(), p_petsc_vector_incomplete, p_petsc_vector_incomplete+2*mNumberOwned);
+                }
+                else
+                {
+                    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, p_petsc_vector_incomplete);
+                }
             }
             else
             {
@@ -957,7 +1057,15 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                     local_data[NUM_STRIPES*i+1] = p_petsc_vector[ local_node_number*NUM_STRIPES + 1];
                 }
 
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
+                if (mUseCache)
+                {
+                    //Covered by TestHdf5DataWriterFullFormatStripedIncompleteCached
+                    mDataCache.insert(mDataCache.end(), local_data.get(), local_data.get()+2*mNumberOwned);
+                }
+                else
+                {
+                    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
+                }
             }
         }
         else
@@ -968,11 +1076,8 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
 
     VecRestoreArray(output_petsc_vector, &p_petsc_vector);
 
+    H5Sclose(memspace);
     H5Sclose(hyperslab_space);
-    if (mNumberOwned != 0)
-    {
-        H5Sclose(memspace);
-    }
     H5Pclose(property_list_id);
 
     if (petscVector != output_petsc_vector)
@@ -980,6 +1085,62 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         // Free local vector
         PetscTools::Destroy(output_petsc_vector);
     }
+}
+
+bool Hdf5DataWriter::GetUsingCache()
+{
+    return mUseCache;
+}
+
+void Hdf5DataWriter::WriteCache()
+{
+    // The HDF5 writes are collective which means that if a process has nothing to write from
+    // its cache then it must still proceed in step with the other processes.
+    bool any_nonempty_caches = PetscTools::ReplicateBool( !mDataCache.empty() );
+    if (!any_nonempty_caches)
+    {
+        // Nothing to do
+        return;
+    }
+
+//    PRINT_3_VARIABLES(mCacheFirstTimeStep, mOffset, 0)
+//    PRINT_3_VARIABLES(mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2])
+//    PRINT_VARIABLE(mDataCache.size())
+
+    // Define memspace and hyperslab
+    hid_t memspace, hyperslab_space;
+    if (mNumberOwned != 0)
+    {
+        hsize_t v_size[1] = {mDataCache.size()};
+        memspace = H5Screate_simple(1, v_size, nullptr);
+
+        hsize_t start[DATASET_DIMS] = {mCacheFirstTimeStep, mOffset, 0};
+        hsize_t count[DATASET_DIMS] = {mCurrentTimeStep-mCacheFirstTimeStep, mNumberOwned, mDatasetDims[2]};
+        assert((mCurrentTimeStep-mCacheFirstTimeStep)*mNumberOwned*mDatasetDims[2] == mDataCache.size()); // Got size right?
+
+        hyperslab_space = H5Dget_space(mVariablesDatasetId);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, start, nullptr, count, nullptr);
+    }
+    else
+    {
+        memspace = H5Screate(H5S_NULL);
+        hyperslab_space = H5Screate(H5S_NULL);
+    }
+
+    // Create property list for collective dataset write
+    hid_t property_list_id = H5Pcreate(H5P_DATASET_XFER);
+    H5Pset_dxpl_mpio(property_list_id, H5FD_MPIO_COLLECTIVE);
+
+    // Write!
+    H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, &mDataCache[0]);
+
+    // Tidy up
+    H5Sclose(memspace);
+    H5Sclose(hyperslab_space);
+    H5Pclose(property_list_id);
+
+    mCacheFirstTimeStep = mCurrentTimeStep; // Update where we got to
+    mDataCache.clear(); // Clear out cache
 }
 
 void Hdf5DataWriter::PutUnlimitedVariable(double value)
@@ -997,20 +1158,20 @@ void Hdf5DataWriter::PutUnlimitedVariable(double value)
     // Make sure that everything is actually extended to the correct dimension.
     PossiblyExtend();
 
-    // This data is only written by the master
+    // This datum is only written by the master
     if (!PetscTools::AmMaster())
     {
         return;
     }
 
     hsize_t size[1] = {1};
-    hid_t memspace = H5Screate_simple(1, size, NULL);
+    hid_t memspace = H5Screate_simple(1, size, nullptr);
 
     // Select hyperslab in the file.
     hsize_t count[1] = {1};
     hsize_t offset[1] = {mCurrentTimeStep};
     hid_t hyperslab_space = H5Dget_space(mUnlimitedDatasetId);
-    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, NULL, count, NULL);
+    H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
     H5Dwrite(mUnlimitedDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, H5P_DEFAULT, &value);
 
@@ -1023,6 +1184,11 @@ void Hdf5DataWriter::Close()
     if (mIsInDefineMode)
     {
         return; // Nothing to do...
+    }
+
+    if (mUseCache)
+    {
+        WriteCache();
     }
 
     H5Dclose(mVariablesDatasetId);
@@ -1066,10 +1232,20 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
     mCurrentTimeStep++;
 
     /*
+     * Write when stepping over a chunk boundary. Note: NOT the same as write
+     * out when the chunk size == the cache size, because we might have started
+     * part-way through a chunk.
+     */
+    if (mUseCache && (mCurrentTimeStep % mChunkSize[0] == 0))
+    {
+        WriteCache();
+    }
+
+    /*
      * Extend the dataset (only reached when adding to an existing dataset,
      * or if mEstimatedUnlimitedLength hasn't been set and has defaulted to 1).
      */
-    if ( mCurrentTimeStep >= (long unsigned) mEstimatedUnlimitedLength )
+    if (mCurrentTimeStep >= (long unsigned) mEstimatedUnlimitedLength)
     {
         mDatasetDims[0]++;
         mNeedExtend = true;
@@ -1080,13 +1256,8 @@ void Hdf5DataWriter::PossiblyExtend()
 {
     if (mNeedExtend)
     {
-#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         H5Dset_extent( mVariablesDatasetId, mDatasetDims );
         H5Dset_extent( mUnlimitedDatasetId, mDatasetDims );
-#else // Deprecated
-        H5Dextend( mVariablesDatasetId, mDatasetDims );
-        H5Dextend( mUnlimitedDatasetId, mDatasetDims );
-#endif
     }
     mNeedExtend = false;
 }
@@ -1171,8 +1342,8 @@ bool Hdf5DataWriter::ApplyPermutation(const std::vector<unsigned>& rPermutation,
         }
     }
     // Make sure we've not done it already
-    assert(mSinglePermutation == NULL);
-    assert(mDoublePermutation == NULL);
+    assert(mSinglePermutation == nullptr);
+    assert(mDoublePermutation == nullptr);
     PetscTools::SetupMat(mSinglePermutation,   mDataFixedDimensionSize,   mDataFixedDimensionSize, 2, mHi - mLo, mHi - mLo);
     PetscTools::SetupMat(mDoublePermutation, 2*mDataFixedDimensionSize, 2*mDataFixedDimensionSize, 4, 2*(mHi - mLo), 2*(mHi - mLo));
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
@@ -1258,87 +1429,86 @@ void Hdf5DataWriter::CalculateChunkDims( unsigned targetSize, unsigned* pChunkSi
 
 void Hdf5DataWriter::SetChunkSize()
 {
-    /*
-     * The size in each dimension is increased in step until the size of
-     * the chunk exceeds a limit, or we end up with one big chunk.
-     *
-     * Also make sure we don't have too many chunks. Over 75 K makes the
-     * H5Pset_istore_k optimisation above very detrimental to performance
-     * according to "Notes from 31 July 2013" at:
-     * http://confluence.diamond.ac.uk/display/Europroj/Ulrik+Pederson+-+Excalibur+Notes
-     */
-    const unsigned recommended_max_number_chunks = 75000;
     if (mUseOptimalChunkSizeAlgorithm)
     {
-        /*
-         * The line below sets the chunk size to (just under) 128 K chunks, which
-         * seems to be a good compromise.
-         *
-         * For large problems performance usually improves with increased chunk size.
-         * A sweet spot seems to be 1 M chunks.
-         *
-         * On a striped filesystem, for best performance, try to match the chunk size
-         * and alignment (see "H5Pset_alignment" above) with the file stripe size.
-         */
-        unsigned target_size_in_bytes = 1024*1024/8; // 128 K
+        const unsigned target_size_in_bytes = mChunkTargetSize;
 
         unsigned target_size = 0;
         unsigned chunk_size_in_bytes;
         bool all_one_chunk;
 
-        // While we have too many chunks, make target_size_in_bytes larger
+        // While the chunks are too small, make mChunkSize[i]s larger, unless
+        // we end up with a chunk that spans the dataset.
         do
         {
-            // While the chunks are too small, make mChunkSize[i]s larger, unless
-            // we end up with a chunk that spans the dataset.
-            do
-            {
-                target_size++;
-                CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
-            }
-            while ( chunk_size_in_bytes < target_size_in_bytes && !all_one_chunk);
-
-            // Go one step back if the target size has been exceeded
-            if ( chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk )
-            {
-                target_size--;
-                CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
-            }
-
-            mNumberOfChunks = CalculateNumberOfChunks();
-
-            /*
-            if ( PetscTools::AmMaster() )
-            {
-                std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
-            }
-            */
-
-            target_size_in_bytes *= 2; // Increase target size for next iteration
+            target_size++;
+            CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
         }
-        while ( mNumberOfChunks > recommended_max_number_chunks );
+        while ( chunk_size_in_bytes < target_size_in_bytes && !all_one_chunk);
+
+        // Go one step back if the target size has been exceeded
+        if (chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk)
+        {
+            target_size--;
+            CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
+        }
     }
-    /*
-     * ... unless the user has set chunk dimensions explicitly, in which case
-     * use those. The program will exit if the size results in too many chunks.
-     */
     else
     {
+        /*
+         * User-provided chunk dims.
+         */
         for (unsigned i=0; i<DATASET_DIMS; ++i)
         {
             mChunkSize[i] = mFixedChunkSize[i];
         }
-
-        mNumberOfChunks = CalculateNumberOfChunks();
-
-        if ( mNumberOfChunks > recommended_max_number_chunks)
-        {
-            /*
-             * The user-defined HDF5 chunk size has resulted in over 75,000 chunks,
-             * which is known to be extremely detrimental to performance. Try
-             * increasing the chunk dimensions or (better) not using fixed chunk sizes.
-             */
-            NEVER_REACHED;
-        }
     }
+
+    mNumberOfChunks = CalculateNumberOfChunks();
+
+    /*
+    if (PetscTools::AmMaster())
+    {
+        std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
+    }
+    */
+}
+
+void Hdf5DataWriter::SetTargetChunkSize(hsize_t targetSize)
+{
+    if (!mIsInDefineMode)
+    {
+        /* Must be in define mode, i.e. creating a new dataset (and possibly a
+         * new HDF5 file) to set the dataset chunk dims. */
+        EXCEPTION("Cannot set chunk target size when not in define mode.");
+    }
+    mChunkTargetSize = targetSize;
+}
+
+void Hdf5DataWriter::SetAlignment(hsize_t alignment)
+{
+    /* Note: calling this method after OpenFile() is pointless as that's where
+     * H5Pset_alignment happens, so the obvious way to protect this method is
+     * to check mFileId to assert H5Fopen has not been called yet.
+     * Unfortunately it's uninitialised so is not always safe to check!
+     *
+     * Fortunately OpenFile() is only called in one of two ways:
+     * 1. In the constructor in combination with mUseExistingFile. Subsequently
+     *    calling this method will end up throwing in the first block below
+     *    (since mUseExistingFile is const).
+     * 2. By EndDefineMode(). Subsequently calling this method will end up in
+     *    the second block below.
+     */
+    if (mUseExistingFile)
+    {
+        // Must be called on new HDF5 files.
+        EXCEPTION("Alignment parameter can only be set for new HDF5 files.");
+    }
+    if (!mIsInDefineMode)
+    {
+        // Creating a new file but EndDefineMode() called already.
+        EXCEPTION("Cannot set alignment parameter when not in define mode.");
+    }
+
+    mAlignment = alignment;
 }

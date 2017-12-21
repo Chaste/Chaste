@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ private:
     }
 
 public:
-    void TestCalculateRelativeWallPositionSimple2dMesh() throw(Exception)
+    void TestCalculateRelativeWallPositionSimple2dMesh()
     {
         DistributedTetrahedralMesh<2,2> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
@@ -127,7 +127,7 @@ public:
         }
     }
 
-    void TestCalculateRelativeWallPositionSimple3dMesh() throw(Exception)
+    void TestCalculateRelativeWallPositionSimple3dMesh()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
@@ -190,12 +190,9 @@ public:
             TS_ASSERT_DELTA(epi_bounding_box.rGetLowerCorner()[i], 0.0, 1e-10);
             TS_ASSERT_DELTA(endo_bounding_box.rGetUpperCorner()[i], 5.0, 1e-10);
         }
-
-
-
     }
 
-    void TestCalculateRelativeWallPositionWithThreeSurfaces() throw(Exception)
+    void TestCalculateRelativeWallPositionWithThreeSurfaces()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         //This mesh will have 9 nodes per side, spaced by 1, it is a cube
@@ -210,7 +207,7 @@ public:
         for (unsigned index=low_index; index<high_index; index++)
         {
             // Get the nodes at cube face considered to be epi (at both external faces)
-            if (  (fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
+            if ((fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
                 ||(fabs(mesh.GetNode(index)->rGetLocation()[0]-8.0) < 1e-6))
             {
                 epi_face.push_back(index);
@@ -286,7 +283,7 @@ public:
 
     }
 
-    void TestDetermineLayerForEachNodeWritingAndReading() throw (Exception)
+    void TestDetermineLayerForEachNodeWritingAndReading()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         //This mesh will have 31 nodes per side, spaced by 1, it is a cube
@@ -301,7 +298,7 @@ public:
         for (unsigned index=low_index; index<high_index; index++)
         {
             // Get the nodes at cube face considered to be epi (at both external faces)
-            if (  (fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
+            if ((fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
                 ||(fabs(mesh.GetNode(index)->rGetLocation()[0]-30.0) < 1e-6))
             {
                 epi_face.push_back(index);
@@ -388,7 +385,7 @@ public:
         TS_ASSERT_THROWS_THIS(HeartGeometryInformation<3> info_bad_file("heart/test/data/ValidPseudoEcg1D.dat"), "A value in the heterogeneities file (heart/test/data/ValidPseudoEcg1D.dat) is out of range (or not an integer). It should be epi = 0, mid = 1, endo = 2");
     }
 
-    void TestHeartGeometryTakingMeshFromFile() throw (Exception)
+    void TestHeartGeometryTakingMeshFromFile()
     {
         //files containing list of nodes on each surface
         std::string epi_surface = "heart/test/data/box_shaped_heart/epi.tri";
@@ -501,7 +498,7 @@ public:
         }
         else
         {
-            //In parallel we need to apply the permuation to original data
+            //In parallel we need to apply the permutation to original data
             //Node i in the original data has moved to index mesh.rGetNodePermutation()[i]
             //therefore we will find its data in rGetLayerForEachNode()[ permutation...]
 
@@ -515,7 +512,7 @@ public:
     }
 
 
-    void TestHeartGeometryOnlyLeftVentricle() throw (Exception)
+    void TestHeartGeometryOnlyLeftVentricle()
     {
          //files containing list of nodes on each surface
          std::string epi_surface = "heart/test/data/box_shaped_heart/epi.tri";

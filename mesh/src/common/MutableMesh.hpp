@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -116,9 +116,9 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
             }
         }
 
-        // If ELEMENT_DIM=SPACEDIM Do a remesh after archiving has finished to get right number of boundary nodes etc.
+        // If ELEMENT_DIM==SPACE_DIM do a remesh after archiving has finished to get right number of boundary nodes etc.
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
-        if(ELEMENT_DIM==SPACE_DIM)
+        if (ELEMENT_DIM == SPACE_DIM)
         {
             NodeMap map(this->GetNumNodes());
             this->ReMesh(map);
@@ -152,7 +152,6 @@ protected:
 
 private:
 
-#define COVERAGE_IGNORE
     /**
      * @return true if the mesh is Voronoi local to the given element.
      * Check whether any neighbouring node is inside the circumsphere of this element.
@@ -162,7 +161,7 @@ private:
      * circumsphere of the element, as a proportion of the circumsphere radius.
      */
     bool CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration);
-#undef COVERAGE_IGNORE
+
 
 public:
 
@@ -252,7 +251,6 @@ public:
      */
     void MoveMergeNode(unsigned index, unsigned targetIndex, bool concreteMove=true);
 
-#define COVERAGE_IGNORE
     /**
      * Delete a node from the mesh by finding an appropriate neighbour node
      * to merge it with.
@@ -267,7 +265,6 @@ public:
      * @param index The index of the element to be deleted
      */
     virtual void DeleteElement(unsigned index);
-#undef COVERAGE_IGNORE
 
     /**
      * Mark a node as deleted. Note that this method DOES NOT deal with the
@@ -302,7 +299,6 @@ public:
      */
     void DeleteBoundaryNodeAt(unsigned index);
 
-#define COVERAGE_IGNORE
     /**
      * Re-index a mesh so that it has no deleted elements or nodes.
      *
@@ -310,7 +306,7 @@ public:
      * with indices of nodes in the new mesh.  This should be created with the correct size (NumAllNodes)
      */
     void ReIndex(NodeMap& map);
-#undef COVERAGE_IGNORE
+
 
     /**
      * Re-mesh a mesh using triangle (via library calls) or tetgen
@@ -326,16 +322,14 @@ public:
      */
     void ReMesh();
 
-#define COVERAGE_IGNORE
+
     /**
      * Find edges in the mesh longer than the given cutoff length and split them creating new elements as required.
      * @param cutoffLength cutoff length for edge splitting
      * @return returns a vector of triples with pointers to the new node followed by pointers to the nodes defining the bisected edge.
      */
     std::vector<c_vector<unsigned, 5> > SplitLongEdges(double cutoffLength);
-#undef COVERAGE_IGNORE
 
-#define COVERAGE_IGNORE
     /**
      * Splits an edge in two and create all the relevant new elements and nodes
      *
@@ -344,9 +338,7 @@ public:
      * @return the index of the new node
      */
     c_vector<unsigned, 3> SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
-#undef COVERAGE_IGNORE
 
-#define COVERAGE_IGNORE
     /**
      * @return true if Voronoi.  Checks the entire mesh element by element and checks whether any neighbouring node
      * is inside the circumsphere of this element.
@@ -356,7 +348,6 @@ public:
      * circumsphere radius.
      */
     bool CheckIsVoronoi(double maxPenetration=0.0);
-#undef COVERAGE_IGNORE
 };
 
 #include "SerializationExportWrapper.hpp"

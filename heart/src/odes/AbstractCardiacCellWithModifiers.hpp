@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -181,7 +181,6 @@ public:
      * @param pNewModifier  The new modifier object to use.
      */
     void SetModifier(const std::string& rModifierName, boost::shared_ptr<AbstractModifier>& pNewModifier);
-
 };
 
 // Special case of archiving an abstract class that's templated over Chaste classes.

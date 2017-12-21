@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -364,7 +364,7 @@ public:
         PetscTools::Destroy(petsc_vec);
     }
 
-    void TestReadOnlyDistributedVector() throw (Exception)
+    void TestReadOnlyDistributedVector()
     {
         DistributedVectorFactory factory(10);
         Vec petsc_vec = factory.CreateVec();
@@ -381,7 +381,7 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // Lock the vector so that modern PETSc (3.6) won't want to change it
-        VecLockPush(petsc_vec);
+        EXCEPT_IF_NOT(VecLockPush(petsc_vec) == 0);
 #endif
         {
             DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec, true);
@@ -396,13 +396,13 @@ public:
         }
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // Take the lock back
-        VecLockPop(petsc_vec);
+        EXCEPT_IF_NOT(VecLockPop(petsc_vec) == 0);
 #endif
 
         PetscTools::Destroy(petsc_vec);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         const unsigned TOTAL = 100;
         DistributedVectorFactory factory(TOTAL);
@@ -416,7 +416,7 @@ public:
         // Where to archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("factory.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("factory.arch");
 
         // Archive
         {

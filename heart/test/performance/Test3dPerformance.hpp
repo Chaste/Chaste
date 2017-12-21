@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,8 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef TESTPERFORMANCE_HPP_
-#define TESTPERFORMANCE_HPP_
+#ifndef TEST3DPERFORMANCE_HPP_
+#define TEST3DPERFORMANCE_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include "BidomainProblem.hpp"
@@ -50,20 +50,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "PerformanceTester.hpp"
 
-class TestPerformance : public CxxTest::TestSuite
+class Test3DPerformance : public CxxTest::TestSuite
 {
 public:
-    void TestPerf() throw(Exception)
+    void TestPerf()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        PetscOptionsSetValue("-log_summary", "");
+        PetscTools::SetOption("-log_summary", "");
         // write headings
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3>::DisplayHeadings();
         HeartEventHandler::Headings();
 
         // base line test
-        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3> tester;
+        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3> tester("Test3DPerf");
         tester.MeshNum=1;
         tester.SimTime=4.0;
         tester.Run();
@@ -131,4 +131,4 @@ public:
     }
 };
 
-#endif /*TESTPERFORMANCE_HPP_*/
+#endif /*TEST3DPERFORMANCE_HPP_*/

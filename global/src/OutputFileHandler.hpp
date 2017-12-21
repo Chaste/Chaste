@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,13 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <fstream>
-#include <sstream>
+#include <ios>
 #include <memory>
 
 class FileFinder; // Avoid circular includes
 
 /** Type of our output streams; a managed pointer to an std::ofstream. */
-typedef std::auto_ptr<std::ofstream> out_stream;
+typedef std::shared_ptr<std::ofstream> out_stream;
 
 /**
  * This file abstracts stuff that needs to be done when creating output files for tests.

@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -31,9 +31,10 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os, sys, inspect
 import glob
+import os
 import re
+import sys
 
 class ProcessValgrind:
 
@@ -163,6 +164,7 @@ if __name__ == "__main__":
     files = glob.glob(sys.argv[1]+'/*_valgrind.out')
     index_file = open(sys.argv[1]+'/index.html','w')
     procVal = ProcessValgrind()
+    ok = True
     index_file.write('<!DOCTYPE html>\n')
     index_file.write('<html>\n')
     index_file.write('<body>\n')
@@ -170,8 +172,15 @@ if __name__ == "__main__":
         filename = os.path.basename(file)
         testname = re.match('(.*)_valgrind.out',filename).group(1)
         status = procVal.EncodeStatus(open(file,'r'))
-        index_file.write('<p> <font color="%s">%s: %s <a href="%s">(test output)</a>\n'%(procVal.StatusColour(status),testname,procVal.DisplayStatus(status),filename))
+        colour = procVal.StatusColour(status)
+        index_file.write('<p> <font color="%s">%s: %s <a href="%s">(test output)</a>\n'%(colour,testname,procVal.DisplayStatus(status),filename))
+        if colour == 'red':
+            ok = False
     index_file.write('</body>\n')
     index_file.write('</html>\n')
-
-
+    index_file.close()
+    if not ok:
+        print('Memory testing not 100% pass rate - failing memory testing.')
+        sys.exit(1)
+    else:
+        print('Memory testing 100% - test passed.')

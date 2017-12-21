@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,10 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedSimulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
-#include "Version.hpp"
 #include "ExecutableSupport.hpp"
-#include "Exception.hpp"
-#include <typeinfo>
+#include "AbstractPdeModifier.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
@@ -63,8 +61,7 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mNumDeaths(0),
       mOutputDivisionLocations(false),
       mOutputCellVelocities(false),
-      mSamplingTimestepMultiple(1),
-      mpCellBasedPdeHandler(NULL)
+      mSamplingTimestepMultiple(1)
 {
     // Set a random seed of 0 if it wasn't specified earlier
     RandomNumberGenerator::Instance();
@@ -73,6 +70,12 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
     {
         mrCellPopulation.InitialiseCells();
     }
+
+    /*
+     * Specify a default time step to use, which may depend on the cell population type.
+     * Note that the time step may be reset using SetDt().
+     */
+    mDt = rCellPopulation.GetDefaultTimeStep();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -81,20 +84,7 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::~AbstractCellBasedSimulation
     if (mDeleteCellPopulationInDestructor)
     {
         delete &mrCellPopulation;
-        delete mpCellBasedPdeHandler;
     }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetCellBasedPdeHandler(CellBasedPdeHandler<SPACE_DIM>* pCellBasedPdeHandler)
-{
-    mpCellBasedPdeHandler = pCellBasedPdeHandler;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellBasedPdeHandler<SPACE_DIM>* AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetCellBasedPdeHandler()
-{
-    return mpCellBasedPdeHandler;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -121,14 +111,15 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                 // Check if there is room into which the cell may divide
                 if (mrCellPopulation.IsRoomToDivide(*cell_iter))
                 {
+                    // Store parent ID for output if required
+                    unsigned parent_cell_id = cell_iter->GetCellId();
+
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
 
-                    // Call method that determines how cell division occurs and returns a vector
-                    c_vector<double, SPACE_DIM> new_location = CalculateCellDivisionVector(*cell_iter);
-
-                    // If required, output this location to file
                     /**
+                     * If required, output this location to file
+                     *
                      * \todo (#2578)
                      *
                      * For consistency with the rest of the output code, consider removing the
@@ -153,11 +144,11 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                         {
                             *mpDivisionLocationFile << cell_location[i] << "\t";
                         }
-                        *mpDivisionLocationFile << "\t" << cell_age << "\n";
+                        *mpDivisionLocationFile << "\t" << cell_age << "\t" << parent_cell_id << "\t" << cell_iter->GetCellId() << "\t" << p_new_cell->GetCellId() << "\n";
                     }
 
-                    // Add new cell to the cell population
-                    mrCellPopulation.AddCell(p_new_cell, new_location, *cell_iter);
+                    // Add the new cell to the cell population
+                    mrCellPopulation.AddCell(p_new_cell, *cell_iter);
 
                     // Update counter
                     num_births_this_step++;
@@ -379,26 +370,19 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     if (PetscTools::AmMaster())
     {
         mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
-    }
 
-    // If any PDEs have been defined, set up results files to store their solution
-    if (mpCellBasedPdeHandler != NULL)
-    {
-        mpCellBasedPdeHandler->OpenResultsFiles(this->mSimulationOutputDirectory);
-        if (PetscTools::AmMaster())
+        for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+             iter != mSimulationModifiers.end();
+             ++iter)
         {
-            *this->mpVizSetupFile << "PDE \n";
+            if (boost::dynamic_pointer_cast<AbstractPdeModifier<SPACE_DIM> >(*iter))
+            {
+                *this->mpVizSetupFile << "PDE \n";
+            }
         }
-
-        /*
-         * If any PDEs have been defined, solve them here before updating cells and store
-         * their solution in results files. This also initializes the relevant CellData.
-         * NOTE that this works as the PDEs are elliptic.
-         */
-        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
-        mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
-        CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
     }
+
+    this->mrCellPopulation.SimulationSetupHook(this);
 
     SetupSolve();
 
@@ -509,14 +493,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // Increment simulation time here, so results files look sensible
         p_simulation_time->IncrementTimeOneStep();
 
-        // If any PDEs have been defined, solve them and store their solution in results files
-        if (mpCellBasedPdeHandler != NULL)
-        {
-            CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
-            mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
-            CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
-        }
-
         // Call UpdateAtEndOfTimeStep() on each modifier
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
@@ -552,12 +528,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
      * dependent.
      */
     UpdateCellPopulation();
-
-    // If any PDEs have been defined, close the results files storing their solution
-    if (mpCellBasedPdeHandler != NULL)
-    {
-        mpCellBasedPdeHandler->CloseResultsFiles();
-    }
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
     // Call UpdateAtEndOfSolve(), on each modifier
@@ -723,11 +693,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    if (mpCellBasedPdeHandler != NULL)
-    {
-        mpCellBasedPdeHandler->OutputParameters(rParamsFile);
-    }
-
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
@@ -735,8 +700,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
 }
 
-//////// Explicit instantiation//////
-
+// Explicit instantiation
 template class AbstractCellBasedSimulation<1,1>;
 template class AbstractCellBasedSimulation<1,2>;
 template class AbstractCellBasedSimulation<2,2>;

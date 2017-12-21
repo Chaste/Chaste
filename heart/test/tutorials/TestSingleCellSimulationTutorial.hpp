@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,10 +76,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Now we define the test class, which must inherit from {{{CxxTest::TestSuite}}}
  * as usual, and the (public) test method
  */
-class TestSingleCellTutorial : public CxxTest::TestSuite
+class TestSingleCellSimulationTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestShannonSimulation() throw(Exception)
+    void TestShannonSimulation()
     {
 /* CVODE is still an optional Chaste dependency, but it is highly recommended for
  * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled
@@ -271,4 +271,4 @@ public:
     }
 };
 
-#endif /*TESTANOTHERBIDOMAINSIMULATIONTUTORIAL_HPP_*/
+#endif /*TESTSINGLECELLSIMULATIONTUTORIAL_HPP_*/

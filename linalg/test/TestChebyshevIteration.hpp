@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,7 @@ class TestChebyshevIteration : public CxxTest::TestSuite
 {
 public:
 
-    void TestChebyshevVsCG() throw (Exception)
+    void TestChebyshevVsCG()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -122,7 +122,7 @@ public:
         PetscTools::Destroy(parallel_layout);
     }
 
-    void TestChebyshevAdaptiveVsNoAdaptive() throw (Exception)
+    void TestChebyshevAdaptiveVsNoAdaptive()
     {
         unsigned num_nodes = 1331;
         DistributedVectorFactory factory(num_nodes);
@@ -148,7 +148,7 @@ public:
         // Make sure we are not inheriting a non-default number of iterations from previous test
         std::stringstream num_it_str;
         num_it_str << 1000;
-        PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+        PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
 
         try
         {
@@ -185,7 +185,7 @@ public:
 
 
         // Make sure we are not inheriting a non-default number of iterations from previous test
-        PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+        PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
         {
             LinearSystem ls = LinearSystem(system_rhs, system_matrix);
 
@@ -205,7 +205,7 @@ public:
         }
 
         // Make sure we are not inheriting a non-default number of iterations from previous test
-        PetscOptionsSetValue("-ksp_max_it", num_it_str.str().c_str());
+        PetscTools::SetOption("-ksp_max_it", num_it_str.str().c_str());
         {
             LinearSystem ls = LinearSystem(system_rhs, system_matrix);
 

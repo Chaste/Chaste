@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,19 +39,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
-#include "AbstractCaUpdateRule.hpp"
-#include "AbstractCaSwitchingUpdateRule.hpp"
+#include "AbstractUpdateRule.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
-
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
 template<unsigned DIM> class AbstractCaBasedDivisionRule; // Circular definition thing.
-
-template<unsigned DIM>
-class AbstractCaUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
@@ -64,7 +59,6 @@ class AbstractCaUpdateRule; // Circular definition
  * The PottsMesh is used to define node connectivity.
  *
  * Multiple cells can be associated at a single node.
- *
  */
 template<unsigned DIM>
 class CaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
@@ -76,19 +70,17 @@ private:
     /** The carrying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
-    /** The update rules used to determine the new location of the cells.
-     * These rules specify how individual cells move into free spaces */
-    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
-
-    /** The update rules used to determine the new location of the cells.
-     * THese rules specify is cells switch locations*/
-    std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
+    /**
+     * The update rules used to determine the new location of the cells.
+     * These rules specify is cells switch locations.
+     */
+    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
 
     /** A pointer to a division rule that is used to specify how cells divide. I.e do they move other cells out of the way.
-     * This is a specialisation for Ca models. */
+     * This is a specialisation for CA models. */
     boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
 
     /**
@@ -113,13 +105,11 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-#define COVERAGE_IGNORE
         archive & boost::serialization::base_object<AbstractOnLatticeCellPopulation<DIM> >(*this);
+        archive & mSwitchingUpdateRuleCollection;
         archive & mLatticeCarryingCapacity;
-        archive & mUpdateRuleCollection;
         archive & mAvailableSpaces;
         archive & mpCaBasedDivisionRule;
-#undef COVERAGE_IGNORE
     }
 
     /**
@@ -201,6 +191,15 @@ public:
     const PottsMesh<DIM>& rGetMesh() const;
 
     /**
+     * Overridden GetTetrahedralMeshForPdeModifier() method.
+     *
+     * @return a pointer to a tetrahedral mesh, for use with a PDE modifier.
+     *
+     * This method is called by AbstractGrowingDomainPdeModifier.
+     */
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+
+    /**
      * Overridden GetNode() method.
      *
      * @param index global index of the specified node
@@ -273,15 +272,16 @@ public:
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  this parameter is not yet used in this class (see #1737)
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
       * Calculate the propensity of a dividing into a given site.
-      * Overridden in child classes to define other division methods. eg directed division.
+      * Overridden in child classes to define other division methods, e.g. directed division.
+      *
+      * \todo This functionality should be moved into the CA-based division rule hierarchy
       *
       * @param currentNodeIndex The index of the current node/lattice site
       * @param targetNodeIndex The index of the target node/lattice site
@@ -289,8 +289,8 @@ public:
       * @return The probability of the cell dividing from the current node to the target node
       */
      double virtual EvaluateDivisionPropensity(unsigned currentNodeIndex,
-                                        unsigned targetNodeIndex,
-                                        CellPtr pCell);
+                                               unsigned targetNodeIndex,
+                                               CellPtr pCell);
     /**
      * Remove all cells labelled as dead.
      *
@@ -382,42 +382,12 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
-     * Add an update rule to be used in this simulation (use this to set up how cells move).
+     * Overridden RemoveAllUpdateRules() method.
      *
-     * @param pUpdateRule pointer to an update rule
-     */
-    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the update rules
+     * Remove any update rules previously passed to this population by clearing
+     * mUpdateRuleCollection and mSwitchingUpdateRuleCollection.
      */
     void RemoveAllUpdateRules();
-
-    /**
-     * Get the collection of update rules to be used in this simulation.
-     *
-     * @return the update rule collection
-     */
-    const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
-
-    /**
-     * Add a switching update rule to be used in this simulation (use this to set up how cells move).
-     *
-     * @param pUpdateRule pointer to an update rule
-     */
-    void AddSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule);
-
-    /**
-     * Method to remove all the switching update rules
-     */
-    void RemoveAllSwitchingUpdateRules();
-
-    /**
-     * Get the collection of switching update rules to be used in this simulation.
-     *
-     * @return the update rule collection
-     */
-    const std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >& rGetSwitchingUpdateRuleCollection() const;
 
     /**
      * Outputs CellPopulation parameters to file
@@ -439,7 +409,6 @@ public:
      */
     bool IsRoomToDivide(CellPtr pCell);
 
-
     /**
      * @return The Ca division rule that is currently being used.
      */
@@ -452,14 +421,60 @@ public:
      */
     void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
 
+    /**
+     * Overridden AddUpdateRule() method.
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
+    /**
+     * Overridden AddUpdateRule() method.
+     *
+     * Get the collection of update rules to be used with this population.
+     * This vector is comprised of mUpdateRuleCollection and mSwitchingUpdateRuleCollection,
+     * one after the other.
+     *
+     * @return the update rule collection
+     */
+    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
+
+    /**
+     * Overridden GetCellDataItemAtPdeNode() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
+     *         with a PDE modifier
+     * @param rVariableName the name of the cell data item to get
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
+     *        (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
+     *        (optional; defaults to 0.0)
+     *
+     * @return the value of a CellData item (interpolated if necessary) at a node,
+     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * This method can be called by PDE modifier classes.
+     */
+    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+                                            std::string& rVariableName,
+                                            bool dirichletBoundaryConditionApplies=false,
+                                            double dirichletBoundaryValue=0.0);
+
+    /**
+     * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
+     *
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
+     *
+     * @return if a node, specified by its index in a tetrahedral mesh for use
+     *         with a PDE modifier, is associated with a non-apoptotic cell.
+     * This method can be called by PDE classes.
+     */
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 };
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
 
-// No archiving yet so untested
-#define COVERAGE_IGNORE
+
 namespace boost
 {
 namespace serialization
@@ -493,6 +508,6 @@ inline void load_construct_data(
 }
 }
 } // namespace ...
-#undef COVERAGE_IGNORE
+
 
 #endif /*CABASEDCELLPOPULATION_HPP_*/

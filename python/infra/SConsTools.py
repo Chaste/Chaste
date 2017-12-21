@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -532,8 +532,8 @@ def GetPathRevision(path):
     """
     if os.path.exists(os.path.join(path, '.git')):
         # Git repo
-        commit_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
-        retcode = subprocess.call(['git', 'diff-index', '--quiet', 'HEAD', '--'])
+        commit_sha = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short=7','HEAD']).strip()
+        retcode = subprocess.call(['git', '-C', path, 'diff-index', '--quiet', 'HEAD', '--'])
         revision = '0x' + commit_sha
         modified = (retcode != 0)
     elif os.path.exists(os.path.join(path, '.svn')):
@@ -548,7 +548,9 @@ def GetPathRevision(path):
         except:
             revision = 'UINT_MAX'
     else:
-        revision, modified = 'Unknown', False
+        # In abscence of git, subversion (or ReleaseVersion.txt) we report revision=0
+        # This allows a zip download from github to be compiled with SCons
+        revision, modified = 0, False
     return (revision, modified)
 
 def GetProjectVersions(projectsRoot, default_revision=None):
@@ -560,7 +562,21 @@ def GetProjectVersions(projectsRoot, default_revision=None):
             revision, _ = GetPathRevision(entry_path)
             if revision == 'Unknown' and default_revision:
                 revision = default_revision
+            if str(revision).startswith('0x'):
+                # Take off the confusing hex symbol
+                revision = str(revision[2:])
             code += '%sversions["%s"] = "%s";\n' % (' '*8, entry, revision)
+    return code
+
+def GetProjectModified(projectsRoot):
+    """Return C++ code filling in the map of whether projects have been modified."""
+    code = ""
+    for entry in sorted(os.listdir(projectsRoot)):
+        entry_path = os.path.join(projectsRoot, entry)
+        if entry[0] != '.' and os.path.isdir(entry_path):
+            _ , modified = GetPathRevision(entry_path)
+
+            code += '%smodified["%s"] = "%s";\n' % (' '*8, entry, modified)
     return code
 
 def GetVersionCpp(templateFilePath, env):
@@ -572,7 +588,7 @@ def GetVersionCpp(templateFilePath, env):
         # Extract just the revision number from the file.
         full_version = open(version_file).read().strip()
         last_component = full_version[1+full_version.rfind('.'):]
-        if last_component[0] == 'r':
+        if last_component[0] is not 'r':
             # It's a git SHA
             chaste_revision = '0x' + last_component[1:]
         else:
@@ -582,8 +598,6 @@ def GetVersionCpp(templateFilePath, env):
     else:
         chaste_revision, wc_modified = GetPathRevision(chaste_root)
         default_revision_for_projects = None
-    if chaste_revision[:2] == '0x':
-        chaste_revision = chaste_revision[:10] # We can't fit more than 8 hex digits in a 32-bit unsigned reliably
 
     time_format = "%a, %d %b %Y %H:%M:%S +0000"
     build_time = time.strftime(time_format, time.gmtime())
@@ -611,6 +625,7 @@ def GetVersionCpp(templateFilePath, env):
              'revision': chaste_revision,
              'wc_modified': str(wc_modified).lower(),
              'project_versions': GetProjectVersions(os.path.join(chaste_root, 'projects'), default_revision_for_projects),
+             'project_modified': GetProjectModified(os.path.join(chaste_root, 'projects')),
              'licence': licence,
              'time_format': time_format,
              'time_size': len(build_time)+1,

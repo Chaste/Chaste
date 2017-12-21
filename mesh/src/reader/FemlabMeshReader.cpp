@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -182,10 +182,7 @@ std::vector < std::vector < unsigned > >
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class FemlabMeshReader<1,1>;
 template class FemlabMeshReader<1,2>;
 template class FemlabMeshReader<1,3>;

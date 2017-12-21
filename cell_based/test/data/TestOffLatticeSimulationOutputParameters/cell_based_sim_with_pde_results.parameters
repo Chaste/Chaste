@@ -1,9 +1,3 @@
-		<CellBasedPdeHandler-2>
-		<WriteAverageRadialPdeSolution>0</WriteAverageRadialPdeSolution>
-		<WriteDailyAverageRadialPdeSolution>0</WriteDailyAverageRadialPdeSolution>
-		<SetBcsOnCoarseBoundary>1</SetBcsOnCoarseBoundary>
-		<NumRadialIntervals>4294967295</NumRadialIntervals>
-		</CellBasedPdeHandler-2>
 		<Dt>0.00833333</Dt>
 		<EndTime>0.5</EndTime>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>

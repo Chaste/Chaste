@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,13 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_
 #define ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_
 
-#include "VertexBasedCellPopulation.hpp"
-
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
+#include "VertexBasedCellPopulation.hpp"
 
 /**
  * An abstract cell division rule for use in vertex-based simulations.
@@ -73,7 +70,7 @@ private:
 
 protected:
 
-/**
+    /**
      * Output any parameters associated with the division rule.
      * Currently empty since this class has no member variables. Should
      * be overridden by any child classes that have parameters.
@@ -83,6 +80,7 @@ protected:
     virtual void OutputCellVertexBasedDivisionRuleParameters(out_stream& rParamsFile);
 
 public:
+
     /**
      * Default constructor.
      */
@@ -96,6 +94,9 @@ public:
     /**
      * Return the vector that will divide the two halves of the existing cell
      * to form the boundary between parent and daughter cell.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population

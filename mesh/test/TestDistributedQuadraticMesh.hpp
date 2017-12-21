@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestDistributedQuadraticMesh : public CxxTest::TestSuite
 {
 public:
-    void TestDumbMeshPartitioning() throw (Exception)
+    void TestDumbMeshPartitioning()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
         QuadraticMesh<2> mesh;
@@ -65,13 +65,13 @@ public:
 
         NodePartitioner<2, 2>::DumbPartitioning(mesh, nodes_owned);
 
-        if(PetscTools::GetNumProcs() == 1)
+        if (PetscTools::GetNumProcs() == 1)
         {
             TS_ASSERT_EQUALS(nodes_owned.size(), 289u);
         }
-        else if(PetscTools::GetNumProcs() == 2)
+        else if (PetscTools::GetNumProcs() == 2)
         {
-            if(PetscTools::GetMyRank() == 0 )
+            if (PetscTools::GetMyRank() == 0)
             {
                 TS_ASSERT_EQUALS(nodes_owned.size(), 145u);
             }
@@ -80,13 +80,13 @@ public:
                 TS_ASSERT_EQUALS(nodes_owned.size(), 144u);
             }
         }
-        else if(PetscTools::GetNumProcs() == 3)
+        else if (PetscTools::GetNumProcs() == 3)
         {
-            if(PetscTools::GetMyRank() == 0 )
+            if (PetscTools::GetMyRank() == 0 )
             {
                 TS_ASSERT_EQUALS(nodes_owned.size(), 97u);
             }
-            else if(PetscTools::GetMyRank() == 1 )
+            else if (PetscTools::GetMyRank() == 1 )
             {
                 TS_ASSERT_EQUALS(nodes_owned.size(), 96u);
             }
@@ -97,26 +97,11 @@ public:
         }
     }
 
-    void TestMetisMeshPartitioning() throw (Exception)
+    void TestPetscMatrixPartitioning()
     {
         EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
-        std::vector<unsigned> nodes_permutation;
-        std::set<unsigned> nodes_owned;
-        std::vector<unsigned> processor_offset;
-
-        typedef NodePartitioner<2, 2> Partitioner2D;
-
-        TS_ASSERT_THROWS_THIS(Partitioner2D::MetisLibraryPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset),
-                              "Metis cannot partition a quadratic mesh.");
-    }
-
-    void TestPetscMatrixPartitioning() throw (Exception)
-    {
-        EXIT_IF_SEQUENTIAL //Doesn't make sense to try and partition in sequential
-
-        if(!PetscTools::HasParMetis())
+        if (!PetscTools::HasParMetis())
         {
             std::cout << "\n\nWarning: PETSc support for ParMetis is not installed. Mesh partitioning not tested." << std::endl;
             return;
@@ -140,7 +125,7 @@ public:
         typedef NodePartitioner<2, 2> Partitioner2D;
         Partitioner2D::PetscMatrixPartitioning(mesh_reader, nodes_permutation, nodes_owned, processor_offset);
 
-        if(PetscTools::GetNumProcs() != 2)
+        if (PetscTools::GetNumProcs() != 2)
         {
             return;
         }
@@ -152,7 +137,7 @@ public:
         // and check that all the nodes are within a certain distance of the centre of mass.
         c_vector<double,2> centre_of_mass = zero_vector<double>(2);
         unsigned counter = 0;
-        for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        for (std::set<unsigned>::iterator iter = nodes_owned.begin();
             iter != nodes_owned.end();
             ++iter)
         {
@@ -167,7 +152,7 @@ public:
         centre_of_mass(0) /= counter;
         centre_of_mass(1) /= counter;
 
-        for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        for (std::set<unsigned>::iterator iter = nodes_owned.begin();
                     iter != nodes_owned.end();
                     ++iter)
         {
@@ -184,7 +169,7 @@ public:
         //ss << "res_" << PetscTools::GetNumProcs() << "_" << PetscTools::GetMyRank() << ".txt";
         //out_stream p_file = handler.OpenOutputFile(ss.str());
         //
-        //for(std::set<unsigned>::iterator iter = nodes_owned.begin();
+        //for (std::set<unsigned>::iterator iter = nodes_owned.begin();
         //    iter != nodes_owned.end();
         //    ++iter)
         //{
@@ -206,7 +191,7 @@ public:
     }
 
 
-    void TestConstructFromMeshReader2D() throw (Exception)
+    void TestConstructFromMeshReader2D()
     {
         /*
          * Note that these mesh files have
@@ -310,7 +295,7 @@ public:
             }
         }
     }
-    void TestConstructFromMeshReader2DWithPetscSupport() throw (Exception)
+    void TestConstructFromMeshReader2DWithPetscSupport()
     {
         EXIT_IF_SEQUENTIAL;
         if (!PetscTools::HasParMetis())
@@ -337,7 +322,7 @@ public:
         }
     }
 
-    void TestConstructFromMeshReader3DElementHintsInFile() throw (Exception)
+    void TestConstructFromMeshReader3DElementHintsInFile()
     {
         /*
          * Note that these mesh files have
@@ -368,7 +353,7 @@ public:
         }
     }
 
-    void TestConstructFromMeshReader3DFullyQuadratic() throw(Exception)
+    void TestConstructFromMeshReader3DFullyQuadratic()
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
@@ -391,7 +376,7 @@ public:
         TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
     }
 
-    void TestConstructFromLinearMeshReaderException() throw(Exception)
+    void TestConstructFromLinearMeshReaderException()
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
@@ -401,7 +386,7 @@ public:
 
     }
 
-    void TestArchiveOfReadMesh() throw(Exception)
+    void TestArchiveOfReadMesh()
     {
         FileFinder archive_dir("distributed_quadratic_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_rectangle.arch";
@@ -469,8 +454,6 @@ public:
         }
         delete p_mesh;
     }
-
 };
-
 
 #endif // TESTDISTRIBUTEDQUADRATICMESH_HPP_

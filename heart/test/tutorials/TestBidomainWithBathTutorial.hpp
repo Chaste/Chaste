@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,11 +84,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 /* Define the test */
-class TestRunningBidomainSimulationsTutorial : public CxxTest::TestSuite
+class TestBidomainWithBathTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestWithBathAndElectrodes() throw (Exception)
+    void TestWithBathAndElectrodes()
     {
         /* First, set the end time and output info. In this simulation
          * we'll explicitly read the mesh, alter it, then pass it
@@ -156,7 +156,7 @@ public: // Tests should be public!
         {
             double x = iter->CalculateCentroid()[0];
             double y = iter->CalculateCentroid()[1];
-            if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
+            if (sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02)
             {
                 if (y<0.05)
                 {

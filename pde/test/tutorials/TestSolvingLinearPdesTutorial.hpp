@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,9 +103,9 @@ private:
     /* For efficiency, we will save the diffusion tensor that will be returned by one of the
      * class' methods as a member variable. The diffusion tensor which has to be returned
      * by the {{{GetDiffusionTensor}}} method in PDE classes is of the type
-     * {{{c_matrix<double,SIZE,SIZE>}}}, which is a u-blas matrix. We use ublas vectors
-     * and matrices where small vectors and matrices are needed. Note that ublas objects
-     * are only particularly efficient if optimisation is on ({{{scons build=GccOpt ...}}}).*/
+     * {{{c_matrix<double,SIZE,SIZE>}}}, which is a uBLAS matrix. We use uBLAS vectors
+     * and matrices where small vectors and matrices are needed. Note that uBLAS objects
+     * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release``).*/
     c_matrix<double,2,2> mDiffusionTensor;
 
 public:
@@ -148,7 +148,7 @@ class TestSolvingLinearPdesTutorial : public CxxTest::TestSuite
 {
 /* All individual test defined in this test suite '''must''' be declared as public. */
 public:
-    void TestSolvingEllipticPde() throw(Exception)
+    void TestSolvingEllipticPde()
     {
         /* First we declare a mesh reader which reads mesh data files of the 'Triangle'
          * format. The path given is relative to the main Chaste directory. As we are in 2d,
@@ -230,7 +230,7 @@ public:
             double y = mesh.GetNode(node_index)->GetPoint()[1];
 
             /* If x=1 or y=1... */
-            if ( (fabs(x-1.0) < 1e-6) || (fabs(y-1.0) < 1e-6) )
+            if ((fabs(x-1.0) < 1e-6) || (fabs(y-1.0) < 1e-6))
             {
                 /* ...associate the boundary condition with the surface element. */
                 bcc.AddNeumannBoundaryCondition(*surf_iter, p_zero_boundary_condition);
@@ -301,7 +301,7 @@ public:
      * conditions u=1.
      *
      */
-    void TestSolvingParabolicPde() throw(Exception)
+    void TestSolvingParabolicPde()
     {
         /* Create a 10 by 10 by 10 mesh in 3D, this time using the {{{ConstructRegularSlabMesh}}} method
          * on the mesh. The first parameter is the cartesian space-step and the other three parameters are the width, height and depth of the mesh.*/

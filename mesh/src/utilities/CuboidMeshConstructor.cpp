@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,9 +71,7 @@ unsigned CuboidMeshConstructor<ELEMENT_DIM, SPACE_DIM>::GetNumNodes()
     return mNumNodes;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
+////// Explicit instantiation////
 
 template class CuboidMeshConstructor<1>;
 template class CuboidMeshConstructor<2>;

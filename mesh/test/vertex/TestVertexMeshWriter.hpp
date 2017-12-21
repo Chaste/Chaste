@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ class TestVertexMeshWriter : public CxxTest::TestSuite
 {
 public:
 
-    void TestVertexMeshWriterIn2d() throw(Exception)
+    void TestVertexMeshWriterIn2d()
     {
         std::vector<Node<2>*> basic_nodes;
         basic_nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -136,7 +136,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterWithCylindricalMesh() throw(Exception)
+    void TestVertexMeshWriterWithCylindricalMesh()
     {
         // Create cylindrical mesh (i.e. one that is left/right periodic)
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
@@ -197,7 +197,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterWithToroidalMesh() throw(Exception)
+    void TestVertexMeshWriterWithToroidalMesh()
     {
         // Create toroidal mesh (i.e. one that is periodic in both directions)
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -258,7 +258,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterIn3dWithoutFaces() throw(Exception)
+    void TestVertexMeshWriterIn3dWithoutFaces()
     {
         // Create 3D mesh
         std::vector<Node<3>*> nodes;
@@ -323,7 +323,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVertexMeshWriterIn3dWithFaces() throw(Exception)
+    void TestVertexMeshWriterIn3dWithFaces()
     {
         // Create a simple 3D mesh using the Voronoi constructor
         std::vector<Node<3>*> nodes;
@@ -382,7 +382,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestMeshWriterWithDeletedNode() throw (Exception)
+    void TestMeshWriterWithDeletedNode()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
@@ -412,7 +412,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 8u);
     }
 
-    void TestReadingAndWritingElementAttributes() throw(Exception)
+    void TestReadingAndWritingElementAttributes()
     {
         // Read in a mesh with element attributes
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
@@ -468,6 +468,25 @@ public:
         VertexMesh<3,3> mesh3d2;
         mesh3d2.ConstructFromMeshReader(mesh_reader3d2);
         TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetUnsignedAttribute(), 49u);
+    }
+
+    void TestWriteFilesUsingMeshReader()
+    {
+        // Create a VertexMeshReader and use it to write mesh files
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
+        TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
+
+        VertexMeshWriter<2,2> mesh_writer("TestWriteFilesUsingMeshReader", "vertex_mesh");
+        mesh_writer.WriteFilesUsingMeshReader(mesh_reader);
+
+        // Now read in the mesh that was written
+        OutputFileHandler handler("TestWriteFilesUsingMeshReader", false);
+        VertexMeshReader<2,2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh");
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
     }
 };
 

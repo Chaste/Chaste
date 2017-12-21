@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,23 +40,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 CommandLineArguments::CommandLineArguments()
-    : p_argc(NULL),
-      p_argv(NULL)
+    : p_argc(nullptr),
+      p_argv(nullptr)
 {
     // Make doubly sure there's only one instance
-    assert(mpInstance == NULL);
+    assert(mpInstance == nullptr);
 }
 
 CommandLineArguments* CommandLineArguments::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new CommandLineArguments;
     }
     return mpInstance;
 }
 
-CommandLineArguments* CommandLineArguments::mpInstance = NULL;
+CommandLineArguments* CommandLineArguments::mpInstance = nullptr;
 
 bool CommandLineArguments::OptionExists(const std::string& rOption)
 {
@@ -78,7 +78,7 @@ char* CommandLineArguments::GetValueCorrespondingToOption(const std::string& rOp
 
     int index = GetIndexForArgument(rOption);
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    if ( num_args<valueNumber )
+    if (num_args < valueNumber)
     {
         std::stringstream ss;
         ss<<"Index="<<valueNumber<<" requested for '"<<rOption<<"', but only "<<num_args<<" given.";
@@ -142,7 +142,7 @@ int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOpti
 
     if (end_idx == start_idx)
     {
-        if ( throwIfNone )
+        if (throwIfNone)
         {
             EXCEPTION("No value(s) given after command line option '" + rOption + "'");
         }
@@ -150,7 +150,6 @@ int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOpti
         {
             return 0;
         }
-
     }
 
     return end_idx - start_idx;
@@ -167,7 +166,7 @@ std::vector<std::string> CommandLineArguments::GetStringsCorrespondingToOption(c
 {
     std::vector<std::string> strings;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for(int i=1; i<=num_args; ++i)
+    for (int i=1; i<=num_args; ++i)
     {
         strings.push_back(GetStringCorrespondingToOption(rOption, i));
     }
@@ -178,7 +177,7 @@ std::vector<double> CommandLineArguments::GetDoublesCorrespondingToOption(const 
 {
     std::vector<double> doubles;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for(int i=1; i<=num_args; ++i)
+    for (int i=1; i<=num_args; ++i)
     {
         doubles.push_back(GetDoubleCorrespondingToOption(rOption, i));
     }
@@ -189,7 +188,7 @@ std::vector<unsigned> CommandLineArguments::GetUnsignedsCorrespondingToOption(co
 {
     std::vector<unsigned> unsigneds;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for(int i=1; i<=num_args; ++i)
+    for (int i=1; i<=num_args; ++i)
     {
         unsigneds.push_back(GetUnsignedCorrespondingToOption(rOption, i));
     }
@@ -200,7 +199,7 @@ std::vector<int> CommandLineArguments::GetIntsCorrespondingToOption(const std::s
 {
     std::vector<int> ints;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for(int i=1; i<=num_args; ++i)
+    for (int i=1; i<=num_args; ++i)
     {
         ints.push_back(GetIntCorrespondingToOption(rOption, i));
     }
@@ -234,9 +233,8 @@ bool CommandLineArguments::GetBoolCorrespondingToOption(const std::string& rOpti
 
 void CommandLineArguments::TestOptionFormat(const std::string& rOption)
 {
-    if ( !( rOption.substr(0,1) == "-" && rOption.substr(1,1).find_first_of("0123456789")==std::string::npos ) )
+    if (!( rOption.substr(0,1) == "-" && rOption.substr(1,1).find_first_of("0123456789")==std::string::npos))
     {
         EXCEPTION("A command line option must begin with '-' followed by a non-numeric character.");
     }
 }
-

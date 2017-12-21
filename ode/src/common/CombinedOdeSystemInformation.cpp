@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,7 +119,7 @@ CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boo
     mInitialised = true;
 }
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 void CombinedOdeSystemInformation::Initialise()
 {
     // does nothing; work done in constructor
@@ -128,4 +128,4 @@ void CombinedOdeSystemInformation::Initialise()
 
 /** Definition of the instance static member. */
 std::vector<struct CombinedOdeSystemInformation::InstancePointers> CombinedOdeSystemInformation::msInstances;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP

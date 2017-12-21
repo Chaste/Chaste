@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,11 +97,6 @@ public:
      * @param rMeshReader the mesh reader
      */
     void ConstructFromMeshReader(AbstractMeshReader<DIM,DIM>& rMeshReader);
-
-private:
-
-protected:
-
 };
 
 #include "SerializationExportWrapper.hpp"

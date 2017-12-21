@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,13 +98,10 @@ public:
     }
 };
 
-
-
-
 class TestBidomainWithBathLong : public CxxTest::TestSuite
 {
 public:
-    void Test3dBathIntracellularStimulation() throw (Exception)
+    void Test3dBathIntracellularStimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(1);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath3d");
@@ -127,7 +124,7 @@ public:
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
             double z = mesh.GetElement(i)->CalculateCentroid()[2];
-            if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05) + (z-0.05)*(z-0.05)) > 0.04 )
+            if (sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05) + (z-0.05)*(z-0.05)) > 0.04)
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
@@ -155,7 +152,7 @@ public:
     }
 
 // see #1061
-    void Test2dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge() throw (Exception)
+    void Test2dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge()
     {
         HeartConfig::Instance()->SetSimulationDuration(40);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dExtraStimGrounded");
@@ -181,7 +178,7 @@ public:
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
-            if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
+            if (sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02)
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }
@@ -206,10 +203,10 @@ public:
          * We are checking the last time step. This test will only make sure that an upstroke is triggered.
          * We ran longer simulation for 350 ms and a nice AP was observed.
          */
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             // test V = 0 for all bath nodes
-            if(mesh.GetNode(i)->GetRegion()==1) // bath
+            if (mesh.GetNode(i)->GetRegion()==1) // bath
             {
                 TS_ASSERT_DELTA(sol_repl[2*i], 0.0, 1e-12);
             }
@@ -222,7 +219,7 @@ public:
     }
 
 // see #1061
-    void Test3dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge() throw (Exception)
+    void Test3dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge()
     {
         HeartConfig::Instance()->SetSimulationDuration(6);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath3dExtraStimGrounded");
@@ -245,12 +242,12 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // Set everything outside a central sphere (radius 0.4) to be bath
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
             double z = mesh.GetElement(i)->CalculateCentroid()[2];
-            if( sqrt((x-0.1)*(x-0.1) + (y-0.1)*(y-0.1) + (z-0.1)*(z-0.1)) > 0.03)
+            if (sqrt((x-0.1)*(x-0.1) + (y-0.1)*(y-0.1) + (z-0.1)*(z-0.1)) > 0.03)
             {
                 mesh.GetElement(i)->SetAttribute(1);
             }

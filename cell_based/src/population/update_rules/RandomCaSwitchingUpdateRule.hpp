@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -125,11 +125,11 @@ public:
     void SetSwitchingParameter(double switchingParameter);
 
     /**
-     * Overridden OutputSwitchingUpdateRuleParameters() method.
+     * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSwitchingUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

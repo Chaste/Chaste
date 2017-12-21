@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,8 +60,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ////////////////////////////////////////////////////////////////
 
-
-
 //////////////////////////////////////////////////////////
 // Assembler for integrals over cable elements
 //////////////////////////////////////////////////////////
@@ -85,9 +83,9 @@ private:
 
         double sigma_i = 1+rX[2] + 0.5*rX[2]*rX[2];
 
-        for(unsigned i=0; i<2; i++)
+        for (unsigned i=0; i<2; i++)
         {
-            for(unsigned j=0; j<2; j++)
+            for (unsigned j=0; j<2; j++)
             {
                 ret(2*i,  2*j)   =  mBeta*rPhi(i)*rPhi(j);
                 ret(2*i+1,2*j)   = -mBeta*rPhi(i)*rPhi(j);
@@ -165,8 +163,6 @@ public:
     }
 };
 
-
-
 //////////////////////////////////////////////////////////////
 // Solver which uses assemblers to create the linear system
 //////////////////////////////////////////////////////////////
@@ -201,7 +197,7 @@ private:
         // apply the Dirichlet boundary conditions
         mpBoundaryConditions->ApplyDirichletToLinearProblem(*(this->mpLinearSystem), computeMatrix);
 
-        if(computeMatrix)
+        if (computeMatrix)
         {
             ApplyIdentityBlock();
         }
@@ -223,9 +219,9 @@ private:
             double y = r_node.rGetLocation()[1];
             double r = sqrt(x*x+y*y);
 
-            if ( fabs(r)>1e-6 ) // if r>0, ie not a cable node
+            if (fabs(r) > 1e-6) // if r>0, ie not a cable node
             {
-                // put 1.0 on the diagonal - the rest of the row must already be zero
+                // Put 1.0 on the diagonal - the rest of the row must already be zero
                 PetscInt index = 2*iter->GetIndex()+1;
                 PetscMatTools::SetElement(this->mpLinearSystem->rGetLhsMatrix(), index, index, 1.0);
             }
@@ -277,7 +273,7 @@ public:
 class TestCoupledCableTestProblem : public CxxTest::TestSuite
 {
 public:
-    void TestSolvingTestProblem() throw(Exception)
+    void TestSolvingTestProblem()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder_refined");
         TrianglesMeshReader<3,3> reader(mesh_base);
@@ -301,21 +297,21 @@ public:
             double z = p_node->rGetLocation()[2];
             double r = sqrt(x*x+y*y);
 
-            if(fabs(r-1)<1e-3)
+            if (fabs(r-1)<1e-3)
             {
                 // apply BC phi_e = 0
                 ConstBoundaryCondition<3>* p_bc = new ConstBoundaryCondition<3>(0.0);
                 bcc.AddDirichletBoundaryCondition(p_node, p_bc, 0);
             }
 
-            if(fabs(r)<1e-6 && fabs(z)<1e-6) // r=0, z=0, ie bottom cable node
+            if (fabs(r)<1e-6 && fabs(z)<1e-6) // r=0, z=0, ie bottom cable node
             {
                 // apply BC phi_i = 1
                 ConstBoundaryCondition<3>* p_bc = new ConstBoundaryCondition<3>(1.0);
                 bcc.AddDirichletBoundaryCondition(p_node, p_bc, 1);
             }
 
-            if(fabs(r)<1e-6 && fabs(z-1)<1e-6) // r=0, z=1, ie top cable node
+            if (fabs(r)<1e-6 && fabs(z-1)<1e-6) // r=0, z=1, ie top cable node
             {
                 // apply BC phi_i = 2
                 ConstBoundaryCondition<3>* p_bc = new ConstBoundaryCondition<3>(2.0);
@@ -330,7 +326,7 @@ public:
         MyBoundaryCondition* p_top_neumann_bc = new MyBoundaryCondition(-1.0/(2*M_PI));
         MyBoundaryCondition* p_bottom_neumann_bc = new MyBoundaryCondition(1.0/(2*M_PI));
 
-        for(MixedDimensionMesh<3,3>::BoundaryElementIterator iter
+        for (MixedDimensionMesh<3,3>::BoundaryElementIterator iter
              = mesh.GetBoundaryElementIteratorBegin();
             iter != mesh.GetBoundaryElementIteratorEnd();
             ++iter)
@@ -369,7 +365,7 @@ public:
             unsigned index = current_node->GetIndex();
             double phi_e = result_repl[2*index];
             double phi_i = result_repl[2*index+1];
-            if(fabs(r)<1e-6)
+            if (fabs(r)<1e-6)
             {
                 double phi_i_exact = 1+z;
                 // Tolerance is quite high, as the mesh is fairly coarse for this problem (node spacing ~2mm)

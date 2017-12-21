@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCaSwitchingUpdateRule.hpp"
 #include "RandomCaSwitchingUpdateRule.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -62,7 +63,7 @@ class TestCaUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDiffusionCaUpdateRuleIn2d() throw (Exception)
+    void TestDiffusionCaUpdateRuleIn2d()
     {
         // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
@@ -90,7 +91,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 1u, p_diff_type);
 
         // Specify where cells lie here we have one cell on the bottom left site
@@ -124,7 +125,7 @@ public:
         TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x, p_cell),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
-    void TestDiffusionCaUpdateRuleIn2dWithMultipleCells() throw (Exception)
+    void TestDiffusionCaUpdateRuleIn2dWithMultipleCells()
     {
         // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
@@ -152,7 +153,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 10u, p_diff_type);
 
         // Specify where cells lie here we have one cell on the bottom left site
@@ -197,7 +198,7 @@ public:
         TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x, p_cell),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
-    void TestArchiveDiffusionCaUpdateRule() throw(Exception)
+    void TestArchiveDiffusionCaUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionCaUpdateRule.arch";
@@ -260,7 +261,7 @@ public:
     /*
      * Now test the switching rules.
      */
-    void TestRandomCaSwitchingUpdateRuleIn2d() throw (Exception)
+    void TestRandomCaSwitchingUpdateRuleIn2d()
     {
         // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 0.1;
@@ -288,7 +289,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 6u, p_diff_type);
 
         // Specify where cells lie here we have cells on the bottom two rows
@@ -309,7 +310,7 @@ public:
         TS_ASSERT_DELTA(random_switching_update_rule.EvaluateSwitchingProbability(UNSIGNED_UNSET,UNSIGNED_UNSET,cell_population, delta_t, delta_x),switching_parameter*delta_t,1e-6);
     }
 
-    void TestArchiveRandomCaSwitchingUpdateRule() throw(Exception)
+    void TestArchiveRandomCaSwitchingUpdateRule()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RandomCaSwitchingUpdateRule.arch";

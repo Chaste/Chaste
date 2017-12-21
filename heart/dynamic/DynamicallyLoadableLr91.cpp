@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,8 +55,6 @@ const double DynamicallyLoadableLr91::ionic_concentrations_Nai = 18.0;
 const double DynamicallyLoadableLr91::ionic_concentrations_Nao = 140.0;
 const double DynamicallyLoadableLr91::plateau_potassium_current_g_Kp = 0.0183;
 const double DynamicallyLoadableLr91::time_dependent_potassium_current_PR_NaK = 0.01833;
-
-
 
 /**
  * Constructor
@@ -184,9 +182,9 @@ void DynamicallyLoadableLr91::EvaluateYDerivatives(double time,
     }
     else
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         time_dependent_potassium_current_Xi_gate_Xi = 1.0;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
 
     double time_dependent_potassium_current_X_gate_alpha_X = 0.0005*exp(0.083*(membrane_V+50.0))/(1.0+exp(0.057*(membrane_V+50.0)));
@@ -257,9 +255,9 @@ double DynamicallyLoadableLr91::GetIIonic(const std::vector<double>* pStateVaria
     }
     else
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         time_dependent_potassium_current_Xi_gate_Xi = 1.0;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     double time_dependent_potassium_current_E_K = ((membrane_R*membrane_T)/membrane_F)*log((ionic_concentrations_Ko+time_dependent_potassium_current_PR_NaK*ionic_concentrations_Nao)/(ionic_concentrations_Ki+time_dependent_potassium_current_PR_NaK*ionic_concentrations_Nai));
     double time_dependent_potassium_current_i_K = time_dependent_potassium_current_g_K*time_dependent_potassium_current_X_gate_X*time_dependent_potassium_current_Xi_gate_Xi*(membrane_V-time_dependent_potassium_current_E_K);
@@ -293,7 +291,7 @@ void DynamicallyLoadableLr91::VerifyStateVariables()
     const double slow_inward_current_f_gate_f = rY[6];            // gating
     const double time_dependent_potassium_current_X_gate_X = rY[7]; // gating
 
-    #define COVERAGE_IGNORE
+    // LCOV_EXCL_START
     if (!(0.0<=fast_sodium_current_h_gate_h && fast_sodium_current_h_gate_h<=1.0))
     {
         EXCEPTION(DumpState("h gate for fast sodium current has gone out of range. Check model parameters, for example spatial stepsize"));
@@ -328,11 +326,8 @@ void DynamicallyLoadableLr91::VerifyStateVariables()
     {
         EXCEPTION(DumpState("X gate for time dependent potassium current has gone out of range. Check model parameters, for example spatial stepsize"));
     }
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 }
-
-
-
 
 template<>
 void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise(void)
@@ -350,7 +345,7 @@ void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise(void)
     this->mVariableUnits.push_back("");
     this->mInitialConditions.push_back(0.00187018);
 
-    this->mVariableNames.push_back("CaI");
+    this->mVariableNames.push_back("cytosolic_calcium_concentration");
     this->mVariableUnits.push_back("mMol");
     this->mInitialConditions.push_back(0.0002);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,7 +78,6 @@ public:
      */
     void CleanTerminalsHueristic();
 
-
     /**
      * Removes any nodes from an airway tree that are not associated with elements.
      */
@@ -118,4 +117,5 @@ private:
      */
     void CleanElementUsingHorsfieldOrder(Element<1,3>* pElement, bool delete_me);
 };
-#endif //  MAJOR_AIRWAYS_CENTRE_LINES_CLEANER_HPP_
+
+#endif // MAJOR_AIRWAYS_CENTRE_LINES_CLEANER_HPP_

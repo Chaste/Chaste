@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,7 +63,7 @@ public:
     }
 
     // Solve on a 1D string of cells, 1mm long with a space step of 0.1mm.
-    void TestMonodomainConstantStimulus() throw(Exception)
+    void TestMonodomainConstantStimulus()
     {
         // this parameters are a bit arbitrary, and chosen to get a good spread of voltages
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75));
@@ -115,7 +115,7 @@ public:
 
     }
 
-    void TestMonodomainSquareWaveStimulus() throw(Exception)
+    void TestMonodomainSquareWaveStimulus()
     {
         // this parameters are a bit arbitrary, and chosen to get a good spread of voltages
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75));
@@ -168,8 +168,6 @@ public:
     }
 
 /// Note: Neumann intracellular stimuli won't work with bidomain (no solution to PDEs) (unless nodes are grounded)
-
-
 };
 
 #endif //_TESTNEUMANNSTIMULUS_HPP_

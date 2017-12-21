@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,7 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * simulation test. We have encountered each of these header files in previous cell-based
  * Chaste tutorials. */
 #include "HoneycombMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
@@ -123,7 +123,8 @@ public:
             cell_iter != this->mpCellPopulation->End();
             ++cell_iter)
         {
-            c_vector<double, 2> location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> location;
+            location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
             if (pow(location[0]/20, 2) + pow(location[1]/10, 2) > 1.0)
             {
@@ -201,17 +202,17 @@ public:
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMyCellKiller() throw(Exception)
+    void TestMyCellKiller()
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh. */
         HoneycombMeshGenerator generator(20, 20, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then construct and initialise some cells, each with a
-         * {{{FixedDurationGenerationBasedCellCycleModel}}}, using the helper class
+         * {{{FixedG1GenerationalCellCycleModel}}}, using the helper class
          * {{{CellsGenerator}}}. */
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         /* Now that we have defined the mesh and cells, we can define the cell population. The
@@ -293,14 +294,14 @@ public:
      * We now provide a test demonstrating how {{{MyCellKiller}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyCellKiller() throw(Exception)
+    void TestOffLatticeSimulationWithMyCellKiller()
     {
         /* We proceed as before, creating a mesh-based cell population. */
         HoneycombMeshGenerator generator(20, 20, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);

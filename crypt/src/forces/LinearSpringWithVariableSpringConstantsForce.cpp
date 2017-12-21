@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
 
 template<unsigned DIM>
 LinearSpringWithVariableSpringConstantsForce<DIM>::LinearSpringWithVariableSpringConstantsForce()
@@ -62,7 +64,7 @@ LinearSpringWithVariableSpringConstantsForce<DIM>::~LinearSpringWithVariableSpri
 template<unsigned DIM>
 void LinearSpringWithVariableSpringConstantsForce<DIM>::SetEdgeBasedSpringConstant(bool useEdgeBasedSpringConstant)
 {
-    assert(DIM == 2);
+    assert(DIM == 2); // LCOV_EXCL_LINE
     mUseEdgeBasedSpringConstant = useEdgeBasedSpringConstant;
 }
 
@@ -221,7 +223,7 @@ template<unsigned DIM>
 void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a MeshBasedCellPopulation
-    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("LinearSpringWithVariableSpringConstantsForce is to be used with a subclass of MeshBasedCellPopulation only");
     }
@@ -299,11 +301,10 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::OutputForceParameters(ou
     GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class LinearSpringWithVariableSpringConstantsForce<1>;
 template class LinearSpringWithVariableSpringConstantsForce<2>;
 template class LinearSpringWithVariableSpringConstantsForce<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

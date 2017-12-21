@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ class TestPseudoEcgCalculator : public CxxTest::TestSuite
 
 public:
 
-    void TestCalculator1DLinearGradient() throw (Exception)
+    void TestCalculator1DLinearGradient()
     {
 
         //read in the 1D mesh, from 0 to 1
@@ -170,8 +170,6 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-
-
         ChastePoint<1> bad_probe_electrode(0.0021132486540519);
         PseudoEcgCalculator<1,1,1> bad_calculator (mesh,
                                                    bad_probe_electrode,
@@ -181,7 +179,7 @@ public:
 
     }
 
-    void TestCalculator1DParabolic() throw (Exception)
+    void TestCalculator1DParabolic()
     {
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         DistributedTetrahedralMesh<1,1> mesh;
@@ -279,13 +277,12 @@ public:
             pseudo_ecg = calculator.ComputePseudoEcgAtOneTimeStep(k);
             TS_ASSERT_DELTA(pseudo_ecg, diff_coeff*expected_result,1e-6);
         }
-
     }
 
     /**
      * Test for BidomainWithBath problems.
      */
-    void TestBathEcgCalculations() throw (Exception)
+    void TestBathEcgCalculations()
     {
         HeartConfig::Instance()->SetSimulationDuration(2.0);  //ms - set to 500 to see whole AP trace.
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d_PseudoEcg");
@@ -301,11 +298,11 @@ public:
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        // set the x<0.25 and x>0.75 regions as the bath region
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        // Set the x<0.25 and x>0.75 regions as the bath region
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
-            if( (x<0.25) || (x>0.75) )
+            if ((x<0.25) || (x>0.75))
             {
                 mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
             }

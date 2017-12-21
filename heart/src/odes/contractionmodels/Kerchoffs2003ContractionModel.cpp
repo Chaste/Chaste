@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -109,7 +109,7 @@ void Kerchoffs2003ContractionModel::SetStretchAndStretchRate(double stretch, dou
 double Kerchoffs2003ContractionModel::GetActiveTension(double lc)
 {
     double f_iso = 0;
-    if(lc > a7)
+    if (lc > a7)
     {
         f_iso = T0 * pow(tanh(a6*(lc-a7)),2);
     }
@@ -117,17 +117,17 @@ double Kerchoffs2003ContractionModel::GetActiveTension(double lc)
     double f_twitch = 0;
     double b = this->GetParameter("b");
     double t_max = b*(mSarcomereLength - ld);
-    if(mIsActivated)
+    if (mIsActivated)
     {
         double t_a = mTime - mActivationTime;
 
-        if(t_a < t_max)
+        if (t_a < t_max)
         {
             double tr = this->GetParameter("tr");
             double td = this->GetParameter("td");
             f_twitch = pow( tanh(t_a/tr)*tanh((t_max-t_a)/td), 2);
         }
-        else if(mElectricallyUnactivated)
+        else if (mElectricallyUnactivated)
         {
             // t_a < t_ma => f_twitch=0 => Ta=0
             // In this case, if electrically unactivated as well,

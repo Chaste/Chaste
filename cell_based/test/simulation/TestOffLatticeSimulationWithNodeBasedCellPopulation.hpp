@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "LogFile.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "CellVolumesWriter.hpp"
 #include "FileComparison.hpp"
+#include "ForwardEulerNumericalMethod.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -75,7 +76,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayer() throw (Exception)
+    void TestSimpleMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -91,7 +92,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -100,6 +101,9 @@ public:
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulation");
+
+        // Test that the member mDt has been initialised correctly
+        TS_ASSERT_DELTA(simulator.GetDt(), 1.0/120.0, 1e-6);
 
         // No need to go for long, don't want any birth or regular grid will be disrupted.
         simulator.SetEndTime(0.5);
@@ -134,7 +138,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a Cylindrical2dNodesOnlyMesh
      * to test periodicity.
      */
-    void TestSimplePeriodicMonolayer() throw (Exception)
+    void TestSimplePeriodicMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -145,13 +149,13 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        double periodic_width = 4.0;
+        double periodic_width = 6.0;
         Cylindrical2dNodesOnlyMesh mesh(periodic_width);
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -185,16 +189,17 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
         RandomNumberGenerator::Instance()->Reseed(0);
 
-        double x_offset = periodic_width/2.0;
-        p_generating_mesh->Translate(x_offset,0.0);
-
         // Convert this to a Cylindrical2dNodesOnlyMesh
         Cylindrical2dNodesOnlyMesh mesh_2(periodic_width);
-        mesh_2.ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
+        mesh_2.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Add an offset
+        double x_offset = periodic_width/2.0;
+        mesh_2.Translate(-x_offset,0.0);
 
         // Create cells
         std::vector<CellPtr> cells_2;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
         cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
 
         // Create a node-based cell population
@@ -212,11 +217,43 @@ public:
 
         simulator_2.Solve();
 
+        // Check with a different interaction distance
+        // First reset the singletons
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Convert this to a Cylindrical2dNodesOnlyMesh
+        Cylindrical2dNodesOnlyMesh mesh_3(periodic_width);
+        mesh_3.ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
+
+        // Create cells
+        std::vector<CellPtr> cells_3;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_3;
+        cells_generator_3.GenerateBasicRandom(cells_3, mesh_3.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_3(mesh_3, cells_3);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator_3(node_based_cell_population_3);
+        simulator_3.SetOutputDirectory("TestOffLatticeSimulationWith3rdPeriodicNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic boundary influencing the cells
+        simulator_3.SetEndTime(10.0);
+
+        // Pass the same force law to the simulation
+        simulator_3.AddForce(p_linear_force);
+
+        simulator_3.Solve();
+
+
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
         for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
         {
             double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
             double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+            double x_3 = simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
 
             if (x_1 < x_offset)
             {
@@ -227,14 +264,17 @@ public:
                 TS_ASSERT_DELTA(x_1-x_offset, x_2, 1e-6)
             }
 
+            TS_ASSERT_DELTA(x_1,x_3,1e-6);
+
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
+            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
         }
     }
 
     /**
      * Create a simulation of a NodeBasedCellPopulation with different cell radii.
      */
-    void TestSimpleMonolayerWithDifferentRadii() throw (Exception)
+    void TestSimpleMonolayerWithDifferentRadii()
     {
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
@@ -253,7 +293,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
@@ -299,7 +339,7 @@ public:
     /**
      * Create a simulation of a NodeBasedCellPopulation with variable cell radii.
      */
-    void TestSimpleMonolayerWithVariableRadii() throw (Exception)
+    void TestSimpleMonolayerWithVariableRadii()
     {
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
@@ -311,7 +351,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Store the radius of the cells in Cell Data
@@ -383,7 +423,7 @@ public:
         }
     }
 
-    void TestSimulationWithBoxes() throw (Exception)
+    void TestSimulationWithBoxes()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -399,7 +439,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -439,7 +479,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem
      * and a CellKiller. Test that no exceptions are thrown, and write the results to file.
      */
-    void TestCellDeath() throw (Exception)
+    void TestCellDeath()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -455,7 +495,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -503,7 +543,7 @@ public:
 
     double mNode3x, mNode4x, mNode3y, mNode4y; // To preserve locations between the below test and test load.
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -519,7 +559,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -559,14 +599,14 @@ public:
         TS_ASSERT_DELTA(node_4_location[1], mNode4y, 1e-4);
     }
 
-    // Testing Save
-    void TestSave() throw (Exception)
+    // Testing Save()
+    void TestSave()
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenereator does not work in parallel
 
         // Create a simple mesh
-        int num_cells_depth = 5;
-        int num_cells_width = 5;
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
@@ -576,7 +616,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -598,6 +638,16 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&node_based_cell_population, zero_vector<double>(2), normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc);
 
+        /*
+         * For more thorough testing of serialization, we 'turn on' adaptivity.
+         * Note that this has no effect on the numerical results, since the
+         * conditions under which the time step would be adapted are not invoked
+         * in this example.
+         */
+        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        p_method->SetUseAdaptiveTimestep(true);
+        simulator.SetNumericalMethod(p_method);
+
         // Solve
         simulator.Solve();
 
@@ -605,8 +655,8 @@ public:
         CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
     }
 
-    // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    // Testing Load() (based on previous two tests)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;    // Cell based archiving doesn't work in parallel.
 
@@ -614,6 +664,10 @@ public:
         // run it from 0.1 to 1.0
         OffLatticeSimulation<2>* p_simulator1;
         p_simulator1 = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithNodeBasedCellPopulationSaveAndLoad", 0.1);
+
+        // Test that the numerical method was archived correctly
+        boost::shared_ptr<AbstractNumericalMethod<2, 2> > p_method = p_simulator1->GetNumericalMethod();
+        TS_ASSERT_EQUALS(p_method->HasAdaptiveTimestep(), true);
 
         p_simulator1->SetEndTime(1.0);
         p_simulator1->Solve();
@@ -643,7 +697,7 @@ public:
     /**
      * Create a simulation of a NodeBasedCellPopulation to test movement threshold.
      */
-    void TestMovementThreshold() throw (Exception)
+    void TestMovementThreshold()
     {
         EXIT_IF_PARALLEL;   // This test doesn't work in parallel because only one process will throw.
 
@@ -656,7 +710,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -693,7 +747,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -704,6 +758,7 @@ public:
         OffLatticeSimulation<2> simulator(node_based_cell_population);
         simulator.SetEndTime(0.1);
         simulator.SetOutputDirectory("TestOffLatticeSimulationUpdateCellLocationsAndTopologyWithNoForce");
+        simulator.SetupSolve();
 
         simulator.UpdateCellLocationsAndTopology();
 
@@ -723,6 +778,83 @@ public:
         // Avoid memory leak
         delete nodes[0];
         delete nodes[1];
+    }
+
+    /**
+     * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem
+     * and a CellKiller. Test that the simulation can be archived and loaded after cells have been killed.
+     */
+    void TestCellDeathWithArchiving()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator and archiving do not work in parallel
+        {
+            // Create a simple mesh
+            unsigned num_cells_depth = 3;
+            unsigned num_cells_width = 3;
+            HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+            TetrahedralMesh<2, 2> *p_generating_mesh = generator.GetMesh();
+
+            // Convert this to a NodesOnlyMesh
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+            TS_ASSERT_EQUALS(mesh.GetMaximumNodeIndex(), 9u);
+
+            // Create cells
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+            for (unsigned i=0; i<cells.size(); i++)
+            {
+                cells[i]->SetBirthTime(-23.49999);  // These cells divide every 24 hours so here we set them to divide just after the archive/restore
+            }
+
+
+
+            // Create a node based cell population
+            NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+            // Set up cell-based simulation
+            OffLatticeSimulation<2> simulator(node_based_cell_population);
+            simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationDeathArchiving");
+            simulator.SetEndTime(0.5);
+
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            p_linear_force->SetCutOffLength(1.5);
+            simulator.AddForce(p_linear_force);
+
+            // Add cell killer
+            MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.9));  //Probability of death in one hour
+            simulator.AddCellKiller(p_killer);
+
+            // Solve
+            simulator.Solve();
+
+            // Check some results
+            TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+            TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 4u);
+
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+        }
+
+        {
+            OffLatticeSimulation<2>* p_simulator1;
+            p_simulator1 = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestOffLatticeSimulationWithNodeBasedCellPopulationDeathArchiving", 0.5);
+
+            p_simulator1->SetEndTime(1.0);
+            NodesOnlyMesh<2>* p_mesh = static_cast<NodesOnlyMesh<2>*>(&(p_simulator1->rGetCellPopulation().rGetMesh()));
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u); // 9 (original) - 4
+            TS_ASSERT_EQUALS(p_mesh->GetMaximumNodeIndex(), 9u);
+
+            p_simulator1->Solve();
+
+            TS_ASSERT_EQUALS(p_simulator1->GetNumBirths(), 2u);
+            TS_ASSERT_EQUALS(p_simulator1->GetNumDeaths(), 8u); // Including previous 4
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 3u); // 9 - 8 + 2
+            TS_ASSERT_EQUALS(p_mesh->GetMaximumNodeIndex(), 9u + 2u); // New births should get fresh indices regardless of gaps caused by deletion.
+
+            delete p_simulator1;
+        }
     }
 };
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -235,8 +235,12 @@ private:
      * @param flag  CVODE error code
      * @param msg  Our description of the error
      * @param rTime  The time that the solver got to
+     * @param rStartTime  The time that the solver started at.
+     * @param rEndTime  The time that the solver was supposed to solve up to.
+     *
      */
-    void CvodeError(int flag, const char * msg, const double& rTime);
+    void CvodeError(int flag, const char * msg, const double& rTime,
+                    const double& rStartTime, const double& rEndTime);
 
     /** Remember where the last solve got to so we know whether to re-initialise. */
     N_Vector mLastSolutionState;
@@ -494,13 +498,10 @@ public:
 //    void CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
 //                               CHASTE_CVODE_DENSE_MATRIX jacobian,
 //                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeSystem)
- BOOST_CLASS_VERSION(AbstractCvodeSystem, 1u)
+BOOST_CLASS_VERSION(AbstractCvodeSystem, 1u)
 
 #endif //_ABSTRACTCVODESYSTEM_HPP_
 #endif // CHASTE_CVODE
-
-

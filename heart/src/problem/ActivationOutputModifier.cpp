@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,11 +95,11 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
     for (unsigned local_index=0; local_index < mLocalSize; local_index++)
     {
         double v = p_solution[local_index*problemDim];
-        if(v > mThreshold && mFirstActivitationTimes[local_index] < 0.0)
+        if (v > mThreshold && mFirstActivitationTimes[local_index] < 0.0)
         {
             mFirstActivitationTimes[local_index] = time;
         }
-#define COVERAGE_IGNORE // Continuous tests are not long enough to allow recover
+// LCOV_EXCL_START // Continuous tests are not long enough to allow recover
         else if (mFirstActivitationTimes[local_index] >= 0.0 && mFirstRecoveryTimes[local_index] < 0.0 && v < mThreshold)
         {
             ///\todo #2570 Add to a longer running test
@@ -113,7 +113,7 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
         {
             mSecondRecoveryTimes[local_index] = time;
         }
-#undef COVERAGE_IGNORE // Continuous tests are not long enough to allow recover
+// LCOV_EXCL_STOP // Continuous tests are not long enough to allow recover
     }
     VecRestoreArray(solution, &p_solution);
 }

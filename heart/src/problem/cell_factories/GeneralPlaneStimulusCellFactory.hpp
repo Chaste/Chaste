@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,41 +53,23 @@ public:
     /**
      * Constructor
      *
-     * \todo The useMeshWidth is temporary, while we are sorting out
-     * 3D stimulus.  It is to be removed later (along with StimulusConvergenceTester)
-     * scale stimulus depending on space_step of elements
-     *
-     * \todo It looks like the value of the stimulus is specific to 3D
-     *
      * @param numEleAcross  Number of elements across which to apply the stimulus
      * @param meshWidth  Width of the mesh (used to calculate magnitude of stimulus)
-     * @param useMeshWidthAsMag  see todo comments above (defaults to false).
      * @param stimulusMagnitude  Magnitude of the applied stimulus (defaults to -1e7, modified in the constructor dependent on mesh size).
      * @param stimulusDuration  Duration of the applied stimulus (defaults to 0.5ms).
      */
-    GeneralPlaneStimulusCellFactory(unsigned numEleAcross, double meshWidth, bool useMeshWidthAsMag=false, double stimulusMagnitude=-1e7, double stimulusDuration=0.5)
+    GeneralPlaneStimulusCellFactory(unsigned numEleAcross, double meshWidth, double stimulusMagnitude=-1e7, double stimulusDuration=0.5)
         : PlaneStimulusCellFactory<CELL,ELEMENT_DIM, SPACE_DIM>(stimulusMagnitude,stimulusDuration) // These values are overridden below anyway.
     {
-        if (useMeshWidthAsMag)
-        {
-            #define COVERAGE_IGNORE
-            this->mpStimulus.reset(new SimpleStimulus(meshWidth, 0.5));
-            #undef COVERAGE_IGNORE
-        }
-        else
-        {
-            stimulusMagnitude*=numEleAcross/(64.0);
-            // ELEMENT_DIM==1 Justification: elements go half size with each refinement
-            // ELEMENT_DIM==2 Justification: Triangles go quarter size with each refinement, but there are twice as many nodes on boundary
-            // ELEMENT_DIM==3 Hypothesis: Triangles go eighth size with each refinement, but there are four-times as many nodes on boundary
-            stimulusMagnitude*=meshWidth/(0.2);
+        stimulusMagnitude*=numEleAcross/(64.0);
+        // ELEMENT_DIM==1 Justification: elements go half size with each refinement
+        // ELEMENT_DIM==2 Justification: Triangles go quarter size with each refinement, but there are twice as many nodes on boundary
+        // ELEMENT_DIM==3 Hypothesis: Triangles go eighth size with each refinement, but there are four-times as many nodes on boundary
+        stimulusMagnitude*=meshWidth/(0.2);
 
-            //std::cout<<"Mag is "<<stimulusMagnitude<<"\n";
-            this->mpStimulus.reset(new SimpleStimulus(stimulusMagnitude, stimulusDuration));
-            LOG(1, "Defined a GeneralPlaneStimulusCellFactory<"<<SPACE_DIM<<"> with SimpleStimulus("<<stimulusMagnitude<<","<< stimulusDuration<< ")\n");
-        }
+        this->mpStimulus.reset(new SimpleStimulus(stimulusMagnitude, stimulusDuration));
+        LOG(1, "Defined a GeneralPlaneStimulusCellFactory<"<<SPACE_DIM<<"> with SimpleStimulus("<<stimulusMagnitude<<","<< stimulusDuration<< ")\n");
     }
-
 };
 
 #endif /*GENERALPLANESTIMULUSCELLFACTORY_HPP_*/

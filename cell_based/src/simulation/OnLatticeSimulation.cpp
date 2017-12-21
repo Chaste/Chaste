@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,12 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "OnLatticeSimulation.hpp"
-#include "PottsBasedCellPopulation.hpp"
+#include "AbstractOnLatticeCellPopulation.hpp"
 #include "CellBasedEventHandler.hpp"
-#include "LogFile.hpp"
-#include "Version.hpp"
-#include "ExecutableSupport.hpp"
-#include "CaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -53,85 +49,25 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
     {
         EXCEPTION("OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
-
-    this->mDt = 0.1; // 6 minutes
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
+void OnLatticeSimulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
-    }
+    // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
+void OnLatticeSimulation<DIM>::RemoveAllUpdateRules()
 {
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
-    }
-}
-
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule)
-{
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddSwitchingUpdateRule(pUpdateRule);
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::RemoveAllCaSwitchingUpdateRules()
-{
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllSwitchingUpdateRules();
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
-{
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
-{
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
-    }
-}
-
-template<unsigned DIM>
-c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
-{
-    ///\todo do something for Potts models here
-    return zero_vector<double>(DIM);
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::WriteVisualizerSetupFile()
-{
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&this->mrCellPopulation)))
-    {
-       *this->mpVizSetupFile << "PottsSimulation\n";
-    }
+    // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
 }
 
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
-    // Update cell locations
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
     static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->UpdateCellLocations(this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
@@ -140,26 +76,7 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
-    bool update_cell_population_this_timestep = true;
-    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        /*
-         * If mInitialiseCells is false, then the simulation has been loaded from an archive.
-         * In this case, we should not call UpdateCellPopulation() at the first time step. This is
-         * because it will have already been called at the final time step prior to saving;
-         * if we were to call it again now, then we would have introduced an extra call to
-         * the random number generator compared to if we had not saved and loaded the simulation,
-         * thus affecting results. This would be bad - we don't want saving and loading to have
-         * any effect on the course of a simulation! See #1445.
-         */
-        if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
-        {
-            NEVER_REACHED;
-            ///\todo #2066 This code should be covered by  cell_based/test/simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp TestLoad
-//            update_cell_population_this_timestep = false;
-        }
-    }
-
+    bool update_cell_population_this_timestep = (this->mInitialiseCells) || (SimulationTime::Instance()->GetTimeStepsElapsed() != 0);
     if (update_cell_population_this_timestep)
     {
         AbstractCellBasedSimulation<DIM>::UpdateCellPopulation();
@@ -171,45 +88,18 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
 {
     // Loop over the collection of update rules and output info for each
     *rParamsFile << "\n\t<UpdateRules>\n";
-    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
+
+    // This static_cast is fine, since otherwise an exception would have been thrown in the constructor
+    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > collection =
+            static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->GetUpdateRuleCollection();
+
+    for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = collection.begin();
+         iter != collection.end();
+         ++iter)
     {
-        std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > collection =
-            static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
-
-        for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = collection.begin();
-             iter != collection.end();
-             ++iter)
-        {
-            (*iter)->OutputUpdateRuleInfo(rParamsFile);
-        }
+        (*iter)->OutputUpdateRuleInfo(rParamsFile);
     }
-    else if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
-    {
-        std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > collection =
-            static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
 
-        for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iter = collection.begin();
-             iter != collection.end();
-             ++iter)
-        {
-            (*iter)->OutputUpdateRuleInfo(rParamsFile);
-        }
-
-        std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > switching_collection =
-            static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetSwitchingUpdateRuleCollection();
-
-        for (typename std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >::iterator iter = switching_collection.begin();
-             iter != switching_collection.end();
-             ++iter)
-        {
-            (*iter)->OutputUpdateRuleInfo(rParamsFile);
-        }
-
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
     *rParamsFile << "\t</UpdateRules>\n";
 }
 
@@ -220,7 +110,7 @@ void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFil
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class OnLatticeSimulation<1>;
 template class OnLatticeSimulation<2>;
 template class OnLatticeSimulation<3>;

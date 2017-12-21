@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMultiLobeAirwayGenerator : public CxxTest::TestSuite
 {
 public:
-    void TestAddLobes() throw(Exception)
+    void TestAddLobes()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -81,10 +81,12 @@ public:
         TS_ASSERT_EQUALS(generator.GetNumLobes(LEFT), 2u);
         TS_ASSERT_EQUALS(generator.GetNumLobes(RIGHT), 1u);
 
+        generator.AddLobe("lung/test/data/rll.stl", RIGHT);
+        TS_ASSERT_EQUALS(generator.GetNumLobes(RIGHT), 2u);
 #endif
     }
 
-    void TestAssignGrowthApicesAndDistributePoints() throw(Exception)
+    void TestAssignGrowthApicesAndDistributePoints()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -117,11 +119,11 @@ public:
 
         //Check that the correct number of points have been distributed
         typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for(std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
+        for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
             iter != generator.mLobeGenerators.end();
             ++iter)
         {
-            if(iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
+            if (iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
             {
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 25, 2);
             }
@@ -134,7 +136,7 @@ public:
     #endif
     }
 
-    void TestDistributePointsByVolume() throw(Exception)
+    void TestDistributePointsByVolume()
     {
     #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -168,11 +170,11 @@ public:
 
         //Check that the correct number of points have been distributed
         typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for(std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
+        for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
             iter != generator.mLobeGenerators.end();
             ++iter)
         {
-            if(iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
+            if (iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
             {
                 TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
             }
@@ -185,7 +187,7 @@ public:
     #endif
     }
 
-    void TestGenerate() throw(Exception)
+    void TestGenerate()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -285,9 +287,6 @@ private:
         return triangle_filter->GetOutput();
     }
 #endif
-
 };
-
-
 
 #endif /* TESTMULTILOBEAIRWAYGENERATOR_HPP_ */

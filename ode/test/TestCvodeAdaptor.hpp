@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -150,7 +150,7 @@ private:
 #endif // CHASTE_CVODE
 
 public:
-    void TestBasics() throw (Exception)
+    void TestBasics()
     {
 #ifdef CHASTE_CVODE
         CvodeAdaptor solver;
@@ -169,7 +169,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestOnOde1() throw (Exception)
+    void TestOnOde1()
     {
 #ifdef CHASTE_CVODE
         HelperTestOde1(0.0, 2.0, 0.001);
@@ -182,7 +182,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestGlobalError() throw (Exception)
+    void TestGlobalError()
     {
 #ifdef CHASTE_CVODE
         OdeFirstOrder ode_system;
@@ -211,7 +211,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestMultipleCalls() throw (Exception)
+    void TestMultipleCalls()
     {
 #ifdef CHASTE_CVODE
         OdeFirstOrder ode_system;
@@ -280,7 +280,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestGlobalErrorSystemOf2Equations() throw (Exception)
+    void TestGlobalErrorSystemOf2Equations()
     {
 #ifdef CHASTE_CVODE
         OdeSecondOrder ode_system;
@@ -311,7 +311,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestWithStoppingEvent() throw (Exception)
+    void TestWithStoppingEvent()
     {
 #ifdef CHASTE_CVODE
         OdeSecondOrderWithEvents ode_system;
@@ -366,7 +366,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestWithRootFunction() throw (Exception)
+    void TestWithRootFunction()
     {
 #ifdef CHASTE_CVODE
         OdeWithRootFunction ode_system;
@@ -413,7 +413,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
 #ifdef CHASTE_CVODE
         ExceptionalOdeWithRootFunction ode_system;
@@ -447,7 +447,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestArchivingCvodeAdaptorSolver() throw(Exception)
+    void TestArchivingCvodeAdaptorSolver()
     {
         EXIT_IF_PARALLEL;
 
@@ -492,7 +492,6 @@ public:
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_CVODE
     }
-
 };
 
 #endif //_TESTCVODEADAPTOR_HPP_

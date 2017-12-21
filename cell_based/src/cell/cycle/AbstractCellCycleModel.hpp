@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,11 +54,11 @@ typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
  * The AbstractCellCycleModel contains basic information to all cell-cycle models.
- * It handles assignment of birth time, cell cycle phase and a Cell.
+ * It handles assignment of birth time, and associates the model with a Cell.
  *
  * Cell-cycle models are noncopyable since cells are noncopyable.
  */
-class AbstractCellCycleModel : public Identifiable, boost::noncopyable
+class AbstractCellCycleModel : public Identifiable
 {
 private:
 
@@ -80,17 +80,18 @@ private:
         // DO NOT archive & mpCell; -- The CellCycleModel is only ever archived from the Cell
         // which knows this and it is handled in the load_construct of Cell.
         archive & mBirthTime;
-        archive & mCurrentCellCyclePhase;
-        archive & mG1Duration;
         archive & mReadyToDivide;
         archive & mDimension;
-        archive & mMinimumGapDuration;
-        archive & mStemCellG1Duration;
-        archive & mTransitCellG1Duration;
-        archive & mSDuration;
-        archive & mG2Duration;
-        archive & mMDuration;
     }
+
+    /**
+     * Prevent copy-assignment of this class, or its subclasses.
+     * Note that we do not define this method, therefore statements like "AbstractCellCycleModel new = old;" will not compile.
+     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateCellCycleModel.
+     *
+     * @return the new cell cycle model.
+     */
+    AbstractCellCycleModel& operator=(const AbstractCellCycleModel&);
 
 protected:
 
@@ -103,15 +104,6 @@ protected:
      */
     double mBirthTime;
 
-    /** The phase of the cell cycle that this model is in (specified in CellCyclePhases.hpp) */
-    CellCyclePhase mCurrentCellCyclePhase;
-
-    /**
-     * How long the G1 phase lasts for.
-     * Not necessarily a fixed value.
-     */
-    double mG1Duration;
-
     /**
      * Whether the cell is currently ready to undergo division.
      */
@@ -123,41 +115,19 @@ protected:
     unsigned mDimension;
 
     /**
-     * Minimum possible duration of either of the gap phases (G1 or G2).
-     * Has units of hours.
+     * Protected copy-constructor for use by CreateCellCycleModel.
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
-     * Used to guarantee a strictly positive duration in cell-cycle models that
-     * use normal random deviates for G1 or G2 phases.
-     */
-    double mMinimumGapDuration;
-
-    /**
-     * Duration of G1 phase for stem cells.
-     * May be used as a mean duration for stochastic cell-cycle models.
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
      *
+     * @param rModel the cell cycle model to copy.
      */
-    double mStemCellG1Duration;
-
-    /**
-     * Duration of G1 phase for transit cells.
-     * May be used as a mean duration for stochastic cell-cycle models.
-     */
-    double mTransitCellG1Duration;
-
-    /**
-     * Duration of S phase for all cell types.
-     */
-    double mSDuration;
-
-    /**
-     * Duration of G2 phase for all cell types.
-     */
-    double mG2Duration;
-
-    /**
-     * Duration of M phase for all cell types.
-     */
-    double mMDuration;
+    AbstractCellCycleModel(const AbstractCellCycleModel& rModel);
 
 public:
 
@@ -223,7 +193,7 @@ public:
      *
      * @param birthTime the simulation time at this cell's birth.
      *
-     * (This function is overridden in AbstractOdeBasedCellCycleModel).
+     * (This function is overridden in  ODE Based Cell Cycle Models).
      */
     virtual void SetBirthTime(double birthTime);
 
@@ -237,7 +207,7 @@ public:
     /**
      * @return the dimension this cell-cycle model thinks the simulation is in.
      */
-    unsigned GetDimension();
+    unsigned GetDimension() const;
 
     /**
      * @return the time at which the cell was born.
@@ -250,22 +220,17 @@ public:
     double GetAge();
 
     /**
-     * @return whether the cell is ready to divide (enter M phase).
+     * @return whether the cell is ready to divide.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * The intention is that this method is called precisely once at
      * each timestep of the simulation. However this does not appear
      * to always be the case at present, and so it can cope with more
      * unusual usage patterns.
      */
-    virtual bool ReadyToDivide();
-
-    /**
-     * This method must be implemented by subclasses in order to set the phase
-     * the cell-cycle model is currently in. It is called from ReadyToDivide()
-     * just prior to deciding whether to divide the cell based on how far through
-     * the cell cycle it is, i.e. whether it has completed M, G1, S and G2 phases.
-     */
-    virtual void UpdateCellCyclePhase()=0;
+    virtual bool ReadyToDivide()=0;
 
     /**
      * Each cell-cycle model must be able to be reset 'after' a cell division.
@@ -289,97 +254,14 @@ public:
      * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
-     * @return new cell-cycle model
+     * Copy constructors are used to set all the member variables in the appropriate classes.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @return new cell-cycle model
      */
     virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
-
-    /**
-     * @return the current cell cycle phase
-     */
-    CellCyclePhase GetCurrentCellCyclePhase();
-
-    /**
-     * @return the duration of the G1 phase of the cell cycle
-     */
-    virtual double GetG1Duration();
-
-    /**
-     * @return mStemCellG1Duration
-     */
-    double GetStemCellG1Duration();
-
-    /**
-     * @return mTransitCellG1Duration
-     */
-    double GetTransitCellG1Duration();
-
-    /**
-     * @return mSDuration + mG2Duration + mMDuration
-     */
-    double GetSG2MDuration();
-
-    /**
-     * @return the duration of the S phase of the cell cycle mSDuration
-     */
-    virtual double GetSDuration();
-
-    /**
-     * @return the duration of the G2 phase of the cell cycle mG2Duration
-     */
-    virtual double GetG2Duration();
-
-    /**
-     * @return the duration of the M phase of the cell cycle mMDuration
-     */
-    virtual double GetMDuration();
-
-    /**
-     * Set mStemCellG1Duration.
-     *
-     * @param stemCellG1Duration  the new value of mStemCellG1Duration
-     */
-    virtual void SetStemCellG1Duration(double stemCellG1Duration);
-
-    /**
-     * Set mTransitCellG1Duration.
-     *
-     * @param transitCellG1Duration  the new value of mTransitCellG1Duration
-     */
-    virtual void SetTransitCellG1Duration(double transitCellG1Duration);
-
-    /**
-     * Set mSDuration.
-     *
-     * @param sDuration  the new value of mSDuration
-     */
-    void SetSDuration(double sDuration);
-
-    /**
-     * Set mG2Duration.
-     *
-     * @param g2Duration  the new value of mG2Duration
-     */
-    void SetG2Duration(double g2Duration);
-
-    /**
-     * Set mMDuration.
-     *
-     * @param mDuration  the new value of mMDuration
-     */
-    void SetMDuration(double mDuration);
-
-    /**
-     * @return the typical cell cycle duration for a transit cell, in hours.
-     * This method is overridden in some subclasses.
-     */
-    virtual double GetAverageTransitCellCycleTime();
-
-    /**
-     * @return the typical cell cycle duration for a stem cell, in hours.
-     * This method is overridden in some subclasses.
-     */
-    virtual double GetAverageStemCellCycleTime();
 
     /**
      *  @return whether a cell with this cell-cycle model is able to fully (terminally) differentiate.
@@ -387,16 +269,24 @@ public:
     virtual bool CanCellTerminallyDifferentiate();
 
     /**
-     * @return mMinimumGapDuration
+     * @return the typical cell cycle duration for a transit cell, in hours.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * #2788 Consider merging this with GetAverageStemCellCycleTime to GetAverageCellCycleDuration
      */
-    double GetMinimumGapDuration();
+    virtual double GetAverageTransitCellCycleTime()=0;
 
     /**
-     * Set mMinimumGapDuration.
+     * @return the typical cell cycle duration for a stem cell, in hours.
      *
-     * @param minimumGapDuration the new value of mMinimumGapDuration
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * #2788 Consider merging this with GetAverageTransitCellCycleTime to GetAverageCellCycleDuration
      */
-    void SetMinimumGapDuration(double minimumGapDuration);
+    virtual double GetAverageStemCellCycleTime()=0;
 
     /**
      * Outputs cell-cycle model used in the simulation to file and then calls

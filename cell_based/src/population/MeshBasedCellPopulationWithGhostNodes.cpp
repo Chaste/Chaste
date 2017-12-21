@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,17 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
 #include "CellLocationIndexWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(
@@ -88,15 +78,22 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                                                  double ghostSpringStiffness)
-             : MeshBasedCellPopulation<DIM,DIM>(rMesh),
-               mGhostSpringStiffness(ghostSpringStiffness)
+                                                                                  double ghostSpringStiffness)
+    : MeshBasedCellPopulation<DIM,DIM>(rMesh),
+      mGhostSpringStiffness(ghostSpringStiffness)
 {
 }
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::~MeshBasedCellPopulationWithGhostNodes()
 {
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* MeshBasedCellPopulationWithGhostNodes<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
+    return static_cast<TetrahedralMesh<DIM, DIM>*>(&(this->mrMesh));
 }
 
 template<unsigned DIM>
@@ -141,65 +138,15 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(const std::set<un
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostPositions(double dt)
-{
-    // Initialise vector of forces on ghost nodes
-    std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
-    for (unsigned i=0; i<drdt.size(); i++)
-    {
-        drdt[i] = zero_vector<double>(DIM);
-    }
-
-    // Calculate forces on ghost nodes
-    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
-        edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
-        ++edge_iterator)
-    {
-        unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
-        unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
-
-        c_vector<double, DIM> force = CalculateForceBetweenGhostNodes(nodeA_global_index, nodeB_global_index);
-
-        double damping_constant = this->GetDampingConstantNormal();
-
-        if (!this->mIsGhostNode[nodeA_global_index])
-        {
-            drdt[nodeB_global_index] -= force / damping_constant;
-        }
-        else
-        {
-            drdt[nodeA_global_index] += force / damping_constant;
-
-            if (this->mIsGhostNode[nodeB_global_index])
-            {
-                drdt[nodeB_global_index] -= force / damping_constant;
-            }
-        }
-    }
-
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-         node_iter != this->mrMesh.GetNodeIteratorEnd();
-         ++node_iter)
-    {
-        unsigned node_index = node_iter->GetIndex();
-        if (this->mIsGhostNode[node_index])
-        {
-            ChastePoint<DIM> new_point(node_iter->rGetLocation() + dt*drdt[node_index]);
-            static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).SetNode(node_index, new_point, false);
-        }
-    }
-}
-
-template<unsigned DIM>
 c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForceBetweenGhostNodes(const unsigned& rNodeAGlobalIndex, const unsigned& rNodeBGlobalIndex)
 {
     assert(rNodeAGlobalIndex != rNodeBGlobalIndex);
     c_vector<double, DIM> unit_difference;
-    c_vector<double, DIM> node_a_location = this->GetNode(rNodeAGlobalIndex)->rGetLocation();
-    c_vector<double, DIM> node_b_location = this->GetNode(rNodeBGlobalIndex)->rGetLocation();
+    const c_vector<double, DIM>& r_node_a_location = this->GetNode(rNodeAGlobalIndex)->rGetLocation();
+    const c_vector<double, DIM>& r_node_b_location = this->GetNode(rNodeBGlobalIndex)->rGetLocation();
 
     // There is reason not to subtract one position from the other (cylindrical meshes)
-    unit_difference = this->mrMesh.GetVectorFromAtoB(node_a_location, node_b_location);
+    unit_difference = this->mrMesh.GetVectorFromAtoB(r_node_a_location, r_node_b_location);
 
     double distance_between_nodes = norm_2(unit_difference);
     unit_difference /= distance_between_nodes;
@@ -210,10 +157,10 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
 }
 
 template<unsigned DIM>
-CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-    // Add new cell to cell population
-    CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+    // Add new cell to population
+    CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Update size of mIsGhostNode if necessary
@@ -324,15 +271,52 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::AcceptCellWritersAcrossPopulati
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::ApplyGhostForces()
 {
-    // First update ghost positions first because they do not affect the real cells
-    UpdateGhostPositions(dt);
+    // Initialise vector of forces on ghost nodes
+    std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
+    for (unsigned i=0; i<drdt.size(); i++)
+    {
+        drdt[i] = zero_vector<double>(DIM);
+    }
 
-    // Then call the base class method
-    AbstractCentreBasedCellPopulation<DIM,DIM>::UpdateNodeLocations(dt);
+    // Calculate forces on ghost nodes
+    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
+        edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
+        ++edge_iterator)
+    {
+        unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
+        unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
+
+        c_vector<double, DIM> force = CalculateForceBetweenGhostNodes(nodeA_global_index, nodeB_global_index);
+
+        if (!this->mIsGhostNode[nodeA_global_index])
+        {
+            drdt[nodeB_global_index] -= force;
+        }
+        else
+        {
+            drdt[nodeA_global_index] += force;
+
+            if (this->mIsGhostNode[nodeB_global_index])
+            {
+                drdt[nodeB_global_index] -= force;
+            }
+        }
+    }
+
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+         node_iter != this->mrMesh.GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        unsigned node_index = node_iter->GetIndex();
+        if (this->mIsGhostNode[node_index])
+        {
+            node_iter->ClearAppliedForce();
+            node_iter->AddAppliedForceContribution(drdt[node_index]);
+        }
+    }
 }
-
 
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
@@ -352,7 +336,7 @@ template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    if (this->mpVoronoiTessellation != NULL)
+    if (this->mpVoronoiTessellation != nullptr)
     {
         unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
         std::stringstream time;

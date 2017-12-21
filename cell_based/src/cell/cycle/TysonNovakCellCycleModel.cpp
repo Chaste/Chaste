@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,20 +58,42 @@ TysonNovakCellCycleModel::TysonNovakCellCycleModel(boost::shared_ptr<AbstractCel
     }
 }
 
+TysonNovakCellCycleModel::TysonNovakCellCycleModel(const TysonNovakCellCycleModel& rModel)
+    : AbstractOdeBasedCellCycleModel(rModel)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     * Create the new cell-cycle model's ODE system and use the current
+     * values of the state variables in mpOdeSystem as an initial condition.
+     *
+     * The member variable mDivideTime is initialized in the
+     * AbstractOdeBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     *
+     * Note that the cell proliferative type is (re)set as soon as
+     * InitialiseDaughterCell() is called on the new cell-cycle model.
+     */
+    assert(rModel.GetOdeSystem());
+    SetOdeSystem(new TysonNovak2001OdeSystem);
+    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+}
+
 void TysonNovakCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
+    assert(mpOdeSystem == nullptr);
     mpOdeSystem = new TysonNovak2001OdeSystem;
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
 
-    AbstractCellCycleModel::Initialise();
+    AbstractOdeBasedCellCycleModel::Initialise();
 }
 
 void TysonNovakCellCycleModel::ResetForDivision()
 {
     AbstractOdeBasedCellCycleModel::ResetForDivision();
 
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     /**
      * This model needs the protein concentrations and phase resetting to G0/G1.
@@ -106,84 +128,14 @@ void TysonNovakCellCycleModel::InitialiseDaughterCell()
          * CellPropertyCollection.
          */
         boost::shared_ptr<AbstractCellProperty> p_transit_type =
-            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
+        mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_transit_type);
     }
 }
 
 AbstractCellCycleModel* TysonNovakCellCycleModel::CreateCellCycleModel()
 {
-    // Create a new cell-cycle model
-    TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel(mpOdeSolver);
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mDt, mpOdeSolver)
-     * will already have been correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     *
-     * Note 3: the member variable mDimension remains unset, since this cell-cycle
-     * model does not need to know the spatial dimension, so if we were to call
-     * SetDimension() on the new cell-cycle model an exception would be triggered;
-     * hence we do not set this member variable.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetDivideTime(mDivideTime);
-    p_model->SetFinishedRunningOdes(mFinishedRunningOdes);
-    p_model->SetG2PhaseStartTime(mG2PhaseStartTime);
-    p_model->SetLastTime(mLastTime);
-
-    /*
-     * Create the new cell-cycle model's ODE system and use the current values
-     * of the state variables in mpOdeSystem as an initial condition.
-     */
-    assert(mpOdeSystem);
-    p_model->SetOdeSystem(new TysonNovak2001OdeSystem);
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
-
-    return p_model;
-}
-
-double TysonNovakCellCycleModel::GetSDuration()
-{
-    /**
-     * Tyson & Novak pretends it is running ODEs in just G1,
-     * but they really represent the whole cell cycle, so
-     * we set the other phases to zero.
-     */
-    return 0.0;
-}
-
-double TysonNovakCellCycleModel::GetG2Duration()
-{
-    /**
-     * Tyson & Novak pretends it is running ODEs in just G1,
-     * but they really represent the whole cell cycle so
-     * we set the other phases to zero.
-     */
-    return 0.0;
-}
-
-double TysonNovakCellCycleModel::GetMDuration()
-{
-    /**
-     * Tyson & Novak pretends it is running ODEs in just G1,
-     * but they really represent the whole cell cycle so
-     * we set the other phases to zero.
-     */
-    return 0.0;
+    return new TysonNovakCellCycleModel(*this);
 }
 
 double TysonNovakCellCycleModel::GetAverageTransitCellCycleTime()

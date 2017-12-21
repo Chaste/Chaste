@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,13 +42,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "Cell.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
 #include "StochasticWntCellCycleModel.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -61,7 +65,7 @@ public:
      * ReadyToDivide() now calls UpdateCellProliferativeType() where appropriate.
      * (at the moment in Wnt-dependent cells).
      */
-    void TestUpdateCellProliferativeTypes() throw (Exception)
+    void TestUpdateCellProliferativeTypes()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);
@@ -69,7 +73,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_stem_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -124,7 +128,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModel() throw(Exception)
+    void TestWithWntCellCycleModel()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
@@ -207,7 +211,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithStochasticWntCellCycleModel() throw(Exception)
+    void TestWithStochasticWntCellCycleModel()
     {
         // If random number generation changes, then print these three lines to get the numbers to go in below
 //        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(4, 0.9) << "\n";
@@ -301,7 +305,7 @@ public:
      * (these test that the cell cycle times are correct for the
      * various mutant cells)
      */
-    void TestWntMutantVariantsAndLabelling() throw(Exception)
+    void TestWntMutantVariantsAndLabelling()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 

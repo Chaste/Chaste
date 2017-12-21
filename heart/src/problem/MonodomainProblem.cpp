@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -136,18 +136,12 @@ void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::WriteOneStep(double time, Vec vo
     AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,1>::WriteExtraVariablesOneStep();
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class MonodomainProblem<1,1>;
 template class MonodomainProblem<1,2>;
 template class MonodomainProblem<1,3>;
 template class MonodomainProblem<2,2>;
 template class MonodomainProblem<3,3>;
-
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

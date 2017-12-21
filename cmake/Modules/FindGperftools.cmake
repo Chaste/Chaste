@@ -61,14 +61,22 @@ find_library(GPERFTOOLS_TCMALLOC_AND_PROFILER
   HINTS ${Gperftools_ROOT_DIR}/lib)
 
 find_path(GPERFTOOLS_INCLUDE_DIR
-  NAMES gperftools/heap-profiler.h
+  NAMES gperftools/heap-profiler.h google/heap-profiler.h
   HINTS ${Gperftools_ROOT_DIR}/include)
 
 find_file(GPERFTOOLS_PPROF_EXE
   NAMES pprof google-pprof
   HINTS ${Gperftools_ROOT_DIR}/bin)
 
-set(GPERFTOOLS_LIBRARIES ${GPERFTOOLS_TCMALLOC_AND_PROFILER})
+if (GPERFTOOLS_TCMALLOC_AND_PROFILER)
+    message("-- Gperftools: Found combined tcmalloc and profiler")
+    message("-- \t ${GPERFTOOLS_TCMALLOC_AND_PROFILER}")
+    set(GPERFTOOLS_LIBRARIES ${GPERFTOOLS_TCMALLOC_AND_PROFILER})
+elseif (GPERFTOOLS_PROFILER AND GPERFTOOLS_TCMALLOC)
+    message("-- Gperftools: Found separate tcmalloc and profiler")
+    message("-- \t ${GPERFTOOLS_TCMALLOC} ${GPERFTOOLS_PROFILER}")
+    set(GPERFTOOLS_LIBRARIES ${GPERFTOOLS_TCMALLOC} ${GPERFTOOLS_PROFILER})
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(

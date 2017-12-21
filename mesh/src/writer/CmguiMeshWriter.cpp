@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -184,18 +184,18 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
         std::string elem_file_name = mRegionNames[region_index] + ".exelem";
 
         boost::shared_ptr<std::ofstream> p_output_file(new std::ofstream((directory+elem_file_name).c_str(), GetOpenMode(append)));
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         if (!p_output_file->is_open())
         {
             EXCEPTION("Could not open file \"" + elem_file_name + "\" in " + directory);
         }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
         // NOTE THAT one could simply do:
         //
         // elem_files[region_index]  = this->mpOutputFileHandler->OpenOutputFile(elem_file_name, GetOpenMode(append));
         //
-        // but that implies automatic conversion between std::auto_ptr to boost::shared_ptr.
+        // but that implies automatic conversion between std::shared_ptr to boost::shared_ptr.
         // That is OK with most compilers, but the combination of gcc 4.1 and boost 1.33 complains about that
         elem_files[region_index]  = p_output_file;
     }
@@ -330,7 +330,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
          ++iter)
     {
-        if ( this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
+        if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
             assert(iter->GetUnsignedAttribute() < mRegionNames.size());//segfault guard
 
@@ -372,10 +372,7 @@ std::ios_base::openmode CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetOpenMode(boo
     return mode;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class CmguiMeshWriter<1,1>;
 template class CmguiMeshWriter<1,2>;
 template class CmguiMeshWriter<1,3>;

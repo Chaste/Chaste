@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,10 +95,7 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder&
     PetscTools::Destroy(data);
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class Hdf5ToTxtConverter<1,1>;
 template class Hdf5ToTxtConverter<1,2>;
 template class Hdf5ToTxtConverter<2,2>;

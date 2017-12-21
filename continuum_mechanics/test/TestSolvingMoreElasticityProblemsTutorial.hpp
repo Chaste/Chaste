@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  */
-#ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
-#define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
+#ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
+#define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 
 /* == Introduction ==
  *
@@ -79,7 +79,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& rX, double time)
  */
 
 
-class TestSolvingMoreElasticityProblemsTutorials : public CxxTest::TestSuite
+class TestSolvingMoreElasticityProblemsTutorial : public CxxTest::TestSuite
 {
 public:
 
@@ -89,7 +89,7 @@ public:
      * on the Dirichlet boundary, and also show how to prescribe a traction that is given in functional form
      * rather than prescribed for each boundary element.
      */
-    void TestIncompressibleProblemMoreComplicatedExample() throw(Exception)
+    void TestIncompressibleProblemMoreComplicatedExample()
     {
         /* Create a mesh */
         QuadraticMesh<2> mesh;
@@ -106,7 +106,7 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             /* If the node is on the Y=0 surface (the LHS) */
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[1])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 /* Add it to the list of fixed nodes */
                 fixed_nodes.push_back(i);
@@ -201,7 +201,7 @@ public:
      * translation in the Y direction could be added a solution to obtain another valid solution, so we
      * fully fix the node at the origin.)
      */
-    void TestWithSlidingDirichletBoundaryConditions() throw(Exception)
+    void TestWithSlidingDirichletBoundaryConditions()
     {
         QuadraticMesh<2> mesh;
         mesh.ConstructRegularSlabMesh(0.1 /*stepsize*/, 1.0 /*width*/, 1.0 /*height*/);
@@ -219,7 +219,7 @@ public:
         /* For the rest, if the node is on the Y=0 surface.. */
         for (unsigned i=1; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[1])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 /* ..add it to the list of fixed nodes.. */
                 fixed_nodes.push_back(i);
@@ -261,7 +261,7 @@ public:
      * Note: for other examples of compressible solves, including problems with an exact solution, see the
      * file `continuum_mechanics/test/TestCompressibleNonlinearElasticitySolver.hpp`
      */
-    void TestSolvingCompressibleProblem() throw (Exception)
+    void TestSolvingCompressibleProblem()
     {
         /* All mechanics problems must take in quadratic meshes, but the mesh files for
          * (standard) linear meshes in Triangles/Tetgen can be automatically converted
@@ -285,7 +285,7 @@ public:
               ++iter)
         {
             double Y = (*iter)->rGetLocation()[1];
-            if(Y < -0.9)
+            if (Y < -0.9)
             {
                 fixed_nodes.push_back((*iter)->GetIndex());
             }
@@ -304,7 +304,7 @@ public:
             ++iter)
         {
            BoundaryElement<1,2>* p_element = *iter;
-           if(p_element->CalculateCentroid()[1]<0.0)
+           if (p_element->CalculateCentroid()[1]<0.0)
            {
                boundary_elems.push_back(p_element);
            }
@@ -372,4 +372,4 @@ public:
     }
 };
 
-#endif // TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIALS_HPP_
+#endif // TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_

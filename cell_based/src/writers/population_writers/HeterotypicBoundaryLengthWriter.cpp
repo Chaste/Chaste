@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,12 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HeterotypicBoundaryLengthWriter.hpp"
+
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+
+#include "CellLabel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::HeterotypicBoundaryLengthWriter()
@@ -135,7 +138,6 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
 
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
-
 
         // Get this node's von Neumann neighbours (not Moore neighbours, since they must share an edge)
         std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);

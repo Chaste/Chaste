@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,12 +61,12 @@ void NonPhysiologicalContractionModel::SetStretchAndStretchRate(double stretch, 
 
 double NonPhysiologicalContractionModel::GetActiveTension()
 {
-    if(mOption==1)
+    if (mOption==1)
     {
         // If solving mechanics problem, results using implicit and explicit solvers are identical, as they should be
         return fabs(sin(mTime));
     }
-    else if(mOption==2)
+    else if (mOption==2)
     {
         // small error between implicit and explicit at lowest dt
         // next dt, small difference between explicit at lowest dt, mostly due to first timestep

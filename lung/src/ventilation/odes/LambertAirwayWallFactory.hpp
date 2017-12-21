@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,7 +68,6 @@ public:
      */
     virtual ~LambertAirwayWallFactory();
 
-
     /**
      * @return a newly airway wall object for the given node.
      *
@@ -77,8 +76,12 @@ public:
      */
     virtual LambertAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
 
+    double GetAlpha0ForGeneration(unsigned generation);
+    double GetAlpha0PrimeForGeneration(unsigned generation);
+    double GetN1ForGeneration(unsigned generation);
+    double GetN2ForGeneration(unsigned generation);
+
     /**
-     *
      * @param time The current time in seconds
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
@@ -89,17 +92,6 @@ public:
      * @param pMesh  the mesh for which to create acinar units.
      */
     virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh);
-
-
-private:
-    /** Walker to determine order of airway elements */
-    AirwayTreeWalker* mpWalker;
-
-    /** By default use Horsfield order, this flag allows use of Strahler order */
-    bool mUseStrahlerOrder;
-
-    /** The largest order in the airway tree*/
-    double mMaxOrder;
 
     /** alpha_0 values by generation dimensionless */
     static const double mAlpha0[17];
@@ -115,7 +107,16 @@ private:
 
     /** The number of generations in the Lambert data. Nb generation number starts at 0! */
     static const double mMaxGeneration;
+
+private:
+    /** Walker to determine order of airway elements */
+    AirwayTreeWalker* mpWalker;
+
+    /** By default use Horsfield order, this flag allows use of Strahler order */
+    bool mUseStrahlerOrder;
+
+    /** The largest order in the airway tree*/
+    double mMaxOrder;
 };
 
 #endif /*LAMBERTAIRWAYWALLFACTORY_HPP_*/
-

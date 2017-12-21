@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /// gcov doesn't like this file...
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 
 /**
  * @file
@@ -145,47 +145,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-// Handle broken BOOST_CLASS_EXPORT in Boost 1.36 & 1.37
-#if BOOST_VERSION >= 103600 && BOOST_VERSION < 103800
-
-/**
- * Global unique identifier for Boost 1.36 and 1.37, to avoid using the source line
- * number as a 'unique' id.
- * @param T type this guid is for
- * @param K string version of T
- * @param S uniquifying string
- */
-#define CHASTE_CLASS_EXPORT_GUID(T, K, S)                                           \
-namespace                                                                           \
-{                                                                                   \
-    ::boost::archive::detail::guid_initializer< T > const &                         \
-        BOOST_PP_CAT(BOOST_PP_CAT(boost_serialization_guid_initializer_, __LINE__), S)               \
-        = ::boost::serialization::singleton<                                        \
-            ::boost::archive::detail::guid_initializer< T >                         \
-          >::get_mutable_instance().export_guid(K);                                 \
-}
-
-/**
- * General export for templated classes.
- * @param T  a type
- * @param S  a unique string for the class + specific template parameter values
- */
-#define CHASTE_CLASS_EXPORT_TEMPLATED(T, S)    \
-    CHASTE_CLASS_EXPORT_GUID(                  \
-        T,                                     \
-        BOOST_PP_STRINGIZE(T), S               \
-    )                                          \
-
-/**
- * What CHASTE_CLASS_EXPORT expands to when it isn't a no-op.
- * @param T  the class to export
- */
-#define CHASTE_CLASS_EXPORT_INTERNAL(T)        \
-   CHASTE_CLASS_EXPORT_TEMPLATED(T, T)
-
-
 // The interface changes yet again in Boost 1.41, and we need something in both .hpp and .cpp...
-#elif BOOST_VERSION >= 104100
+#if BOOST_VERSION >= 104100
 // .hpp file needs to use BOOST_CLASS_EXPORT_KEY
 
 /**
@@ -459,4 +420,4 @@ template<class T> struct pack<void (T)> {
 #endif // Long if!
 #endif // !defined(CHASTE_CLASS_EXPORT) || defined(CHASTE_SERIALIZATION_CPP)
 
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP

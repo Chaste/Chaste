@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -136,7 +136,7 @@ bool Divides(double smallerNumber, double largerNumber)
 
 unsigned CeilDivide(unsigned numerator, unsigned denominator)
 {
-    if( numerator==0u )
+    if (numerator == 0u)
     {
         return 0u;
     }
@@ -157,13 +157,6 @@ bool CompareDoubles::IsNearZero(double number, double tolerance)
     return fabs(number) <= fabs(tolerance);
 }
 
-/**
- * Divide two non-negative floating point numbers, avoiding overflow and underflow.
- * @param numerator  the number to be divided
- * @param divisor  the number to divide by
- */
-double SafeDivide(double numerator, double divisor);
-
 double SafeDivide(double numerator, double divisor)
 {
     // Avoid overflow
@@ -179,7 +172,6 @@ double SafeDivide(double numerator, double divisor)
     }
 
     return numerator/divisor;
-
 }
 
 bool CompareDoubles::WithinRelativeTolerance(double number1, double number2, double tolerance)

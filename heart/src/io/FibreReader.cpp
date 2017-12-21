@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,8 +119,8 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
             third_direction.push_back(col2);
         }
     }
-
 }
+
 template<unsigned DIM>
 void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
                                                     c_matrix<double,DIM,DIM>& rFibreMatrix,
@@ -152,19 +152,18 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
              num_entries = GetTokensAtNextLine();
              mNextIndex++;
         }
-        if(num_entries < mNumItemsPerLine)
+        if (num_entries < mNumItemsPerLine)
         {
             EXCEPTION("A line is incomplete in " << mFilePath
                           << " - each line should contain " << DIM*DIM << " entries");
         }
-        for(unsigned i=0; i<DIM; i++)
+        for (unsigned i=0; i<DIM; i++)
         {
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 rFibreMatrix(i,j) = mTokens[DIM*i + j];
             }
         }
-
     }
 
     // The binary file and ascii file are row-major. However, we store column major matrices.
@@ -243,7 +242,6 @@ void FibreReader<DIM>::GetFibreVector(unsigned fibreIndex,
     }
 }
 
-
 template<unsigned DIM>
 unsigned FibreReader<DIM>::GetTokensAtNextLine()
 {
@@ -265,18 +263,18 @@ unsigned FibreReader<DIM>::GetTokensAtNextLine()
             EXCEPTION(error);
         }
 
-        // get rid of any comments
+        // Get rid of any comments
         line = line.substr(0, line.find('#'));
 
         blank_line = (line.find_first_not_of(" \t",0) == std::string::npos);
     }
-    while(blank_line);
+    while (blank_line);
 
-    // get rid of any trailing whitespace
+    // Get rid of any trailing whitespace
     std::string::iterator iter = line.end();
     iter--;
     unsigned nchars2delete = 0;
-    while(*iter == ' ' || *iter == '\t')
+    while (*iter == ' ' || *iter == '\t')
     {
         nchars2delete++;
         iter--;
@@ -290,7 +288,7 @@ unsigned FibreReader<DIM>::GetTokensAtNextLine()
     {
         double item;
         line_stream >> item;
-        if(index >= mNumItemsPerLine)
+        if (index >= mNumItemsPerLine)
         {
             EXCEPTION("Too many entries in a line in " + mFilePath);
         }
@@ -299,7 +297,6 @@ unsigned FibreReader<DIM>::GetTokensAtNextLine()
 
     return index; // the number of entries put into mTokens
 }
-
 
 template<unsigned DIM>
 void FibreReader<DIM>::ReadNumLinesOfDataFromFile()
@@ -323,7 +320,7 @@ void FibreReader<DIM>::ReadNumLinesOfDataFromFile()
     std::string extras;
     header_line >> extras;
 
-    if (extras=="BIN")
+    if (extras == "BIN")
     {
         mFileIsBinary = true;
     }
@@ -334,13 +331,6 @@ void FibreReader<DIM>::ReadNumLinesOfDataFromFile()
     }
 }
 
-
-
 template class FibreReader<1>;
 template class FibreReader<2>;
 template class FibreReader<3>;
-
-
-
-
-

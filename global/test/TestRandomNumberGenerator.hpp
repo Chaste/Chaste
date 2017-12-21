@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRandomNumberGenerator : public CxxTest::TestSuite
 {
 public:
-
     double ran1;
 
     void LongerTestToFindPeriod()
@@ -61,7 +60,7 @@ public:
         srand(0);
         int first = rand();
         unsigned period_srand;
-        for (period_srand=0; ; period_srand++)
+        for (period_srand = 0;; period_srand++)
         {
             if (rand() == first)
             {
@@ -78,7 +77,7 @@ public:
         double double_first = p_gen->ranf();
 
         unsigned period_class;
-        for (period_class=0; ; period_class++)
+        for (period_class = 0;; period_class++)
         {
             if (p_gen->ranf() == double_first)
             {
@@ -162,7 +161,7 @@ public:
 
     void TestArchiveRandomNumberGenerator()
     {
-        OutputFileHandler handler("archive",false);
+        OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "random_number.arch";
 
@@ -178,10 +177,10 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Generate some random numbers before archiving
-            for (unsigned i=0; i<11; i++)
+            for (unsigned i = 0; i < 11; i++)
             {
                 p_gen->ranf();
-                p_gen->randMod(1 + 3*i);
+                p_gen->randMod(1 + 3 * i);
                 p_gen->StandardNormalRandomDeviate();
                 p_gen->NormalRandomDeviate(0.5, 0.1);
             }
@@ -196,14 +195,14 @@ public:
             }
 
             // Generator saved here - record the next 11 uniform numbers
-            for (unsigned i=0; i<11; i++)
+            for (unsigned i = 0; i < 11; i++)
             {
                 double random = p_gen->ranf();
                 generated_numbers.push_back(random);
             }
 
             // Record some numbers from the normal distribution too.
-            for (unsigned i=0; i<11; i++)
+            for (unsigned i = 0; i < 11; i++)
             {
                 double random = p_gen->NormalRandomDeviate(0.5, 0.1);
                 generated_numbers.push_back(random);
@@ -216,7 +215,7 @@ public:
         {
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             p_gen->Reseed(25); // any old seed, different from that above
-            for (unsigned i=0; i<7; i++) // generate some numbers
+            for (unsigned i = 0; i < 7; i++) // generate some numbers
             {
                 p_gen->ranf();
                 p_gen->NormalRandomDeviate(0.5, 0.1);
@@ -243,10 +242,10 @@ public:
             }
 
             // Random Number generator restored; now check it generates the same numbers as the one we saved
-            for (unsigned i=0; i<generated_numbers.size(); i++)
+            for (unsigned i = 0; i < generated_numbers.size(); i++)
             {
                 double random;
-                if (i<11)
+                if (i < 11)
                 {
                     random = p_gen->ranf();
                 }
@@ -261,7 +260,7 @@ public:
         }
     }
 
-    void TestPermutationShuffle() throw(Exception)
+    void TestPermutationShuffle()
     {
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(0);
@@ -269,10 +268,10 @@ public:
         std::vector<unsigned> shuffled_results;
         p_gen->Shuffle(5, shuffled_results);
 
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; i++)
         {
             bool found = false;
-            for (unsigned j=0; j<shuffled_results.size(); j++)
+            for (unsigned j = 0; j < shuffled_results.size(); j++)
             {
                 if (shuffled_results[j] == i)
                 {
@@ -285,20 +284,20 @@ public:
 
         unsigned num_trials = 1000000;
         unsigned results[5][5];
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; i++)
         {
-            for (unsigned j=0; j<5; j++)
+            for (unsigned j = 0; j < 5; j++)
             {
                 results[i][j] = 0u;
             }
         }
 
-        for (unsigned trial=0; trial<num_trials; trial++)
+        for (unsigned trial = 0; trial < num_trials; trial++)
         {
             p_gen->Shuffle(5, shuffled_results);
-            for (unsigned i=0; i<5; i++)
+            for (unsigned i = 0; i < 5; i++)
             {
-                for (unsigned j=0; j<5; j++)
+                for (unsigned j = 0; j < 5; j++)
                 {
                     if (shuffled_results[j] == i)
                     {
@@ -308,12 +307,12 @@ public:
             }
         }
 
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; i++)
         {
-            for (unsigned j=0; j<5; j++)
+            for (unsigned j = 0; j < 5; j++)
             {
                 // Probability of i going to position j
-                double prob = (double)results[i][j]/num_trials;
+                double prob = (double)results[i][j] / num_trials;
 
                 /*
                  * This test could fail with very low probability (just rerun).
@@ -340,14 +339,14 @@ public:
 
         // Make an identity permutation vector and put it through the generic version of shuffle
         std::vector<boost::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
-        for (unsigned i=0; i<test_size; i++)
+        for (unsigned i = 0; i < test_size; i++)
         {
             boost::shared_ptr<unsigned> p_i(new unsigned(i));
             identity_perm_for_shuffle[i] = p_i;
         }
         p_gen->Shuffle(identity_perm_for_shuffle);
 
-        for (unsigned i=0; i<test_size; i++)
+        for (unsigned i = 0; i < test_size; i++)
         {
             TS_ASSERT_EQUALS(empty_perm_for_shuffle[i], *identity_perm_for_shuffle[i]);
         }
@@ -370,39 +369,16 @@ public:
 
         //Predictable exponential?
         p_gen->Reseed(42);
-        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(4.0), 0.1173, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(4.0), 0.1881, 1e-4);
 
         //Predictable gamma?
         p_gen->Reseed(42);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 0.9385, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 1.5054, 1e-4);
 
         //Predictable normal?
         p_gen->Reseed(42);
         TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), -0.6387, 1e-4);
     }
-
-    void TestExponentialMethodsInsideBoost() throw(Exception)
-    {
-        boost::mt19937 mersenneTwisterGenerator(0u);
-
-        // Generator way of doing it
-        // make an exponential distribution
-        boost::exponential_distribution<> ed;
-
-        // `merge' this distribution with our random number generator
-        boost::variate_generator<boost::mt19937& , boost::exponential_distribution<> > var_exponential(mersenneTwisterGenerator, ed);
-
-        // return the random number
-        TS_ASSERT_DELTA(var_exponential(), 0.7958, 1e-4);
-
-        // Reseed
-        mersenneTwisterGenerator.seed(0u);
-
-        // Distribution way of doing it
-        // Works only on 1.47+
-        //TS_ASSERT_DELTA(ed(mersenneTwisterGenerator), 0.7958, 1e-4);
-    }
-
 
     void TestReproducibilityAcrossPlatforms()
     {
@@ -427,14 +403,13 @@ public:
         TS_ASSERT_EQUALS(p_gen->randMod(6), 3u);
         TS_ASSERT_DELTA(p_gen->ranf(), 0.3337, 1e-4);
 
-        for (unsigned i=0; i<1000; i++)
+        for (unsigned i = 0; i < 1000; i++)
         {
             p_gen->StandardNormalRandomDeviate();
         }
-        // Boost 1.56 values
-         TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.2132, 1e-4);
-         TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.6166, 1e-4);
-
+        // Boost 1.65 values
+        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), -0.7667, 1e-4);
+        TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 256.2037, 1e-4);
     }
 
     void TestReseedingWorksProperly()
@@ -487,10 +462,10 @@ public:
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(5);
 
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 1.0), 0.2510, 1e-4);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(2.0, 1.0), 1.3033, 1e-4);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 3.5595, 1e-4);
-        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(3.5, 2.9), 12.6437, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 1.0), 0.9120, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(2.0, 1.0), 2.3151, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 2.4686, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(3.5, 2.9), 21.6512, 1e-4);
     }
 
     void TestExponentialRandomDeviate()
@@ -505,10 +480,10 @@ public:
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(21);
 
-        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(1.0), 0.0499, 1e-4);
-        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(2.0), 0.8029, 1e-4);
-        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(3.0), 0.1137, 1e-4);
-        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(4.0), 0.2847, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(1.0), 0.3363, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(2.0), 0.6298, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(3.0), 0.2967, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(4.0), 0.2715, 1e-4);
     }
 };
 

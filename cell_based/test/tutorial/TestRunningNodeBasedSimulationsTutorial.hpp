@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * UserTutorials/RunningMeshBasedSimulations. */
 #include "CellsGenerator.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -101,7 +101,7 @@ public:
      * In the first test, we run a simple node-based simulation, in which we create a monolayer
      * of cells, using a nodes only mesh. Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /** The next line is needed because HoneycombMeshGenerator is not designed to be run in parallel */
         EXIT_IF_PARALLEL;
@@ -127,14 +127,14 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CellsGenerator` helper class, which is templated over the type
-         * of cell model required (here {{{StochasticDurationCellCycleModel}}})
+         * of cell model required (here {{{UniformCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * {{{cells}}} should become - one cell for each node, the third argument specifies
          * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
@@ -174,9 +174,11 @@ public:
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.
      *
-     * Alternatively to view in Paraview
-     * Load the file {{{/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd}}},
-     * and add glyphs to represent cells.  An option is to use 3D spherical glyphs and then make a planar cut.
+     * Alternatively, to view in Paraview, load the file {{{/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd}}}
+     * and add glyphs to represent cells. An option is to use 3D spherical glyphs and then make a planar cut.
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
+     *
      *
      *
      * EMPTYLINE
@@ -189,7 +191,7 @@ public:
      * to the 2D test with the dimension template (<2,2> and <2>) changed from 2 to 3 and instead of using a mesh
      * generator we generate the nodes directly.
      */
-    void TestSpheroid() throw(Exception)
+    void TestSpheroid()
     {
         /** The next line is needed because we cannot currently run node based simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -217,7 +219,7 @@ public:
          */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         /* We make a {{{NodeBasedCellPopulation}}} (this time with dimension 3) as before.
@@ -267,7 +269,7 @@ public:
      *
      * In the third test we run a node-based simulation restricted to the surface of a sphere.
      */
-    void TestOnSurfaceOfSphere() throw(Exception)
+    void TestOnSurfaceOfSphere()
     {
         /** The next line is needed because we cannot currently run node based simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -291,7 +293,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> cell_population(mesh, cells);

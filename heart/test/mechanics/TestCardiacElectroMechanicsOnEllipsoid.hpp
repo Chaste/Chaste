@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,11 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-
 #ifndef TESTONELLIPSOID_HPP_
 #define TESTONELLIPSOID_HPP_
-
 
 #include <cxxtest/TestSuite.h>
 #include "CardiacElectroMechanicsProblem.hpp"
@@ -83,7 +80,7 @@ public:
 class TestCardiacElectroMechanicsOnEllipsoid : public CxxTest::TestSuite
 {
 public:
-    void TestOnEllipsoid() throw(Exception)
+    void TestOnEllipsoid()
     {
         EXIT_IF_PARALLEL; // needs investigation, possibly related to #2057
 
@@ -128,7 +125,7 @@ public:
         std::vector<c_vector<double,3> > locations;
 
         bool first = true;
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -138,7 +135,7 @@ public:
                 fixed_nodes.push_back(i);
                 c_vector<double,3> new_location;
 
-                if(first)
+                if (first)
                 {
                     new_location(0) = x;
                     new_location(1) = y;
@@ -173,7 +170,7 @@ public:
               ++iter)
         {
             ChastePoint<3> centroid = (*iter)->CalculateCentroid();
-            if(centroid[2]<0)
+            if (centroid[2]<0)
             {
                 Node<3>* p_node = (*iter)->GetNode(0);
                 double x = p_node->rGetLocation()[0];
@@ -219,8 +216,6 @@ public:
         FileFinder finder("heart/test/data/fibre_tests/ellipsoid_8225_elements.ortho",RelativeTo::ChasteSourceRoot);
         problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
-
-
         ////////////////////////////////////////////////////////////////////////////////
         //
         // Solve
@@ -234,13 +229,10 @@ public:
                                                   &problem_defn,
                                                   "TestCardiacElectroMechanicsEllipsoid");
 
-
         // problem.SetNoElectricsOutput();
 
         problem.Solve();
     }
-
 };
-
 
 #endif // TESTONELLIPSOID_HPP_

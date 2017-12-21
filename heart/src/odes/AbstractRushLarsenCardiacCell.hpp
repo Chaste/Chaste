@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -131,7 +131,7 @@ public:
     void SolveAndUpdateState(double tStart, double tEnd);
 
 private:
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     /**
      * This function should never be called - the cell class incorporates its own solver.
      *
@@ -143,7 +143,7 @@ private:
     {
         NEVER_REACHED;
     }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 protected:
     /**

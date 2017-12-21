@@ -11,7 +11,9 @@ odes/TestMirams2010WntOdeSystem.hpp
 odes/TestVanLeeuwen2009WntSwatCellCycleOdeSystem.hpp
 odes/TestWntCellCycleOdeSystem.hpp
 population/TestCellBetaCateninWriter.hpp
+population/TestCryptDivisionRules.hpp
 population/TestCryptSimulationBoundaryCondition.hpp
+population/TestShovingCaBasedDivisionRules.hpp
 population/TestSloughingCellKillers.hpp
 population/TestVertexBasedCellPopulationForCrypt.hpp
 simulation/TestOffLatticeCryptProjectionSimulation.hpp

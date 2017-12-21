@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,6 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetBodyForce(c_vector<double,DIM>
     mpBodyForceFunction = pFunction;
 }
 
-
 template<unsigned DIM>
 BodyForceType ContinuumMechanicsProblemDefinition<DIM>::GetBodyForceType()
 {
@@ -120,7 +119,6 @@ c_vector<double,DIM> ContinuumMechanicsProblemDefinition<DIM>::GetBodyForce(c_ve
     }
 }
 
-
 template<unsigned DIM>
 TractionBoundaryConditionType ContinuumMechanicsProblemDefinition<DIM>::GetTractionBoundaryConditionType()
 {
@@ -147,7 +145,6 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetTractionBoundaryConditions(std
     mpTractionBoundaryConditionFunction = pFunction;
 }
 
-
 template<unsigned DIM>
 void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
                                                                                        double normalPressure)
@@ -167,9 +164,6 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedS
     mTractionBoundaryElements = rTractionBoundaryElements;
     mpNormalPressureFunction = pFunction;
 }
-
-
-
 
 template<unsigned DIM>
 void ContinuumMechanicsProblemDefinition<DIM>::SetZeroDirichletNodes(std::vector<unsigned>& rZeroDirichletNodes)
@@ -206,14 +200,12 @@ std::vector<BoundaryElement<DIM-1,DIM>*>& ContinuumMechanicsProblemDefinition<DI
     return mTractionBoundaryElements;
 }
 
-
 template<unsigned DIM>
 std::vector<c_vector<double,DIM> >& ContinuumMechanicsProblemDefinition<DIM>::rGetElementwiseTractions()
 {
     assert(mTractionBoundaryConditionType==ELEMENTWISE_TRACTION);
     return mElementwiseTractions;
 }
-
 
 template<unsigned DIM>
 double ContinuumMechanicsProblemDefinition<DIM>::GetNormalPressure()
@@ -246,18 +238,12 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetPressureScaling(double scaleFa
 template<unsigned DIM>
 void ContinuumMechanicsProblemDefinition<DIM>::Validate()
 {
-    if(mDirichletNodes.size()==0)
+    if (mDirichletNodes.size() == 0)
     {
         EXCEPTION("No Dirichlet boundary conditions (eg fixed displacement or fixed flow) have been set");
     }
 }
 
-
-
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class ContinuumMechanicsProblemDefinition<2>;
 template class ContinuumMechanicsProblemDefinition<3>;
-

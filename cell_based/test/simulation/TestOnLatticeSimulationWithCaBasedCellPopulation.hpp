@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,15 +40,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
-
-#include "CellwiseSourcePde.hpp"
-#include "ConstBoundaryCondition.hpp"
-#include "PetscSetupAndFinalize.hpp"
-#include "AveragedSourcePde.hpp"
+#ifdef CHASTE_VTK
+#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkUnstructuredGrid.h>
+#endif //CHASTE_VTK
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -62,13 +63,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "ApoptoticCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
-
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellLabelWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
-
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -99,7 +98,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -109,7 +108,7 @@ public:
             "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
 
-    void TestCaSingleCellRandomMovement() throw (Exception)
+    void TestCaSingleCellRandomMovement()
     {
         EXIT_IF_PARALLEL;
 
@@ -126,7 +125,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 1, p_diff_type);
 
         // Specify where cells lie
@@ -146,7 +145,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         for (unsigned i=1; i<=num_runs; i++)
         {
@@ -193,10 +192,10 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[8], diffusion_parameter*delta_t/4.0, 1e-2);
 
         // For coverage
-        simulator.RemoveAllCaUpdateRules();
+        simulator.RemoveAllUpdateRules();
     }
 
-    void TestCaMonolayerWithBirth() throw (Exception)
+    void TestCaMonolayerWithBirth()
     {
         EXIT_IF_PARALLEL;
 
@@ -207,7 +206,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 2, p_stem_type);
 
         // Specify where the cells lie
@@ -228,21 +227,21 @@ public:
         // Adding update rule(s)
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
         simulator.SetOutputDivisionLocations(true);
 
         // Run simulation
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 12u); ///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 12u);
 
         // Test no deaths and some births
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 10u); ///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 10u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
         // Now remove the update rules and check that only birth happens when the simulator runs again
-        simulator.RemoveAllPottsUpdateRules();
+        simulator.RemoveAllUpdateRules();
         simulator.SetEndTime(50);
         simulator.Solve();
 
@@ -265,7 +264,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestCaMonolayerWithDeath() throw (Exception)
+    void TestCaMonolayerWithDeath()
     {
         EXIT_IF_PARALLEL;
 
@@ -279,7 +278,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         // Specify where cells lie
@@ -333,7 +332,7 @@ public:
         }
     }
 
-    void  TestCaMonolayerWithApoptoticCellKiller() throw (Exception)
+    void  TestCaMonolayerWithApoptoticCellKiller()
     {
         EXIT_IF_PARALLEL;
 
@@ -347,7 +346,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         // Specify where cells lie
@@ -366,7 +365,8 @@ public:
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
-        // update all cells in population to prescribe an initial oxygen concentration and apoptosis time
+        // Assign roughly half the cells to undergo apoptotis. Set their location index as
+        // a cell data item to check ordering in output VTK file
         std::list<CellPtr> cells2 = cell_population.rGetCells();
         std::list<CellPtr>::iterator it;
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
@@ -378,6 +378,7 @@ public:
             {
                 (*it)->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
             }
+            (*it)->GetCellData()->SetItem("Location Index For Test", double(cell_population.GetLocationIndexUsingCell((*it))));
         }
 
         // Set up cell-based simulation
@@ -395,13 +396,37 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test no deaths and some births
+        // Test no births and some deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT(simulator.GetNumDeaths() > 0);
 
+        #ifdef CHASTE_VTK
+            // Check that the ordering in the vtk file is correct
+            OutputFileHandler output_file_handler("TestCaMonolayerWithApoptoticCellKiller", false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Read in the final timepoint
+            FileFinder vtk_file2(results_dir + "results_from_time_0/results_5.vtu", RelativeTo::Absolute);
+            TS_ASSERT(vtk_file2.Exists());
+            vtkSmartPointer<vtkXMLUnstructuredGridReader> p_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+            p_reader->SetFileName(vtk_file2.GetAbsolutePath().c_str());
+            p_reader->Update();
+
+            // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
+            vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
+            unsigned counter = 0;
+            for (CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+            {
+                unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+                TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));
+                TS_ASSERT_EQUALS(location_index, unsigned(p_grid->GetPointData()->GetArray("Location Index For Test")->GetTuple1(counter)));
+                counter++;
+            }
+
+        #endif //CHASTE_VTK
     }
 
-    void TestCaMonolayerWithRandomSwitching() throw (Exception)
+    void TestCaMonolayerWithRandomSwitching()
     {
         EXIT_IF_PARALLEL;
 
@@ -415,7 +440,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 8, p_diff_type);
 
         // Specify some cells on the bottom row
@@ -441,11 +466,11 @@ public:
         // Add switching Update Rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
         p_switching_update_rule->SetSwitchingParameter(1.0);
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Coverage of remove method
-        simulator.RemoveAllCaSwitchingUpdateRules();
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.RemoveAllUpdateRules();
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -471,7 +496,7 @@ public:
     }
 
     ///\todo #2713 check this test makes sense
-    void TestCaMonolayerWithRandomSwitchingAndUpdateNodesInNonRandomOrder() throw (Exception)
+    void TestCaMonolayerWithRandomSwitchingAndUpdateNodesInNonRandomOrder()
     {
         EXIT_IF_PARALLEL;
 
@@ -483,7 +508,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         std::vector<unsigned> location_indices;
@@ -508,7 +533,7 @@ public:
         // Add switching update rule
         MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
         p_switching_update_rule->SetSwitchingParameter(0.5);
-        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+        simulator.AddUpdateRule(p_switching_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -554,7 +579,7 @@ public:
      * RandomMovement has been tested in TestCaSingleCellRandomMovement for one cell per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestCaMultipleCellsRandomMovement() throw (Exception)
+    void TestCaMultipleCellsRandomMovement()
     {
         EXIT_IF_PARALLEL;
 
@@ -565,7 +590,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
         // Specify where cells lie: four cells in each of the first ten sites
@@ -591,7 +616,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -599,7 +624,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 40u);
     }
 
-    void TestCaMultipleCellsRandomMovementIn3d() throw (Exception)
+    void TestCaMultipleCellsRandomMovementIn3d()
     {
         EXIT_IF_PARALLEL;
 
@@ -610,7 +635,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
         // Specify where cells lie: four cells in each of the first ten sites
@@ -636,7 +661,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<3>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -649,7 +674,7 @@ public:
      * This test adds to the above by further testing cellular birth considering multiple cells per lattice site.
      * A  two-lattice mesh was created and only one lattice had free space to add one daughter cell.
      */
-    void TestMultipleCellsPerLatticeSiteWithBirth() throw (Exception)
+    void TestMultipleCellsPerLatticeSiteWithBirth()
     {
         EXIT_IF_PARALLEL;
 
@@ -660,7 +685,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 3, p_stem_type);
 
         // Specify where cells lie
@@ -682,7 +707,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -713,7 +738,7 @@ public:
      * Cellular death has been tested in TestCaMonolayerWithDeath for one cell per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestMultipleCellsPerLatticeSiteWithDeath() throw (Exception)
+    void TestMultipleCellsPerLatticeSiteWithDeath()
     {
         EXIT_IF_PARALLEL;
 
@@ -727,7 +752,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 2*p_mesh->GetNumNodes(), p_diff_type);
 
         // Specify where cells lie
@@ -782,7 +807,7 @@ public:
         }
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;
 
@@ -791,7 +816,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
 
         std::vector<unsigned> location_indices;
@@ -811,7 +836,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -819,13 +844,18 @@ public:
         // Check some results
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 10u);
 
-        CellPtr p_cell = *(simulator.rGetCellPopulation().Begin());
-        c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell);
-        TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 3.0, 1e-4);
+        CellPtr p_cell_0 = *(simulator.rGetCellPopulation().Begin());
+        c_vector<double, 2> cell_location_0 = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell_0);
+        TS_ASSERT_DELTA(cell_location_0[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_0[1], 3.0, 1e-4);
+
+        CellPtr p_cell_1 = *(++(simulator.rGetCellPopulation().Begin()));
+        c_vector<double, 2> cell_location_1 = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell_1);
+        TS_ASSERT_DELTA(cell_location_1[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
     }
 
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;
 
@@ -834,7 +864,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
 
         std::vector<unsigned> location_indices;
@@ -854,7 +884,7 @@ public:
         // Add update rule
         MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -863,8 +893,7 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    ///\todo make the following test pass - see #2066 and comment in OnLatticeSimulation::UpdateCellPopulation()
-    void DONOTTestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;
 
@@ -886,10 +915,21 @@ public:
         // These results are from time 20 in TestStandardResultForArchivingTestsBelow()
         TS_ASSERT_EQUALS(p_simulator2->rGetCellPopulation().GetNumRealCells(), 10u);
 
-        CellPtr p_cell = *(p_simulator2->rGetCellPopulation().Begin());
-        c_vector<double, 2> cell_location = static_cast <CaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
-        TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
+        CellPtr p_cell_0 = *(p_simulator2->rGetCellPopulation().Begin());
+        c_vector<double, 2> cell_location_0 = p_simulator2->rGetCellPopulation().GetLocationOfCellCentre(p_cell_0);
+        TS_ASSERT_DELTA(cell_location_0[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_0[1], 3.0, 1e-4);
+
+        CellPtr p_cell_1 = *(++(p_simulator2->rGetCellPopulation().Begin()));
+        c_vector<double, 2> cell_location_1 = p_simulator2->rGetCellPopulation().GetLocationOfCellCentre(p_cell_1);
+        TS_ASSERT_DELTA(cell_location_1[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location_1[1], 0.0, 1e-4);
+
+        std::vector<boost::shared_ptr<AbstractUpdateRule<2> > > update_rules =
+            static_cast<CaBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation()))->GetUpdateRuleCollection();
+
+        double diffusion_parameter = (dynamic_cast<DiffusionCaUpdateRule<2>*>(update_rules[0].get()))->GetDiffusionParameter();
+        TS_ASSERT_DELTA(diffusion_parameter, 0.1, 1e-4);
 
         // Tidy up
         delete p_simulator1;

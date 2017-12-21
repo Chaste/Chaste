@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,19 +34,41 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "StochasticOxygenBasedCellCycleModel.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "CellPropertyRegistry.hpp"
 
 StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel()
     : SimpleOxygenBasedCellCycleModel()
 {
 }
 
+StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel)
+   : SimpleOxygenBasedCellCycleModel(rModel),
+     mStochasticG2Duration(rModel.mStochasticG2Duration)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     *
+     * The member variables mCurrentHypoxicDuration, mCurrentHypoxiaOnsetTime,
+     * mHypoxicConcentration, mQuiescentConcentration and mCriticalHypoxicDuration
+     * are initialized in the SimpleOxygenBasedCellCycleModel constructor.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     *
+     * Note that mG1Duration and mStochasticG2Duration are (re)set as
+     * soon as InitialiseDaughterCell() is called on the new cell-cycle model.
+     */
+}
+
 void StochasticOxygenBasedCellCycleModel::GenerateStochasticG2Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-    double mean = AbstractCellCycleModel::GetG2Duration();
+    double mean = AbstractPhaseBasedCellCycleModel::GetG2Duration();
     double standard_deviation = 1.0;
 
     mStochasticG2Duration = p_gen->NormalRandomDeviate(mean, standard_deviation);
@@ -66,7 +88,7 @@ void StochasticOxygenBasedCellCycleModel::InitialiseDaughterCell()
 
 void StochasticOxygenBasedCellCycleModel::Initialise()
 {
-    AbstractSimpleCellCycleModel::Initialise();
+    AbstractSimplePhaseBasedCellCycleModel::Initialise();
     GenerateStochasticG2Duration();
 }
 
@@ -76,50 +98,19 @@ void StochasticOxygenBasedCellCycleModel::ResetForDivision()
     GenerateStochasticG2Duration();
 }
 
-double StochasticOxygenBasedCellCycleModel::GetG2Duration()
+double StochasticOxygenBasedCellCycleModel::GetG2Duration() const
 {
     return mStochasticG2Duration;
 }
 
 AbstractCellCycleModel* StochasticOxygenBasedCellCycleModel::CreateCellCycleModel()
 {
-    // Create a new cell-cycle model
-    StochasticOxygenBasedCellCycleModel* p_model = new StochasticOxygenBasedCellCycleModel();
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mTimeSpentInG1Phase,
-     * mCurrentHypoxicDuration, mCurrentHypoxiaOnsetTime) will already have been
-     * correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetHypoxicConcentration(mHypoxicConcentration);
-    p_model->SetQuiescentConcentration(mQuiescentConcentration);
-    p_model->SetCriticalHypoxicDuration(mCriticalHypoxicDuration);
-    p_model->SetCurrentHypoxiaOnsetTime(mCurrentHypoxiaOnsetTime);
-
-    return p_model;
+    return new StochasticOxygenBasedCellCycleModel(*this);
 }
 
 void StochasticOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

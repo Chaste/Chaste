@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,6 +115,11 @@ public:
      */
     void Setk3(double);
 
+    /**
+    * Works out the difference between the pressure and the pressure needed to produce a particular radius
+    */
+    double CalculatePressureRadiusResidual(double radius);
+
 private:
     /** The airway radius at zero transpulmonary pressure */
     double mRi;
@@ -148,7 +153,6 @@ private:
 
     /** The parameter k3 from LaPrad et al. 2013 PLoS Comp Biol*/
     double mk3;
-
 };
 
 #endif /*LAPRADAIRWAYWALL_HPP_*/

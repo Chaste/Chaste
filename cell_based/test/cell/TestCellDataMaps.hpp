@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellVecData.hpp"
 #include "CellData.hpp"
@@ -60,7 +60,7 @@ class TestCellDataMaps : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellData() throw (Exception)
+    void TestCellData()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -68,7 +68,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
         p_cell->InitialiseCellCycleModel();
@@ -100,7 +100,7 @@ public:
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
     }
 
-    void TestCellVecData() throw (Exception)
+    void TestCellVecData()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -108,7 +108,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
         p_cell->InitialiseCellCycleModel();
@@ -174,4 +174,4 @@ public:
     }
 };
 
-#endif /*TESTCELL_HPP_*/
+#endif /*TESTCELLDATAMAPS_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractMaterialLaw<DIM>::AbstractMaterialLaw()
-    : mpChangeOfBasisMatrix(NULL)
+    : mpChangeOfBasisMatrix(nullptr)
 {
 }
 
@@ -108,13 +108,13 @@ void AbstractMaterialLaw<DIM>::Compute2ndPiolaKirchoffStress(c_matrix<double,DIM
     ComputeStressAndStressDerivative(rC, invC, pressure, rT, dTdE, false);
 }
 
+// LCOV_EXCL_START
 template<unsigned DIM>
 void AbstractMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
 {
-    #define COVERAGE_IGNORE
     EXCEPTION("[the material law you are using]::ScaleMaterialParameters() has not been implemented\n");
-    #undef COVERAGE_IGNORE
 }
+// LCOV_EXCL_STOP
 
 template<unsigned DIM>
 void AbstractMaterialLaw<DIM>::SetChangeOfBasisMatrix(c_matrix<double,DIM,DIM>& rChangeOfBasisMatrix)
@@ -125,7 +125,7 @@ void AbstractMaterialLaw<DIM>::SetChangeOfBasisMatrix(c_matrix<double,DIM,DIM>& 
 template<unsigned DIM>
 void AbstractMaterialLaw<DIM>::ResetToNoChangeOfBasisMatrix()
 {
-    mpChangeOfBasisMatrix = NULL;
+    mpChangeOfBasisMatrix = nullptr;
 }
 
 template<unsigned DIM>
@@ -174,10 +174,6 @@ void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(c_matrix<doubl
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
-//template class AbstractMaterialLaw<1>;
 template class AbstractMaterialLaw<2>;
 template class AbstractMaterialLaw<3>;

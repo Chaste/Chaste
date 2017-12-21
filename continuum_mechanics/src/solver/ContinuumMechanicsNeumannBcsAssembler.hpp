@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -132,7 +132,7 @@ public:
         QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(pMesh);
         DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(pMesh);
 
-        if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+        if ((p_quad_mesh == NULL) && (p_distributed_quad_mesh == NULL))
         {
             EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
         }
@@ -140,7 +140,6 @@ public:
         // We therefore use the highest order integration rule available.
         mpQuadRule = new GaussianQuadratureRule<DIM-1>(3);
     }
-
 
     /**
      * Destructor.
@@ -155,12 +154,12 @@ public:
 template<unsigned DIM>
 void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
 {
-    if(this->mVectorToAssemble==NULL)
+    if (this->mVectorToAssemble==NULL)
     {
         EXCEPTION("Vector to be assembled has not been set");
     }
 
-    if( PetscVecTools::GetSize(this->mVectorToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
+    if (PetscVecTools::GetSize(this->mVectorToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
     {
         EXCEPTION("Vector provided to be assembled has size " << PetscVecTools::GetSize(this->mVectorToAssemble) << ", not expected size of " << (DIM+1)*mpMesh->GetNumNodes() << " ((dim+1)*num_nodes)");
     }
@@ -200,8 +199,6 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
         }
     }
 }
-
-
 
 template<unsigned DIM>
 void ContinuumMechanicsNeumannBcsAssembler<DIM>::AssembleOnBoundaryElement(BoundaryElement<DIM-1,DIM>& rBoundaryElement,

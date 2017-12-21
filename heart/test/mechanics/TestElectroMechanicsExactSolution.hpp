@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -111,10 +111,6 @@ c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
     return traction;
 }
 
-
-
-
-
 /**
  *  Test against an exact solution.
  *
@@ -136,7 +132,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
 class TestElectroMechanicsExactSolution : public CxxTest::TestSuite
 {
 public:
-    void TestIncompressibleSolveWithExactSolution() throw(Exception)
+    void TestIncompressibleSolveWithExactSolution()
     {
         MechanicsEventHandler::Reset();
 
@@ -199,9 +195,9 @@ public:
         ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>* p_solver
             = dynamic_cast<ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>*>(problem.mpCardiacMechSolver);
 
-        for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = p_solver->rGetQuadPointToDataAtQuadPointMap().begin();
-            iter != p_solver->rGetQuadPointToDataAtQuadPointMap().end();
-            iter++)
+        for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = p_solver->rGetQuadPointToDataAtQuadPointMap().begin();
+             iter != p_solver->rGetQuadPointToDataAtQuadPointMap().end();
+             iter++)
         {
             ConstantActiveTension* p_contraction_model = dynamic_cast<ConstantActiveTension*>(iter->second.ContractionModel);
             p_contraction_model->SetActiveTensionValue(ACTIVE_TENSION);
@@ -239,8 +235,5 @@ public:
         MechanicsEventHandler::Report();
     }
 };
+
 #endif //_TESTELECTROMECHANICSEXACTSOLUTION_HPP_
-
-
-
-

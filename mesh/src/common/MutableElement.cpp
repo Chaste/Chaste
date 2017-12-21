@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -301,10 +301,7 @@ bool MutableElement<1, SPACE_DIM>::IsElementOnBoundary() const
     return is_element_on_boundary;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MutableElement<1,1>;
 template class MutableElement<1,2>;
 template class MutableElement<1,3>;

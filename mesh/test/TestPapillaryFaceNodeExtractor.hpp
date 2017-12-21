@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ class TestPapillaryExtractor : public CxxTest::TestSuite
 {
 public:
 
-    void TestExtractor() throw(Exception)
+    void TestExtractor()
     {
 //        TrianglesMeshReader<3, 3> mesh_reader("/home/chaste/heart_data/heartT_renum_i");
 //        TetrahedralMesh<3,3> mesh;

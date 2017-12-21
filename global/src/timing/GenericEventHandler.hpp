@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ public:
      *
      * @param event  the index of an event (this must be less than NUM_EVENTS)
      */
-    static void BeginEvent(unsigned event) throw (Exception)
+    static void BeginEvent(unsigned event)
     {
         Instance()->BeginEventImpl(event);
     }
@@ -234,7 +234,7 @@ private:
      *
      * @param event  the index of an event (this must be less than NUM_EVENTS)
      */
-    void BeginEventImpl(unsigned event) throw (Exception)
+    void BeginEventImpl(unsigned event)
     {
         if (!mEnabled)
         {
@@ -309,7 +309,7 @@ private:
         assert(event<NUM_EVENTS);
         if (!mEnabled)
         {
-            return 0.0;
+            EXCEPTION("Asked to report on a disabled event handler.  Check for contributory errors above.");
         }
         double time;
         if (mHasBegun[event])

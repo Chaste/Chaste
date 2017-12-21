@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,10 +105,12 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
                 {
                     nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]) );
                 }
+                // LCOV_EXCL_START
                 catch (Exception&)
                 {
                     NEVER_REACHED;
                 }
+                // LCOV_EXCL_STOP
             }
 
             Element<1u, SPACE_DIM>* p_element = new Element<1u,SPACE_DIM>(element_index, nodes, false);
@@ -142,6 +144,7 @@ unsigned MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 {
    return mNumCableElements;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetNumLocalCableElements() const
 {
@@ -208,12 +211,7 @@ typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableElementIterator MixedD
     return mCableElements.end();
 }
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MixedDimensionMesh<1,1>;
 template class MixedDimensionMesh<1,2>;
 template class MixedDimensionMesh<1,3>;

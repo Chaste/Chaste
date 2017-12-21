@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "VertexCryptBoundaryForce.hpp"
+#include "PopulationTestingForce.hpp"
+#include "ForwardEulerNumericalMethod.hpp"
 #include "CryptCellsGenerator.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "SimpleWntCellCycleModel.hpp"
@@ -109,7 +111,7 @@ private:
 
 public:
 
-    void TestBoundaryConditionsAtCryptBase() throw (Exception)
+    void TestBoundaryConditionsAtCryptBase()
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -122,7 +124,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -131,33 +133,39 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cell_population);
 
-        std::vector<c_vector<double, 2> > old_node_locations(p_mesh->GetNumNodes());
+        // Add a simple testing force
+        bool positionDependentForce = false;
+        MAKE_PTR_ARGS(PopulationTestingForce<2>, p_force,(positionDependentForce));
+        simulator.AddForce(p_force);
 
-        // Make up some forces
+        // Save old node locations
+        std::vector<c_vector<double, 2> > old_node_locations(p_mesh->GetNumNodes());
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            c_vector<double, 2> force;
             old_node_locations[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_node_locations[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
+        }
 
-            force[0] = i*0.01;
-            force[1] = 2*i*0.01;
-            cell_population.GetNode(i)->ClearAppliedForce();
-            cell_population.GetNode(i)->AddAppliedForceContribution(force);
-       }
+        double dt = 0.01;
+        simulator.SetDt(dt);
+        simulator.SetupSolve();
 
-        simulator.SetDt(0.01);
-        simulator.UpdateNodePositions();
+        simulator.UpdateCellLocationsAndTopology();
 
         for (unsigned node_index=0; node_index<simulator.rGetCellPopulation().GetNumNodes(); node_index++)
         {
-            c_vector<double, 2> node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
+            c_vector<double, 2> node_location;
+            node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
 
-            TS_ASSERT_DELTA(node_location[0], old_node_locations[node_index][0] + node_index*0.01*0.01, 1e-9);
+            AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
+            double damping = p_offLattice_pop->GetDampingConstant(node_index);
+            c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(node_index, damping, old_node_locations[node_index], dt);
+
+            TS_ASSERT_DELTA(node_location[0], expected_location[0], 1e-9);
 
             if (old_node_locations[node_index][1] > 0.0)
             {
-                TS_ASSERT_DELTA(node_location[1], old_node_locations[node_index][1] + 2*node_index*0.01*0.01, 1e-9);
+                TS_ASSERT_DELTA(node_location[1], expected_location[1], 1e-9);
             }
             else
             {
@@ -180,7 +188,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -228,7 +236,7 @@ public:
     /**
      * Test that a short crypt simulation without cell birth runs without throwing any errors.
      */
-    void TestCryptWithNoBirth() throw (Exception)
+    void TestCryptWithNoBirth()
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -238,7 +246,7 @@ public:
 
         // Create cells, all differentiated
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
         // Create cell population
@@ -273,7 +281,7 @@ public:
      * Test that a short crypt simulation, in which cell birth occurs,
      * runs without throwing any errors.
      */
-    void TestCryptWithBirth() throw (Exception)
+    void TestCryptWithBirth()
     {
         double crypt_length = 5.0;
 
@@ -283,7 +291,7 @@ public:
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Cell 1 should divide at time t=0.05
@@ -329,7 +337,7 @@ public:
      * Commented test of a long crypt simulation. Used to generate attachment
      * VertexSimulation.mpeg on #1095.
      */
-    void noTestCryptSimulationLong() throw (Exception)
+    void noTestCryptSimulationLong()
     {
         double crypt_length = 20.0;
 
@@ -341,7 +349,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -379,7 +387,7 @@ public:
      * cell proliferation is Wnt-based, to check that WntConcentration
      * doesn't throw a wobbly.
      */
-    void TestShortWntBasedCryptSimulation() throw (Exception)
+    void TestShortWntBasedCryptSimulation()
     {
         double crypt_length = 10.0;
 
@@ -434,7 +442,7 @@ public:
 
     /** Longer Wnt based simulation
      */
-    void noTestWntBasedCryptSimulationLong() throw (Exception)
+    void noTestWntBasedCryptSimulationLong()
     {
         double crypt_length = 20.0;
 
@@ -488,7 +496,7 @@ public:
     }
 
     // Test a crypt simulation with a boundary force on the crypt base.
-    void TestCryptSimulationWithBoundaryForce() throw (Exception)
+    void TestCryptSimulationWithBoundaryForce()
     {
         double crypt_length = 6.0;
 
@@ -500,7 +508,7 @@ public:
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Create cell population
@@ -545,7 +553,7 @@ public:
     /**
      * Test that archiving a crypt simulation correctly archives its mesh.
      */
-    void TestMeshSurvivesSaveLoad() throw (Exception)
+    void TestMeshSurvivesSaveLoad()
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -555,7 +563,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -604,7 +612,7 @@ public:
         delete p_simulator;
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         double crypt_length = 22.0;
 
@@ -616,7 +624,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -671,7 +679,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestVertexCryptSimulation2DParameterOutput() throw (Exception)
+    void TestVertexCryptSimulation2DParameterOutput()
     {
         double crypt_length = 22.0;
 
@@ -683,7 +691,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -718,7 +726,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         double crypt_length = 22.0;
 
@@ -730,7 +738,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -776,7 +784,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 0.2
@@ -834,7 +842,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWriteBetaCateninAndAncestors() throw (Exception)
+    void TestWriteBetaCateninAndAncestors()
     {
         // Create mesh
         unsigned crypt_width = 6;

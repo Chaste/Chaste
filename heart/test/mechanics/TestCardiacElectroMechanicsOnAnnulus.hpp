@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // linear increase from 0 to 1KPa in 100ms
 double LinearPressureFunction(double t)
 {
-    if(t>=100)
+    if (t>=100)
     {
         return -1;
     }
@@ -84,13 +84,12 @@ public:
             return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         }
     }
-
 };
 
 class TestCardiacElectroMechanicsOnAnnulus : public CxxTest::TestSuite
 {
 public:
-    void TestDynamicExpansionNoElectroMechanics() throw (Exception)
+    void TestDynamicExpansionNoElectroMechanics()
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
@@ -107,7 +106,7 @@ public:
 
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -149,7 +148,7 @@ public:
 
         // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
         // markedly (might be able to remove this line after #2057 is done..)
-        //PetscOptionsSetValue("-pc_type", "lu"); // removed - see comments at the end of #1818.
+        //PetscTools::SetOption("-pc_type", "lu"); // removed - see comments at the end of #1818.
 
         std::vector<BoundaryElement<1,2>*> boundary_elems;
         for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
@@ -190,7 +189,7 @@ public:
     }
 
 
-    void TestStaticExpansionAndElectroMechanics() throw (Exception)
+    void TestStaticExpansionAndElectroMechanics()
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
@@ -206,7 +205,7 @@ public:
 
          std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -255,7 +254,7 @@ public:
 
         // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
         // markedly (might be able to remove this line after #2057 is done..)
-        //PetscOptionsSetValue("-pc_type", "lu"); // removed - see comments at the end of #1818.
+        //PetscTools::SetOption("-pc_type", "lu"); // removed - see comments at the end of #1818.
 
         std::vector<BoundaryElement<1,2>*> boundary_elems;
         for (TetrahedralMesh<2,2>::BoundaryElementIterator iter

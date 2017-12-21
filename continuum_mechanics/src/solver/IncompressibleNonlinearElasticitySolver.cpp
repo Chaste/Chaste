@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,13 +79,13 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-        #define COVERAGE_IGNORE
-        // note: if assembleJacobian only
-        if(CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
+        // LCOV_EXCL_START
+        // Note: if assembleJacobian only
+        if (CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
         {
             std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
 
         Element<DIM, DIM>& element = *iter;
 
@@ -194,7 +194,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
         PetscMatTools::SwitchWriteMode(this->mPreconditionMatrix);
     }
 
-    if(assembleJacobian)
+    if (assembleJacobian)
     {
        this->AddIdentityBlockForDummyPressureVariables(NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING);
     }
@@ -288,7 +288,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     static c_matrix<double,NUM_NODES_PER_ELEMENT,DIM> grad_quad_phi_times_invF;
 
 
-    if(this->mSetComputeAverageStressPerElement)
+    if (this->mSetComputeAverageStressPerElement)
     {
         this->mAverageStressesPerElement[rElement.GetIndex()] = zero_vector<double>(DIM*(DIM+1)/2);
     }
@@ -376,7 +376,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         p_material_law->SetChangeOfBasisMatrix(this->mChangeOfBasisMatrix);
         p_material_law->ComputeStressAndStressDerivative(C, inv_C, pressure, T, dTdE, assembleJacobian);
 
-        if(this->mIncludeActiveTension)
+        if (this->mIncludeActiveTension)
         {
             // Add any active stresses, if there are any. Requires subclasses to overload this method,
             // see for example the cardiac mechanics assemblers.
@@ -384,7 +384,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                                                      T, dTdE, assembleJacobian);
         }
 
-        if(this->mSetComputeAverageStressPerElement)
+        if (this->mSetComputeAverageStressPerElement)
         {
             this->AddStressToAverageStressPerElement(T,rElement.GetIndex());
         }
@@ -547,7 +547,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
 
     if (assembleJacobian)
     {
-        if(this->mPetscDirectSolve)
+        if (this->mPetscDirectSolve)
         {
             // Petsc will do an LU factorisation of the preconditioner, which we
             // set equal to  [ A  B1^T ]
@@ -576,17 +576,14 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         }
     }
 
-
-    if(this->mSetComputeAverageStressPerElement)
+    if (this->mSetComputeAverageStressPerElement)
     {
-        for(unsigned i=0; i<DIM*(DIM+1)/2; i++)
+        for (unsigned i=0; i<DIM*(DIM+1)/2; i++)
         {
             this->mAverageStressesPerElement[rElement.GetIndex()](i) /= this->mpQuadratureRule->GetNumQuadPoints();
         }
     }
 }
-
-
 
 template<size_t DIM>
 void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
@@ -614,9 +611,6 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
     }
 }
 
-
-
-
 template<size_t DIM>
 IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticitySolver(
         AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
@@ -627,7 +621,7 @@ IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticityS
                                              outputDirectory,
                                              INCOMPRESSIBLE)
 {
-    if(rProblemDefinition.GetCompressibilityType() != INCOMPRESSIBLE)
+    if (rProblemDefinition.GetCompressibilityType() != INCOMPRESSIBLE)
     {
         EXCEPTION("SolidMechanicsProblemDefinition object contains compressible material laws");
     }
@@ -635,10 +629,6 @@ IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticityS
     FormInitialGuess();
 }
 
-
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class IncompressibleNonlinearElasticitySolver<2>;
 template class IncompressibleNonlinearElasticitySolver<3>;

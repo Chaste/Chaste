@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -59,7 +59,7 @@ class TestSloughingCellKillers : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestSloughingCellKillerTopAndSides() throw(Exception)
+    void TestSloughingCellKillerTopAndSides()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -69,7 +69,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void TestSloughingCellKillerTopOnly() throw(Exception)
+    void TestSloughingCellKillerTopOnly()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -124,7 +124,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -162,7 +162,7 @@ public:
         }
     }
 
-    void TestSloughingCellKillerIn1d() throw(Exception)
+    void TestSloughingCellKillerIn1d()
     {
         // Create 1D mesh
         unsigned num_cells = 14;
@@ -171,7 +171,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -212,7 +212,7 @@ public:
         }
     }
 
-    void TestSloughingCellKillerIn3d() throw(Exception)
+    void TestSloughingCellKillerIn3d()
     {
         // Create 3D mesh
         MutableMesh<3,3> mesh;
@@ -220,7 +220,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -233,7 +233,7 @@ public:
         TS_ASSERT_THROWS_THIS(sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath(), "SloughingCellKiller is not yet implemented in 3D");
     }
 
-    void TestArchivingOfSloughingCellKiller() throw (Exception)
+    void TestArchivingOfSloughingCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -274,7 +274,7 @@ public:
         }
     }
 
-    void TestRadialSloughingCellKillerMethods() throw(Exception)
+    void TestRadialSloughingCellKillerMethods()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -297,7 +297,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -337,7 +337,7 @@ public:
         }
     }
 
-    void TestArchivingOfRadialSloughingCellKiller() throw (Exception)
+    void TestArchivingOfRadialSloughingCellKiller()
     {
         // Set up
         OutputFileHandler handler("archive", false);    // don't erase contents of folder

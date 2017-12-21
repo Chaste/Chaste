@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,24 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTODESRN_HPP_
-#define ABSTRACTODESRN_HPP_
+#ifndef ABSTRACTODESRNMODEL_HPP_
+#define ABSTRACTODESRNMODEL_HPP_
 
 #include <vector>
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 #include "AbstractSrnModel.hpp"
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
-//class AbstractSrnModel; ///\todo #2752 remove this commented code
 
 /**
  * This class contains the abstract code for an ODE sub-cellular reaction network (SRN) model
  *  - based on AbstractOdeBasedCellCycleModel
  *
  * \todo #2752 Thoroughly document this class
+ *
  */
 class AbstractOdeSrnModel : public AbstractSrnModel, public CellCycleModelOdeHandler
 {
@@ -59,7 +60,7 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the srn model and member variables.
+     * Archive the SRN model and member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -69,17 +70,11 @@ private:
     {
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
-        archive & mFinishedRunningOdes;
         archive & mInitialConditions;
         archive & mStateSize;
     }
 
 protected:
-
-    /**
-     * Whether the SRN model is currently in a delay (not solving ODEs).
-     */
-    bool mFinishedRunningOdes;
 
     /**
      * The initial condition for the ODE state variables.
@@ -101,28 +96,19 @@ protected:
      */
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
-    using AbstractSrnModel::CreateSrnModel;
     /**
-     * Overridden CreateSrnModel() method.
+     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
      *
-     * Builder method to create new instances of the SRN model.
-     * Each concrete subclass must implement this method to create an
-     * instance of that subclass.
-     *
-     * This method is called by Cell::Divide() to create a SRN
-     * model for the daughter cell.  Note that the parent SRN
-     * model will have had ResetForDivision() called just before
-     * CreateSrnModel() is called, so performing an exact copy of the
-     * parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
-     * Note bring virtual functions from AbstractSrnModel into derived namespace so overloading virtual works.
-     *
-     * @param pModel pointer to an ODE SRN model
-     *
-     * @return new SRN model
+     * @param rModel  the SRN model to copy.
      */
-    AbstractSrnModel* CreateSrnModel(AbstractOdeSrnModel* pModel);
+    AbstractOdeSrnModel(const AbstractOdeSrnModel& rModel);
 
 public:
     /**
@@ -147,16 +133,9 @@ public:
      /**
      * For a naturally cycling model this does not need to be overridden in the
      * subclasses. But most models should override this function and then
-     * call AbstractOdeBasedCellCycleModel::ResetForDivision() from inside their version.
+     * call AbstractSrnModel::ResetForDivision() from inside their version.
      */
     virtual void ResetForDivision();
-
-    /**
-     * Set mFinishedRunningOdes. Used in CreateSrnModel().
-     *
-     * @param finishedRunningOdes the new value of mFinishedRunningOdes
-     */
-    void SetFinishedRunningOdes(bool finishedRunningOdes);
 
     /**
      * Set mInitialConditions. Used in CreateSrnModel().
@@ -166,18 +145,13 @@ public:
     void SetInitialConditions(std::vector<double> initialConditions);
 
     /**
-     * @return reference to the ODE system state values.
-     */
-    const std::vector<double>& GetStateVariables();
-
-    /**
-     * Outputs cell cycle model parameters to file.
+     * Outputs SRN model parameters to file. Virtual void so needs to be specified in child classes.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile) = 0;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)
 
-#endif /* ABSTRACTODESRN_HPP_ */
+#endif /* ABSTRACTODESRNMODEL_HPP_ */

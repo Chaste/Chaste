@@ -1,5 +1,5 @@
 #
-# Acknowledgement: This file is based on the FindXerces.cmake file http://wiki.codesynthesis.com/uploads/8/86/FindXSD.cmake.gz
+# Acknowledgement: This file is based on the FindXSD.cmake file http://wiki.codesynthesis.com/uploads/8/86/FindXSD.cmake.gz
 # 
 # Attempt to find the xsd application in various places. If found, the full
 # path will be in XSD_EXECUTABLE. Look in the usual locations, as well as in
@@ -7,8 +7,14 @@
 #
 
 # Mono also has a utility called xsd, so try to find xsdcxx first
+
+#prefer $ENV{XSD_ROOT}
 FIND_PROGRAM( XSD_EXECUTABLE NAMES xsdcxx xsd
-		   	  HINTS ${RWSL_DEPS}/xsd/bin $ENV{XSD_ROOT}/bin
+		   	  HINTS $ENV{XSD_ROOT}/bin
+              NO_DEFAULT_PATH )
+
+#now try other system paths
+FIND_PROGRAM( XSD_EXECUTABLE NAMES xsdcxx xsd
 			  PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
 			  		/usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
 			  		/usr/local/bin

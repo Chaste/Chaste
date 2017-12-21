@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellLabel.hpp"
+#include "WildTypeCellMutationState.hpp"
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
 
 SimpleWntCellCycleModel::SimpleWntCellCycleModel()
     : mUseCellProliferativeTypeDependentG1Duration(false),
@@ -47,37 +52,38 @@ SimpleWntCellCycleModel::SimpleWntCellCycleModel()
 {
 }
 
+SimpleWntCellCycleModel::SimpleWntCellCycleModel(const SimpleWntCellCycleModel& rModel)
+   : AbstractSimplePhaseBasedCellCycleModel(rModel),
+     mUseCellProliferativeTypeDependentG1Duration(rModel.mUseCellProliferativeTypeDependentG1Duration),
+     mWntStemThreshold(rModel.mWntStemThreshold),
+     mWntTransitThreshold(rModel.mWntTransitThreshold),
+     mWntLabelledThreshold(rModel.mWntLabelledThreshold)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     *
+     * Note that mG1Duration and the cell's proliferative type are
+     * (re)set as soon as InitialiseDaughterCell() is called on the
+     * new cell-cycle model.
+     */
+}
+
 AbstractCellCycleModel* SimpleWntCellCycleModel::CreateCellCycleModel()
 {
-    // Create a new cell-cycle model
-    SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
+    return new SimpleWntCellCycleModel(*this);
+}
 
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide) will already have been
-     * correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetUseCellProliferativeTypeDependentG1Duration(mUseCellProliferativeTypeDependentG1Duration);
-    p_model->SetWntStemThreshold(mWntStemThreshold);
-    p_model->SetWntTransitThreshold(mWntTransitThreshold);
-    p_model->SetWntLabelledThreshold(mWntLabelledThreshold);
-
-    return p_model;
+bool SimpleWntCellCycleModel::GetUseCellProliferativeTypeDependentG1Duration() const
+{
+    return mUseCellProliferativeTypeDependentG1Duration;
 }
 
 void SimpleWntCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(bool useCellProliferativeTypeDependentG1Duration)
@@ -87,7 +93,7 @@ void SimpleWntCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(boo
 
 void SimpleWntCellCycleModel::SetG1Duration()
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
 
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -123,9 +129,9 @@ void SimpleWntCellCycleModel::SetG1Duration()
     }
 }
 
-double SimpleWntCellCycleModel::GetWntLevel()
+double SimpleWntCellCycleModel::GetWntLevel() const
 {
-    assert(mpCell != NULL);
+    assert(mpCell != nullptr);
     double level = 0;
 
     switch (mDimension)
@@ -176,6 +182,11 @@ WntConcentrationType SimpleWntCellCycleModel::GetWntType()
             const unsigned DIM = 3;
             wnt_type = WntConcentration<DIM>::Instance()->GetType();
             break;
+        }
+        case UNSIGNED_UNSET:
+        {
+            // If you trip this you have tried to use a simulation without setting the dimension.
+            NEVER_REACHED;
         }
         default:
             NEVER_REACHED;
@@ -254,7 +265,7 @@ void SimpleWntCellCycleModel::UpdateCellCyclePhase()
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
         mpCell->SetCellProliferativeType(p_diff_type);
     }
-    AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
+    AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase();
 }
 
 void SimpleWntCellCycleModel::InitialiseDaughterCell()
@@ -268,7 +279,7 @@ void SimpleWntCellCycleModel::InitialiseDaughterCell()
         mpCell->SetCellProliferativeType(p_transit_type);
     }
 
-    AbstractSimpleCellCycleModel::InitialiseDaughterCell();
+    AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell();
 }
 
 bool SimpleWntCellCycleModel::CanCellTerminallyDifferentiate()
@@ -276,7 +287,7 @@ bool SimpleWntCellCycleModel::CanCellTerminallyDifferentiate()
     return false;
 }
 
-double SimpleWntCellCycleModel::GetWntStemThreshold()
+double SimpleWntCellCycleModel::GetWntStemThreshold() const
 {
     return mWntStemThreshold;
 }
@@ -288,7 +299,7 @@ void SimpleWntCellCycleModel::SetWntStemThreshold(double wntStemThreshold)
     mWntStemThreshold = wntStemThreshold;
 }
 
-double SimpleWntCellCycleModel::GetWntTransitThreshold()
+double SimpleWntCellCycleModel::GetWntTransitThreshold() const
 {
     return mWntTransitThreshold;
 }
@@ -300,7 +311,7 @@ void SimpleWntCellCycleModel::SetWntTransitThreshold(double wntTransitThreshold)
     mWntTransitThreshold = wntTransitThreshold;
 }
 
-double SimpleWntCellCycleModel::GetWntLabelledThreshold()
+double SimpleWntCellCycleModel::GetWntLabelledThreshold() const
 {
     return mWntLabelledThreshold;
 }
@@ -320,7 +331,7 @@ void SimpleWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParams
     *rParamsFile << "\t\t\t<WntLabelledThreshold>" << mWntLabelledThreshold << "</WntLabelledThreshold>\n";
 
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,16 +41,19 @@ AirwayRemesher::AirwayRemesher(TetrahedralMesh<1,3>& rMesh,
                                                      mWalker(mrMesh, mOutletNodeIndex),
                                                      mCalculator(mrMesh, mOutletNodeIndex)
 {
+}
 
+void AirwayRemesher::Remesh(MutableMesh<1,3>& rOutputMesh)
+{
+    Remesh(rOutputMesh, DBL_MAX);
 }
 
 void AirwayRemesher::Remesh(MutableMesh<1,3>& outputMesh, double maximumResistance)
 {
   std::vector<AirwayBranch*> branches = mCalculator.GetBranches();
-
   std::map<Node<3>*, Node<3>*> node_map;
 
-  for(std::vector<AirwayBranch*>::iterator iter = branches.begin(); iter != branches.end(); ++iter)
+  for (std::vector<AirwayBranch*>::iterator iter = branches.begin(); iter != branches.end(); ++iter)
   {
       double resistance = (*iter)->GetPoiseuilleResistance();
 
@@ -62,7 +65,7 @@ void AirwayRemesher::Remesh(MutableMesh<1,3>& outputMesh, double maximumResistan
       unsigned subdivisions = (unsigned)(ceil(resistance/maximumResistance));
 
       Node<3>* new_start_node;
-      if(node_map.count(start_node) == 0)
+      if (node_map.count(start_node) == 0)
       {
           new_start_node = new Node<3>(0, start_node->rGetLocation(), start_node->IsBoundaryNode());
           outputMesh.AddNode(new_start_node);
@@ -73,7 +76,7 @@ void AirwayRemesher::Remesh(MutableMesh<1,3>& outputMesh, double maximumResistan
           new_start_node = node_map[start_node];
       }
 
-      for(unsigned division = 0; division < (subdivisions - 1); ++division) //Note we handle the final element as a special case
+      for (unsigned division = 0; division < (subdivisions - 1); ++division) //Note we handle the final element as a special case
       {
           Node<3>* new_end_node = new Node<3>(0, start_node->rGetLocation() + ((double)division + 1)/subdivisions*direction);
 
@@ -90,7 +93,6 @@ void AirwayRemesher::Remesh(MutableMesh<1,3>& outputMesh, double maximumResistan
           new_start_node = new_end_node;
       }
 
-
       Node<3>* new_distal_node = new Node<3>(0, distal_node->rGetLocation(), distal_node->IsBoundaryNode());
       outputMesh.AddNode(new_distal_node);
       node_map[distal_node] = new_distal_node;
@@ -104,5 +106,5 @@ void AirwayRemesher::Remesh(MutableMesh<1,3>& outputMesh, double maximumResistan
       outputMesh.AddElement(elem);
   }
 
-  //If average resistance is > maximumResistance, sub divide
+  // If average resistance is > maximumResistance, sub divide
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "DeltaNotchSrnModel.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -52,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "PottsMeshGenerator.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "OnLatticeSimulation.hpp"
 #include "DeltaNotchTrackingModifier.hpp"
@@ -70,7 +72,7 @@ class TestDeltaNotchModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestUpdateAtEndOfTimeStepNodeBased() throw(Exception)
+    void TestUpdateAtEndOfTimeStepNodeBased()
     {
         EXIT_IF_PARALLEL;
 
@@ -92,7 +94,7 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -135,9 +137,6 @@ public:
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
         double mean_delta = dynamic_cast<DeltaNotchSrnModel*>(cell0->GetSrnModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
-
-
-
     }
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()
@@ -165,7 +164,7 @@ public:
         starter_conditions.push_back(0.5);
 
         // Establish a Stochastic CCM and a DN SRN for each of the cells
-        StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+        UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
         p_cc_model->SetDimension(2);
 
         DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -187,7 +186,7 @@ public:
         starter_conditions_2.push_back(0.5);
 
         // Establish a Stochastic CCM and a DN SRN for each of the cells
-        StochasticDurationCellCycleModel* p_cc_model_2 = new StochasticDurationCellCycleModel();
+        UniformCellCycleModel* p_cc_model_2 = new UniformCellCycleModel();
         p_cc_model_2->SetDimension(2);
 
         DeltaNotchSrnModel* p_srn_model_2 = new DeltaNotchSrnModel();
@@ -235,7 +234,8 @@ public:
 
 
         // Now move cell so the cells have no neighboursthen they both run to a homogeneous steady state (note here mean delta=0)
-        c_vector<double,2> old_point = static_cast<NodesOnlyMesh<2>* >(&(simulator.rGetCellPopulation().rGetMesh()))->GetNode(1)->rGetLocation();
+        c_vector<double,2> old_point;
+        old_point = static_cast<NodesOnlyMesh<2>* >(&(simulator.rGetCellPopulation().rGetMesh()))->GetNode(1)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+2.0;
         new_point.rGetLocation()[1] = old_point[1];
@@ -288,7 +288,7 @@ public:
         starter_conditions.push_back(0.5);
 
         // Establish a Stochastic CCM and a DN SRN for each of the cells
-        StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+        UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
         p_cc_model->SetDimension(2);
 
         DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -310,7 +310,7 @@ public:
         starter_conditions_2.push_back(0.5);
 
         // Establish a Stochastic CCM and a DN SRN for each of the cells
-        StochasticDurationCellCycleModel* p_cc_model_2 = new StochasticDurationCellCycleModel();
+        UniformCellCycleModel* p_cc_model_2 = new UniformCellCycleModel();
         p_cc_model_2->SetDimension(2);
 
         DeltaNotchSrnModel* p_srn_model_2 = new DeltaNotchSrnModel();
@@ -366,7 +366,7 @@ public:
         }
     }
 
-    void TestUpdateAtEndOfTimeStepVertex() throw (Exception)
+    void TestUpdateAtEndOfTimeStepVertex()
     {
         EXIT_IF_PARALLEL;
 
@@ -386,7 +386,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -430,7 +430,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 0.9921, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepMeshBasedWithGhostes() throw (Exception)
+    void TestUpdateAtEndOfTimeStepMeshBasedWithGhostes()
     {
         EXIT_IF_PARALLEL;
 
@@ -450,7 +450,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -493,7 +493,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepPottsBased() throw (Exception)
+    void TestUpdateAtEndOfTimeStepPottsBased()
     {
         EXIT_IF_PARALLEL;
 
@@ -512,7 +512,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -551,7 +551,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepCaBased() throw (Exception)
+    void TestUpdateAtEndOfTimeStepCaBased()
     {
         EXIT_IF_PARALLEL;
 
@@ -583,7 +583,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<location_indices.size(); i++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
@@ -622,7 +622,7 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;
 
@@ -641,7 +641,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();

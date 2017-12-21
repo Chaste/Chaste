@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellsGenerator.hpp"
 #include "OnLatticeSimulation.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
+#include "CellLabel.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 
 // Needed for NodesOnlyMesh
@@ -70,7 +71,7 @@ class TestRepresentativePottsBasedOnLatticeSimulation : public AbstractCellBased
 {
 public:
 
-    void TestPottsMonolayerCellSorting() throw (Exception)
+    void TestPottsMonolayerCellSorting()
     {
         EXIT_IF_PARALLEL;
 
@@ -81,7 +82,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         // Make this pointer first as if we move it after creating the cell population the label numbers aren't tracked
@@ -111,7 +112,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
         p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
@@ -119,7 +120,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();

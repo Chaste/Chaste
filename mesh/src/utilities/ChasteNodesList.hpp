@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,7 +105,6 @@ public:
      * @return the size of the nodes list
      */
     unsigned GetSize() const;
-
 };
 
 // Declare identifier for the serializer
@@ -121,7 +120,7 @@ template<class Archive, unsigned SPACE_DIM>
 inline void save_construct_data(
     Archive & ar, const ChasteNodesList<SPACE_DIM> * t, const unsigned int file_version)
 {
-    const std::vector<Node<SPACE_DIM>* > node_list = t->rGetNodesList();
+    const std::vector<Node<SPACE_DIM>*>& node_list = t->rGetNodesList();
 
     // Archive the size first
     unsigned size = t->GetSize();

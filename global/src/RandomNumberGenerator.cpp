@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,26 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "Exception.hpp"
 
-RandomNumberGenerator* RandomNumberGenerator::mpInstance = NULL;
+#if BOOST_VERSION < 106400 // #2893
+// Forward compatibility with Boost 1.64 onwards
+#include "Boost165ExponentialDistribution.hpp"
+#include "Boost165GammaDistribution.hpp"
+#endif
+
+RandomNumberGenerator* RandomNumberGenerator::mpInstance = nullptr;
 
 RandomNumberGenerator::RandomNumberGenerator()
-    : mMersenneTwisterGenerator(0u),
-      mGenerateUnitReal(mMersenneTwisterGenerator, boost::uniform_real<>()),
-#if BOOST_VERSION < 105600  //#2585
-      mGenerateStandardNormal(mMersenneTwisterGenerator, boost::random::normal_distribution_v156<>(mMersenneTwisterGenerator, 0.0, 1.0))
+        : mMersenneTwisterGenerator(0u),
+          mGenerateUnitReal(mMersenneTwisterGenerator, boost::uniform_real<>()),
+#if BOOST_VERSION < 106400 // #2585 and #2893
+          mGenerateStandardNormal(mMersenneTwisterGenerator, boost::random::normal_distribution_v165<>(0.0, 1.0))
 #else
-      mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
+          mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
 #endif
 {
-    assert(mpInstance == NULL); // Ensure correct serialization
+    assert(mpInstance == nullptr); // Ensure correct serialization
 }
 
 RandomNumberGenerator* RandomNumberGenerator::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new RandomNumberGenerator();
     }
@@ -64,7 +70,7 @@ void RandomNumberGenerator::Destroy()
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 
@@ -82,17 +88,10 @@ unsigned RandomNumberGenerator::randMod(unsigned base)
      * and all the types are unsigneds.
      */
 
-#if BOOST_VERSION < 103700
-    unsigned base_range =(mMersenneTwisterGenerator.max)() - (mMersenneTwisterGenerator.min)();
-    unsigned val = mMersenneTwisterGenerator() - (mMersenneTwisterGenerator.min)();
-#else
     // equivalent to (eng() - eng.min()) % (_max - _min + 1) + _min,
     // but guarantees no overflow.
-    unsigned base_range =
-        boost::random::detail::subtract<unsigned>()((mMersenneTwisterGenerator.max)(), (mMersenneTwisterGenerator.min)());
-    unsigned val =
-        boost::random::detail::subtract<unsigned>()(mMersenneTwisterGenerator(), (mMersenneTwisterGenerator.min)());
-#endif
+    unsigned base_range = boost::random::detail::subtract<unsigned>()((mMersenneTwisterGenerator.max)(), (mMersenneTwisterGenerator.min)());
+    unsigned val = boost::random::detail::subtract<unsigned>()(mMersenneTwisterGenerator(), (mMersenneTwisterGenerator.min)());
 
     if (base - 1u >= base_range)
     {
@@ -124,20 +123,29 @@ double RandomNumberGenerator::NormalRandomDeviate(double mean, double stdDev)
 
 double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
 {
-    boost::gamma_distribution<> gd(shape);
-    boost::variate_generator<boost::mt19937& , boost::gamma_distribution<> > var_gamma(mMersenneTwisterGenerator, gd);
+// make a gamma distribution and `merge' this distribution with our random number generator
 
-    return scale*var_gamma();
+#if BOOST_VERSION < 106400
+    boost::random::gamma_distribution_v165<> gd(shape);
+    boost::variate_generator<boost::mt19937&, boost::random::gamma_distribution_v165<> > var_gamma(mMersenneTwisterGenerator, gd);
+#else
+    boost::gamma_distribution<> gd(shape);
+    boost::variate_generator<boost::mt19937&, boost::gamma_distribution<> > var_gamma(mMersenneTwisterGenerator, gd);
+#endif
+    return scale * var_gamma();
 }
 
 double RandomNumberGenerator::ExponentialRandomDeviate(double scale)
 {
-    // make an exponential distribution
+// make an exponential distribution and `merge' this distribution with our random number generator
+
+#if BOOST_VERSION < 106400
+    boost::random::exponential_distribution_v165<> ed(scale);
+    boost::variate_generator<boost::mt19937&, boost::random::exponential_distribution_v165<> > var_exponential(mMersenneTwisterGenerator, ed);
+#else
     boost::exponential_distribution<> ed(scale);
-
-    // `merge' this distribution with our random number generator
-    boost::variate_generator<boost::mt19937& , boost::exponential_distribution<> > var_exponential(mMersenneTwisterGenerator, ed);
-
+    boost::variate_generator<boost::mt19937&, boost::exponential_distribution<> > var_exponential(mMersenneTwisterGenerator, ed);
+#endif
     // return the random number
     return var_exponential();
 }
@@ -156,15 +164,15 @@ void RandomNumberGenerator::Reseed(unsigned seed)
 void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues)
 {
     rValues.resize(num);
-    for (unsigned i=0; i<num; i++)
+    for (unsigned i = 0; i < num; i++)
     {
         rValues[i] = i;
     }
 
-    for (unsigned end=num-1; end>0; end--)
+    for (unsigned end = num - 1; end > 0; end--)
     {
         // Pick a random integer from {0,..,end}
-        unsigned k = RandomNumberGenerator::Instance()->randMod(end+1);
+        unsigned k = RandomNumberGenerator::Instance()->randMod(end + 1);
         unsigned temp = rValues[end];
         rValues[end] = rValues[k];
         rValues[k] = temp;

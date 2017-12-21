@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,6 @@ c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)> MonodomainAssembler<ELEMENT
             + mStiffnessMatrixAssembler.ComputeMatrixTerm(rPhi,rGradPhi,rX,rU,rGradU,pElement);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainAssembler(
                         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
@@ -66,13 +65,7 @@ MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainAssembler(
     assert(pTissue);
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
-
+// Explicit instantiation
 template class MonodomainAssembler<1,1>;
 template class MonodomainAssembler<1,2>;
 template class MonodomainAssembler<1,3>;

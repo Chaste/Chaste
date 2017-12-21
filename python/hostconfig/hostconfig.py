@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,9 +95,14 @@ except ImportError:
             if sys.platform == 'darwin':
                 distro = 'macosx'
             else:
-                fp = open('/etc/issue')
-                distro = fp.read().split()[0].lower()
-                fp.close()
+                # Get distro via Python
+                import platform
+                distro = platform.linux_distribution()[0].lower()
+                # Get distro manually
+                if distro == '':
+                    fp = open('/etc/issue')
+                    distro = fp.read().split()[0].lower()
+                    fp.close()
             (file, pathname, desc) = imp.find_module(distro, ['python/hostconfig'])
             try:
                 conf = imp.load_module(distro, file, pathname, desc)

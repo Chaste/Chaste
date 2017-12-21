@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,7 +90,6 @@ public:
 
         return p_cell;
     }
-
 };
 
 #ifdef CHASTE_CVODE
@@ -231,7 +230,7 @@ private:
 
 public:
 
-    void TestWithDifferentCellsAndSolvers() throw(Exception)
+    void TestWithDifferentCellsAndSolvers()
     {
         double duration = 25;
         HeartConfig::Instance()->SetSimulationDuration(duration); //ms
@@ -352,9 +351,7 @@ public:
             TS_ASSERT(CompareBenchmarkResults(fe_node_100, cvode_node_100, 0.4)); // Only 0.2 -- 0.4mV difference with CVODE
         }
 #endif // CHASTE_CVODE
-
     }
-
 };
 
 #endif /*TEST1DMONODOMAINSHANNONCVODEBENCHMARKS_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,31 +86,31 @@ public:
 
         double Z = rX(2);
 
-        if ( fabs(rX(0)-1)<1e-6 )
+        if (fabs(rX(0)-1) < 1e-6)
         {
             traction(0) =  lam1 - invlam1;
             traction(1) =  0.0;
             traction(2) =  -a*Z*invlam1*invlam1*invlam2;
         }
-        else if ( fabs(rX(1)-0)<1e-6 )
+        else if (fabs(rX(1)-0) < 1e-6)
         {
             traction(0) =  0.0;
             traction(1) =  0.0;
             traction(2) =  b*Z*invlam1;
         }
-        else if ( fabs(rX(1)-1)<1e-6 )
+        else if (fabs(rX(1)-1) < 1e-6)
         {
             traction(0) =  0.0;
             traction(1) =  lam2 - invlam2;
             traction(2) =  -b*Z*invlam2*invlam2*invlam1;
         }
-        else if ( fabs(rX(2)-0)<1e-6 )
+        else if (fabs(rX(2)-0) < 1e-6)
         {
             traction(0) =  0.0;
             traction(1) =  0.0;
             traction(2) =  lam1*lam2 - invlam1*invlam2;
         }
-        else if ( fabs(rX(2)-1)<1e-6 )
+        else if (fabs(rX(2)-1) < 1e-6)
         {
             traction(0) =  -a*invlam1*invlam1;
             traction(1) =  -b*invlam2*invlam2;
@@ -150,13 +150,13 @@ public:
      * It is then possible to determine the body force and surface tractions required for
      * this deformation, and they are defined in the above class.
      */
-    void TestSolve3d() throw(Exception)
+    void TestSolve3d()
     {
-        unsigned num_runs=4;
+        unsigned num_runs = 4;
         double l2_errors[4];
         unsigned num_elem_each_dir[4] = {1,2,5,10};
 
-        for(unsigned run=0; run<num_runs; run++)
+        for (unsigned run=0; run<num_runs; run++)
         {
             QuadraticMesh<3> mesh(1.0/num_elem_each_dir[run], 1.0, 1.0, 1.0);
 
@@ -173,7 +173,7 @@ public:
                 double Z = mesh.GetNode(i)->rGetLocation()[2];
 
                 // if X=0
-                if ( fabs(X)<1e-6)
+                if (fabs(X) < 1e-6)
                 {
                     fixed_nodes.push_back(i);
                     c_vector<double,3> new_position;
@@ -187,12 +187,11 @@ public:
 
             // Define traction boundary conditions on all boundary elems that are not on X=0
             std::vector<BoundaryElement<2,3>*> boundary_elems;
-            for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
-                  = mesh.GetBoundaryElementIteratorBegin();
-                iter != mesh.GetBoundaryElementIteratorEnd();
-                ++iter)
+            for (TetrahedralMesh<3,3>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+                 iter != mesh.GetBoundaryElementIteratorEnd();
+                 ++iter)
             {
-                if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
+                if (fabs((*iter)->CalculateCentroid()[0]) > 1e-6)
                 {
                     BoundaryElement<2,3>* p_element = *iter;
                     boundary_elems.push_back(p_element);
@@ -236,7 +235,7 @@ public:
 
                 l2_errors[run] += norm_2(error);
 
-                if(num_elem_each_dir[run]==5u)
+                if (num_elem_each_dir[run]==5u)
                 {
                     TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-2);
                     TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-2);
@@ -253,7 +252,7 @@ public:
             }
         }
 
-        //for(unsigned run=0; run<num_runs; run++)
+        //for (unsigned run=0; run<num_runs; run++)
         //{
         //    std::cout << 1.0/num_elem_each_dir[run] << " " << l2_errors[run] << "\n";
         //}
@@ -293,7 +292,7 @@ public:
      *  has a smaller area than the undeformed surface.
      *
      */
-    void TestWithPressureOnDeformedSurfaceBoundaryCondition3d() throw (Exception)
+    void TestWithPressureOnDeformedSurfaceBoundaryCondition3d()
     {
         double lambda = 0.85;
 
@@ -323,7 +322,7 @@ public:
             double Z = mesh.GetNode(i)->rGetLocation()[2];
 
             // if X=0
-            if ( fabs(X)<1e-6)
+            if (fabs(X) < 1e-6)
             {
                 fixed_nodes.push_back(i);
                 c_vector<double,3> new_position_before_rotation;

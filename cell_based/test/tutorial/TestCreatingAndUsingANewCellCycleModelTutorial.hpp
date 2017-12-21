@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * depend on the cell type. A simple cell-cycle model is defined as ''generation-based'' if it keeps track of the
  * generation of the corresponding cell, and sets the cell type according
  * to this. Our new cell-cycle model will inherit from this abstract class. */
-#include "AbstractSimpleGenerationBasedCellCycleModel.hpp"
+#include "AbstractSimpleGenerationalCellCycleModel.hpp"
 
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based Chaste
@@ -101,13 +101,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * chosen such that the mean of the distribution, 1/λ, equals the mean
  * G1 duration as defined in the {{{AbstractCellCycleModel}}} class. We will also assume that
  * cells divide a certain number of generations before becoming differentiated. To implement this model we define a new cell-cycle model, {{{MyCellCycleModel}}},
- * which inherits from {{{AbstractSimpleGenerationBasedCellCycleModel}}} and
+ * which inherits from {{{AbstractSimpleGenerationalCellCycleModel}}} and
  * overrides the {{{SetG1Duration()}}} method.
  *
  * Note that usually this code would be separated out into a separate declaration in
  * a .hpp file and definition in a .cpp file.
  */
-class MyCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
+class MyCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
 {
 private:
 
@@ -115,7 +115,7 @@ private:
      * to archive (save or load) the cell-cycle model object in a cell-based simulation.
      * The code consists of a serialize method, in which we first archive the cell
      * cycle model using the serialization code defined in the base class
-     * {{{AbstractSimpleGenerationBasedCellCycleModel}}}. We then archive an instance
+     * {{{AbstractSimpleGenerationalCellCycleModel}}}. We then archive an instance
      * of the {{{RandomNumberGenerator}}} singleton class, which is used in the
      * {{{SetG1Duration()}}} method. Note that serialization of singleton objects
      * must be done with care. Before the object is serialized via a pointer, it must
@@ -125,7 +125,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleGenerationBasedCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleGenerationalCellCycleModel>(*this);
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         archive & *p_gen;
         archive & p_gen;
@@ -244,7 +244,7 @@ public:
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMyCellCycleModel() throw(Exception)
+    void TestMyCellCycleModel()
     {
         /* Test that we can construct a {{{MyCellCycleModel}}} object: */
         TS_ASSERT_THROWS_NOTHING(MyCellCycleModel cell_model3);
@@ -265,19 +265,23 @@ public:
             cells.push_back(p_cell);
         }
 
-        /* Find the mean G1 duration and test that it is within some tolerance of
+        /* To check the CCM has been set up correctly we get a pointer to the one stored on the first cell.
+         * We use a static_cast so we can access all the member variables in the concrete class MyCellCycleModel.
+         *
+         * Find the mean G1 duration and test that it is within some tolerance of
          * the expected value: */
-        double expected_mean_g1_duration = cells[0]->GetCellCycleModel()->GetStemCellG1Duration();
+
+        double expected_mean_g1_duration = static_cast<MyCellCycleModel*>(cells[0]->GetCellCycleModel())->GetStemCellG1Duration();
         double sample_mean_g1_duration = 0.0;
 
         for (unsigned i=0; i<num_cells; i++)
         {
-            sample_mean_g1_duration += cells[i]->GetCellCycleModel()->GetG1Duration()/ (double) num_cells;
+            sample_mean_g1_duration += static_cast<MyCellCycleModel*>(cells[i]->GetCellCycleModel())->GetG1Duration()/ (double) num_cells;
         }
 
         TS_ASSERT_DELTA(sample_mean_g1_duration, expected_mean_g1_duration, 0.1);
 
-        /* Now construct another {{{MyCellCycleModel}}} and associated cell. */
+        /* Now construct another {{{MyCellCycleModel}}} and associated cell. To check it works for transit cells. */
         MyCellCycleModel* p_my_model = new MyCellCycleModel;
         CellPtr p_my_cell(new Cell(p_state, p_my_model));
         p_my_cell->SetCellProliferativeType(p_transit_type);
@@ -286,8 +290,8 @@ public:
         /* Use the helper method {{{CheckReadyToDivideAndPhaseIsUpdated()}}} to
          * test that this cell progresses correctly through the cell cycle. */
         unsigned num_steps = 100;
-        double mean_cell_cycle_time = cells[0]->GetCellCycleModel()->GetStemCellG1Duration()
-                                        + cells[0]->GetCellCycleModel()->GetSG2MDuration();
+        double mean_cell_cycle_time = p_my_model->GetTransitCellG1Duration()
+                                        + p_my_model->GetSG2MDuration();
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(mean_cell_cycle_time, num_steps);
 
@@ -359,8 +363,9 @@ public:
 
             input_arch >> p_cell;
 
-            /* Test that the private data has been restored correctly. */
-            AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
+            /* Test that the private data has been restored correctly. Note we cast it to the correct type
+             * so we can acess all the member variables */
+            MyCellCycleModel* p_model = static_cast<MyCellCycleModel*>(p_cell->GetCellCycleModel());
 
             TS_ASSERT_DELTA(p_model->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model->GetAge(), 2.5, 1e-12);
@@ -374,7 +379,7 @@ public:
      * We conclude with a brief test demonstrating how {{{MyCellCycleModel}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyCellCycleModel() throw(Exception)
+    void TestOffLatticeSimulationWithMyCellCycleModel()
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh covering a
          * circular domain of given radius.

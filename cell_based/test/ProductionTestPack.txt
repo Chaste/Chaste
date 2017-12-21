@@ -9,4 +9,3 @@ simulation/TestOffLatticeSimulationWithPdes.hpp
 population/TestCellKillers.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulation.hpp
-population/TestPdeAndBoundaryConditions.hpp

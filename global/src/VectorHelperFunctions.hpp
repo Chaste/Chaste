@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -316,7 +316,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<doubl
 template<>
 inline double GetVectorComponent(const N_Vector& rVec, unsigned index)
 {
-    assert(rVec != NULL);
+    assert(rVec != nullptr);
     return NV_Ith_S(rVec, index);
 }
 
@@ -329,7 +329,7 @@ inline double GetVectorComponent(const N_Vector& rVec, unsigned index)
 template<>
 inline void SetVectorComponent(N_Vector& rVec, unsigned index, double value)
 {
-    assert(rVec != NULL);
+    assert(rVec != nullptr);
     NV_Ith_S(rVec, index) = value;
 }
 
@@ -341,7 +341,7 @@ inline void SetVectorComponent(N_Vector& rVec, unsigned index, double value)
 template<>
 inline unsigned GetVectorSize(const N_Vector& rVec)
 {
-    assert(rVec != NULL);
+    assert(rVec != nullptr);
     return NV_LENGTH_S(rVec);
 }
 
@@ -352,7 +352,7 @@ inline unsigned GetVectorSize(const N_Vector& rVec)
 template<>
 inline void InitialiseEmptyVector(N_Vector& rVec)
 {
-    rVec = NULL;
+    rVec = nullptr;
 }
 
 /**
@@ -363,7 +363,7 @@ inline void InitialiseEmptyVector(N_Vector& rVec)
 template<>
 inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
 {
-    if (rVec == NULL)
+    if (rVec == nullptr)
     {
         rVec = N_VNew_Serial(size);
     }
@@ -376,7 +376,7 @@ inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
 template<>
 inline N_Vector CreateEmptyVector()
 {
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -387,7 +387,7 @@ inline N_Vector CreateEmptyVector()
 template<>
 inline bool IsEmptyVector(N_Vector& rVec)
 {
-    return rVec == NULL;
+    return rVec == nullptr;
 }
 
 /**
@@ -400,7 +400,7 @@ inline void DeleteVector(N_Vector& rVec)
     if (rVec)
     {
         rVec->ops->nvdestroy(rVec);
-        rVec = NULL;
+        rVec = nullptr;
     }
 }
 
@@ -412,7 +412,7 @@ inline void DeleteVector(N_Vector& rVec)
 template<>
 inline N_Vector CopyVector(N_Vector& rVec)
 {
-    N_Vector copy = NULL;
+    N_Vector copy = nullptr;
     if (rVec)
     {
         copy = N_VClone(rVec);
@@ -492,7 +492,7 @@ inline std::vector<double> MakeStdVec(N_Vector v)
  */
 inline N_Vector MakeNVector(const std::vector<double>& rSrc)
 {
-    N_Vector nv = NULL;
+    N_Vector nv = nullptr;
     CreateVectorIfEmpty(nv, rSrc.size());
     CopyFromStdVector(rSrc,nv);
     return nv;

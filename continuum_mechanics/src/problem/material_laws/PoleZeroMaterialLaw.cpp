@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,6 @@ PoleZeroMaterialLaw<DIM>::PoleZeroMaterialLaw(std::vector<std::vector<double> > 
 {
     SetParameters(k,a,b);
 }
-
 
 template<unsigned DIM>
 void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
@@ -192,9 +191,6 @@ void PoleZeroMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////////////
-
 template class PoleZeroMaterialLaw<2>;
 template class PoleZeroMaterialLaw<3>;

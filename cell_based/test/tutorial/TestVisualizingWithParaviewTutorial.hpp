@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * In this tutorial we show how Chaste is used to generate simulations
+ * In this tutorial we show how Chaste can be used to generate simulations
  * that can be viewed in Paraview, and how to use Paraview itself. Four examples
  * are provided: the first two use a `MeshBasedCellPopulation` (a cell-centre model
  * based on a Delaunay triangulation description of cell neighbours);
@@ -79,8 +79,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The remaining header files define classes that will be used in the cell population
  * simulation test. We have encountered each of these header files in previous cell-based
  * Chaste tutorials. */
-#include "StochasticDurationCellCycleModel.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -114,7 +114,7 @@ public:
      * in which we use
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model.
      */
-    void Test2DMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
+    void Test2DMeshBasedMonolayerSimulationForVisualizing()
     {
         /* In a similar way to previous cell-based Chaste tutorials,
          * we create a mesh-based cell population in which cells are defined by their centres,
@@ -127,7 +127,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -164,7 +164,7 @@ public:
          * with the correct number of cells. If different simulation input parameters are being explored
          * the lines should be removed.
          */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 102u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 108u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 
@@ -203,9 +203,9 @@ public:
      * In the second test, similar to the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
      * in which we use
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model. However here we impose periodic boundaries.
-     * THe only differnece in this test is the generation of the mesh
+     * The only difference in this test is the generation of the mesh
      */
-    void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
+    void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing()
     {
         /*
          * We setup the simulation in the same way as above but
@@ -218,7 +218,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -242,7 +242,7 @@ public:
          * with the correct number of cells. If different simulation input parameters are being explored
          * the lines should be removed.
          */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 102u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 108u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 
@@ -262,7 +262,7 @@ public:
     * We next run a similar simulation to the first two examples, but now use a `NodeBasedCellPopulation`,
     * in which cells are represented as 'overlapping spheres'.
     */
-    void Test2DNodeBasedMonolayerSimulationForVisualizing() throw (Exception)
+    void Test2DNodeBasedMonolayerSimulationForVisualizing()
     {
         /* We set up the simulation in much the same way as above, except now using a `NodesOnlyMesh` and
          * `NodeBasedCellPopulation`. Further details on how to set up a node-based simulation can be found in
@@ -276,7 +276,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -294,7 +294,7 @@ public:
         /* The next two lines are for test purposes only and are not part of this tutorial.
          * We are checking that we reached the end time of the simulation
          * with the correct number of cells. */
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 108u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 
@@ -307,6 +307,9 @@ public:
     * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
     * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
     *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
+    *
     * EMPTYLINE
     *
     * == Test 4 - a basic vertex-based simulation ==
@@ -316,7 +319,7 @@ public:
     * Here, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells using a mutable vertex mesh. Each cell is assigned a fixed cell-cycle model.
     */
-    void Test2DVertexBasedMonolayerSimulationForVisualizing() throw(Exception)
+    void Test2DVertexBasedMonolayerSimulationForVisualizing()
     {
         /* In this test, we create a vertex-based cell population in which cells are defined
          * by their vertices, and cell proliferation is governed by a fixed generation-based
@@ -326,7 +329,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);

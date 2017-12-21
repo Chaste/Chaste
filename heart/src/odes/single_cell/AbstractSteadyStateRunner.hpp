@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_CVODE
 
-#include "Exception.hpp"
-#include "Warnings.hpp"
-#include "RegularStimulus.hpp"
-#include "AbstractCvodeCell.hpp"
 #include <boost/shared_ptr.hpp>
+#include "AbstractCvodeCell.hpp"
+#include "Exception.hpp"
+#include "RegularStimulus.hpp"
+#include "Warnings.hpp"
 
 /**
  * This class is abstract to investigate different ways of getting a cell model to steady state.
@@ -67,6 +67,9 @@ protected:
     /** The maximum number of paces that are allowed */
     unsigned mMaxNumPaces;
 
+    /** Whether to suppress output from this class (defaults to false) */
+    bool mSuppressOutput;
+
     /**
      * Run the cell model to steady state
      * (defined by a small change in state variables between beats)
@@ -77,7 +80,7 @@ protected:
      * and should increment mNumEvaluations to reflect how many paces
      * were simulated
      */
-    virtual void RunToSteadyStateImplementation()=0;
+    virtual void RunToSteadyStateImplementation() = 0;
 
 public:
     /**
@@ -104,6 +107,13 @@ public:
     bool RunToSteadyState();
 
     /**
+     * Stop class, and subclasses printing output to std::cout
+     *
+     * @param  suppress  whether to suppress output.
+     */
+    void SuppressOutput(bool suppress = true);
+
+    /**
      * @return The number of cell model 'paces/beats' that had to be evaluated.
      */
     unsigned GetNumEvaluations();
@@ -116,5 +126,3 @@ public:
 #endif // CHASTE_CVODE
 
 #endif // _ABSTRACTSTEADYSTATERUNNER_HPP_
-
-

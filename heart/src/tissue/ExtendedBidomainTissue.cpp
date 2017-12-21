@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,9 +82,9 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
                                                      this->mpDistributedVectorFactory->GetLow(),
                                                      this->mpDistributedVectorFactory->GetHigh());
     }
+    // LCOV_EXCL_START //don't really know how to cover this...
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE //don't really know how to cover this...
         // Errors thrown creating cells will often be process-specific
         PetscTools::ReplicateException(true);
         // Should really do this for other processes too, but this is all we need
@@ -97,8 +97,8 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
             delete (*cell_iterator);
         }
         throw e;
-#undef COVERAGE_IGNORE
     }
+    // LCOV_EXCL_STOP
     PetscTools::ReplicateException(false);
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
@@ -169,23 +169,24 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
             Node<SPACE_DIM>* p_node = this->mpMesh->GetNode(global_index);
             mGgapDistributed[local_index] = mGGap;//assign default uniform value everywhere first
 
-            //then change where and if necessary
+            // Then change where and if necessary
             for (unsigned het_index = 0; het_index < mGgapHeterogeneityRegions.size(); het_index++)
             {
-                if ( mGgapHeterogeneityRegions[het_index]->DoesContain ( p_node->GetPoint() ) )
+                if (mGgapHeterogeneityRegions[het_index]->DoesContain(p_node->GetPoint()))
                 {
                     mGgapDistributed[local_index] = mGgapValues[het_index];
                 }
             }
         }
     }
+    // LCOV_EXCL_START
     catch (const Exception& e)
     {
-#define COVERAGE_IGNORE
         PetscTools::ReplicateException(true);
         throw e;
-#undef COVERAGE_IGNORE
     }
+    // LCOV_EXCL_STOP
+
     PetscTools::ReplicateException(false);
 }
 
@@ -247,14 +248,16 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             assert(hetero_intra_conductivities.size()==0);
             hetero_intra_conductivities.resize(num_elements, intra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
+
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -273,9 +276,9 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                if ( conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid) )
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
-                    //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
+                    // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
                         hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
@@ -382,14 +385,15 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             //initialise with the values of teh default conductivity tensor
             hetero_extra_conductivities.resize(num_elements, extra_conductivities);
         }
+        // LCOV_EXCL_START
         catch(std::bad_alloc &badAlloc)
         {
-#define COVERAGE_IGNORE
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
             throw badAlloc;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
+
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
@@ -408,10 +412,10 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             ChastePoint<SPACE_DIM> element_centroid(iter->CalculateCentroid());
             for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
-                // if element centroid is contained in the region
-                if ( conductivities_heterogeneity_areas[region_index]->DoesContain( element_centroid ) )
+                // If element centroid is contained in the region
+                if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
-                    //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
+                    // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
                     for (unsigned i=0; i<SPACE_DIM; i++)
                     {
                         hetero_extra_conductivities[local_element_index][i] = extra_h_conductivities[region_index][i];
@@ -532,13 +536,13 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
             this->mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
             mCellsDistributedSecondCell[index.Local]->ComputeExceptVoltage(time, nextTime);
         }
+        // LCOV_EXCL_START
         catch (Exception &e)
         {
-#define COVERAGE_IGNORE
             PetscTools::ReplicateException(true);
             throw e;
-#undef COVERAGE_IGNORE
         }
+        // LCOV_EXCL_STOP
 
         // update the Iionic and stimulus caches
         this->UpdateCaches(index.Global, index.Local, nextTime);//in parent class
@@ -548,7 +552,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
     HeartEventHandler::EndEvent(HeartEventHandler::SOLVE_ODES);
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
-    if ( this->mDoCacheReplication )
+    if (this->mDoCacheReplication)
     {
         this->ReplicateCaches();
         ReplicateAdditionalCaches();//extended bidomain specific caches
@@ -670,10 +674,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SetCmSecondCell(double value)
     mCmSecondCell = value;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ExtendedBidomainTissue<1>;
 template class ExtendedBidomainTissue<2>;
 template class ExtendedBidomainTissue<3>;

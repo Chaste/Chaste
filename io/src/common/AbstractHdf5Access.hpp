@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,10 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ABSTRACTHDF5ACCESS_HPP_
 #define ABSTRACTHDF5ACCESS_HPP_
-
-#ifndef H5_USE_16_API
-#define H5_USE_16_API 1
-#endif
 
 #include <hdf5.h>
 #include <string>
@@ -155,8 +151,6 @@ public:
      * @return the unit of the Unlimited dimension (usually "msec").
      */
     std::string GetUnlimitedDimensionUnit();
-
-
 };
 
 #endif // ABSTRACTHDF5ACCESS_HPP_

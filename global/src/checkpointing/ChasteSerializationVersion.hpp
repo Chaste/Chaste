@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CHASTESERIALIZATIONVERSION_HPP_
 
 /// gcov doesn't like this file...
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 
 /**
  * @file
@@ -94,6 +94,6 @@ struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 
 
 // gcov doesn't like this file...
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 #endif /*CHASTESERIALIZATIONVERSION_HPP_*/

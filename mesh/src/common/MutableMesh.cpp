@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -217,7 +217,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
                 this->GetElement(*it)->CalculateWeightedDirection(this->mElementWeightedDirections[ (*it) ],
                                                             this->mElementJacobianDeterminants[ (*it) ]);
 
-                if ( inner_prod(previous_direction, this->mElementWeightedDirections[ (*it) ]) < 0)
+                if (inner_prod(previous_direction, this->mElementWeightedDirections[ (*it) ]) < 0)
                 {
                     EXCEPTION("Moving node caused an subspace element to change direction");
                 }
@@ -270,7 +270,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElement(unsigned index)
     this->mElements[index]->MarkAsDeleted();
     mDeletedElementIndices.push_back(index);
 
-    //Delete any nodes that are no longer attached to mesh.
+    // Delete any nodes that are no longer attached to mesh
     for (unsigned node_index = 0; node_index < this->mElements[index]->GetNumNodes(); ++node_index)
     {
         if (this->mElements[index]->GetNode(node_index)->GetNumContainingElements() == 0u)
@@ -293,7 +293,6 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElement(unsigned index)
         }
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNodePriorToReMesh(unsigned index)
@@ -677,9 +676,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    #define COVERAGE_IGNORE
-    assert( ELEMENT_DIM == SPACE_DIM );
-    #undef COVERAGE_IGNORE
+    assert( ELEMENT_DIM == SPACE_DIM ); // LCOV_EXCL_LINE
 
     // Avoid some triangle/tetgen errors: need at least four
     // nodes for tetgen, and at least three for triangle
@@ -699,7 +696,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
             this->mpDistributedVectorFactory = new DistributedVectorFactory(this->GetNumNodes());
         }
     }
-    if (SPACE_DIM==1)
+    if (SPACE_DIM == 1)
     {
         // Store the node locations
         std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
@@ -724,11 +721,13 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Construct the nodes and boundary nodes
         for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
         {
-            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
+            // As we're in 1D, the boundary nodes are simply at either end of the mesh
+            bool is_boundary_node = (node_index==0 || node_index==old_node_locations.size()-1);
+
+            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], is_boundary_node);
             this->mNodes.push_back(p_node);
 
-            // As we're in 1D, the boundary nodes are simply at either end of the mesh
-            if ( node_index==0 || node_index==old_node_locations.size()-1 )
+            if (is_boundary_node)
             {
                 this->mBoundaryNodes.push_back(p_node);
             }
@@ -784,7 +783,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         this->ExportToMesher(map, mesher_input);
 
         // Library call
-        triangulate((char*)"Qze", &mesher_input, &mesher_output, NULL);
+        triangulate((char*)"Qze", &mesher_input, &mesher_output, nullptr);
 
         this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
 
@@ -802,7 +801,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Library call
         tetgen::tetrahedralize((char*)"Qz", &mesher_input, &mesher_output);
 
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
+        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
     }
 }
 
@@ -816,15 +815,14 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
-    assert(ELEMENT_DIM == 2);
-    assert(SPACE_DIM == 3);
+    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
+    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
 
     std::vector<c_vector<unsigned, 5> > history;
 
-
     bool long_edge_exists = true;
 
-    while(long_edge_exists)
+    while (long_edge_exists)
     {
         std::set<std::pair<unsigned, unsigned> > long_edges;
 
@@ -957,18 +955,18 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
         //Add node in both of these elements to new_node_index_vector (this enables us to add a new spring in the MeshBasedCellPopulation
         unsigned other_node_index = UNSIGNED_UNSET;
 
-        if ( (p_original_element->GetNodeGlobalIndex(0) != new_node_index) &&
-             (p_original_element->GetNodeGlobalIndex(0) != pNodeA->GetIndex() ) )
+        if ((p_original_element->GetNodeGlobalIndex(0) != new_node_index) &&
+            (p_original_element->GetNodeGlobalIndex(0) != pNodeA->GetIndex()))
         {
             other_node_index = p_original_element->GetNodeGlobalIndex(0);
         }
-        else if ( (p_original_element->GetNodeGlobalIndex(1) != new_node_index) &&
-                  (p_original_element->GetNodeGlobalIndex(1) != pNodeA->GetIndex() ) )
+        else if ((p_original_element->GetNodeGlobalIndex(1) != new_node_index) &&
+                 (p_original_element->GetNodeGlobalIndex(1) != pNodeA->GetIndex()))
         {
             other_node_index = p_original_element->GetNodeGlobalIndex(1);
         }
-        else if ( (p_original_element->GetNodeGlobalIndex(2) != new_node_index) &&
-                  (p_original_element->GetNodeGlobalIndex(2) != pNodeA->GetIndex() ) )
+        else if ((p_original_element->GetNodeGlobalIndex(2) != new_node_index) &&
+                 (p_original_element->GetNodeGlobalIndex(2) != pNodeA->GetIndex()))
         {
             other_node_index = p_original_element->GetNodeGlobalIndex(2);
         }
@@ -980,8 +978,8 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
         counter++;
     }
 
-    assert(counter<4);
-    assert(counter>1);// need to be in at least one element
+    assert(counter < 4);
+    assert(counter > 1);// need to be in at least one element
 
     if (counter == 2) // only one new element
     {
@@ -994,7 +992,7 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
+    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
     unsigned num_nodes = pElement->GetNumNodes();
     std::set<unsigned> neighbouring_elements_indices;
     std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;
@@ -1049,7 +1047,8 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
          it != neighbouring_nodes_indices.end();
          ++it)
     {
-        c_vector<double, ELEMENT_DIM> node_location = this->GetNode(*it)->rGetLocation();
+        c_vector<double, ELEMENT_DIM> node_location;
+        node_location = this->GetNode(*it)->rGetLocation();
 
         // Calculate vector from circumcenter to node
         node_location -= circum_centre;
@@ -1095,18 +1094,13 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(double maxPenetration)
     return true;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MutableMesh<1,1>;
 template class MutableMesh<1,2>;
 template class MutableMesh<1,3>;
 template class MutableMesh<2,2>;
 template class MutableMesh<2,3>;
 template class MutableMesh<3,3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

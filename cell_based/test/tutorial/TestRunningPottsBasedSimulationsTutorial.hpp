@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,21 +47,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = Examples showing how to create, run and visualize Potts-based simulations =
  *
- * EMPTYLINE
- *
  * == Introduction ==
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize Potts-based simulations.
  * Full details of the mathematical model can be found in Graner, F. and Glazier, J. A. (1992). Simulation
  * of biological cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2015–2016.
  *
- * EMPTYLINE
- *
  * == The test ==
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -76,18 +68,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
 #include "PottsMeshGenerator.hpp"
 /* The next header file defines the class that simulates the evolution of an on lattice {{{CellPopulation}}}. */
 #include "OnLatticeSimulation.hpp"
 /* The next header file defines a{{{CellPopulation}}} class for implementing a cellular Potts model.*/
 #include "PottsBasedCellPopulation.hpp"
-/* The next header file defines some update rules for describing the Hamiltonian used to define the Potts simulations. */
+/* The next header files define some update rules for describing the Hamiltonian used to define the Potts simulations. */
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "TransitCellProliferativeType.hpp"
+/* Finally these headers allow us to output cell labels. */
+#include "CellLabel.hpp"
 #include "CellLabelWriter.hpp"
 
 /*
@@ -106,7 +100,7 @@ public:
      * In the first test, we run a simple Potts-based simulation, in which we create a monolayer
      * of cells, using a Potts mesh. Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /** The next line is needed because we cannot currently run Potts simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -124,14 +118,14 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CellsGenerator` helper class, which is templated over the type
-         * of cell model required (here {{{StochasticDurationCellCycleModel}}})
+         * of cell model required (here {{{UniformCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * {{{cells}}} should become - one cell for each element. Third argument makes all cells
          * proliferate.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
@@ -187,12 +181,12 @@ public:
         /*
          * Finally we add the update rule to the simulator.
          */
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         /*
          * We repeat the process for any other update rules.
          */
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
@@ -215,17 +209,20 @@ public:
      *
      * See UserTutorials/VisualizingWithParaview for more information.
      *
-     * Load the file {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd}}}, and click apply
+     * Load the file {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
      *
-     * Select the "Display" tab and select "color by" cell index to see individual cells
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      *
-     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unocupied lattice sites are labelled with -1). This will allow you to view only the cells.
+     * Select the "Display" tab and select "color by" cell index to see individual cells.
      *
-     * Load the files {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/outlines_..vtu}}}, and click apply
+     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
      *
-     * In order to see the cell outlines you will need to select "Surface With Edges" in the drop down menu
+     * Load the files {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/outlines_..vtu}}}, and click apply.
+     *
+     * In order to see the cell outlines you will need to select "Surface With Edges" in the drop down menu.
      *
      * Click play to see the evolution of the simulation.
      *
@@ -245,7 +242,7 @@ public:
      * cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2015–2016.
      *
      */
-    void TestPottsMonolayerCellSorting() throw (Exception)
+    void TestPottsMonolayerCellSorting()
     {
         /** The next line is needed because we cannot currently run Potts simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -263,7 +260,7 @@ public:
          * the third argument is set to make all cells non-proliferative. */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* Before we make a {{{CellPopulation}}} we make a boost shared pointer to a cell label and then assign this
@@ -298,7 +295,7 @@ public:
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
 
@@ -307,7 +304,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
         /*
          * These parameters cause the cells to sort, for different values you can get different patterns.
          *
@@ -339,7 +336,7 @@ public:
      * The next test extends the previous example to three dimensions.
      *
      */
-    void TestPottsSpheroidCellSorting() throw (Exception)
+    void TestPottsSpheroidCellSorting()
     {
         /** The next line is needed because we cannot currently run Potts simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -362,7 +359,7 @@ public:
          * the third argument is set to make all cells non-proliferative.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* As for the 2D case before we make a {{{CellPopulation}}} we make a pointer to a cell label and then assign this
@@ -403,7 +400,7 @@ public:
          */
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(8.0);
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
 
         /*
          * We use the same differential adhesion parameters as in the 2D case.
@@ -414,7 +411,7 @@ public:
         p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
         p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
         p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
-        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+        simulator.AddUpdateRule(p_differential_adhesion_update_rule);
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
@@ -430,13 +427,16 @@ public:
      * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
      * See UserTutorials/VisualizingWithParaview for more information.
      *
-     * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply
+     * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply.
      *
      * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
      *
-     * Select the "Display" tab and select "color by" cell label. (you can also "color by" cell index to see individual cells)
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      *
-     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unocupied lattice sites are labelled with -1). This will allow you to view only the cells.
+     * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
+     *
+     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
      *
      * Click play to see the evolution of the simulation.
      *
@@ -446,4 +446,4 @@ public:
      */
 };
 
-#endif /* TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_ */
+#endif /* TESTRUNNINGPOTTSBASEDSIMULATIONSTUTORIAL_HPP_ */

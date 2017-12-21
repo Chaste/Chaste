@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ public:
      * is used.  Whether the working copy is modified is ignored by this method; use
      * IsWorkingCopyModified to test that.
      */
-    static unsigned GetRevisionNumber();
+    static unsigned long long GetRevisionNumber();
 
     /**
      * @return  If this Chaste was built from a subversion working copy, then return whether there
@@ -143,6 +143,11 @@ public:
      * @return  The version numbers (i.e. revisions) of any checked-out projects.
      */
     static const std::map<std::string, std::string>& rGetProjectVersions();
+
+    /**
+     * @return  Whether any checked-out projects have uncommitted revisions.
+     */
+    static const std::map<std::string, std::string>& rGetIfProjectsModified();
 
     /**
      * @return  A single-line string representation of the provenance information to be attached

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -113,6 +113,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
      */
+    // LCOV_EXCL_START
     virtual c_matrix<double,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableMatrixTerm(
         c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
         c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
@@ -126,6 +127,7 @@ protected:
         NEVER_REACHED;
         return zero_matrix<double>(PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES);
     }
+    // LCOV_EXCL_STOP
 
     /**
      * @return the vector to be added to element stiffness vector
@@ -147,6 +149,7 @@ protected:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
+    // LCOV_EXCL_START
     virtual c_vector<double,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableVectorTerm(
         c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
         c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
@@ -160,6 +163,7 @@ protected:
         NEVER_REACHED;
         return zero_vector<double>(PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES);
     }
+    // LCOV_EXCL_STOP
 
     /**
      * Calculate the contribution of a single cable element to the linear system.
@@ -209,8 +213,6 @@ public:
         delete mpCableQuadRule;
     }
 };
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::AbstractFeCableIntegralAssembler(
@@ -280,7 +282,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
             Element<CABLE_ELEMENT_DIM, SPACE_DIM>& r_element = *(*iter);
 
             // Test for ownership first, since it's pointless to test the criterion on something which we might know nothing about.
-            if ( r_element.GetOwnership() == true && ElementAssemblyCriterion(r_element)==true )
+            if (r_element.GetOwnership() == true && ElementAssemblyCriterion(r_element)==true)
             {
                 AssembleOnCableElement(r_element, a_elem, b_elem);
 
@@ -363,7 +365,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
 
         CableBasisFunction::ComputeBasisFunctions(quad_point, phi);
 
-        if ( this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR )
+        if (this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR)
         {
             ComputeTransformedBasisFunctionDerivatives(quad_point, inverse_jacobian, grad_phi);
         }

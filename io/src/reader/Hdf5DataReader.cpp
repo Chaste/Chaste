@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,7 +86,7 @@ void Hdf5DataReader::CommonConstructor()
                   " , H5Fopen error code = " << mFileId);
     }
 
-    mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str());
+    mVariablesDatasetId = H5Dopen(mFileId, mDatasetName.c_str(), H5P_DEFAULT);
     SetMainDatasetRawChunkCache();
 
     if (mVariablesDatasetId <= 0)
@@ -125,7 +125,7 @@ void Hdf5DataReader::CommonConstructor()
         hid_t timestep_dataspace = H5Dget_space(mUnlimitedDatasetId);
 
         // Get the dataset/dataspace dimensions
-        H5Sget_simple_extent_dims(timestep_dataspace, &mNumberTimesteps, NULL);
+        H5Sget_simple_extent_dims(timestep_dataspace, &mNumberTimesteps, nullptr);
     }
 
     // Get the attribute where the name of the variables are stored
@@ -136,7 +136,7 @@ void Hdf5DataReader::CommonConstructor()
     hid_t attribute_space = H5Aget_space(attribute_id);
 
     hsize_t attr_dataspace_dim;
-    H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, NULL);
+    H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, nullptr);
 
     unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
     char* string_array = (char *)malloc(sizeof(char)*MAX_STRING_SIZE*(int)num_columns);
@@ -236,7 +236,7 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
                 break;
             }
         }
-        if ( node_index == mIncompleteNodeIndices.size())
+        if (node_index == mIncompleteNodeIndices.size())
         {
             EXCEPTION("The incomplete dataset '" << mDatasetName << "' does not contain info of node " << nodeIndex);
         }
@@ -257,10 +257,10 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
     hsize_t offset[3] = {0, actual_node_index, column_index};
     hsize_t count[3]  = {mDatasetDims[0], 1, 1};
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
-    H5Sselect_hyperslab(variables_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+    H5Sselect_hyperslab(variables_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
     // Define a simple memory dataspace
-    hid_t memspace = H5Screate_simple(1, &mDatasetDims[0] ,NULL);
+    hid_t memspace = H5Screate_simple(1, &mDatasetDims[0] ,nullptr);
 
     // Data buffer to return
     std::vector<double> ret(mDatasetDims[0]);
@@ -304,13 +304,13 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
     hsize_t offset[3] = {0, lowerIndex, column_index};
     hsize_t count[3]  = {mDatasetDims[0], upperIndex-lowerIndex, 1};
     hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
-    H5Sselect_hyperslab(variables_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+    H5Sselect_hyperslab(variables_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
     // Define a simple memory dataspace
     hsize_t data_dimensions[2];
     data_dimensions[0] = mDatasetDims[0];
     data_dimensions[1] = upperIndex-lowerIndex;
-    hid_t memspace = H5Screate_simple(2, data_dimensions, NULL);
+    hid_t memspace = H5Screate_simple(2, data_dimensions, nullptr);
 
     double* data_read = new double[mDatasetDims[0]*(upperIndex-lowerIndex)];
 
@@ -379,13 +379,13 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
     {
         // Define a dataset in memory for this process
         hsize_t v_size[1] = {(unsigned)(hi-lo)};
-        hid_t memspace = H5Screate_simple(1, v_size, NULL);
+        hid_t memspace = H5Screate_simple(1, v_size, nullptr);
 
         // Select hyperslab in the file.
         hsize_t offset[3] = {timestep, (unsigned)(lo), column_index};
         hsize_t count[3]  = {1, (unsigned)(hi-lo), 1};
         hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
-        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, NULL, count, NULL);
+        H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 
         double* p_petsc_vector;
         VecGetArray(data, &p_petsc_vector);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,13 +41,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -72,7 +73,7 @@ public:
         FileComparison( boundary_force_results_dir + "boundary_results.parameters", "crypt/test/data/TestForcesForCrypt/boundary_results.parameters").CompareFiles();
     }
 
-    void TestVertexCryptBoundaryForceMethods() throw (Exception)
+    void TestVertexCryptBoundaryForceMethods()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
@@ -88,7 +89,7 @@ public:
         boost::shared_ptr<AbstractCellProliferativeType> p_diff_type(new DifferentiatedCellProliferativeType);
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - elem_index;
@@ -129,7 +130,7 @@ public:
         }
     }
 
-    void TestVertexCryptBoundaryForceForceWithNonVertexCellPopulation() throw (Exception)
+    void TestVertexCryptBoundaryForceForceWithNonVertexCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -145,7 +146,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> non_vertex_cell_population(mesh, cells);

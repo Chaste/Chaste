@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,6 +60,12 @@ private:
     /** The radius associated with the Node */
     double mRadius;
 
+    /** Vector of indices corresponding to neighbouring nodes. */
+    std::vector<unsigned> mNeighbourIndices;
+
+    /** A bool indicating whether the neighbours of this node have been calculated yet. */
+    bool mNeighboursSetUp;
+
     /** Whether the node represents a particle or not: Used for NodeBasedCellPopulationWithParticles */
     bool mIsParticle;
 
@@ -78,6 +84,8 @@ private:
         archive & mAttributes;
         archive & mRegion;
         archive & mRadius;
+        archive & mNeighbourIndices;
+        archive & mNeighboursSetUp;
         archive & mIsParticle;
 
         for (unsigned d = 0; d < SPACE_DIM; d++)
@@ -129,14 +137,55 @@ public:
     /**
      * Add a contribution to the force vector
      *
-     * @param appliedForceContribution the contribution to add to mAppliedForce
+     * @param rForceContribution the contribution to add to mAppliedForce
      */
-    void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& appliedForceContribution);
+    void AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution);
 
     /**
      * Set mAppliedForce to a zero vector.
      */
     void ClearAppliedForce();
+
+    /**
+     * Add a neighbour to this node's vector of neighbouring node  indices.
+     *
+     * @param index of the node to add.
+     */
+    void AddNeighbour(unsigned index);
+
+    /**
+     * Clear this node's vector of neighbour indices.
+     */
+    void ClearNeighbours();
+
+    /**
+     * Remove duplicates from the vector of node neighbour indices.
+     */
+    void RemoveDuplicateNeighbours();
+
+    /**
+     * Check whether the node neighbours collection is empty.
+     *
+     * @return whether this node has any neighbours.
+     */
+    bool NeighboursIsEmpty();
+
+    /**
+     * Sets a flag to indicate that the neighbours of this node have/have not been updated.
+     *
+     * @param flag whether the neighbours are set up or not
+     */
+    void SetNeighboursSetUp(bool flag);
+
+    /**
+     * @return a flag to indicate that the neighbours of this node have/have not been updated.
+     */
+    bool GetNeighboursSetUp();
+
+    /**
+     * @return this node's vector of neighbour indices.
+     */
+    std::vector<unsigned>& rGetNeighbours();
 
     /**
      * Get whether this node is a particle, or not.

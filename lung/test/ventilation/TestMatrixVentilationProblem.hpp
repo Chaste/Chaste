@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MatrixVentilationProblem.hpp"
 #include "Warnings.hpp"
 
-
-
 void LinearTimeBCs(AbstractVentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double time = rTimeStepper.GetTime();
@@ -78,7 +76,7 @@ class TestMatrixVentilationProblem : public CxxTest::TestSuite
 private:
 
 public:
-    void TestOnBranch() throw(Exception)
+    void TestOnBranch()
     {
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh", 0u);
         problem.SetMeshInMilliMetres();
@@ -101,7 +99,7 @@ public:
         problem.WriteVtk("TestVentilation", "small_conical");
 #endif
     }
-    void TestOnBranchCylindrical() throw(Exception)
+    void TestOnBranchCylindrical()
     {
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh");
         problem.SetMeshInMilliMetres();
@@ -130,7 +128,7 @@ public:
 #endif
     }
 
-    void TestThreeBifurcationsWithRadiusOnEdgeFile() throw (Exception)
+    void TestThreeBifurcationsWithRadiusOnEdgeFile()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
@@ -158,7 +156,7 @@ public:
         TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -2.8143e-14, 1e-15);
     }
 
-    void TestThreeBifurcations() throw (Exception)
+    void TestThreeBifurcations()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
@@ -183,7 +181,8 @@ public:
         TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
     }
 
-    void TestThreeBifurcationsExtraLinksDirect() throw (Exception)
+
+    void TestThreeBifurcationsExtraLinksDirect()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
         problem.SetMeshInMilliMetres();
@@ -211,7 +210,7 @@ public:
 
     }
 
-    void TestThreeBifurcationsExtraLinks() throw (Exception)
+    void TestThreeBifurcationsExtraLinks()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations_extra_links", 0u);
         problem.SetMeshInMilliMetres();
@@ -242,7 +241,7 @@ public:
 #endif
     }
 
-    void TestThreeBifurcationsFluxBoundaries() throw (Exception)
+    void TestThreeBifurcationsFluxBoundaries()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetMeshInMilliMetres();
@@ -267,7 +266,7 @@ public:
         TS_ASSERT_DELTA(flux[6],  -7.10176e-11, 1e-16); // BC (Inflow flux)
     }
 
-    void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
+    void TestThreeBifurcationsWithDynamicResistance()
     {
         /*
          * HOW_TO_TAG Continuum mechanics/Ventilation
@@ -299,7 +298,7 @@ public:
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
     }
-   void TestThreeBifurcationsExtraLinksWithDynamicResistance() throw (Exception)
+   void TestThreeBifurcationsExtraLinksWithDynamicResistance()
     {
         /*
          * As previous but with every segment divided into two segments
@@ -326,7 +325,33 @@ public:
 #endif
     }
 
-    void TestTimeVaryingThreeBifurcations() throw (Exception)
+    void TestThreeBifurcationsWithPerElementDynamicResistance()
+    {
+        MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
+        problem.SetMeshInMilliMetres();
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(150000); //Needed to increase the resistance in these artificial airways
+        // Here's the set-up function with applies van Ertbruggen 2005
+        problem.SetPerGenerationDynamicResistance();
+
+        problem.Solve();
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 75114.3782,   1e-1);
+        TS_ASSERT_DELTA(pressure[2], 125695.1375, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 125695.1375, 1e-2);
+        TS_ASSERT_DELTA(pressure[4], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[6], -6.2138e-7, 1e-11);  // -4.424511e-7 with Pedley. -7.1017e-7 with static
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
+#endif
+    }
+
+    void TestTimeVaryingThreeBifurcations()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetRadiusOnEdge();
@@ -335,7 +360,7 @@ public:
         problem.SolveOverTime(stepper, &LinearTimeBCs, "TestVentilation", "three_bifurcations_time");
     }
 
-    void TestSineThreeBifurcations() throw (Exception)
+    void TestSineThreeBifurcations()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetRadiusOnEdge();
@@ -352,7 +377,7 @@ public:
         TS_ASSERT_DELTA(pressure[5], 12.972452, 1e-5); //BC
     }
 
-    void TestGravitationalVaryingThreeBifurcations() throw (Exception)
+    void TestGravitationalVaryingThreeBifurcations()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations", 0u);
         problem.SetRadiusOnEdge();
@@ -371,16 +396,16 @@ public:
      * Output file names are given to the function (but might instead be given in the file)
      *
      */
-    void TestSolveProblemDefinedInFile() throw (Exception)
+    void TestSolveProblemDefinedInFile()
     {
         MatrixVentilationProblem problem("lung/test/data/three_bifurcations");
         problem.SolveProblemFromFile("lung/test/data/ChasteVentilationInput.txt", "VentilationOutput", "3_bifurcations");
     }
 
-    void TestTopOfAirwaysPatientData() throw (Exception)
+    void TestTopOfAirwaysPatientData()
     {
         MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
+        PetscTools::SetOption("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
         //problem.SetConstantInflowFluxes(100.0);
@@ -397,10 +422,10 @@ public:
     }
 
 
-    void TestTopOfAirwaysPatientDataOutflowFlux() throw (Exception)
+    void TestTopOfAirwaysPatientDataOutflowFlux()
     {
         MatrixVentilationProblem problem("lung/test/data/top_of_tree", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
+        PetscTools::SetOption("-ksp_monitor", "");
         problem.SetOutflowFlux(0.001);
         problem.SetConstantInflowPressures(50.0);
         //problem.SetConstantInflowFluxes(100.0);
@@ -414,10 +439,10 @@ public:
         TS_ASSERT_DELTA(flux[0], 0.001, 1e-5);
     }
 
-    void OnlyWorksWithUMFPACKTestPatientData() throw (Exception)
+    void OnlyWorksWithUMFPACKTestPatientData()
     {
         MatrixVentilationProblem problem("notforrelease_lung/test/data/Novartis002", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
+        PetscTools::SetOption("-ksp_monitor", "");
 
         problem.SetOutflowPressure(0.);
         problem.SetConstantInflowPressures(50.0);
@@ -438,9 +463,9 @@ public:
 //        vtk_writer.AddPointData("Pressure", pressure);
 //
 //        std::vector<double> radii(problem.rGetMesh().GetNumElements());
-//        for(TetrahedralMesh<1,3>::ElementIterator iter = problem.rGetMesh().GetElementIteratorBegin();
-//            iter != problem.rGetMesh().GetElementIteratorEnd();
-//            ++iter)
+//        for (TetrahedralMesh<1,3>::ElementIterator iter = problem.rGetMesh().GetElementIteratorBegin();
+//             iter != problem.rGetMesh().GetElementIteratorEnd();
+//             ++iter)
 //        {
 //            radii[(*iter).GetIndex()] = (*iter).GetAttribute();
 //        }
@@ -448,7 +473,7 @@ public:
 //        vtk_writer.AddCellData("Radii", radii);
 //        vtk_writer.WriteFilesUsingMesh(problem.rGetMesh());
     }
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         TS_ASSERT_THROWS_THIS(MatrixVentilationProblem bad_problem("mesh/test/data/y_branch_3d_mesh", 1u),
                 "Outlet node is not a boundary node");

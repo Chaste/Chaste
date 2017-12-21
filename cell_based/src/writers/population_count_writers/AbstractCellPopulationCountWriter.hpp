@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,12 +93,18 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
@@ -107,6 +113,9 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
@@ -114,12 +123,18 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

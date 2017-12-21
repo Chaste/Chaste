@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
         if (element.GetOwnership() == true)
         {
-            for(unsigned j=0; j<num_quad_pts_per_element; j++)
+            for (unsigned j=0; j<num_quad_pts_per_element; j++)
             {
                 unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
 
@@ -84,7 +84,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 data_at_quad_point.Stretch = 1.0;
                 data_at_quad_point.StretchLastTimeStep = 1.0;
 
-                if ( mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)
+                if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)
                         ->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId() )
                 {
                     // Bath
@@ -105,7 +105,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     // initialise fibre/sheet direction matrix to be the identity, fibres in X-direction, and sheet in XY-plane
     mConstantFibreSheetDirections = zero_matrix<double>(DIM,DIM);
-    for(unsigned i=0; i<DIM; i++)
+    for (unsigned i=0; i<DIM; i++)
     {
         mConstantFibreSheetDirections(i,i) = 1.0;
     }
@@ -113,7 +113,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
     mpVariableFibreSheetDirections = NULL;
 
     // Check that we are using the right kind of solver.
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+    for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
             iter != this->mQuadPointToDataAtQuadPointMap.end();
             iter++)
     {
@@ -144,7 +144,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPai
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanicsSolver()
 {
-    for(mMapIterator = mQuadPointToDataAtQuadPointMap.begin();
+    for (mMapIterator = mQuadPointToDataAtQuadPointMap.begin();
         mMapIterator != mQuadPointToDataAtQuadPointMap.end();
         ++mMapIterator)
     {
@@ -155,13 +155,11 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanics
         }
     }
 
-    if(mpVariableFibreSheetDirections)
+    if (mpVariableFibreSheetDirections)
     {
         delete mpVariableFibreSheetDirections;
     }
 }
-
-
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage(std::vector<double>& rCalciumConcentrations,
@@ -173,14 +171,14 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
 
     ContractionModelInputParameters input_parameters;
 
-    for(unsigned i=0; i<rCalciumConcentrations.size(); i++)
+    for (unsigned i=0; i<rCalciumConcentrations.size(); i++)
     {
         input_parameters.intracellularCalciumConcentration = rCalciumConcentrations[i];
         input_parameters.voltage = rVoltages[i];
 
 ///\todo #1828 / #1211 don't pass in entire vector
         std::map<unsigned,DataAtQuadraturePoint>::iterator iter = mQuadPointToDataAtQuadPointMap.find(i);
-        if(iter != mQuadPointToDataAtQuadPointMap.end())
+        if (iter != mQuadPointToDataAtQuadPointMap.end())
         {
             iter->second.ContractionModel->SetInputParameters(input_parameters);
         }
@@ -192,11 +190,11 @@ template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetupChangeOfBasisMatrix(unsigned elementIndex,
                                                                                      unsigned currentQuadPointGlobalIndex)
 {
-    if(!mpVariableFibreSheetDirections) // constant fibre directions
+    if (!mpVariableFibreSheetDirections) // constant fibre directions
     {
         this->mChangeOfBasisMatrix = mConstantFibreSheetDirections;
     }
-    else if(!mFibreSheetDirectionsDefinedByQuadraturePoint) // fibre directions defined for each mechanics mesh element
+    else if (!mFibreSheetDirectionsDefinedByQuadraturePoint) // fibre directions defined for each mechanics mesh element
     {
         this->mChangeOfBasisMatrix = (*mpVariableFibreSheetDirections)[elementIndex];
     }
@@ -206,8 +204,6 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetupChangeOfBasisMa
     }
 }
 
-
-
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
                                                                                                unsigned elementIndex,
@@ -216,7 +212,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                                                                                                FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
                                                                                                bool addToDTdE)
 {
-    for(unsigned i=0; i<DIM; i++)
+    for (unsigned i=0; i<DIM; i++)
     {
         mCurrentElementFibreDirection(i) = this->mChangeOfBasisMatrix(i,0);
     }
@@ -246,7 +242,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     double dTdE_coeff_n2 = 0.0; // only set non-zero if we apply cross fibre tension in 3D
     double dTdE_coeff_n3 = 0.0; // only set non-zero if we apply cross fibre tension in 3D and implicit
 
-    if(IsImplicitSolver())
+    if (IsImplicitSolver())
     {
         double dt = mNextTime-mCurrentTime;
         //std::cout << "d sigma / d lamda = " << d_act_tension_dlam << ", d sigma / d lamdat = " << d_act_tension_d_dlamdt << "\n" << std::flush;
@@ -254,11 +250,11 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     }
 
     bool apply_cross_fibre_tension = (this->mrElectroMechanicsProblemDefinition.GetApplyCrossFibreTension()) && (DIM > 1);
-    if(apply_cross_fibre_tension)
+    if (apply_cross_fibre_tension)
     {
         double sheet_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetTensionFraction();
 
-        for(unsigned i=0; i<DIM; i++)
+        for (unsigned i=0; i<DIM; i++)
         {
             mCurrentElementSheetDirection(i) = this->mChangeOfBasisMatrix(i,1);
         }
@@ -268,7 +264,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
         // amend the stress and dTdE using the active tension
         dTdE_coeff_s1 = -2*sheet_cross_fraction*detF*active_tension/(I4_sheet*I4_sheet); // note: I4*I4 = lam^4
 
-        if(IsImplicitSolver())
+        if (IsImplicitSolver())
         {
             double dt = mNextTime-mCurrentTime;
             dTdE_coeff_s3 = sheet_cross_fraction*(d_act_tension_dlam + d_act_tension_d_dlamdt/dt)*detF/(lambda_fibre*I4_sheet); // note: I4*lam = lam^3
@@ -281,7 +277,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
         if (DIM>2)
         {
             double sheet_normal_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetNormalTensionFraction();
-            for(unsigned i=0; i<DIM; i++)
+            for (unsigned i=0; i<DIM; i++)
             {
                 mCurrentElementSheetNormalDirection(i) = this->mChangeOfBasisMatrix(i,2);
             }
@@ -293,7 +289,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
             rT += sheet_normal_cross_fraction*(active_tension*detF/I4_sheet_normal)*outer_prod(mCurrentElementSheetNormalDirection,mCurrentElementSheetNormalDirection);
 
             dTdE_coeff_n2 = active_tension*sheet_normal_cross_fraction*detF/I4_sheet_normal;
-            if(IsImplicitSolver())
+            if (IsImplicitSolver())
             {
                 double dt = mNextTime-mCurrentTime;
                 dTdE_coeff_n3 = sheet_normal_cross_fraction*(d_act_tension_dlam + d_act_tension_d_dlamdt/dt)*detF/(lambda_fibre*I4_sheet_normal); // note: I4*lam = lam^3
@@ -302,7 +298,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     }
 
 
-    if(addToDTdE)
+    if (addToDTdE)
     {
         c_matrix<double,DIM,DIM> invC = Inverse(rC);
 
@@ -322,7 +318,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                                          +  dTdE_coeff2 * mCurrentElementFibreDirection(M)
                                                         * mCurrentElementFibreDirection(N)
                                                         * invC(P,Q);
-                        if(apply_cross_fibre_tension)
+                        if (apply_cross_fibre_tension)
                         {
                             rDTdE(M,N,P,Q) += dTdE_coeff_s1 * mCurrentElementSheetDirection(M)
                                                             * mCurrentElementSheetDirection(N)
@@ -363,11 +359,11 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //    ///\todo #2180 The code below applies a cross fibre tension in the 2D case. Things that need doing:
 //    // * Refactor the common code between the block below and the block above to avoid duplication.
 //    // * Handle the 3D case.
-//    if(this->mrElectroMechanicsProblemDefinition.GetApplyCrossFibreTension() && DIM > 1)
+//    if (this->mrElectroMechanicsProblemDefinition.GetApplyCrossFibreTension() && DIM > 1)
 //    {
 //        double sheet_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetTensionFraction();
 //
-//        for(unsigned i=0; i<DIM; i++)
+//        for (unsigned i=0; i<DIM; i++)
 //        {
 //            mCurrentElementSheetDirection(i) = this->mChangeOfBasisMatrix(i,1);
 //        }
@@ -381,7 +377,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //        // the cross-fibre code is only tested using the explicit solver so the code below fails coverage.
 //        // This will need to be added back in once an implicit test is in place.
 //        double lambda_sheet = sqrt(I4_sheet);
-//        if(IsImplicitSolver())
+//        if (IsImplicitSolver())
 //        {
 //           double dt = mNextTime-mCurrentTime;
 //           dTdE_coeff_s1 += (d_act_tension_dlam + d_act_tension_d_dlamdt/dt)/(lambda_sheet*I4_sheet); // note: I4*lam = lam^3
@@ -390,7 +386,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //        rT += sheet_cross_fraction*(active_tension*detF/I4_sheet)*outer_prod(mCurrentElementSheetDirection,mCurrentElementSheetDirection);
 //
 //        double dTdE_coeff_s2 = active_tension*detF/I4_sheet;
-//        if(addToDTdE)
+//        if (addToDTdE)
 //        {
 //           for (unsigned M=0; M<DIM; M++)
 //           {
@@ -438,13 +434,13 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
     ChastePoint<DIM> quadrature_point; // not needed, but has to be passed in
 
     // loop over all the elements
-    for(unsigned elem_index=0; elem_index<this->mrQuadMesh.GetNumElements(); elem_index++)
+    for (unsigned elem_index=0; elem_index<this->mrQuadMesh.GetNumElements(); elem_index++)
     {
         Element<DIM,DIM>* p_elem = this->mrQuadMesh.GetElement(elem_index);
 
         // get the fibre direction for this element
         SetupChangeOfBasisMatrix(elem_index, 0); // 0 is quad index, and doesn't matter as checked that fibres not defined by quad pt above.
-        for(unsigned i=0; i<DIM; i++)
+        for (unsigned i=0; i<DIM; i++)
         {
             mCurrentElementFibreDirection(i) = this->mChangeOfBasisMatrix(i,0);
         }
@@ -511,7 +507,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetVariableFibreShee
     }
 
     mpVariableFibreSheetDirections = new std::vector<c_matrix<double,DIM,DIM> >(num_entries, zero_matrix<double>(DIM,DIM));
-    for(unsigned index=0; index<num_entries; index++)
+    for (unsigned index=0; index<num_entries; index++)
     {
         reader.GetFibreSheetAndNormalMatrix(index, (*mpVariableFibreSheetDirections)[index] );
     }
@@ -523,12 +519,12 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetConstantFibreShee
     mConstantFibreSheetDirections = rFibreSheetMatrix;
     // check orthogonality
     c_matrix<double,DIM,DIM>  temp = prod(trans(rFibreSheetMatrix),rFibreSheetMatrix);
-    for(unsigned i=0; i<DIM; i++)
+    for (unsigned i=0; i<DIM; i++)
     {
-        for(unsigned j=0; j<DIM; j++)
+        for (unsigned j=0; j<DIM; j++)
         {
             double val = (i==j ? 1.0 : 0.0);
-            if(fabs(temp(i,j)-val)>1e-4)
+            if (fabs(temp(i,j)-val)>1e-4)
             {
                 EXCEPTION("The given fibre-sheet matrix, " << rFibreSheetMatrix << ", is not orthogonal");
             }

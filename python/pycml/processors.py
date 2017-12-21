@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -158,11 +158,13 @@ class ModelModifier(object):
             target_cname, target_vname = target
         src_comp = self.model.get_component_by_name(src_cname)
         target_comp = self.model.get_component_by_name(target_cname)
+#         print "connect_variables(", src_cname, src_vname, "to", target_cname, target_vname, ")"
         if src_comp == target_comp:
             return target_comp.get_variable_by_name(target_vname)
         # Determine encapsulation paths from target & source to the root
         src_path = self._parent_path(src_comp)
         target_path = self._parent_path(target_comp)
+#         print "paths: src=", map(lambda c: c and c.name, src_path), map(lambda c: c and c.name, target_path)
         # At some point these will share a common path, even if it's just the root itself
         meeting_index = self._find_common_tail(src_path, target_path)
         # Construct path from source to target, leaving out the root (None)
@@ -172,9 +174,12 @@ class ModelModifier(object):
         path.extend(reversed(target_path[:meeting_index]))
         # Traverse this path, adding connections at each step
         next_src_var = src_comp.get_variable_by_name(src_vname)
+#         print "conn", map(lambda c: c.name, path), next_src_var, src_vname, target_vname
         for i, src_comp in enumerate(path[:-1]):
             target_comp = path[i+1]
+#             print "step", i, "from", next_src_var, "to", target_comp.name, target_vname
             next_src_var = self._make_connection(next_src_var, target_comp, target_vname)
+#             print "step", i, "made", next_src_var
         return next_src_var
     
     def _make_connection(self, src_var, target_comp, target_vname):
@@ -185,10 +190,11 @@ class ModelModifier(object):
         """
         src_comp = src_var.component
         target_var = self._find_or_create_variable(target_comp.name, target_vname, src_var)
+#         print "_make_conn", src_var, target_var, target_comp.name, target_vname
         # Sanity check the target variable
         if (target_var.get_type() == VarTypes.Mapped
             and target_var.get_source_variable(recurse=True) is src_var.get_source_variable(recurse=True)):
-#            print "Connection exists between", src_var, "and target", target_var
+#             print "Connection exists between", src_var, "and target", target_var
             return target_var
         elif target_var.get_type() == VarTypes.Unknown:
             # We've created this variable, so should be ok, but check for gotchas
@@ -209,8 +215,8 @@ class ModelModifier(object):
                 if getattr(src_var, src_if + u'_interface', u'none') == u'in':
                     src_var = src_var.get_source_variable()
             # Check and set the interface attributes
-#            print "Connecting source", src_var, src_if, getattr(src_var, src_if + u'_interface', u'none'),
-#            print "to", target_var, target_if, getattr(target_var, target_if + u'_interface', u'none')
+#             print "Connecting source", src_var, src_if, getattr(src_var, src_if + u'_interface', u'none'), src_var.units,
+#             print "to", target_var, target_if, getattr(target_var, target_if + u'_interface', u'none'), target_var.units
             assert getattr(src_var, src_if + u'_interface', u'none') != u'in'
             assert getattr(target_var, target_if + u'_interface', u'none') != u'out'
             src_var.xml_set_attribute((src_if + u'_interface', None), u'out')

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParallelCellsGenerator.hpp"
 #include "Cell.hpp"
 #include "NodesOnlyMesh.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -55,14 +55,14 @@ class TestParallelCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestConstruct1dParallelPopulation() throw (Exception)
+    void TestConstruct1dParallelPopulation()
     {
         NodesOnlyMesh<1> mesh;
         mesh.SetMaximumInteractionDistance(0.5);
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> generator;
+        ParallelCellsGenerator<FixedG1GenerationalCellCycleModel, 1> generator;
         c_vector<double, 2> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population1d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);
@@ -91,14 +91,14 @@ public:
         }
     }
 
-    void TestConstruct2dParallelPopulation() throw (Exception)
+    void TestConstruct2dParallelPopulation()
     {
         NodesOnlyMesh<2> mesh;
         mesh.SetMaximumInteractionDistance(0.5);
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 2> generator;
+        ParallelCellsGenerator<UniformG1GenerationalCellCycleModel, 2> generator;
         c_vector<double, 4> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population2d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);
@@ -126,14 +126,14 @@ public:
         }
     }
 
-    void TestConstruct3dParallelPopulation() throw (Exception)
+    void TestConstruct3dParallelPopulation()
     {
         NodesOnlyMesh<3> mesh;
         mesh.SetMaximumInteractionDistance(0.5);
 
         std::vector<CellPtr> cells;
 
-        ParallelCellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> generator;
+        ParallelCellsGenerator<UniformG1GenerationalCellCycleModel, 3> generator;
         c_vector<double, 6> bounding_box = generator.GetArchiveBoundingBox("cell_based/test/data/TestParallelConstruction/Population3d.dat");
 
         TS_ASSERT_DELTA(bounding_box[0], 0.0, 1e-4);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,8 +69,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkVersion.h>
 #endif
-
-
 
 /**
  * This stimulus causes an exception to be thrown when normally a simple stimulus would activate.
@@ -180,7 +178,7 @@ public:
     }
 
 
-    void TestBidomainErrorHandling() throw (Exception)
+    void TestBidomainErrorHandling()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -474,7 +472,7 @@ public:
      * (Historical reasons...)
      *
      */
-    void TestCompareBidomainProblemWithMonodomain() throw(Exception)
+    void TestCompareBidomainProblemWithMonodomain()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
@@ -561,7 +559,7 @@ public:
     // Solve a simple simulation and check the output was only
     // printed out at the correct times
     ///////////////////////////////////////////////////////////////////
-    void TestBidomainProblemPrintsOnlyAtRequestedTimesAndOnlyRequestedNodes() throw (Exception)
+    void TestBidomainProblemPrintsOnlyAtRequestedTimesAndOnlyRequestedNodes()
     {
         HeartEventHandler::Disable();
 
@@ -659,7 +657,7 @@ public:
         HeartEventHandler::Enable();
     }
 
-    void TestBidomainFallsOverProducesOutput() throw(Exception)
+    void TestBidomainFallsOverProducesOutput()
     {
 #ifndef NDEBUG //Note that this test relies on the debug VerifyStateVariables() method throwing
         HeartConfig::Instance()->SetSimulationDuration(0.3);  //ms
@@ -703,7 +701,7 @@ public:
         std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};
 
-        for(unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; i++)
         {
             TS_ASSERT(handler.FindFile(files[i]).Exists());
         }
@@ -711,7 +709,7 @@ public:
     }
 
 
-    void TestBidomainProblemExceptions() throw (Exception)
+    void TestBidomainProblemExceptions()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
@@ -758,7 +756,7 @@ public:
     }
 
 
-    void TestCompareOrthotropicWithAxisymmetricBidomain() throw (Exception)
+    void TestCompareOrthotropicWithAxisymmetricBidomain()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetMeshFileName("heart/test/data/box_shaped_heart/box_heart", cp::media_type::Orthotropic);
@@ -890,7 +888,7 @@ public:
      }
 
     // Test the functionality for outputting the values of requested cell state variables
-    void TestBidomainProblemPrintsMultipleVariables() throw (Exception)
+    void TestBidomainProblemPrintsMultipleVariables()
     {
         // Get the singleton in a clean state
         HeartConfig::Instance()->Reset();
@@ -953,7 +951,7 @@ public:
     /* HOW_TO_TAG Cardiac/Output
      * Output all cell model state variables for the cell model used in a particular simulation
      */
-    void TestBidomainProblemPrintsAllStateVariables() throw (Exception)
+    void TestBidomainProblemPrintsAllStateVariables()
     {
         // Get the singleton in a clean state
         HeartConfig::Instance()->Reset();
@@ -995,9 +993,7 @@ public:
         {
             TS_ASSERT_DELTA( obscure_at_5[time_step], 0.0044, 1e-3); //Does not change over time at this node
         }
-
     }
-
 
     /*
      * Simple bidomain simulation to test against in the archiving tests below
@@ -1007,7 +1003,7 @@ public:
      * the equations have been divided through by the surface-area-to-volume ratio.
      * (Historical reasons...)
      */
-    void TestSimpleBidomain1D() throw(Exception)
+    void TestSimpleBidomain1D()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
@@ -1043,7 +1039,6 @@ public:
         {
             mSolutionReplicated1d2ms.push_back(solution_replicated[index]);
         }
-
     }
 
     /*
@@ -1054,7 +1049,7 @@ public:
      *
      * NOTE: This test uses NON-PHYSIOLOGICAL parameters values.
      */
-    void TestPermutedBidomain1D() throw(Exception)
+    void TestPermutedBidomain1D()
     {
 
         TetrahedralMesh<1,1> mesh;
@@ -1097,12 +1092,9 @@ public:
         boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", new_index_for_5, 0.1));
         bidomain_problem.AddOutputModifier(trace_5);
 
-
-
         bidomain_problem.SetMesh(&mesh);
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
-
 
         // Extra trace data
         OutputFileHandler handler1("BidomainUnpermuted1d", false);
@@ -1133,7 +1125,7 @@ public:
      * the equations have been divided through by the surface-area-to-volume ratio.
      * (Historical reasons...)
      */
-    void TestBidomainProblemInTwoHalves() throw (Exception)
+    void TestBidomainProblemInTwoHalves()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
@@ -1191,13 +1183,79 @@ public:
         TS_ASSERT(h5_file.Exists());
     }
 
+    void TestBidomainProblemWithWriterCache()
+    {
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainWithWriterCache");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d_with_cache");
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        // Doesn't really test that the cache was used (since this test would pass with cache turned off too)...
+        TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainWithWriterCache", "BidomainLR91_1d_with_cache", true,
+                                                "heart/test/data/BidomainWithWriterCache", "BidomainLR91_1d_with_cache", false,
+                                                4e-4));
+    }
+
+    void TestBidomainProblemWithWriterCacheIncomplete()
+    {
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainWithWriterCacheIncomplete");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d_with_cache_incomplete");
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        std::vector<unsigned> nodes_to_be_output;
+        nodes_to_be_output.push_back(0);
+        nodes_to_be_output.push_back(5);
+        nodes_to_be_output.push_back(10);
+        bidomain_problem.SetOutputNodes(nodes_to_be_output);
+
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainWithWriterCacheIncomplete", "BidomainLR91_1d_with_cache_incomplete", true,
+                                                "heart/test/data/BidomainWithWriterCache", "BidomainLR91_1d_with_cache_incomplete", false,
+                                                4e-4));
+    }
+
+    /* Disabled this one for now as it passes in an ugly way */
+    void louieTestBidomainProblemWithWriterCacheExtraVarsException()
+    {
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesBidomain.xml");
+
+        std::vector<std::string> output_variables;
+        output_variables.push_back("calcium_dynamics__Ca_NSR");
+        output_variables.push_back("ionic_concentrations__Nai");
+        output_variables.push_back("fast_sodium_current_j_gate__j");
+        output_variables.push_back("ionic_concentrations__Ki");
+        HeartConfig::Instance()->SetOutputVariables( output_variables );
+
+        PlaneStimulusCellFactory<CellFaberRudy2000FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetUseHdf5DataWriterCache();
+
+        bidomain_problem.Initialise();
+        TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(), "Cached writes must write all variables at once.");
+    }
+
     /**
      * Not a very thorough test yet - just checks we can load a problem, simulate it, and
      * get expected results.
      *
      * This test relies on the h5 file generated in TestSimpleBidomain1D. Always run after!
      */
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("bidomain_problem_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "bidomain_problem.arch";
@@ -1271,9 +1329,6 @@ public:
             delete p_bidomain_problem;
         }
     }
-
-
-
 };
 
 #endif /*TESTBIDOMAINPROBLEM_HPP_*/

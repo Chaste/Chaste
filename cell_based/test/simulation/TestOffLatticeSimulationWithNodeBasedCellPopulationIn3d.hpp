@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SphereGeometryBoundaryCondition.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "PlaneBasedCellKiller.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 
 // Cell population writers
 #include "NodeVelocityWriter.hpp"
@@ -64,7 +64,7 @@ class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractC
 {
 public:
 
-    void Test3dNodeBasedRestrictedToSphere() throw (Exception)
+    void Test3dNodeBasedRestrictedToSphere()
     {
         // Create a simple 3D NodeBasedCellPopulation
         std::vector<Node<3>*> nodes;
@@ -76,7 +76,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
@@ -126,7 +126,7 @@ public:
         }
     }
 
-    void Test3dNodeBasedPlaneBoundary() throw (Exception)
+    void Test3dNodeBasedPlaneBoundary()
     {
         EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
 
@@ -140,7 +140,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<UniformG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);

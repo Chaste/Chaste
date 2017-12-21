@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,12 +115,6 @@ public:
      */
     NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh);
 
-    /**
-     * Update particle positions.
-     *
-     * @param dt
-     */
-    void UpdateParticlePositions(double dt);
 
     /**
      * Update mIsParticle if required by a remesh.
@@ -128,17 +122,6 @@ public:
      * @param rMap A map between node indices before and after remesh
      */
     void UpdateParticlesAfterReMesh(NodeMap& rMap);
-
-    /**
-     * Overridden UpdateNodeLocation() method.
-     *
-     * Update the location of each node in the cell population given
-     * a two vectors of forces on cells and particles and a time step over which
-     * to integrate the equations of motion.
-     *
-     * @param dt  time step
-     */
-    void UpdateNodeLocations(double dt);
 
     /**
      * IsParticle() method.
@@ -162,12 +145,11 @@ public:
      * Add a new cell to the cell population and update mIsParticle.
      *
      * @param pNewCell  the cell to add
-     * @param rCellDivisionVector  the position in space at which to put it
      * @param pParentCell pointer to a parent cell  - this is required for
      *  mesh-based cell populations
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
 
     /**
      * Overridden WriteVtkResultsToFile() method.

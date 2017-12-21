@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "CellLabel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
@@ -181,13 +185,14 @@ public:
         TS_ASSERT_DELTA(norm_2(linear_force.CalculateForceBetweenNodes(20, 21, crypt)), 1.5*8.59312/18.14, 1e-5);
 
         linear_force.SetBetaCatSpringScaler(20/6.0);
+        TS_ASSERT_DELTA(linear_force.GetBetaCatSpringScaler(), 20/6.0, 1e-6);
         TS_ASSERT_DELTA(norm_2(linear_force.CalculateForceBetweenNodes(20, 21, crypt)), 1.5*8.59312/20.0, 1e-5);
 
         // Tidy up
         WntConcentration<2>::Destroy();
     }
 
-    void TestGeneralisedLinearSpringForceWithEdgeLengthBasedSpring() throw (Exception)
+    void TestGeneralisedLinearSpringForceWithEdgeLengthBasedSpring()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -220,7 +225,7 @@ public:
                 y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
+            FixedG1GenerationalCellCycleModel* p_cell_cycle_model = new FixedG1GenerationalCellCycleModel;
             p_cell_cycle_model->SetDimension(2);
 
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
@@ -358,7 +363,7 @@ public:
         TS_ASSERT_DELTA(new_force[0]*new_force[0] + new_force[1]*new_force[1], 4.34024, 1e-3);
     }
 
-    void TestGeneralisedLinearSpringForceWithEdgeBasedSpringsOnPeriodicMesh() throw (Exception)
+    void TestGeneralisedLinearSpringForceWithEdgeBasedSpringsOnPeriodicMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -393,7 +398,7 @@ public:
                 y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel;
+            FixedG1GenerationalCellCycleModel* p_cell_cycle_model = new FixedG1GenerationalCellCycleModel;
             p_cell_cycle_model->SetDimension(2);
 
             double typical_transit_cycle_time = p_cell_cycle_model->GetAverageTransitCellCycleTime();
@@ -505,7 +510,7 @@ public:
         MutableMesh<2,2> mesh(nodes);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
@@ -553,7 +558,7 @@ public:
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         MeshBasedCellPopulationWithGhostNodes<2> stretched_cell_population(*p_mesh, cells, location_indices);
@@ -583,7 +588,7 @@ public:
         std::vector<unsigned> location_indices2 = generator2.GetCellLocationIndices();
 
         std::vector<CellPtr> cells2;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator2;
         cells_generator2.GenerateGivenLocationIndices(cells2, location_indices2);
 
         MeshBasedCellPopulationWithGhostNodes<2> squashed_cell_population(*p_mesh2, cells2, location_indices2);
@@ -626,7 +631,7 @@ public:
         FileComparison( variable_force_results_dir + "variable_results.parameters", "crypt/test/data/TestForcesForCrypt/variable_results.parameters").CompareFiles();
     }
 
-    void TestLinearSpringWithVariableSpringConstantsForceArchiving() throw (Exception)
+    void TestLinearSpringWithVariableSpringConstantsForceArchiving()
     {
         EXIT_IF_PARALLEL; // Avoid race conditions
 
@@ -647,7 +652,7 @@ public:
 
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+                FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
                 p_cell->SetCellProliferativeType(p_stem_type);
                 p_cell->SetBirthTime(-50.0);
@@ -705,7 +710,7 @@ public:
         }
     }
 
-    void TestLinearSpringWithVariableSpringConstantsForceWithNodeBasedCellPopulation() throw (Exception)
+    void TestLinearSpringWithVariableSpringConstantsForceWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -722,7 +727,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -113,7 +113,7 @@ public:
      * ComputeJacobian must sit, using the input arguments specified above.
      */
     virtual Vec Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat,Mat,void*),
 #else
                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat*,Mat*,MatStructure*,void*),

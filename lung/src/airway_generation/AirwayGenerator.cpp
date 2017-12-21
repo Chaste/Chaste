@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,13 +47,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <UblasIncludes.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
-
 #ifdef CHASTE_VTK
 
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 
-#if ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
+#if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 #include "vtkGeometryFilter.h"
 #include "vtkDoubleArray.h"
@@ -75,7 +74,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCleanPolyData.h"
 #include "vtkSelectEnclosedPoints.h"
 
-
 AirwayGenerator::AirwayGenerator(vtkSmartPointer<vtkPolyData> LobeSurface,
                                  double branchLengthLimit,
                                  unsigned pointLimit,
@@ -93,23 +91,23 @@ AirwayGenerator::AirwayGenerator(vtkSmartPointer<vtkPolyData> LobeSurface,
     mAirwayTree->SetPoints(vtkSmartPointer<vtkPoints>::New());
     mAirwayTree->SetLines(vtkSmartPointer<vtkCellArray>::New());
 
-    //Set up a filter to check if a point is inside the surface or not
+    // Set up a filter to check if a point is inside the surface or not
     mPointSelector->CheckSurfaceOn();
     mPointSelector->Initialize(mLobeSurface);
     mPointSelector->SetTolerance(1e-6);
 
-    //Calculate the bounding box of the lobe to allow progressive point reassignment limit to be used
+    // Calculate the bounding box of the lobe to allow progressive point reassignment limit to be used
     c_vector<double, 6> lobe_bounds;
     mLobeSurface->GetBounds(lobe_bounds.data());
     double lobe_bound_size = norm_2(subslice(lobe_bounds, 0,2,3) - subslice(lobe_bounds, 1,2,3));
 
-    for(unsigned generation_number = 0; generation_number < MAX_GENERATIONS; ++generation_number)
+    for (unsigned generation_number = 0; generation_number < MAX_GENERATIONS; ++generation_number)
     {
         AirwayGeneration gen(generation_number);
 
-        if(pointDistanceLimit)
+        if (pointDistanceLimit)
         {
-            //Heuristic formula to determine distribution radius (see #2275)
+            // Heuristic formula to determine distribution radius (see #2275)
             double scale_distance_limit = lobe_bound_size/30; //30 is the expected total number of generations
             gen.SetDistributionRadius(std::max(lobe_bound_size - scale_distance_limit*generation_number, 5.0));
         }
@@ -117,13 +115,10 @@ AirwayGenerator::AirwayGenerator(vtkSmartPointer<vtkPolyData> LobeSurface,
     }
 }
 
-
 AirwayGenerator::~AirwayGenerator()
 {
     mPointSelector->Complete();
 }
-
-
 
 vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloudUsingTargetPoints(const unsigned& rApproxPoints)
 {
@@ -144,7 +139,6 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloudUsingTargetVolume(
 {
     double point_spacing = std::pow(rApproxDensity, 1.0/3.0);
     return CreatePointCloud(point_spacing);
-
 }
 
 vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloud(const double& rPointSpacing)
@@ -156,15 +150,15 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloud(const double& rPo
     unsigned yi_max = std::ceil((bounds[3] - bounds[2])/rPointSpacing);
     unsigned zi_max = std::ceil((bounds[5] - bounds[4])/rPointSpacing);
 
-    //Generate the point cloud
+    // Generate the point cloud
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     double node_index = 0;
 
-    for(unsigned xi = 0; xi < xi_max; ++xi)
+    for (unsigned xi = 0; xi < xi_max; ++xi)
     {
-        for(unsigned yi = 0; yi < yi_max; ++yi)
+        for (unsigned yi = 0; yi < yi_max; ++yi)
         {
-            for(unsigned zi = 0; zi < zi_max; ++zi)
+            for (unsigned zi = 0; zi < zi_max; ++zi)
             {
                 double x = bounds[0] + xi*rPointSpacing;
                 double y = bounds[2] + yi*rPointSpacing;
@@ -178,7 +172,7 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloud(const double& rPo
         }
     }
 
-    //Some vtk filters get confused by individual points, so we add each point to a poly_vertex to keep them happy
+    // Some vtk filters get confused by individual points, so we add each point to a poly_vertex to keep them happy
     vtkSmartPointer<vtkPolyVertex> poly_vertex = vtkSmartPointer<vtkPolyVertex>::New();
     poly_vertex->GetPointIds()->SetNumberOfIds(points->GetNumberOfPoints());
 
@@ -199,13 +193,10 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloud(const double& rPo
     return mSeedPointCloud;
 }
 
-
-
 vtkSmartPointer<vtkPolyData> AirwayGenerator::GetPointCloud()
 {
     return mSeedPointCloud;
 }
-
 
 vtkSmartPointer<vtkPolyData> AirwayGenerator::GetAirwayTree()
 {
@@ -238,9 +229,6 @@ void AirwayGenerator::GetCentreOfMass(vtkSmartPointer<vtkPolyData> pointCloud,
     }
 }
 
-//
-//
-//
 vtkSmartPointer<vtkPolyData> AirwayGenerator::SplitPointCloud(vtkSmartPointer<vtkPolyData> pointCloud,
                                                               double rNormal[3],
                                                               double rOrigin[3],
@@ -268,34 +256,28 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::SplitPointCloud(vtkSmartPointer<vt
     return filter->GetOutput();
 }
 
-//
-//
-//
 void AirwayGenerator::AddInitialApex(double rStartLocation[3],
                                      double rOriginalDirection[3],
                                      double rParentDirection[3],
                                      const double& rRadius,
                                      const unsigned& rGeneration)
 {
-    //Create the vtk point and add to the airway tree
+    // Create the vtk point and add to the airway tree
     const unsigned start_id = mAirwayTree->GetPoints()->InsertNextPoint(rStartLocation);
     AddApex(start_id, rStartLocation, rOriginalDirection, rParentDirection, rGeneration);
 
-    //The starting point id is stored to allow Horsfield order to be calculated correctly
+    // The starting point id is stored to allow Horsfield order to be calculated correctly
     mStartIds.push_back(start_id);
-    mStartRadii.push_back(rRadius); //Radius must be retained for resulting radii calculations
+    mStartRadii.push_back(rRadius); // Radius must be retained for resulting radii calculations
 }
 
-//
-//
-//
 void AirwayGenerator::AddApex(const unsigned& rStartId,
                               double rStartLocation[3],
                               double rOriginalDirection[3],
                               double rParentDirection[3],
                               const unsigned& rGeneration)
 {
-    if(rGeneration < MAX_GENERATIONS)
+    if (rGeneration < MAX_GENERATIONS)
     {
         mGenerations[rGeneration].AddApex(rStartId, rStartLocation, rOriginalDirection, rParentDirection);
     }
@@ -309,7 +291,6 @@ void AirwayGenerator::AddApex(const unsigned& rStartId,
     }
 }
 
-
 std::deque<AirwayGeneration>& AirwayGenerator::GetGenerations()
 {
     return mGenerations;
@@ -320,20 +301,18 @@ std::set<unsigned>& AirwayGenerator::GetInvalidIds()
     return mInvalidIds;
 }
 
-
-
 void AirwayGenerator::GrowApex(Apex& rApex)
 {
-    if(rApex.mPointCloud->GetNumberOfPoints() == 0)
+    if (rApex.mPointCloud->GetNumberOfPoints() == 0)
     {
         return; //Can't grow an apex without any points associated to it
     }
 
-    //Determine the current point cloud centre of mass
+    // Determine the current point cloud centre of mass
     double centre[3];
     GetCentreOfMass(rApex.mPointCloud, centre);
 
-    //Determine the splitting plane: normal to the direction of the existing branch and the direction to the centre of the point cloud
+    // Determine the splitting plane: normal to the direction of the existing branch and the direction to the centre of the point cloud
     double centre_direction[3];
     vtkMath::Subtract(centre, rApex.mCurrentLocation, centre_direction);
     vtkMath::Normalize(centre_direction);
@@ -341,10 +320,10 @@ void AirwayGenerator::GrowApex(Apex& rApex)
     double normal[3];
     vtkMath::Cross(rApex.mOriginalDirection, centre_direction, normal);
 
-    //If the current direction and the vector to the centre are colinear then the normal is not well defined.
-    //Tawhai 2004 does not define what should happen in this case. We fall back to the approach in Tawhai 2000:
-    //Use the plane made by the branch and its parent as the splitting plane.
-    if(vtkMath::Norm(normal) < 1e-10) //This tolerance is arbitrary, need to think about what is appropriate here.
+    // If the current direction and the vector to the centre are colinear then the normal is not well defined.
+    // Tawhai 2004 does not define what should happen in this case. We fall back to the approach in Tawhai 2000:
+    // Use the plane made by the branch and its parent as the splitting plane.
+    if (vtkMath::Norm(normal) < 1e-10) //This tolerance is arbitrary, need to think about what is appropriate here.
     {
         vtkMath::Cross(rApex.mOriginalDirection, rApex.mParentDirection, normal);
     }
@@ -352,14 +331,14 @@ void AirwayGenerator::GrowApex(Apex& rApex)
     assert(vtkMath::Norm(normal) > 1e-10);
     vtkMath::Normalize(normal);
 
-    //Split the point cloud twice, creating new apices if needed. Should this be bundled up into a method/loop?
+    // Split the point cloud twice, creating new apices if needed. Should this be bundled up into a method/loop?
     {
         vtkSmartPointer<vtkPolyData> cloud = SplitPointCloud(rApex.mPointCloud,
                                                              normal,
                                                              centre,
                                                              false);
 
-        if(cloud->GetNumberOfPoints() > 0)
+        if (cloud->GetNumberOfPoints() > 0)
         {
             double end_location[3];
             vtkIdType end_id = InsertBranch(cloud, rApex.mStartId, rApex.mOriginalDirection, end_location);
@@ -386,7 +365,7 @@ void AirwayGenerator::GrowApex(Apex& rApex)
                                                              centre,
                                                              true);
 
-        if(cloud->GetNumberOfPoints() > 0)
+        if (cloud->GetNumberOfPoints() > 0)
         {
             double end_location[3];
             vtkIdType end_id = InsertBranch(cloud, rApex.mStartId, rApex.mOriginalDirection, end_location);
@@ -408,7 +387,6 @@ void AirwayGenerator::GrowApex(Apex& rApex)
     }
 }
 
-
 vtkIdType AirwayGenerator::InsertBranch(vtkSmartPointer<vtkPolyData> pPointCloud,
                                         unsigned startId,
                                         double originalDirection[3],
@@ -418,13 +396,13 @@ vtkIdType AirwayGenerator::InsertBranch(vtkSmartPointer<vtkPolyData> pPointCloud
 
     CheckBranchAngleLengthAndAdjust(startId, originalDirection, endLocation);
 
-    //If the branch point isn't inside the surface then terminate
-    if(!mPointSelector->IsInsideSurface(endLocation))
+    // If the branch point isn't inside the surface then terminate
+    if (!mPointSelector->IsInsideSurface(endLocation))
     {
         return -1;
     }
 
-    //Create the new branch in mAirwayTree
+    // Create the new branch in mAirwayTree
     vtkIdType new_id = mAirwayTree->GetPoints()->InsertNextPoint(endLocation);
 
     vtkIdType pt_ids[2];
@@ -435,7 +413,6 @@ vtkIdType AirwayGenerator::InsertBranch(vtkSmartPointer<vtkPolyData> pPointCloud
 
     return new_id;
 }
-
 
 void AirwayGenerator::InvalidateClosestPoint(double point[3], vtkSmartPointer<vtkPolyData> searchCloud)
 {
@@ -453,16 +430,15 @@ void AirwayGenerator::InvalidateClosestPoint(double point[3], vtkSmartPointer<vt
     mInvalidIds.insert(invalid_id);
 }
 
-
 void AirwayGenerator::Generate()
 {
-    for(std::deque<AirwayGeneration>::iterator gen_iter = mGenerations.begin();
-        gen_iter != mGenerations.end();
-        ++gen_iter)
+    for (std::deque<AirwayGeneration>::iterator gen_iter = mGenerations.begin();
+         gen_iter != mGenerations.end();
+         ++gen_iter)
     {
         gen_iter->DistributeGrowthPoints(mSeedPointCloud, mInvalidIds);
 
-        for(std::deque<Apex>::iterator apex_iter = gen_iter->GetApices().begin();
+        for (std::deque<Apex>::iterator apex_iter = gen_iter->GetApices().begin();
             apex_iter != gen_iter->GetApices().end();
             ++apex_iter)
         {
@@ -471,18 +447,15 @@ void AirwayGenerator::Generate()
     }
 }
 
-//
-//
-//
 void AirwayGenerator::CheckBranchAngleLengthAndAdjust(unsigned startId, double originalDirection[3], double centre[3])
 {
-    //calculate vector from apex start to the centre
+    // Calculate vector from apex start to the centre
     double new_direction[3];
     double start_point[3];
     mAirwayTree->GetPoints()->GetPoint(startId, start_point);
     vtkMath::Subtract(centre, start_point, new_direction);
 
-    //Record the branching length
+    // Record the branching length
     double branch_length = vtkMath::Norm(new_direction);
 
     vtkMath::Normalize(new_direction);
@@ -491,16 +464,16 @@ void AirwayGenerator::CheckBranchAngleLengthAndAdjust(unsigned startId, double o
     std::copy(originalDirection, originalDirection+3, old_direction);
     vtkMath::Normalize(old_direction);
 
-    //determine branch angle & rotate if needed
+    // Determine branch angle & rotate if needed
     const double dot_product = vtkMath::Dot(new_direction, old_direction);
     const double branch_angle = std::acos(dot_product/(vtkMath::Norm(new_direction)*vtkMath::Norm(old_direction)));
 
-    if(branch_angle > (M_PI*mAngleLimit/180.0))
+    if (branch_angle > (M_PI*mAngleLimit/180.0))
     {
-        //rotate centre to within tolerance
-        //Instead of forming an axis of rotation and a rotation matrix,
-        //two cross products are taken and used to project direction
-        //onto the correct angle.
+        // Rotate centre to within tolerance
+        // Instead of forming an axis of rotation and a rotation matrix,
+        // two cross products are taken and used to project direction
+        // onto the correct angle.
         double perpendicular_one[3];
         vtkMath::Cross(new_direction, old_direction, perpendicular_one);
         vtkMath::Normalize(perpendicular_one);
@@ -513,19 +486,15 @@ void AirwayGenerator::CheckBranchAngleLengthAndAdjust(unsigned startId, double o
         vtkMath::Add(perpendicular_two, old_direction, new_direction);
     }
 
-    //Reduce the branch length as required
+    // Reduce the branch length as required
     branch_length = branch_length*mBranchingFraction;
     vtkMath::MultiplyScalar(new_direction, branch_length);
 
-    //Update the centre
+    // Update the centre
     centre[0] = 0, centre[1] = 0, centre[2] = 0;
     vtkMath::Add(start_point, new_direction, centre);
-
 }
 
-//
-//
-//
 unsigned AirwayGenerator::HorsfieldProcessPoint(unsigned pointId, vtkSmartPointer<vtkDoubleArray> pOrder, std::deque<unsigned>& rProcessedPoints)
 {
     rProcessedPoints.push_back(pointId);
@@ -533,10 +502,10 @@ unsigned AirwayGenerator::HorsfieldProcessPoint(unsigned pointId, vtkSmartPointe
     vtkSmartPointer<vtkIdList> point_ids = vtkSmartPointer<vtkIdList>::New();
     vtkSmartPointer<vtkIdList> cell_ids = vtkSmartPointer<vtkIdList>::New();
 
-    unsigned max_child_order = 1; //Terminal branches are defined to have order one
+    unsigned max_child_order = 1; // Terminal branches are defined to have order one
     unsigned num_children = 0;
 
-    //Loop over the cells, finding connected points
+    // Loop over the cells, finding connected points
     mAirwayTree->GetPointCells(pointId, cell_ids);
     for (int i = 0; i < cell_ids->GetNumberOfIds(); ++i)
     {
@@ -560,7 +529,7 @@ unsigned AirwayGenerator::HorsfieldProcessPoint(unsigned pointId, vtkSmartPointe
         }
     }
 
-    //Horsfield always increments if there is more than one child
+    // Horsfield always increments if there is more than one child
     if (num_children > 1)
     {
         ++max_child_order;
@@ -580,9 +549,9 @@ void AirwayGenerator::CalculateHorsfieldOrder()
 
     order->SetNumberOfValues(mAirwayTree->GetNumberOfPoints());
 
-    for(std::vector<unsigned>::iterator iter = mStartIds.begin();
-        iter != mStartIds.end();
-        ++iter)
+    for (std::vector<unsigned>::iterator iter = mStartIds.begin();
+         iter != mStartIds.end();
+         ++iter)
     {
         HorsfieldProcessPoint(*iter, order, processed_points);
     }
@@ -596,12 +565,12 @@ void AirwayGenerator::MarkStartIds()
     start_ids->SetName("start_id");
     start_ids->SetNumberOfValues(mAirwayTree->GetNumberOfPoints());
 
-    for(int i = 0; i < mAirwayTree->GetNumberOfPoints(); ++i)
+    for (int i = 0; i < mAirwayTree->GetNumberOfPoints(); ++i)
     {
         start_ids->SetValue(i, 0.0);
     }
 
-    for(std::vector<unsigned>::iterator iter = mStartIds.begin();
+    for (std::vector<unsigned>::iterator iter = mStartIds.begin();
         iter != mStartIds.end();
         ++iter)
     {
@@ -625,19 +594,15 @@ void AirwayGenerator::CalculateRadii(const double& rDiameterRatio)
 
     std::vector<unsigned>::iterator id_iter;
     std::vector<double>::iterator radius_iter;
-    for(id_iter = mStartIds.begin(), radius_iter = mStartRadii.begin();
+    for (id_iter = mStartIds.begin(), radius_iter = mStartRadii.begin();
         id_iter != mStartIds.end() && radius_iter != mStartRadii.end();
         ++id_iter, ++radius_iter)
     {
         radius->SetValue(*id_iter, *radius_iter);
         RadiiProcessPoint(*id_iter, *id_iter, processed_points);
     }
-
 }
 
-//
-//
-//
 void AirwayGenerator::RadiiProcessPoint(unsigned pointId, unsigned startId, std::deque<unsigned>& rProcessedPoints)
 {
     rProcessedPoints.push_back(pointId);
@@ -645,7 +610,7 @@ void AirwayGenerator::RadiiProcessPoint(unsigned pointId, unsigned startId, std:
     vtkSmartPointer<vtkIdList> point_ids = vtkSmartPointer<vtkIdList>::New();
     vtkSmartPointer<vtkIdList> cell_ids = vtkSmartPointer<vtkIdList>::New();
 
-    //Loop over the cells, finding connected points
+    // Loop over the cells, finding connected points
     mAirwayTree->GetPointCells(pointId, cell_ids);
     for (int i = 0; i < cell_ids->GetNumberOfIds(); ++i)
     {
@@ -707,10 +672,9 @@ double AirwayGenerator::CalculateLobeVolume()
     return mass_properties->GetVolume();
 }
 
-
 void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::string rOutputFileNameRoot)
 {
-    //Use a vtk connectivity filter to separate the airway tree
+    // Use a vtk connectivity filter to separate the airway tree
     vtkSmartPointer<vtkPolyDataConnectivityFilter> connectivity_filter = vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
 #if VTK_MAJOR_VERSION >= 6
     connectivity_filter->SetInputData(mAirwayTree);
@@ -722,8 +686,8 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
 
     OutputFileHandler output(rOutputDirectory, false);
 
-    //Loop over the airway components writing out each one in turn
-    for(int connected_region = 0; connected_region < connectivity_filter->GetNumberOfExtractedRegions(); ++connected_region)
+    // Loop over the airway components writing out each one in turn
+    for (int connected_region = 0; connected_region < connectivity_filter->GetNumberOfExtractedRegions(); ++connected_region)
     {
         connectivity_filter->InitializeSpecifiedRegionList();
         connectivity_filter->AddSpecifiedRegion(connected_region);
@@ -744,9 +708,9 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
         grid->DeepCopy(poly_clean->GetOutput());
         grid->SetCells(VTK_LINE, poly_clean->GetOutput()->GetLines());
 
-        //In extremely rare cases, the vtkAppendFilter can incorrectly merge two points that are close but aren't actually coincident.
-        //This can leave repeated line elements, these are filtered out here.
-        vtkSmartPointer<vtkUnstructuredGrid> appended_grid = grid;
+        // In extremely rare cases, the vtkAppendFilter can incorrectly merge two points that are close but aren't actually coincident.
+        // This can leave repeated line elements, these are filtered out here.
+        const vtkSmartPointer<vtkUnstructuredGrid>& appended_grid = grid;
         vtkSmartPointer<vtkUnstructuredGrid> filtered_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
         filtered_grid->SetPoints(appended_grid->GetPoints());
         filtered_grid->SetCells(VTK_LINE, vtkSmartPointer<vtkCellArray>::New());
@@ -754,7 +718,7 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
         std::set<std::set<int> > cell_set;
         std::set<std::set<int> >::iterator cell_set_iter;
 
-        for(int i = 0; i < appended_grid->GetNumberOfCells(); ++i)
+        for (int i = 0; i < appended_grid->GetNumberOfCells(); ++i)
         {
             vtkSmartPointer<vtkLine> line = (vtkLine*) appended_grid->GetCell(i);
 
@@ -764,13 +728,12 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
             line_ids_set.insert(line_ids->GetId(0));
             line_ids_set.insert(line_ids->GetId(1));
 
-            if(cell_set.find(line_ids_set) == cell_set.end())
+            if (cell_set.find(line_ids_set) == cell_set.end())
             {
                 filtered_grid->InsertNextCell(VTK_LINE, line_ids);
                 cell_set.insert(line_ids_set);
             }
         }
-
 
         vtkSmartPointer<vtkXMLUnstructuredGridWriter> vtu_writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
         vtu_writer->SetFileName(vtu_file_name.str().c_str());
@@ -781,12 +744,12 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
 #endif
         vtu_writer->Write();
 
-        //Load the vtu in to a Chaste mesh and serialize out in triangles/tetgen format
+        // Load the vtu in to a Chaste mesh and serialize out in triangles/tetgen format
         VtkMeshReader<1,3> combined_mesh_reader(filtered_grid);
         TetrahedralMesh<1,3> combined_mesh;
         combined_mesh.ConstructFromMeshReader(combined_mesh_reader);
 
-        //Insert data attributes in the vtu file as node attributes in the mesh
+        // Insert data attributes in the vtu file as node attributes in the mesh
         for (TetrahedralMesh<1,3>::NodeIterator node_iter = combined_mesh.GetNodeIteratorBegin();
              node_iter != combined_mesh.GetNodeIteratorEnd();
              ++node_iter)
@@ -806,7 +769,3 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
 #endif //( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 #endif //CHASTE_VTK
-
-
-
-

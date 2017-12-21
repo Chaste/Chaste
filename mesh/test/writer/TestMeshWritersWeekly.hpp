@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -242,10 +242,7 @@ avg:    2.655 ( 28%)     2.496 ( 27%)     3.897 ( 42%)     0.207 (  2%)     0.11
 max:    2.694 ( 29%)     2.496 ( 27%)     3.898 ( 42%)     0.271 (  3%)     0.176 (  2%)     8.193 ( 88%)     6.891 ( 74%)     0.065 (  1%)     8.463 ( 90%)     0.475 (  5%)     9.358 (100%)  (seconds)
          *
          */
-
-
     }
-
 };
 
 #endif //_TESTMESHWRITERSWEEKLY_HPP_

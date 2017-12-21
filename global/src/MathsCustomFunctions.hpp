@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,6 +88,14 @@ unsigned CeilDivide(unsigned numerator, unsigned denominator);
  * @param value  the argument value
  */
 double Signum(double value);
+
+/**
+ * @return the results of dividing two non-negative floating point numbers, avoiding overflow and underflow.
+ *
+ * @param numerator  the number to be divided
+ * @param divisor  the number to divide by
+ */
+double SafeDivide(double numerator, double divisor);
 
 /**
  * Utility static methods for comparing floating point numbers, based on

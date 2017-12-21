@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ class TestDynamicVentilation : public CxxTest::TestSuite
 {
 public:
 
-    void TestColemanDynamicVentilationSingleAirway() throw(Exception)
+    void TestColemanDynamicVentilationSingleAirway()
     {
 #if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
         FileFinder mesh_finder("lung/test/data/single_branch", RelativeTo::ChasteSourceRoot);
@@ -134,12 +134,15 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(factory.GetMesh());
 #else
         std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif
     }
 
-    void TestColemanDynamicVentilationThreeBifurcations() throw(Exception)
+    void TestColemanDynamicVentilationThreeBifurcations()
     {
         FileFinder mesh_finder("lung/test/data/three_bifurcations", RelativeTo::ChasteSourceRoot);
 
@@ -204,7 +207,7 @@ public:
     }
 
 
-    void TestColemanDynamicVentilationOtisBifurcations() throw(Exception)
+    void TestColemanDynamicVentilationOtisBifurcations()
     {
 #if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
        FileFinder mesh_finder("lung/test/data/otis_bifurcation", RelativeTo::ChasteSourceRoot);
@@ -270,11 +273,11 @@ public:
            std::map<unsigned, AbstractAcinarUnit*>& r_acinar_map = problem.rGetAcinarUnitMap();
            double total_volume = r_acinar_map[2]->GetVolume() + r_acinar_map[3]->GetVolume();
 
-           if(min_total_volume > total_volume)
+           if (min_total_volume > total_volume)
            {
                min_total_volume = total_volume;
            }
-           if(max_total_volume < total_volume)
+           if (max_total_volume < total_volume)
            {
                max_total_volume = total_volume;
            }
@@ -288,7 +291,7 @@ public:
 #endif
     }
 
-    void TestColemanVsExplicitWithPedley() throw(Exception)
+    void TestColemanVsExplicitWithPedley()
     {
 #if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
         //This test compares an acinar unit using an explicit coupling scheme against an
@@ -353,8 +356,6 @@ public:
         std::cout << "Warning: This test needs a direct solver (UMFPACK or KLU) to execute correctly." << std::endl;
 #endif
     }
-
 };
-
 
 #endif /* TESTDYNAMICVENTILATION_HPP_ */

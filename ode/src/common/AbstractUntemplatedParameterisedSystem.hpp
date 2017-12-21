@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -299,8 +299,6 @@ protected:
      * of a suitable class.  See for example the OdeSystemInformation class.
      */
     boost::shared_ptr<AbstractOdeSystemInformation> mpSystemInfo;
-
 };
-
 
 #endif /*ABSTRACTUNTEMPLATEDPARAMETERISEDSYSTEM_HPP_*/

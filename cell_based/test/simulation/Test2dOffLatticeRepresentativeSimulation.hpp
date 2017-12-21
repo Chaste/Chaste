@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "RandomCellKiller.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -63,7 +63,7 @@ class Test2DMonolayerRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void Test2DMonolayerRepresentativeSimulationForProfiling() throw (Exception)
+    void Test2DMonolayerRepresentativeSimulationForProfiling()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
@@ -78,7 +78,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             p_model->SetMaxTransitGenerations(UINT_MAX);
             p_model->SetTransitCellG1Duration(1.0);
             p_model->SetStemCellG1Duration(1.0);

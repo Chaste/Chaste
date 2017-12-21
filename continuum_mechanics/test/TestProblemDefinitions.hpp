@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,28 +67,38 @@ double PressureFunction(double t)
     return 3*t;
 }
 
-
 // Helper function for creating std vectors. Ugly, but makes things below much neater (avoids many, many push_backs).
 template<class T>
 std::vector<T> MakeStdVec(unsigned size, T value0=0, T value1=0, T value2=0, T value3=0, T value4=0)
 {
     std::vector<T> ret(size);
-    ret[0]=value0;
-    if(size>1) ret[1]=value1;
-    if(size>2) ret[2]=value2;
-    if(size>3) ret[3]=value3;
-    if(size>4) ret[4]=value4;
-    assert(size<=5);
+    ret[0] = value0;
+    if (size > 1)
+    {
+        ret[1] = value1;
+    }
+    if (size > 2)
+    {
+        ret[2] = value2;
+    }
+    if (size > 3)
+    {
+        ret[3] = value3;
+    }
+    if (size > 4)
+    {
+        ret[4] = value4;
+    }
+    assert(size <= 5);
     return ret;
 }
-
 
 class TestProblemDefinitions : public CxxTest::TestSuite
 {
 public:
     // Test all the functionality inside ContinuumMechanicsProblemDefinition,
     // which will be common to other problem definition classes
-    void TestContinuumMechanicsProblemDefinition() throw(Exception)
+    void TestContinuumMechanicsProblemDefinition()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
 
@@ -214,7 +224,7 @@ public:
     }
 
     // Test the functionality specific to SolidMechanicsProblemDefinition
-    void TestSolidMechanicsProblemDefinition() throw(Exception)
+    void TestSolidMechanicsProblemDefinition()
     {
         TS_ASSERT_EQUALS(SolidMechanicsProblemDefinition<2>::FREE, DBL_MAX);
         TS_ASSERT_LESS_THAN(0, SolidMechanicsProblemDefinition<2>::FREE);
@@ -311,11 +321,11 @@ public:
         // set a heterogeneous law
         MooneyRivlinMaterialLaw<2> incomp_mooney_rivlin_law_2(2.0);
         std::vector<AbstractMaterialLaw<2>*> laws;
-        for(unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
         {
             laws.push_back(&incomp_mooney_rivlin_law);
         }
-        for(unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
         {
             laws.push_back(&incomp_mooney_rivlin_law_2);
         }
@@ -323,11 +333,11 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,laws);
 
         TS_ASSERT_EQUALS(problem_defn.IsHomogeneousMaterial(), false);
-        for(unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
         {
             TS_ASSERT_EQUALS(problem_defn.GetIncompressibleMaterialLaw(i), &incomp_mooney_rivlin_law);
         }
-        for(unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
         {
             TS_ASSERT_EQUALS(problem_defn.GetIncompressibleMaterialLaw(i), &incomp_mooney_rivlin_law_2);
         }
@@ -346,11 +356,11 @@ public:
         // set a heterogeneous law
         CompressibleMooneyRivlinMaterialLaw<2> comp_mooney_rivlin_law_2(4.0, 1.0);
         std::vector<AbstractMaterialLaw<2>*> comp_laws;
-        for(unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
         {
             comp_laws.push_back(&comp_mooney_rivlin_law);
         }
-        for(unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
         {
             comp_laws.push_back(&comp_mooney_rivlin_law_2);
         }
@@ -358,11 +368,11 @@ public:
         problem_defn.SetMaterialLaw(COMPRESSIBLE,comp_laws);
 
         TS_ASSERT_EQUALS(problem_defn.IsHomogeneousMaterial(), false);
-        for(unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
         {
             TS_ASSERT_EQUALS(problem_defn.GetCompressibleMaterialLaw(i), &comp_mooney_rivlin_law);
         }
-        for(unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
         {
             TS_ASSERT_EQUALS(problem_defn.GetCompressibleMaterialLaw(i), &comp_mooney_rivlin_law_2);
         }
@@ -393,7 +403,7 @@ public:
 
     }
 
-    void TestStokesFlowProblemDefinition() throw(Exception)
+    void TestStokesFlowProblemDefinition()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
 

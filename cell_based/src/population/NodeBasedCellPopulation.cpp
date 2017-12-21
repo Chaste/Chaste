@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,14 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
-
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -96,6 +88,25 @@ template<unsigned DIM>
 const NodesOnlyMesh<DIM>& NodeBasedCellPopulation<DIM>::rGetMesh() const
 {
     return *mpNodesOnlyMesh;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    // Note that this code does not yet work in parallel.
+    assert(PetscTools::IsSequential());
+
+    std::vector<Node<DIM>*> temp_nodes;
+
+    // Get the nodes of mpNodesOnlyMesh
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
+         node_iter != mpNodesOnlyMesh->GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation(), node_iter->IsBoundaryNode()));
+    }
+
+    return new MutableMesh<DIM,DIM>(temp_nodes);
 }
 
 template<unsigned DIM>
@@ -155,11 +166,11 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     RefreshHaloCells();
 
-    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
+    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs);
 
     AddReceivedHaloCells();
 
-    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs, mNodeNeighbours);
+    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs);
 
     /*
      * Update cell radii based on CellData
@@ -284,8 +295,7 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MechanicsCutOffLength>" << mpNodesOnlyMesh->GetMaximumInteractionDistance() << "</MechanicsCutOffLength>\n";
-    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii <<
-"</UseVariableRadii>\n";
+    *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii << "</UseVariableRadii>\n";
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -368,26 +378,25 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
         EXCEPTION("neighbourhoodRadius should be less than or equal to the  the maximum interaction radius defined on the NodesOnlyMesh");
     }
 
-
-    // Check the mNodeNeighbours has been set up correctly
-    if (mNodeNeighbours.empty())
-    {
-        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNodesWithinNeighbourhoodRadius()");
-    }
-
     std::set<unsigned> neighbouring_node_indices;
 
     // Get location
     Node<DIM>* p_node_i = this->GetNode(index);
-    c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
+
+    // Check the mNodeNeighbours has been set up correctly
+    if (!(p_node_i->GetNeighboursSetUp()))
+    {
+        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNodesWithinNeighbourhoodRadius()");
+    }
 
     // Get set of 'candidate' neighbours.
-    std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
+    std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (std::set<unsigned>::iterator iter = near_nodes.begin();
-            iter != near_nodes.end();
-            ++iter)
+    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
+         iter != near_nodes.end();
+         ++iter)
     {
         // Be sure not to return the index itself.
         if ((*iter) != index)
@@ -395,10 +404,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
             Node<DIM>* p_node_j = this->GetNode((*iter));
 
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+            const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
             // Get the vector the two nodes (using GetVectorFromAtoB to catch periodicities etc.)
-            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location);
+            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location);
 
             // Calculate the distance between the two nodes
             double distance_between_nodes = norm_2(node_to_node_vector);
@@ -419,18 +428,18 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
 template<unsigned DIM>
 std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    // Check the mNodeNeighbours has been set up correctly
-    if (mNodeNeighbours.empty())
-    {
-        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
-    }
-
-    std::set<unsigned>     neighbouring_node_indices;
+    std::set<unsigned> neighbouring_node_indices;
 
     // Get location and radius of node
     Node<DIM>* p_node_i = this->GetNode(index);
-    c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = p_node_i->rGetLocation();
     double radius_of_cell_i = p_node_i->GetRadius();
+
+    // Check the mNodeNeighbours has been set up correctly
+    if (!(p_node_i->GetNeighboursSetUp()))
+    {
+        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+    }
 
     // Make sure that the max_interaction distance is smaller than or equal to the box collection size
     if (!(radius_of_cell_i * 2.0 <= mpNodesOnlyMesh->GetMaximumInteractionDistance()))
@@ -439,10 +448,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     }
 
     // Get set of 'candidate' neighbours
-    std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
+    std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (std::set<unsigned>::iterator iter = near_nodes.begin();
+    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
          iter != near_nodes.end();
          ++iter)
     {
@@ -452,10 +461,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             Node<DIM>* p_node_j = this->GetNode((*iter));
 
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+            const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
             // Get the vector the two nodes (using GetVectorFromAtoB to catch periodicities etc.)
-            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location);
+            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location);
 
             // Calculate the distance between the two nodes
             double distance_between_nodes = norm_2(node_to_node_vector);
@@ -486,7 +495,7 @@ template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Not implemented or tested in 1D
-    assert(DIM==2 ||DIM==3);
+    assert(DIM==2 ||DIM==3); // LCOV_EXCL_LINE
 
     // Get node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
@@ -500,7 +509,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned num_cells = 0;
 
     // Get the location of this node
-    c_vector<double, DIM> node_i_location = GetNode(node_index)->rGetLocation();
+    const c_vector<double, DIM>& r_node_i_location = GetNode(node_index)->rGetLocation();
 
     // Get the set of node indices corresponding to this cell's neighbours
     std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
@@ -525,7 +534,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         Node<DIM>* p_node_j = this->GetNode(*iter);
 
         // Get the location of the neighbouring node
-        c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+        const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
 
         double neighbouring_cell_radius = p_node_j->GetRadius();
 
@@ -533,7 +542,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
         // Calculate the distance between the two nodes and add to cell radius
-        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location));
+        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
 
         if (separation < cell_radius+neighbouring_cell_radius)
         {
@@ -584,79 +593,86 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     NodeMap map(1 + this->mpNodesOnlyMesh->GetMaximumNodeIndex());
     this->mpNodesOnlyMesh->ReMesh(map);
 
-    // Store the number of cells for which to output data to VTK
-    unsigned num_nodes = GetNumNodes();
-    std::vector<double> rank(num_nodes);
-
-    unsigned num_cell_data_items = 0;
-    std::vector<std::string> cell_data_names;
-
-    // We assume that the first cell is representative of all cells
-    if (num_nodes > 0)
-    {
-        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-        cell_data_names = this->Begin()->GetCellData()->GetKeys();
-    }
-
-    std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
-    {
-        std::vector<double> cell_data_var(num_nodes);
-        cell_data.push_back(cell_data_var);
-    }
-
     // Create mesh writer for VTK output
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
-    // Iterate over any cell writers that are present
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
-    {
-        // Create vector to store VTK cell data
-        std::vector<double> vtk_cell_data(num_nodes);
+    auto num_nodes = GetNumNodes();
 
-        // Loop over cells
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
-        {
-            // Get the node index corresponding to this cell
-            unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
-            unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
-
-            // Populate the vector of VTK cell data
-            vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
-        }
-
-        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
-    }
-
-    // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    // For each cell that this process owns, find the corresponding node index, which we only want to calculate once
+    std::vector<unsigned> node_indices_in_cell_order;
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         // Get the node index corresponding to this cell
         unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
-        for (unsigned var=0; var<num_cell_data_items; var++)
-        {
-            cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
-        }
-
-        rank[node_index] = (PetscTools::GetMyRank());
+        node_indices_in_cell_order.emplace_back(node_index);
     }
 
-    mesh_writer.AddPointData("Process rank", rank);
-
-    if (num_cell_data_items > 0)
+    // Iterate over any cell writers that are present.  This is in a separate loop to below, because the writer loop
+    // needs to the the outer loop.
+    for (auto&& p_cell_writer : this->mCellWriters)
     {
-        for (unsigned var=0; var<cell_data.size(); var++)
+        // Add any scalar data
+        if (p_cell_writer->GetOutputScalarData())
         {
-            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
+            std::vector<double> vtk_cell_data(num_nodes);
+
+            unsigned loop_it = 0;
+            for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+            {
+                unsigned node_idx = node_indices_in_cell_order[loop_it];
+                vtk_cell_data[node_idx] = p_cell_writer->GetCellDataForVtkOutput(*cell_iter, this);
+            }
+
+            mesh_writer.AddPointData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
+        }
+
+        // Add any vector data
+        if (p_cell_writer->GetOutputVectorData())
+        {
+            std::vector<c_vector<double, DIM>> vtk_cell_data(num_nodes);
+
+            unsigned loop_it = 0;
+            for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+            {
+                unsigned node_idx = node_indices_in_cell_order[loop_it];
+                vtk_cell_data[node_idx] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+            }
+
+            mesh_writer.AddPointData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_data);
+        }
+    }
+
+    // Process rank and cell data can be collected on a cell-by-cell basis, and both occur in the following loop
+    // We assume the first cell is representative of all cells
+    if (this->Begin() != this->End())  // some processes may own no cells, so can't do this->Begin()->GetCellData()
+    {
+        auto num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+        std::vector<std::vector<double>> cell_data(num_cell_data_items, std::vector<double>(num_nodes));
+
+        std::vector<double> rank(num_nodes);
+
+        unsigned loop_it = 0;
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter, ++loop_it)
+        {
+            unsigned node_idx = node_indices_in_cell_order[loop_it];
+
+            for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+            {
+                cell_data[cell_data_idx][node_idx] = cell_iter->GetCellData()->GetItem(cell_data_names[cell_data_idx]);
+            }
+
+            rank[node_idx] = (PetscTools::GetMyRank());
+        }
+
+        // Add point data to writers
+        mesh_writer.AddPointData("Process rank", rank);
+        for (unsigned cell_data_idx = 0; cell_data_idx < num_cell_data_items; ++cell_data_idx)
+        {
+            mesh_writer.AddPointData(cell_data_names[cell_data_idx], cell_data[cell_data_idx]);
         }
     }
 
@@ -664,7 +680,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
-    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << R"(" group="" part="0" file="results_)";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     if (PetscTools::IsSequential())
     {
@@ -679,12 +695,12 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 }
 
 template<unsigned DIM>
-CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     assert(pNewCell);
 
-    // Add new cell to cell population
-    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+    // Add new cell to population
+    CellPtr p_created_cell = AbstractCentreBasedCellPopulation<DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Then set the new cell radius in the NodesOnlyMesh
@@ -734,28 +750,9 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
     }
 }
 
-/**
- * This null deleter is for the next method, SendCellsToNeighbourProcesses so we can make a
- * shared_ptr copy of mCellsToSendx without it actually being deleted when the pointer goes out of scope.
- * We need a shared pointer to send it because ObjectCommunicator only sends/recvs shared pointers to
- * avoid memory management problems.
- */
-struct null_deleter
-{
-    /**
-     * The delete operation that does nothing.
-     */
-    void operator()(void const *) const
-    {
-    }
-};
-
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 {
-#if BOOST_VERSION < 103700
-    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
-#else // BOOST_VERSION >= 103700
     MPI_Status status;
 
     if (!PetscTools::AmTopMost())
@@ -768,16 +765,11 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
-#endif
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
 {
-#if BOOST_VERSION < 103700
-    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
-#else // BOOST_VERSION >= 103700
-
     if (!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
@@ -801,16 +793,11 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
         int tag = SmallPow (3u, 1 + PetscTools::GetMyRank() ) * SmallPow (2u, 1+ PetscTools::GetMyRank() - 1);
         mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, tag);
     }
-#endif
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::GetReceivedCells()
 {
-#if BOOST_VERSION < 103700
-    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
-#else // BOOST_VERSION >= 103700
-
     if (!PetscTools::AmTopMost())
     {
         mpCellsRecvRight = mRightCommunicator.GetRecvObject();
@@ -819,8 +806,8 @@ void NodeBasedCellPopulation<DIM>::GetReceivedCells()
     {
         mpCellsRecvLeft = mLeftCommunicator.GetRecvObject();
     }
-#endif
 }
+
 template<unsigned DIM>
 std::pair<CellPtr, Node<DIM>* > NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
 {

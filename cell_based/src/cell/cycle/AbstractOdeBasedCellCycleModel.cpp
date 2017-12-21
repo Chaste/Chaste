@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,22 +34,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOdeBasedCellCycleModel.hpp"
-#include <iostream>
-#include <cassert>
-#include "Exception.hpp"
 
 AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(double lastTime,
                                                                boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
-      mDivideTime(lastTime),
-      mFinishedRunningOdes(false),
-      mG2PhaseStartTime(DBL_MAX)
+      mDivideTime(lastTime)
 {
     AbstractCellCycleModel::SetBirthTime(lastTime);
 }
 
 AbstractOdeBasedCellCycleModel::~AbstractOdeBasedCellCycleModel()
 {
+}
+
+AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel)
+    : AbstractCellCycleModel(rModel),
+      CellCycleModelOdeHandler(rModel),
+      mDivideTime(rModel.mDivideTime)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
 }
 
 void AbstractOdeBasedCellCycleModel::SetBirthTime(double birthTime)
@@ -59,99 +67,48 @@ void AbstractOdeBasedCellCycleModel::SetBirthTime(double birthTime)
     mDivideTime = birthTime;
 }
 
-std::vector<double> AbstractOdeBasedCellCycleModel::GetProteinConcentrations() const
+bool AbstractOdeBasedCellCycleModel::ReadyToDivide()
 {
-    assert(mpOdeSystem != NULL);
-    return mpOdeSystem->rGetStateVariables();
-}
+    assert(mpCell != nullptr);
 
-void AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
-{
-    assert(mpOdeSystem != NULL);
-    assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
-    mLastTime = lastTime;
-    mpOdeSystem->SetStateVariables(proteinConcentrations);
-}
-
-void AbstractOdeBasedCellCycleModel::UpdateCellCyclePhase()
-{
-    assert(mpOdeSystem != NULL);
-
-    double current_time = SimulationTime::Instance()->GetTime();
-
-    // Update the phase from M to G1 when necessary
-    if (mCurrentCellCyclePhase == M_PHASE)
+    if (!mReadyToDivide)
     {
-        double m_duration = GetMDuration();
-        if (GetAge() >= m_duration)
-        {
-            mCurrentCellCyclePhase = G_ONE_PHASE;
-            mLastTime = m_duration + mBirthTime;
-        }
-        else
-        {
-            // Still dividing; don't run ODEs
-            return;
-        }
-    }
+        assert(mpOdeSystem != nullptr);
 
-    if (current_time > mLastTime)
-    {
-        if (!mFinishedRunningOdes)
+        double current_time = SimulationTime::Instance()->GetTime();
+
+        if (current_time > mLastTime)
         {
             // Update whether a stopping event has occurred
-            mFinishedRunningOdes = SolveOdeToTime(current_time);
+            mReadyToDivide = SolveOdeToTime(current_time);
 
             // Check no concentrations have gone negative
             for (unsigned i=0; i<mpOdeSystem->GetNumberOfStateVariables(); i++)
             {
                 if (mpOdeSystem->rGetStateVariables()[i] < -DBL_EPSILON)
                 {
-                    #define COVERAGE_IGNORE
+                    // LCOV_EXCL_START
                     EXCEPTION("A protein concentration " << i << " has gone negative (" <<
                               mpOdeSystem->rGetStateVariables()[i] << ")\n"
                               << "Chaste predicts that the CellCycleModel numerical method is probably unstable.");
-                    #undef COVERAGE_IGNORE
+                    // LCOV_EXCL_STOP
                 }
             }
-
-            if (mFinishedRunningOdes)
+            if (mReadyToDivide)
             {
-                // Update durations of each phase
-                mG1Duration = GetOdeStopTime() - mBirthTime - GetMDuration();
-                mG2PhaseStartTime = GetOdeStopTime() + GetSDuration();
-                mDivideTime = mG2PhaseStartTime + GetG2Duration();
-
-                // Update phase
-                if (current_time >= mG2PhaseStartTime)
-                {
-                    mCurrentCellCyclePhase = G_TWO_PHASE;
-                }
-                else
-                {
-                    mCurrentCellCyclePhase = S_PHASE;
-                }
-            }
-        }
-        else
-        {
-            // ODE model finished, just increasing time until division...
-            if (current_time >= mG2PhaseStartTime)
-            {
-                mCurrentCellCyclePhase = G_TWO_PHASE;
+                mDivideTime = GetOdeStopTime();
             }
         }
     }
+    return mReadyToDivide;
 }
 
 void AbstractOdeBasedCellCycleModel::ResetForDivision()
 {
-    assert(mFinishedRunningOdes);
+    assert(mReadyToDivide);
     AbstractCellCycleModel::ResetForDivision();
     mBirthTime = mDivideTime;
     mLastTime = mDivideTime;
-    mFinishedRunningOdes = false;
-    mG1Duration = DBL_MAX;
     mDivideTime = DBL_MAX;
 }
 
@@ -165,25 +122,8 @@ double AbstractOdeBasedCellCycleModel::GetOdeStopTime()
     return stop_time;
 }
 
-void AbstractOdeBasedCellCycleModel::SetFinishedRunningOdes(bool finishedRunningOdes)
-{
-    mFinishedRunningOdes = finishedRunningOdes;
-}
-
-void AbstractOdeBasedCellCycleModel::SetDivideTime(double divideTime)
-{
-    mDivideTime = divideTime;
-}
-
-void AbstractOdeBasedCellCycleModel::SetG2PhaseStartTime(double g2PhaseStartTime)
-{
-    mG2PhaseStartTime = g2PhaseStartTime;
-}
-
 void AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,11 +52,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                                                                    const FileFinder& rDirectory,
                                                                    const std::string& rHdf5FileName,
-                                                                   const std::string& rVoltageName)
+                                                                   const std::string& rVoltageName,
+                                                                   hsize_t hdf5DataWriterChunkSize)
         : mDirectory(rDirectory),
           mHdf5File(rHdf5FileName),
           mVoltageName(rVoltageName),
-          mrMesh(rMesh)
+          mrMesh(rMesh),
+          mHdf5DataWriterChunkSize(hdf5DataWriterChunkSize)
 {
     mLo = mrMesh.GetDistributedVectorFactory()->GetLow();
     mHi = mrMesh.GetDistributedVectorFactory()->GetHigh();
@@ -154,7 +156,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     }
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::~PostProcessingWriter()
 {
@@ -182,11 +183,19 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
      * dataset doesn't exist yet and needs creating. If it is NOT in define mode, it means the dataset
      * exists, so we'll empty it and calculate new postprocessing data. */
     int apd_id;
-    if ( writer.IsInDefineMode() )
+    if (writer.IsInDefineMode())
     {
         apd_id = writer.DefineVariable(rDatasetName, rDatasetUnit);
         writer.DefineFixedDimension(mrMesh.GetNumNodes());
         writer.DefineUnlimitedDimension(rUnlimitedVariableName, rUnlimitedVariableUnit);
+        if (mHdf5DataWriterChunkSize>0u)
+        {
+            /* Pass target chunk size through to writer. (We don't do the
+             * alignment one as well because that can only be done for a new
+             * file and PostProcessingWriter can only add to an existing file.)
+             */
+            writer.SetTargetChunkSize(mHdf5DataWriterChunkSize);
+        }
         writer.EndDefineMode();
     }
     else
@@ -428,18 +437,18 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
             {
                 unsigned node_index = rNodeIndices[requested_index];
 
-                //handle permutation, if any
-                if ( (mrMesh.rGetNodePermutation().size() != 0) &&
-                      !HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() )
+                // Handle permutation, if any
+                if ((mrMesh.rGetNodePermutation().size() != 0) &&
+                    !HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
                 {
                     node_index = mrMesh.rGetNodePermutation()[ rNodeIndices[requested_index] ];
                 }
 
-                //grab the data from the hdf5 file.
+                // Grab the data from the hdf5 file.
                 std::vector<double> time_series = mpDataReader->GetVariableOverTime(variable_names[name_index], node_index);
                 assert ( time_series.size() == mpDataReader->GetUnlimitedDimensionValues().size());
 
-                //fill the output_data data structure
+                // Fill the output_data data structure
                 for (unsigned time_step = 0; time_step < time_series.size(); time_step++)
                 {
                     output_data[time_step][requested_index] = time_series[time_step];
@@ -493,11 +502,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
     PetscTools::EndRoundRobin();
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class PostProcessingWriter<1,1>;
 template class PostProcessingWriter<1,2>;
 template class PostProcessingWriter<2,2>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-
-
-
 #ifndef _TESTMOREMECHANICS_HPP_
 #define _TESTMOREMECHANICS_HPP_
 
@@ -66,9 +63,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //  3. InterpolateMechanicsSolutionToNewMesh() is a useful method (defined in this test) for using the solution on a coarse
 //     mesh as a guess solution on a fine mesh, may go to src later..
 
-
-
-
 /**
  *  Interpolate the mechanics solution vector from a coarse mesh mesh to a fine mesh. Idea is that you
  *  solve first on a coarse mesh, interpolate the solution onto a fine mesh, then use this interpolated
@@ -88,18 +82,18 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
 {
     unsigned NUM_UNKNOWNS = (compressibilityType==INCOMPRESSIBLE ? DIM+1 : DIM);
 
-    if(rCoarseSolution.size() != rCoarseMesh.GetNumNodes()*NUM_UNKNOWNS)
+    if (rCoarseSolution.size() != rCoarseMesh.GetNumNodes()*NUM_UNKNOWNS)
     {
         EXCEPTION("rCoarseSolution not correct size");
     }
-    if(rFineSolution.size() != rFineMesh.GetNumNodes()*NUM_UNKNOWNS)
+    if (rFineSolution.size() != rFineMesh.GetNumNodes()*NUM_UNKNOWNS)
     {
         rFineSolution.resize(rFineMesh.GetNumNodes()*NUM_UNKNOWNS);
     }
 
     c_vector<double, (DIM+1)*(DIM+2)/2> quad_basis;
 
-    for(unsigned i=0; i<rFineMesh.GetNumNodes(); i++)
+    for (unsigned i=0; i<rFineMesh.GetNumNodes(); i++)
     {
         // find containing elements and weights in coarse mesh
         ChastePoint<DIM> point = rFineMesh.GetNode(i)->GetPoint();
@@ -111,7 +105,7 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
         c_vector<double,DIM> xi;
         xi(0) = weight(1);
         xi(1) = weight(2);
-        if(DIM==3)
+        if (DIM==3)
         {
             xi(2) = weight(3);
         }
@@ -121,16 +115,16 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
         // interpolate (u,p) (don't do anything for p if compressible)
         c_vector<double,DIM+1> fine_solution = zero_vector<double>(DIM+1);
 
-        for(unsigned elem_node_index=0; elem_node_index<(DIM+1)*(DIM+2)/2; elem_node_index++)
+        for (unsigned elem_node_index=0; elem_node_index<(DIM+1)*(DIM+2)/2; elem_node_index++)
         {
             unsigned coarse_node = p_coarse_element->GetNodeGlobalIndex(elem_node_index);
             c_vector<double,DIM+1> coarse_solution_at_node;
 
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 coarse_solution_at_node(j) = rCoarseSolution[NUM_UNKNOWNS*coarse_node + j];
             }
-            if(compressibilityType==INCOMPRESSIBLE)
+            if (compressibilityType==INCOMPRESSIBLE)
             {
                 coarse_solution_at_node(DIM) = rCoarseSolution[NUM_UNKNOWNS*coarse_node + DIM];
             }
@@ -138,19 +132,19 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
             fine_solution += coarse_solution_at_node*quad_basis(elem_node_index);
         }
 
-        for(unsigned j=0; j<DIM; j++)
+        for (unsigned j=0; j<DIM; j++)
         {
             rFineSolution[NUM_UNKNOWNS*i + j] = fine_solution(j);
         }
 
-        if(compressibilityType==INCOMPRESSIBLE)
+        if (compressibilityType==INCOMPRESSIBLE)
         {
             rFineSolution[NUM_UNKNOWNS*i + DIM] = fine_solution(DIM);
 
             // Whilst the returned p from a solve is defined properly at all nodes, during the solve linear basis functions are
             // used for p and therefore p not computed explicitly at internal nodes, and the solver solves for p=0 at these internal
             // nodes. (After the solve, p is interpolated from vertices to internal nodes)
-            if(rFineMesh.GetNode(i)->IsInternal())
+            if (rFineMesh.GetNode(i)->IsInternal())
             {
                 rFineSolution[NUM_UNKNOWNS*i + DIM] = 0.0;
             }
@@ -182,7 +176,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
     {
         BoundaryElement<2,3>* p_element = *iter;
         double Z = p_element->CalculateCentroid()[2];
-        if(fabs(Z)<1e-6)
+        if (fabs(Z)<1e-6)
         {
             boundary_elems.push_back(p_element);
         }
@@ -202,19 +196,19 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
     solver.SetTakeFullFirstNewtonStep();
     solver.SetUsePetscDirectSolve();
 
-    if(useSolutionAsGuess)
+    if (useSolutionAsGuess)
     {
-        if(solver.rGetCurrentSolution().size()!=rSolution.size())
+        if (solver.rGetCurrentSolution().size()!=rSolution.size())
         {
             EXCEPTION("Badly-sized input");
         }
-        for(unsigned i=0; i<rSolution.size(); i++)
+        for (unsigned i=0; i<rSolution.size(); i++)
         {
             solver.rGetCurrentSolution()[i] = rSolution[i];
         }
     }
 
-    if(scaleFactor < 1.0)
+    if (scaleFactor < 1.0)
     {
         try
         {
@@ -238,7 +232,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
 
     rSolution.clear();
     rSolution.resize(solver.rGetCurrentSolution().size());
-    for(unsigned i=0; i<rSolution.size(); i++)
+    for (unsigned i=0; i<rSolution.size(); i++)
     {
         rSolution[i] = solver.rGetCurrentSolution()[i];
     }
@@ -267,7 +261,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
     {
         BoundaryElement<2,3>* p_element = *iter;
         double Z = p_element->CalculateCentroid()[2];
-        if(fabs(Z)<1e-6)
+        if (fabs(Z)<1e-6)
         {
             boundary_elems.push_back(p_element);
         }
@@ -289,19 +283,19 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
     solver.SetTakeFullFirstNewtonStep();
     solver.SetUsePetscDirectSolve();
 
-    if(useSolutionAsGuess)
+    if (useSolutionAsGuess)
     {
-        if(solver.rGetCurrentSolution().size()!=rSolution.size())
+        if (solver.rGetCurrentSolution().size()!=rSolution.size())
         {
             EXCEPTION("Badly-sized input");
         }
-        for(unsigned i=0; i<rSolution.size(); i++)
+        for (unsigned i=0; i<rSolution.size(); i++)
         {
             solver.rGetCurrentSolution()[i] = rSolution[i];
         }
     }
 
-    if(scaleFactor < 1.0)
+    if (scaleFactor < 1.0)
     {
         try
         {
@@ -325,7 +319,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
 
     rSolution.clear();
     rSolution.resize(solver.rGetCurrentSolution().size());
-    for(unsigned i=0; i<rSolution.size(); i++)
+    for (unsigned i=0; i<rSolution.size(); i++)
     {
         rSolution[i] = solver.rGetCurrentSolution()[i];
     }
@@ -333,12 +327,10 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
     return solver.GetNumNewtonIterations();
 }
 
-
-
 class TestMoreMechanics : public CxxTest::TestSuite
 {
 public:
-    void TestBarPressureOnUnderside() throw(Exception)
+    void TestBarPressureOnUnderside()
     {
         EXIT_IF_PARALLEL; // petsc's direct solve only runs one 1 proc - MUMPS may be the answer for direct solves in parallel
 
@@ -377,9 +369,7 @@ public:
         ///////////////////////////////////////
     }
 
-
-
-    void TestBarPressureOnUndersideCompressible() throw(Exception)
+    void TestBarPressureOnUndersideCompressible()
     {
         EXIT_IF_PARALLEL; // petsc's direct solve only runs one 1 proc - MUMPS may be the answer for direct solves in parallel
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(Quadra
 template<unsigned DIM>
 ElectroMechanicsProblemDefinition<DIM>::~ElectroMechanicsProblemDefinition()
 {
-    if(mpDefaultMaterialLaw)
+    if (mpDefaultMaterialLaw)
     {
         delete mpDefaultMaterialLaw;
     }
@@ -92,12 +92,12 @@ void ElectroMechanicsProblemDefinition<DIM>::SetContractionModel(ContractionMode
 template<unsigned DIM>
 void ElectroMechanicsProblemDefinition<DIM>::SetUseDefaultCardiacMaterialLaw(CompressibilityType compressibilityType)
 {
-    if(mpDefaultMaterialLaw)
+    if (mpDefaultMaterialLaw)
     {
         delete mpDefaultMaterialLaw;
     }
 
-    if(compressibilityType == INCOMPRESSIBLE)
+    if (compressibilityType == INCOMPRESSIBLE)
     {
         mpDefaultMaterialLaw = new NashHunterPoleZeroLaw<DIM>();
         this->SetMaterialLaw(INCOMPRESSIBLE, mpDefaultMaterialLaw);
@@ -166,12 +166,12 @@ void ElectroMechanicsProblemDefinition<DIM>::Validate()
 {
     SolidMechanicsProblemDefinition<DIM>::Validate();
 
-    if(mMechanicsSolveTimestep < 0.0)
+    if (mMechanicsSolveTimestep < 0.0)
     {
         EXCEPTION("Timestep for mechanics solve hasn't been set yet");
     }
 
-    if(mContractionModelOdeTimeStep < 0.0)
+    if (mContractionModelOdeTimeStep < 0.0)
     {
         std::string message =  "Contraction model or contraction model ODE timestep have not been set. "
                                "Make sure SetContractionModel(), or SetContractionCellFactory() AND SetContractionModelOdeTimestep "
@@ -179,7 +179,7 @@ void ElectroMechanicsProblemDefinition<DIM>::Validate()
         EXCEPTION(message);
     }
 
-    if(mDeformationAffectsConductivity && this->GetCompressibilityType()==COMPRESSIBLE)
+    if (mDeformationAffectsConductivity && this->GetCompressibilityType()==COMPRESSIBLE)
     {
         // the conductivity depends on the deformation gradient and also scales in some way with
         // J=det(F), which is not equal to 1 in the compressible case. The F dependence
@@ -187,7 +187,7 @@ void ElectroMechanicsProblemDefinition<DIM>::Validate()
         EXCEPTION("Deformation affecting the conductivity is currently not implemented fully for compressible problems");
     }
 
-    if(mDeformationAffectsCellModels && mReadFibreSheetInformationFromFile && mFibreSheetDirectionsDefinedPerQuadraturePoint)
+    if (mDeformationAffectsCellModels && mReadFibreSheetInformationFromFile && mFibreSheetDirectionsDefinedPerQuadraturePoint)
     {
         // This combination is not allowed. For explanation see doxygen for SetDeformationAffectsElectrophysiology()
         std::stringstream message;
@@ -197,9 +197,6 @@ void ElectroMechanicsProblemDefinition<DIM>::Validate()
     }
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class ElectroMechanicsProblemDefinition<2>;
 template class ElectroMechanicsProblemDefinition<3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,13 +89,12 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
         // The problem hasn't been set up with a bath, so check that the user hasn't set any options
         // which would suggest they're expecting there to be a bath!
         std::set<unsigned> bath_identifiers = HeartConfig::Instance()->rGetBathIdentifiers();
-        if ( !(bath_identifiers.size()==1 && bath_identifiers.find(1)==bath_identifiers.begin()) ) // IF NOT only 1 in the bath identifiers set
+        if (!(bath_identifiers.size()==1 && bath_identifiers.find(1)==bath_identifiers.begin())) // IF NOT only 1 in the bath identifiers set
         {
             EXCEPTION("User has set bath identifiers, but the BidomainProblem isn't expecting a bath. Did you mean to use BidomainProblem(..., true)? Or alternatively, BidomainWithBathProblem(...)?");
         }
     }
 }
-
 
 template<unsigned DIM>
 Vec BidomainProblem<DIM>::CreateInitialCondition()
@@ -180,8 +179,6 @@ BidomainProblem<DIM>::BidomainProblem()
 {
     mFixedExtracellularPotentialNodes.resize(0);
 }
-
-
 
 template<unsigned DIM>
 void BidomainProblem<DIM>::SetFixedExtracellularPotentialNodes(std::vector<unsigned> nodes)
@@ -298,7 +295,7 @@ void BidomainProblem<DIM>::SetElectrodes()
 template<unsigned DIM>
 void BidomainProblem<DIM>::AtBeginningOfTimestep(double time)
 {
-    if ( mpElectrodes && mpElectrodes->SwitchOn(time) )
+    if (mpElectrodes && mpElectrodes->SwitchOn(time))
     {
         // At the moment mpBcc and mpDefaultBcc point to a set default BC
         assert(this->mpBoundaryConditionsContainer);
@@ -317,7 +314,7 @@ void BidomainProblem<DIM>::AtBeginningOfTimestep(double time)
 
         // At t==0 or after checkpointing we won't have a system assembled at this stage: BCs will be applied once the matrix
         // is assembled. Dirichlet BCs will be present at the time of assembly and no null space will be created either.
-        if ( mpSolver->GetLinearSystem() != NULL )
+        if (mpSolver->GetLinearSystem() != NULL)
         {
             // System matrix is assembled once at the beginning of the simulation. After that, nobody will take care
             // of applying new BC to the system matrix. Must be triggered explicitly.
@@ -339,7 +336,7 @@ void BidomainProblem<DIM>::AtBeginningOfTimestep(double time)
 template<unsigned DIM>
 void BidomainProblem<DIM>::OnEndOfTimestep(double time)
 {
-    if ( mpElectrodes && mpElectrodes->SwitchOff(time) )
+    if (mpElectrodes && mpElectrodes->SwitchOff(time))
     {
         // At the moment mpBcc should exist and therefore
         // mpDefaultBcc should be empty (not if electrodes switched on after 0ms)
@@ -372,15 +369,13 @@ void BidomainProblem<DIM>::OnEndOfTimestep(double time)
     }
 }
 
-
-
 template<unsigned DIM>
 void BidomainProblem<DIM>::SetUpAdditionalStoppingTimes(std::vector<double>& rAdditionalStoppingTimes)
 {
-    if ( mpElectrodes )
+    if (mpElectrodes)
     {
-        rAdditionalStoppingTimes.push_back( mpElectrodes->GetSwitchOnTime() );
-        rAdditionalStoppingTimes.push_back( mpElectrodes->GetSwitchOffTime() );
+        rAdditionalStoppingTimes.push_back(mpElectrodes->GetSwitchOnTime());
+        rAdditionalStoppingTimes.push_back(mpElectrodes->GetSwitchOffTime());
     }
 }
 
@@ -390,10 +385,7 @@ bool BidomainProblem<DIM>::GetHasBath()
     return mHasBath;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class BidomainProblem<1>;
 template class BidomainProblem<2>;
 template class BidomainProblem<3>;

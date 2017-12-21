@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,14 +51,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMajorAirwaysCentreLinesCleaner : public CxxTest::TestSuite
 {
 public:
-    void TestDeleteOrderSimpleMesh() throw(Exception)
+    void TestDeleteOrderSimpleMesh()
     {
         TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
         MutableMesh<1,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Assign valid radii
-        for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
         }
@@ -82,7 +82,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetLocation()[2], 0.0, 1e-6);
     }
 
-    void TestDeleteFirstOrder() throw(Exception)
+    void TestDeleteFirstOrder()
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
@@ -91,7 +91,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Assign valid radii
-        for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             mesh.GetNode(node_index)->AddNodeAttribute(1.0);
         }
@@ -115,7 +115,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestHeuristicCleanSimpleMesh() throw(Exception)
+    void TestHeuristicCleanSimpleMesh()
     {
         {
             TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
@@ -123,7 +123,7 @@ public:
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Assign valid radii
-            for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+            for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
                  mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
             }
@@ -158,7 +158,7 @@ public:
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Assign valid radii
-            for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+            for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
                  mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
             }
@@ -187,14 +187,14 @@ public:
         }
     }
 
-    void TestRemoveIsolatedNodesSimpleMesh() throw(Exception)
+    void TestRemoveIsolatedNodesSimpleMesh()
     {
         TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_isolated_nodes_major_airways_mesh");
         MutableMesh<1,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        //Assign valid radii
-        for(unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
+        // Assign valid radii
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
           mesh.GetNode(node_index)->rGetNodeAttributes()[0] = 1.0;
         }
@@ -208,9 +208,6 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
     }
-
 };
-
-
 
 #endif /* TESTMAJORAIRWAYSCENTRELINESCLEANER_HPP_ */

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,7 +60,6 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
                          local_size, local_size);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
         Vec currentSolution,
@@ -70,11 +69,10 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     assert(this->mpLinearSystem->rGetRhsVector() != NULL);
     assert(currentSolution != NULL);
 
-
     /////////////////////////////////////////
     // set up LHS matrix (and mass matrix)
     /////////////////////////////////////////
-    if(computeMatrix)
+    if (computeMatrix)
     {
         mpExtendedBidomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpExtendedBidomainAssembler->AssembleMatrix();
@@ -175,13 +173,12 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
 
     this->mpBoundaryConditions->ApplyDirichletToLinearProblem(*(this->mpLinearSystem), computeMatrix);
 
-    if(computeMatrix)
+    if (computeMatrix)
     {
         this->mpLinearSystem->FinaliseLhsMatrix();
     }
     this->mpLinearSystem->FinaliseRhsVector();
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainSolver(
@@ -196,7 +193,7 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainSolver(
     mVecForConstructingRhs = NULL;
 
     // create assembler
-    if(this->mBathSimulation)
+    if (this->mBathSimulation)
     {
         //this->mpExtendedExtendedBidomainAssembler = new ExtendedExtendedBidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedExtendedBidomainTissue,this->mDt);
         EXCEPTION("Bath simulations are not yet supported for extended bidomain problems");
@@ -216,18 +213,14 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::~ExtendedBidomainSolver()
     delete mpExtendedBidomainAssembler;
     delete mpExtendedBidomainNeumannSurfaceTermAssembler;
 
-    if(mVecForConstructingRhs)
+    if (mVecForConstructingRhs)
     {
         PetscTools::Destroy(mVecForConstructingRhs);
         PetscTools::Destroy(mMassMatrix);
     }
 }
 
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class ExtendedBidomainSolver<1,1>;
 template class ExtendedBidomainSolver<2,2>;
 template class ExtendedBidomainSolver<3,3>;
-

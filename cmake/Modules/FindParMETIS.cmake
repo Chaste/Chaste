@@ -67,14 +67,6 @@ if(PARMETIS_FOUND)
                PATH_SUFFIXES lib
                NO_DEFAULT_PATH)
   find_library(PARMETIS_LIBRARY parmetis)
-
-  # check ParMETIS library
-  if(PARMETIS_LIBRARY)
-      #list(APPEND CMAKE_REQUIRED_LIBRARIES ${PARMETIS_LIBRARY} ${METIS_LIBRARY} ${MPI_C_LIBRARIES})
-    set(CMAKE_REQUIRED_LIBRARIES ${PARMETIS_LIBRARY} ${METIS_LIBRARY} ${MPI_CXX_LIBRARIES} m)
-    include(CheckFunctionExists)
-    check_function_exists(parmetis_v3_partkway HAVE_PARMETIS)
-  endif(PARMETIS_LIBRARY)
 endif(PARMETIS_FOUND)
 
 # behave like a CMake module is supposed to behave
@@ -84,7 +76,6 @@ find_package_handle_standard_args(
   DEFAULT_MSG
   PARMETIS_INCLUDE_DIR
   PARMETIS_LIBRARY
-  HAVE_PARMETIS
 )
 
 mark_as_advanced(PARMETIS_INCLUDE_DIR METIS_LIBRARY PARMETIS_LIBRARY METIS_LIB_NAME PARMETIS_LIB_NAME PARMETIS_LINK_FLAGS)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef ABSTRACTCARDIACPROBLEM_HPP_
 #define ABSTRACTCARDIACPROBLEM_HPP_
-
-
 
 #include <string>
 #include <vector>
@@ -204,9 +202,15 @@ private:
         SaveBoundaryConditions(archive, mpMesh, mpBoundaryConditionsContainer);
         SaveBoundaryConditions(archive, mpMesh, mpDefaultBoundaryConditionsContainer);
 
-        if (version>= 3)
+        if (version >= 3)
         {
             archive & mOutputModifiers;
+        }
+
+        if (version >= 4)
+        {
+            archive & mUseHdf5DataWriterCache;
+            archive & mHdf5DataWriterChunkSizeAndAlignment;
         }
     }
 
@@ -227,7 +231,7 @@ private:
             archive & element_dim;
             archive & space_dim;
             archive & problem_dim;
-            if ( (element_dim != ELEMENT_DIM) ||(space_dim != SPACE_DIM) ||(problem_dim != PROBLEM_DIM) )
+            if ((element_dim != ELEMENT_DIM) ||(space_dim != SPACE_DIM) ||(problem_dim != PROBLEM_DIM))
             {
                 /*If we carry on from this point then the mesh produced by unarchiving from the
                  * archive is templated as AbstractTetrahedralMesh<element_dim, space_dim>
@@ -323,9 +327,15 @@ private:
         mpBoundaryConditionsContainer = LoadBoundaryConditions(archive, mpMesh);
         mpDefaultBoundaryConditionsContainer = LoadBoundaryConditions(archive, mpMesh);
 
-        if (version>= 3)
+        if (version >= 3)
         {
             archive & mOutputModifiers;
+        }
+
+        if (version >= 4)
+        {
+            archive & mUseHdf5DataWriterCache;
+            archive & mHdf5DataWriterChunkSizeAndAlignment;
         }
     }
 
@@ -425,8 +435,6 @@ protected:
     /** Adaptivity controller (defaults to NULL). */
     AbstractTimeAdaptivityController* mpTimeAdaptivityController;
 
-
-
     /**
      * Subclasses must override this method to create a PDE object of the appropriate type.
      *
@@ -462,6 +470,16 @@ protected:
      * The object to use to write results to disk.
      */
     Hdf5DataWriter* mpWriter;
+
+    /**
+     * Whether to instruct the writer to cache writes.
+     */
+    bool mUseHdf5DataWriterCache;
+
+    /**
+     * Size to pass to Hdf5DataWriter for chunk size and alignment.
+     */
+    hsize_t mHdf5DataWriterChunkSizeAndAlignment;
 
     /**
      * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
@@ -654,6 +672,35 @@ public:
     bool InitialiseWriter();
 
     /**
+     * Set whether to use caching in the Hdf5DataWriter. This tells the
+     * Hdf5DataWriter to write only whole chunks to disk, rather than every
+     * print timestep, which is much faster when running with many processes.
+     * @param useCache Whether to use the cache
+     */
+    void SetUseHdf5DataWriterCache(bool useCache=true);
+
+    /**
+     * Set Hdf5DataWriter target chunk size and alignment parameters.
+     *
+     * The most likely use case for this is setting it to the stripe size on a
+     * striped filesystem. This results in the writer choosing chunk dimensions
+     * that should efficiently fit within a stripe, AND padding the chunks so
+     * each chunk fits in one stripe.
+     *
+     * For example, if your filesystem uses 1 M stripes, call this method with
+     * argument 1048576 (or 0x100000 if you like round numbers).
+     *
+     * NOTE: The alignment parameter is only used for NEW HDF5 files. The chunk
+     *       size is only used for NEW datasets (e.g. results or postprocessing)
+     *       and NOT when EXTENDING a dataset.
+     *       In other words, when adding a dataset to a file the alignment
+     *       parameter will be ignored. When adding to a dataset, both will be
+     *       ignored. etc.
+     * @param size size in bytes to use for target chunk size and alignment
+     */
+    void SetHdf5DataWriterTargetChunkSizeAndAlignment(hsize_t size);
+
+    /**
      * Specifies which nodes in the mesh to output. This method must be called before InitialiseWriter,
      * otherwise all nodes will still be output. If this method is called when extending an existing
      * HDF5 file, it will be ignored.
@@ -698,8 +745,6 @@ public:
      */
     virtual void SetUpAdditionalStoppingTimes(std::vector<double>& rAdditionalStoppingTimes)
     {}
-
-
 
     ///\todo #1704 add default adaptivity controller and allow the user just to call with true
     // and no controller, in which case the default is used.
@@ -804,14 +849,14 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
         {
             // If the mesh which was archived was a TetrahedralMesh then we have all the boundary conditions
             // in every process-specific archive.  We no longer test for this.
-#define COVERAGE_IGNORE
-            if(!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
+// LCOV_EXCL_START
+            if (!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
             {
                 // The correct way to do this should be:
                 // p_bcc->LoadFromArchive(archive, mpMesh);
                 WARNING("Loading from a parallel archive which used a non-distributed mesh.  This scenario should work but is not fully tested.");
             }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
         }
     }
@@ -844,7 +889,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM,  unsigned PROBLEM_DIM>
 struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost
-    CHASTE_VERSION_CONTENT(3);
+    CHASTE_VERSION_CONTENT(4);
 };
 } // namespace serialization
 } // namespace boost

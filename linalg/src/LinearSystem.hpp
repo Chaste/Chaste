@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -420,7 +420,7 @@ public:
      * @return the solution vector
      * @param lhsGuess  an optional initial guess for the solution (defaults to NULL)
      */
-    Vec Solve(Vec lhsGuess=NULL);
+    Vec Solve(Vec lhsGuess=nullptr);
 
     /**
      * Set an element of the right-hand side vector to a given value.

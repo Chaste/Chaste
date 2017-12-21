@@ -4,6 +4,11 @@
 #  Chaste_LIBRARIES    - libraries to link against
  
 # Compute paths
+
+cmake_minimum_required(VERSION 2.8.10)
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy) 
 get_filename_component(Chaste_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 set(Chaste_VERSION_MAJOR @Chaste_VERSION_MAJOR@)
@@ -11,6 +16,8 @@ set(Chaste_VERSION_MINOR @Chaste_VERSION_MINOR@)
 
 # If not in a build tree set required variables
 if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
+    set(Chaste_BINARY_DIR ${Chaste_CMAKE_DIR})
+    message("-- Found Chaste libraries in ${Chaste_BINARY_DIR}")
     add_definitions(-DCHASTE_CMAKE)
 
     set(Chaste_USE_VTK @Chaste_USE_VTK@)
@@ -33,13 +40,25 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     find_package(PythonInterp REQUIRED)
     set(Chaste_PYTHON_DIR @EXPORT_Chaste_PYTHON_DIR@)
 
+    option(BUILD_SHARED_LIBS
+    "Set whether we are set whether to generate dynamic-linked libraries. ON by default"
+    @BUILD_SHARED_LIBS@)
+
     include(${Chaste_CMAKE_DIR}/cmake/Modules/ChasteMacros.cmake)
 
-    set(Chaste_ENABLE_TESTING ON CACHE BOOL "Enable Chaste Testing")
+    set(Chaste_NUM_CPUS_TEST @Chaste_NUM_CPUS_TEST@ CACHE STRING  "Number of cpus to use when running tests.")
+    set(Chaste_ENABLE_TESTING @Chaste_ENABLE_TESTING@ CACHE BOOL "Enable Chaste Testing")
+
+    set(TestPackTypes @TestPackTypes@)
+
     if(Chaste_ENABLE_TESTING)
         enable_testing()
-        list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
-        find_package(CxxTest)
+        set(CXXTEST_INCLUDES "${Chaste_BINARY_DIR}/cxxtest")
+        set(CXXTEST_PYTHON_TESTGEN_EXECUTABLE ${CXXTEST_INCLUDES}/cxxtestgen.py)
+        foreach(type ${TestPackTypes})
+            add_custom_target(${type})
+        endforeach()
+        add_custom_target(tutorials)
     endif()
 
     set(Chaste_DEPENDS_global @Chaste_DEPENDS_global@)
@@ -66,13 +85,12 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     set(Chaste_crypt_INCLUDE_DIRS @EXPORT_Chaste_crypt_INCLUDE_DIRS@)
     set(Chaste_lung_INCLUDE_DIRS @EXPORT_Chaste_lung_INCLUDE_DIRS@)
     set(Chaste_heart_INCLUDE_DIRS @EXPORT_Chaste_heart_INCLUDE_DIRS@)
+    @EXPORT_Chaste_ADDITIONAL_PROJECTS@
 
-    set(Chaste_INCLUDES @Chaste_INCLUDES@)
-    set(Chaste_LINK_LIBRARIES @Chaste_LINK_LIBRARIES@)
+    set(Chaste_INCLUDES "@Chaste_INCLUDES@")
+    set(Chaste_LINK_LIBRARIES "@Chaste_LINK_LIBRARIES@")
 
-    set(Chaste_ALL_LIBRARIES @Chaste_ALL_LIBRARIES@)
-
-    set(TestPackTypes @TestPackTypes@)
+    set(Chaste_ALL_LIBRARIES "@Chaste_ALL_LIBRARIES@")
 
     # Our library dependencies (contains definitions for IMPORTED targets)
     include("${Chaste_CMAKE_DIR}/ChasteTargets.cmake")

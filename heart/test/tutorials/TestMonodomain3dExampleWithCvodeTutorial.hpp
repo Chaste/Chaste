@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ public:
          * '''NB:''' this will use more memory than the standard approach of sharing one solver
          * object between all of the action potential models on a processor.
          */
-        if ( (x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6) )
+        if ((x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6))
         {
             p_cell = new CellLuoRudy1991FromCellMLCvode(p_empty_solver, mpStimulus);
         }
@@ -158,10 +158,10 @@ public:
  * The rest of the test is almost identical to the non-CVODE cell case,
  * - just note the #ifdef tag and the comment about ODE timesteps.
  */
-class TestMonodomain3dExample : public CxxTest::TestSuite
+class TestMonodomain3dExampleWithCvodeTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
 #ifdef CHASTE_CVODE
         DistributedTetrahedralMesh<3,3> mesh;
@@ -198,7 +198,7 @@ public:
         monodomain_problem.SetMesh( &mesh );
 
         bool partial_output = false;
-        if(partial_output)
+        if (partial_output)
         {
             std::vector<unsigned> nodes_to_be_output;
             nodes_to_be_output.push_back(0);

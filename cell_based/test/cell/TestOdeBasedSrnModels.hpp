@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,10 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NullSrnModel.hpp"
 #include "DeltaNotchSrnModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
@@ -64,7 +64,7 @@ class TestOdeBasedSrnModels : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDeltaNotchSrnCorrectBehaviour() throw(Exception)
+    void TestDeltaNotchSrnCorrectBehaviour()
     {
         TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnModel srn_model);
 
@@ -76,7 +76,7 @@ public:
         starter_conditions.push_back(0.5);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -97,7 +97,7 @@ public:
         double end_time = 10.0;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
 
-        while(p_simulation_time->GetTime() < end_time)
+        while (p_simulation_time->GetTime() < end_time)
         {
             p_simulation_time->IncrementTimeOneStep();
             p_srn_model->SimulateToCurrentTime();
@@ -143,7 +143,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new DeltaNotchSrnModel;
@@ -189,7 +189,7 @@ public:
         }
     }
 
-    void TestGoldbeter1991SrnCorrectBehaviour() throw(Exception)
+    void TestGoldbeter1991SrnCorrectBehaviour()
     {
         TS_ASSERT_THROWS_NOTHING(Goldbeter1991SrnModel srn_model);
 
@@ -202,7 +202,7 @@ public:
         starter_conditions.push_back(0.7);
         p_srn_model->SetInitialConditions(starter_conditions);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cc_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -224,7 +224,7 @@ public:
         double end_time = 10.0;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
 
-        while(p_simulation_time->GetTime() < end_time)
+        while (p_simulation_time->GetTime() < end_time)
         {
             p_simulation_time->IncrementTimeOneStep();
             p_srn_model->SimulateToCurrentTime();
@@ -273,7 +273,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, 100);
 
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
 
             // As usual, we archive via a pointer to the most abstract class possible
             AbstractSrnModel* p_srn_model = new Goldbeter1991SrnModel;
@@ -288,12 +288,11 @@ public:
             p_cell->InitialiseSrnModel();
             p_cell->SetBirthTime(0.0);
 
-
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Now update the SRN so the state variables are different from ICS
-            while(p_simulation_time->GetTime() < end_time)
+            while (p_simulation_time->GetTime() < end_time)
             {
                 p_simulation_time->IncrementTimeOneStep();
                 p_srn_model->SimulateToCurrentTime();

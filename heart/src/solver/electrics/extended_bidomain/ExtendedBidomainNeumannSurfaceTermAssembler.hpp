@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ public:
 };
 
 
-#define COVERAGE_IGNORE //no non-zero Neumann BC allowed at the moment in extended bidomain problems
+// LCOV_EXCL_START //no non-zero Neumann BC allowed at the moment in extended bidomain problems
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>::ComputeVectorSurfaceTerm(
     const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM> &rSurfaceElement,
@@ -110,6 +110,6 @@ c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEM
     }
     return ret;
 }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 #endif // EXTENDEDBIDOMAINNEUMANNSURFACETERMASSEMBLER_HPP_

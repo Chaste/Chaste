@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
     KSPGetPC(rKspObject, &mPetscPCObject);
 
     Mat system_matrix, dummy;
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     KSPGetOperators(rKspObject, &system_matrix, &dummy);
 #else
     MatStructure flag;
@@ -91,7 +91,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
     // Odd number of local rows: impossible if V_m and phi_e for each node are stored in the same processor.
     if ((num_rows%2 != 0) || (num_local_rows%2 != 0))
     {
-        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation.");
+        TERMINATE("Wrong matrix parallel layout detected in PCLDUFactorisation."); // LCOV_EXCL_LINE
     }
 
     // Allocate memory
@@ -256,14 +256,14 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
 void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
 {
     // These options will get read by PCSetFromOptions
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
     // Set up amg preconditioner for block A11
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
     PCSetType(mPCContext.PC_amg_A11, PCBJACOBI);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock);
 #else
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock, DIFFERENT_NONZERO_PATTERN);//   SAME_PRECONDITIONER);
@@ -274,7 +274,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     // Set up amg preconditioner for block A22_B1
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22_B1));
     PCSetType(mPCContext.PC_amg_A22_B1, PCBJACOBI);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     PCSetOperators(mPCContext.PC_amg_A22_B1, mPCContext.A22_B1_matrix_subblock, mPCContext.A22_B1_matrix_subblock);
 #else
     PCSetOperators(mPCContext.PC_amg_A22_B1, mPCContext.A22_B1_matrix_subblock, mPCContext.A22_B1_matrix_subblock, DIFFERENT_NONZERO_PATTERN);//   SAME_PRECONDITIONER);
@@ -286,13 +286,13 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22_B2));
     PCSetType(mPCContext.PC_amg_A22_B2, PCHYPRE);
     //PCHYPRESetType(mPCContext.PC_amg_A22_B2, "boomeramg");
-    PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+    PetscTools::SetOption("-pc_hypre_type", "boomeramg");
 
-    PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
-    PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
+    PetscTools::SetOption("-pc_hypre_boomeramg_max_iter", "1");
+    PetscTools::SetOption("-pc_hypre_boomeramg_strong_threshold", "0.0");
+    PetscTools::SetOption("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
     PCSetOperators(mPCContext.PC_amg_A22_B2, mPCContext.A22_B2_matrix_subblock, mPCContext.A22_B2_matrix_subblock);
 #else
     PCSetOperators(mPCContext.PC_amg_A22_B2, mPCContext.A22_B2_matrix_subblock, mPCContext.A22_B2_matrix_subblock, DIFFERENT_NONZERO_PATTERN);//   SAME_PRECONDITIONER);
@@ -314,13 +314,13 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 
     // Cast the context pointer to PCTwoLevelsBlockDiagonalContext
     PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalContext* block_diag_context = (PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalContext*) pc_context;
-    assert(block_diag_context!=NULL);
+    assert(block_diag_context!=nullptr);
 
     /*
      * Scatter x = [x1 x21 x22]'
      */
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(block_diag_context->A11_scatter_ctx, x, block_diag_context->x1_subvector, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd(block_diag_context->A11_scatter_ctx, x, block_diag_context->x1_subvector, INSERT_VALUES, SCATTER_FORWARD);
 #else
@@ -329,7 +329,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 #endif
 
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(block_diag_context->A22_B1_scatter_ctx, x, block_diag_context->x21_subvector, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd(block_diag_context->A22_B1_scatter_ctx, x, block_diag_context->x21_subvector, INSERT_VALUES, SCATTER_FORWARD);
 #else
@@ -338,7 +338,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 #endif
 
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(block_diag_context->A22_B2_scatter_ctx, x, block_diag_context->x22_subvector, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd(block_diag_context->A22_B2_scatter_ctx, x, block_diag_context->x22_subvector, INSERT_VALUES, SCATTER_FORWARD);
 #else
@@ -359,7 +359,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
      * Gather y = [y1 y21 y22]'
      */
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(block_diag_context->A11_scatter_ctx, block_diag_context->y1_subvector, y, INSERT_VALUES, SCATTER_REVERSE);
     VecScatterEnd(block_diag_context->A11_scatter_ctx, block_diag_context->y1_subvector, y, INSERT_VALUES, SCATTER_REVERSE);
 #else
@@ -368,7 +368,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 #endif
 
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(block_diag_context->A22_B1_scatter_ctx, block_diag_context->y21_subvector, y, INSERT_VALUES, SCATTER_REVERSE);
     VecScatterEnd(block_diag_context->A22_B1_scatter_ctx, block_diag_context->y21_subvector, y, INSERT_VALUES, SCATTER_REVERSE);
 #else
@@ -377,7 +377,7 @@ PetscErrorCode PCTwoLevelsBlockDiagonalApply(void* pc_context, Vec x, Vec y)
 #endif
 
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(block_diag_context->A22_B2_scatter_ctx, block_diag_context->y22_subvector, y, INSERT_VALUES, SCATTER_REVERSE);
     VecScatterEnd(block_diag_context->A22_B2_scatter_ctx, block_diag_context->y22_subvector, y, INSERT_VALUES, SCATTER_REVERSE);
 #else

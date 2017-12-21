@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -380,7 +380,6 @@ public:
                             );
             t.AdvanceOneTimeStep();
         }
-
     }
 
     void TestComplicatedStimulus()
@@ -427,7 +426,7 @@ public:
         }
     }
 
-    void TestArchivingStimuli() throw(Exception)
+    void TestArchivingStimuli()
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;
@@ -538,7 +537,6 @@ public:
             delete p_multiple;
         }
     }
-
 };
 
 #endif /*TESTSTIMULUS_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 
 #include "RandomNumberGenerator.hpp"
+#include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -73,15 +74,15 @@ private:
             {
                 break;
             }
-            if ( !(line[0] == '#' || line[0] == '!' || line.substr(0, 10) == "Group name") )
+            if (!(line[0] == '#' || line[0] == '!' || line.substr(0, 10) == "Group name"))
             {
                 //Even though both files were created with the same build, they may have slightly different creation
                 //times in their provenance line (so we ignore it).
                 rSetOfLines.insert(line);
             }
         }
-
     }
+
     void ComparePermutedFiles(const std::string& rFilePath1, const std::string& rFilePath2)
     {
         if (!PetscTools::AmMaster())
@@ -104,7 +105,7 @@ private:
                         DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh2 )
     {
         // Check that the same partitioner was used
-        TS_ASSERT_EQUALS(rMesh1.mMetisPartitioning, rMesh2.mMetisPartitioning);
+        TS_ASSERT_EQUALS(rMesh1.mPartitioning, rMesh2.mPartitioning);
         // Check that we have the right number of nodes and elements
         TS_ASSERT_EQUALS(rMesh1.GetNumBoundaryElements(), rMesh2.GetNumBoundaryElements());
         TS_ASSERT_EQUALS(rMesh1.GetNumElements(), rMesh2.GetNumElements());
@@ -159,8 +160,6 @@ private:
         {
             TS_ASSERT_EQUALS(prev_node->GetIndex()+1, current_node->GetIndex())
         }
-
-
 
         /*
          * All the nodes have been assigned
@@ -298,15 +297,12 @@ private:
         }
         else
         {
-            //Metis may allocate no nodes to a partition if the mesh is small and there are many processes
+            // A partitioner may allocate no nodes to a partition if the mesh is small and there are many processes
             // Look out for "You just increased the maxndoms"
-            TS_ASSERT( 0u == total_nodes_this_process );
-            TS_ASSERT( 0u == total_elements_this_process );
-            TS_ASSERT( 0u == total_b_elements_this_process );
+            TS_ASSERT(0u == total_nodes_this_process);
+            TS_ASSERT(0u == total_elements_this_process);
+            TS_ASSERT(0u == total_b_elements_this_process);
         }
-
-
-
     }
 
 public:
@@ -518,7 +514,7 @@ public:
     void TestConstructFromMeshReader3D()
     {
         /*
-         * In this test we let METIS reorder the DistributedTetrahedralMesh. We want to check that although
+         * In this test we let parMETIS reorder the DistributedTetrahedralMesh. We want to check that although
          * the indices of the nodes have changed, the location of the nodes is consistent with a
          * TetrahedralMesh representation of the same mesh.
          */
@@ -580,7 +576,7 @@ public:
 
     }
 
-    void TestConstructionFromMeshReaderWithNodeAttributes() throw(Exception)
+    void TestConstructionFromMeshReaderWithNodeAttributes()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements_with_node_attributes");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
@@ -607,7 +603,7 @@ public:
         unsigned probe_node_1 = 0u;
         unsigned probe_node_2 = 8u;
 
-        if ( PetscTools::IsParallel() )//need to figure out where they end up in permutation
+        if (PetscTools::IsParallel())//need to figure out where they end up in permutation
         {
             TS_ASSERT(mesh.rGetNodePermutation().size() > 0);
             probe_node_1 = mesh.rGetNodePermutation()[probe_node_1];
@@ -623,26 +619,6 @@ public:
             TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetNodeAttributes()[0u], 3.0, 1e-6);
             TS_ASSERT_DELTA(mesh.GetNode(probe_node_2)->rGetNodeAttributes()[1u], 24.5, 1e-6);
         }
-    }
-
-    void TestConstructFromMeshReaderWithBinaryFiles()
-    {
-        /* Note that the PARMETIS_LIBRARY partitioning type is able to randomly permute element
-         * access when using binary files (in order to avoid disk contention).  This means that a
-         * binary reader can give a different partition compared to the equivalent ascii reader
-         *
-         * Here we select the METIS_LIBRARY partition in order to avoid such issues.
-         */
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements_binary");
-        TrianglesMeshReader<3,3> mesh_reader_ascii("mesh/test/data/cube_136_elements");
-
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        DistributedTetrahedralMesh<3,3> mesh_from_ascii(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        mesh_from_ascii.ConstructFromMeshReader(mesh_reader_ascii);
-
-        CompareMeshes(mesh, mesh_from_ascii);
     }
 
     void TestConstructFromMeshReaderWithNclFile()
@@ -665,20 +641,7 @@ public:
         CompareMeshes( mesh, mesh_from_ncl );
     }
 
-    void TestEverythingIsAssignedMetisLibrary()
-    {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_reader.GetNumNodes());
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_reader.GetNumElements());
-        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumFaces());
-
-        CheckEverythingIsAssigned<3,3>(mesh);
-    }
-
-    void TestRandomShuffle() throw (Exception)
+    void TestRandomShuffle()
     {
         unsigned num_elts = 200;
 
@@ -731,22 +694,19 @@ public:
      */
     void TestComparePartitionQualities()
     {
-        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_binary, num_local_nodes_metis, num_total_nodes;
+        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_parmetis, num_local_nodes_metis_deprecated;
 
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_1mm_6000_elements");
             //TrianglesMeshReader<3,3> mesh_reader("heart/test/data/heart");
             DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
             mesh.ConstructFromMeshReader(mesh_reader);
+            // There's warning because METIS is deprecated and this is actually a parMETIS partition
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            Warnings::Instance()->QuietDestroy();
 
-            TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_reader.GetNumNodes());
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_reader.GetNumElements());
-            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumFaces());
-
-            CheckEverythingIsAssigned<3,3>(mesh);
-
-            num_local_nodes_metis = mesh.GetNumLocalNodes();
-            num_total_nodes=mesh.GetNumNodes();
+            num_local_nodes_metis_deprecated = mesh.GetNumLocalNodes();
         }
 
         if (PetscTools::HasParMetis())
@@ -781,34 +741,30 @@ public:
 
             CheckEverythingIsAssigned<3,3>(mesh);
 
-            num_local_nodes_binary = mesh.GetNumLocalNodes();
+            num_local_nodes_parmetis = mesh.GetNumLocalNodes();
+            TS_ASSERT_EQUALS(num_local_nodes_metis_deprecated, num_local_nodes_parmetis); // METIS is deprecated so these are the same
         }
 
-        unsigned max_local_nodes_metis;
         unsigned max_local_nodes_petsc_parmetis;
-        unsigned max_local_nodes_binary;
+        unsigned max_local_nodes_parmetis;
 
-        MPI_Allreduce (&num_local_nodes_metis, &max_local_nodes_metis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
         MPI_Allreduce (&num_local_nodes_petsc_parmetis, &max_local_nodes_petsc_parmetis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
-        MPI_Allreduce (&num_local_nodes_binary, &max_local_nodes_binary, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
+        MPI_Allreduce (&num_local_nodes_parmetis, &max_local_nodes_parmetis, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD );
 
         if (PetscTools::AmMaster())
         {
-            std::cout << "METIS\tPETSC PARMETIS\tPARMETIS BINARY" << std::endl;
-            std::cout << max_local_nodes_metis << "\t" << max_local_nodes_petsc_parmetis << "\t\t" << max_local_nodes_binary << std::endl;
+            std::cout << "PETSC PARMETIS\tPARMETIS" << std::endl;
+            std::cout << max_local_nodes_petsc_parmetis << "\t\t" << max_local_nodes_parmetis << std::endl;
         }
         PetscTools::Barrier();
 
-        TS_ASSERT(num_local_nodes_petsc_parmetis <= max_local_nodes_binary);
+        TS_ASSERT(num_local_nodes_petsc_parmetis <= max_local_nodes_parmetis);
         //Watch out for dumb partition and warn about it
         if (PetscTools::IsParallel())
         {
-            //Dumb partition is ceil(n/p), ceil(n/p), .... [ceil(n/p) + n - p*ceil(n/p)]
-            //i.e. most processes get ceil(n/p)  = floor((n+p-1)/p)
-            unsigned max_in_dumb_partition = (num_total_nodes + PetscTools::GetNumProcs() - 1)/PetscTools::GetNumProcs();
-            if (max_local_nodes_petsc_parmetis ==  max_in_dumb_partition)
+            if (max_local_nodes_petsc_parmetis ==  0u)
             {
-                TS_TRACE("That was dumb partition -- it did not use ParMETIS");
+                TS_TRACE("Did not use ParMETIS because the interface is not available");
             }
         }
     }
@@ -874,7 +830,7 @@ public:
     }
 
 
-    void TestConstruct3DWithRegions() throw (Exception)
+    void TestConstruct3DWithRegions()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart_nonnegative_flags");
         DistributedTetrahedralMesh<3,3> mesh;
@@ -911,32 +867,6 @@ public:
         }
     }
 
-    void TestMetisPartitioning()
-    {
-        EXIT_IF_SEQUENTIAL;
-
-        {
-            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-            mesh.ConstructFromMeshReader(mesh_reader);
-
-            // Check that each processor owns the number of nodes corresponding to its METIS partition
-            unsigned local_nodes = mesh.GetDistributedVectorFactory()->GetLocalOwnership();
-            TS_ASSERT_EQUALS(local_nodes, mesh.GetNumLocalNodes());
-
-            TS_ASSERT_EQUALS(mesh.GetPartitionType(), DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-        }
-
-        {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-            DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-            mesh.ConstructFromMeshReader(mesh_reader);
-
-            // Check that each processor owns the number of nodes corresponding to its METIS partition
-            unsigned local_nodes = mesh.GetDistributedVectorFactory()->GetLocalOwnership();
-            TS_ASSERT_EQUALS(local_nodes, mesh.GetNumLocalNodes());
-        }
-    }
 
     void TestPartitioningOfEmbeddedDimensionMesh()
     {
@@ -955,7 +885,7 @@ public:
      * This test constructs a simple cuboid mesh and divides
      * between two processes
      */
-    void TestGeometricPartition() throw(Exception)
+    void TestGeometricPartition()
     {
         unsigned num_procs = PetscTools::GetNumProcs();
         unsigned rank = PetscTools::GetMyRank();
@@ -1019,13 +949,13 @@ public:
     }
 
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder main_archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_tetrahedral_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("distributed_tetrahedral_mesh");
 
-        DistributedTetrahedralMesh<2,2>* p_mesh = new DistributedTetrahedralMesh<2,2>(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        DistributedTetrahedralMesh<2,2>* p_mesh = new DistributedTetrahedralMesh<2,2>(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         //std::vector<unsigned> halo_node_indices;
         std::vector<Node<2>*> halo_nodes;
         unsigned num_nodes;
@@ -1124,7 +1054,7 @@ public:
         // restore from a single processor archive
         {
             FileFinder archive_dir("mesh/test/data/distributed_mesh_archive", RelativeTo::ChasteSourceRoot);
-            if ( PetscTools::IsSequential() )
+            if (PetscTools::IsSequential())
             {
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(
                         archive_dir, "distributed_tetrahedral_mesh.arch");
@@ -1159,13 +1089,13 @@ public:
         delete p_mesh;
     }
 
-    void TestArchivingBinaryMesh() throw(Exception)
+    void TestArchivingBinaryMesh()
     {
         FileFinder archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "binary_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("binary_mesh");
 
-        DistributedTetrahedralMesh<3,3>* p_mesh = new DistributedTetrahedralMesh<3,3>(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        DistributedTetrahedralMesh<3,3>* p_mesh = new DistributedTetrahedralMesh<3,3>(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         //std::vector<unsigned> halo_node_indices;
         std::vector<Node<3>*> halo_nodes;
         unsigned num_nodes;
@@ -1330,8 +1260,8 @@ private:
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetBoundaryElement(i), "does not belong to processor");
             }
         }
-
     }
+
 public:
     void TestConstructLinearMesh()
     {
@@ -1673,9 +1603,6 @@ public:
         TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(outside_mesh), base_mesh.GetNearestNodeIndex(outside_mesh));
         TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(within_mesh), base_mesh.GetNearestNodeIndex(within_mesh));
         TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(origin_mesh), base_mesh.GetNearestNodeIndex(origin_mesh));
-
-
-
     }
 
     void TestNearestNodeIndex2D()
@@ -2065,7 +1992,6 @@ public:
             FileComparison comparer(generated_parallel,generated_sequential);
             TS_ASSERT(comparer.CompareFiles());
         }
-
     }
 
     void TestEfficientParallelWriting3D()
@@ -2123,7 +2049,7 @@ public:
         }
     }
 
-    void TestArchiveOfConstructedMesh() throw(Exception)
+    void TestArchiveOfConstructedMesh()
     {
         FileFinder archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_rectangle.arch";
@@ -2236,7 +2162,7 @@ public:
         delete p_mesh;
     }
 
-    void TestLoadBadFacesException() throw (Exception)
+    void TestLoadBadFacesException()
     {
         DistributedTetrahedralMesh<3,3> distributed_mesh_bad;
         TrianglesMeshReader<3,3> mesh_reader_bad("mesh/test/data/cube_21_nodes_side/Cube21_bad_faces"); // 5x5x5mm cube (internode distance = 0.25mm)
@@ -2290,7 +2216,7 @@ public:
 
     }
 
-    void TestCheckOutwardNormals() throw (Exception)
+    void TestCheckOutwardNormals()
     {
         {
             DistributedTetrahedralMesh<2,2> mesh;
@@ -2304,7 +2230,7 @@ public:
         }
     }
 
-    void TestCalculateEdgeLengths() throw (Exception)
+    void TestCalculateEdgeLengths()
     {
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -2331,7 +2257,7 @@ public:
         }
     }
 
-    void TestPartitionHasNoElementsWithAllHaloNodes() throw (Exception)
+    void TestPartitionHasNoElementsWithAllHaloNodes()
     {
         TrianglesMeshReader<3,3> reader("heart/test/data/box_shaped_heart/box_heart");
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
@@ -2355,11 +2281,11 @@ public:
         }
     }
     /* HOW_TO_TAG Mesh
-     * Construct a distributed regular mesh (rectangle in 2D or cuboid in 3D) which is no does not have a
-     * regular split.  The default is for parallel code to split 2-D meshes into slices in the y-dimension
+     * Construct a distributed regular mesh (rectangle in 2D or cuboid in 3D) which does not have a default
+     * split plane.  The default is for parallel code to split 2-D meshes into slices in the y-dimension
      * and 3-D meshes in the z-dimension.
      */
-    void TestConstructSlabMeshWithDimensionSplit() throw (Exception)
+    void TestConstructSlabMeshWithDimensionSplit()
     {
         double step = 1.0;
         unsigned width = 3;
@@ -2424,7 +2350,8 @@ public:
                  iter != mesh_with_x_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 2> pos = iter->rGetLocation();
+                c_vector<double, 2> pos;
+                pos = iter->rGetLocation();
                 max_x_with_x_split = std::max(max_x_with_x_split, pos[0]);
                 max_y_with_x_split = std::max(max_y_with_x_split, pos[1]);
             }
@@ -2445,7 +2372,8 @@ public:
                  iter != mesh_with_default_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 2> pos = iter->rGetLocation();
+                c_vector<double, 2> pos;
+                pos = iter->rGetLocation();
                 max_x_with_default_split = std::max(max_x_with_default_split, pos[0]);
                 max_y_with_default_split = std::max(max_y_with_default_split, pos[1]);
             }
@@ -2539,7 +2467,8 @@ public:
                  iter != mesh_with_x_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 3> pos = iter->rGetLocation();
+                c_vector<double, 3> pos;
+                pos = iter->rGetLocation();
                 max_x_with_x_split = std::max(max_x_with_x_split, pos[0]);
                 max_y_with_x_split = std::max(max_y_with_x_split, pos[1]);
                 max_z_with_x_split = std::max(max_z_with_x_split, pos[2]);
@@ -2563,7 +2492,8 @@ public:
                  iter != mesh_with_y_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 3> pos = iter->rGetLocation();
+                c_vector<double, 3> pos;
+                pos = iter->rGetLocation();
                 max_x_with_y_split = std::max(max_x_with_y_split, pos[0]);
                 max_y_with_y_split = std::max(max_y_with_y_split, pos[1]);
                 max_z_with_y_split = std::max(max_z_with_y_split, pos[2]);
@@ -2587,7 +2517,8 @@ public:
                  iter != mesh_with_default_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 3> pos = iter->rGetLocation();
+                c_vector<double, 3> pos;
+                pos = iter->rGetLocation();
                 max_x_with_default_split = std::max(max_x_with_default_split, pos[0]);
                 max_y_with_default_split = std::max(max_y_with_default_split, pos[1]);
                 max_z_with_default_split = std::max(max_z_with_default_split, pos[2]);

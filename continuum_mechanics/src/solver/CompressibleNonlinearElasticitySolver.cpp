@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,13 +85,13 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleRes
 
         if (element.GetOwnership() == true)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             // note: if assembleJacobian only
-            if(CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
+            if (CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && assembleJacobian)
             {
                 std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << (*iter).GetIndex() << " of " << this->mrQuadMesh.GetNumElements() << std::flush;
             }
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
 
             AssembleOnElement(element, a_elem, a_elem_precond, b_elem, assembleResidual, assembleJacobian);
 
@@ -240,7 +240,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> temp_matrix;
     static c_matrix<double,NUM_NODES_PER_ELEMENT,DIM> grad_quad_phi_times_invF;
 
-    if(this->mSetComputeAverageStressPerElement)
+    if (this->mSetComputeAverageStressPerElement)
     {
         this->mAverageStressesPerElement[rElement.GetIndex()] = zero_vector<double>(DIM*(DIM+1)/2);
     }
@@ -319,7 +319,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         p_material_law->SetChangeOfBasisMatrix(this->mChangeOfBasisMatrix);
         p_material_law->ComputeStressAndStressDerivative(C, inv_C, 0.0, T, dTdE, assembleJacobian);
 
-        if(this->mIncludeActiveTension)
+        if (this->mIncludeActiveTension)
         {
             // Add any active stresses, if there are any. Requires subclasses to overload this method,
             // see for example the cardiac mechanics assemblers.
@@ -327,7 +327,7 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                                                      T, dTdE, assembleJacobian);
         }
 
-        if(this->mSetComputeAverageStressPerElement)
+        if (this->mSetComputeAverageStressPerElement)
         {
             this->AddStressToAverageStressPerElement(T,rElement.GetIndex());
         }
@@ -445,16 +445,14 @@ void CompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         rAElemPrecond = rAElem;
     }
 
-    if(this->mSetComputeAverageStressPerElement)
+    if (this->mSetComputeAverageStressPerElement)
     {
-        for(unsigned i=0; i<DIM*(DIM+1)/2; i++)
+        for (unsigned i=0; i<DIM*(DIM+1)/2; i++)
         {
             this->mAverageStressesPerElement[rElement.GetIndex()](i) /= this->mpQuadratureRule->GetNumQuadPoints();
         }
     }
-
 }
-
 
 template<size_t DIM>
 CompressibleNonlinearElasticitySolver<DIM>::CompressibleNonlinearElasticitySolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
@@ -465,21 +463,17 @@ CompressibleNonlinearElasticitySolver<DIM>::CompressibleNonlinearElasticitySolve
                                              outputDirectory,
                                              COMPRESSIBLE)
 {
-    if(rProblemDefinition.GetCompressibilityType() != COMPRESSIBLE)
+    if (rProblemDefinition.GetCompressibilityType() != COMPRESSIBLE)
     {
         EXCEPTION("SolidMechanicsProblemDefinition object contains incompressible material laws");
     }
 }
-
 
 template<size_t DIM>
 CompressibleNonlinearElasticitySolver<DIM>::~CompressibleNonlinearElasticitySolver()
 {
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
-
 template class CompressibleNonlinearElasticitySolver<2>;
 template class CompressibleNonlinearElasticitySolver<3>;

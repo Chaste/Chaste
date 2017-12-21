@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,11 +48,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestExecutableSupport : public CxxTest::TestSuite
 {
 public:
-    void TestStaticMethods() throw(Exception)
+    void TestStaticMethods()
     {
         const std::string output_dir("TestExecutableSupport");
         CommandLineArguments* p_args = CommandLineArguments::Instance();
         ExecutableSupport::StandardStartup(p_args->p_argc, p_args->p_argv);
+        ExecutableSupport::StartupWithoutShowingCopyright(p_args->p_argc, p_args->p_argv);
         ExecutableSupport::SetOutputDirectory(output_dir);
         std::string msg("This is not an error, it's just for coverage.");
         ExecutableSupport::PrintError(msg, true);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -213,7 +213,6 @@ public:
      * @param pDataReader  An HDF5 data reader to use (needed if the existing one is deleted and a new one opened)
      */
     void SetHdf5DataReader(Hdf5DataReader* pDataReader);
-
 };
 
 #endif //_PROPAGATIONPROPERTIESCALCULATOR_HPP_

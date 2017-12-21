@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,12 +70,12 @@ void RandomCaSwitchingUpdateRule<DIM>::SetSwitchingParameter(double switchingPar
 }
 
 template<unsigned DIM>
-void RandomCaSwitchingUpdateRule<DIM>::OutputSwitchingUpdateRuleParameters(out_stream& rParamsFile)
+void RandomCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SwitchingParameter>" << mSwitchingParameter << "</SwitchingParameter>\n";
 
     // Call method on direct parent class
-    AbstractCaSwitchingUpdateRule<DIM>::OutputSwitchingUpdateRuleParameters(rParamsFile);
+    AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
 // Explicit instantiation

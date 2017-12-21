@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,13 +119,11 @@ double MyPressureFunction(double t)
     return 1.32317 + 100*(t-1.0);
 }
 
-
-
 class TestIncompressibleNonlinearElasticitySolver : public CxxTest::TestSuite
 {
 public:
     // This is purely for coverage of assembling a 3D system...
-    void TestAssembleSystem3D() throw (Exception)
+    void TestAssembleSystem3D()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -151,7 +149,7 @@ public:
         TS_ASSERT_THROWS_THIS(IncompressibleNonlinearElasticitySolver<3> another_solver(mesh,problem_defn,""), "SolidMechanicsProblemDefinition object contains compressible material laws");
     }
 
-    void TestAssembleSystem() throw (Exception)
+    void TestAssembleSystem()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
         ExponentialMaterialLaw<2> law(2.0, 3.0);
@@ -275,7 +273,7 @@ public:
             unsigned row = 3*i+2;
             if ((lo<=(int)row) && ((int)row<hi))
             {
-                for(unsigned col=0; col<num_dofs; col++)
+                for (unsigned col=0; col<num_dofs; col++)
                 {
                     double val = PetscMatTools::GetElement(solver.mrJacobianMatrix,row,col);
                     TS_ASSERT_DELTA(val, (double)(row==col), 1e-12);
@@ -316,7 +314,7 @@ public:
         }
     }
 
-    void TestComputeResidualAndGetNormWithBadDeformation() throw(Exception)
+    void TestComputeResidualAndGetNormWithBadDeformation()
     {
         // There are 10 nodes (including internals) which means that the (non)linear system
         // can't be distributed over more than 10 processes.  This may cause deadlock in
@@ -377,7 +375,7 @@ public:
     // A test where the solution should be zero displacement
     // It mainly tests that the initial guess was set up correctly to
     // the final correct solution, ie u=0, p=zero_strain_pressure (!=0)
-    void TestWithZeroDisplacement() throw(Exception)
+    void TestWithZeroDisplacement()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
@@ -428,7 +426,7 @@ public:
         }
     }
 
-    void TestSettingUpHeterogeneousProblem() throw(Exception)
+    void TestSettingUpHeterogeneousProblem()
     {
         // two element quad mesh on the square
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
@@ -463,7 +461,7 @@ public:
         TS_ASSERT_DELTA(solver.rGetCurrentSolution()[11], 10.0, 1e-6); //3*3+2
     }
 
-    void TestSolve() throw(Exception)
+    void TestSolve()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
@@ -530,8 +528,6 @@ public:
         MechanicsEventHandler::Report();
     }
 
-
-
     /**
      *  Solve a problem with non-zero dirichlet boundary conditions
      *  and non-zero tractions. THIS TEST COMPARES AGAINST AN EXACT SOLUTION.
@@ -551,7 +547,7 @@ public:
      *  compare the computed displacement and pressure against the true solution.
      *
      */
-    void TestSolveWithNonZeroBoundaryConditions() throw(Exception)
+    void TestSolveWithNonZeroBoundaryConditions()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -569,7 +565,7 @@ public:
         std::vector<c_vector<double,2> > locations;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
                 c_vector<double,2> new_position;
@@ -617,7 +613,7 @@ public:
 
         std::vector<double> old_current_soln = solver.rGetCurrentSolution();
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double exact_x = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
             double exact_y = lambda*mesh.GetNode(i)->rGetLocation()[1];
@@ -625,7 +621,7 @@ public:
             solver.rGetCurrentSolution()[3*i] = exact_x - mesh.GetNode(i)->rGetLocation()[0];
             solver.rGetCurrentSolution()[3*i+1] = exact_y - mesh.GetNode(i)->rGetLocation()[1];
 
-            if(mesh.GetNode(i)->IsInternal())
+            if (mesh.GetNode(i)->IsInternal())
             {
                 solver.rGetCurrentSolution()[3*i+2] =  0.0;
             }
@@ -660,8 +656,6 @@ public:
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
             }
         }
-
-
 
         ///////////////////////////////////////////////////////////////////////////
         // Now solve properly
@@ -742,9 +736,9 @@ public:
      *  s = 2c[Y*alpha/lam^2, 1/lam - lam]  on Y=1
      *
      */
-    void TestAgainstExactSolution() throw(Exception)
+    void TestAgainstExactSolution()
     {
-        for(unsigned run=0; run<2; run++)
+        for (unsigned run=0; run<2; run++)
         {
             MechanicsEventHandler::Reset();
 
@@ -780,7 +774,7 @@ public:
             problem_defn.SetBodyForce(MyBodyForce);
             problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
 
-            if(run==1)
+            if (run==1)
             {
                 problem_defn.SetVerboseDuringSolve(); // coverage
                 problem_defn.SetSolveUsingSnes();
@@ -799,7 +793,7 @@ public:
 
             solver.Solve();
 
-            if(run==0)
+            if (run==0)
             {
                 // matrix might have (small) errors introduced if this fails
                 TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
@@ -835,7 +829,7 @@ public:
             MechanicsEventHandler::Headings();
             MechanicsEventHandler::Report();
 
-            if(run==0)
+            if (run==0)
             {
                 // Check output files were created: the standard output files initial.nodes and solution.nodes, the extra newton iteration
                 // output files created as SetWriteOutputEachNewtonIteration() was called above, and the cmgui files created as
@@ -879,11 +873,11 @@ public:
      *  needs to work this out), and it is scaled by 1.0/lambda as it acts on a smaller surface
      *  than would on the undeformed surface.
      */
-    void TestSolveWithPressureBcsOnDeformedSurface() throw(Exception)
+    void TestSolveWithPressureBcsOnDeformedSurface()
     {
         std::vector<double> soln_first_run;
 
-        for(unsigned run=0; run<2; run++)
+        for (unsigned run=0; run<2; run++)
         {
             double lambda = 0.85;
             double c1 = 1.0;
@@ -896,7 +890,7 @@ public:
             std::vector<c_vector<double,2> > locations;
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+                if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
                 {
                     fixed_nodes.push_back(i);
                     c_vector<double,2> new_position;
@@ -930,7 +924,7 @@ public:
             // the two variants of SetApplyNormalPressureOnDeformedSurface(). MyPressureFunction
             // will return the same value as that in the variable pressure IF the current time
             // is set to 1.0.
-            if(run==0)
+            if (run==0)
             {
                 problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
             }
@@ -943,7 +937,7 @@ public:
                                                               problem_defn,
                                                               "nonlin_elas_pressure_on_deformed");
 
-            if(run==1)
+            if (run==1)
             {
                 solver.SetCurrentTime(1.0);
                 // To speed up this test, we provide the correct answer as the initial guess for
@@ -954,7 +948,7 @@ public:
 
             solver.Solve();
 
-            if(run==0)
+            if (run==0)
             {
                 soln_first_run = solver.rGetCurrentSolution();
             }
@@ -983,8 +977,127 @@ public:
         }
     }
 
+    /*
+     *  Repeat of previous test but with SNES solver from PETSc.
+     *
+     *  Test the functionality for specifying that a pressure should act in the normal direction on the
+     *  DEFORMED SURFACE.
+     *
+     *  The deformation is based on that in TestSolveWithNonZeroBoundaryConditions (x=X/lambda,
+     *  y=Y*lam; see comments for this test), but the exact solution here is this rotated by
+     *  45 degrees anticlockwise. We choose dirichlet boundary conditions on the X=0 surface to
+     *  match this, and a pressure on the opposite surface (similar to the traction provided in
+     *  TestSolveWithNonZeroBoundaryConditions, except we don't provide the direction, the code
+     *  needs to work this out), and it is scaled by 1.0/lambda as it acts on a smaller surface
+     *  than would on the undeformed surface.
+     */
+    void TestSolveWithPressureBcsOnDeformedSurfaceSnes()
+    {
+        std::vector<double> soln_first_run;
 
+        for (unsigned run=0; run<2; run++)
+        {
+            double lambda = 0.85;
+            double c1 = 1.0;
+            unsigned num_elem = 10;
 
+            QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
+            MooneyRivlinMaterialLaw<2> law(c1);
+
+            std::vector<unsigned> fixed_nodes;
+            std::vector<c_vector<double,2> > locations;
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
+                {
+                    fixed_nodes.push_back(i);
+                    c_vector<double,2> new_position;
+                    new_position(0) = (lambda/sqrt(2.0)) * mesh.GetNode(i)->rGetLocation()[1];
+                    new_position(1) = (lambda/sqrt(2.0)) * mesh.GetNode(i)->rGetLocation()[1];
+                    locations.push_back(new_position);
+                }
+            }
+
+            std::vector<BoundaryElement<1,2>*> boundary_elems;
+            double pressure = (2*c1*(pow(lambda,-1) - lambda*lambda*lambda))/lambda;
+
+            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+                  = mesh.GetBoundaryElementIteratorBegin();
+                iter != mesh.GetBoundaryElementIteratorEnd();
+                ++iter)
+            {
+                if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
+                {
+                    BoundaryElement<1,2>* p_element = *iter;
+                    boundary_elems.push_back(p_element);
+                }
+            }
+            assert(boundary_elems.size()==num_elem);
+
+            SolidMechanicsProblemDefinition<2> problem_defn(mesh);
+
+            problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn.SetFixedNodes(fixed_nodes, locations);
+
+            /*** Switch on SNES this time ***/
+            problem_defn.SetSolveUsingSnes();
+            /*** Switch on SNES this time ***/
+
+            // the two variants of SetApplyNormalPressureOnDeformedSurface(). MyPressureFunction
+            // will return the same value as that in the variable pressure IF the current time
+            // is set to 1.0.
+            if (run==0)
+            {
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure);
+            }
+            else
+            {
+                problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, MyPressureFunction);
+            }
+
+            IncompressibleNonlinearElasticitySolver<2> solver(mesh,
+                                                              problem_defn,
+                                                              "nonlin_elas_pressure_on_deformed");
+
+            if (run==1)
+            {
+                solver.SetCurrentTime(1.0);
+                // To speed up this test, we provide the correct answer as the initial guess for
+                // the second run. Note: the second run may still take an iteration or two, as the
+                // final newton solve tolerance may be different (eg if relative tolerance)
+                solver.rGetCurrentSolution() = soln_first_run;
+            }
+
+            solver.Solve();
+
+            if (run==0)
+            {
+                soln_first_run = solver.rGetCurrentSolution();
+            }
+
+            std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                double exact_x_before_rotation = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
+                double exact_y_before_rotation = lambda*mesh.GetNode(i)->rGetLocation()[1];
+
+                double exact_x = (1.0/sqrt(2.0))*( exact_x_before_rotation + exact_y_before_rotation);
+                double exact_y = (1.0/sqrt(2.0))*(-exact_x_before_rotation + exact_y_before_rotation);
+
+                TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-3 );
+                TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-3 );
+            }
+
+            // check the final pressure
+            std::vector<double>& r_pressures = solver.rGetPressures();
+            TS_ASSERT_EQUALS(r_pressures.size(), mesh.GetNumNodes());
+            for (unsigned i=0; i<r_pressures.size(); i++)
+            {
+                TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 5e-2 );
+            }
+        }
+    }
 
     /**
      *  Same as TestSolveWithNonZeroBoundaryConditions()
@@ -1007,7 +1120,7 @@ public:
      *  compare the computed displacement and pressure against the true solution.
      *
      */
-    void TestSlidingBoundaryConditions() throw(Exception)
+    void TestSlidingBoundaryConditions()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -1026,7 +1139,7 @@ public:
         // for the rest of the nodes, if X=0, set x=0, leave y free.
         for (unsigned i=1; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
                 c_vector<double,2> new_position;
@@ -1112,7 +1225,7 @@ public:
     // same set up as TestSolveWithNonZeroBoundaryConditions, here we test
     // that the simulation works fine if the internal nodes are not assumed to
     // have indices greater than vertex nodes
-    void TestWithReordering() throw(Exception)
+    void TestWithReordering()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -1123,7 +1236,7 @@ public:
         double end_residual_norm_normal =0.0;
         double end_residual_norm_reordered = 0.0;
 
-        for(unsigned run=0; run<2; run++)
+        for (unsigned run=0; run<2; run++)
         {
             std::string mesh_file = (run==0 ? "mesh/test/data/square_128_elements_quadratic" : "mesh/test/data/square_128_elements_quadratic_reordered");
 
@@ -1137,7 +1250,7 @@ public:
             std::vector<c_vector<double,2> > locations;
             for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+                if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
                 {
                     fixed_nodes.push_back(i);
                     c_vector<double,2> new_position;
@@ -1176,7 +1289,7 @@ public:
 
             solver.Solve();
 
-            if(run==0)
+            if (run==0)
             {
                 soln_normal = solver.rGetCurrentSolution();
                 end_residual_norm_normal = solver.ComputeResidualAndGetNorm(false);
@@ -1196,11 +1309,11 @@ public:
 
         // The two meshes are the same except the nodes 4 and 81 have been swapped around.
         // Hence, the solutions should be the same except for the unknowns at these nodes
-        for(unsigned i=0; i<289 /*num total nodes*/; i++)
+        for (unsigned i=0; i<289 /*num total nodes*/; i++)
         {
-            if(i!=4 && i!=81)
+            if (i!=4 && i!=81)
             {
-                for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
+                for (unsigned j=0; j<3; j++) // [u,v,p] unknowns
                 {
                     TS_ASSERT_DELTA(soln_normal[3*i+j], soln_reordered[3*i+j], 7e-7);
                 }
@@ -1208,7 +1321,7 @@ public:
         }
 
         // Check the solution at nodes 4 and 81
-        for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
+        for (unsigned j=0; j<3; j++) // [u,v,p] unknowns
         {
             TS_ASSERT_DELTA(soln_normal[3*4+j],  soln_reordered[3*81+j], 4e-7);
             TS_ASSERT_DELTA(soln_normal[3*81+j], soln_reordered[3*4+j],  5e-7);
@@ -1217,7 +1330,7 @@ public:
 
     // same set up as SolveWithNonZeroBoundaryConditions, here we test
     // that the simulation works fine with a DistributedQuadraticMesh
-    void TestSolveDistributedQuadraticMeshWithNonZeroBoundaryConditions() throw(Exception)
+    void TestSolveDistributedQuadraticMeshWithNonZeroBoundaryConditions()
     {
         double lambda = 0.85;
         double c1 = 1.0;
@@ -1236,7 +1349,7 @@ public:
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
-            if ( fabs(iter->rGetLocation()[0])<1e-6)
+            if (fabs(iter->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(iter->GetIndex());
                 c_vector<double,2> new_position;
@@ -1292,7 +1405,7 @@ public:
             solver.rGetCurrentSolution()[3*iter->GetIndex()] = exact_x - iter->rGetLocation()[0];
             solver.rGetCurrentSolution()[3*iter->GetIndex()+1] = exact_y - iter->rGetLocation()[1];
 
-            if(iter->IsInternal())
+            if (iter->IsInternal())
             {
                 solver.rGetCurrentSolution()[3*iter->GetIndex()+2] =  0.0;
             }
@@ -1389,7 +1502,7 @@ public:
 
 
     // This is purely to ensure coverage of vtk output in 3d
-    void TestVtkCoverage3d() throw(Exception)
+    void TestVtkCoverage3d()
     {
        QuadraticMesh<3> mesh;
        TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -1424,7 +1537,7 @@ public:
     // after the solve by linearly interpolating from vertices. Here we test this directly - in particular in 3d as the
     // 3d tests use constant pressure solutions so it is important to check with non-constant pressure
     // at the vertices.
-    void TestRemoveDummyPressure() throw(Exception)
+    void TestRemoveDummyPressure()
     {
         // 2d version
         {
@@ -1442,9 +1555,9 @@ public:
                                                               "");
 
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
+                if (! mesh.GetNode(i)->IsInternal())
                 {
                     double x = mesh.GetNode(i)->rGetLocation()[0];
                     double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -1455,7 +1568,7 @@ public:
 
             solver.RemovePressureDummyValuesThroughLinearInterpolation();
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -1483,10 +1596,9 @@ public:
                                                               problem_defn,
                                                               "");
 
-
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                if(! mesh.GetNode(i)->IsInternal())
+                if (!mesh.GetNode(i)->IsInternal())
                 {
                     double x = mesh.GetNode(i)->rGetLocation()[0];
                     double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -1497,7 +1609,7 @@ public:
 
             solver.RemovePressureDummyValuesThroughLinearInterpolation();
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];

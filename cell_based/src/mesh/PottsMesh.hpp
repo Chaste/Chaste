@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -335,9 +335,6 @@ public:
      */
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
 
-
-
-
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////
@@ -433,6 +430,7 @@ typename PottsMesh<DIM>::PottsElementIterator PottsMesh<DIM>::GetElementIterator
 {
     return PottsElementIterator(*this, mElements.end());
 }
+
 template<unsigned DIM>
 PottsElement<DIM>& PottsMesh<DIM>::PottsElementIterator::operator*()
 {

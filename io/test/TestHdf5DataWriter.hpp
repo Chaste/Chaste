@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,8 @@ public:
         hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
 
         // Create the dataset with default properties and close filespace.
-        hid_t dset_id = H5Dcreate(file_id, "IntArray", H5T_NATIVE_INT, filespace, H5P_DEFAULT);
+        hid_t dset_id = H5Dcreate(file_id, "IntArray", H5T_NATIVE_INT, filespace,
+                                  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
@@ -132,7 +133,8 @@ public:
         hid_t char_type = H5Tcopy(H5T_C_S1);
         // H5Tset_strpad(char_type, H5T_STR_NULLPAD);
         H5Tset_size(char_type, 21 );
-        hid_t attr = H5Acreate(dset_id, "Name", char_type, colspace, H5P_DEFAULT);
+        hid_t attr = H5Acreate(dset_id, "Name", char_type, colspace,
+                               H5P_DEFAULT, H5P_DEFAULT);
 
         // Write to the attribute
         status = H5Awrite(attr, char_type, col_data);
@@ -191,7 +193,8 @@ public:
         hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
 
         // Create the dataset with default properties and close filespace.
-        hid_t dset_id = H5Dcreate(file_id, "TheVector", H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT);
+        hid_t dset_id = H5Dcreate(file_id, "TheVector", H5T_NATIVE_DOUBLE, filespace,
+                                  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
@@ -233,7 +236,7 @@ public:
 
         hsize_t file_id = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
         //H5Tget_nmembers(file_id);
-        hsize_t dataset_id = H5Dopen(file_id, "TheVector");
+        hsize_t dataset_id = H5Dopen(file_id, "TheVector", H5P_DEFAULT);
         hsize_t dxpl = H5Pcreate(H5P_DATASET_XFER);
         hsize_t edc = H5Pget_edc_check(dxpl);
         TS_ASSERT_EQUALS(edc, (hsize_t) 1) //Checksum is enabled
@@ -255,18 +258,22 @@ public:
         // The last component was owned by processor "num_procs-1"
         TS_ASSERT_EQUALS(((int)data[data_size-1]/100), num_procs-1);
 
-        H5Pclose (dxpl);
+        H5Pclose(dxpl);
         H5Dclose(dataset_id);
         H5Fclose(file_id);
     }
 
-    void TestHdf5DataWriterMultipleColumns() throw(Exception)
+    void TestHdf5DataWriterMultipleColumns()
     {
         int number_nodes = 100;
 
         DistributedVectorFactory factory(number_nodes);
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_multi_column", false);
+
+        // Coverage
+        TS_ASSERT_EQUALS(writer.GetUsingCache(), false);
+
         writer.DefineFixedDimension(number_nodes);
 
         int node_id = writer.DefineVariable("Node","dimensionless");
@@ -299,20 +306,6 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_multi_column_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_multi_column", true,
             "io/test/data", "hdf5_test_multi_column", false));
 
@@ -329,7 +322,167 @@ public:
         PetscTools::Destroy(petsc_data_2);
     }
 
-    void TestHdf5DataWriterNonEvenRowDistribution() throw(Exception)
+    void TestHdf5DataWriterSingleColumnNoTimeCachedFails()
+    {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_single_column_cached_fails",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+        writer.DefineFixedDimension(number_nodes);
+
+        int node_id = writer.DefineVariable("Node","dimensionless");
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+             index!= distributed_vector_1.End();
+             ++index)
+        {
+            distributed_vector_1[index] =  index.Global;
+        }
+        distributed_vector_1.Restore();
+
+        TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, petsc_data_1),
+                              "Cached writes require an unlimited dimension.");
+
+        PetscTools::Destroy(petsc_data_1);
+    }
+
+    void TestHdf5DataWriterMultipleColumnsCachedFails()
+    {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_multi_column_cached_fails",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+        writer.DefineFixedDimension(number_nodes);
+
+        // Define TWO variables
+        int node_id = writer.DefineVariable("Node","dimensionless");
+        writer.DefineVariable("I_K","milliamperes");
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+             index!= distributed_vector_1.End();
+             ++index)
+        {
+            distributed_vector_1[index] =  index.Global;
+        }
+        distributed_vector_1.Restore();
+
+        // Try and write ONE -> exception
+        TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, petsc_data_1),
+                              "Cached writes must write all variables at once.");
+
+        PetscTools::Destroy(petsc_data_1);
+    }
+
+    void TestHdf5DataWriterSingleColumnCached()
+    {
+        int number_nodes = 100;
+        DistributedVectorFactory factory(number_nodes);
+        std::string folder("TestHdf5DataWriter");
+        std::string filename("hdf5_test_single_column_cached");
+
+        // Write the original file
+        {
+            Hdf5DataWriter writer(factory,
+                                  folder,
+                                  filename,
+                                  false,
+                                  false, // extend
+                                  "Data",
+                                  true); // cache
+            writer.DefineFixedDimension(number_nodes);
+
+            int node_id = writer.DefineVariable("Node","dimensionless");
+            writer.DefineUnlimitedDimension("Time", "msec");
+            writer.EndDefineMode();
+
+            Vec petsc_data_1 = factory.CreateVec();
+            DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                 index!= distributed_vector_1.End();
+                 ++index)
+            {
+                distributed_vector_1[index] =  index.Global;
+            }
+            distributed_vector_1.Restore();
+            writer.PutVector(node_id, petsc_data_1);
+            writer.PutUnlimitedVariable(0.0);
+            writer.AdvanceAlongUnlimitedDimension();
+            writer.Close();
+            PetscTools::Destroy(petsc_data_1);
+        }
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", filename, true,
+                                                "io/test/data", filename, false));
+
+        // Now extend it
+        {
+            Hdf5DataWriter writer(factory,
+                                  folder,
+                                  filename,
+                                  false,
+                                  true, // extend
+                                  "Data",
+                                  true); // cache
+
+            // Check chunk info was read correctly
+            hsize_t expected_chunk_size[3] = {1, 100, 1};
+            for ( int i=0; i<3; ++i )
+            {
+                TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
+            }
+            // Check the cache has reserved the right amount of space
+            TS_ASSERT_EQUALS(writer.mDataCache.capacity(), writer.mNumberOwned);
+
+            // Get IDs for the variables in the file
+            int node_id = writer.GetVariableByName("Node");
+
+            Vec petsc_data_1 = factory.CreateVec();
+            DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                 index!= distributed_vector_1.End();
+                 ++index)
+            {
+                distributed_vector_1[index] =  number_nodes*2 + index.Global;
+            }
+            distributed_vector_1.Restore();
+            writer.PutVector(node_id, petsc_data_1);
+            writer.PutUnlimitedVariable(1.0);
+            writer.AdvanceAlongUnlimitedDimension();
+            writer.Close();
+            PetscTools::Destroy(petsc_data_1);
+        }
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", filename, true,
+                                                "io/test/data", filename + "_extended", false));
+    }
+
+    void TestHdf5DataWriterNonEvenRowDistribution()
     {
         int number_nodes = 100;
 
@@ -379,20 +532,6 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_multi_column_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_multi_column_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_non_even_row_dist", true,
                                                 "io/test/data", "hdf5_test_multi_column", false));
 
@@ -400,7 +539,7 @@ public:
         PetscTools::Destroy(petsc_data_2);
     }
 
-    void TestHdf5DataWriterFullFormatIncomplete() throw(Exception)
+    void TestHdf5DataWriterFullFormatIncomplete()
     {
         int number_nodes = 100;
 
@@ -456,25 +595,8 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_incomplete.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_incomplete_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_incomplete_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//
-//        }
-
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete", true,
                                                 "io/test/data", "hdf5_test_full_format_incomplete", false));
-
-        std::cout << "This one needs fixing too:\n" << std::flush;
 
         // Test whether one with big-endian datatypes looks the same:
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete", true,
@@ -485,7 +607,61 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterFullFormat() throw(Exception)
+    void TestHdf5DataWriterFullFormatIncompleteCached()
+    {
+        int number_nodes = 100;
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_full_format_incomplete_cached",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+
+        int node_id = writer.DefineVariable("Node","dimensionless");
+        writer.DefineUnlimitedDimension("Time", "msec");
+
+        std::vector<unsigned> node_numbers;
+        node_numbers.push_back(21);
+        node_numbers.push_back(47);
+        node_numbers.push_back(48);
+        writer.DefineFixedDimension(node_numbers, number_nodes);
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (unsigned time_step=0; time_step<10; time_step++)
+        {
+            // Write some values
+            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                 index!= distributed_vector_1.End();
+                 ++index)
+            {
+                distributed_vector_1[index] =  index.Global;
+            }
+            distributed_vector_1.Restore();
+
+            // Write the vector
+
+            writer.PutVector(node_id, petsc_data_1);
+            writer.PutUnlimitedVariable(time_step);
+            writer.AdvanceAlongUnlimitedDimension();
+        }
+
+        writer.Close();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete_cached", true,
+                                                "io/test/data", "hdf5_test_full_format_incomplete_cached", false));
+
+        PetscTools::Destroy(petsc_data_1);
+    }
+
+    void TestHdf5DataWriterFullFormat()
     {
         int number_nodes = 100;
 
@@ -498,9 +674,6 @@ public:
         int ik_id = writer.DefineVariable("I_K", "milliamperes");
         int ina_id = writer.DefineVariable("I_Na", "milliamperes");
         writer.DefineUnlimitedDimension("Time", "msec", 10);
-
-        // Set the chunk sizes (mostly for coverage)
-        writer.SetFixedChunkSize(3,5,3);
 
         writer.EndDefineMode();
 
@@ -538,20 +711,7 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
                                                  "io/test/data", "hdf5_test_full_format", false));
 
         PetscTools::Destroy(petsc_data_1);
@@ -559,7 +719,7 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterFullFormatStriped() throw(Exception)
+    void TestHdf5DataWriterFullFormatStriped()
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -623,21 +783,6 @@ public:
 
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_striped_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-//
-
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_striped", true,
                                                 "io/test/data", "hdf5_test_full_format_striped", false));
 
@@ -646,7 +791,130 @@ public:
         PetscTools::Destroy(petsc_data_short);
     }
 
-    void TestHdf5DataWriterFullFormatStripedWith3Variables() throw(Exception)
+    void TestHdf5DataWriterStripedCached()
+    {
+        int number_nodes = 100;
+        DistributedVectorFactory vec_factory(number_nodes);
+
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_striped_with_cache",
+                              false,
+                              false,
+                              "Data",
+                              true); // use cache
+        writer.DefineFixedDimension(number_nodes);
+
+        /* Set specific chunk dims for coverage.
+         * We expect that the writer will flush whole chunks (every 3 steps in
+         * this case) automatically, but we have 10 entries, so Close() will do
+         * for the final flush. */
+        writer.SetFixedChunkSize(3, 10, 2);
+
+        int vm_id = writer.DefineVariable("V_m", "millivolts");
+        int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
+
+        std::vector<int> striped_variable_IDs;
+        striped_variable_IDs.push_back(vm_id);
+        striped_variable_IDs.push_back(phi_e_id);
+
+        writer.DefineUnlimitedDimension("Time", "msec");
+
+        writer.EndDefineMode();
+
+        // Check chunk info was read correctly
+        hsize_t expected_chunk_size[3] = {3, 10, 2};
+        for ( int i=0; i<3; ++i )
+        {
+            TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
+        }
+        // Check the cache has reserved the right amount of space
+        unsigned expected_capacity = 3 * writer.mNumberOwned * 2;
+        TS_ASSERT_EQUALS(writer.mDataCache.capacity(), expected_capacity);
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Vec petsc_data_long = factory.CreateVec(2);
+        DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
+        DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
+        DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
+
+        for (unsigned time_step=0; time_step<10; time_step++)
+        {
+            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+                 index!= distributed_vector_long.End();
+                 ++index)
+            {
+                vm_stripe[index] =  time_step*1000 + index.Global*2;
+                phi_e_stripe[index] =  time_step*1000 + index.Global*2+1;
+            }
+            distributed_vector_long.Restore();
+
+            writer.PutStripedVector(striped_variable_IDs, petsc_data_long);
+            writer.PutUnlimitedVariable(time_step);
+            writer.AdvanceAlongUnlimitedDimension();
+
+            // Check that the cache is emptied on whole chunks. Size of cache
+            // should go 0, 200, 400, 0, ... when run with one process.
+            unsigned expected_cache_size = ((time_step+1) % 3) * writer.mNumberOwned * 2;
+            TS_ASSERT_EQUALS(writer.mDataCache.size(), expected_cache_size);
+        }
+
+        // Final flush happens here
+        writer.Close();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_striped_with_cache", true,
+                                                "io/test/data", "hdf5_test_striped_with_cache", false));
+
+        PetscTools::Destroy(petsc_data_long);
+    }
+
+    void TestHdf5DataWriterStripedNoTimeCachedFails()
+    {
+        int number_nodes = 100;
+        DistributedVectorFactory vec_factory(number_nodes);
+
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_striped_no_time_cache",
+                              false,
+                              false,
+                              "Data",
+                              true); // use cache
+        writer.DefineFixedDimension(number_nodes);
+
+        int vm_id = writer.DefineVariable("V_m", "millivolts");
+        int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
+
+        std::vector<int> striped_variable_IDs;
+        striped_variable_IDs.push_back(vm_id);
+        striped_variable_IDs.push_back(phi_e_id);
+
+        writer.EndDefineMode();
+
+        DistributedVectorFactory factory(number_nodes);
+
+        Vec petsc_data_long = factory.CreateVec(2);
+        DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
+        DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
+        DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
+
+        for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+             index!= distributed_vector_long.End();
+             ++index)
+        {
+            vm_stripe[index] =  1000 + index.Global*2;
+            phi_e_stripe[index] =  1000 + index.Global*2+1;
+        }
+        distributed_vector_long.Restore();
+
+        TS_ASSERT_THROWS_THIS(writer.PutStripedVector(striped_variable_IDs, petsc_data_long),
+                              "Cached writes require an unlimited dimension.")
+
+        PetscTools::Destroy(petsc_data_long);
+    }
+
+    void TestHdf5DataWriterFullFormatStripedWith3Variables()
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
@@ -698,21 +966,26 @@ public:
         PetscTools::Destroy(petsc_data);
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncomplete() throw(Exception)
+    void Hdf5DataWriterFullFormatStripedIncomplete(bool useCache, std::string outputFile, std::string expectedException)
     {
         int number_nodes = 100;
         DistributedVectorFactory vec_factory(number_nodes);
 
-        Hdf5DataWriter writer(vec_factory, "TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete", false);
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              outputFile,
+                              false,
+                              false,
+                              "Data",
+                              useCache);
 
         std::vector<unsigned> node_numbers;
-        node_numbers.push_back(21);
-        node_numbers.push_back(47);
-        node_numbers.push_back(60);
-        node_numbers.push_back(61);
-        node_numbers.push_back(62);
-        node_numbers.push_back(90);
-        node_numbers.push_back(95);
+        node_numbers.push_back(4);
+        node_numbers.push_back(8);
+        node_numbers.push_back(15);
+        node_numbers.push_back(16);
+        node_numbers.push_back(23);
+        node_numbers.push_back(42);
         writer.DefineFixedDimension(node_numbers, number_nodes);
 
         int vm_id = writer.DefineVariable("V_m","millivolts");
@@ -749,25 +1022,10 @@ public:
         }
         writer.Close();
 
-//        if (PetscTools::AmMaster())
-//        {
-//            // call h5dump to take the binary hdf5 output file and print it
-//            // to a text file. Note that the first line of the txt file would
-//            // be the directory it has been printed to, but is this line is
-//            // removed by piping the output through sed to delete the first line
-//            OutputFileHandler handler("TestHdf5DataWriter",false);
-//            std::string file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_incomplete.h5";
-//            std::string new_file = handler.GetOutputDirectoryFullPath() + "/hdf5_test_full_format_striped_incomplete_dumped.txt";
-//            system( ("h5dump "+file+" | sed 1d > "+new_file).c_str() );
-//            FileComparison comparer(new_file, "io/test/data/hdf5_test_full_format_striped_incomplete_dumped.txt");
-//            TS_ASSERT(comparer.CompareFiles());
-//        }
-
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete", true,
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", outputFile, true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
         PetscTools::Destroy(petsc_data_long);
-        writer.Close();
 
         // Now cover two exceptions: one is the unsupported PutStripedVector for incomplete data and 3 vars...
         int first = writer.DefineVariable("first","millivolts");
@@ -781,8 +1039,7 @@ public:
         writer.EndDefineMode();
 
         Vec petsc_data_3vars = factory.CreateVec(3);
-        TS_ASSERT_THROWS_THIS(writer.PutStripedVector(three_variable_IDs, petsc_data_3vars),
-                                "The PutStripedVector functionality for incomplete data is supported for only 2 stripes");
+        TS_ASSERT_THROWS_THIS(writer.PutStripedVector(three_variable_IDs, petsc_data_3vars), expectedException);
 
         PetscTools::Destroy(petsc_data_3vars);
         writer.Close();
@@ -796,6 +1053,20 @@ public:
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(one_ID, petsc_data_1var),
                                 "The PutStripedVector method requires at least two variables ID. If only one is needed, use PutVector method instead");
         PetscTools::Destroy(petsc_data_1var);
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncomplete()
+    {
+        Hdf5DataWriterFullFormatStripedIncomplete(false,
+                                                  "hdf5_test_full_format_striped_incomplete",
+                                                  "The PutStripedVector functionality for incomplete data is supported for only 2 stripes");
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncompleteCached()
+    {
+        Hdf5DataWriterFullFormatStripedIncomplete(true,
+                                                  "hdf5_test_full_format_striped_incomplete_cached",
+                                                  "Cached writes must write all variables at once.");
     }
 
     void TestNonImplementedFeatures()
@@ -1134,7 +1405,7 @@ public:
     }
 
     /**
-     * Test the functionality for adding further data to an existing file.
+     * Test the functionality for adding a new dataset ("Postprocessing") to an existing file.
      *
      * This test must come after TestHdf5DataWriterFullFormat and TestHdf5DataWriterFullFormatStripedIncomplete,
      * as we extend their files.
@@ -1150,13 +1421,17 @@ public:
         // Open the real file
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_full_format", false, true, "Postprocessing");
 
+        // Can't set alignment on existing file (with pre-existing dataset or not).
+        TS_ASSERT_THROWS_THIS(writer.SetAlignment(123), "Alignment parameter can only be set for new HDF5 files.");
+
+        // CAN set chunk size target on new dataset in existing file
+        writer.SetTargetChunkSize(0x800); // 2 K
+
         // Define what the new dataset is going to look like.
-        {
-            writer.DefineFixedDimension(number_nodes);
-            writer.DefineVariable("Phase", "dimensionless");
-            writer.DefineUnlimitedDimension("Time", "msec", 10);
-            writer.EndDefineMode();
-        }
+        writer.DefineFixedDimension(number_nodes);
+        writer.DefineVariable("Phase", "dimensionless");
+        writer.DefineUnlimitedDimension("Time", "msec", 10);
+        writer.EndDefineMode();
 
         // Get IDs for the variables in the file
         int phase_id = writer.GetVariableByName("Phase");
@@ -1185,10 +1460,32 @@ public:
         // Close and test
         writer.Close();
         PetscTools::Destroy(phase_petsc);
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
+                                                "io/test/data", "hdf5_test_full_format_extended", false, 1e-10, "Postprocessing"));
+
+        // Check chunk dimensions are as expected
+        OutputFileHandler file_handler("TestHdf5DataWriter", false);
+        FileFinder file = file_handler.FindFile("hdf5_test_full_format.h5");
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        hid_t dset = H5Dopen(h5_file, "Postprocessing", H5P_DEFAULT); // open dataset
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+        hsize_t expected_dims[3] = {10, 25, 1};
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims );
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+        H5Pclose(dcpl);
+        H5Dclose(dset);
+        H5Fclose(h5_file);
     }
 
-    /* Test for adding a new variable (such as phase) to an existing data set on disk */
-    void TestHdf5DataWriterAddNewVariable() throw(Exception)
+    /**
+     *  Test for adding a new dataset ("Extra stuff") to an existing HDF5 file.
+     */
+    void TestHdf5DataWriterAddNewVariable()
     {
         int number_nodes = 100;
 
@@ -1311,7 +1608,7 @@ public:
     }
 
     /**
-     * Test the functionality for adding further data to an existing file.
+     * Test the functionality for adding further data to an existing dataset in an existing file.
      *
      * This test must come after TestHdf5DataWriterFullFormat and TestHdf5DataWriterFullFormatStripedIncomplete,
      * as we extend their files.
@@ -1355,6 +1652,13 @@ public:
         TS_ASSERT_THROWS_THIS(writer.GetVariableByName("bob"),
                               "Variable does not exist in hdf5 definitions.");
 
+        // Can't set chunk size on existing dataset
+        TS_ASSERT_THROWS_THIS(writer.SetTargetChunkSize(123),
+                              "Cannot set chunk target size when not in define mode.");
+
+        // Can't set alignment on existing file (with pre-existing dataset or not).
+        TS_ASSERT_THROWS_THIS(writer.SetAlignment(456), "Alignment parameter can only be set for new HDF5 files.");
+
         // Create some extra test data
         Vec node_petsc = factory.CreateVec();
         Vec ik_petsc = factory.CreateVec();
@@ -1395,11 +1699,94 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
                                                 "io/test/data", "hdf5_test_full_format_extended", false));
 
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
-                                                "io/test/data", "hdf5_test_full_format_extended", false, 1e-10, "Postprocessing"));
-
         TS_ASSERT_THROWS_THIS(Hdf5DataWriter another_writer(factory, "TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete", false, true),
                               "Unable to extend an incomplete data file at present.");
+    }
+
+    /**
+     * This test must come after TestWriteToExistingFile as it extends even further.
+     */
+    void TestWriteToExistingFileWithCache(void)
+    {
+        int number_nodes = 100;
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_full_format",
+                              false,
+                              true, // extend
+                              "Data",
+                              true); // cache
+
+        // Check chunk info was read correctly
+        hsize_t expected_chunk_size[3] = {10, 100, 3};
+        for ( int i=0; i<3; ++i )
+        {
+            TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
+        }
+        // Check the cache has reserved the right amount of space
+        unsigned expected_capacity = 10 * writer.mNumberOwned * 3;
+        TS_ASSERT_EQUALS(writer.mDataCache.capacity(), expected_capacity);
+
+        // Get IDs for the variables in the file
+        int node_id = writer.GetVariableByName("Node");
+        int ik_id = writer.GetVariableByName("I_K");
+        int ina_id = writer.GetVariableByName("I_Na");
+
+        std::vector<int> variable_IDs;
+        variable_IDs.push_back(node_id);
+        variable_IDs.push_back(ik_id);
+        variable_IDs.push_back(ina_id);
+
+        Vec petsc_data_long = factory.CreateVec(3);
+        DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
+        DistributedVector::Stripe node_stripe(distributed_vector_long, 0);
+        DistributedVector::Stripe ik_stripe(distributed_vector_long, 1);
+        DistributedVector::Stripe ina_stripe(distributed_vector_long, 2);
+
+        for (unsigned time_step=15; time_step<20; time_step++)
+        {
+            // Fill in data
+            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+                 index != distributed_vector_long.End();
+                 ++index)
+            {
+                node_stripe[index] = index.Global;
+                ik_stripe[index] = time_step*1000 + 100 + index.Global;
+                ina_stripe[index] = time_step*1000 + 200 + index.Global;
+            }
+            distributed_vector_long.Restore();
+
+            // Write to file
+            writer.PutStripedVector(variable_IDs, petsc_data_long);
+            writer.PutUnlimitedVariable(time_step);
+
+            // Check that the cache is growing at the expected rate.
+            // Should go 300, 600, 900, ... when run with one process.
+            unsigned expected_cache_size = ((time_step-15+1) % 10) * writer.mNumberOwned * 3;
+            TS_ASSERT_EQUALS(writer.mDataCache.size(), expected_cache_size);
+
+            writer.AdvanceAlongUnlimitedDimension();
+
+            /*
+             * We started halfway through a chunk, so after the final
+             * iteration there should be a flush (despite only having a half-
+             * full cache).
+             */
+            if (time_step == 19)
+            {
+                TS_ASSERT_EQUALS(writer.mDataCache.size(), 0u);
+            }
+        }
+
+        // Close and test
+        writer.Close();
+        PetscTools::Destroy(petsc_data_long);
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
+                                                "io/test/data", "hdf5_test_full_format_extended_twice", false));
+
     }
 
     void TestPermutation()
@@ -1510,7 +1897,7 @@ public:
                                                 "io/test/data", "hdf5_permuted", false));
     }
 
-    void TestHdf5DataWriterFullFormatIncompleteUsingMatrix() throw(Exception)
+    void TestHdf5DataWriterFullFormatIncompleteUsingMatrix()
     {
         int number_nodes = 100;
 
@@ -1574,21 +1961,79 @@ public:
         PetscTools::Destroy(petsc_data_3);
     }
 
-    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix() throw(Exception)
+    void TestHdf5DataWriterSingleIncompleteUsingMatrixCached()
     {
         int number_nodes = 100;
-        DistributedVectorFactory vec_factory(number_nodes);
 
-        Hdf5DataWriter writer(vec_factory, "TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete_using_matrix", false);
+        DistributedVectorFactory factory(number_nodes);
+
+        Hdf5DataWriter writer(factory,
+                              "TestHdf5DataWriter",
+                              "hdf5_test_single_incomplete_using_matrix_cached",
+                              false,
+                              false,
+                              "Data",
+                              true); // cache
+
+        int node_id = writer.DefineVariable("Node","dimensionless");
+        writer.DefineUnlimitedDimension("Time", "msec");
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(60);
-        node_numbers.push_back(61);
-        node_numbers.push_back(62);
-        node_numbers.push_back(90);
-        node_numbers.push_back(95);
+        writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
+
+        writer.EndDefineMode();
+
+        Vec petsc_data_1 = factory.CreateVec();
+        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+
+        for (unsigned time_step=0; time_step<10; time_step++)
+        {
+            // Write some values
+            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                 index!= distributed_vector_1.End();
+                 ++index)
+            {
+                distributed_vector_1[index] =  index.Global;
+            }
+            distributed_vector_1.Restore();
+
+            writer.PutVector(node_id, petsc_data_1);
+            writer.PutUnlimitedVariable(time_step);
+            writer.AdvanceAlongUnlimitedDimension();
+        }
+
+        writer.Close();
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_single_incomplete_using_matrix_cached", true,
+                                                "io/test/data", "hdf5_test_single_incomplete_using_matrix_cached", false));
+
+        PetscTools::Destroy(petsc_data_1);
+    }
+
+    void Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(bool useCache, std::string outputFile)
+    {
+        /* This test doesn't get run directly, see following two blocks */
+        int number_nodes = 100;
+        DistributedVectorFactory vec_factory(number_nodes);
+
+        Hdf5DataWriter writer(vec_factory,
+                              "TestHdf5DataWriter",
+                              outputFile,
+                              false,
+                              false,
+                              "Data",
+                              useCache);
+
+        std::vector<unsigned> node_numbers;
+        node_numbers.push_back(4);
+        node_numbers.push_back(8);
+        node_numbers.push_back(15);
+        node_numbers.push_back(16);
+        node_numbers.push_back(23);
+        node_numbers.push_back(42);
         writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
 
         int vm_id = writer.DefineVariable("V_m","millivolts");
@@ -1627,10 +2072,102 @@ public:
         writer.Close();
 
 
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_striped_incomplete_using_matrix", true,
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", outputFile, true,
                                                 "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
 
         PetscTools::Destroy(petsc_data_long);
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix()
+    {
+        // Without caching
+        Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(false, "hdf5_test_full_format_striped_incomplete_using_matrix");
+    }
+
+    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached()
+    {
+        // With caching
+        Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(true, "hdf5_test_full_format_striped_incomplete_using_matrix_cached");
+    }
+
+    void TestHdf5DataWriterManualChunkSizeAndAlignment()
+    {
+        std::string folder("TestHdf5DataWriter");
+        std::string filename("hdf5_test_manual_chunk_size_and_alignment");
+
+        {
+            int number_nodes = 2000;
+            DistributedVectorFactory factory(number_nodes);
+            Hdf5DataWriter writer(factory, folder, filename, false);
+
+            // Define some dimensions and variables
+            writer.DefineUnlimitedDimension("Time", "msec", 101);
+            writer.DefineFixedDimension(number_nodes);
+            // Odd number of variables for
+            writer.DefineVariable("Node","dimensionless");
+            writer.DefineVariable("I_K","milliamperes");
+            writer.DefineVariable("I_Na","milliamperes");
+
+            /* Set the target chunk size to 8 K (smaller than normal) and the
+             * alignment to 16 K.
+             * Note: this is a stupid example and just for testing. Because
+             * every 8 K chunk will be aligned to 16 K boundaries the file
+             * will be about twice the size it needs to be on disk!
+             */
+            writer.SetTargetChunkSize(0x2000); // 8 K
+            writer.SetAlignment(0x4000); // 16 K
+            writer.EndDefineMode();
+
+            // Test assertions
+            TS_ASSERT_THROWS_THIS(writer.SetTargetChunkSize(123),
+                                  "Cannot set chunk target size when not in define mode.");
+            TS_ASSERT_THROWS_THIS(writer.SetAlignment(456),
+                                  "Cannot set alignment parameter when not in define mode.");
+
+            // Don't bother actually writing anything, that's tested elsewhere
+            writer.Close();
+        }
+
+        // Open file
+        OutputFileHandler file_handler(folder, false);
+        FileFinder file = file_handler.FindFile(filename+".h5");
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        hid_t dset = H5Dopen(h5_file, "Data", H5P_DEFAULT); // open dataset
+
+        /* Check chunk dimensions are as expected for 8 K chunks with these
+         * dataset dimensions. */
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+        hsize_t expected_dims[3] = {17, 20, 3};
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+        H5Pclose(dcpl);
+
+        /*
+         * Check the "location" of the datasets (the offset from the start of
+         * file, a bit like a pointer to the start of the dataset) to confirm
+         * alignment was switched on.
+         * With alignment switched off, Data is usually located at 800 B. With
+         * alignment = 16 K it is at 64 K. For the Data_Unlimited dataset the
+         * numbers are 4935472 B (about 4.7 MB) and 10125312 B (about 9.7 MB),
+         * respectively.
+         * (These numbers might be machine-dependent!)
+         */
+        H5O_info_t data_info;
+        H5Oget_info( dset, &data_info );
+        TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
+        H5Oget_info( dset, &data_info );
+        TS_ASSERT_EQUALS(data_info.addr, 0x9A8000u); // About 9.7 MB
+
+        // Tidy up
+        H5Dclose(dset);
+        H5Fclose(h5_file);
     }
 };
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
 #include "MutableVertexMesh.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
 #include "ArchiveOpener.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -134,7 +135,7 @@ private:
 
 public:
 
-    void TestMutableVertexElementIterator() throw (Exception)
+    void TestMutableVertexElementIterator()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
@@ -184,7 +185,7 @@ public:
         TS_ASSERT_EQUALS(mesh.IsMeshChanging(), true);
     }
 
-    void TestBasic2dMutableVertexMesh() throw(Exception)
+    void TestBasic2dMutableVertexMesh()
     {
         // Make seven nodes to assign to two elements
         std::vector<Node<2>*> basic_nodes;
@@ -375,7 +376,7 @@ public:
         TS_ASSERT_DELTA(point3[1], 1.9, 1e-6);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
@@ -431,7 +432,7 @@ public:
         TS_ASSERT_EQUALS(new_index, 3u);
     }
 
-    void TestAddElement() throw (Exception)
+    void TestAddElement()
     {
         // Make four nodes to assign to two elements
         std::vector<Node<2>*> nodes;
@@ -495,7 +496,7 @@ public:
         delete p_replaced_vertex_element;
     }
 
-    void TestDeletingNodes() throw (Exception)
+    void TestDeletingNodes()
     {
         // Make a simple vertex mesh
         std::vector<Node<2>*> nodes;
@@ -535,7 +536,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
     }
 
-    void TestDivideVertexElementGivenNodes() throw(Exception)
+    void TestDivideVertexElementGivenNodes()
     {
         // Make four nodes
         std::vector<Node<2>*> basic_nodes;
@@ -584,7 +585,7 @@ public:
         TS_ASSERT_EQUALS(new_element_index, 0u);
     }
 
-    void TestDivideVertexElementGivenNodesForCoverage() throw(Exception)
+    void TestDivideVertexElementGivenNodesForCoverage()
     {
         /*
          * Divide a square element like so
@@ -643,7 +644,7 @@ public:
     }
 
 
-    void TestDivideVertexElementAbove() throw(Exception)
+    void TestDivideVertexElementAbove()
     {
         // Make four nodes
         std::vector<Node<2>*> basic_nodes;
@@ -687,7 +688,7 @@ public:
     }
 
     // This also tests that boundary nodes are updated on element division
-    void TestDivideVertexElementGivenAxisOfDivision() throw(Exception)
+    void TestDivideVertexElementGivenAxisOfDivision()
     {
         // Make five nodes, 0, 1 and 2 are boundary nodes
         std::vector<Node<2>*> nodes;
@@ -778,7 +779,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetContainingElementIndices(), expected_elements_containing_node_6);
     }
 
-    void TestDivideVertexElementWithBoundaryNodes() throw(Exception)
+    void TestDivideVertexElementWithBoundaryNodes()
     {
 
         /*
@@ -879,7 +880,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->rGetContainingElementIndices(), expected_elements_containing_node_7);
     }
 
-    void TestDeleteElementWithBoundaryNodes() throw(Exception)
+    void TestDeleteElementWithBoundaryNodes()
     {
 
         /*
@@ -960,7 +961,7 @@ public:
      * Test that in the case where the given axis of division does not
      * cross two edges of the element, an exception is thrown.
      */
-    void TestDivideVertexElementGivenAxisOfDivisionFailsForBadElement() throw(Exception)
+    void TestDivideVertexElementGivenAxisOfDivisionFailsForBadElement()
     {
         // Create a mesh consisting of a single non-convex element
         std::vector<Node<2>*> nodes;
@@ -994,7 +995,7 @@ public:
                               "Cannot proceed with element division: the given axis of division does not cross two edges of the element");
     }
 
-    void TestDivideVertexElementAlongShortAxis() throw(Exception)
+    void TestDivideVertexElementAlongShortAxis()
     {
         // Make five nodes
         std::vector<Node<2>*> nodes;
@@ -1071,7 +1072,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetContainingElementIndices(), expected_elements_containing_node_6);
     }
 
-    void TestDivideVertexElementWithNonRegularElement() throw(Exception)
+    void TestDivideVertexElementWithNonRegularElement()
     {
         // Make six nodes
         std::vector<Node<2>*> nodes;
@@ -1140,7 +1141,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 2.3260, 1e-4);
     }
 
-    void TestDivideVertexElementWhereNewNodesAreCloseToOldNodes1() throw(Exception)
+    void TestDivideVertexElementWhereNewNodesAreCloseToOldNodes1()
     {
         // Make 6 nodes
         std::vector<Node<2>*> nodes;
@@ -1193,7 +1194,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 1.0, 1e-4);
     }
 
-    void TestDivideVertexElementWhereNewNodesAreCloseToOldNodes2() throw(Exception)
+    void TestDivideVertexElementWhereNewNodesAreCloseToOldNodes2()
     {
         // Make 6 nodes
         std::vector<Node<2>*> nodes;
@@ -1249,7 +1250,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 1.0, 1e-4);
     }
 
-    void TestDivideVertexElementGivenAxisOfDivisionWithShortEdge() throw(Exception)
+    void TestDivideVertexElementGivenAxisOfDivisionWithShortEdge()
     {
         // Make five nodes, 0, 1 and 2 are boundary nodes
         std::vector<Node<2>*> nodes;
@@ -1342,6 +1343,7 @@ public:
         mesh.SetCellRearrangementThreshold(0.54);
         mesh.SetT2Threshold(0.012);
         mesh.SetCellRearrangementRatio(1.6);
+        mesh.SetDistanceForT3SwapChecking(7.3);
 
         AbstractMesh<2,2>* const p_mesh = &mesh;
 
@@ -1389,6 +1391,8 @@ public:
             TS_ASSERT_DELTA(p_mesh_original->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetT2Threshold(), 0.012, 1e-6);
             TS_ASSERT_DELTA(p_mesh_loaded->GetCellRearrangementRatio(), 1.6, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_original->GetDistanceForT3SwapChecking(), 7.3, 1e-6);
+            TS_ASSERT_DELTA(p_mesh_loaded->GetDistanceForT3SwapChecking(), 7.3, 1e-6);
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
@@ -1803,6 +1807,18 @@ public:
         // or edge 2.  The closest edge is not well defined in this situation.
         unsigned edge_closest_to_point1 = mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point1,0);
         TS_ASSERT(edge_closest_to_point1 == 1u || edge_closest_to_point1 == 2u);
+    }
+
+    void TestSetAndGetDistanceForT3SwapChecking()
+    {
+        HoneycombVertexMeshGenerator mesh_generator(10,10); // is_flat_bottom, T1swaptthreshold, T2swapthreshold, elementArea
+        MutableVertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        double standard_distance = p_mesh->GetDistanceForT3SwapChecking();
+        TS_ASSERT_EQUALS(standard_distance, 5.0);
+
+        p_mesh->SetDistanceForT3SwapChecking( 10.0 );
+        double new_distance = p_mesh->GetDistanceForT3SwapChecking();
+        TS_ASSERT_EQUALS(new_distance, 10.0);
     }
 
     void TestHandleHighOrderJunctions()

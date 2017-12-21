@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ private:
 
     double ComputeTimeStep(double currentTime, Vec currentSolution)
     {
-        if(currentTime < mThresholdTime)
+        if (currentTime < mThresholdTime)
         {
             return 0.01; // ms
         }
@@ -70,7 +70,6 @@ private:
             return 1;
         }
     }
-
 
 public:
     FixedTimeAdaptivityController(double thresholdTime)
@@ -85,7 +84,7 @@ public:
 class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 {
 public:
-    void TestWithCube() throw(Exception)
+    void TestWithCube()
     {
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
         HeartConfig::Instance()->SetSimulationDuration(3); //ms
@@ -142,7 +141,7 @@ public:
         TS_ASSERT_DELTA(max_adaptive, 25.6083, 1e-3);
     }
 
-    void TestWithChebyshevAndFixedIterations() throw(Exception)
+    void TestWithChebyshevAndFixedIterations()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
@@ -222,7 +221,6 @@ public:
                 TS_FAIL(e.GetShortMessage());
             }
         }
-
     }
 };
 

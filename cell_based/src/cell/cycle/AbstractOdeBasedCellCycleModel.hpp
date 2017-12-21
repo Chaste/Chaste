@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,14 +48,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * This class contains all the functionality shared by 'ODE-based' cell-cycle models,
- * where the duration of one or more cell cycle phases are evaluated 'on the fly'
+ * where the duration of the cell cycle is evaluated 'on the fly'
  * as the cell ages, according to a system of ordinary differential equations (ODEs)
  * governing (for example) the concentrations of key intracellular proteins. To
  * determine when cell division should occur, one or more stopping conditions for
  * this ODE system may be specified.
  *
  * This class of cell-cycle models is distinct from 'simple' cell-cycle models, where
- * the duration of each cell cycle phase is determined when the cell-cycle model is
+ * the duration of the cell cycle is determined when the cell-cycle model is
  * created.
  */
 class AbstractOdeBasedCellCycleModel : public AbstractCellCycleModel, public CellCycleModelOdeHandler
@@ -76,8 +76,6 @@ private:
         archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
         archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
         archive & mDivideTime;
-        archive & mFinishedRunningOdes;
-        archive & mG2PhaseStartTime;
     }
 
 protected:
@@ -85,17 +83,26 @@ protected:
     /** The time at which the cell should divide - Set this to DBL_MAX in constructor. */
     double mDivideTime;
 
-    /** Whether the cell-cycle model is currently in a delay (not solving ODEs). */
-    bool mFinishedRunningOdes;
-
-    /** The start time for the G2 phase. */
-    double mG2PhaseStartTime;
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel.
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the cell cycle model to copy.
+     */
+    AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel);
 
 public:
 
     /**
      * Creates an AbstractOdeBasedCellCycleModel, calls SetBirthTime on the
-     * AbstractCellCycleModel to make sure that can be set 'back in time' for
+     * AbstractPhaseBasedCellCycleModel to make sure that can be set 'back in time' for
      * cells which did not divide at the current time.
      *
      * @param lastTime  The birth time of the cell / last time model was evaluated (defaults to the current SimulationTime)
@@ -108,14 +115,6 @@ public:
      * Destructor.
      */
     virtual ~AbstractOdeBasedCellCycleModel();
-
-    /**
-     * Default UpdateCellCyclePhase() method for an ODE-based cell-cycle model.
-     * This method calls SolveOdeToTime() for G1 phase and adds time for the other phases.
-     *
-     * Can be overridden if they should do something more subtle.
-     */
-    virtual void UpdateCellCyclePhase();
 
     /**
      * Get the time at which the ODE stopping event occurred.
@@ -135,20 +134,11 @@ public:
     void SetBirthTime(double birthTime);
 
     /**
-     * @return the protein concentrations at the current time (useful for tests)
+     * See AbstractCellCycleModel::ResetForDivision()
      *
-     * NB: Will copy the vector - you can't use this to modify the concentrations.
+     * @return whether the cell is ready to divide (enter M phase).
      */
-    std::vector<double> GetProteinConcentrations() const;
-
-    /**
-     * Sets the protein concentrations and time when the model was last evaluated - should only be called by tests
-     *
-     * @param lastTime the SimulationTime at which the protein concentrations apply
-     * @param proteinConcentrations a standard vector of doubles of protein concentrations
-     *
-     */
-    void SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations);
+    virtual bool ReadyToDivide();
 
     /**
      * For a naturally cycling model this does not need to be overridden in the
@@ -156,27 +146,6 @@ public:
      * call AbstractOdeBasedCellCycleModel::ResetForDivision() from inside their version.
      */
     virtual void ResetForDivision();
-
-    /**
-     * Set mFinishedRunningOdes. Used in CreateCellCycleModel().
-     *
-     * @param finishedRunningOdes the new value of mFinishedRunningOdes
-     */
-    void SetFinishedRunningOdes(bool finishedRunningOdes);
-
-    /**
-     * Set mDivideTime.
-     *
-     * @param divideTime the new value of mDivideTime
-     */
-    void SetDivideTime(double divideTime);
-
-    /**
-     * Set mG2PhaseStartTime. Used in CreateCellCycleModel().
-     *
-     * @param g2PhaseStartTime the new value of mG2PhaseStartTime
-     */
-    void SetG2PhaseStartTime(double g2PhaseStartTime);
 
     /**
      * Outputs cell cycle model parameters to file.
@@ -188,4 +157,4 @@ public:
 
 CLASS_IS_ABSTRACT(AbstractOdeBasedCellCycleModel)
 
-#endif /*ABSTRACTODEBASEDCELLCYCLEMODEL_HPP_*/
+#endif /*ABSTRACTODEBASDCELLCYCLEMODEL_HPP_*/

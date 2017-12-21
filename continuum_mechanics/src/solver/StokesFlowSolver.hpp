@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -166,7 +166,7 @@ void StokesFlowSolver<DIM>::Solve()
 {
     mrProblemDefinition.Validate();
 
-    if(this->mVerbose)
+    if (this->mVerbose)
     {
         Timer::Reset();
     }
@@ -176,7 +176,7 @@ void StokesFlowSolver<DIM>::Solve()
     AssembleSystem();
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ASSEMBLE);
 
-    if(this->mVerbose)
+    if (this->mVerbose)
     {
         Timer::PrintAndReset("AssembleSystem");
     }
@@ -194,7 +194,7 @@ void StokesFlowSolver<DIM>::Solve()
 
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if ((PETSC_VERSION_MAJOR==3) && (PETSC_VERSION_MINOR>=5))
     KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix);
 #else
     KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
@@ -224,9 +224,9 @@ void StokesFlowSolver<DIM>::Solve()
 //    ///// For printing matrix when debugging
 //    OutputFileHandler handler("TEMP");
 //    out_stream p_file = handler.OpenOutputFile("matrix.txt");
-//    for(unsigned i=0; i<this->mNumDofs; i++)
+//    for (unsigned i=0; i<this->mNumDofs; i++)
 //    {
-//        for(unsigned j=0; j<this->mNumDofs; j++)
+//        for (unsigned j=0; j<this->mNumDofs; j++)
 //        {
 //            *p_file << PetscMatTools::GetElement(this->mSystemLhsMatrix, i, j) << " ";
 //        }
@@ -235,13 +235,13 @@ void StokesFlowSolver<DIM>::Solve()
 //    p_file->close();
 //
 //    out_stream p_file2 = handler.OpenOutputFile("rhs.txt");
-//    for(unsigned i=0; i<this->mNumDofs; i++)
+//    for (unsigned i=0; i<this->mNumDofs; i++)
 //    {
 //        *p_file2 << PetscVecTools::GetElement(this->mLinearSystemRhsVector, i) << "\n";
 //    }
 //    p_file2->close();
 
-    if(this->mVerbose)
+    if (this->mVerbose)
     {
         Timer::PrintAndReset("KSP Setup");
     }
@@ -252,7 +252,7 @@ void StokesFlowSolver<DIM>::Solve()
     KSPGetConvergedReason(solver,&reason);
     KSPEXCEPT(reason);
 
-    if(this->mVerbose)
+    if (this->mVerbose)
     {
         Timer::PrintAndReset("KSP Solve");
         int num_iters;
@@ -280,8 +280,6 @@ void StokesFlowSolver<DIM>::Solve()
     this->WriteCurrentSpatialSolution("flow_solution", "nodes");
     this->WriteCurrentPressureSolution();
 }
-
-
 
 template<unsigned DIM>
 void StokesFlowSolver<DIM>::AssembleSystem()
@@ -343,7 +341,5 @@ std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetVelocities()
 {
     return rGetSpatialSolution();
 }
-
-
 
 #endif /* STOKESFLOWSOLVER_HPP_ */

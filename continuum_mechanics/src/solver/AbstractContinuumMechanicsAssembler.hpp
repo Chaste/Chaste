@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,6 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
 class AbstractContinuumMechanicsAssembler : public AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX>
 {
+protected:
     /** Whether the matrix is block symmetric (B1=B2). Currently fixed to true, in
      *  the future this may become a template.
      */
@@ -105,7 +106,6 @@ class AbstractContinuumMechanicsAssembler : public AbstractFeAssemblerInterface<
     /** Stencil size. */
     static const unsigned STENCIL_SIZE = DIM*NUM_NODES_PER_ELEMENT + NUM_VERTICES_PER_ELEMENT;
 
-protected:
     /** The quadratic mesh */
     AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
 
@@ -226,7 +226,7 @@ protected:
      *  See concrete classes for examples. Needed to be implemented (overridden) if the concrete class
      *  is going to assemble vectors (ie if CAN_ASSEMBLE_VECTOR is true).
      *
-     *  Default implementation returns a zero vector - ie the block will be zero if this is not over-ridden
+     *  No default implementation - this method must be over-ridden
      *
      *  @param rQuadPhi  All the quadratic basis functions on this element, evaluated at the current quad point
      *  @param rGradQuadPhi  Gradients of all the quadratic basis functions on this element, evaluated at the current quad point
@@ -238,10 +238,7 @@ protected:
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
         c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
-    {
-        return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
-    }
+        Element<DIM,DIM>* pElement) = 0;
 
 
     /**
@@ -275,8 +272,6 @@ protected:
         return zero_vector<double>(PRESSURE_BLOCK_SIZE_ELEMENTAL);
     }
 
-
-
     /**
      * Calculate the contribution of a single element to the linear system.
      *
@@ -302,11 +297,11 @@ public:
     {
         assert(pMesh);
 
-        //Check that the mesh is Quadratic
+        // Check that the mesh is quadratic
         QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(pMesh);
         DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(pMesh);
 
-        if(p_quad_mesh == NULL && p_distributed_quad_mesh == NULL)
+        if ((p_quad_mesh == NULL) && (p_distributed_quad_mesh == NULL))
         {
             EXCEPTION("Continuum mechanics assemblers require a quadratic mesh");
         }
@@ -316,9 +311,7 @@ public:
         mpQuadRule = new GaussianQuadratureRule<DIM>(3);
     }
 
-
 //    void SetCurrentSolution(Vec currentSolution);
-
 
     /**
      * Destructor.
@@ -353,11 +346,11 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     assert(this->mAssembleMatrix || this->mAssembleVector);
     if (this->mAssembleMatrix)
     {
-        if(this->mMatrixToAssemble==NULL)
+        if (this->mMatrixToAssemble == NULL)
         {
             EXCEPTION("Matrix to be assembled has not been set");
         }
-        if( PetscMatTools::GetSize(this->mMatrixToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
+        if (PetscMatTools::GetSize(this->mMatrixToAssemble) != (DIM+1)*mpMesh->GetNumNodes())
         {
             EXCEPTION("Matrix provided to be assembled has size " << PetscMatTools::GetSize(this->mMatrixToAssemble) << ", not expected size of " << (DIM+1)*mpMesh->GetNumNodes() << " ((dim+1)*num_nodes)");
         }
@@ -365,11 +358,11 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
 
     if (this->mAssembleVector)
     {
-        if(this->mVectorToAssemble==NULL)
+        if (this->mVectorToAssemble == NULL)
         {
             EXCEPTION("Vector to be assembled has not been set");
         }
-        if( PetscVecTools::GetSize(this->mVectorToAssemble) != (DIM+1)*mpMesh->GetNumNodes() )
+        if (PetscVecTools::GetSize(this->mVectorToAssemble) != (DIM+1)*mpMesh->GetNumNodes())
         {
             EXCEPTION("Vector provided to be assembled has size " << PetscVecTools::GetSize(this->mVectorToAssemble) << ", not expected size of " << (DIM+1)*mpMesh->GetNumNodes() << " ((dim+1)*num_nodes)");
         }
@@ -401,16 +394,15 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         Element<DIM, DIM>& r_element = *iter;
 
         // Test for ownership first, since it's pointless to test the criterion on something which we might know nothing about.
-        if ( r_element.GetOwnership() == true  /*&& ElementAssemblyCriterion(r_element)==true*/ )
+        if (r_element.GetOwnership() == true  /*&& ElementAssemblyCriterion(r_element)==true*/)
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             // note: if assemble matrix only
-            if(CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && this->mAssembleMatrix)
+            if (CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") && this->mAssembleMatrix)
             {
                 std::cout << "\r[" << PetscTools::GetMyRank() << "]: Element " << r_element.GetIndex() << " of " << mpMesh->GetNumElements() << std::flush;
             }
-            #undef COVERAGE_IGNORE
-
+            // LCOV_EXCL_STOP
 
             AssembleOnElement(r_element, a_elem, b_elem);
 
@@ -467,7 +459,6 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         rBElem.clear();
     }
 
-
     // Allocate memory for the basis functions values and derivative values
     static c_vector<double, NUM_VERTICES_PER_ELEMENT> linear_phi;
     static c_vector<double, NUM_NODES_PER_ELEMENT> quad_phi;
@@ -492,13 +483,13 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         c_vector<double,DIM> X = zero_vector<double>(DIM);
         for (unsigned vertex_index=0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
         {
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 X(j) += linear_phi(vertex_index)*rElement.GetNode(vertex_index)->rGetLocation()(j);
             }
         }
 
-        if(this->mAssembleVector)
+        if (this->mAssembleVector)
         {
             c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> b_spatial
                 = ComputeSpatialVectorTerm(quad_phi, grad_quad_phi, X, &rElement);
@@ -509,15 +500,13 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                 rBElem(i) += b_spatial(i)*wJ;
             }
 
-
             for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
             {
                 rBElem(SPATIAL_BLOCK_SIZE_ELEMENTAL + i) += b_pressure(i)*wJ;
             }
         }
 
-
-        if(this->mAssembleMatrix)
+        if (this->mAssembleMatrix)
         {
             c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> a_spatial_spatial
                 = ComputeSpatialSpatialMatrixTerm(quad_phi, grad_quad_phi, X, &rElement);
@@ -526,7 +515,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                 = ComputeSpatialPressureMatrixTerm(quad_phi, grad_quad_phi, linear_phi, grad_linear_phi, X, &rElement);
 
             c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> a_pressure_spatial;
-            if(!BLOCK_SYMMETRIC_MATRIX)
+            if (!BLOCK_SYMMETRIC_MATRIX)
             {
                 NEVER_REACHED; // to-come: non-mixed problems
                 //a_pressure_spatial = ComputeSpatialPressureMatrixTerm(quad_phi, grad_quad_phi, lin_phi, grad_lin_phi, x, &rElement);
@@ -537,22 +526,22 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
 
             for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
             {
-                for(unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
+                for (unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
                 {
                     rAElem(i,j) += a_spatial_spatial(i,j)*wJ;
                 }
 
-                for(unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+                for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
                 {
                     rAElem(i, SPATIAL_BLOCK_SIZE_ELEMENTAL + j) += a_spatial_pressure(i,j)*wJ;
                 }
             }
 
-            for(unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+            for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
             {
-                if(BLOCK_SYMMETRIC_MATRIX)
+                if (BLOCK_SYMMETRIC_MATRIX)
                 {
-                    for(unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
+                    for (unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
                     {
                         rAElem(SPATIAL_BLOCK_SIZE_ELEMENTAL + i, j) += a_spatial_pressure(j,i)*wJ;
                     }
@@ -562,7 +551,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                     NEVER_REACHED; // to-come: non-mixed problems
                 }
 
-                for(unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+                for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
                 {
                     rAElem(SPATIAL_BLOCK_SIZE_ELEMENTAL + i, SPATIAL_BLOCK_SIZE_ELEMENTAL + j) += a_pressure_pressure(i,j)*wJ;
                 }
@@ -570,6 +559,5 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         }
     }
 }
-
 
 #endif // ABSTRACTCONTINUUMMECHANICSASSEMBLER_HPP_

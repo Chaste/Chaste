@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,7 +61,7 @@ double MatrixNorm(c_matrix<double,2,2> mat)
 class TestImplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 {
 public:
-    void TestCompareJacobians() throw(Exception)
+    void TestCompareJacobians()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
@@ -103,7 +103,7 @@ public:
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0);
             std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
 
-            for(unsigned i=0; i<calcium_conc.size(); i++)
+            for (unsigned i=0; i<calcium_conc.size(); i++)
             {
                 calcium_conc[i] = 0.05;
             }
@@ -128,7 +128,7 @@ public:
             int lo, hi;
             MatGetOwnershipRange(solver.mrJacobianMatrix, &lo, &hi);
 
-            for(unsigned j=0; j<num_dofs; j++)
+            for (unsigned j=0; j<num_dofs; j++)
             {
                 solver.mCurrentSolution.clear();
                 solver.FormInitialGuess();
@@ -138,13 +138,13 @@ public:
 
                 ReplicatableVector perturbed_rhs( solver.mResidualVector );
 
-                for(unsigned i=0; i<num_dofs; i++)
+                for (unsigned i=0; i<num_dofs; i++)
                 {
-                    if((lo<=(int)i) && ((int)i<hi))
+                    if ((lo<=(int)i) && ((int)i<hi))
                     {
                         double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                         double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec[i])/h;
-                        if((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
+                        if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
                         {
                             // relative error
                             TS_ASSERT_DELTA( (analytic_matrix_val-numerical_matrix_val)/analytic_matrix_val, 0.0, 1e-2);
@@ -169,7 +169,7 @@ public:
     // A test where we specify the 'resting' intracellular calcium concentration
     // for which the active tension should be zero, so should solve in 0 newton
     // iterations
-    void TestWithZeroActiveTension() throw(Exception)
+    void TestWithZeroActiveTension()
     {
         QuadraticMesh<2> mesh(0.125, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(0.02);
@@ -215,11 +215,9 @@ public:
         delete p_pair;
     }
 
-
-
     // Specifies a non-constant active tension and checks the lambda behaves
     // as it should do. Also has hardcoded tests
-    void TestSpecifiedCalciumCompression() throw(Exception)
+    void TestSpecifiedCalciumCompression()
     {
         // NOTE: test hardcoded for num_elem = 4
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
@@ -253,7 +251,7 @@ public:
 
         solver.Initialise();
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-        for(unsigned i=0; i<calcium_conc.size(); i++)
+        for (unsigned i=0; i<calcium_conc.size(); i++)
         {
             double Y = quad_points.rGet(i)(1);
             // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -282,7 +280,7 @@ public:
 //        // to observe this - SEE FIGURE ATTACHED TO TICKET #757.
 //        // The lambda are constant for given Y if Y>0.1.5 (ie not near fixed nodes)
 //        // and a cubic polynomial can be fitted with matlab
-//        for(unsigned i=0; i<lambda.size(); i++)
+//        for (unsigned i=0; i<lambda.size(); i++)
 //        {
 //            TS_ASSERT_LESS_THAN(lambda[i], 1.0);
 //
@@ -303,12 +301,12 @@ public:
 //            //  plot(yy,fit,'r')
 //            double lam_fit = -0.026920*Y*Y*Y + 0.066128*Y*Y - 0.056929*Y + 0.978174;
 //
-//            if(Y>0.6)
+//            if (Y>0.6)
 //            {
 //                double error = 0.0005;
 //                TS_ASSERT_DELTA(lambda[i], lam_fit, error);
 //            }
-//            else if(Y>0.15)
+//            else if (Y>0.15)
 //            {
 //                double error = 0.0030;
 //                TS_ASSERT_DELTA(lambda[i], lam_fit, error);
@@ -325,7 +323,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(quad_points.rGet(21)), 3u);
 
         std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
-        if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
+        if (iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9737, 2e-3);
         }
@@ -340,7 +338,7 @@ public:
     // through either setting a constant fibre direction or using a file of different (though in this case
     // all equal) fibre directions for each element.
     // The stretches should be identical to in the above test, the deformation rotated.
-    void TestDifferentFibreDirections() throw(Exception)
+    void TestDifferentFibreDirections()
     {
         for (unsigned run=1; run<=2; run++)
         {
@@ -374,7 +372,7 @@ public:
             ///////////////////////////////////////////////////////////////////////////
             solver.Initialise();
 
-            if(run==1)
+            if (run==1)
             {
                 c_matrix<double,2,2> non_orthogonal_mat = zero_matrix<double>(2,2);
                 non_orthogonal_mat(0,0) = 1.0;
@@ -398,7 +396,7 @@ public:
             QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
 
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-            for(unsigned i=0; i<calcium_conc.size(); i++)
+            for (unsigned i=0; i<calcium_conc.size(); i++)
             {
                 double X = quad_points.rGet(i)(0);
                 // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -423,7 +421,7 @@ public:
             // Was quad point 34 = 3*9 + 7 (quad 7 in element 3) when there were 9 quads per element
             // Investigate quad point 19 = 3*6 + 1 (quad 3 in element 3)
             std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
-            if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
+            if (iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
             {
                 TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
             }
@@ -438,7 +436,7 @@ public:
 
     // cover all other contraction model options which are allowed but not been used in a test
     // so far (or in TestExplicitCardiacMechanicsSolver)
-    void TestCoverage() throw(Exception)
+    void TestCoverage()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -486,7 +484,7 @@ public:
     }
 
 
-    void TestComputeDeformationGradientAndStretchesEachElement() throw(Exception)
+    void TestComputeDeformationGradientAndStretchesEachElement()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -520,7 +518,7 @@ public:
         std::vector<c_matrix<double,2,2> > deformation_gradients(mesh.GetNumElements());
 
         // initialise to junk
-        for(unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i=0; i<stretches.size(); i++)
         {
             stretches[i] = 13482.534578;
             deformation_gradients[i](0,0)
@@ -531,7 +529,7 @@ public:
 
 
         solver.ComputeDeformationGradientAndStretchInEachElement(deformation_gradients, stretches);
-        for(unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i=0; i<stretches.size(); i++)
         {
             TS_ASSERT_DELTA(stretches[i], 1.0, 1e-6);
             double err = MatrixNorm(deformation_gradients[i]-identity_matrix<double>(2));
@@ -553,7 +551,7 @@ public:
         c_matrix<double,2,2> correct_F = identity_matrix<double>(2);
         correct_F(1,1) = 0.9;        //in need of deletion even if all these 3 have no influence at all on this test
 
-        for(unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i=0; i<stretches.size(); i++)
         {
             TS_ASSERT_DELTA(stretches[i], 1.0, 1e-6);
             double err = MatrixNorm(deformation_gradients[i]-correct_F);
@@ -571,7 +569,7 @@ public:
         // stretches should now be 0.8, F should be equal to [0.8,0;0,0.9]
         solver.ComputeDeformationGradientAndStretchInEachElement(deformation_gradients, stretches);
         correct_F(0,0) = 0.8;
-        for(unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i=0; i<stretches.size(); i++)
         {
             TS_ASSERT_DELTA(stretches[i], 0.8, 1e-3);
             double err = MatrixNorm(deformation_gradients[i]-correct_F);
@@ -627,7 +625,7 @@ public:
 
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-        for(unsigned i=0; i<calcium_conc.size(); i++)
+        for (unsigned i=0; i<calcium_conc.size(); i++)
         {
             double X = quad_points.rGet(i)(0);
             // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -649,7 +647,7 @@ public:
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 1.0565, 1e-2);
 
         std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
-        if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
+        if (iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);
         }
@@ -660,7 +658,7 @@ public:
         delete p_pair;
     }
 
-    void TestCrossFibreTensionWithSimpleContractionModel() throw(Exception)
+    void TestCrossFibreTensionWithSimpleContractionModel()
     {
         QuadraticMesh<2> mesh(0.25, 1.0, 1.0);
         MooneyRivlinMaterialLaw<2> law(1);
@@ -694,7 +692,7 @@ public:
         y[2] = -0.0008;
         y[3] = 0.0;
 
-        for(unsigned i=0; i < tension_fractions.size();i++)
+        for (unsigned i=0; i < tension_fractions.size();i++)
         {
             problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 
@@ -720,7 +718,7 @@ public:
             // Set up a voltage and calcium level at each quadrature point.
             QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-            for(unsigned j=0; j<calcium_conc.size(); j++)
+            for (unsigned j=0; j<calcium_conc.size(); j++)
             {
                 double X = quad_points.rGet(j)(0);
                 // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -753,7 +751,7 @@ public:
      *
      * Therefore nothing should happen!
      */
-    void TestIsotropicCrossFibreTensions() throw(Exception)
+    void TestIsotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -843,7 +841,7 @@ public:
      * This time we will make x (fibres) and z (sheet-normal) contract,
      * and y will not contract (so nodes will expand out for y, shrink in for x,z).
      */
-    void TestAnisotropicCrossFibreTensions() throw(Exception)
+    void TestAnisotropicCrossFibreTensions()
     {
         /*
          * Expected resulting deformed location of Nodes 4, 24, 104, 124:
@@ -947,7 +945,7 @@ public:
 //    // to the entire X=0 edge makes it runs in sequential (~60 iters PCBJACOBI) and parallel
 //    // (~400 iters PCBJACOBI).
 //    //
-//    void strangefailingbehaviourinparallelTestCompareWithDeadExplicitSolver() throw(Exception)
+//    void strangefailingbehaviourinparallelTestCompareWithDeadExplicitSolver()
 //    {
 //        // note 8 elements is assumed in the fixed nodes
 //        QuadraticMesh<2> mesh(0.125, 1.0, 1.0);

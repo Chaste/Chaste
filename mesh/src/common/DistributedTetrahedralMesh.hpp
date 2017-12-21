@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,7 +93,7 @@ private:
     ChasteCuboid<SPACE_DIM>* mpSpaceRegion;
 
     /** Partitioning method. */
-    DistributedTetrahedralMeshPartitionType::type mMetisPartitioning;
+    DistributedTetrahedralMeshPartitionType::type mPartitioning;
 
     /** Needed for serialization.*/
     friend class boost::serialization::access;
@@ -398,7 +398,7 @@ private:
     /**
      * Compute a parallel partitioning of a given mesh
      * using specialised methods below based on the value
-     * of mMetisPartitioning
+     * of mPartitioning
      *
      * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
      * @param rNodesOwned is a set to be filled with the indices of nodes owned by this process
@@ -414,7 +414,7 @@ private:
 
     /**
       * Specialised method to compute a parallel partitioning of a given mesh with the ParMetis library
-      * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
+      * (called by ComputeMeshPartitioning, based on the value of mPartitioning)
       *
       * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
       * @param rElementsOwned is an empty set to be filled with the indices of elements owned by this process

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,8 +59,6 @@ typedef enum InterpolationLevel_
     NORMAL,
     NONLINEAR
 } InterpolationLevel;
-
-
 
 /**
  *   A base class for AbstractFeVolumeIntegralAssembler (the main abstract assembler class), AbstractSurfaceFeObjectAssembler, and
@@ -166,7 +164,7 @@ AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECT
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::SetCurrentSolution(Vec currentSolution)
 {
-    assert(currentSolution != NULL);
+    assert(currentSolution != nullptr);
 
     // Replicate the current solution and store so can be used in AssembleOnElement
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);

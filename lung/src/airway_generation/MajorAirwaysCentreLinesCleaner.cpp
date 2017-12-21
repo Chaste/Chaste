@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,6 @@ MajorAirwaysCentreLinesCleaner::MajorAirwaysCentreLinesCleaner(MutableMesh<1,3>&
                                                                                      mWalker(rMesh, rootIndex),
                                                                                      mCalculator(rMesh, rootIndex)
 {
-
 }
 
 void MajorAirwaysCentreLinesCleaner::CleanUsingHorsfieldOrder(unsigned order)
@@ -58,29 +57,28 @@ void  MajorAirwaysCentreLinesCleaner::CleanElementUsingHorsfieldOrder(Element<1,
 {
     std::vector<Element<1,3>* > child_eles = mWalker.GetChildElements(pElement);
 
-    //If either of the children of this element are below the order limit delete BOTH of them.
+    // If either of the children of this element are below the order limit delete BOTH of them.
     bool delete_children = delete_me; //Always delete children if this element is to be deleted.
-    for(unsigned i = 0; i < child_eles.size(); ++i)
+    for (unsigned i = 0; i < child_eles.size(); ++i)
     {
-        if(mWalker.GetElementHorsfieldOrder(child_eles[i]) <= mMaxOrder)
+        if (mWalker.GetElementHorsfieldOrder(child_eles[i]) <= mMaxOrder)
         {
             delete_children = true;
         }
     }
 
-    //Recursively process children
-    for(unsigned i = 0; i < child_eles.size(); ++i)
+    // Recursively process children
+    for (unsigned i = 0; i < child_eles.size(); ++i)
     {
         CleanElementUsingHorsfieldOrder(child_eles[i], delete_children);
     }
 
-    //Remove this element if necessary
-    if(delete_me)
+    // Remove this element if necessary
+    if (delete_me)
     {
         mrMesh.DeleteElement(pElement->GetIndex());
     }
 }
-
 
 void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
 {
@@ -98,22 +96,22 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
              double length = (*branch_iter)->GetLength();
              double mean_radius = (*branch_iter)->GetAverageRadius();
 
-             //Smooth out radii.
-             for(std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
-                 ele_iter != eles.end();
-                 ++ele_iter)
+             // Smooth out radii
+             for (std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
+                  ele_iter != eles.end();
+                  ++ele_iter)
              {
                  (*ele_iter)->GetNode(1)->rGetNodeAttributes()[0] = mean_radius;
              }
 
-             //If it's too long then shorten it
-             if ( (length / parent_length) > 0.9)
+             // If it's too long then shorten it
+             if ((length / parent_length) > 0.9)
              {
                  Node<3>* p_start_node = eles.front()->GetNode(0);
-                 c_vector<double, 3> start_location = p_start_node->rGetLocation();
+                 const c_vector<double, 3>& start_location = p_start_node->rGetLocation();
                  c_vector<double, 3> branch_direction = (*branch_iter)->GetDirection();
 
-                 for(std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
+                 for (std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
                      ele_iter != eles.end();
                      ++ele_iter)
                  {
@@ -133,15 +131,15 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
                  Element<1,3>* p_element = new Element<1,3>(UINT_MAX, nodes);
                  mrMesh.AddElement(p_element);
              }
-             else if ( (length / parent_length) < 0.6) //If it's too short then lengthen it
+             else if ((length / parent_length) < 0.6) // If it's too short then lengthen it
              {
                  Node<3>* p_start_node = eles.front()->GetNode(0);
-                 c_vector<double, 3> start_location = p_start_node->rGetLocation();
+                 const c_vector<double, 3>& start_location = p_start_node->rGetLocation();
                  c_vector<double, 3> branch_direction = (*branch_iter)->GetDirection();
 
-                 for(std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
-                     ele_iter != eles.end();
-                     ++ele_iter)
+                 for (std::list<Element<1,3>* >::iterator ele_iter = eles.begin();
+                      ele_iter != eles.end();
+                      ++ele_iter)
                  {
                      mrMesh.DeleteElement((*ele_iter)->GetIndex());
                  }
@@ -163,17 +161,15 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
     }
 }
 
-
 void MajorAirwaysCentreLinesCleaner::CleanIsolatedNodes()
 {
     for (AbstractTetrahedralMesh<1,3>::NodeIterator iter = mrMesh.GetNodeIteratorBegin();
          iter != mrMesh.GetNodeIteratorEnd();
          ++iter)
     {
-        if(iter->ContainingElementsBegin() == iter->ContainingElementsEnd()) //There are no containing elements
+        if (iter->ContainingElementsBegin() == iter->ContainingElementsEnd()) //There are no containing elements
         {
             mrMesh.DeleteNodePriorToReMesh(iter->GetIndex());
         }
     }
 }
-

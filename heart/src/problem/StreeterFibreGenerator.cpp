@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,7 +79,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
     Node<SPACE_DIM>* p_current_node = this->mpMesh->GetNode(nodeIndex);
 
     // Loop over the elements containing the given node
-    for(typename Node<SPACE_DIM>::ContainingElementIterator element_iterator = p_current_node->ContainingElementsBegin();
+    for (typename Node<SPACE_DIM>::ContainingElementIterator element_iterator = p_current_node->ContainingElementsBegin();
         element_iterator != p_current_node->ContainingElementsEnd();
         ++element_iterator)
     {
@@ -87,7 +87,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
         Element<SPACE_DIM,SPACE_DIM>* p_containing_element = this->mpMesh->GetElement(*element_iterator);
 
        // Loop over the nodes of the element
-       for(unsigned node_local_index=0;
+       for (unsigned node_local_index=0;
            node_local_index<p_containing_element->GetNumNodes();
            node_local_index++)
        {
@@ -106,9 +106,6 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
 
     return average/nodes_visited;
 }
-
-
-
 
 template<unsigned SPACE_DIM>
 double StreeterFibreGenerator<SPACE_DIM>::GetFibreMaxAngle(
@@ -199,7 +196,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
     out_stream p_regions_file, p_thickness_file, p_ave_thickness_file;
 
     //Make sure that only the master process writes the log files if requested.
-    bool logInfo = PetscTools::AmMaster() & mLogInfo;
+    bool logInfo = PetscTools::AmMaster() && mLogInfo;
 
     if (logInfo)
     {
@@ -247,7 +244,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
                 break;
 
             case HeartGeometryInformation<SPACE_DIM>::UNKNOWN:
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 std::cerr << "Wrong distances node: " << node_index << "\t"
                           << "Epi " << mpGeometryInfo->rGetDistanceMapEpicardium()[node_index] << "\t"
                           << "RV " << mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index] << "\t"
@@ -258,7 +255,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
                 dist_epi = 1;
                 dist_endo = 0;
                 break;
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
 
             default:
                 NEVER_REACHED;
@@ -268,13 +265,13 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
 
         if (std::isnan(mWallThickness[node_index]))
         {
-            #define COVERAGE_IGNORE
+            // LCOV_EXCL_START
             /*
              *  A node contained on both epicardium and lv (or rv) surfaces has wall thickness 0/0.
              *  By setting its value to 0 we consider it contained only on the lv (or rv) surface.
              */
             mWallThickness[node_index] = 0;
-            #undef COVERAGE_IGNORE
+            // LCOV_EXCL_STOP
         }
 
         if (logInfo)
@@ -446,7 +443,6 @@ void StreeterFibreGenerator<SPACE_DIM>::Visit(Element<SPACE_DIM, SPACE_DIM>* pEl
     rData[8] = rotated_longitude_direction[2];
 }
 
-
 template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::SetApexToBase(const c_vector<double, SPACE_DIM>& apexToBase)
 {
@@ -475,9 +471,7 @@ void StreeterFibreGenerator<SPACE_DIM>::SetLogInfo(bool logInfo)
     mLogInfo = logInfo;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 template class StreeterFibreGenerator<3>;
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP

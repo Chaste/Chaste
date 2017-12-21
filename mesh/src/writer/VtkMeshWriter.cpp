@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,12 +93,12 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 
         assert((current_element.size() == ELEMENT_DIM + 1) || (current_element.size() == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2));
 
-        vtkCell* p_cell=NULL;
+        vtkCell* p_cell=nullptr;
         if (ELEMENT_DIM == 3 && current_element.size() == 4)
         {
             p_cell = vtkTetra::New();
         }
-        else if(ELEMENT_DIM == 3 && current_element.size() == 10)
+        else if (ELEMENT_DIM == 3 && current_element.size() == 10)
         {
             p_cell = vtkQuadraticTetra::New();
         }
@@ -193,11 +193,6 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
 #else
         p_writer->SetInput(mpVtkUnstructedMesh);
 #endif
-        //Uninitialised stuff arises (see #1079), but you can remove
-        //valgrind problems by removing compression:
-        // **** REMOVE WITH CAUTION *****
-        p_writer->SetCompressor(NULL);
-        // **** REMOVE WITH CAUTION *****
         std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".vtu";
         p_writer->SetFileName(vtk_file_name.c_str());
         //p_writer->PrintSelf(std::cout, vtkIndent());
@@ -283,14 +278,14 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > dataPayload)
 {
-    assert(SPACE_DIM != 1);
+    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
 
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        if(SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_vectors->InsertNextValue(dataPayload[i](0)); //a11
             p_vectors->InsertNextValue(dataPayload[i](1)); //a12
@@ -319,14 +314,14 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
-    assert(SPACE_DIM != 1);
+    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
 
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        if(SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
             p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
@@ -359,7 +354,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
 
-    if (mWriteParallelFiles && this->mpDistributedMesh != NULL)
+    if (mWriteParallelFiles && this->mpDistributedMesh != nullptr)
     {
         // In parallel, the vector we pass will only contain the values from the privately owned nodes.
         // To get the values from the halo nodes (which will be inserted at the end of the vector we need to
@@ -514,14 +509,14 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
-    assert(SPACE_DIM != 1);
+    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
 
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
-        if(SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
             p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
@@ -554,7 +549,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     mpNodesOnlyMesh = dynamic_cast<NodesOnlyMesh<SPACE_DIM>* >(&rMesh);
 
-    if (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL)
+    if (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr)
     {
         EXCEPTION("Cannot write parallel files using a sequential mesh");
     }
@@ -602,11 +597,11 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
       AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
       bool keepOriginalElementIndexing)
 {
-    //Have we got a parallel mesh?
+    // Have we got a parallel mesh?
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
 
-    if ( PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL) )
+    if (PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr))
     {
         AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFilesUsingMesh( rMesh,keepOriginalElementIndexing );
     }
@@ -667,7 +662,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
              ++elem_iter)
         {
 
-            vtkCell* p_cell=NULL;
+            vtkCell* p_cell=nullptr;
             ///\todo This ought to look exactly like the other MakeVtkMesh
             if (ELEMENT_DIM == 3)
             {
@@ -734,11 +729,6 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
 #else
             p_writer->SetInput(mpVtkUnstructedMesh);
 #endif
-            //Uninitialised stuff arises (see #1079), but you can remove
-            //valgrind problems by removing compression:
-            // **** REMOVE WITH CAUTION *****
-            p_writer->SetCompressor(NULL);
-            // **** REMOVE WITH CAUTION *****
             std::string pvtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+ ".pvtu";
             p_writer->SetFileName(pvtk_file_name.c_str());
             //p_writer->PrintSelf(std::cout, vtkIndent());
@@ -758,10 +748,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class VtkMeshWriter<1,1>;
 template class VtkMeshWriter<1,2>;
 template class VtkMeshWriter<1,3>;

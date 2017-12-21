@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-
-
 class PointStimulusHeartCellFactory : public AbstractCardiacCellFactory<3>
 {
 private:
@@ -76,8 +74,6 @@ public:
     }
 };
 
-
-
 class TestBidomainHeart : public CxxTest::TestSuite
 {
 private:
@@ -94,11 +90,11 @@ private:
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91HalfHeart");
-        PetscOptionsSetValue("-options_table", "");
+        PetscTools::SetOption("-options_table", "");
     }
 public:
 
-    void TestBidomainDg0Heart() throw (Exception)
+    void TestBidomainDg0Heart()
     {
         SetParameters();
 

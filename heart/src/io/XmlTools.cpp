@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,8 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 
-
-
 xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadXmlFile(
     const std::string& rFileName,
     const ::xsd::cxx::tree::properties<char>& rProps,
@@ -91,13 +89,13 @@ xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadXmlFile(
             EXCEPTION("XML parsing error in configuration file: " + rFileName);
         }
     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     catch (...)
     { // This shouldn't happen, but just in case...
         Finalize();
         throw;
     }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     return p_doc;
 }
 
@@ -113,9 +111,9 @@ XmlTools::Finalizer::Finalizer(bool init)
     // to stop some compilers complaining about an unused variable!
     if (init)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         xercesc::XMLPlatformUtils::Initialize();
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 }
 
@@ -186,11 +184,11 @@ xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadFileToDomDocume
     else
     {
         // This branch is only used by projects
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         p_conf->setParameter(XMLUni::fgDOMValidate, false);
         p_conf->setParameter(XMLUni::fgXercesSchema, false);
         p_conf->setParameter(XMLUni::fgXercesSchemaFullChecking, false);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     // We will release the DOM document ourselves.
@@ -237,11 +235,11 @@ xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadFileToDomDocume
     else
     {
         // This branch is only used by projects
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         p_parser->setFeature(XMLUni::fgDOMValidation, false);
         p_parser->setFeature(XMLUni::fgXercesSchema, false);
         p_parser->setFeature(XMLUni::fgXercesSchemaFullChecking, false);
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     xml::dom::bits::error_handler_proxy<char> ehp(rErrorHandler);
@@ -260,7 +258,7 @@ xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadFileToDomDocume
     return p_doc;
 }
 
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
 void XmlTools::PrintNode(const std::string& rMsg, xercesc::DOMNode* pNode, bool showChildren)
 {
     std::string prefix = X2C(pNode->getPrefix());
@@ -288,7 +286,7 @@ void XmlTools::PrintNode(const std::string& rMsg, xercesc::DOMNode* pNode, bool 
         }
     }
 }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
 xercesc::DOMElement* XmlTools::SetNamespace(xercesc::DOMDocument* pDocument,
                                             xercesc::DOMElement* pElement,
@@ -417,12 +415,12 @@ void XmlTools::WrapContentInElement(xercesc::DOMDocument* pDocument,
     const XMLCh* p_qualified_name;
     if (p_prefix)
     {
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         // We can't actually cover this code, since versions of the parameters file which need this
         // transform didn't use a namespace, so can't have a namespace prefix!
         xercesc::QName qname(p_prefix, pNewElementLocalName, 0);
         p_qualified_name = qname.getRawName();
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
     else
     {

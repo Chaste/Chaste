@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -99,7 +99,7 @@ public:
     //
     // Here we run on a fine (as opposed to v fine) mesh and with a normal dt, and check that the solutions
     // are near.
-    void TestComparisonOnNormalMeshes() throw(Exception)
+    void TestComparisonOnNormalMeshes()
     {
         ReplicatableVector final_voltage_normal;
         ReplicatableVector final_voltage_operator_splitting;
@@ -147,22 +147,22 @@ public:
 
         bool some_node_depolarised = false;
         assert(final_voltage_normal.GetSize()==final_voltage_operator_splitting.GetSize());
-        for(unsigned j=0; j<final_voltage_normal.GetSize(); j++)
+        for (unsigned j=0; j<final_voltage_normal.GetSize(); j++)
         {
             // this tolerance means the wavefronts are not on top of each other, but not too far
             // separated (as otherwise max difference between the voltages across space would be
             // greater than 80).
-            double tol=25;
+            double tol = 25;
 
             TS_ASSERT_DELTA(final_voltage_normal[j], final_voltage_operator_splitting[j], tol);
 
-            if(final_voltage_normal[j]>-80)
+            if (final_voltage_normal[j]>-80)
             {
                 // shouldn't be exactly equal, as long as away from resting potential
                 TS_ASSERT_DIFFERS(final_voltage_normal[j], final_voltage_operator_splitting[j]);
             }
 
-            if(final_voltage_normal[j]>0.0)
+            if (final_voltage_normal[j]>0.0)
             {
                 some_node_depolarised = true;
             }

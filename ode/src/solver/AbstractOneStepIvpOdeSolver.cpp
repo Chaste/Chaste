@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OdeSolution AbstractOneStepIvpOdeSolver::Solve(AbstractOdeSystem* pOdeSystem,
     assert(timeSampling >= timeStep);
 
     mStoppingEventOccurred = false;
-    if ( pOdeSystem->CalculateStoppingEvent(startTime, rYValues) == true )
+    if (pOdeSystem->CalculateStoppingEvent(startTime, rYValues) == true)
     {
         EXCEPTION("(Solve with sampling) Stopping event is true for initial condition");
     }
@@ -75,7 +75,7 @@ OdeSolution AbstractOneStepIvpOdeSolver::Solve(AbstractOdeSystem* pOdeSystem,
         // write current solution into solutions
         solutions.rGetSolutions().push_back(rYValues);
         // Push back new time into the time solution vector
-        if ( mStoppingEventOccurred )
+        if (mStoppingEventOccurred)
         {
             solutions.rGetTimes().push_back(mStoppingTime);
         }
@@ -101,7 +101,7 @@ void AbstractOneStepIvpOdeSolver::Solve(AbstractOdeSystem* pOdeSystem,
     assert(timeStep > 0.0);
 
     mStoppingEventOccurred = false;
-    if ( pOdeSystem->CalculateStoppingEvent(startTime, rYValues) == true )
+    if (pOdeSystem->CalculateStoppingEvent(startTime, rYValues) == true)
     {
         EXCEPTION("(Solve without sampling) Stopping event is true for initial condition");
     }
@@ -138,8 +138,8 @@ void AbstractOneStepIvpOdeSolver::InternalSolve(AbstractOdeSystem* pOdeSystem,
                             curr_is_curr ? rYValues : rWorkingMemory,
                             curr_is_curr ? rWorkingMemory : rYValues);
         stepper.AdvanceOneTimeStep();
-        if ( pOdeSystem->CalculateStoppingEvent(stepper.GetTime(),
-                                                curr_is_curr ? rWorkingMemory : rYValues) == true )
+        if (pOdeSystem->CalculateStoppingEvent(stepper.GetTime(),
+                                                curr_is_curr ? rWorkingMemory : rYValues) == true)
         {
             mStoppingTime = stepper.GetTime();
             mStoppingEventOccurred = true;

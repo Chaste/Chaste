@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,11 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* HOW_TO_TAG General
  * Read and use parameters from the command line
  *
- * If your want to use parameters that are supplied in the command line, then
+ * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
- *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
+ *  (ii) compile but do not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
  *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
  *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see ChasteGuides/RunningBinariesFromCommandLine)
+ *
  *
  *
  *  For example:
@@ -71,29 +72,31 @@ class TestCommandLineArguments : public CxxTest::TestSuite
 {
 public:
 
-    void TestCommandLineArgumentsSingleton() throw(Exception)
+    void TestCommandLineArgumentsSingleton()
     {
         // Test that argc and argv are populated
         int argc = *(CommandLineArguments::Instance()->p_argc);
         TS_ASSERT_LESS_THAN(0, argc); // argc should always be 1 or greater
 
-        // argv[0] will be equal to global/build/debug/TestCommandLineArgumentsRunner
-        // or global/build/optimised/TestCommandLineArgumentsRunner, etc
+        /* argv[0] will be equal to global/build/debug/TestCommandLineArguments
+         * or global/build/optimised/TestCommandLineArguments, etc
+         * Variations on Windows (CMake) include .../TestCommandLineArguments.exe
+         * Test executables built with SCons (deprecated) have the word Runner
+         * * .../TestCommandLineArgumentsRunner
+         * * .../TestCommandLineArgumentsRunner.exe
+         */
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
-#ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
-#else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
-#endif
+        size_t pos = arg_as_string.find("TestCommandLineArguments");
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
+
         // Now test OptionExists() and GetValueCorrespondingToOption()
         //
         // The following tests would require the following arguments to be passed
         // in:
-        // ./global/build/debug/TestCommandLineArgumentsRunner -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
+        // ./global/build/debug/TestCommandLineArguments -myoption -myintval 24 -mydoubleval 3.14 -3.14 -m2intval -42 -mystrings Baboons Monkeys Gibbons -mystring more_baboons
         //
         // To test the methods we overwrite the arg_c and arg_v contained in the
         // singleton with the arguments that were needed.
@@ -161,9 +164,9 @@ public:
         CommandLineArguments::Instance()->p_argv = &new_argv;
 
         // Test OptionExists()
-        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("-myoption"));
+        TS_ASSERT_EQUALS(CommandLineArguments::Instance()->OptionExists("-myoption"), true);
 
-        TS_ASSERT( ! CommandLineArguments::Instance()->OptionExists("-asddsgijdfgokgfgurgher") );
+        TS_ASSERT_EQUALS(CommandLineArguments::Instance()->OptionExists("-asddsgijdfgokgfgurgher"), false);
 
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->OptionExists("-42"),
                 "A command line option must begin with '-' followed by a non-numeric character.");
@@ -173,6 +176,9 @@ public:
 
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->GetStringsCorrespondingToOption("-mynonsense"),
                 "Command line option '-mynonsense' does not exist");
+
+        // Test GetNumberOfArgumentsForOption()
+        TS_ASSERT_EQUALS(CommandLineArguments::Instance()->GetNumberOfArgumentsForOption("-myoption", false), 0);
 
         // Test GetValueCorrespondingToOption()
         char* val = CommandLineArguments::Instance()->GetValueCorrespondingToOption("-myintval");
@@ -258,11 +264,11 @@ public:
         CommandLineArguments::Instance()->p_argv = p_real_argv;
     }
 
-    void TestCommandLineArgumentsMocker() throw(Exception)
+    void TestCommandLineArgumentsMocker()
     {
         {
             /* HOW_TO_TAG General
-             * Use mock/pretend command line arguments
+             * Use mock (pretend) command line arguments
              */
             CommandLineArgumentsMocker wrapper("--option1 choice1 --option2 2 --option3 1.0 2.0 3.0");
 
@@ -287,26 +293,21 @@ public:
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
-#ifdef _MSC_VER
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe", final_part_of_string);
-#else
-        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
-        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
-#endif
+        size_t pos = arg_as_string.find("TestCommandLineArguments");
+        // If TestCommandLineArguments is not a substring of the commandline then pos==std::string::npos
+        TS_ASSERT_DIFFERS(pos, std::string::npos);
     }
 
     /* A test which a user can run in order to check that they are passing command line arguments correctly*/
-    void TestCommandLineArgumentsParrotting() throw(Exception)
+    void TestCommandLineArgumentsParrotting()
     {
         std::string verb = "--verbose";
-        if ( CommandLineArguments::Instance()->OptionExists(verb) )
+        if (CommandLineArguments::Instance()->OptionExists(verb))
         {
             bool is_verbose = CommandLineArguments::Instance()->GetBoolCorrespondingToOption(verb);
             std::cout << "You have successfully set "<< verb << " to take the value "<< is_verbose<<".\n";
         }
     }
-
 };
 
 #endif /*TESTCOMMANDLINEARGUMENTS_HPP_*/

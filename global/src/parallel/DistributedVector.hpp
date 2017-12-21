@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -148,7 +148,7 @@ public:
      * For use in tests.
      * Will throw a DistributedVectorException if the specified element is not on this process.
      */
-    double& operator[](unsigned globalIndex) throw (DistributedVectorException);
+    double& operator[](unsigned globalIndex);
 
     /**
      * Store elements that have been written to
@@ -234,7 +234,7 @@ public:
          * @param globalIndex index within the stripe
          * @return value of striped vector
          */
-        double& operator[](unsigned globalIndex) throw (DistributedVectorException)
+        double& operator[](unsigned globalIndex)
         {
             if (mLo <= globalIndex && globalIndex < mHi)
             {
@@ -247,11 +247,10 @@ public:
          * @param index
          * @return value of striped distributed vector pointed to by index.
          */
-        double& operator[](Iterator index) throw (DistributedVectorException)
+        double& operator[](Iterator index)
         {
             return mpVec[index.Local*mStride + mStripe];
         }
-
     };
 
     /**
@@ -292,7 +291,7 @@ public:
          * @param globalIndex index within the chunk
          * @return value of striped vector
          */
-        double& operator[](unsigned globalIndex) throw (DistributedVectorException)
+        double& operator[](unsigned globalIndex)
         {
             if (mLo <= globalIndex && globalIndex < mHi)
             {
@@ -306,11 +305,10 @@ public:
          * @param index
          * @return value of striped distributed vector pointed to by index.
          */
-        double& operator[](Iterator index) throw (DistributedVectorException)
+        double& operator[](Iterator index)
         {
             return mpVec[mOffset + index.Local];
         }
-
     };
 
     /**
@@ -330,7 +328,7 @@ public:
      * @return value of distributed vector pointed to by index.
      * Do not use if stride>1.
      */
-    double& operator[](Iterator index) throw (DistributedVectorException);
+    double& operator[](Iterator index);
 };
 
 #endif /*DISTRIBUTEDVECTOR_HPP_*/

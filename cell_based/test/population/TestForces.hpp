@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentialAdhesionGeneralisedLinearSpringForce.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -73,7 +73,7 @@ class TestForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestGeneralisedLinearSpringForceMethods() throw (Exception)
+    void TestGeneralisedLinearSpringForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -89,7 +89,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
 
         // Create cell population
@@ -144,7 +144,8 @@ public:
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point = p_mesh->GetNode(59)->rGetLocation();
+        c_vector<double,2> old_point;
+        old_point = p_mesh->GetNode(59)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+0.5;
         new_point.rGetLocation()[1] = old_point[1];
@@ -200,7 +201,7 @@ public:
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
     }
 
-    void TestGeneralisedLinearSpringForceCalculationIn1d() throw (Exception)
+    void TestGeneralisedLinearSpringForceCalculationIn1d()
     {
         // Create a 1D mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -209,7 +210,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), p_diff_type);
 
         // Create cell population
@@ -299,7 +300,7 @@ public:
         TS_ASSERT_DELTA(cell_population2.GetNode(2)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness(), 1e-6);
     }
 
-    void TestGeneralisedLinearSpringForceCalculationIn3d() throw (Exception)
+    void TestGeneralisedLinearSpringForceCalculationIn3d()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
@@ -309,7 +310,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         for (unsigned i=0; i<cells.size(); i++)
         {
@@ -351,7 +352,8 @@ public:
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            c_vector<double,3> old_point = mesh.GetNode(i)->rGetLocation();
+            c_vector<double,3> old_point;
+            old_point = mesh.GetNode(i)->rGetLocation();
             ChastePoint<3> new_point;
             new_point.rGetLocation()[0] = scale_factor*old_point[0];
             new_point.rGetLocation()[1] = scale_factor*old_point[1];
@@ -411,7 +413,7 @@ public:
         }
     }
 
-    void TestDifferentialAdhesionGeneralisedLinearSpringForceMethods() throw (Exception)
+    void TestDifferentialAdhesionGeneralisedLinearSpringForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -427,7 +429,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
 
         // Create cell population
@@ -453,7 +455,8 @@ public:
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point = p_mesh->GetNode(59)->rGetLocation();
+        c_vector<double,2> old_point;
+        old_point = p_mesh->GetNode(59)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+0.5;
         new_point.rGetLocation()[1] = old_point[1];
@@ -670,7 +673,7 @@ public:
         }
     }
 
-    void TestGeneralisedLinearSpringForceArchiving() throw (Exception)
+    void TestGeneralisedLinearSpringForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -712,7 +715,7 @@ public:
         }
     }
 
-    void TestDifferentialAdhesionGeneralisedLinearSpringForceArchiving() throw (Exception)
+    void TestDifferentialAdhesionGeneralisedLinearSpringForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -760,7 +763,7 @@ public:
         }
     }
 
-    void TestChemotacticForceMethods() throw (Exception)
+    void TestChemotacticForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -774,7 +777,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MAKE_PTR(CellLabel, p_label);
@@ -819,7 +822,7 @@ public:
         }
     }
 
-    void TestChemotacticForceArchiving() throw (Exception)
+    void TestChemotacticForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -856,7 +859,7 @@ public:
         }
     }
 
-    void TestRepulsionForceMethods() throw (Exception)
+    void TestRepulsionForceMethods()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -869,7 +872,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -957,7 +960,7 @@ public:
         }
     }
 
-    void TestRepulsionForceArchiving() throw (Exception)
+    void TestRepulsionForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -999,7 +1002,7 @@ public:
         }
     }
 
-    void TestNagaiHondaForceMethods() throw (Exception)
+    void TestNagaiHondaForceMethods()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -1024,7 +1027,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-1.0);
@@ -1137,7 +1140,7 @@ public:
         }
     }
 
-    void TestNagaiHondaForceArchiving() throw (Exception)
+    void TestNagaiHondaForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1181,7 +1184,7 @@ public:
         }
     }
 
-    void TestNagaiHondaDifferentialAdhesionForceMethods() throw (Exception)
+    void TestNagaiHondaDifferentialAdhesionForceMethods()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -1189,7 +1192,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         MAKE_PTR(CellLabel, p_label);
@@ -1250,7 +1253,7 @@ public:
         TS_ASSERT_DELTA(adhesion_parameter_nodes_10_14, 2.8, 1e-6);
     }
 
-    void TestNagaiHondaDifferentialAdhesionForceArchiving() throw (Exception)
+    void TestNagaiHondaDifferentialAdhesionForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1292,7 +1295,7 @@ public:
         }
     }
 
-    void TestWelikyOsterForceMethods() throw (Exception)
+    void TestWelikyOsterForceMethods()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -1316,7 +1319,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
@@ -1361,7 +1364,7 @@ public:
         }
     }
 
-    void TestWelikyOsterForceArchiving() throw (Exception)
+    void TestWelikyOsterForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1401,7 +1404,7 @@ public:
         }
     }
 
-    void TestFarhadifarForceMethods() throw (Exception)
+    void TestFarhadifarForceMethods()
     {
         // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
         // Construct a 2D vertex mesh consisting of a single element
@@ -1427,7 +1430,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-1.0);
@@ -1539,7 +1542,7 @@ public:
         }
     }
 
-    void TestFarhadifarForceTerms() throw(Exception)
+    void TestFarhadifarForceTerms()
        {
         /**
          * Here we test that the forces are applied correctly to individual nodes.
@@ -1580,7 +1583,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -1601,18 +1604,19 @@ public:
 
         force.AddForceContribution(cell_population);
 
-        c_vector<double, 2> applied_force_0 = cell_population.rGetMesh().GetNode(0)->rGetAppliedForce();
-        c_vector<double, 2> applied_force_1 = cell_population.rGetMesh().GetNode(1)->rGetAppliedForce();
+        c_vector<double, 2> applied_force_0;
+        applied_force_0 = cell_population.rGetMesh().GetNode(0)->rGetAppliedForce();
+        c_vector<double, 2> applied_force_1;
+        applied_force_1 = cell_population.rGetMesh().GetNode(1)->rGetAppliedForce();
 
         // If this is a Farhadifar force, this will be the force at the vertices
         TS_ASSERT_DELTA(applied_force_0[0], 3.44, 1e-10);
         TS_ASSERT_DELTA(applied_force_0[1], 3.44, 1e-10);
         TS_ASSERT_DELTA(applied_force_1[0], 0.0, 1e-10);
         TS_ASSERT_DELTA(applied_force_1[1], 6.76, 1e-10);
-
     }
 
-    void TestFarhadifarForceInSimulation() throw(Exception)
+    void TestFarhadifarForceInSimulation()
     {
         /**
          * This is the same test as above, just that now we don't check that the applied forces are calculated correctly,
@@ -1655,7 +1659,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Get a cell population
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
@@ -1705,7 +1709,7 @@ public:
 
     }
 
-    void TestFarhadifarForceArchiving() throw (Exception)
+    void TestFarhadifarForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1751,7 +1755,7 @@ public:
         }
     }
 
-    void TestCentreBasedForcesWithVertexCellPopulation() throw (Exception)
+    void TestCentreBasedForcesWithVertexCellPopulation()
     {
         // Construct simple vertex mesh
         std::vector<Node<2>*> nodes;
@@ -1771,7 +1775,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_state, p_model));
         p_cell->SetCellProliferativeType(p_diff_type);
         p_cell->SetBirthTime(-1.0);
@@ -1792,7 +1796,7 @@ public:
                  "RepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
-    void TestIncorrectForcesWithNodeBasedCellPopulation() throw (Exception)
+    void TestIncorrectForcesWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -1809,7 +1813,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -1851,7 +1855,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), p_diff_type);
 
         // Create cell population
@@ -1900,7 +1904,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -1971,7 +1975,7 @@ public:
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -2020,7 +2024,7 @@ public:
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes(), std::vector<unsigned>(), p_diff_type);
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -2077,7 +2081,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
@@ -2128,7 +2132,7 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
-    void TestDiffusionForceArchiving() throw (Exception)
+    void TestDiffusionForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

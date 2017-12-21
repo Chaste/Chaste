@@ -60,7 +60,7 @@ std::string ChasteBuildInfo::GetVersionString()
 {
     std::stringstream version;
     version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
-            << "." << GetRevisionNumber();
+            << "." << std::hex << GetRevisionNumber() << std::dec;
     return version.str();
 }
 
@@ -74,7 +74,7 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
     return ${Chaste_VERSION_MINOR}u;
 }
 
-unsigned ChasteBuildInfo::GetRevisionNumber()
+unsigned long long ChasteBuildInfo::GetRevisionNumber()
 {
     return 0x${Chaste_revision};
 }
@@ -135,6 +135,16 @@ const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
         ${project_versions}
     }
     return versions;
+}
+
+const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
+{
+    static std::map<std::string, std::string> modified;
+    if (modified.empty())
+    {
+        ${projects_modified}
+    }
+    return modified;
 }
 
 std::string ChasteBuildInfo::GetProvenanceString()

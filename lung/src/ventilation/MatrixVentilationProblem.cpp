@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,15 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MatrixVentilationProblem.hpp"
-
 #include "ReplicatableVector.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
 
 MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
-      mpLinearSystem(NULL),
-      mSolution(NULL)
+      mpLinearSystem(nullptr),
+      mSolution(nullptr)
 {
 
     // We solve for flux at every edge and for pressure at each node/bifurcation
@@ -53,21 +51,21 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
     mpLinearSystem->SetAbsoluteTolerance(1e-5);
 
 #ifdef LUNG_USE_UMFPACK
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     mpLinearSystem->SetPcType("lu");
-    PetscOptionsSetValue("-pc_factor_mat_solver_package", "umfpack");
+    PetscTools::SetOption("-pc_factor_mat_solver_package", "umfpack");
     mpLinearSystem->SetKspType("gmres");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #elif LUNG_USE_KLU
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
     mpLinearSystem->SetPcType("lu");
-    PetscOptionsSetValue("-pc_factor_mat_solver_package", "klu");
+    PetscTools::SetOption("-pc_factor_mat_solver_package", "klu");
     mpLinearSystem->SetKspType("gmres");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 #else
     mpLinearSystem->SetPcType("jacobi");
-    PetscOptionsSetValue("-ksp_diagonal_scale","");
-    PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
+    PetscTools::SetOption("-ksp_diagonal_scale","");
+    PetscTools::SetOption("-ksp_diagonal_scale_fix","");
     mpLinearSystem->SetKspType("fgmres");
 #endif
 
@@ -165,8 +163,8 @@ void MatrixVentilationProblem::Assemble(bool dynamicReassemble)
          ++iter)
     {
         unsigned element_index = iter->GetIndex();
-        //Only assemble if the row for this element is locally owned
-        if ( (unsigned) lo <=  element_index && element_index < (unsigned) hi )
+        // Only assemble if the row for this element is locally owned
+        if ((unsigned) lo <=  element_index && element_index < (unsigned) hi)
         {
             /* Poiseuille flow gives:
              *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
@@ -277,7 +275,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 //            max_scaled_flux = fabs(solution_vector_repl[i]);
 //            max_flux = rFluxesOnEdges[i];
 //        }
-
     }
 
     rPressuresOnNodes.resize(mMesh.GetNumNodes());
@@ -288,7 +285,6 @@ void MatrixVentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<doubl
 //        {
 //            max_pressure = fabs(rPressuresOnNodes[i]);
 //        }
-
     }
 //    PRINT_5_VARIABLES(max_flux, max_scaled_flux, max_pressure, max_scaled_flux/max_pressure, max_flux/max_pressure);
 }

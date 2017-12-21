@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "OutputFileHandler.hpp"
+#include "Warnings.hpp"
 #include "ClassOfSimpleVariables.hpp"
 #include "ForTestArchiving.hpp"
 //This test is always run sequentially (never in parallel)
@@ -118,7 +119,7 @@ public:
         }
     }
 
-    void TestArchivingLinkedChildAndParent() throw (Exception)
+    void TestArchivingLinkedChildAndParent()
     {
         /*
          * This test is an abstraction of archiving a cyclically linked parent-child pair.
@@ -172,7 +173,7 @@ public:
         }
     }
 
-    void TestArchivingSetOfSetOfPointers() throw (Exception)
+    void TestArchivingSetOfSetOfPointers()
     {
         /*
          * This test is an abstraction of archiving a set of sets of pointers and a list of objects.
@@ -281,7 +282,7 @@ public:
         }
     }
 
-    void TestArchivingBoostSharedPtrToChild() throw (Exception)
+    void TestArchivingBoostSharedPtrToChild()
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;
@@ -318,7 +319,7 @@ public:
         }
     }
 
-    void TestArchivingBoostSharedPtrToChildUsingBaseClass() throw (Exception)
+    void TestArchivingBoostSharedPtrToChildUsingBaseClass()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
@@ -351,7 +352,7 @@ public:
         }
     }
 
-    void TestArchivingSubChild() throw (Exception)
+    void TestArchivingSubChild()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
@@ -400,7 +401,7 @@ public:
      *
      * The test below is identical to the one above, apart from the two lines indicated.
      */
-    void TestUsingABinaryArchive() throw (Exception)
+    void TestUsingABinaryArchive()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
@@ -433,6 +434,20 @@ public:
             TS_ASSERT(dynamic_cast<ChildClass*>(p_base.get()));
             TS_ASSERT(dynamic_cast<SubChildClass*>(p_base.get()));
         }
+    }
+
+    void TestUndentifiableClass()
+    {
+        // This Identifiable child class is not registered for serialization, it is expected to give a warning when GetIdentifiable is called.
+        BadIdentifiable bad_indentifiable;
+
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        std::string class_name = bad_indentifiable.GetIdentifier();
+        TS_ASSERT_EQUALS(class_name, "UnknownClass-ReflectionFailed");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+
+        // Clean up
+        Warnings::QuietDestroy();
     }
 };
 

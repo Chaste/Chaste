@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -127,7 +127,6 @@ public:
      *  i.e. they use the same iterator.
      */
     ElementData GetNextFaceData();
-
 };
 
 #endif /*ABSTRACTCACHEDMESHREADER_HPP_*/

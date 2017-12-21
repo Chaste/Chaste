@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -164,7 +164,6 @@ public:
      * @param strict whether the point must not be too close to an edge/face (defaults to false)
      */
     bool IncludesPoint(const ChastePoint<SPACE_DIM>& rTestPoint, bool strict=false);
-
 };
 
 #endif //_ELEMENT_HPP_

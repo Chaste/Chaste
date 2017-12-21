@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,9 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PottsMeshReader.hpp"
-#include "Exception.hpp"
-
-#include <sstream>
 
 template<unsigned SPACE_DIM>
 PottsMeshReader<SPACE_DIM>::PottsMeshReader(std::string pathBaseName)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 #include "Warnings.hpp"
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory()
     : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>(),
@@ -75,13 +73,13 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
 
     std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
 
-    if(!junction_stream.good())
+    if (!junction_stream.good())
     {   // file couldn't be opened
         EXCEPTION("Couldn't open data file: " << junction_file.GetAbsolutePath());
     }
 
     // Reads in file defining nodes and resistance (separated by space)
-    while(junction_stream.good())
+    while (junction_stream.good())
     {
         std::string this_line;
         getline(junction_stream, this_line);
@@ -104,7 +102,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
         double resistance;
         line >> resistance;
 
-        if(mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
+        if (mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
         {
             unsigned mapped_node_id = mpMixedDimensionMesh->rGetNodePermutation()[node_id];
 
@@ -161,7 +159,6 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
     pPurkinjeCell->SetStimulusFunction(p_multi_stim_purkinje);
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
 {
@@ -183,7 +180,6 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
     ReadJunctionsFile();
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreatePurkinjeCellForNode(
         Node<SPACE_DIM>* pNode,
@@ -199,7 +195,6 @@ AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM
         return new FakeBathCell(this->mpSolver, this->mpZeroStimulus);
     }
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::GetMixedDimensionMesh()
@@ -217,16 +212,13 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunctionFromFile(
                                                                                 AbstractCardiacCellInterface* pCardiacCell)
 {
     std::map<unsigned, double>::iterator iter = mJunctionMap.find(pNode->GetIndex());
-    if(iter != mJunctionMap.end())
+    if (iter != mJunctionMap.end())
     {
         CreateJunction(pNode, pPurkinjeCell, pCardiacCell, iter->second);
     }
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractPurkinjeCellFactory<1,1>;
 template class AbstractPurkinjeCellFactory<2,2>;
 template class AbstractPurkinjeCellFactory<3,3>;

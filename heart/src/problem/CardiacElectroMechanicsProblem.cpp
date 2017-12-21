@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,10 +64,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     // find the nearest electrics mesh node
     double min_dist = DBL_MAX;
     unsigned node_index = UNSIGNED_UNSET;
-    for(unsigned i=0; i<mpElectricsMesh->GetNumNodes(); i++)
+    for (unsigned i=0; i<mpElectricsMesh->GetNumNodes(); i++)
     {
         double dist = norm_2(mWatchedLocation - mpElectricsMesh->GetNode(i)->rGetLocation());
-        if(dist < min_dist)
+        if (dist < min_dist)
         {
             min_dist = dist;
             node_index = i;
@@ -78,9 +78,9 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     assert(node_index != UNSIGNED_UNSET); // should def have found something
     c_vector<double,DIM> pos = mpElectricsMesh->GetNode(node_index)->rGetLocation();
 
-    if(min_dist > 1e-8)
+    if (min_dist > 1e-8)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         std::cout << "ERROR: Could not find an electrics node very close to requested watched location - "
                   << "min distance was " << min_dist << " for node " << node_index
                   << " at location " << pos << std::flush;;
@@ -88,7 +88,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
         //// the following causes a seg fault for some reason (!!???!!!)
         //EXCEPTION("Could not find an electrics node very close to requested watched location");
         NEVER_REACHED;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     else
     {
@@ -101,13 +101,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     node_index = UNSIGNED_UNSET;
     c_vector<double,DIM> pos_at_min;
 
-    for(unsigned i=0; i<mpMechanicsMesh->GetNumNodes(); i++)
+    for (unsigned i=0; i<mpMechanicsMesh->GetNumNodes(); i++)
     {
         c_vector<double,DIM> position = mpMechanicsMesh->GetNode(i)->rGetLocation();
 
         double dist = norm_2(position-mWatchedLocation);
 
-        if(dist < min_dist)
+        if (dist < min_dist)
         {
             min_dist = dist;
             node_index = i;
@@ -118,9 +118,9 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     // set up watched node, if close enough
     assert(node_index != UNSIGNED_UNSET); // should def have found something
 
-    if(min_dist > 1e-8)
+    if (min_dist > 1e-8)
     {
-        #define COVERAGE_IGNORE
+        // LCOV_EXCL_START
         std::cout << "ERROR: Could not find a mechanics node very close to requested watched location - "
                   << "min distance was " << min_dist << " for node " << node_index
                   << " at location " << pos_at_min;
@@ -128,7 +128,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
         //// the following causes a seg fault for some reason (!!???!!!)
         //EXCEPTION("Could not find a mechanics node very close to requested watched location");
         NEVER_REACHED;
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
     }
     else
     {
@@ -157,7 +157,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData
     //    double Ca = mpElectricsProblem->GetMonodomainTissue()->GetCardiacCell(mWatchedElectricsNodeIndex)->GetIntracellularCalciumConcentration();
 
     *mpWatchedLocationFile << time << " ";
-    for(unsigned i=0; i<DIM; i++)
+    for (unsigned i=0; i<DIM; i++)
     {
         *mpWatchedLocationFile << deformed_position[mWatchedMechanicsNodeIndex](i) << " ";
     }
@@ -306,7 +306,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
     }
     // check whether output is required
     mWriteOutput = (outputDirectory!="");
-    if(mWriteOutput)
+    if (mWriteOutput)
     {
         mOutputDirectory = outputDirectory;
         // create the directory
@@ -329,7 +329,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     // NOTE if SetWatchedLocation but not Initialise has been called, mpWatchedLocationFile
     // will be uninitialised and using it will cause a seg fault. Hence the mpMechanicsMesh!=NULL
     // it is true if Initialise has been called.
-    if(mIsWatchedLocation && mpMechanicsMesh)
+    if (mIsWatchedLocation && mpMechanicsMesh)
     {
         mpWatchedLocationFile->close();
     }
@@ -352,7 +352,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     ///\todo This is fragile: check how the TimeStepper does it, and possibly refactor the behaviour there
     /// into a static helper method if it isn't already.
     mNumElecTimestepsPerMechTimestep = (unsigned) floor((mpProblemDefinition->GetMechanicsSolveTimestep()/HeartConfig::Instance()->GetPdeTimeStep())+0.5);
-    if(fabs(mNumElecTimestepsPerMechTimestep*HeartConfig::Instance()->GetPdeTimeStep() - mpProblemDefinition->GetMechanicsSolveTimestep()) > 1e-6)
+    if (fabs(mNumElecTimestepsPerMechTimestep*HeartConfig::Instance()->GetPdeTimeStep() - mpProblemDefinition->GetMechanicsSolveTimestep()) > 1e-6)
     {
         EXCEPTION("Electrics PDE timestep does not divide mechanics solve timestep");
     }
@@ -373,7 +373,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     LOG(2, "Initialising..");
 
 
-    if(mIsWatchedLocation)
+    if (mIsWatchedLocation)
     {
         DetermineWatchedNodes();
     }
@@ -382,7 +382,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     mpElectricsProblem->SetMesh(mpElectricsMesh);
     mpElectricsProblem->Initialise();
 
-    if(mCompressibilityType==INCOMPRESSIBLE)
+    if (mCompressibilityType==INCOMPRESSIBLE)
     {
         switch(mpProblemDefinition->GetSolverType())
         {
@@ -435,20 +435,20 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     mInterpolatedCalciumConcs.assign(num_quad_points, 0.0);
     mInterpolatedVoltages.assign(num_quad_points, 0.0);
 
-    if(mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
+    if (mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
     {
        mpCardiacMechSolver->SetVariableFibreSheetDirections(mpProblemDefinition->GetFibreSheetDirectionsFile(),
                                                             mpProblemDefinition->GetFibreSheetDirectionsDefinedPerQuadraturePoint());
     }
 
 
-    if(mpProblemDefinition->GetDeformationAffectsConductivity() || mpProblemDefinition->GetDeformationAffectsCellModels())
+    if (mpProblemDefinition->GetDeformationAffectsConductivity() || mpProblemDefinition->GetDeformationAffectsCellModels())
     {
         mpMeshPair->SetUpBoxesOnCoarseMesh();
     }
 
 
-    if(mpProblemDefinition->GetDeformationAffectsCellModels() || mpProblemDefinition->GetDeformationAffectsConductivity())
+    if (mpProblemDefinition->GetDeformationAffectsCellModels() || mpProblemDefinition->GetDeformationAffectsConductivity())
     {
         // initialise the stretches saved for each mechanics element
         mStretchesForEachMechanicsElement.resize(mpMechanicsMesh->GetNumElements(), 1.0);
@@ -458,7 +458,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     }
 
 
-    if(mpProblemDefinition->GetDeformationAffectsCellModels())
+    if (mpProblemDefinition->GetDeformationAffectsCellModels())
     {
         // compute the coarse elements which contain each fine node -- for transferring stretch from
         // mechanics solve electrics cell models
@@ -466,7 +466,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 
     }
 
-    if(mpProblemDefinition->GetDeformationAffectsConductivity())
+    if (mpProblemDefinition->GetDeformationAffectsConductivity())
     {
         // compute the coarse elements which contain each fine element centroid -- for transferring F from
         // mechanics solve to electrics mesh elements
@@ -477,7 +477,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         mpElectricsProblem->GetTissue()->SetConductivityModifier(this);
     }
 
-    if(mWriteOutput)
+    if (mWriteOutput)
     {
         TrianglesMeshWriter<DIM,DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
@@ -488,7 +488,7 @@ template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 {
     // initialise the meshes and mechanics solver
-    if(mpCardiacMechSolver==NULL)
+    if (mpCardiacMechSolver==NULL)
     {
         Initialise();
     }
@@ -533,7 +533,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                                                                *(this->mpMechanicsMesh),
                                                                WRITE_QUADRATIC_MESH);
         variable_names.push_back("V");
-        if(ELEC_PROB_DIM==2)
+        if (ELEC_PROB_DIM==2)
         {
             variable_names.push_back("Phi_e");
             if (mHasBath==true)
@@ -556,12 +556,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     ////////////////////////////////////////////////////////////////
 
     LOG(2, "\nSolving for initial deformation");
-    #define COVERAGE_IGNORE
-    if(verbose_during_solve)
+    // LCOV_EXCL_START
+    if (verbose_during_solve)
     {
         std::cout << "\n\n ** Solving for initial deformation\n";
     }
-    #undef COVERAGE_IGNORE
+    // LCOV_EXCL_STOP
 
     mpMechanicsSolver->SetWriteOutput(false);
 
@@ -569,22 +569,22 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ALL_MECH);
 
     mpMechanicsSolver->SetIncludeActiveTension(false);
-    if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
+    if (mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
     {
         mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(true);
     }
 
     unsigned total_newton_iters = 0;
-    for(unsigned index=1; index<=mpProblemDefinition->GetNumIncrementsForInitialDeformation(); index++)
+    for (unsigned index=1; index<=mpProblemDefinition->GetNumIncrementsForInitialDeformation(); index++)
     {
-        #define COVERAGE_IGNORE
-        if(verbose_during_solve)
+        // LCOV_EXCL_START
+        if (verbose_during_solve)
         {
             std::cout << "    Increment " << index << " of " << mpProblemDefinition->GetNumIncrementsForInitialDeformation() << "\n";
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
 
-        if(mpProblemDefinition->GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
+        if (mpProblemDefinition->GetTractionBoundaryConditionType()==PRESSURE_ON_DEFORMED)
         {
             mpProblemDefinition->SetPressureScaling(((double)index)/mpProblemDefinition->GetNumIncrementsForInitialDeformation());
         }
@@ -607,7 +607,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         mpMechanicsSolver->WriteCurrentSpatialSolution("solution","nodes",mech_writer_counter);
         p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), mech_writer_counter);
 
-        if(!mNoElectricsOutput)
+        if (!mNoElectricsOutput)
         {
             // the writer inside monodomain problem uses the printing timestep
             // inside HeartConfig to estimate total number of timesteps, so make
@@ -621,12 +621,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             mpElectricsProblem->WriteOneStep(stepper.GetTime(), initial_voltage);
         }
 
-        if(mIsWatchedLocation)
+        if (mIsWatchedLocation)
         {
             WriteWatchedLocationData(stepper.GetTime(), initial_voltage);
         }
 
-        if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
+        if (mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
         {
             mpMechanicsSolver->WriteCurrentStrains(DEFORMATION_GRADIENT_F,"deformation_gradient",mech_writer_counter);
             mpMechanicsSolver->WriteCurrentAverageElementStresses("second_PK",mech_writer_counter);
@@ -650,13 +650,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     while (!stepper.IsTimeAtEnd())
     {
         LOG(2, "\nCurrent time = " << stepper.GetTime());
-        #define COVERAGE_IGNORE
-        if(verbose_during_solve)
+        // LCOV_EXCL_START
+        if (verbose_during_solve)
         {
             // also output time to screen as newton solve information will be output
             std::cout << "\n\n ** Current time = " << stepper.GetTime() << "\n";
         }
-        #undef COVERAGE_IGNORE
+        // LCOV_EXCL_STOP
 
         /////////////////////////////////////////////////////////////////////////////////////
         ////
@@ -664,7 +664,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         ////  solver (MEF)
         ////
         //////////////////////////////////////////////////////////////////////////////////////
-        if(mpProblemDefinition->GetDeformationAffectsCellModels() || mpProblemDefinition->GetDeformationAffectsConductivity())
+        if (mpProblemDefinition->GetDeformationAffectsCellModels() || mpProblemDefinition->GetDeformationAffectsConductivity())
         {
             //  Determine the stretch and deformation gradient on each element.
             //
@@ -680,10 +680,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             mpCardiacMechSolver->ComputeDeformationGradientAndStretchInEachElement(mDeformationGradientsForEachMechanicsElement, mStretchesForEachMechanicsElement);
         }
 
-        if( mpProblemDefinition->GetDeformationAffectsCellModels() )
+        if (mpProblemDefinition->GetDeformationAffectsCellModels())
         {
             //  Set the stretches on each of the cell models
-            for(unsigned global_index = mpElectricsMesh->GetDistributedVectorFactory()->GetLow();
+            for (unsigned global_index = mpElectricsMesh->GetDistributedVectorFactory()->GetLow();
                          global_index < mpElectricsMesh->GetDistributedVectorFactory()->GetHigh();
                          global_index++)
             {
@@ -702,7 +702,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         /////////////////////////////////////////////////////////////////////////
         LOG(2, "  Solving electrics");
         MechanicsEventHandler::BeginEvent(MechanicsEventHandler::NON_MECH);
-        for(unsigned i=0; i<mNumElecTimestepsPerMechTimestep; i++)
+        for (unsigned i=0; i<mNumElecTimestepsPerMechTimestep; i++)
         {
             double current_time = stepper.GetTime() + i*HeartConfig::Instance()->GetPdeTimeStep();
             double next_time = stepper.GetTime() + (i+1)*HeartConfig::Instance()->GetPdeTimeStep();
@@ -716,11 +716,11 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             PetscReal min_voltage, max_voltage;
             VecMax(electrics_solution,PETSC_NULL,&max_voltage); //the second param is where the index would be returned
             VecMin(electrics_solution,PETSC_NULL,&min_voltage);
-            if(i==0)
+            if (i==0)
             {
                 LOG(2, "  minimum and maximum voltage is " << min_voltage <<", "<<max_voltage);
             }
-            else if(i==1)
+            else if (i==1)
             {
                 LOG(2, "  ..");
             }
@@ -729,7 +729,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             initial_voltage = electrics_solution;
         }
 
-        if(mpProblemDefinition->GetDeformationAffectsConductivity())
+        if (mpProblemDefinition->GetDeformationAffectsConductivity())
         {
             p_electrics_solver->SetMatrixIsNotAssembled();
         }
@@ -746,7 +746,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         LOG(2, "  Interpolating Ca_I and voltage");
 
         //Collect the distributed calcium data into one Vec to be later replicated
-        for(unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); node_index++)
         {
             if (mpElectricsMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
             {
@@ -761,14 +761,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         ReplicatableVector calcium_repl(calcium_data);//size = number of electrics nodes
 
         //interpolate values onto mechanics mesh
-        for(unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
+        for (unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
         {
             double interpolated_CaI = 0;
             double interpolated_voltage = 0;
 
             Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpMeshPair->rGetElementsAndWeights()[i].ElementNum));
 
-            for(unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
             {
                 unsigned global_index = element.GetNodeGlobalIndex(node_index);
                 double CaI_at_node =  calcium_repl[global_index];
@@ -806,15 +806,15 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         mpMechanicsSolver->SetCurrentTime(stepper.GetTime());
 
         // see if we will need to output stresses at the end of this timestep
-        if(    mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET
-            && (counter+1)%mNumTimestepsToOutputDeformationGradientsAndStress == 0 )
+        if (mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET
+            && (counter+1)%mNumTimestepsToOutputDeformationGradientsAndStress == 0)
         {
             mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(true);
         }
 
 //// For attempting to improve Newton convergence by quadratically extrapolating from
 //// last two solutions to guess next solution. See comments above
-//        for(unsigned i=0; i<mpMechanicsSolver->rGetCurrentSolution().size(); i++)
+//        for (unsigned i=0; i<mpMechanicsSolver->rGetCurrentSolution().size(); i++)
 //        {
 //            double current = mpMechanicsSolver->rGetCurrentSolution()[i];
 //            double previous = current_solution_previous_time_step[i];
@@ -822,7 +822,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 //            //double guess = 2*current - previous;
 //            double guess = 3*current - 3*previous + second_last;
 //
-//            if(!first_step)
+//            if (!first_step)
 //            {
 //                current_solution_second_last_time_step[i] = current_solution_previous_time_step[i];
 //            }
@@ -848,7 +848,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         ////
         /////////////////////////////////////////////////////////////////////////
         MechanicsEventHandler::BeginEvent(MechanicsEventHandler::OUTPUT);
-        if(mWriteOutput && (counter%WRITE_EVERY_NTH_TIME==0))
+        if (mWriteOutput && (counter%WRITE_EVERY_NTH_TIME==0))
         {
             LOG(2, "  Writing output");
             // write deformed position
@@ -858,19 +858,19 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
 
-            if(!mNoElectricsOutput)
+            if (!mNoElectricsOutput)
             {
                 mpElectricsProblem->mpWriter->AdvanceAlongUnlimitedDimension();
                 mpElectricsProblem->WriteOneStep(stepper.GetTime(), electrics_solution);
             }
 
-            if(mIsWatchedLocation)
+            if (mIsWatchedLocation)
             {
                 WriteWatchedLocationData(stepper.GetTime(), electrics_solution);
             }
             OnEndOfTimeStep(counter);
 
-            if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET && counter%mNumTimestepsToOutputDeformationGradientsAndStress==0)
+            if (mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET && counter%mNumTimestepsToOutputDeformationGradientsAndStress==0)
             {
                 mpMechanicsSolver->WriteCurrentStrains(DEFORMATION_GRADIENT_F,"deformation_gradient",mech_writer_counter);
                 mpMechanicsSolver->WriteCurrentAverageElementStresses("second_PK",mech_writer_counter);
@@ -882,8 +882,6 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         // write the total elapsed time..
         LogFile::Instance()->WriteElapsedTime("  ");
     }
-
-
 
     if ((mWriteOutput) && (!mNoElectricsOutput))
     {
@@ -925,9 +923,9 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         HeartConfig::Instance()->SetOutputDirectory(config_directory);
     }
 
-    if(p_cmgui_writer)
+    if (p_cmgui_writer)
     {
-        if(mNoElectricsOutput)
+        if (mNoElectricsOutput)
         {
             p_cmgui_writer->WriteCmguiScript("","undeformed");
         }
@@ -944,15 +942,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     MechanicsEventHandler::EndEvent(MechanicsEventHandler::ALL);
 }
 
-
-
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 double CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Max(std::vector<double>& vec)
 {
     double max = -1e200;
-    for(unsigned i=0; i<vec.size(); i++)
+    for (unsigned i=0; i<vec.size(); i++)
     {
-        if(vec[i]>max) max=vec[i];
+        if (vec[i]>max) max=vec[i];
     }
     return max;
 }
@@ -974,12 +970,11 @@ template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetOutputDeformationGradientsAndStress(double timeStep)
 {
     mNumTimestepsToOutputDeformationGradientsAndStress = (unsigned) floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep())+0.5);
-    if(fabs(mNumTimestepsToOutputDeformationGradientsAndStress*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
+    if (fabs(mNumTimestepsToOutputDeformationGradientsAndStress*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
     {
         EXCEPTION("Timestep provided for SetOutputDeformationGradientsAndStress() is not a multiple of mechanics solve timestep");
     }
 }
-
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGetDeformedPosition()
@@ -987,12 +982,7 @@ std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM,ELEC_PROB
     return mpMechanicsSolver->rGetDeformedPosition();
 }
 
-
-
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
 
 //note: 1d incompressible material doesn't make sense
 template class CardiacElectroMechanicsProblem<2,1>;

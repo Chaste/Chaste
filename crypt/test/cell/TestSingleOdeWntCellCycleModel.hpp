@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,6 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "FileComparison.hpp"
 
@@ -68,7 +70,7 @@ private:
 
 public:
 
-    void xTestSetTheRandomNumbersForAllTheseTests() throw(Exception)
+    void xTestSetTheRandomNumbersForAllTheseTests()
     {
         // If random numbers change then copy the output of these to the static definitions at the bottom.
         // (Some beta-catenin concentrations might need changing manually too)
@@ -81,7 +83,7 @@ public:
         std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
     }
 
-    void TestCorrectBehaviour() throw(Exception)
+    void TestCorrectBehaviour()
     {
         // Set up the simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -321,7 +323,7 @@ public:
             // Wnt should change this to a transit cell
             TS_ASSERT_EQUALS(p_stem_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
+            TS_ASSERT_EQUALS(static_cast<SingleOdeWntCellCycleModel*>(p_stem_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
             p_cell_model->SetBetaCateninDivisionThreshold(beta_catenin_threshold);
             TS_ASSERT_DELTA(p_cell_model->GetBetaCateninDivisionThreshold(), beta_catenin_threshold, 1e-12);
@@ -363,10 +365,10 @@ public:
             input_arch >> p_cell;
 
             // Check
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            SingleOdeWntCellCycleModel* p_cell_model = static_cast<SingleOdeWntCellCycleModel*>(p_cell->GetCellCycleModel());
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
-            TS_ASSERT_DELTA((static_cast<SingleOdeWntCellCycleModel*>(p_cell_model))->GetBetaCateninDivisionThreshold(), beta_catenin_threshold, 1e-12);
+            TS_ASSERT_DELTA(p_cell_model->GetBetaCateninDivisionThreshold(), beta_catenin_threshold, 1e-12);
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), false);
             p_simulation_time->IncrementTimeOneStep();
@@ -376,7 +378,7 @@ public:
             TS_ASSERT_DELTA(p_cell_model->GetSG2MDuration(), 10.0, 1e-12);
 
             TS_ASSERT_DELTA(p_gen->ranf(), random_number_test, 1e-7);
-            TS_ASSERT_EQUALS((static_cast<SingleOdeWntCellCycleModel*>(p_cell_model))->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(p_cell_model->GetDimension(), 2u);
 
             // Tidy up
             SimulationTime::Destroy();
@@ -399,7 +401,6 @@ public:
         std::string single_ode_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( single_ode_wnt_results_dir + "single_ode_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/single_ode_wnt_results.parameters").CompareFiles();
     }
-
 };
 
 // Member initialisation

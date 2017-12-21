@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,16 +66,12 @@ void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
     // Strip off source root dir if exists
-    // Check only valid for cmake builds so ignore coverage here
-    // /todo #2656 - remove coverage ignore after cmake transition
-#define COVERAGE_IGNORE
     std::string filename(rFilename);
     const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
     if (filename.compare(0,root_dir_length,ChasteSourceRootDir()) == 0)
     {
         filename.replace(0,root_dir_length,"./");
     }
-#undef COVERAGE_IGNORE
 
     std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(filename)));
     mShortMessage = rMessage;
@@ -114,7 +110,7 @@ std::string Exception::CheckShortMessageContains(std::string expected) const
     return error;
 }
 
-#define COVERAGE_IGNORE //Termination NEVER EVER happens under normal testing conditions.
+// LCOV_EXCL_START //Termination NEVER EVER happens under normal testing conditions.
 void Exception::Terminate(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber)
 {
     std::stringstream error_message;
@@ -138,4 +134,4 @@ void Exception::Terminate(const std::string& rMessage, const std::string& rFilen
     }
 }
 
-#undef COVERAGE_IGNORE // Termination NEVER EVER happens under normal testing conditions
+// LCOV_EXCL_STOP // Termination NEVER EVER happens under normal testing conditions

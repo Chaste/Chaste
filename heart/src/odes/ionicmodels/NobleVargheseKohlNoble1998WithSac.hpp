@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -166,9 +166,7 @@ namespace boost
             ar >> p_stimulus;
             ::new(t)CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
         }
-
     }
-
 }
 
 #endif

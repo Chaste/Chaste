@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,13 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HDF5DATAWRITER_HPP_
 #define HDF5DATAWRITER_HPP_
 
-
-// Not sure why this seems to need to be included here as well as in AbstractHdf5Access.hpp,
-// but it does on some of the build machines.
-#ifndef H5_USE_16_API
-#define H5_USE_16_API 1
-#endif
-
 #include <vector>
 
 #include "AbstractHdf5Access.hpp"
@@ -54,13 +47,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class Hdf5DataWriter : public AbstractHdf5Access //: public AbstractDataWriter
 {
+    friend class TestHdf5DataWriter;
 private:
 
     /** The factory to use in creating PETSc Vec and DistributedVector objects. */
     DistributedVectorFactory& mrVectorFactory;
 
-    bool mCleanDirectory;                           /**< Whether to wipe the output directory */
-    bool mUseExistingFile;                          /**< Whether we are using an existing file (for extending existing dataset, or adding a new one)*/
+    const bool mCleanDirectory;                     /**< Whether to wipe the output directory */
+    const bool mUseExistingFile;                    /**< Whether we are using an existing file (for extending existing dataset, or adding a new one)*/
     bool mIsInDefineMode;                           /**< Is the DataWriter in define mode or not */
     bool mIsFixedDimensionSet;                      /**< Is the fixed dimension set */
 
@@ -87,9 +81,15 @@ private:
 
     bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
     hsize_t mChunkSize[DATASET_DIMS];               /**< Stores chunk dimensions */
-    hsize_t mNumberOfChunks;                  /**< The total number of chunks in the dataset */
+    hsize_t mNumberOfChunks;                        /**< The total number of chunks in the dataset */
     hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
+    hsize_t mChunkTargetSize;                       /**< User-provided target chunk size (for the algorithm) */
 
+    hsize_t mAlignment;                             /**< User-provided alignment parameter */
+
+    bool mUseCache;                                 /**< Whether to use a cache */
+    long unsigned mCacheFirstTimeStep;              /**< Coordinate to keep track of cache writes */
+    std::vector<double> mDataCache;                 /**< Cache results here before writing */
 
     /**
      * Check name of variable is allowed, i.e. contains only alphanumeric & _, and isn't blank.
@@ -138,6 +138,8 @@ private:
      * unless user-specified values have been set using #SetFixedChunkSize.
      * By default, chunks of 128 K are used, which seems to be a good compromise. For large problems
      * performance will usually improve by increasing this value (to e.g. 1 M).
+     *
+     * Note: The public method for altering the algorithm's target chunk size is #SetTargetChunkSize.
      */
     void SetChunkSize();
 
@@ -152,6 +154,7 @@ public:
      * @param cleanDirectory  whether to clean the directory (defaults to true)
      * @param extendData  whether to try opening an existing file and appending to it.
      * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
+     * @param useCache  Whether to cache writes so only whole chunks are written to disk.
      *
      * The extendData parameter allows us to add to an existing dataset.  It only really makes
      * sense if the existing file has an unlimited dimension which we can extend.  It also only
@@ -162,7 +165,8 @@ public:
                    const std::string& rBaseName,
                    bool cleanDirectory=true,
                    bool extendData=false,
-                   std::string datasetName="Data");
+                   std::string datasetName="Data",
+                   bool useCache=false);
 
     /**
      * Destructor.
@@ -256,6 +260,17 @@ public:
     void PutStripedVector(std::vector<int> variableIDs, Vec petscVector);
 
     /**
+     * Whether we're caching writes
+     * @return whether we're caching writes
+     */
+    bool GetUsingCache();
+
+    /**
+     * Write the cache to disk.
+     */
+    void WriteCache();
+
+    /**
      * Write a single value for the unlimited variable (e.g. time) to the dataset.
      *
      * @param value the data
@@ -314,6 +329,87 @@ public:
                            const unsigned& rNodesPerChunk,
                            const unsigned& rVariablesPerChunk);
 
+    /*
+     * * NOTES ON CHUNK SIZE AND ALIGNMENT *
+     *
+     * The default target chunk size is 128 K, which seems to be a good compromise
+     * for small problems (e.g. on a desktop PC). For larger problems, I/O
+     * performance often improves with increased chunk size. A sweet spot seems to
+     * be 1 M chunks.
+     *
+     * On a striped filesystem, for best performance set the chunk size and
+     * alignment (using `H5Pset_alignment` above) to the file stripe size. With
+     * `H5Pset_alignment`, every chunk starts at a multiple of the alignment value.
+     *
+     * To avoid wasting space, the chunk size should be an integer multiple of the
+     * alignment value. Note that the algorithm below automatically goes back one
+     * step after exceeding the chunk size, which minimises wasted space. To see
+     * why, consider the examples below.
+     *
+     * (Example 1) Say our file system uses 1 M stripes. If we set
+     *     target_size_in_bytes = 1024*1024;
+     * below and uncomment
+     *     H5Pset_alignment(fapl, 0, 1024*1024);
+     * above, i.e. aim for (slightly under) 1 M chunks and align them to 1 M
+     * boundaries, then the algorithm below will get as close as possible to 1 M
+     * chunks but not exceed it, so each chunk will be padded slightly to sit on
+     * the 1 M boundaries. Each chunk will therefore have its own stripe on the
+     * file system, which should give us the best bandwidth and least contention.
+     * Conclusion: this is optimal!
+     *
+     * Note: In general the algorithm can get very close to the target so the
+     * waste isn't bad. Typical utilization is 99.99% (check with "h5ls -v ...").
+     *
+     * (Example 2) We set
+     *     target_size_in_bytes = 128*1024;
+     * and uncomment
+     *     H5Pset_alignment(fapl, 0, 1024*1024);
+     * i.e. 128 K chunks aligned to 1 M boundaries. This would pad every chunk to
+     * 1 M boundaries, wasting 7/8 of the space in the file! A file which might be
+     * 5 G with an efficient layout would be more like 40 G! Conclusion: setting
+     * the chunk size to less than the alignment value is very bad!
+     *
+     * (Example 3) Say our file system uses 1 M stripes. We set
+     *     target_size_in_bytes = 2*1024*1024;
+     * and uncomment
+     *     H5Pset_alignment(fapl, 0, 1024*1024);
+     * i.e. 2 M chunks aligned to 1 M boundaries. This might not be optimal, but
+     * it's OK, since the chunk size is (slightly under) twice the alignment, as in
+     * Example 1 the amount of padding would be very small. Each read/write would
+     * require accessing 2 stripes on the file system. Conclusion: a chunk size of
+     * an integer multiple of the alignment value is fine (but not optimal).
+     */
+
+    /**
+     * Adjust the target (max) chunk size in the chunking algorithm. Useful
+     * when one knows roughly how big a chunk should be but doesn't care about
+     * the exact dimensions or shape. Default is 128 K.
+     *
+     * Especially useful with SetAlignment for ensuring each chunk gets its own
+     * stripe on striped file systems.
+     *
+     * This method only has an effect when creating a NEW DATASET. Must be
+     * called in define mode.
+     *
+     * @param targetSize Max chunk size (bytes)
+     */
+    void SetTargetChunkSize(hsize_t targetSize);
+
+    /**
+     * Set the alignment parameter to pass through to H5Pset_alignment. Every
+     * file object will be aligned on the disk to a multiple of this parameter.
+     * See the H5P docs for more information.
+     *
+     * Especially useful with SetTargetChunkSize to ensure each chunk (each
+     * chunk is an 'file object') is aligned to a disk stripe on a striped file
+     * system with minimal wastage.
+     *
+     * This method only has an effect when creating a NEW HDF5 FILE. Must be
+     * called in define mode with extendData set to False.
+     *
+     * @param alignment Alignment (bytes)
+     */
+    void SetAlignment(hsize_t alignment);
 };
 
 #endif /*HDF5DATAWRITER_HPP_*/

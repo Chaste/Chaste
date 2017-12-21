@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
 }
 
@@ -44,9 +44,27 @@ AbstractWntOdeBasedCellCycleModel::~AbstractWntOdeBasedCellCycleModel()
 {
 }
 
-double AbstractWntOdeBasedCellCycleModel::GetWntLevel()
+AbstractWntOdeBasedCellCycleModel::AbstractWntOdeBasedCellCycleModel(const AbstractWntOdeBasedCellCycleModel& rModel)
+   : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
 {
-    assert(mpCell != NULL);
+    /*
+     * The member variables mDivideTime and mG2PhaseStartTime are
+     * initialized in the AbstractOdeBasedPhaseBasedCellCycleModel
+     * constructor.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
+}
+
+double AbstractWntOdeBasedCellCycleModel::GetWntLevel() const
+{
+    assert(mpCell != nullptr);
     double level = 0;
 
     switch (mDimension)
@@ -78,9 +96,9 @@ double AbstractWntOdeBasedCellCycleModel::GetWntLevel()
 
 void AbstractWntOdeBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedCellCycleModel::ResetForDivision();
+    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
 
-    assert(mpOdeSystem != NULL);
+    assert(mpOdeSystem != nullptr);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
     // Keep the Wnt pathway in the same state but reset the cell cycle part
@@ -94,7 +112,7 @@ void AbstractWntOdeBasedCellCycleModel::ResetForDivision()
 
 void AbstractWntOdeBasedCellCycleModel::UpdateCellCyclePhase()
 {
-    AbstractOdeBasedCellCycleModel::UpdateCellCyclePhase();
+    AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase();
     if (SimulationTime::Instance()->GetTime() == mLastTime
         || GetOdeStopTime() == mLastTime)
     {
@@ -105,8 +123,8 @@ void AbstractWntOdeBasedCellCycleModel::UpdateCellCyclePhase()
 
 void AbstractWntOdeBasedCellCycleModel::UpdateCellProliferativeType()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
     ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
 }
 
@@ -127,9 +145,6 @@ bool AbstractWntOdeBasedCellCycleModel::CanCellTerminallyDifferentiate()
 
 void AbstractWntOdeBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
-    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    // No new parameters to output, so just call method on direct parent class
+    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
-

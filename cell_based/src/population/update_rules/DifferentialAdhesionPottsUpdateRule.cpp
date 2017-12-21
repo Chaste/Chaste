@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 
+#include "CellLabel.hpp"
+
 template<unsigned DIM>
 DifferentialAdhesionPottsUpdateRule<DIM>::DifferentialAdhesionPottsUpdateRule()
     : AdhesionPottsUpdateRule<DIM>(),
@@ -52,11 +54,11 @@ DifferentialAdhesionPottsUpdateRule<DIM>::~DifferentialAdhesionPottsUpdateRule()
 template<unsigned DIM>
 double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
 {
-    if ( pCellA->HasCellProperty<CellLabel>() && pCellB->HasCellProperty<CellLabel>() )
+    if (pCellA->HasCellProperty<CellLabel>() && pCellB->HasCellProperty<CellLabel>())
     {
         return GetLabelledCellLabelledCellAdhesionEnergyParameter();
     }
-    else if ( pCellA->HasCellProperty<CellLabel>() || pCellB->HasCellProperty<CellLabel>() )
+    else if (pCellA->HasCellProperty<CellLabel>() || pCellB->HasCellProperty<CellLabel>())
     {
         return GetLabelledCellCellAdhesionEnergyParameter();
     }
@@ -126,7 +128,7 @@ void DifferentialAdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_st
     AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class DifferentialAdhesionPottsUpdateRule<1>;
 template class DifferentialAdhesionPottsUpdateRule<2>;
 template class DifferentialAdhesionPottsUpdateRule<3>;

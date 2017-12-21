@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ class TestCylindrical2dMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestCreateMirrorCellsAndAlignmentTester() throw (Exception)
+    void TestCreateMirrorCellsAndAlignmentTester()
     {
         // Note that elements are not created (and boundary elements are not changed),
         // this just creates a set of new nodes
@@ -82,8 +82,10 @@ public:
         // Check that the image nodes are where they should be.
         for (unsigned i=0; i<p_mesh->mLeftOriginals.size(); i++)
         {
-            c_vector<double,2> original_location = p_mesh->GetNode(p_mesh->mLeftOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location = p_mesh->GetNode(p_mesh->mLeftImages[i])->rGetLocation();
+            c_vector<double,2> original_location;
+            original_location = p_mesh->GetNode(p_mesh->mLeftOriginals[i])->rGetLocation();
+            c_vector<double,2> image_location;
+            image_location = p_mesh->GetNode(p_mesh->mLeftImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[0] + crypt_width, image_location[0], 1e-7);
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
@@ -91,8 +93,10 @@ public:
 
         for (unsigned i=0; i<p_mesh->mRightOriginals.size(); i++)
         {
-            c_vector<double,2> original_location = p_mesh->GetNode(p_mesh->mRightOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location = p_mesh->GetNode(p_mesh->mRightImages[i])->rGetLocation();
+            c_vector<double,2> original_location;
+            original_location = p_mesh->GetNode(p_mesh->mRightOriginals[i])->rGetLocation();
+            c_vector<double,2> image_location;
+            image_location = p_mesh->GetNode(p_mesh->mRightImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[0] - crypt_width, image_location[0], 1e-7);
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
@@ -109,7 +113,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[1], p_mesh->GetNode(corresponding_node_index)->rGetLocation()[1], 1e-9);
     }
 
-    void TestReconstructCylindricalMesh() throw (Exception)
+    void TestReconstructCylindricalMesh()
     {
         // This test takes in a new mesh created using the mirror function above
         // and a ReMesh call, then removes nodes, elements and boundary elements
@@ -224,7 +228,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 12u);
     }
 
-    void TestCylindricalReMesh() throw (Exception)
+    void TestCylindricalReMesh()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -248,7 +252,7 @@ public:
     /*
      * Failing test for ReMesh (see #1275)
      */
-    void noTestCylindricalReMeshFailingTest() throw (Exception)
+    void noTestCylindricalReMeshFailingTest()
     {
         // Load a problematic mesh
         TrianglesMeshReader<2,2> mesh_reader("cell_based/test/data/TestCylindricalMeshBug/mesh");
@@ -266,7 +270,7 @@ public:
         mesh.ReMesh(map);
     }
 
-    void TestCylindricalReMeshAfterDelete() throw (Exception)
+    void TestCylindricalReMeshAfterDelete()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -303,7 +307,7 @@ public:
         }
    }
 
-    void TestCylindricalReMeshOnSmallMesh() throw (Exception)
+    void TestCylindricalReMeshOnSmallMesh()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -322,7 +326,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
     }
 
-    void TestGetVectorBetweenCyclindricalPoints() throw (Exception)
+    void TestGetVectorBetweenCyclindricalPoints()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -391,7 +395,7 @@ public:
         TS_ASSERT_DELTA(vector[1], 1.0, 1e-7);
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -454,7 +458,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[0], 0.0001, 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
@@ -495,7 +499,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), sqrt(3.0), 1e-6);
     }
 
-    void TestHaloNodeInsertionAndRemoval() throw (Exception)
+    void TestHaloNodeInsertionAndRemoval()
     {
         unsigned cells_across = 5;
         unsigned cells_up = 3;
@@ -543,7 +547,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), original_num_nodes);
     }
 
-    void TestHaloNodeReMesh() throw (Exception)
+    void TestHaloNodeReMesh()
     {
         // This test checks that a Halo node remesh can handle a mesh of uneven height
 
@@ -583,7 +587,7 @@ public:
     }
 
     // NB This checks that periodicity is maintained through archiving...
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "cylindrical_mesh_base.arch";
@@ -677,7 +681,7 @@ public:
         }
     }
 
-    void TestConstructFromNodeList() throw (Exception)
+    void TestConstructFromNodeList()
     {
         std::vector<Node<2>*> nodes;
 
@@ -734,7 +738,7 @@ public:
          */
     }
 
-    void TestGenerateVectorsOfElementsStraddlingPeriodicBoundaries() throw (Exception)
+    void TestGenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
         Cylindrical2dMesh mesh(9.1);
@@ -772,7 +776,7 @@ public:
         mesh.DeleteHaloNodes();
     }
 
-    void TestCorrectNonPeriodicMeshMapLeftToRight() throw (Exception)
+    void TestCorrectNonPeriodicMeshMapLeftToRight()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
         Cylindrical2dMesh mesh(9.1);
@@ -825,7 +829,7 @@ public:
         }
     }
 
-    void TestCorrectNonPeriodicMeshes() throw (Exception)
+    void TestCorrectNonPeriodicMeshes()
     {
         std::vector<Node<2>*> nodes;
         // Generates a mesh which could be meshed in different ways.
@@ -897,7 +901,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(mesh.ReconstructCylindricalMesh());
     }
 
-    void TestVoronoiTessellationUsesOverriddenMetric() throw (Exception)
+    void TestVoronoiTessellationUsesOverriddenMetric()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;

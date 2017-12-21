@@ -15,20 +15,24 @@
 		<OutputMeshInVtk>0</OutputMeshInVtk>
 		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<CentreBasedDivisionRule>
+			<RandomDirectionCentreBasedDivisionRule-2-2>
+			</RandomDirectionCentreBasedDivisionRule-2-2>
+		</CentreBasedDivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
 	</MeshBasedCellPopulation-2-2>
 
 	<CellCycleModels>
-		<FixedDurationGenerationBasedCellCycleModel>
+		<FixedG1GenerationalCellCycleModel>
 			<MaxTransitGenerations>3</MaxTransitGenerations>
 			<StemCellG1Duration>14</StemCellG1Duration>
 			<TransitCellG1Duration>2</TransitCellG1Duration>
 			<SDuration>5</SDuration>
 			<G2Duration>4</G2Duration>
 			<MDuration>1</MDuration>
-		</FixedDurationGenerationBasedCellCycleModel>
+		</FixedG1GenerationalCellCycleModel>
 	</CellCycleModels>
 
 	<SrnModels>
@@ -47,5 +51,13 @@
 
 	<CellPopulationBoundaryConditions>
 	</CellPopulationBoundaryConditions>
+
+	<NumericalMethod>
+		<ForwardEulerNumericalMethod-2-2>
+			<UseAdaptiveTimestep>0</UseAdaptiveTimestep> 
+			<UseUpdateNodeLocation>0</UseUpdateNodeLocation> 
+			<GhostNodeForcesEnabled>0</GhostNodeForcesEnabled> 
+		</ForwardEulerNumericalMethod-2-2>
+	</NumericalMethod>
 
 </Chaste>

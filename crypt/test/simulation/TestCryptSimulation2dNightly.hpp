@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ public:
     /**
      * Provides a reasonable test for the ghost node system...
      */
-    void Test2DHoneycombMeshNotPeriodic() throw (Exception)
+    void Test2DHoneycombMeshNotPeriodic()
     {
         // Create mesh
         unsigned num_cells_depth = 11;
@@ -93,7 +93,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         TS_ASSERT_EQUALS(cells.size(), location_indices.size());
@@ -152,7 +152,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
     }
 
-    void TestMonolayer() throw (Exception)
+    void TestMonolayer()
     {
         // Create mesh
         unsigned num_cells_depth = 11;
@@ -167,7 +167,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true, -1.0);
 
         // Create cell population
@@ -214,7 +214,7 @@ public:
      * differentiated, check that the number of cells at the end
      * of the simulation is as expected.
      */
-    void Test2DCorrectCellNumbers() throw (Exception)
+    void Test2DCorrectCellNumbers()
     {
         // Create mesh
         unsigned num_cells_width = 7;
@@ -239,7 +239,7 @@ public:
             MAKE_PTR(StemCellProliferativeType, p_stem_type);
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             unsigned generation = 4;
             if (location_indices[i] == 27) // middle of bottom row of cells
@@ -322,7 +322,7 @@ public:
 
 ///////// PERIODIC TESTS - These test the system as a whole /////////
 
-    void Test2DPeriodicNightly() throw (Exception)
+    void Test2DPeriodicNightly()
     {
         // Create mesh
         unsigned cells_across = 6;
@@ -339,7 +339,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -370,7 +370,7 @@ public:
         TS_ASSERT_EQUALS(number_of_nodes, 135u);
     }
 
-    void TestCrypt2DPeriodicWntNightly() throw (Exception)
+    void TestCrypt2DPeriodicWntNightly()
     {
         CellBasedEventHandler::Enable();
 
@@ -455,7 +455,7 @@ public:
      * mutant simulation. Mutant viscosities are tested elsewhere
      * directly.
      */
-    void dontRunTestWithMutantCellsUsingDifferentViscosities() throw (Exception)
+    void dontRunTestWithMutantCellsUsingDifferentViscosities()
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -539,7 +539,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestRandomDeathWithPeriodicMesh() throw (Exception)
+    void TestRandomDeathWithPeriodicMesh()
     {
         unsigned cells_across = 7;
         unsigned cells_up = 12;
@@ -553,7 +553,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population

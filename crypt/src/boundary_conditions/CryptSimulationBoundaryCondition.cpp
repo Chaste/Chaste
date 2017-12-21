@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -205,7 +205,7 @@ void CryptSimulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditio
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
-///////// Explicit instantiation
+// Explicit instantiation
 template class CryptSimulationBoundaryCondition<1>;
 template class CryptSimulationBoundaryCondition<2>;
 template class CryptSimulationBoundaryCondition<3>;

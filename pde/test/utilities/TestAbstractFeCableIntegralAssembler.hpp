@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ public:
 class TestAbstractFeCableIntegralAssembler : public CxxTest::TestSuite
 {
 public:
-    void TestBasicCableAssemblers() throw(Exception)
+    void TestBasicCableAssemblers()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -190,13 +190,13 @@ public:
 
         PetscTools::Destroy(vec);
 
-        //Test matrix assembly
+        // Test matrix assembly
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i=lo; i<(unsigned)hi; i++)
         {
-            //Central cable nodes
-            if( i > 55 && i < 65)
+            // Central cable nodes
+            if (i > 55 && i < 65)
             {
                 double value = PetscMatTools::GetElement(mat,i,i);
                 TS_ASSERT_DELTA(value, (2.0/3.0)*h*coefficient, 1e-4);
@@ -207,7 +207,7 @@ public:
                 value = PetscMatTools::GetElement(mat,i,i+1);
                 TS_ASSERT_DELTA(value, (1.0/6.0)*h*coefficient, 1e-4);
             }
-            else if( i == 55)
+            else if (i == 55)
             {
                 double value = PetscMatTools::GetElement(mat,i,i);
                 TS_ASSERT_DELTA(value, (1.0/3.0)*h*coefficient, 1e-4);
@@ -215,7 +215,7 @@ public:
                 value = PetscMatTools::GetElement(mat,i,i+1);
                 TS_ASSERT_DELTA(value, (1.0/6.0)*h*coefficient, 1e-4);
             }
-            else if( i == 65 )
+            else if (i == 65)
             {
                 double value = PetscMatTools::GetElement(mat,i,i);
                 TS_ASSERT_DELTA(value, (1.0/3.0)*h*coefficient, 1e-4);
@@ -234,7 +234,7 @@ public:
     }
 
 
-    void TestExceptionsAndSetCurrentSolution() throw(Exception)
+    void TestExceptionsAndSetCurrentSolution()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -261,8 +261,5 @@ public:
         PetscTools::Destroy(current_soln);
     }
 };
-
-
-
 
 #endif /*TESTABSTRACTFECABLEINTEGRALASSEMBLER_HPP_*/

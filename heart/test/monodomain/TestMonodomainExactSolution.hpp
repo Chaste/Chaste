@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,11 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #ifndef TESTMONODOMAINEXACTSOLUTION_HPP_
 #define TESTMONODOMAINEXACTSOLUTION_HPP_
-
-
 
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
@@ -45,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "PetscSetupAndFinalize.hpp"
 #include "AbstractCardiacCellFactory.hpp"
-
 
 //////////////////////////////////////////////////////////////////////////////////
 //
@@ -92,7 +88,7 @@ public :
         ///////////////////////
         // initial condition
         ///////////////////////
-        if(DIM==1)
+        if (DIM==1)
         {
             mStateVariables[0] = cos(M_PI*mX[0]);
         }
@@ -118,7 +114,7 @@ public :
         // We use the next timestep to be consistent with how GetStimulus(time) is called.
 
         double t = PdeSimulationTime::GetNextTime();
-        if(DIM==1)
+        if (DIM==1)
         {
             return (-0.5*M_PI*M_PI + 1.5)*exp(-t)*cos(M_PI*mX[0]);
         }
@@ -155,7 +151,7 @@ public:
     ///////////////////////
     double GetStimulus(double time)
     {
-        if(DIM==1)
+        if (DIM==1)
         {
             return  -M_PI*M_PI *exp(-time)*cos(M_PI*mX[0]);
         }
@@ -170,8 +166,6 @@ public:
         }
     }
 };
-
-
 
 template<unsigned DIM>
 class MyCellFactory : public AbstractCardiacCellFactory<DIM>
@@ -194,13 +188,10 @@ public:
     }
 };
 
-
-
-
 class TestMonodomainExactSolution : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainExactSolution1d() throw(Exception)
+    void TestMonodomainExactSolution1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h=0.01; //cm
@@ -236,21 +227,21 @@ public:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        for(unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-                double x=mesh.GetNode(i)->rGetLocation()[0];
+                double x = mesh.GetNode(i)->rGetLocation()[0];
 
                 double V = voltage_repl[i];
                 double t = 0.01*timestep;
                 double exact_solution = exp(-t)*cos(M_PI*x);
 
                 // for testing suitable tols:
-                if(fabs(V-exact_solution)>0.002*exp(-t))
+                if (fabs(V-exact_solution)>0.002*exp(-t))
                 {
                     std::cout << "t, i = " << t << " " << i << "\n";
                     std::cout << "V, exact_solution = " << V << " " << exact_solution << "\n";
@@ -263,7 +254,7 @@ public:
         }
     }
 
-    void TestMonodomainExactSolution2d() throw(Exception)
+    void TestMonodomainExactSolution2d()
     {
         TetrahedralMesh<2,2> mesh;
         double h=0.02; //cm
@@ -298,12 +289,12 @@ public:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        for(unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double x=mesh.GetNode(i)->rGetLocation()[0];
                 double y=mesh.GetNode(i)->rGetLocation()[1];
@@ -313,7 +304,7 @@ public:
                 double exact_solution = exp(-t)*cos(M_PI*x)*cos(M_PI*y);
 
                 // for testing suitable tols:
-                if(fabs(V-exact_solution)>0.002*exp(-t))
+                if (fabs(V-exact_solution)>0.002*exp(-t))
                 {
                     std::cout << "t, i = " << t << " " << i << "\n";
                     std::cout << "V, exact_solution = " << V << " " << exact_solution << "\n";
@@ -333,7 +324,7 @@ public:
     }
 
 
-    void TestMonodomainExactSolution3d() throw(Exception)
+    void TestMonodomainExactSolution3d()
     {
         TetrahedralMesh<3,3> mesh;
         double h=0.05; //cm
@@ -366,12 +357,12 @@ public:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        for(unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
                 double x=mesh.GetNode(i)->rGetLocation()[0];
                 double y=mesh.GetNode(i)->rGetLocation()[1];
@@ -382,7 +373,7 @@ public:
                 double exact_solution = exp(-t)*cos(M_PI*x)*cos(M_PI*y)*cos(M_PI*z);
 
                 // for testing suitable tols:
-                if(fabs(V-exact_solution)>0.03*exp(-t))
+                if (fabs(V-exact_solution)>0.03*exp(-t))
                 {
                     std::cout << "t, i = " << t << " " << i << "\n";
                     std::cout << "V, exact_solution = " << V << " " << exact_solution << "\n";
@@ -399,7 +390,7 @@ public:
                 TS_ASSERT_DELTA(V, exact_solution, 0.03*exp(-t));
             }
         }
-
     }
 };
+
 #endif /*TESTMONODOMAINEXACTSOLUTION_HPP_*/

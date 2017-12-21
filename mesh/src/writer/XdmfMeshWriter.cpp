@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
 #else
     assert(keepOriginalElementIndexing);
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
-    bool mesh_is_distributed = (this->mpDistributedMesh != NULL) && PetscTools::IsParallel();
+    bool mesh_is_distributed = (this->mpDistributedMesh != nullptr) && PetscTools::IsParallel();
 
     if (PetscTools::AmMaster())
     {
@@ -256,8 +256,8 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 
     DOMImplementation* p_DOM_implementation = DOMImplementationRegistry::getDOMImplementation(X("core"));
 
-    DOMDocumentType* p_DOM_document_type = p_DOM_implementation->createDocumentType(X("Xdmf"),0,X("Xdmf.dtd"));
-    DOMDocument* p_DOM_document = p_DOM_implementation->createDocument(0, X("Xdmf"), p_DOM_document_type);
+    DOMDocumentType* p_DOM_document_type = p_DOM_implementation->createDocumentType(X("Xdmf"),nullptr,X("Xdmf.dtd"));
+    DOMDocument* p_DOM_document = p_DOM_implementation->createDocument(nullptr, X("Xdmf"), p_DOM_document_type);
     DOMElement* p_root_element = p_DOM_document->getDocumentElement();
     p_root_element->setAttribute(X("Version"), X("2.0"));
     p_root_element->setAttribute(X("xmlns:xi"), X("http://www.w3.org/2001/XInclude"));
@@ -287,7 +287,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     DOMText* p_time_text = p_DOM_document->createTextNode(X(time_stream.str()));
     p_time_dataitem_element->appendChild(p_time_text);
 
-    for(unsigned t=0; t<mNumberOfTimePoints; ++t)
+    for (unsigned t=0; t<mNumberOfTimePoints; ++t)
     {
         DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
         p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
@@ -360,9 +360,9 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     XMLFormatTarget* p_target = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".xdmf"));
 
 #if _XERCES_VERSION >= 30000
-    DOMLSSerializer *p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createLSSerializer();
+    DOMLSSerializer* p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createLSSerializer();
     p_serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true);
-    DOMLSOutput *p_output = ((DOMImplementationLS*)p_DOM_implementation)->createLSOutput();
+    DOMLSOutput* p_output = ((DOMImplementationLS*)p_DOM_implementation)->createLSOutput(); // Calls a new somewhere!
     p_output->setByteStream(p_target);
     p_serializer->write(p_DOM_document, p_output);
 #else
@@ -374,15 +374,15 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     // Cleanup
     p_serializer->release();
     p_DOM_document->release();
+#if _XERCES_VERSION >= 30000
+    delete p_output;
+#endif
     delete p_target;
     XMLPlatformUtils::Terminate();
 #endif // _MSC_VER
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class XdmfMeshWriter<1,1>;
 template class XdmfMeshWriter<1,2>;
 template class XdmfMeshWriter<1,3>;

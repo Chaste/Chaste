@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,14 +59,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
-
 /*
  * Basic tests only - no archiving test
  *
  */
-
-
 class TestGoldbeter1991OdeSystem : public CxxTest::TestSuite
 {
 public:
@@ -91,7 +87,7 @@ public:
     }
 
 
-    void TestGoldbeter1991OSolver() throw(Exception)
+    void TestGoldbeter1991OSolver()
     {
         Goldbeter1991OdeSystem ode_system;
 
@@ -194,10 +190,6 @@ public:
             delete p_ode_system;
         }
     }
-
-
-
 };
-
 
 #endif /* TESTGOLDBETER1991ODESYSTEM_HPP_ */

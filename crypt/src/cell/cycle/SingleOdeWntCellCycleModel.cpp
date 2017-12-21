@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,48 +57,38 @@ SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(boost::shared_ptr<Abstrac
     assert(mpOdeSolver->IsSetUp());
 }
 
-AbstractCellCycleModel* SingleOdeWntCellCycleModel::CreateCellCycleModel()
+SingleOdeWntCellCycleModel::SingleOdeWntCellCycleModel(const SingleOdeWntCellCycleModel& rModel)
+    : SimpleWntCellCycleModel(rModel),
+      CellCycleModelOdeHandler(rModel),
+      mBetaCateninDivisionThreshold(rModel.mBetaCateninDivisionThreshold)
 {
-    // Create a new cell-cycle model
-    SingleOdeWntCellCycleModel* p_model = new SingleOdeWntCellCycleModel(this->mpOdeSolver);
-
     /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mDt, mpOdeSolver)
-     * will already have been correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetUseCellProliferativeTypeDependentG1Duration(mUseCellProliferativeTypeDependentG1Duration);
-    p_model->SetWntStemThreshold(mWntStemThreshold);
-    p_model->SetWntTransitThreshold(mWntTransitThreshold);
-    p_model->SetWntLabelledThreshold(mWntLabelledThreshold);
-    p_model->SetLastTime(mLastTime);
-    p_model->SetBetaCateninDivisionThreshold(mBetaCateninDivisionThreshold);
-
-    /*
+     * Initialize only those member variables defined in this class.
      * Create the new cell-cycle model's ODE system and use the current values
      * of the state variables in mpOdeSystem as an initial condition.
+     *
+     * The member variables mUseCellProliferativeTypeDependentG1Duration,
+     * mWntStemThreshold, mWntTransitThreshold and mWntLabelledThreshold
+     * are initialized in the SimpleWntCellCycleModel constructor.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
      */
-    assert(mpOdeSystem);
-    double wnt_level = this->GetWntLevel();
-    p_model->SetOdeSystem(new Mirams2010WntOdeSystem(wnt_level, mpCell->GetMutationState()));
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
 
-    return p_model;
+    assert(rModel.GetOdeSystem());
+    double wnt_level = rModel.GetWntLevel();
+    SetOdeSystem(new Mirams2010WntOdeSystem(wnt_level, rModel.mpCell->GetMutationState()));
+    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+}
+
+AbstractCellCycleModel* SingleOdeWntCellCycleModel::CreateCellCycleModel()
+{
+    return new SingleOdeWntCellCycleModel(*this);
 }
 
 void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
@@ -106,13 +96,13 @@ void SingleOdeWntCellCycleModel::UpdateCellCyclePhase()
     assert(SimulationTime::Instance()->IsStartTimeSetUp());
     SolveOdeToTime(SimulationTime::Instance()->GetTime());
     ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
-    AbstractSimpleCellCycleModel::UpdateCellCyclePhase(); /// Don't call the SimpleWntCellCycleModel - it will overwrite this.
+    AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase(); /// Don't call the SimpleWntCellCycleModel - it will overwrite the beta catenin levels.
 }
 
 void SingleOdeWntCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     double wnt_level = this->GetWntLevel();
     mpOdeSystem = new Mirams2010WntOdeSystem(wnt_level, mpCell->GetMutationState());
@@ -140,8 +130,8 @@ void SingleOdeWntCellCycleModel::AdjustOdeParameters(double currentTime)
 
 void SingleOdeWntCellCycleModel::ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()
 {
-    assert(mpOdeSystem != NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
 
     if (GetBetaCateninConcentration() < GetBetaCateninDivisionThreshold())
     {
@@ -183,9 +173,7 @@ double SingleOdeWntCellCycleModel::GetBetaCateninDivisionThreshold()
 
 void SingleOdeWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     SimpleWntCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

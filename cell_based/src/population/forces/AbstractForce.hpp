@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,8 @@ public:
     /**
      * Calculates the force on each node.
      *
-     * This method must be overridden in concrete classes.
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -97,6 +98,14 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputForceParameters(out_stream& rParamsFile)=0;
+
+    /**
+     * Write any data necessary to a visualization setup file.
+     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     *
+     * @param pVizSetupFile a visualization setup file
+     */
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractForce)

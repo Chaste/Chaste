@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -108,9 +108,7 @@ public:
      * @return a pointer to the singleton instance, creating it if necessary.
      */
     static boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > Instance();
-
 };
-
 
 template<class ODE_SYSTEM>
 boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > OdeSystemInformation<ODE_SYSTEM>::Instance()
@@ -127,7 +125,7 @@ template<class ODE_SYSTEM>
 OdeSystemInformation<ODE_SYSTEM>::OdeSystemInformation()
 {
     // Make sure there's only one instance - enforces correct serialization
-    assert(mpInstance == NULL);
+    assert(mpInstance == nullptr);
 }
 
 template<class ODE_SYSTEM>

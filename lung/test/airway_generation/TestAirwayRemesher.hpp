@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayRemesher : public CxxTest::TestSuite
 {
 public:
-    void TestRemeshSingleBranch() throw(Exception)
+    void TestRemeshSingleBranch()
     {
         //Load a single branch mesh file
         TrianglesMeshReader<1,3> reader("mesh/test/data/1D_in_3D_0_to_1mm_10_elements");
@@ -94,13 +94,19 @@ public:
         TS_ASSERT_DELTA(output_mesh_three.GetElement(0)->GetAttribute(), 0.05, 1e-6);
         TS_ASSERT_DELTA(output_mesh_three.GetElement(5)->GetAttribute(), 0.05, 1e-6);
 
+        MutableMesh<1,3> output_mesh_four;
+        remesher.Remesh(output_mesh_four); //Utility method to remove all intermediate nodes
+
+        TS_ASSERT_EQUALS(output_mesh_one.GetNumNodes(), 2u);
+        TS_ASSERT_EQUALS(output_mesh_one.GetNumElements(), 1u);
+        TS_ASSERT_DELTA(output_mesh_one.GetElement(0)->GetAttribute(), 0.05, 1e-6);
 
         //To visualise
         //VtkMeshWriter<1,3> writer("TestAirwayRemesher", "1D_remeshed");
         //writer.WriteFilesUsingMesh(output_mesh_three);
     }
 
-    void TestRemeshFullTree() throw(Exception)
+    void TestRemeshFullTree()
     {
         TrianglesMeshReader<1,3> reader("lung/test/data/TestSubject002");
 
@@ -126,7 +132,7 @@ public:
 //        VtkMeshWriter<1,3> writer("TestAirwayRemesher", "Novartis002_remeshed");
 //        std::vector<double> radii(output_mesh_one.GetNumElements());
 //
-//        for(TetrahedralMesh<1,3>::ElementIterator iter = output_mesh_one.GetElementIteratorBegin();
+//        for (TetrahedralMesh<1,3>::ElementIterator iter = output_mesh_one.GetElementIteratorBegin();
 //            iter != output_mesh_one.GetElementIteratorEnd();
 //            ++iter)
 //        {
@@ -140,7 +146,5 @@ public:
 //        writer2.WriteFilesUsingMesh(output_mesh_one);
     }
 };
-
-
 
 #endif /* TESTAIRWAYREMESHER_HPP_ */

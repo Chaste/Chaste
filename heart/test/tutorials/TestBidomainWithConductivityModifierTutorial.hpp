@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -108,8 +108,7 @@ public:
     */
     c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
     {
-
-        if ( elementIndex == 0 )
+        if (elementIndex == 0)
         {
             // For element 0 let's return the "special matrix", regardless of intra/extracellular.
             return mSpecialMatrix;
@@ -117,7 +116,7 @@ public:
 
         // Otherwise, we change the behaviour depending on the `domainIndex` (intra/extracellular).
         double domain_scaling;
-        if ( domainIndex == 0 )
+        if (domainIndex == 0)
         {
             domain_scaling = 1.0; // domainIndex==0 implies intracellular
         }
@@ -143,7 +142,7 @@ public:
 class TestBidomainWithConductivityModifierTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestConductivityModifier() throw(Exception)
+    void TestConductivityModifier()
     {
         /*
          * Generate a mesh.

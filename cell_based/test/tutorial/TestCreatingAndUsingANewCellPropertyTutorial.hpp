@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,7 +83,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "CellLabel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -217,7 +218,8 @@ public:
             {
                 unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-                c_vector<double, 2> location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                c_vector<double, 2> location;
+                location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
                 c_vector<double, 2> force = -1.0 * mStrength * location;
                 rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
             }
@@ -270,7 +272,7 @@ public:
      *
      * We begin by testing that our new cell property is implemented correctly.
      */
-    void TestMotileCellProperty() throw(Exception)
+    void TestMotileCellProperty()
     {
         /* We begin by testing that some of the base class methods work correctly.
          * We typically use shared pointers to create and access a cell property
@@ -341,7 +343,7 @@ public:
      * We conclude with a brief test demonstrating how {{{MotileCellProperty}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMotileCellProperty() throw(Exception)
+    void TestOffLatticeSimulationWithMotileCellProperty()
     {
         /* Note that HoneycombMeshGenerator, used in this test, is not
          *  yet implemented in parallel. */
@@ -375,7 +377,7 @@ public:
         {
             /* For each node we create a cell with our cell-cycle model and the wild-type cell mutation state.
              * We then add the property {{{MotileCellProperty}}} to a random selection of the cells, as follows. */
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPropertyCollection collection;
             if (RandomNumberGenerator::Instance()->ranf() < 0.2)

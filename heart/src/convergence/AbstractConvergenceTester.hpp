@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -170,10 +170,7 @@ public:
      *  used in StimulusConverger in projects/jmpf
      */
     bool FixedResult;
-    /** true if the plane stimulus should applied with an exact value (not scaled by space-step)
-     *  used in StimulusConverger in projects/jmpf
-     */
-    bool UseAbsoluteStimulus;
+
     /**
      * A value to be used with a plane stimulus (not scaled by space-step)
      *  used in StimulusConverger in projects/jmpf
@@ -282,15 +279,15 @@ public:
 
             //If the printing time step is too fine, then simulations become I/O bound without much improvement in accuracy
             double printing_step = this->PdeTimeStep;
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             while (printing_step < 1.0e-4)
             {
                 printing_step *= 2.0;
                 std::cout<<"Warning: PrintingTimeStep increased\n";
             }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(this->OdeTimeStep, this->PdeTimeStep, printing_step);
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
             if (SimulateFullActionPotential)
             {
                 HeartConfig::Instance()->SetSimulationDuration(400.0);
@@ -299,7 +296,7 @@ public:
             {
                 HeartConfig::Instance()->SetSimulationDuration(8.0);
             }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
             HeartConfig::Instance()->SetOutputDirectory("Convergence"+nameOfTest);
             HeartConfig::Instance()->SetOutputFilenamePrefix("Results");
 
@@ -319,16 +316,7 @@ public:
                 }
                 case PLANE:
                 {
-                    if (this->UseAbsoluteStimulus)
-                    {
-                        #define COVERAGE_IGNORE
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(0, this->AbsoluteStimulus, true);
-                        #undef COVERAGE_IGNORE
-                    }
-                    else
-                    {
-                        p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), false, this->AbsoluteStimulus);
-                    }
+                    p_cell_factory = new GeneralPlaneStimulusCellFactory<CELL, DIM>(num_ele_across, constructor.GetWidth(), this->AbsoluteStimulus);
                     break;
                 }
                 case QUARTER:
@@ -478,22 +466,22 @@ public:
 
                 try
                 {
-                    #define COVERAGE_IGNORE
+                    // LCOV_EXCL_START
                     if (SimulateFullActionPotential)
                     {
                         Apd90FirstQn = ppc.CalculateActionPotentialDuration(90.0, first_quadrant_node);
                         Apd90ThirdQn = ppc.CalculateActionPotentialDuration(90.0, third_quadrant_node);
                     }
-                    #undef COVERAGE_IGNORE
+                    // LCOV_EXCL_STOP
                     ConductionVelocity  = ppc.CalculateConductionVelocity(first_quadrant_node,third_quadrant_node,0.5*mesh_width);
                 }
+                // LCOV_EXCL_START
                 catch (Exception e)
                 {
-                    #define COVERAGE_IGNORE
                     std::cout << "Warning - this run threw an exception in calculating propagation.  Check convergence results\n";
                     std::cout << e.GetMessage() << std::endl;
-                    #undef COVERAGE_IGNORE
                 }
+                // LCOV_EXCL_STOP
                 double cond_velocity_error = 1e10;
                 double apd90_first_qn_error = 1e10;
                 double apd90_third_qn_error = 1e10;
@@ -504,7 +492,7 @@ public:
                     {
                         cond_velocity_error = fabs(ConductionVelocity - prev_cond_velocity) / prev_cond_velocity;
                     }
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
                     if (prev_apd90_first_qn != 0.0)
                     {
                         apd90_first_qn_error = fabs(Apd90FirstQn - prev_apd90_first_qn) / prev_apd90_first_qn;
@@ -521,7 +509,7 @@ public:
                     {
                         apd90_third_qn_error = DBL_EPSILON; //Avoid log zero on plot
                     }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
                     if (cond_velocity_error == 0.0)
                     {
                         cond_velocity_error = DBL_EPSILON; //Avoid log zero on plot
@@ -589,18 +577,18 @@ public:
                     // convergence criterion
                     this->Converged = l2_norm_full < this->RelativeConvergenceCriterion;
                     this->LastDifference = l2_norm_full;
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
                     assert (time_series.size() != 1u);
                     if (time_series.back() == 0.0)
                     {
                         std::cout << "Failed after successful convergence - give up this convergence test\n";
                         break;
                     }
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
 
                 }
 
-                if ( time_series.back() != 0.0)
+                if (time_series.back() != 0.0)
                 {
                     // Simulation ran to completion
                     this->PopulatedResult=true;
@@ -632,9 +620,11 @@ public:
                 info_file.close();
             }
         }
-
     }
 
+    /**
+     * Show convergence details relevant to this run in std::cout
+     */
     void DisplayRun()
     {
         if (!PetscTools::AmMaster())
@@ -676,14 +666,6 @@ public:
         std::time_t rawtime;
         std::time( &rawtime );
         std::cout << std::ctime(&rawtime);
-        ///\todo The UseAbsoluteStimulus is temporary, while we are sorting out
-        ///3D stimulus.  It is to be removed later (along with StimulusConvergenceTester)
-        if (this->UseAbsoluteStimulus)
-        {
-            #define COVERAGE_IGNORE
-            std::cout<<"Using absolute stimulus of "<<this->AbsoluteStimulus<<std::endl;
-            #undef COVERAGE_IGNORE
-        }
         std::cout << std::flush;
         //HeartEventHandler::Headings();
         //HeartEventHandler::Report();

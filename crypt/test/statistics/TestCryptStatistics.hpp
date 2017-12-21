@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "SimpleDataWriter.hpp"
 #include "CryptStatistics.hpp"
 #include "CryptSimulation2d.hpp"
@@ -81,7 +82,7 @@ private:
 
 public:
 
-    void TestGetSection() throw (Exception)
+    void TestGetSection()
     {
         double crypt_length = 22.0;
 
@@ -98,7 +99,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         // Create cell population
@@ -169,7 +170,7 @@ public:
         }
     }
 
-    void TestMakeMeinekeGraphs() throw (Exception)
+    void TestMakeMeinekeGraphs()
     {
         // Specify output directory
         std::string output_directory = "MakeMeinekeGraphs";
@@ -188,7 +189,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> temp_cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430
@@ -256,7 +257,7 @@ public:
              ++cell_iter)
         {
             bool is_labelled = cell_iter->HasCellProperty<CellLabel>();
-            bool in_s_phase = (cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase() == S_PHASE);
+            bool in_s_phase = (static_cast <AbstractPhaseBasedCellCycleModel*>(cell_iter->GetCellCycleModel())->GetCurrentCellCyclePhase() == S_PHASE);
 
             TS_ASSERT_EQUALS(is_labelled, in_s_phase);
 
@@ -340,7 +341,7 @@ public:
      * This test runs multiple crypt simulations and records whether
      * or not labelled cells are in a randomly chosen crypt section.
      */
-    void TestMultipleCryptSimulations() throw (Exception)
+    void TestMultipleCryptSimulations()
     {
         std::string output_directory = "MakeMoreMeinekeGraphs";
 
@@ -392,7 +393,7 @@ public:
 
             // Set up cells
             std::vector<CellPtr> temp_cells;
-            CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+            CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
             cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
             // This awkward way of setting up the cells is a result of #430

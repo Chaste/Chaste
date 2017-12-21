@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
+#include "PopulationTestingForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
@@ -62,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CellId.hpp"
 #include "CellPropertyRegistry.hpp"
+#include "ApoptoticCellProperty.hpp"
 #include "SmartPointers.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "FileComparison.hpp"
@@ -150,7 +152,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
@@ -177,7 +179,7 @@ public:
      * and the spring system will resemble a parallelogram. However we keep
      * the simulation time at 1.0 in order to keep the test short.
      */
-    void Test2DSpringSystem() throw (Exception)
+    void Test2DSpringSystem()
     {
         EXIT_IF_PARALLEL;    // Writing mesh based in parallel causes duplicated results.
 
@@ -187,7 +189,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
 
         cells_generator.Generate(cells, &mesh, std::vector<unsigned>(), false, 0.0, 3.0, 6.5, 8.0);
 
@@ -239,7 +241,7 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt2DSpringsResults/results.vizelements").CompareFiles();
     }
 
-    void TestWithMultipleCellKillers() throw (Exception)
+    void TestWithMultipleCellKillers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -253,7 +255,7 @@ public:
 
        // Set up cells
        std::vector<CellPtr> cells;
-       CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+       CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
        cells_generator.Generate(cells, p_mesh, location_indices, true);
 
        // Create cell population
@@ -313,7 +315,7 @@ public:
        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), num_cells-2u);
     }
 
-    void TestUpdatePositions() throw (Exception)
+    void TestUpdatePositions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -326,7 +328,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -335,29 +337,22 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cell_population);
 
-        // No force law passed to simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        simulator.AddForce(p_linear_force);
+        // Add a simple testing force
+        bool positionDependentForce = false;
+        MAKE_PTR_ARGS(PopulationTestingForce<2>, p_force,(positionDependentForce));
+        simulator.AddForce(p_force);
 
+        // Save old node locations
         std::vector<c_vector<double, 2> > old_posns(p_mesh->GetNumNodes());
-
-        // Make up some forces
         for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
         {
-            c_vector<double, 2> force;
-
             old_posns[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
-
-            force[0] = i*0.01;
-            force[1] = 2*i*0.01;
-
-            p_mesh->GetNode(i)->ClearAppliedForce();
-            p_mesh->GetNode(i)->AddAppliedForceContribution(force);
         }
 
         simulator.SetDt(0.01);
-        simulator.UpdateNodePositions();
+        simulator.SetupSolve();
+        simulator.UpdateCellLocationsAndTopology();
 
         // Create a set of node indices corresponding to ghost nodes
         std::set<unsigned> node_indices;
@@ -384,6 +379,10 @@ public:
             unsigned index = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
             c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
 
+            AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
+            double damping = p_offLattice_pop->GetDampingConstant(index);
+            c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(index, damping, old_posns[index], 0.01);
+
             if (old_posns[index][1] == 0) // stem
             {
                 // No Wnt so shouldn't have been moved
@@ -392,13 +391,13 @@ public:
             }
             else
             {
-                TS_ASSERT_DELTA(cell_location[0], old_posns[index][0] +   index*0.01*0.01, 1e-9);
-                TS_ASSERT_DELTA(cell_location[1], old_posns[index][1] + 2*index*0.01*0.01, 1e-9);
+                TS_ASSERT_DELTA(cell_location[0], expected_location[0], 1e-9);
+                TS_ASSERT_DELTA(cell_location[1], expected_location[1], 1e-9);
             }
         }
     }
 
-    void Test2DCylindrical() throw (Exception)
+    void Test2DCylindrical()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -417,7 +416,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         // Create cell population
@@ -464,7 +463,7 @@ public:
         CellBasedEventHandler::Reset(); // otherwise event handler left in bad state after throw
     }
 
-    void Test2DCylindricalMultipleDivisions() throw (Exception)
+    void Test2DCylindricalMultipleDivisions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -491,7 +490,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true); // true = mature cells
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -557,7 +556,7 @@ public:
      *
      * Note - if the previous test is changed we need to update the file this test refers to.
      */
-    void TestVisualizerOutput() throw (Exception)
+    void TestVisualizerOutput()
     {
         EXIT_IF_PARALLEL;
 
@@ -583,7 +582,7 @@ public:
      * But at least it uses Wnt cell cycle and runs reasonably quickly...
      * For a better test with more randomly distributed cell ages see the Nightly test pack.
      */
-    void TestWithWntDependentCells() throw (Exception)
+    void TestWithWntDependentCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -641,7 +640,7 @@ public:
     }
 
     // A better check that the loaded mesh is the same as that saved
-    void TestMeshSurvivesSaveLoad() throw (Exception)
+    void TestMeshSurvivesSaveLoad()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -706,7 +705,7 @@ public:
     }
 
     // A check that save and load works when a Voronoi tessellation is involved
-    void TestMeshSurvivesSaveLoadWithVoronoiTessellation() throw (Exception)
+    void TestMeshSurvivesSaveLoadWithVoronoiTessellation()
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
@@ -765,7 +764,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -783,7 +782,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -840,7 +839,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -858,7 +857,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -897,7 +896,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
 
@@ -965,7 +964,7 @@ public:
      * to be 'mature' cells which won't shrink together.
      * Limited this by using only four cells of minimum age.
      */
-    void TestWntCellsCannotMoveAcrossYEqualsZero() throw (Exception)
+    void TestWntCellsCannotMoveAcrossYEqualsZero()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1075,7 +1074,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCellIdOutput() throw (Exception)
+    void TestCellIdOutput()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1097,7 +1096,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         for (unsigned i=0; i<cells.size(); i++)
@@ -1136,7 +1135,7 @@ public:
 
     // This is a strange test -- all cells divide within a quick time, it gives
     // good testing of the periodic boundaries though... [comment no longer valid?]
-    void TestWithTysonNovakCells() throw (Exception)
+    void TestWithTysonNovakCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1200,7 +1199,7 @@ public:
         TS_ASSERT_EQUALS(number_of_nodes, 123u);
     }
 
-    void TestAddCellKiller() throw (Exception)
+    void TestAddCellKiller()
     {
         EXIT_IF_PARALLEL;
 
@@ -1213,7 +1212,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, &mesh, std::vector<unsigned>(), false, 0.0, 3.0, 6.5, 8.0);
 
         cells[60]->SetBirthTime(-50.0);
@@ -1239,7 +1238,7 @@ public:
         TS_ASSERT_EQUALS(num_deaths, 11u);
     }
 
-    void TestCalculateCellDivisionVectorConfMesh() throw (Exception)
+    void TestCalculateCellDivisionVectorConfMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1271,13 +1270,17 @@ public:
         p_linear_force->SetMeinekeDivisionRestingSpringLength(0.9); // coverage
         simulator.AddForce(p_linear_force);
 
-        c_vector<double, 2> daughter_location = simulator.CalculateCellDivisionVector(*conf_iter);
-        c_vector<double, 2> new_parent_location = conf_mesh.GetNode(0)->rGetLocation();
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*conf_iter, *p_cast_population);
+
+        c_vector<double, 2> new_parent_location = locations.first;
+        c_vector<double, 2> daughter_location = locations.second;
         c_vector<double, 2> parent_to_daughter = conf_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    void TestCalculateCellDivisionVectorConfMeshStemCell() throw (Exception)
+    void TestCalculateCellDivisionVectorConfMeshStemCell()
     {
         EXIT_IF_PARALLEL;
 
@@ -1305,9 +1308,11 @@ public:
         // Repeat two times for coverage
         // need vector from parent to daughter to have both +ve and -ve y component
         // different branches will execute to make sure daughter stays in crypt ie. +ve y component
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
         for (unsigned repetitions=0; repetitions<=1; repetitions++)
         {
-            c_vector<double, 2> daughter_location = simulator.CalculateCellDivisionVector(*conf_iter);
+            std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*conf_iter, *p_cast_population);
+            c_vector<double, 2> daughter_location = locations.second;
             c_vector<double, 2> new_parent_location = conf_mesh.GetNode(0)->rGetLocation();
             c_vector<double, 2> parent_to_daughter = conf_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
 
@@ -1320,7 +1325,7 @@ public:
        }
     }
 
-    void TestCalculateCellDivisionVectorCylindricalMesh() throw (Exception)
+    void TestCalculateCellDivisionVectorCylindricalMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1345,13 +1350,17 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cyl_crypt);
 
-        c_vector<double, 2> daughter_location = simulator.CalculateCellDivisionVector(*cyl_iter);
-        c_vector<double, 2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*cyl_iter, *p_cast_population);
+
+        c_vector<double, 2> new_parent_location = locations.first;
+        c_vector<double, 2> daughter_location = locations.second;
         c_vector<double, 2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    void TestCalculateCellDivisionVectorCylindricalMeshStemCell() throw (Exception)
+    void TestCalculateCellDivisionVectorCylindricalMeshStemCell()
     {
         EXIT_IF_PARALLEL;
 
@@ -1376,7 +1385,9 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cyl_crypt);
 
-        c_vector<double,2> daughter_location = simulator.CalculateCellDivisionVector(*cyl_iter);
+        MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
+        std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*cyl_iter, *p_cast_population);
+        c_vector<double,2> daughter_location = locations.second;
         c_vector<double,2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
         c_vector<double,2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
 
@@ -1388,7 +1399,7 @@ public:
     }
 
     // Short test which sets mNoBirth for coverage
-    void TestNoBirth() throw (Exception)
+    void TestNoBirth()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1409,7 +1420,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);// true = mature cells
 
         // Create cell population
@@ -1446,7 +1457,7 @@ public:
     }
 
     // Test death on a non-periodic mesh. Note that birth does occur too.
-    void TestRandomDeathOnNonPeriodicCrypt() throw (Exception)
+    void TestRandomDeathOnNonPeriodicCrypt()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1463,7 +1474,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         // Create cell population
@@ -1503,7 +1514,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
@@ -1553,7 +1564,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
         TS_ASSERT_EQUALS(cells.size(), 16u);
 
@@ -1563,8 +1574,8 @@ public:
         cells[2]->SetMutationState(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
         cells[3]->SetMutationState(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
         cells[4]->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        cells[2]->SetBirthTime(1.5-(cells[2]->GetCellCycleModel()->GetStemCellG1Duration()
-                                   + cells[2]->GetCellCycleModel()->GetSG2MDuration()));
+        cells[2]->SetBirthTime(1.5-(static_cast<FixedG1GenerationalCellCycleModel*>(cells[2]->GetCellCycleModel())->GetStemCellG1Duration()
+                                   + static_cast<FixedG1GenerationalCellCycleModel*>(cells[2]->GetCellCycleModel())->GetSG2MDuration()));
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -1749,7 +1760,7 @@ public:
         delete p_simulator;
     }
 
-    void TestWriteBetaCatenin() throw (Exception)
+    void TestWriteBetaCatenin()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1805,7 +1816,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCryptSimulation2DParameterOutput() throw (Exception)
+    void TestCryptSimulation2DParameterOutput()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1823,7 +1834,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
         // Create cell population
@@ -1851,7 +1862,7 @@ public:
         ///\todo check output of simulator.OutputSimulationSetup();
     }
 
-    void TestAncestorCryptSimulations() throw (Exception)
+    void TestAncestorCryptSimulations()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1872,7 +1883,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> temp_cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430

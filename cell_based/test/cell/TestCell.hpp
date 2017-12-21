@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,13 +46,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
 #include "CellData.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "Goldbeter1991SrnModel.hpp"
 #include "NullSrnModel.hpp"
@@ -61,6 +61,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellAncestor.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
@@ -69,8 +71,11 @@ class TestCell: public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellConstructor() throw(Exception)
+    void TestCellConstructor()
     {
+        // Coverage
+        TS_ASSERT_THROWS_NOTHING(null_deleter());
+
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);
@@ -80,7 +85,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_type);
 
         // Create a cell-cycle model
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
         // Create a cell
         CellPtr p_cell(new Cell(p_state, p_model));
@@ -103,7 +108,7 @@ public:
         TS_ASSERT(dynamic_cast<NullSrnModel*>(p_cell->GetSrnModel()));
     }
 
-    void TestCellConstructorWithSrn() throw(Exception)
+    void TestCellConstructorWithSrn()
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -114,7 +119,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_type);
 
         // Create a cell-cycle model
-        FixedDurationGenerationBasedCellCycleModel* p_cc_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cc_model = new FixedG1GenerationalCellCycleModel();
 
         // Create a SRN model
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
@@ -140,7 +145,7 @@ public:
         TS_ASSERT(dynamic_cast<NullSrnModel*>(p_cell->GetSrnModel()));
     }
 
-    void TestWithCellPropertyCollection() throw(Exception)
+    void TestWithCellPropertyCollection()
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -150,7 +155,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_wild_type(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         // Create a cell-cycle model
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
         MAKE_PTR(CellLabel, p_label);
         MAKE_PTR(CellLabel, p_label_2);
@@ -167,7 +172,7 @@ public:
         p_cell->SetBirthTime(-1.0);
         p_cell->InitialiseCellCycleModel();
 
-        TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
+        TS_ASSERT_EQUALS(static_cast<FixedG1GenerationalCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
 
         // Test cell property collection
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 5u);
@@ -184,7 +189,7 @@ public:
         // Test creating another cell with the same cell property collection
         TS_ASSERT_EQUALS(p_wild_type->GetCellCount(), 1u);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model2 = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell2(new Cell(p_wild_type, p_model2, NULL, false, collection));
         p_cell2->SetCellProliferativeType(p_type);
         p_cell2->SetBirthTime(-1.0);
@@ -226,7 +231,7 @@ public:
         CellPtr p_daughter_cell = p_cell->Divide();
 
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
-        TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_daughter_cell->GetCellCycleModel())->GetGeneration(), 1u);
+        TS_ASSERT_EQUALS(static_cast<FixedG1GenerationalCellCycleModel*>(p_daughter_cell->GetCellCycleModel())->GetGeneration(), 1u);
         TS_ASSERT_EQUALS(p_daughter_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0.0, 1e-9);
 
@@ -264,11 +269,11 @@ public:
         TS_ASSERT_EQUALS(num_wild_type, 0u);
     }
 
-    void TestCellsAgeingCorrectly() throw(Exception)
+    void TestCellsAgeingCorrectly()
     {
         // These lines are added to cover the exception case that a cell is
         // created without simulation time being set up...
-        FixedDurationGenerationBasedCellCycleModel fixed_model;
+        FixedG1GenerationalCellCycleModel fixed_model;
         SimulationTime::Destroy();
 
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -290,7 +295,7 @@ public:
         // Cell wasn't created - count should be zero
         TS_ASSERT_EQUALS(p_healthy_state->GetCellCount(), 0u);
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
         // Create a SRN model
         NullSrnModel* p_srn_model = new NullSrnModel();
@@ -324,7 +329,7 @@ public:
         TS_ASSERT_EQUALS(p_stem_cell->IsDead(), true);
 
         // Coverage of operator equals
-        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model2 = new FixedG1GenerationalCellCycleModel();
         NullSrnModel* p_srn_model2 = new NullSrnModel();
         CellPtr p_live_cell(new Cell(p_healthy_state, p_model2,p_srn_model2));
         p_live_cell->SetCellProliferativeType(p_type);
@@ -349,7 +354,7 @@ public:
 
         TS_ASSERT_THROWS_THIS(CellPtr p_bad_cell2(new Cell(p_healthy_state, NULL)), "Cell-cycle model is null");
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model,p_srn_model));
         p_stem_cell->SetCellProliferativeType(p_type);
@@ -366,7 +371,7 @@ public:
         TS_ASSERT_DELTA(p_model->GetSG2MDuration(), 10.0, 1e-12);
 
         // Test coverage of operator=
-        FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model2 = new FixedG1GenerationalCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model2 = new Goldbeter1991SrnModel();
         CellPtr p_other_cell(new Cell(p_healthy_state, p_model2, p_srn_model2));
         p_other_cell->SetCellProliferativeType(p_type_transit);
@@ -397,7 +402,7 @@ public:
         CellPtr p_daughter_cell = p_stem_cell->Divide();
 
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), false);
-        TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_daughter_cell->GetCellCycleModel())->GetGeneration(), 1u);
+        TS_ASSERT_EQUALS(static_cast<FixedG1GenerationalCellCycleModel*>(p_daughter_cell->GetCellCycleModel())->GetGeneration(), 1u);
         TS_ASSERT(dynamic_cast<Goldbeter1991SrnModel*>(p_daughter_cell->GetSrnModel()));
         TS_ASSERT_EQUALS(p_daughter_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0, 1e-9);
@@ -442,7 +447,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -508,7 +513,7 @@ public:
         TS_ASSERT_EQUALS(differentiated_cells[59], 8u);
     }
 
-    void TestWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
+    void TestWithFixedG1GenerationalCellCycleModel()
     {
         // Simulation time is 6000 because we want to test that differentiated cells never divide.
 
@@ -522,7 +527,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         //  Creating different types of cells with different cell-cycle models at SimulationTime = 6 hours
-        FixedDurationGenerationBasedCellCycleModel* p_stem_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_stem_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -532,24 +537,24 @@ public:
         TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 2.0, 1e-12);
         TS_ASSERT_DELTA(p_stem_model->GetSG2MDuration(), 10.0, 1e-12);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_stoch_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformG1GenerationalCellCycleModel* p_stoch_model = new UniformG1GenerationalCellCycleModel();
         CellPtr p_stochastic_stem_cell(new Cell(p_healthy_state, p_stoch_model));
         p_stochastic_stem_cell->SetCellProliferativeType(p_type);
         p_stochastic_stem_cell->InitialiseCellCycleModel();
 
-        FixedDurationGenerationBasedCellCycleModel* p_diff_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_diff_model = new FixedG1GenerationalCellCycleModel();
         p_diff_model->SetGeneration(6);
         CellPtr p_differentiated_cell(new Cell(p_healthy_state, p_diff_model));
         p_differentiated_cell->SetCellProliferativeType(p_diff_type);
         p_differentiated_cell->InitialiseCellCycleModel();
 
-        StochasticDurationGenerationBasedCellCycleModel* p_stoch_diff_model = new StochasticDurationGenerationBasedCellCycleModel();
+        UniformG1GenerationalCellCycleModel* p_stoch_diff_model = new UniformG1GenerationalCellCycleModel();
         p_stoch_diff_model->SetGeneration(6);
         CellPtr p_stochastic_differentiated_cell(new Cell(p_healthy_state, p_stoch_diff_model));
         p_stochastic_differentiated_cell->SetCellProliferativeType(p_diff_type);
         p_stochastic_differentiated_cell->InitialiseCellCycleModel();
 
-        FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_transit_model = new FixedG1GenerationalCellCycleModel();
         p_transit_model->SetGeneration(2);
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
         p_transit_cell->SetCellProliferativeType(p_transit_type);
@@ -592,7 +597,7 @@ public:
         TS_ASSERT_EQUALS(p_stochastic_differentiated_cell->ReadyToDivide(), false);
     }
 
-    void TestStochasticCycleModel() throw(Exception)
+    void TestStochasticCycleModel()
     {
         // Go up in steps of 0.01 to test stochasticity in cell-cycle models
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -609,7 +614,7 @@ public:
         CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>();
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_transit_model = new FixedG1GenerationalCellCycleModel();
         p_transit_model->SetGeneration(2);
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
         p_transit_cell->SetCellProliferativeType(p_transit_type);
@@ -628,7 +633,7 @@ public:
         // Now at t = 17.99, cell is 11.99 old
         TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
 
-        StochasticDurationGenerationBasedCellCycleModel* p_cell_cycle_model = new StochasticDurationGenerationBasedCellCycleModel;
+        UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel;
         p_transit_cell->SetCellProliferativeType(p_transit_type);
 
         // This now resets the age of the cell to 0.0 so more time added in underneath
@@ -678,7 +683,7 @@ public:
             CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>();
             CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>();
 
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
             p_stem_cell->SetCellProliferativeType(p_type);
             p_stem_cell->InitialiseCellCycleModel();
@@ -753,34 +758,34 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_stem_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_stem_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
         cells.push_back(p_stem_cell);
 
-        FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_transit_model = new FixedG1GenerationalCellCycleModel();
         p_transit_model->SetGeneration(1);
         CellPtr p_transit_cell_1(new Cell(p_healthy_state, p_transit_model));
         p_transit_cell_1->SetCellProliferativeType(p_transit_type);
         p_transit_cell_1->InitialiseCellCycleModel();
         cells.push_back(p_transit_cell_1);
 
-        FixedDurationGenerationBasedCellCycleModel* p_transit_model2 = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_transit_model2 = new FixedG1GenerationalCellCycleModel();
         p_transit_model2->SetGeneration(2);
         CellPtr p_transit_cell_2(new Cell(p_healthy_state, p_transit_model2));
         p_transit_cell_2->SetCellProliferativeType(p_transit_type);
         p_transit_cell_2->InitialiseCellCycleModel();
         cells.push_back(p_transit_cell_2);
 
-        FixedDurationGenerationBasedCellCycleModel* p_transit_model3 = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_transit_model3 = new FixedG1GenerationalCellCycleModel();
         p_transit_model3->SetGeneration(3);
         CellPtr p_transit_cell_3(new Cell(p_healthy_state, p_transit_model3));
         p_transit_cell_3->SetCellProliferativeType(p_transit_type);
         p_transit_cell_3->InitialiseCellCycleModel();
         cells.push_back(p_transit_cell_3);
 
-        FixedDurationGenerationBasedCellCycleModel* p_diff_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_diff_model = new FixedG1GenerationalCellCycleModel();
         p_diff_model->SetGeneration(4);
         CellPtr p_differentiated_cell(new Cell(p_healthy_state, p_diff_model));
         p_differentiated_cell->SetCellProliferativeType(p_diff_type);
@@ -858,7 +863,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithTysonNovakCellCycleModel() throw(Exception)
+    void TestWithTysonNovakCellCycleModel()
     {
         double standard_tyson_duration = 1.242;
 
@@ -960,7 +965,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model,p_srn_model));
         p_cell->SetCellProliferativeType(p_transit_type);
@@ -1007,7 +1012,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model,p_srn_model));
         p_cell->SetCellProliferativeType(p_transit_type);
@@ -1031,7 +1036,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_cell_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
@@ -1124,7 +1129,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
         p_cell->InitialiseCellCycleModel();
@@ -1149,7 +1154,7 @@ public:
         TS_ASSERT_EQUALS(p_daughter_cell->IsLogged(), false);
     }
 
-    void TestAncestors() throw (Exception)
+    void TestAncestors()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -1157,7 +1162,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         Goldbeter1991SrnModel* p_srn_model = new Goldbeter1991SrnModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model, p_srn_model));
         p_cell->SetCellProliferativeType(p_type);
@@ -1180,7 +1185,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_cell->SetAncestor(p_healthy_state), "Attempting to give cell a cell ancestor which is not a CellAncestor");
     }
 
-    void TestCellId() throw (Exception)
+    void TestCellId()
     {
         // Resetting the Maximum cell Id to zero (to account for previous tests)
         CellId::ResetMaxCellId();
@@ -1191,7 +1196,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
         p_cell->InitialiseCellCycleModel();

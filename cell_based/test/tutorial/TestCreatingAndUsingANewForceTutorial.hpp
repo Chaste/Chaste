@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * simulation test. We have encountered each of these header files in previous cell-based
  * Chaste tutorials. */
 #include "HoneycombMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
@@ -208,7 +208,7 @@ public:
      *
      * We now test that our new force is implemented correctly.
      */
-    void TestMyForce() throw(Exception)
+    void TestMyForce()
     {
         /* We first create a {{{MeshBasedCellPopulation}}} using the helper
          * classes {{{HoneycombMeshGenerator}}} and {{{CellsGenerator}}},
@@ -218,7 +218,7 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -279,7 +279,7 @@ public:
      * We now provide a test demonstrating how {{{MyForce}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyForce() throw(Exception)
+    void TestOffLatticeSimulationWithMyForce()
     {
         /* Once again we create a {{{MeshBasedCellPopulation}}}. */
         HoneycombMeshGenerator generator(5, 5);
@@ -287,7 +287,7 @@ public:
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);

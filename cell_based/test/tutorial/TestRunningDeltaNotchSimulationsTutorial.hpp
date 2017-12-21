@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,6 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleTargetAreaModifier.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "WildTypeCellMutationState.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
@@ -96,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 /*
  * The next header file defines a simple subcellular reaction network model that includes the functionality
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
@@ -125,7 +126,7 @@ public:
      * In the first test, we demonstrate how to simulate a monolayer that incorporates
      * Delta/Notch signalling, using a vertex-based approach.
      */
-    void TestVertexBasedMonolayerWithDeltaNotch() throw (Exception)
+    void TestVertexBasedMonolayerWithDeltaNotch()
     {
         /* We include the next line because Vertex simulations cannot be run in parallel */
         EXIT_IF_PARALLEL;
@@ -134,7 +135,7 @@ public:
         HoneycombVertexMeshGenerator generator(5, 5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        /* We then create some cells, each with a cell-cycle model, {{{StochasticDurationCellCycleModel}}} and a subcellular reaction network model
+        /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
          * {{{DeltaNotchSrnModel}}}, which
          * incorporates a Delta/Notch ODE system, here we use the hard coded initial conditions of 1.0 and 1.0.
          * In this example we choose to make each cell differentiated,
@@ -145,7 +146,7 @@ public:
 
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
             /* We choose to initialise the concentrations to random levels in each cell. */
@@ -209,7 +210,7 @@ public:
      * In the next test we run a similar simulation as before, but this time with node-based
      * 'overlapping spheres' model.
      */
-    void TestNodeBasedMonolayerWithDeltaNotch() throw (Exception)
+    void TestNodeBasedMonolayerWithDeltaNotch()
     {
         /* We include the next line because HoneycombMeshGenerator, used in this test, is not
          *  yet implemented in parallel. */
@@ -232,7 +233,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationCellCycleModel* p_cc_model = new StochasticDurationCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
             /* We choose to initialise the concentrations to random levels in each cell. */
@@ -275,10 +276,13 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information
+     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
      *
      * Load the file {{{/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd}}},
-     * add a spherical glyph.
+     * and add a spherical glyph.
+     *
+     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+     * displayed by Paraview.
      */
 };
 

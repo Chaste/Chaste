@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -227,7 +227,6 @@ public:
      * @return path with spaces escaped
      */
     static std::string EscapeSpaces(const std::string& rPath);
-
 };
 
 #endif /* XMLTOOLS_HPP_ */

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -277,7 +277,7 @@ public:
      *  This is obviously really just two virtually identical uncoupled
      *  problems
      */
-    void TestSimpleCoupledPde() throw (Exception)
+    void TestSimpleCoupledPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         TetrahedralMesh<2,2> mesh;
@@ -339,7 +339,7 @@ public:
      *
      *  This is obviously two identical uncoupled problems
      */
-    void TestSimpleCoupledPdeWithNeumannBoundaryConditions() throw (Exception)
+    void TestSimpleCoupledPdeWithNeumannBoundaryConditions()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         TetrahedralMesh<2,2> mesh;
@@ -429,7 +429,7 @@ public:
      *
      *    u = sin(pi*x)sin(pi*x),   v = sin(2*pi*x)sin(2*pi*x)
      */
-    void TestRealCoupledPde() throw (Exception)
+    void TestRealCoupledPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
         TetrahedralMesh<2,2> mesh;

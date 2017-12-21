@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,19 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIMPLEOXYGENBASEDCELLCYCLEMODEL_HPP_
 #define SIMPLEOXYGENBASEDCELLCYCLEMODEL_HPP_
 
-#include "AbstractSimpleCellCycleModel.hpp"
+#include "AbstractSimplePhaseBasedCellCycleModel.hpp"
 
 /**
  * Simple oxygen-based cell-cycle model.
  *
  * A simple oxygen-dependent cell-cycle model that inherits from
- * AbstractSimpleCellCycleModel. The duration of G1 phase depends
+ * AbstractSimplePhaseBasedCellCycleModel. The duration of G1 phase depends
  * on the local oxygen concentration. A prolonged period of acute
  * hypoxia leads to the cell being labelled as apoptotic. This model
  * allows for quiescence imposed by transient periods of hypoxia,
  * followed by reoxygenation.
  */
-class SimpleOxygenBasedCellCycleModel : public AbstractSimpleCellCycleModel
+class SimpleOxygenBasedCellCycleModel : public AbstractSimplePhaseBasedCellCycleModel
 {
 private:
 
@@ -61,7 +61,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimplePhaseBasedCellCycleModel>(*this);
         archive & mCurrentHypoxicDuration;
         archive & mCurrentHypoxiaOnsetTime;
         archive & mHypoxicConcentration;
@@ -102,6 +102,21 @@ protected:
      */
     double mCriticalHypoxicDuration;
 
+    /**
+     * Protected copy-constructor for use by CreateCellCycleModel.
+     * The only way for external code to create a copy of a cell cycle model
+     * is by calling that method, to ensure that a model of the correct subclass is created.
+     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     *
+     * This method is called by child classes to set member variables for a daughter cell upon cell division.
+     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
+     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * can be done in InitialiseDaughterCell().
+     *
+     * @param rModel the cell cycle model to copy.
+     */
+    SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel);
+
 public:
 
     /**
@@ -123,12 +138,12 @@ public:
     /**
      * @return mCurrentHypoxicDuration
      */
-    double GetCurrentHypoxicDuration();
+    double GetCurrentHypoxicDuration() const;
 
     /**
      * @return mCurrentHypoxiaOnsetTime
      */
-    double GetCurrentHypoxiaOnsetTime();
+    double GetCurrentHypoxiaOnsetTime() const;
 
     /**
      * Overridden builder method to create new copies of
@@ -141,7 +156,7 @@ public:
     /**
      * @return mHypoxicConcentration
      */
-    double GetHypoxicConcentration();
+    double GetHypoxicConcentration() const;
 
     /**
      * Set method for mHypoxicConcentration.
@@ -153,7 +168,7 @@ public:
     /**
      * @return mQuiescentConcentration
      */
-    double GetQuiescentConcentration();
+    double GetQuiescentConcentration() const;
 
     /**
      * Set method for mQuiescentConcentration.
@@ -165,7 +180,7 @@ public:
     /**
      * @return mCriticalHypoxicDuration
      */
-    double GetCriticalHypoxicDuration();
+    double GetCriticalHypoxicDuration() const;
 
     /**
      * Set method for mCriticalHypoxicDuration.
@@ -182,7 +197,7 @@ public:
     void SetCurrentHypoxiaOnsetTime(double currentHypoxiaOnsetTime);
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

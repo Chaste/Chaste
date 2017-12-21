@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "BuskeAdhesiveForce.hpp"
 #include "BuskeElasticForce.hpp"
 #include "BuskeCompressionForce.hpp"
@@ -64,7 +64,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeInteractionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayerWithBuskeAdhesiveForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeAdhesiveForce()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -78,7 +78,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -118,7 +118,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeElasticForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayerWithBuskeElasticForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeElasticForce()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -132,7 +132,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node-based cell population
@@ -171,7 +171,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a BuskeCompressionForce system.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
+    void TestSimpleMonolayerWithBuskeCompressionForce()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -188,7 +188,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
@@ -228,7 +228,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with all Buske forces.
      * Test that no exceptions are thrown.
      */
-    void TestAllBuskeForces() throw (Exception)
+    void TestAllBuskeForces()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -243,7 +243,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         // Create a node-based cell population
@@ -269,7 +269,7 @@ public:
     /**
      * Test that two nodes relax to the equilibrium distance.
      */
-    void TestBuskeRelaxationForces() throw (Exception)
+    void TestBuskeRelaxationForces()
     {
         EXIT_IF_PARALLEL;
 
@@ -284,7 +284,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator_buske;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_buske;
         cells_generator_buske.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 
         // Create a node-based cell population

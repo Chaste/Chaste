@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,17 +40,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit lengths that points in a random direction.
+ * A class to generate a division vector of unit length that points in a random direction.
  */
 template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;

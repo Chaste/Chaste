@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -162,7 +162,7 @@ public:
      * This is purely for coverage of assembling a 3D system (and also uses
      * alternative, heterogeneous constructor, also for coverage).
      */
-    void TestAssembleSystem3D() throw (Exception)
+    void TestAssembleSystem3D()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -194,7 +194,7 @@ public:
 
     // compare computed Jacobian against a numerically computed
     // Jacobian
-    void TestAssembleSystem() throw (Exception)
+    void TestAssembleSystem()
     {
         QuadraticMesh<2> mesh(1.0/2.0, 1.0, 1.0);
         CompressibleExponentialLaw<2> law;
@@ -259,7 +259,7 @@ public:
                     }
 
 //                    double difference =  analytic_matrix_val - numerical_matrix_val;
-//                    if(fabs(difference)<1e-6)
+//                    if (fabs(difference)<1e-6)
 //                    {
 //                        difference = 0.0;
 //                    }
@@ -319,7 +319,7 @@ public:
 
 //                    double difference =  analytic_matrix_val - numerical_matrix_val;
 //
-//                    if(fabs(difference)<1e-5)
+//                    if (fabs(difference)<1e-5)
 //                    {
 //                        difference = 0.0;
 //                    }
@@ -336,7 +336,7 @@ public:
 
 
     // It just tests that nothing happens if zero force and tractions are given
-    void TestWithZeroDisplacement() throw(Exception)
+    void TestWithZeroDisplacement()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
@@ -393,7 +393,7 @@ public:
      *    -0.608190204001744 - 0.890314286611269i
      *     0.955749406631746
      */
-    void TestSolveForSimpleDeformationWithCompMooneyRivlin() throw(Exception)
+    void TestSolveForSimpleDeformationWithCompMooneyRivlin()
     {
         double c = 2.2;
         double d = 1.1;
@@ -414,7 +414,7 @@ public:
         std::vector<c_vector<double,2> > locations;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
                 c_vector<double,2> new_position;
@@ -469,7 +469,7 @@ public:
 
         std::vector<double> old_current_soln = solver.rGetCurrentSolution();
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double exact_x = alpha*mesh.GetNode(i)->rGetLocation()[0];
             double exact_y = beta*mesh.GetNode(i)->rGetLocation()[1];
@@ -496,8 +496,6 @@ public:
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
             }
         }
-
-
 
         ///////////////////////////////////////////////////////////////////////////
         // Now solve properly
@@ -580,9 +578,9 @@ public:
      *
      * The calculation is written out fully in the FiniteElementImplementations document.
      */
-    void TestAgainstExactNonlinearSolution() throw(Exception)
+    void TestAgainstExactNonlinearSolution()
     {
-        for(unsigned run = 0; run < 2; run++)
+        for (unsigned run = 0; run < 2; run++)
         {
             unsigned num_elem = 10;
             QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -613,7 +611,7 @@ public:
             problem_defn.SetBodyForce(MyBodyForce);
             problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
 
-            if(run==1)
+            if (run==1)
             {
                 problem_defn.SetSolveUsingSnes();
             }
@@ -639,7 +637,7 @@ public:
                 TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
             }
 
-            if(run==0)
+            if (run==0)
             {
                 // Check that the last matrix was symmetric
                 TS_ASSERT(PetscMatTools::CheckSymmetry(solver.mrJacobianMatrix));
@@ -669,10 +667,10 @@ public:
                 c_matrix<double,6,6> a_elem_incompressible;
                 c_vector<double,6> b_elem_incompressible;
 
-                for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+                for (unsigned i=0; i<mesh.GetNumNodes(); i++)
                 {
                     // spatial variables
-                    for(unsigned j=0; j<2; j++)
+                    for (unsigned j=0; j<2; j++)
                     {
                         incompressible_solver.mCurrentSolution[3*i+j] = solver.mCurrentSolution[2*i+j];
                     }
@@ -682,7 +680,7 @@ public:
 
                 incompressible_solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem_incompressible, b_elem_incompressible, true, false, 0);
 
-                for(unsigned i=0; i<6; i++)
+                for (unsigned i=0; i<6; i++)
                 {
                     TS_ASSERT_DELTA( b_elem_incompressible(i), b_elem(i), 1e-12 );
                 }
@@ -691,7 +689,7 @@ public:
     }
 
 
-    void TestCheckPositiveDefinitenessOfJacobianMatrix() throw(Exception)
+    void TestCheckPositiveDefinitenessOfJacobianMatrix()
     {
         unsigned num_elem = 10;
 
@@ -720,7 +718,7 @@ public:
         PetscVecTools::Zero(test_vec);
         PetscVecTools::Zero(product_vec);
 
-        for(unsigned i=0; i<N; i++)
+        for (unsigned i=0; i<N; i++)
         {
             PetscVecTools::SetElement(test_vec, i, 1.0);
 
@@ -739,7 +737,7 @@ public:
 
     // Solve using an exponential material law. Doesn't test against an exact solution, just that check that the
     // solver converges. Doesn't seem very robust.
-    void TestSolveForSimpleDeformationWithExponentialLaw() throw(Exception)
+    void TestSolveForSimpleDeformationWithExponentialLaw()
     {
         unsigned num_elem = 5;
 
@@ -765,7 +763,7 @@ public:
         // In parallel, this fails with the current solver / preconditioner combination (cg + bjacobi)
         // although checked that matrix is positive definite. Fails because one of the blocks is
         // not positive def? Get round this by using just jacobi preconditioning.
-        PetscOptionsSetValue("-pc_type","jacobi");
+        PetscTools::SetOption("-pc_type","jacobi");
 
         solver.Solve();
 
@@ -787,7 +785,7 @@ public:
      * except the y position of the fixed nodes is left free, i.e. sliding boundary conditions
      * are given
      */
-    void TestSolveUsingSlidingBoundaryConditions2d() throw(Exception)
+    void TestSolveUsingSlidingBoundaryConditions2d()
     {
         double c = 2.2;
         double d = 1.1;
@@ -814,7 +812,7 @@ public:
         // for the rest of the nodes, if X=0, set x=0, leave y free.
         for (unsigned i=1; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
                 c_vector<double,2> new_position;
@@ -883,7 +881,7 @@ public:
     }
 
     // 3d sliding boundary conditions test
-    void TestSolveUsingSlidingBoundaryConditions3d() throw(Exception)
+    void TestSolveUsingSlidingBoundaryConditions3d()
     {
         unsigned num_elem = 2;
 
@@ -900,7 +898,7 @@ public:
         // for the rest of the nodes, if Y=0, set y=0, leave x,z free.
         for (unsigned i=1; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[1])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
                 c_vector<double,3> new_position;
@@ -934,7 +932,7 @@ public:
         // just check the Y=0 nodes still have y=0 but have moved in X and Z (except for node at origin)
         for (unsigned i=1; i<mesh.GetNumNodes(); i++)
         {
-            if ( fabs(mesh.GetNode(i)->rGetLocation()[1])<1e-6)
+            if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 TS_ASSERT_DELTA(r_solution[i](1), 0.0, 1e-8);
                 TS_ASSERT_DIFFERS(r_solution[i](0), mesh.GetNode(i)->rGetLocation()[0]);
@@ -946,7 +944,7 @@ public:
     /* HOW_TO_TAG Continuum mechanics
      * Write strain after solve
      */
-    void TestWritingStrain() throw(Exception)
+    void TestWritingStrain()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -1019,7 +1017,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestWritingStrain3d() throw(Exception)
+    void TestWritingStrain3d()
     {
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
@@ -1040,7 +1038,7 @@ public:
         // Apply a deformation
         //
         // (x,y,z) = (aX, bY-cX, cZ+aY)
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double X = mesh.GetNode(i)->rGetLocation()[0];
             double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -1058,7 +1056,7 @@ public:
         //     [0  a  c]
         c_matrix<double,3,3> F;
 
-        for(unsigned i=0; i<1 /*mesh.GetNumElements()*/; i++)
+        for (unsigned i=0; i<1 /*mesh.GetNumElements()*/; i++)
         {
             solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(i)), F);
 
@@ -1078,7 +1076,7 @@ public:
     }
 
 
-    void TestWritingStress3dAndExceptions() throw(Exception)
+    void TestWritingStress3dAndExceptions()
     {
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
@@ -1099,8 +1097,6 @@ public:
         solver_0.SetComputeAverageStressPerElementDuringSolve();
         solver_0.WriteCurrentAverageElementStresses("wont_be_written",0);
 
-
-
         CompressibleNonlinearElasticitySolver<3> solver(mesh,
                                                         problem_defn,
                                                         "TestWritingStress");
@@ -1116,7 +1112,7 @@ public:
         solver.SetComputeAverageStressPerElementDuringSolve();
 
         assert(solver.mAverageStressesPerElement.size()==6u);
-        for(unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; i++)
         {
             solver.mAverageStressesPerElement[i] = zero_vector<double>(6);
         }
@@ -1141,7 +1137,7 @@ public:
 
         solver.AddStressToAverageStressPerElement(T,2);
 
-        for(unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; i++)
         {
             solver.mAverageStressesPerElement[3](i) = i;
         }
@@ -1150,9 +1146,9 @@ public:
         double corrrect_T3[3][3] = { {0, 1, 2}, {1, 3, 4}, {2, 4, 5} };
 
 
-        for(unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; i++)
         {
-            for(unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; j++)
             {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(0)(i,j), T(i,j), 1e-12);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(1)(i,j), 2*T(i,j), 1e-12);
@@ -1164,9 +1160,9 @@ public:
 
         T(2,2) = 10.243;
 
-        for(unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; i++)
         {
-            for(unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; j++)
             {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(2)(i,j), T(i,j), 1e-12);
             }
@@ -1182,7 +1178,7 @@ public:
     }
 
     // quick 2d test that complements above test
-    void TestWritingStress2d() throw(Exception)
+    void TestWritingStress2d()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
@@ -1201,7 +1197,7 @@ public:
         solver.SetComputeAverageStressPerElementDuringSolve();
 
         assert(solver.mAverageStressesPerElement.size()==2u);
-        for(unsigned i=0; i<2; i++)
+        for (unsigned i=0; i<2; i++)
         {
             solver.mAverageStressesPerElement[i] = zero_vector<double>(3);
         }
@@ -1213,9 +1209,9 @@ public:
         T(1,0) = 0.43;
         solver.AddStressToAverageStressPerElement(T,0);
 
-        for(unsigned i=0; i<2; i++)
+        for (unsigned i=0; i<2; i++)
         {
-            for(unsigned j=0; j<2; j++)
+            for (unsigned j=0; j<2; j++)
             {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(0)(i,j), T(i,j), 1e-12);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(1)(i,j), 0.0, 1e-12);
@@ -1224,7 +1220,7 @@ public:
     }
 
     //Covers exceptions that are thrown in AbstractContinuumMechanicsSolver if used with a non-quadratic mesh
-    void TestAbstractContinuumMechanicsSolverMeshType() throw(Exception)
+    void TestAbstractContinuumMechanicsSolverMeshType()
     {
         TetrahedralMesh<2,2> mesh;
         SolidMechanicsProblemDefinition<2> problem_defn(mesh);

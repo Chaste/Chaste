@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,7 +70,7 @@ public:
         else
         {
             p_model = new Kerchoffs2003ContractionModel;
-            if ( centroid[1] >= 0.05)
+            if (centroid[1] >= 0.05)
             {
                 static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("tr", 25.0);
                 static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("td", 25.0); // ms
@@ -84,7 +84,7 @@ public:
 class TestAbstractContractionCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestContractionCellFactory() throw (Exception)
+    void TestContractionCellFactory()
     {
         {
             LabelBasedContractionCellFactory<2> factory(CONSTANT);
@@ -123,7 +123,7 @@ public:
         }
     }
 
-    void TestContractionCellFactoryOnSquare() throw (Exception)
+    void TestContractionCellFactoryOnSquare()
     {
 
         //2D square meshes for electrics and mechanics
@@ -205,7 +205,5 @@ public:
         delete p_mesh_m;
     }
 };
-
-
 
 #endif /* TESTABSTRACTCONTRACTIONCELLFACTORY_HPP_ */

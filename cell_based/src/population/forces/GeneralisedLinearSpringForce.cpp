@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "GeneralisedLinearSpringForce.hpp"
-#include "IsNan.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GeneralisedLinearSpringForce()
@@ -75,8 +74,8 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     Node<SPACE_DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
 
     // Get the node locations
-    c_vector<double, SPACE_DIM> node_a_location = p_node_a->rGetLocation();
-    c_vector<double, SPACE_DIM> node_b_location = p_node_b->rGetLocation();
+    const c_vector<double, SPACE_DIM>& r_node_a_location = p_node_a->rGetLocation();
+    const c_vector<double, SPACE_DIM>& r_node_b_location = p_node_b->rGetLocation();
 
     // Get the node radii for a NodeBasedCellPopulation
     double node_a_radius = 0.0;
@@ -96,7 +95,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
      * their positions, because this method can be overloaded (e.g. to enforce a
      * periodic boundary in Cylindrical2dMesh).
      */
-    unit_difference = rCellPopulation.rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
+    unit_difference = rCellPopulation.rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location);
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);
@@ -233,11 +232,13 @@ double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeSpringStif
 {
     return mMeinekeSpringStiffness;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeDivisionRestingSpringLength()
 {
     return mMeinekeDivisionRestingSpringLength;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeSpringGrowthDuration()
 {

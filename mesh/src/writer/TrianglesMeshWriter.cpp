@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshWriter(
     const std::string& rDirectory,
@@ -278,7 +277,6 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     }
 //    PetscTools::Barrier("DodgyBarrierAfterFACE");
     MeshEventHandler::EndEvent(MeshEventHandler::FACE);
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -300,7 +298,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
 
     // Write the element header
     unsigned num_elements = this->GetNumElements();
-    assert(SPACE_DIM != ELEMENT_DIM);
+    assert(SPACE_DIM != ELEMENT_DIM);    // LCOV_EXCL_LINE
     unsigned num_attr = 1;
 
     *p_element_file << num_elements << "\t";
@@ -326,8 +324,8 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
 
     *p_element_file << comment << "\n";
     p_element_file->close();
-
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
 {
@@ -338,7 +336,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
         return;
     }
 
-    assert(SPACE_DIM == 3 && ELEMENT_DIM == 2);
+    assert(SPACE_DIM == 3 && ELEMENT_DIM == 2);    // LCOV_EXCL_LINE
 
     std::string face_file_name = this->mBaseName;
     face_file_name = face_file_name + ".edge";
@@ -372,7 +370,6 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
     p_face_file->close();
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 template<class T_DATA>
 void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, unsigned itemNumber,
@@ -382,7 +379,6 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
     //Instantiates the attribute variety with the attributes empty
     WriteItem(pFile, itemNumber, dataPacket, std::vector<double>());
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 template<class T_DATA>
@@ -419,10 +415,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class TrianglesMeshWriter<1,1>;
 template class TrianglesMeshWriter<1,2>;
 template class TrianglesMeshWriter<1,3>;

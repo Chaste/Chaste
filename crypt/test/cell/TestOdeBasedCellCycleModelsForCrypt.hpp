@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,6 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
 
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
@@ -78,7 +80,7 @@ public:
      * Wnt concentration linearly to zero over the time interval 1<t<2, and the
      * cell doesn't divide.
      */
-    void TestWntCellCycleModelForVaryingWntStimulus() throw(Exception)
+    void TestWntCellCycleModelForVaryingWntStimulus()
     {
         // Set up Wnt concentration
         double wnt_level = 1.0;
@@ -212,7 +214,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisOne() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisOne()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -299,7 +301,8 @@ public:
         // is fine as the cell-cycle model dictates the division time, not when
         // the cell is actually divided.
         CellPtr p_daughter_cell = p_stem_cell->Divide();
-        AbstractCellCycleModel* p_cell_model2 = p_daughter_cell->GetCellCycleModel();
+        VanLeeuwen2009WntSwatCellCycleModelHypothesisOne* p_cell_model2 =
+                 static_cast<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne*>(p_daughter_cell->GetCellCycleModel());
 
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_cell_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -446,7 +449,7 @@ public:
         WntConcentration<3>::Destroy();
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisTwo() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisTwo()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -501,7 +504,8 @@ public:
         // is fine as the cell-cycle model dictates the division time, not when
         // the cell is actually divided.
         CellPtr p_daughter_cell = p_stem_cell->Divide();
-        AbstractCellCycleModel* p_cell_model2 = p_daughter_cell->GetCellCycleModel();
+        VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo* p_cell_model2 =
+                         static_cast<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo*>(p_daughter_cell->GetCellCycleModel());
 
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentCellCyclePhase(), M_PHASE);
         TS_ASSERT_EQUALS(p_cell_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -515,7 +519,7 @@ public:
         WntConcentration<3>::Destroy();
     }
 
-    void TestWntCellCycleModelForAPCSingleHit() throw(Exception)
+    void TestWntCellCycleModelForAPCSingleHit()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -583,7 +587,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntCellCycleModelForBetaCatSingleHit() throw(Exception)
+    void TestWntCellCycleModelForBetaCatSingleHit()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -647,7 +651,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntCellCycleModelForAPCDoubleHit() throw(Exception)
+    void TestWntCellCycleModelForAPCDoubleHit()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -712,7 +716,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntCellCycleModelForConstantWntStimulusHealthyCell() throw(Exception)
+    void TestWntCellCycleModelForConstantWntStimulusHealthyCell()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -776,7 +780,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestStochasticWntCellCycleModel() throw (Exception)
+    void TestStochasticWntCellCycleModel()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -900,7 +904,9 @@ public:
             input_arch >> p_cell;
 
             // Test archiving
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            WntCellCycleModel* p_cell_model = static_cast<WntCellCycleModel*>(p_cell->GetCellCycleModel());
+
+
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
@@ -973,7 +979,9 @@ public:
             input_arch >> p_cell;
 
             // Test archiving
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            AbstractVanLeeuwen2009WntSwatCellCycleModel* p_cell_model =
+                    static_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(p_cell->GetCellCycleModel());
+
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
@@ -1044,7 +1052,9 @@ public:
             input_arch >> p_cell;
 
             // Test archiving
-            AbstractCellCycleModel* p_cell_model = p_cell->GetCellCycleModel();
+            AbstractVanLeeuwen2009WntSwatCellCycleModel* p_cell_model =
+                       static_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(p_cell->GetCellCycleModel());
+
             TS_ASSERT_EQUALS(p_cell, p_cell_model->GetCell());
 
             TS_ASSERT_EQUALS(p_cell_model->ReadyToDivide(), true);
@@ -1104,7 +1114,7 @@ public:
 
             TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->ReadyToDivide(), false);
-            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_ONE_PHASE);
+            TS_ASSERT_EQUALS(static_cast<StochasticWntCellCycleModel*>(p_stoc_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_ONE_PHASE);
 
             // When the above tests are included here they pass, so we
             // also put them after the load to see if they still pass.
@@ -1143,7 +1153,7 @@ public:
             input_arch >> p_wnt_cell;
 
             // Test archiving
-            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_ONE_PHASE);
+            TS_ASSERT_EQUALS(static_cast<StochasticWntCellCycleModel*>(p_stoc_cell->GetCellCycleModel())->GetCurrentCellCyclePhase(), G_ONE_PHASE);
 
             // Check - stochastic should divide at 15.14499
             // Wnt should divide at 15.971
@@ -1173,7 +1183,7 @@ public:
 
             TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetBirthTime(), 0.0, 1e-12);
             TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetAge(), 17.0, 1e-12);
-            TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetSG2MDuration(), 10.0, 1e-12);
+            TS_ASSERT_DELTA(static_cast<StochasticWntCellCycleModel*>(p_stoc_cell->GetCellCycleModel())->GetSG2MDuration(), 10.0, 1e-12);
         }
 
         // Tidy up
@@ -1229,7 +1239,6 @@ public:
         std::string stochastic_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( stochastic_wnt_results_dir + "stochastic_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/stochastic_wnt_results.parameters").CompareFiles();
     }
-
 };
 
 #endif /*TESTODEBASEDCELLCYCLEMODELSFORCRYPT_HPP_*/

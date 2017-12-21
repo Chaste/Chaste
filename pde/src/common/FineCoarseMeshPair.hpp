@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FINECOARSEMESHPAIR_HPP_
 
 #include "AbstractTetrahedralMesh.hpp"
-#include "BoxCollection.hpp"
+#include "DistributedBoxCollection.hpp"
 #include "QuadraturePointsGroup.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "Warnings.hpp"
@@ -118,13 +118,13 @@ private:
     /**
      * Boxes on the fine mesh domain, for easier determination of
      * containing element for a given point. */
-    BoxCollection<DIM>* mpFineMeshBoxCollection;
+    DistributedBoxCollection<DIM>* mpFineMeshBoxCollection;
 
     /**
      * Boxes on the coarse mesh domain, for easier determination of
      * containing element for a given point.
      */
-    BoxCollection<DIM>* mpCoarseMeshBoxCollection;
+    DistributedBoxCollection<DIM>* mpCoarseMeshBoxCollection;
 
     /**
      * The containing elements and corresponding weights in the fine
@@ -149,7 +149,7 @@ private:
      *
      *  Note, after ComputeFineElementsAndWeightsForCoarseQuadPoints() or
      *  ComputeFineElementsAndWeightsForCoarseNodes(), then
-     *   mCounters[1] = mNotInMesh.size() = mNotInMeshNearestElementWeights.size();
+     *   mStatisticsCounters[1] = mNotInMesh.size() = mNotInMeshNearestElementWeights.size();
      */
     std::vector<unsigned> mStatisticsCounters;
 
@@ -204,7 +204,7 @@ private:
      */
     void SetUpBoxes(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
                     double boxWidth,
-                    BoxCollection<DIM>*& rpBoxCollection);
+                    DistributedBoxCollection<DIM>*& rpBoxCollection);
 
     /**
      * Helper method. Gets all the elements in the given box, in the given box collection
@@ -216,7 +216,7 @@ private:
      * @param rElementIndices The returned vector of element indices in that box of the box collection. Not
      *  cleared before use.
      */
-    void CollectElementsInContainingBox(BoxCollection<DIM>*& rpBoxCollection,
+    void CollectElementsInContainingBox(DistributedBoxCollection<DIM>*& rpBoxCollection,
                                         unsigned boxIndex,
                                         std::set<unsigned>& rElementIndices);
     /**
@@ -229,7 +229,7 @@ private:
      * @param rElementIndices The returned vector of element indices in that box or a local box. Not
      *  cleared before use.
      */
-    void CollectElementsInLocalBoxes(BoxCollection<DIM>*& rpBoxCollection,
+    void CollectElementsInLocalBoxes(DistributedBoxCollection<DIM>*& rpBoxCollection,
                                      unsigned boxIndex,
                                      std::set<unsigned>& rElementIndices);
 
@@ -238,6 +238,14 @@ private:
      * mStatisticsCounters.
      */
     void ResetStatisticsVariables();
+    /**
+     * In parallel: share mStatisticsCounters and all the "fine element weights for..." information
+     */
+    void ShareFineElementData();
+    /**
+     * In parallel: share mStatisticsCounters and all the "this coarse element index for..." information
+     */
+    void ShareCoarseElementData();
 
 public:
 
@@ -408,7 +416,6 @@ public:
      * @return the coarse mesh
      */
     const AbstractTetrahedralMesh<DIM, DIM>& GetCoarseMesh() const;
-
 };
 
 #endif /*FINECOARSEMESHPAIR_HPP_*/

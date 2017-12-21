@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,16 +34,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/bind.hpp>
-#include <boost/mem_fn.hpp>
 
 #include <algorithm>
 #include <functional>
 
 #include "AbstractCellPopulation.hpp"
-#include "AbstractOdeBasedCellCycleModel.hpp"
-#include "Exception.hpp"
-#include "PetscTools.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
 #include "SmartPointers.hpp"
+#include "CellAncestor.hpp"
+#include "ApoptoticCellProperty.hpp"
 
 // Cell writers
 #include "BoundaryNodeWriter.hpp"
@@ -54,6 +53,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
+
+// These #includes are needed for SetDefaultCellMutationStateAndProliferativeTypeOrdering()
+#include "WildTypeCellMutationState.hpp"
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "DefaultCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -257,29 +266,41 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
         cell_cycle_phase_count[i] = 0;
     }
 
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    /*
+     * Note that in parallel with a poor partition a process could end up with zero cells
+     * in which case the calculation should be skipped since `this->Begin()` is not defined.
+     */
+    if (GetNumAllCells() > 0u)
     {
-        switch ((*cell_iter)->GetCellCycleModel()->GetCurrentCellCyclePhase())
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>((*(this->Begin()))->GetCellCycleModel()) == nullptr)
         {
-            case G_ZERO_PHASE:
-                cell_cycle_phase_count[0]++;
-                break;
-            case G_ONE_PHASE:
-                cell_cycle_phase_count[1]++;
-                break;
-            case S_PHASE:
-                cell_cycle_phase_count[2]++;
-                break;
-            case G_TWO_PHASE:
-                cell_cycle_phase_count[3]++;
-                break;
-            case M_PHASE:
-                cell_cycle_phase_count[4]++;
-                break;
-            default:
-                NEVER_REACHED;
+            EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
+        }
+
+        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+             cell_iter != this->End();
+             ++cell_iter)
+        {
+            switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
+            {
+                case G_ZERO_PHASE:
+                    cell_cycle_phase_count[0]++;
+                    break;
+                case G_ONE_PHASE:
+                    cell_cycle_phase_count[1]++;
+                    break;
+                case S_PHASE:
+                    cell_cycle_phase_count[2]++;
+                    break;
+                case G_TWO_PHASE:
+                    cell_cycle_phase_count[3]++;
+                    break;
+                case M_PHASE:
+                    cell_cycle_phase_count[4]++;
+                    break;
+                default:
+                    NEVER_REACHED;
+            }
         }
     }
 
@@ -331,6 +352,11 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAttachedToLocationInd
 
     // Return whether there is a cell attached to the location index
     return !(cells.empty());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+{
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -409,6 +435,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultCellMutationState
         mutations_and_proliferative_types.push_back(p_registry->Get<StemCellProliferativeType>());
         mutations_and_proliferative_types.push_back(p_registry->Get<TransitCellProliferativeType>());
         mutations_and_proliferative_types.push_back(p_registry->Get<DifferentiatedCellProliferativeType>());
+
         // Parallel process with no cells won't have the default property, so add it in
         mutations_and_proliferative_types.push_back(p_registry->Get<DefaultCellProliferativeType>());
         p_registry->SpecifyOrdering(mutations_and_proliferative_types);
@@ -724,6 +751,11 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParamet
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputResultsForChasteVisualizer()
 {
     return mOutputResultsForChasteVisualizer;
@@ -788,6 +820,19 @@ std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Crea
         ordered_pair.second = index1;
     }
     return ordered_pair;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+{
+    bool non_apoptotic_cell_present = false;
+
+    if (IsCellAttachedToLocationIndex(pdeNodeIndex))
+    {
+        non_apoptotic_cell_present = !(GetCellUsingLocationIndex(pdeNodeIndex)->template HasCellProperty<ApoptoticCellProperty>());
+    }
+
+    return non_apoptotic_cell_present;
 }
 
 // Explicit instantiation

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,7 +83,7 @@ class TestFibreReaderAbilityExtendedBidomainProblem: public CxxTest::TestSuite
 
 public:
 
-    void TestFibreAbilityNoFibreExtendedProblem() throw (Exception)
+    void TestFibreAbilityNoFibreExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -134,7 +134,7 @@ public:
         }
     }
 
-    void TestOrthoFibreAbilityExtendedProblem() throw (Exception)
+    void TestOrthoFibreAbilityExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -164,11 +164,11 @@ public:
 
         // We should expect unchanged tensors for elements with x < 0.5 mm and modified tensors for x > 0.5
         for (AbstractTetrahedralMesh<2,2>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
-                     it != extended_problem.rGetMesh().GetElementIteratorBegin();
-                     ++it)
+             it != extended_problem.rGetMesh().GetElementIteratorBegin();
+             ++it)
         {
             // Get effective conductivity tensors for element < 0.5 mm
-            if(it->CalculateCentroid()[0] < 0.05)
+            if (it->CalculateCentroid()[0] < 0.05)
             {
                 modified_extracellular =  extended_tissue->rGetExtracellularConductivityTensor(it->GetIndex());
                 TS_ASSERT_DELTA(modified_extracellular(0,0), 3, tol);
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    void Test3DAxiFibreAbilityExtendedProblem() throw (Exception)
+    void Test3DAxiFibreAbilityExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -277,7 +277,6 @@ public:
             TS_ASSERT_DELTA(modified_intracellular_second_cell(2,1), 0, tol);
             TS_ASSERT_DELTA(modified_intracellular_second_cell(2,2), 6, tol);
         }
-
     }
 };
 

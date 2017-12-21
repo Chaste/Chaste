@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,9 +44,10 @@ NodeAttributes<SPACE_DIM>::NodeAttributes()
         mRegion(0u),
         mAppliedForce(zero_vector<double>(SPACE_DIM)),
         mRadius(0.0),
+        mNeighbourIndices(std::vector<unsigned>()),
+        mNeighboursSetUp(false),
         mIsParticle(false)
 {
-
 }
 
 template<unsigned SPACE_DIM>
@@ -80,9 +81,9 @@ c_vector<double, SPACE_DIM>& NodeAttributes<SPACE_DIM>::rGetAppliedForce()
 }
 
 template<unsigned SPACE_DIM>
-void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(c_vector<double, SPACE_DIM>& appliedForceContribution)
+void NodeAttributes<SPACE_DIM>::AddAppliedForceContribution(const c_vector<double, SPACE_DIM>& rForceContribution)
 {
-    mAppliedForce += appliedForceContribution;
+    mAppliedForce += rForceContribution;
 }
 
 template<unsigned SPACE_DIM>
@@ -93,6 +94,50 @@ void NodeAttributes<SPACE_DIM>::ClearAppliedForce()
         mAppliedForce[d] = 0.0;
     }
 }
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::AddNeighbour(unsigned index)
+{
+    mNeighbourIndices.push_back(index);
+}
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::ClearNeighbours()
+{
+    mNeighbourIndices.clear();
+}
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::RemoveDuplicateNeighbours()
+{
+    sort( mNeighbourIndices.begin(), mNeighbourIndices.end() );
+    mNeighbourIndices.erase( unique( mNeighbourIndices.begin(), mNeighbourIndices.end() ), mNeighbourIndices.end() );
+}
+
+template<unsigned SPACE_DIM>
+bool NodeAttributes<SPACE_DIM>::NeighboursIsEmpty()
+{
+    return mNeighbourIndices.empty();
+}
+
+template<unsigned SPACE_DIM>
+void NodeAttributes<SPACE_DIM>::SetNeighboursSetUp(bool flag)
+{
+    mNeighboursSetUp = flag;
+};
+
+template<unsigned SPACE_DIM>
+bool NodeAttributes<SPACE_DIM>::GetNeighboursSetUp()
+{
+    return mNeighboursSetUp;
+};
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned>& NodeAttributes<SPACE_DIM>::rGetNeighbours()
+{
+    return mNeighbourIndices;
+};
+
 
 template<unsigned SPACE_DIM>
 bool NodeAttributes<SPACE_DIM>::IsParticle()
@@ -123,10 +168,7 @@ void NodeAttributes<SPACE_DIM>::SetRadius(double radius)
     mRadius = radius;
 }
 
-//////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////////
-
 template class NodeAttributes<1>;
 template class NodeAttributes<2>;
 template class NodeAttributes<3>;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,21 +60,21 @@ std::string ChasteBuildInfo::GetVersionString()
 {
     std::stringstream version;
     version << GetMajorReleaseNumber() << "." << GetMinorReleaseNumber()
-            << "." << GetRevisionNumber();
+            << "." << std::hex << GetRevisionNumber() << std::dec;
     return version.str();
 }
 
 unsigned ChasteBuildInfo::GetMajorReleaseNumber()
 {
-    return 3u;
+    return 2017u;
 }
 
 unsigned ChasteBuildInfo::GetMinorReleaseNumber()
 {
-    return 4u;
+    return 1u;
 }
 
-unsigned ChasteBuildInfo::GetRevisionNumber()
+unsigned long long ChasteBuildInfo::GetRevisionNumber()
 {
     return %(revision)s;
 }
@@ -132,9 +132,19 @@ const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
     static std::map<std::string, std::string> versions;
     if (versions.empty())
     {
-        %(project_versions)s;
+%(project_versions)s
     }
     return versions;
+}
+
+const std::map<std::string, std::string>& ChasteBuildInfo::rGetIfProjectsModified()
+{
+    static std::map<std::string, std::string> modified;
+    if (modified.empty())
+    {
+%(project_modified)s
+    }
+    return modified;
 }
 
 std::string ChasteBuildInfo::GetProvenanceString()

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,14 +47,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
 #include "vtkVersion.h"
 
-#if ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
+#if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkSelectEnclosedPoints.h"
-#include "vtkPointLocator.h"
-#include "vtkCellLocator.h"
 
+#include "vtkCellLocator.h"
 
 /**
  * Airway Generator
@@ -169,7 +168,6 @@ public:
      */
     double CalculateBranchAngle(double rCentre[3], Apex& rCurrentApex);
 
-
     /**
      * Adds an initial growth apex to the system
      *
@@ -261,7 +259,6 @@ public:
      * @param rMaxDiameter The diameter of a branch of the highest order
      */
     void CalculateRadii(const double& rDiameterRatio);
-
 
     /**
      * Marks all points belonging to an initial apex

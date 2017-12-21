@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,6 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "AbstractCryptStatistics.hpp"
 #include "CellPropertyRegistry.hpp"
+#include "AbstractPhaseBasedCellCycleModel.hpp"
+#include "CellLabel.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 AbstractCryptStatistics::AbstractCryptStatistics(MeshBasedCellPopulation<2>& rCrypt)
     : mrCrypt(rCrypt)
@@ -50,7 +53,7 @@ void AbstractCryptStatistics::LabelSPhaseCells()
          cell_iter != mrCrypt.End();
          ++cell_iter)
     {
-        if (cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase()== S_PHASE)
+        if (static_cast <AbstractPhaseBasedCellCycleModel*>(cell_iter->GetCellCycleModel())->GetCurrentCellCyclePhase()== S_PHASE)
         {
             // This should only be done for wild type cells (at the moment anyway)
             assert(cell_iter->GetMutationState()->IsType<WildTypeCellMutationState>());

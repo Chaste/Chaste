@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ class TestPapillaryFibreCalculator : public CxxTest::TestSuite
 {
 public:
 
-    void TestGetSingleRadiusVector(void) throw(Exception)
+    void TestGetSingleRadiusVector(void)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
         TetrahedralMesh<3,3> mesh;
@@ -64,7 +64,7 @@ public:
         TS_ASSERT_DELTA(radius_vector[2], -0.275, 1e-9);
     }
 
-    void TestGetRadiusVectorsAndConstructStructureTensors(void) throw(Exception)
+    void TestGetRadiusVectorsAndConstructStructureTensors(void)
     {
         // Test in three parts to use the results of one test in the next...
         //
@@ -133,7 +133,7 @@ public:
     }
 
     // see also TestPapillaryFibreCalculatorLong() for bigger test of the main method on a cylinder.
-    void TestGetFibreOrientationsOnSimpleCube(void) throw(Exception)
+    void TestGetFibreOrientationsOnSimpleCube(void)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
         TetrahedralMesh<3,3> mesh;
@@ -164,8 +164,6 @@ public:
         TS_ASSERT_DELTA(fabs(fibre_orientations[5](1)), 0.3176, 1e-4);
         TS_ASSERT_DELTA(fabs(fibre_orientations[5](2)), 0.6704, 1e-4);
     }
-
-
 };
 
 #endif /*TESTPAPILLARYFIBRECALCULATOR_HPP_*/

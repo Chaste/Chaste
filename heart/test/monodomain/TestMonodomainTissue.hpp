@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ public:
 class TestMonodomainTissue : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainTissueBasic() throw(Exception)
+    void TestMonodomainTissueBasic()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -150,6 +150,12 @@ public:
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);
+
+        // Coverage
+        TS_ASSERT_THROWS_THIS(cell_factory.FillInCellularTransmuralAreas(),
+              "To get here you have probably asked for Epi/Mid/Endo CellularHeterogeneities in your HeartConfig "
+              "options or configuration .xml file, to use this you will need to provide a method"
+              " `FillInCellularTransmuralAreas()` in your cell factory to override this one.");
 
         // Stimulus function to use at node 0. Node 1 is not stimulated.
         boost::shared_ptr<SimpleStimulus> p_stimulus = cell_factory.GetStimulus();
@@ -230,7 +236,7 @@ public:
         PetscTools::Destroy(voltage);
     }
 
-    void TestMonodomainTissueGetCardiacCell() throw(Exception)
+    void TestMonodomainTissueGetCardiacCell()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -260,7 +266,7 @@ public:
         }
     }
 
-    void TestSolveCellSystemsInclUpdateVoltage() throw(Exception)
+    void TestSolveCellSystemsInclUpdateVoltage()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -316,7 +322,7 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestNodeExchange() throw(Exception)
+    void TestNodeExchange()
     {
         HeartConfig::Instance()->Reset();
 
@@ -329,32 +335,31 @@ public:
 
         MonodomainTissue<1> monodomain_tissue( &cell_factory, true );
 
-
-        if ( PetscTools::GetNumProcs() == 1 )
+        if (PetscTools::GetNumProcs() == 1)
         {
-            TS_ASSERT_EQUALS( mesh.GetNumHaloNodes(), 0u );
+            TS_ASSERT_EQUALS(mesh.GetNumHaloNodes(), 0u);
         }
         else
         {
-            if ( PetscTools::AmMaster() || PetscTools::AmTopMost() )
+            if (PetscTools::AmMaster() || PetscTools::AmTopMost())
             {
-                TS_ASSERT_EQUALS( mesh.GetNumHaloNodes(), 1u );
+                TS_ASSERT_EQUALS(mesh.GetNumHaloNodes(), 1u);
             }
             else
             {
-                TS_ASSERT_EQUALS( mesh.GetNumHaloNodes(), 2u );
+                TS_ASSERT_EQUALS(mesh.GetNumHaloNodes(), 2u);
             }
         }
 
         for (DistributedTetrahedralMesh<1,1>::HaloNodeIterator it=mesh.GetHaloNodeIteratorBegin();
-                it != mesh.GetHaloNodeIteratorEnd();
-                ++it)
+             it != mesh.GetHaloNodeIteratorEnd();
+             ++it)
         {
             AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCellOrHaloCell( (*it)->GetIndex() );
             TS_ASSERT_DELTA(cell->GetStimulus(0.001),0,1e-10);
         }
 
-        if ( PetscTools::AmMaster() )
+        if (PetscTools::AmMaster())
         {
             // Master owns node 0
             AbstractCardiacCellInterface* cell = monodomain_tissue.GetCardiacCellOrHaloCell(0);
@@ -368,7 +373,7 @@ public:
         }
     }
 
-    void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange() throw(Exception)
+    void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -442,7 +447,7 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestSaveAndLoadCardiacTissue() throw (Exception)
+    void TestSaveAndLoadCardiacTissue()
     {
         HeartConfig::Instance()->Reset();
         // Archive settings
@@ -525,7 +530,7 @@ public:
         }
     }
 
-    void TestMonodomainTissueUsingPurkinjeCellFactory() throw(Exception)
+    void TestMonodomainTissueUsingPurkinjeCellFactory()
     {
         HeartConfig::Instance()->Reset();
 
@@ -551,8 +556,8 @@ public:
             AbstractCardiacCellInterface* p_purkinje_cell = tissue.GetPurkinjeCell(global_index);
             double y = current_node->rGetLocation()[1];
 
-            // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
-            if( fabs(y-0.05) < 1e-8 )
+            // Cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
+            if (fabs(y-0.05) < 1e-8)
             {
                 TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != NULL);
             }
@@ -605,7 +610,7 @@ public:
                 double y = current_node->rGetLocation()[1];
 
                 // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
-                if( fabs(y-0.05) < 1e-8 )
+                if (fabs(y-0.05) < 1e-8)
                 {
                     TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_purkinje_cell) != NULL);
                 }
@@ -657,7 +662,5 @@ public:
         delete p_problem;
     }
 };
-
-
 
 #endif //_TESTMONODOMAINTISSUE_HPP_

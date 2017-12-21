@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,7 +74,7 @@ class TestPottsBasedCryptSimulation : public AbstractCellBasedWithTimingsTestSui
 {
 public:
 
-    void TestPottsCryptWithSimpleWntCellCycleModel() throw (Exception)
+    void TestPottsCryptWithSimpleWntCellCycleModel()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
 
@@ -113,9 +113,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -128,7 +128,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
     }
 
-    void TestPottsCryptWithGenerationBasedCellCycleModel() throw (Exception)
+    void TestPottsCryptWithGenerationalCellCycleModel()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
 
@@ -140,7 +140,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<StochasticDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 2.5, 8.0, 16.0, 36);
 
         // Create cell population
@@ -149,7 +149,7 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestPottsGenerationBasedCrypt");
+        simulator.SetOutputDirectory("TestPottsGenerationalCrypt");
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(10.0);
@@ -161,9 +161,9 @@ public:
 
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
-        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+        simulator.AddUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
-        simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+        simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Run simulation
         simulator.Solve();

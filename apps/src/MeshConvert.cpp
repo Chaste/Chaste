@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
             ExecutableSupport::Print("Opening "+base+" mesh file(s).");
 
-            std::auto_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>(argv[1]);
+            std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>(argv[1]);
             //We have to make a mesh so that we can get the node connectivity list back
             DistributedTetrahedralMesh<3,3> mesh;
             mesh.ConstructFromMeshReader(*p_mesh_reader);

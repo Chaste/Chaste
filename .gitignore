@@ -1,0 +1,58 @@
+# Lines that start with '#' are comments.
+
+# Built files
+*.[oa]
+*.os
+*.class
+*.so
+*.pyc
+build/*
+
+# Backups, SCons databases, core dumps, and temporary 'stuff'
+*~
+.sconsign*
+core.*
+*.avi
+*.patch
+*.log
+/*_generator*.arch
+# Last one is ApPredict lookup tables
+
+# A useful folder name to collect lots of local-only files
+_local/
+
+# Temporary build folders for dynamically loaded models
+/heart/dynamic/tmp_*_*
+/heart/dynamic/luo_rudy_1991_dyn.*
+
+# Local hostconfig
+/python/hostconfig/local.py
+/python/hostconfig/machines/local.py
+
+# Test summary results
+/test_summary/*
+
+# Misc. in /
+/.settings
+/.cdtproject
+/.cproject
+/.pydevproject
+/buildtime.txt
+/gmon.out
+/Chaste
+/doxygen
+/.externalToolBuilders
+/testoutput
+
+# Misc in /anim/
+/anim/*.mpeg
+/anim/*.png
+/anim/notforrelease/*.png
+/anim/notforrelease/make_a_movie
+
+# Misc in /apps/
+/apps/data
+
+# Built exes in /apps/src/
+/apps/src/Chaste
+/apps/src/MeshConvert

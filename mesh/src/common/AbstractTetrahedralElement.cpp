@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -193,7 +193,6 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateWeightedDirect
     }
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateNormal()
 {
@@ -229,7 +228,7 @@ c_vector<double, SPACE_DIM> AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateInverseJacobian(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian)
 {
-    assert(ELEMENT_DIM <= SPACE_DIM);
+    assert(ELEMENT_DIM <= SPACE_DIM);     // LCOV_EXCL_LINE
     CalculateJacobian(rJacobian, rJacobianDeterminant);
 
     // CalculateJacobian should make sure that the determinant is not close to zero (or, in fact, negative)
@@ -290,7 +289,7 @@ AbstractTetrahedralElement<0, SPACE_DIM>::AbstractTetrahedralElement(unsigned in
     // Sanity checking
     //unsigned total_nodes = 1;
     assert(this->mNodes.size() == 1);
-    assert(SPACE_DIM > 0);
+    assert(SPACE_DIM > 0);     // LCOV_EXCL_LINE
 
     // This is so we know it's the first time of asking
     // Create Jacobian
@@ -315,7 +314,7 @@ void AbstractTetrahedralElement<0, SPACE_DIM>::CalculateWeightedDirection(
         c_vector<double, SPACE_DIM>& rWeightedDirection,
         double& rJacobianDeterminant)
 {
-    assert(SPACE_DIM > 0);
+    assert(SPACE_DIM > 0);     // LCOV_EXCL_LINE
 
     // End point of a line
     rWeightedDirection = zero_vector<double>(SPACE_DIM);
@@ -327,7 +326,7 @@ void AbstractTetrahedralElement<0, SPACE_DIM>::CalculateWeightedDirection(
 template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractTetrahedralElement<0, SPACE_DIM>::CalculateNormal()
 {
-    assert(SPACE_DIM > 0);
+    assert(SPACE_DIM > 0);     // LCOV_EXCL_LINE
 
     // End point of a line
     c_vector<double, SPACE_DIM> normal = zero_vector<double>(SPACE_DIM);
@@ -357,10 +356,7 @@ void AbstractTetrahedralElement<0, SPACE_DIM>::GetStiffnessMatrixGlobalIndices(u
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class AbstractTetrahedralElement<0,1>;
 template class AbstractTetrahedralElement<1,1>;
 template class AbstractTetrahedralElement<0,2>;

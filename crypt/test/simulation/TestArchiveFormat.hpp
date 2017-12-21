@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,8 +83,14 @@ public:
      *  scons build=GccOpt_hostconfig,boost=1-40,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
      *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
+     * OR to produce archives in CMake:
+     *  cmake -DBOOST_ROOT=/path/to/boost1.40 -DChaste_USE_CVODE=OFF /path/to/Chaste
+     *  make TestGenerateSteadyStateCrypt_simulation_Runner
+     *  ctest -R TestGenerateSteadyStateCrypt
+     *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/
+     *
      */
-    void TestLoadArchive() throw (Exception)
+    void TestLoadArchive()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
@@ -119,6 +125,9 @@ public:
         {
             archive_handler.CopyFileTo(temp_file);
         }
+#ifndef CHASTE_CVODE
+        std::cout << "Warning: CVODE is off.  If this configuration of the test suite fails, but none of the others, then the archive was built with CVODE on.  If should be built with CVODE off." << std::endl;
+#endif //CHASTE_CVODE
 
         // Load and run crypt simulation
         CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile, t);

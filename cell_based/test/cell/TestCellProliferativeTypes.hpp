@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,7 +60,7 @@ class TestCellProliferativeTypes : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellProliferativeTypeMethods() throw(Exception)
+    void TestCellProliferativeTypeMethods()
     {
         MAKE_PTR(StemCellProliferativeType, p_type);
         TS_ASSERT_EQUALS(p_type->GetCellCount(), 0u);
@@ -96,7 +96,7 @@ public:
         TS_ASSERT(const_stem_type.IsSame(p_stem_type.get()));
     }
 
-    void TestArchiveStemCellProliferativeType() throw(Exception)
+    void TestArchiveStemCellProliferativeType()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StemCellProliferativeType.arch";
@@ -141,7 +141,7 @@ public:
         }
     }
 
-    void TestArchiveTransitCellProliferativeType() throw(Exception)
+    void TestArchiveTransitCellProliferativeType()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "TransitCellProliferativeType.arch";
@@ -186,7 +186,7 @@ public:
         }
     }
 
-    void TestArchiveDifferentiatedCellProliferativeType() throw(Exception)
+    void TestArchiveDifferentiatedCellProliferativeType()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DifferentiatedCellProliferativeType.arch";
@@ -231,7 +231,7 @@ public:
         }
     }
 
-    void TestArchiveDefaultCellProliferativeType() throw(Exception)
+    void TestArchiveDefaultCellProliferativeType()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DefaultCellProliferativeType.arch";

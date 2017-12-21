@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,20 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTPOTTSUPDATERULE_HPP_
 #define ABSTRACTPOTTSUPDATERULE_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-
+#include "AbstractUpdateRule.hpp"
 #include "PottsBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 class PottsBasedCellPopulation; // Circular definition
 
 /**
- * An abstract Potts update rule class, for use in cell-based simulations
- * using the cellular Potts model.
+ * An abstract Potts update rule class, for use in cellular Potts model simulations.
  */
 template<unsigned DIM>
-class AbstractPottsUpdateRule : public Identifiable
+class AbstractPottsUpdateRule : public AbstractUpdateRule<DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -63,6 +60,7 @@ class AbstractPottsUpdateRule : public Identifiable
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
     }
 
 public:
@@ -80,6 +78,9 @@ public:
     /**
      * Calculate the contribution to the Hamiltonian.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param currentNodeIndex The index of the current node/lattice site
      * @param targetNodeIndex The index of the target node/lattice site
      * @param rCellPopulation The cell population
@@ -92,24 +93,11 @@ public:
                                                    PottsBasedCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
-     * Output update rule to file. Call OutputUpdateRuleParameters() to output
-     * all member variables to file.
+     * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile a file stream
      */
-    void OutputUpdateRuleInfo(out_stream& rParamsFile);
-
-    /**
-     * Output update rule parameters to file.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param rParamsFile a file stream
-     */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
-
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractPottsUpdateRule)
 
 #endif /*ABSTRACTPOTTSUPDATERULE_HPP_*/

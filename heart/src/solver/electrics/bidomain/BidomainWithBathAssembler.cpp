@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,12 +83,7 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
     }
 }
 
-
-
-///////////////////////////////////////////////////////
-// explicit instantiation
-///////////////////////////////////////////////////////
-
+// Explicit instantiation
 template class BidomainWithBathAssembler<1,1>;
 template class BidomainWithBathAssembler<2,2>;
 template class BidomainWithBathAssembler<3,3>;

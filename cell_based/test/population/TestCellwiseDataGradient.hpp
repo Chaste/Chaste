@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellwiseDataGradient.hpp"
 #include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "TrianglesMeshReader.hpp"
 
@@ -59,7 +59,7 @@ class TestCellwiseDataGradient : public AbstractCellBasedTestSuite
 
 public:
 
-    void TestCellwiseDataGradientVerySmallMesh() throw(Exception)
+    void TestCellwiseDataGradientVerySmallMesh()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -68,7 +68,7 @@ public:
 
         // Create a cell population
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    void TestCellwiseDataGradientFineMesh() throw(Exception)
+    void TestCellwiseDataGradientFineMesh()
     {
         // Create a mesh: [0,2]x[0,2]
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
@@ -101,7 +101,7 @@ public:
 
         // Create a cell population
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
@@ -162,7 +162,7 @@ public:
     }
 
 ///\todo uncomment this test or remove it
-//    void TestCellwiseDataGradientWithGhostNodes() throw(Exception)
+//    void TestCellwiseDataGradientWithGhostNodes()
 //    {
 //        // Create a mesh: [0,2]x[0,2]
 //        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
@@ -181,7 +181,7 @@ public:
 //
 //        // Set up cells
 //        std::vector<CellPtr> cells;
-//        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+//        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
 //        cells_generator.GenerateBasic(cells, cell_location_indices.size());
 //
 //        // Create a cell population

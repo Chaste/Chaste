@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptCellsGenerator.hpp"
 /*
  * The next two header files define two different types of cell-cycle model.
- * In a {{{FixedDurationGenerationBasedCellCycleModel}}}, the duration of each phase
+ * In a {{{FixedG1GenerationalCellCycleModel}}}, the duration of each phase
  * of the cell cycle is fixed. In a {{{WntCellCycleModel}}}, the duration of a cell's G1 phase
  * is determined by a system of nonlinear ODEs describing a cell's response to the local
  * concentration of Wnt,
@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * proliferation in the crypt. In our crypt simulations, we impose a fixed gradient of
  * Wnt up the axis of the crypt.
  */
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable triangular mesh
  * for the crypt simulation, such that the cell corresponding to each node is initially
@@ -127,7 +127,7 @@ public:
      * cylindrical mesh, with each cell progressing through a fixed cell-cycle model,
      * and sloughing enforced at the top of the crypt.
      */
-    void TestCryptWithFixedCellCycle() throw(Exception)
+    void TestCryptWithFixedCellCycle()
     {
         /* First, we generate a mesh. The basic Chaste mesh is a {{{TetrahedralMesh}}}.
          * To enforce periodicity at the left- and right-hand sides of the mesh, we
@@ -150,7 +150,7 @@ public:
         /*
          * Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we use the `CryptCellsGenerator` helper class, which is templated over the type
-         * of cell-cycle model required (here {{{FixedDurationGenerationBasedCellCycleModel}}})
+         * of cell-cycle model required (here {{{FixedG1GenerationalCellCycleModel}}})
          * and the dimension. We create an empty vector of cells and pass this into the
          * method {{{Generate()}}} along with the mesh. The fourth argument 'true' indicates that the cells
          * should be assigned random birth times, to avoid synchronous division. The
@@ -158,7 +158,7 @@ public:
          * called. Note that we only ever deal with shared pointers to cells, named {{{CellPtr}}}s.
          */
         std::vector<CellPtr> cells;
-        CryptCellsGenerator<FixedDurationGenerationBasedCellCycleModel> cells_generator;
+        CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
         /*
@@ -231,7 +231,7 @@ public:
      * using a fixed cell-cycle model, we use a Wnt-dependent cell-cycle model,
      * with the Wnt concentration varying within the crypt in a predefined manner.
      */
-    void TestCryptWithWntCellCycle() throw(Exception)
+    void TestCryptWithWntCellCycle()
     {
         /* First we create a cylindrical mesh, and get the cell location indices, exactly as before.
          * Note that time is re-initialized to zero and random number generator is re-seeded to zero in the {{{AbstractCellBasedTestSuite}}}.*/

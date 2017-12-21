@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,8 +76,15 @@ void PetscVecTools::AddToElement(Vec vector, PetscInt row, double value)
 void PetscVecTools::Display(Vec vector)
 {
     //Give full precision, scientific notation
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPushFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#else
     PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
+#endif
     VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7+
+    PetscViewerPopFormat(PETSC_VIEWER_STDOUT_WORLD);
+#endif
 }
 
 void PetscVecTools::Zero(Vec vector)
@@ -226,7 +233,7 @@ void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter first
 
 
 //    //PETSc-3.x.x or PETSc-2.3.3
-//#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+//#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
 //    VecScatterBegin(firstVariableScatterContext, interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD);
 //    VecScatterEnd(firstVariableScatterContext, interleavedVec, firstVariableVec, INSERT_VALUES, SCATTER_FORWARD);
 //#else
@@ -235,7 +242,7 @@ void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter first
 //#endif
 //
 //    //PETSc-3.x.x or PETSc-2.3.3
-//#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+//#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
 //    VecScatterBegin(secondVariableScatterContefirstVariableScatterContextt, interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD);
 //    VecScatterEnd(secondVariableScatterContefirstVariableScatterContextt, interleavedVec, secondVariableVec, INSERT_VALUES, SCATTER_FORWARD);
 //#else
@@ -268,7 +275,7 @@ void PetscVecTools::DoInterleavedVecGather(Vec interleavedVec, VecScatter firstV
     VecRestoreArray(firstVariableVec, &p_1st_variable_vec);
     VecRestoreArray(secondVariableVec, &p_2nd_variable_vec);
 
-//#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+//#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
 //    VecScatterBegin(firstVariableScatterContext, firstVariableVec, interleavedVec, INSERT_VALUES, SCATTER_REVERSE);
 //    VecScatterEnd(firstVariableScatterContext, firstVariableVec, interleavedVec, INSERT_VALUES, SCATTER_REVERSE);
 //#else
@@ -277,7 +284,7 @@ void PetscVecTools::DoInterleavedVecGather(Vec interleavedVec, VecScatter firstV
 //#endif
 //
 ////PETSc-3.x.x or PETSc-2.3.3
-//#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+//#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
 //    VecScatterBegin(secondVariableScatterContext, secondVariableVec, interleavedVec, INSERT_VALUES, SCATTER_REVERSE);
 //    VecScatterEnd(secondVariableScatterContext, secondVariableVec, interleavedVec, INSERT_VALUES, SCATTER_REVERSE);
 //#else

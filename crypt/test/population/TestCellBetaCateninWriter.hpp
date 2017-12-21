@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ class TestCellBetaCateninWriter : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestWriter() throw (Exception)
+    void TestWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -108,7 +108,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCellBetaCateninWriterArchiving() throw (Exception)
+    void TestCellBetaCateninWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);

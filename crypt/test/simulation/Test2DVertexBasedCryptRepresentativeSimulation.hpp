@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SloughingCellKiller.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FakePetscSetup.hpp"
 
@@ -64,7 +65,7 @@ class Test2DVertexCryptRepresentativeSimulation : public CxxTest::TestSuite
 {
 public:
 
-    void Test2DVertexCryptRepresentativeSimulationForProfiling() throw (Exception)
+    void Test2DVertexCryptRepresentativeSimulationForProfiling()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);

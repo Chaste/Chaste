@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh) throw (Exception)
+void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh)
 {
     this->mpMesh = pMesh;
 
@@ -62,7 +62,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
         {
             // open file
             this->mFileReader.reset(new FibreReader<SPACE_DIM>(this->mFibreOrientationFile, ORTHO));
-            if(this->mFileReader->GetNumLinesOfData() != this->mpMesh->GetNumElements())
+            if (this->mFileReader->GetNumLinesOfData() != this->mpMesh->GetNumElements())
             {
                 EXCEPTION("The size of the fibre file does not match the number of elements in the mesh");
             }
@@ -70,7 +70,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
 
         if (this->mUseNonConstantConductivities)
         {
-            if(this->mpNonConstantConductivities->size() != this->mpMesh->GetNumLocalElements())
+            if (this->mpNonConstantConductivities->size() != this->mpMesh->GetNumLocalElements())
             {
                 EXCEPTION("The size of the conductivities vector does not match the number of elements in the mesh");
             }
@@ -140,7 +140,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
 
         if (this->mUseFibreOrientation)
         {
-            // close fibre file
+            // Close fibre file
             this->mFileReader.reset();
         }
     }
@@ -148,11 +148,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
     this->mInitialised = true;
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class OrthotropicConductivityTensors<1,1>;
 template class OrthotropicConductivityTensors<1,2>;
 template class OrthotropicConductivityTensors<1,3>;

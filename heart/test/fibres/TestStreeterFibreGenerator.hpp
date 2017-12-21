@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestStreeterFibreGenerator : public CxxTest::TestSuite
 {
 private:
-    void CompareGeneratedWithReferenceFile(FileFinder& rGeneratedFile, FibreFileType generatedFileType, FileFinder& rReferenceFile, FibreFileType referenceFileType) throw (Exception)
+    void CompareGeneratedWithReferenceFile(FileFinder& rGeneratedFile, FibreFileType generatedFileType, FileFinder& rReferenceFile, FibreFileType referenceFileType)
     {
         // Make sure that any parallel file writers have finished before attempting to open
         PetscTools::Barrier("Wait for WriteData()");
@@ -110,7 +110,7 @@ private:
 
 public:
 
-    void TestSimpleOrthotropic() throw (Exception)
+    void TestSimpleOrthotropic()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
@@ -140,7 +140,7 @@ public:
         CompareGeneratedWithReferenceFile(fibre_file_binary, ORTHO, fibre_file_reference, ORTHO);
     }
 
-    void TestSimpleOrthotropicNotDistributed() throw (Exception)
+    void TestSimpleOrthotropicNotDistributed()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
@@ -203,7 +203,7 @@ public:
         fibre_generator.SetApexToBase(axis);
     }
 
-    void TestConstructStreeterOnLeftWedge() throw(Exception)
+    void TestConstructStreeterOnLeftWedge()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/human_wedge_mesh/HumanWedgeMesh");
         std::string epi_face_file = "heart/test/data/human_wedge_mesh/epi.tri";
@@ -230,7 +230,7 @@ public:
         CompareGeneratedWithReferenceFile(fibre_file1, ORTHO, fibre_file2, ORTHO);
     }
 
-    void TestConstructStreeterOnRightWedge() throw(Exception)
+    void TestConstructStreeterOnRightWedge()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/human_wedge_mesh/HumanWedgeMesh");
         std::string epi_face_file = "heart/test/data/human_wedge_mesh/epi.tri";
@@ -257,7 +257,7 @@ public:
         CompareGeneratedWithReferenceFile(fibre_file1, ORTHO, fibre_file2, ORTHO);
     }
 
-    void TestSetLogInfo() throw (Exception)
+    void TestSetLogInfo()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
@@ -283,15 +283,16 @@ public:
         TS_ASSERT_EQUALS(wall_thickness_file.IsFile(), false);
         TS_ASSERT_EQUALS(averaged_thickness_file.IsFile(), false);
 
+        // Make the above parallel tests finish before the next part.
+        // (When master process enters PreWriteCalculations it will create empty files for the node_regions etc.)
+        PetscTools::Barrier("Wait for tests that files don't exist yet");
         fibre_generator.SetLogInfo(true);
-
         fibre_generator.WriteData(handler, "box_heart.ortho");
 
         TS_ASSERT_EQUALS(node_regions_file.IsFile(), true);
         TS_ASSERT_EQUALS(wall_thickness_file.IsFile(), true);
         TS_ASSERT_EQUALS(averaged_thickness_file.IsFile(), true);
     }
-
 };
 
 #endif /*TESTSTREETERFIBREGENERATOR_HPP_*/

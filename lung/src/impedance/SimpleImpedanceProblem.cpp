@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,7 +93,7 @@ void SimpleImpedanceProblem::Solve()
 
     mImpedances.resize(mFrequencies.size());
 
-    for(unsigned frequency_index = 0; frequency_index < mFrequencies.size(); ++frequency_index)
+    for (unsigned frequency_index = 0; frequency_index < mFrequencies.size(); ++frequency_index)
     {
         mImpedances[frequency_index] = CalculateElementImpedance(p_element, mFrequencies[frequency_index]);
     }
@@ -120,7 +120,7 @@ std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(Element<1
     std::complex<double> Z(0, 0);
 
     //Get children
-    if(mWalker.GetNumberOfChildElements(pElement) == 0u) //Branch is terminal, hence consider to be an acinus
+    if (mWalker.GetNumberOfChildElements(pElement) == 0u) //Branch is terminal, hence consider to be an acinus
     {
         Z = CalculateAcinusImpedance(mWalker.GetDistalNode(pElement), frequency);
     }
@@ -132,19 +132,19 @@ std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(Element<1
 
         assert(child_eles.size() <= 2u);
 
-        for(unsigned i = 0; i < child_eles.size(); ++i)
+        for (unsigned i = 0; i < child_eles.size(); ++i)
         {
             assert(child_eles[i] != pElement);
 
             std::complex<double> ele_impedance = CalculateElementImpedance(child_eles[i], frequency);
 
-            if(real(ele_impedance) != 0.0 || imag(ele_impedance) != 0.0)
+            if (real(ele_impedance) != 0.0 || imag(ele_impedance) != 0.0)
             {
                 sum_one_over_Z_child += 1.0/ele_impedance;
             }
         }
 
-        if(real(sum_one_over_Z_child) != 0.0 || imag(sum_one_over_Z_child) != 0.0)
+        if (real(sum_one_over_Z_child) != 0.0 || imag(sum_one_over_Z_child) != 0.0)
         {
             Z = 1.0/sum_one_over_Z_child;
         }
@@ -171,7 +171,7 @@ std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(Element<1
 
 std::complex<double> SimpleImpedanceProblem::CalculateAcinusImpedance(Node<3>* pNode, double frequency)
 {
-    if(frequency == 0.0)
+    if (frequency == 0.0)
     {
         return 0.0;
     }
@@ -193,7 +193,6 @@ void  SimpleImpedanceProblem::SetMu(double mu)
     mMu = mu;
 }
 
-
 double SimpleImpedanceProblem::CalculateElementResistance(double radius, double length)
 {
     return 8*mMu*length/(M_PI*radius*radius*radius*radius);
@@ -208,9 +207,3 @@ void SimpleImpedanceProblem::SetMeshInMilliMetres()
 {
     mLengthScaling = 1e-3;
 }
-
-
-
-
-
-

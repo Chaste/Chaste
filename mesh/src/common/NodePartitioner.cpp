@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,31 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "petscao.h"
 #include "petscmat.h"
 
-/*
- * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
- * the library was compiled with a plain-C compiler, it fails to link using a C++ compiler.
- * Note that METIS 4.0 fails to compile with g++ or icpc, so a C compiler should be used.
- *
- * Somebody had this problem before: http://www-users.cs.umn.edu/~karypis/.discus/messages/15/113.html?1119486445
- *
- * Note that it was thought necessary to define the function header before the #include statement.
-*/
-
 #include <parmetis.h>
-
-///\todo #2250 Direct calls to METIS are to be deprecated
-#if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above implies METIS 5.x and above
-//Redefine the index type so that we can still use the old name "idxtype"
-#define idxtype idx_t
-#else
-//Old version of ParMETIS does not need the type redefinition
-//Old version of ParMETIS is missing the METIS prototype signature definition
-extern "C" {
-extern void METIS_PartMeshNodal(int*, int*, int*, int*, int*, int*, int*, int*, int*);
-}
-#endif
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -91,147 +67,6 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEM
     }
 }
 
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                                                           std::vector<unsigned>& rNodePermutation,
-                                                                           std::set<unsigned>& rNodesOwned,
-                                                                           std::vector<unsigned>& rProcessorsOffset)
-{
-    assert(PetscTools::IsParallel());
-    ///\todo #2250 Direct calls to METIS are to be deprecated
-    WARN_ONCE_ONLY("METIS_LIBRARY partitioning is deprecated and will be removed from later versions of Chaste");
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
-
-    TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>*>(&rMeshReader);
-
-    unsigned order_of_elements = 1;
-    if (p_mesh_reader)
-    {
-        //A triangles mesh reader will let you read with non-linear elements
-        order_of_elements = p_mesh_reader->GetOrderOfElements();
-    }
-
-    // If it is a quadratic TrianglesMeshReader
-    if (order_of_elements == 2)
-    {
-        //Metis 4.0 cannot partition second order meshes
-        EXCEPTION("Metis cannot partition a quadratic mesh.");
-    }
-
-    idxtype nn = rMeshReader.GetNumNodes();
-    idxtype* npart = new idxtype[nn];
-    assert(npart != NULL);
-
-    //Only the master process will access the element data and perform the partitioning
-    if (PetscTools::AmMaster())
-    {
-        idxtype ne = rMeshReader.GetNumElements();
-        idxtype* elmnts = new idxtype[ne * (ELEMENT_DIM+1)];
-        assert(elmnts != NULL);
-
-        unsigned counter=0;
-        for (unsigned element_number = 0; element_number < rMeshReader.GetNumElements(); element_number++)
-        {
-            ElementData element_data = rMeshReader.GetNextElementData();
-
-            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
-            {
-                elmnts[counter++] = element_data.NodeIndices[i];
-            }
-        }
-        rMeshReader.Reset();
-
-        idxtype nparts = PetscTools::GetNumProcs();
-        idxtype edgecut;
-        idxtype* epart = new idxtype[ne];
-        assert(epart != NULL);
-
-        Timer::Reset();
-#if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above implies METIS 5.x and above
-        //New interface
-        //Where to find information on element i in the elmnts array
-        idxtype* eptr = new idxtype[ne+1];
-        for (idxtype i=0; i<=ne; i++)
-        {
-            eptr[i] = i * (ELEMENT_DIM+1);
-        }
-        METIS_PartMeshNodal(&ne, &nn, eptr, elmnts,
-                NULL /*vwgt*/, NULL /*vsize*/, &nparts, NULL /*tpwgts*/,
-                NULL /*options*/, &edgecut /*aka objval*/, epart, npart);
-#else
-        //Old interface
-        int numflag = 0; //0 means C-style numbering is assumed
-        int etype;
-        switch (ELEMENT_DIM)
-        {
-            case 2:
-                etype = 1; //1 is Metis speak for triangles
-                break;
-            case 3:
-                etype = 2; //2 is Metis speak for tetrahedra
-                break;
-            default:
-                NEVER_REACHED;
-        }
-
-        METIS_PartMeshNodal(&ne, &nn, elmnts, &etype, &numflag, &nparts, &edgecut, epart, npart);
-#endif
-        delete[] elmnts;
-        delete[] epart;
-    }
-
-    //Here's the new bottle-neck: share all the node ownership data
-    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
-    MPI_Datatype mpi_idxtype = MPI_LONG_LONG_INT;
-    if (sizeof(idxtype) == sizeof(int))
-    {
-        mpi_idxtype = MPI_INT;
-    }
-    MPI_Bcast(npart /*data*/, nn /*size*/, mpi_idxtype, 0 /*From Master*/, PETSC_COMM_WORLD);
-
-    assert(rProcessorsOffset.size() == 0); // Making sure the vector is empty. After calling resize() only newly created memory will be initialised to 0.
-    rProcessorsOffset.resize(PetscTools::GetNumProcs(), 0);
-
-    for (unsigned node_index=0; node_index<rMeshReader.GetNumNodes(); node_index++)
-    {
-        unsigned part_read = npart[node_index];
-
-        // METIS output says I own this node
-        if (part_read == PetscTools::GetMyRank())
-        {
-            rNodesOwned.insert(node_index);
-        }
-
-        // Offset is defined as the first node owned by a processor. We compute it incrementally.
-        // i.e. if node_index belongs to proc 3 (of 6) we have to shift the processors 4, 5, and 6
-        // offset a position.
-        for (unsigned proc=part_read+1; proc<PetscTools::GetNumProcs(); proc++)
-        {
-            rProcessorsOffset[proc]++;
-        }
-    }
-
-    /*
-     *  Once we know the offsets we can compute the permutation vector
-     */
-    std::vector<unsigned> local_index(PetscTools::GetNumProcs(), 0);
-
-    rNodePermutation.resize(rMeshReader.GetNumNodes());
-
-    for (unsigned node_index=0; node_index<rMeshReader.GetNumNodes(); node_index++)
-    {
-        unsigned part_read = npart[node_index];
-
-        rNodePermutation[node_index] = rProcessorsOffset[part_read] + local_index[part_read];
-
-        local_index[part_read]++;
-    }
-
-    delete[] npart;
-}
-
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                               std::vector<unsigned>& rNodePermutation,
@@ -239,13 +74,11 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
                                               std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3);      // LCOV_EXCL_LINE // Metis works with triangles and tetras
 
     if (!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
-#define COVERAGE_IGNORE
-        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");
-#undef COVERAGE_IGNORE
+        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");      // LCOV_EXCL_LINE
     }
 
     unsigned num_nodes = rMeshReader.GetNumNodes();
@@ -271,7 +104,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     ///\todo #1216 change the number 54 below (row nonzero allocation) to be nonmagic
     PetscTools::SetupMat(connectivity_matrix, num_nodes, num_nodes, 54, PETSC_DECIDE, PETSC_DECIDE, false);
 
-    if ( ! rMeshReader.IsFileFormatBinary() )
+    if (!rMeshReader.IsFileFormatBinary())
     {
         // Advance the file pointer to the first element I own
         for (unsigned element_index = 0; element_index < first_local_element; element_index++)
@@ -292,7 +125,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     {
         ElementData element_data;
 
-        if ( rMeshReader.IsFileFormatBinary() )
+        if (rMeshReader.IsFileFormatBinary())
         {
             element_data = rMeshReader.GetElementData(first_local_element + element_index);
         }
@@ -486,8 +319,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 
         // Establish whether it lies in the domain. ChasteCuboid::DoesContain is
         // insufficient for this as it treats all boundaries as open.
-        ChastePoint<SPACE_DIM> lower = pRegion->rGetLowerCorner();
-        ChastePoint<SPACE_DIM> upper = pRegion->rGetUpperCorner();
+        const ChastePoint<SPACE_DIM>& lower = pRegion->rGetLowerCorner();
+        const ChastePoint<SPACE_DIM>& upper = pRegion->rGetUpperCorner();
 
         bool does_contain = true;
 
@@ -495,11 +328,10 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
         {
             bool boundary_check;
             boundary_check = ((location[d] > lower[d]) || sqrt((location[d]-lower[d])*(location[d]-lower[d])) < DBL_EPSILON);
-            boundary_check *= (location[d] < upper[d]);
-            does_contain *= boundary_check;
+            does_contain = (does_contain && boundary_check && (location[d] < upper[d]));
         }
 
-        if(does_contain)
+        if (does_contain)
         {
             node_ownership[node] = 1;
             rNodesOwned.insert(node);
@@ -533,23 +365,14 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
                 rNodePermutation.push_back(node);
             }
         }
-
     }
     assert(rNodePermutation.size() == num_nodes);
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class NodePartitioner<1,1>;
 template class NodePartitioner<1,2>;
 template class NodePartitioner<1,3>;
 template class NodePartitioner<2,2>;
 template class NodePartitioner<2,3>;
 template class NodePartitioner<3,3>;
-
-
-
-
-

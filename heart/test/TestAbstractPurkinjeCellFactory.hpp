@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ public:
 class TestAbstractPurkinjeCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestPurkinjeCellFactory() throw (Exception)
+    void TestPurkinjeCellFactory()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         MixedDimensionMesh<2,2> mixed_mesh;
@@ -103,7 +103,7 @@ public:
             double y = current_node->rGetLocation()[1];
 
             // cable nodes are on y=0.05 (we don't test by index because indices may be permuted in parallel).
-            if( fabs(y-0.05) < 1e-8 )
+            if (fabs(y-0.05) < 1e-8)
             {
                 TS_ASSERT(dynamic_cast<CellDiFrancescoNoble1985FromCellML*>(p_cell) != NULL);
             }

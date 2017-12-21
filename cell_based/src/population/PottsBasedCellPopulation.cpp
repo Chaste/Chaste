@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,16 +35,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsBasedCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "Warnings.hpp"
+#include "AbstractPottsUpdateRule.hpp"
+#include "NodesOnlyMesh.hpp"
+#include "CellPopulationElementWriter.hpp"
+#include "CellIdWriter.hpp"
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
-#include "NodesOnlyMesh.hpp"
-#include "Exception.hpp"
-
-// Cell writers
-#include "CellPopulationElementWriter.hpp"
-#include "CellIdWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -81,8 +78,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                                         bool validate,
                                                         const std::vector<unsigned> locationIndices)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -97,8 +94,8 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh),
-      mpElementTessellation(NULL),
-      mpMutableMesh(NULL),
+      mpElementTessellation(nullptr),
+      mpMutableMesh(nullptr),
       mTemperature(0.1),
       mNumSweepsPerTimestep(1)
 {
@@ -128,6 +125,24 @@ template<unsigned DIM>
 const PottsMesh<DIM>& PottsBasedCellPopulation<DIM>::rGetMesh() const
 {
     return *mpPottsMesh;
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
+{
+    std::vector<Node<DIM>*> temp_nodes;
+
+    // Create nodes at the centre of the cells
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        unsigned index = this->GetLocationIndexUsingCell(*cell_iter);
+        c_vector<double, DIM> location = this->GetLocationOfCellCentre(*cell_iter);
+        temp_nodes.push_back(new Node<DIM>(index, location));
+    }
+
+    return new MutableMesh<DIM, DIM>(temp_nodes);
 }
 
 template<unsigned DIM>
@@ -174,7 +189,7 @@ PottsElement<DIM>* PottsBasedCellPopulation<DIM>::GetElementCorrespondingToCell(
 }
 
 template<unsigned DIM>
-CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr PottsBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
     // Get the element associated with this cell
     PottsElement<DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
@@ -196,24 +211,30 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<CellPtr>::iterator it = this->mCells.begin();
-         it != this->mCells.end();
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
          )
     {
-        if ((*it)->IsDead())
+        if ((*cell_iter)->IsDead())
         {
-            // Remove the element from the mesh
+            // Get the location index corresponding to this cell
+            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+            // Use this to remove the cell from the population
+            mpPottsMesh->DeleteElement(location_index);
+
+            // Erase cell and update counter
+            cell_iter = this->mCells.erase(cell_iter);
             num_removed++;
-            mpPottsMesh->DeleteElement(this->GetLocationIndexUsingCell((*it)));
-            it = this->mCells.erase(it);
         }
         else
         {
-            ++it;
+            ++cell_iter;
         }
     }
     return num_removed;
 }
+
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
@@ -236,7 +257,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     if (this->mIterateRandomlyOverUpdateRuleCollection)
     {
         // Randomly permute mUpdateRuleCollection
-        p_gen->Shuffle(mUpdateRuleCollection);
+        p_gen->Shuffle(this->mUpdateRuleCollection);
     }
 
     for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)
@@ -278,18 +299,20 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
             std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
             // Only calculate Hamiltonian and update elements if the nodes are from different elements, or one is from the medium
-            if (    ( !containing_elements.empty() && neighbour_containing_elements.empty() )
-                 || ( containing_elements.empty() && !neighbour_containing_elements.empty() )
-                 || ( !containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin() ) )
+            if ((!containing_elements.empty() && neighbour_containing_elements.empty())
+                || (containing_elements.empty() && !neighbour_containing_elements.empty())
+                || (!containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin()))
             {
                 double delta_H = 0.0; // This is H_1-H_0.
 
                 // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-                for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
-                     iter != mUpdateRuleCollection.end();
+                for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = this->mUpdateRuleCollection.begin();
+                     iter != this->mUpdateRuleCollection.end();
                      ++iter)
                 {
-                    delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                    // This static cast is fine, since we assert the update rule must be a Potts update rule in AddUpdateRule()
+                    double dH = (boost::static_pointer_cast<AbstractPottsUpdateRule<DIM> >(*iter))->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                    delta_H += dH;
                 }
 
                 // Generate a uniform random number to do the random motion
@@ -398,21 +421,10 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
+void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
-    mUpdateRuleCollection.push_back(pUpdateRule);
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::RemoveAllUpdateRules()
-{
-    mUpdateRuleCollection.clear();
-}
-
-template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >& PottsBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
-{
-    return mUpdateRuleCollection;
+    assert(bool(dynamic_cast<AbstractPottsUpdateRule<DIM>*>(pUpdateRule.get())));
+    this->mUpdateRuleCollection.push_back(pUpdateRule);
 }
 
 template<unsigned DIM>
@@ -449,8 +461,8 @@ void PottsBasedCellPopulation<DIM>::CreateMutableMesh()
     std::vector<Node<DIM>*> nodes;
     for (unsigned node_index=0; node_index<this->mrMesh.GetNumNodes(); node_index++)
     {
-      c_vector<double, DIM> location = this->mrMesh.GetNode(node_index)->rGetLocation();
-      nodes.push_back(new Node<DIM>(node_index, location));
+      const c_vector<double, DIM>& r_location = this->mrMesh.GetNode(node_index)->rGetLocation();
+      nodes.push_back(new Node<DIM>(node_index, r_location));
     }
 
     mpMutableMesh = new MutableMesh<DIM,DIM>(nodes);
@@ -607,9 +619,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 
-    // Extra Part to output the outlines of cells
-
-    if (DIM ==2 )
+    // Extra part to output the outlines of cells
+    if (DIM ==2)
     {
         std::vector<Node<2>*> outline_nodes;
         std::vector<VertexElement<2,2>*>  outline_elements;
@@ -632,45 +643,44 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             {
                 std::set<unsigned> neighbouring_element_indices = this->rGetMesh().GetNode(*neighbour_iter)->rGetContainingElementIndices();
 
-                //if different cells add a line
-                if ( element_indices != neighbouring_element_indices)
+                // If different cells add a line
+                if (element_indices != neighbouring_element_indices)
                 {
                     std::vector<Node<2>*> element_nodes;
 
-                    c_vector<double, 2> node_location = this->mrMesh.GetNode(node_index)->rGetLocation();
-                    c_vector<double, 2> neighbour_node_location = this->mrMesh.GetNode(*neighbour_iter)->rGetLocation();
+                    const c_vector<double, 2>& r_node_location = this->mrMesh.GetNode(node_index)->rGetLocation();
+                    const c_vector<double, 2>& r_neighbour_node_location = this->mrMesh.GetNode(*neighbour_iter)->rGetLocation();
 
-                    c_vector<double, 2> unit_tangent = neighbour_node_location - node_location;
-
+                    c_vector<double, 2> unit_tangent = r_neighbour_node_location - r_node_location;
 
                     if (norm_2(unit_tangent) > 1.0) // It's a periodic neighbour
                     {
-                        c_vector<double, 2> mid_point = 0.5*(node_location + neighbour_node_location);
-                        if (unit_tangent(0)==0)
+                        c_vector<double, 2> mid_point = 0.5*(r_node_location + r_neighbour_node_location);
+                        if (unit_tangent(0) == 0)
                         {
-                            if (node_location(1) < neighbour_node_location (1))
+                            if (r_node_location(1) < r_neighbour_node_location(1))
                             {
-                                mid_point(1) = node_location(1) - 0.5;
+                                mid_point(1) = r_node_location(1) - 0.5;
                             }
                             else
                             {
-                                mid_point(1) = node_location(1) + 0.5;
+                                mid_point(1) = r_node_location(1) + 0.5;
                             }
                         }
                         else
                         {
-                            assert(unit_tangent(1)==0);
+                            assert(unit_tangent(1) == 0);
 
-                            if (node_location(0) < neighbour_node_location (0))
+                            if (r_node_location(0) < r_neighbour_node_location(0))
                             {
-                                mid_point(0) = node_location(0) - 0.5;
+                                mid_point(0) = r_node_location(0) - 0.5;
                             }
                             else
                             {
-                                mid_point(0) = node_location(0) + 0.5;
+                                mid_point(0) = r_node_location(0) + 0.5;
                             }
                         }
-                        assert(norm_2(unit_tangent)>0);
+                        assert(norm_2(unit_tangent) > 0);
                         unit_tangent = unit_tangent/norm_2(unit_tangent);
 
                         c_vector<double, DIM> unit_normal;
@@ -702,9 +712,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                     }
                     else // Standard Neighbour
                     {
-                        c_vector<double, 2> mid_point = 0.5*(node_location + neighbour_node_location);
+                        c_vector<double, 2> mid_point = 0.5*(r_node_location + r_neighbour_node_location);
 
-                        assert(norm_2(unit_tangent)>0);
+                        assert(norm_2(unit_tangent) > 0);
                         unit_tangent = unit_tangent/norm_2(unit_tangent);
 
                         c_vector<double, 2> unit_normal;
@@ -732,11 +742,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                         VertexElement<2,2>* p_element = new VertexElement<2,2>(outline_element_index, element_nodes);
                         outline_elements.push_back(p_element);
                         outline_element_index++;
-
                     }
-
                 }
-
             }
         }
         VertexMesh<2,2> cell_outline_mesh(outline_nodes,outline_elements);
@@ -744,10 +751,20 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         VertexMeshWriter<2, 2> outline_mesh_writer(rDirectory, "outlines", false);
         outline_mesh_writer.WriteVtkUsingMesh(cell_outline_mesh, time.str());
         outline_mesh_writer.WriteFilesUsingMesh(cell_outline_mesh);
-
-
     }
 #endif //CHASTE_VTK
+}
+
+template<unsigned DIM>
+double PottsBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
+    unsigned pdeNodeIndex,
+    std::string& rVariableName,
+    bool dirichletBoundaryConditionApplies,
+    double dirichletBoundaryValue)
+{
+    CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex);
+    double value = p_cell->GetCellData()->GetItem(rVariableName);
+    return value;
 }
 
 // Explicit instantiation

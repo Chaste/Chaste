@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "ArchiveOpener.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "ApoptoticCellProperty.hpp"
+#include "CellLabel.hpp"
 #include "CellsGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
@@ -56,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
+#include "SmartPointers.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -68,7 +72,7 @@ class TestCellKillers : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestTargetedCellKiller() throw(Exception)
+    void TestTargetedCellKiller()
     {
         // Set up singleton classes
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -81,7 +85,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -120,7 +124,8 @@ public:
             if (!(*cell_iter)->IsDead())
             {
                 Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-                c_vector<double, 2> location = p_node->rGetLocation();
+                c_vector<double, 2> location;
+                location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
             }
         }
@@ -136,14 +141,15 @@ public:
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
         }
 
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestRandomCellKiller() throw(Exception)
+    void TestRandomCellKiller()
     {
         // Set up singleton classes
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -156,7 +162,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         double death_time = p_simulation_time->GetTime() + cells[0]->GetApoptosisTime();
@@ -223,7 +229,8 @@ public:
             if (!(*cell_iter)->IsDead())
             {
                 Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-                c_vector<double, 2> location = p_node->rGetLocation();
+                c_vector<double, 2> location;
+                location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
             }
         }
@@ -239,14 +246,15 @@ public:
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
         }
 
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestApoptoticCellKiller() throw(Exception)
+    void TestApoptoticCellKiller()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         double end_time = 1.0;
@@ -260,16 +268,14 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         double lo_oxygen_concentration = 0.0;
 
-        // Set some model parameters for the cell-cycle model
+        // Set the oxygen level for the cells
         for (unsigned index=0; index < cells.size(); index++)
         {
-            cells[index]->GetCellCycleModel()->SetStemCellG1Duration(8.0);
-            cells[index]->GetCellCycleModel()->SetTransitCellG1Duration(8.0);
             cells[index]->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         }
 
@@ -314,7 +320,8 @@ public:
             if (!(*cell_iter)->IsDead())
             {
                 Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-                c_vector<double, 2> location = p_node->rGetLocation();
+                c_vector<double, 2> location;
+                location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
             }
         }
@@ -330,14 +337,15 @@ public:
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double, 2> location = p_node->rGetLocation();
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
         }
 
         TS_ASSERT(new_locations == old_locations);
     }
 
-    void TestPlaneBasedCellKillerIn1d() throw(Exception)
+    void TestPlaneBasedCellKillerIn1d()
     {
         // Create 1D mesh
         unsigned num_cells = 14;
@@ -346,7 +354,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -386,7 +394,7 @@ public:
         }
     }
 
-    void TestPlaneBasedCellKillerIn2d() throw(Exception)
+    void TestPlaneBasedCellKillerIn2d()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -396,7 +404,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -433,7 +441,7 @@ public:
         }
     }
 
-    void TestPlaneBasedCellKillerIn3d() throw(Exception)
+    void TestPlaneBasedCellKillerIn3d()
     {
         // Create 3D mesh
         MutableMesh<3,3> mesh;
@@ -442,7 +450,7 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create cell population
@@ -479,7 +487,7 @@ public:
         }
     }
 
-    void TestIsolatedLabelledCellKiller() throw(Exception)
+    void TestIsolatedLabelledCellKiller()
     {
         // Create a non-vertex based cell population
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -487,7 +495,7 @@ public:
         non_vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> non_vertex_cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> non_vertex_cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> non_vertex_cells_generator;
         non_vertex_cells_generator.GenerateBasic(non_vertex_cells, non_vertex_mesh.GetNumNodes());
 
         MeshBasedCellPopulation<2> non_vertex_cell_population(non_vertex_mesh, non_vertex_cells);
@@ -501,7 +509,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -533,7 +541,6 @@ public:
              ++cell_iter)
         {
             bool should_be_dead = (cell_population.GetLocationIndexUsingCell(*cell_iter) == 3);
-
             TS_ASSERT_EQUALS(cell_iter->IsDead(), should_be_dead);
         }
 
@@ -556,7 +563,7 @@ public:
         }
     }
 
-    void TestArchivingOfTargetedCellKiller() throw (Exception)
+    void TestArchivingOfTargetedCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -593,7 +600,7 @@ public:
        }
     }
 
-    void TestArchivingOfRandomCellKiller() throw (Exception)
+    void TestArchivingOfRandomCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -630,7 +637,7 @@ public:
         }
     }
 
-    void TestArchivingOfApoptoticCellKiller() throw (Exception)
+    void TestArchivingOfApoptoticCellKiller()
     {
         // Set up
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -665,7 +672,7 @@ public:
         }
     }
 
-    void TestArchivingOfPlaneBasedCellKiller() throw (Exception)
+    void TestArchivingOfPlaneBasedCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -709,7 +716,7 @@ public:
         }
     }
 
-    void TestArchivingOfIsolatedLabelledCellKiller() throw (Exception)
+    void TestArchivingOfIsolatedLabelledCellKiller()
     {
         // Set up singleton classes
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -722,7 +729,7 @@ public:
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -833,7 +840,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 

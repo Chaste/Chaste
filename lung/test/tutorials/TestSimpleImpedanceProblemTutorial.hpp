@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSIMPLEIMPEDANCEPROBLEMTUTORIAL_HPP_
 #define TESTSIMPLEIMPEDANCEPROBLEMTUTORIAL_HPP_
 
-/* HOW_TO_TAG Lung/simulations
+/* HOW_TO_TAG Lung/Simulation
  * Calculate transfer impedance of an airway tree using a simple impedance model
  */
 
@@ -75,7 +75,7 @@ class TestSimpleImpedanceProblemTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestCalculateImpedance() throw (Exception)
+    void TestCalculateImpedance()
     {
         EXIT_IF_PARALLEL;
 

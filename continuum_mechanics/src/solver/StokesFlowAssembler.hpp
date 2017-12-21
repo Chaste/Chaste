@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -135,7 +135,7 @@ private:
                                       * rGradQuadPhi(spatial_dim1, node_index2)
                                       * rGradQuadPhi(spatial_dim2, node_index1);
 
-                for(unsigned k=0; k<DIM; k++)
+                for (unsigned k=0; k<DIM; k++)
                 {
                     ret(index1,index2) +=   mu
                                           * (spatial_dim1==spatial_dim2)

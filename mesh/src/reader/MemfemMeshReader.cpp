@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,9 +71,9 @@ MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::MemfemMeshReader(const std::string& rP
     {
         // ignored from coverage because otherwise would have to create files
         // for a bad mesh just to test this line
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         EXCEPTION("Number of nodes does not match expected number declared in header");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     // Open element file and store the lines as a vector of strings (minus the comments)
@@ -94,9 +94,9 @@ MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::MemfemMeshReader(const std::string& rP
     {
         // Ignored from coverage because otherwise we would have to create files
         // for a bad mesh just to test this line
-#define COVERAGE_IGNORE
+// LCOV_EXCL_START
         EXCEPTION("Number of elements does not match expected number declared in header");
-#undef COVERAGE_IGNORE
+// LCOV_EXCL_STOP
     }
 
     // Open boundary face file and store the lines as a vector of strings (minus the comments)
@@ -161,7 +161,7 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
         const std::string& r_line_of_data = *the_iterator;
         std::stringstream line_stream(r_line_of_data);
 
-        if ( readHeader == false || the_iterator != rRawData.begin() )
+        if (readHeader == false || the_iterator != rRawData.begin())
         {
             std::vector<unsigned> current_indices;
 
@@ -181,10 +181,7 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
     return tokenized_data;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MemfemMeshReader<1,1>;
 template class MemfemMeshReader<1,2>;
 template class MemfemMeshReader<1,3>;

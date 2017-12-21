@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayBranch : public CxxTest::TestSuite
 {
 public:
-    void TestMakeBranch() throw(Exception)
+    void TestMakeBranch()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
@@ -95,9 +95,21 @@ public:
         TS_ASSERT_EQUALS(branch_two.IsMajor(), false);
 
         TS_ASSERT_EQUALS(branch_one.IsMajor(), true);
+
+        //Check radius on edge calculations
+        AirwayBranch branch_three(true);
+        mesh.GetElement(0)->SetAttribute(0.5);
+        mesh.GetElement(1)->SetAttribute(0.5);
+        mesh.GetElement(2)->SetAttribute(0.5);
+        branch_three.AddElement(mesh.GetElement(0));
+        branch_three.AddElement(mesh.GetElement(1));
+        branch_three.AddElement(mesh.GetElement(2));
+
+        TS_ASSERT_DELTA(branch_three.GetAverageRadius(), 0.5, 1e-3);
+        TS_ASSERT_DELTA(branch_three.GetPoiseuilleResistance(), 2.7313, 1e-3);
     }
 
-    void TestAngleCalculations() throw(Exception)
+    void TestAngleCalculations()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh");
@@ -107,7 +119,7 @@ public:
         AirwayBranch branch_two;
         AirwayBranch branch_three;
 
-        for(unsigned i = 0; i < 10; ++i)
+        for (unsigned i = 0; i < 10; ++i)
         {
             branch_one.AddElement(mesh.GetElement(i));
             branch_two.AddElement(mesh.GetElement(10 + i));
@@ -131,9 +143,17 @@ public:
         TS_ASSERT(!branch_one.IsTerminal());
         TS_ASSERT(branch_two.IsTerminal());
         TS_ASSERT(branch_three.IsTerminal());
+
+        //Check special case of a zero rotation angle.
+        branch_one.SetChildOne(&branch_two);
+        branch_one.SetChildTwo(&branch_one);
+        branch_one.SetSibling(&branch_two);
+        branch_two.SetSibling(&branch_one);
+
+        TS_ASSERT_DELTA(branch_two.GetRotationAngle(), 0.0, 1e-6);
     }
 
-    void TestBranchIndexing() throw(Exception)
+    void TestBranchIndexing()
     {
         AirwayBranch branch;
 
@@ -145,7 +165,7 @@ public:
         TS_ASSERT_EQUALS(branch.GetIndex(), 5u);
     }
 
-    void TestGetProximalAndDistalNodes() throw(Exception)
+    void TestGetProximalAndDistalNodes()
     {
         // Load mesh
         TetrahedralMesh<1,3> mesh;
@@ -188,7 +208,7 @@ public:
         bool proximal_in_first_elem = proximal_is_node_0 || proximal_is_node_1;
         TS_ASSERT_EQUALS(proximal_in_first_elem, true);
 
-        if(proximal_is_node_0)
+        if (proximal_is_node_0)
         {
             p_first_elem_non_proximal = p_first_elem_node_1;
         }
@@ -203,7 +223,7 @@ public:
         bool distal_in_last_elem = distsal_is_node_0 || distsal_is_node_1;
         TS_ASSERT_EQUALS(distal_in_last_elem, true);
 
-        if(distsal_is_node_0)
+        if (distsal_is_node_0)
         {
             p_last_elem_non_distal = p_last_elem_node_1;
         }
@@ -226,7 +246,7 @@ public:
         TS_ASSERT_LESS_THAN(non_distal_to_proximal, proximal_to_distal);
     }
 
-    void TestBranchProperties() throw(Exception)
+    void TestBranchProperties()
     {
         Node<3> node_a(0u, true, 0.0, 0.0, 0.0);
         Node<3> node_b(1u, true, 1.0, 0.0, 0.0);

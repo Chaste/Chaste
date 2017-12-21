@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mOrientations(rOrientations)
 {
     // This constructor should only be used in 3D
-    assert(SPACE_DIM == 3);
+    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Each face must have an associated orientation
     assert(mFaces.size() == mOrientations.size());
@@ -182,7 +182,7 @@ unsigned VertexElement<1, SPACE_DIM>::GetNumFaces() const
 template<unsigned SPACE_DIM>
 VertexElement<0, SPACE_DIM>* VertexElement<1, SPACE_DIM>::GetFace(unsigned index) const
 {
-    return NULL;
+    return nullptr;
 }
 
 template<unsigned SPACE_DIM>
@@ -192,10 +192,7 @@ bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedClockwise(unsigned index) cons
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class VertexElement<1,1>;
 template class VertexElement<1,2>;
 template class VertexElement<1,3>;

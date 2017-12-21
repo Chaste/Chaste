@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "TransitCellProliferativeType.hpp"
 /* The next header file defines a stochastic cell-cycle model class. */
-#include "StochasticDurationCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 /* The next header file defines a helper class for generating a suitable mesh. */
 #include "HoneycombMeshGenerator.hpp"
 /* The next header file defines the class that simulates the evolution of an off-lattice {{{CellPopulation}}}. */
@@ -107,7 +107,7 @@ public:
      * In the first test, we run a simple mesh-based simulation, in which we create a monolayer
      * of cells, using a mutable mesh. Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /* Next, we generate a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}}. This generates a honeycomb-shaped mesh,
@@ -120,7 +120,7 @@ public:
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we use the `CellsGenerator` helper class, which is templated over the type
-         * of cell cycle model required (here {{{StochasticDurationCellCycleModel}}})
+         * of cell cycle model required (here {{{UniformCellCycleModel}}})
          * and the dimension.
          * For a list of possible cell cycle models see subclasses of {{{AbstractCellCycleModel}}}.
          * These can be found in the inheritance diagram, here, [class:AbstractCellCycleModel AbstractCellCycleModel].
@@ -133,7 +133,7 @@ public:
          * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
@@ -219,7 +219,7 @@ public:
      * create a monolayer of cells, using a mutable mesh.
      * Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayerWithGhostNodes() throw(Exception)
+    void TestMonolayerWithGhostNodes()
     {
         /* We start by generating a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}} as before. Here the first and second arguments
@@ -243,7 +243,7 @@ public:
          * As before all cells have {{{TransitCellProliferativeType}}}. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
 
         /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.

@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2016, University of Oxford.
+"""Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -31,8 +31,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 """
-Defines the Protocol class, which encapsulates the input & output of a
-simulation protocol.
+Defines the Protocol class, which encapsulates the interface between a model
+and a Web Lab protocol.
 """
 
 import os
@@ -80,13 +80,14 @@ class Protocol(processors.ModelModifier):
         self._optional_vars = set()
         warn_only = not model.get_option('fully_automatic') and model.get_option('warn_on_units_errors')
         self.set_units_converter(processors.UnitsConverter(self.model, warn_only))
+        self.assignments_to_convert = set()
     
     @staticmethod
     def apply_protocol_file(doc, proto_file_path):
         """Parse a protocol XML file and apply it to the given model document."""
         proto = Protocol(doc.model)
-        proto_units = doc.model.get_standard_units().copy()
-        proto.parse_protocol(proto_file_path, proto_units)
+        proto.units = doc.model.get_standard_units().copy()
+        proto.parse_protocol(proto_file_path, proto.units)
         proto.modify_model()
     
     @staticmethod
@@ -150,6 +151,7 @@ class Protocol(processors.ModelModifier):
         self.add_protocol_namespaces(proto_xml.xmlns_prefixes)
         # Relative URIs must be resolved relative to this protocol file, or its xml:base if present
         base = os.path.dirname(getattr(proto_xml.protocol, 'base', proto_file_path))
+        self.base = getattr(self, 'base', base) # Only set this if we're the main file
         # Any imports?
         for proto_import in getattr(proto_xml.protocol, u'import_', []):
             source = proto_import.source
@@ -226,6 +228,10 @@ class Protocol(processors.ModelModifier):
         variable doesn't exist.  The variable itself will be added in a later processing phase, once we
         can determine whether its definition can actually be evaluated.  It will be given units even later,
         once variable connections have been fixed and hence the units of the RHS can be calculated.
+
+        As a special case, however, if the default is just a number with units, we treat this as declaring
+        a variable using the initial_value attribute, and create the whole thing here, to avoid confusing
+        edge cases where the optional variable is a state variable with ODE specified using `define diff()`.
         """
         self._optional_vars.add(prefixed_name)
         assert len(children) <= 1, 'Malformed specifyOptionalVariable element with %d children' % len(children)
@@ -233,10 +239,17 @@ class Protocol(processors.ModelModifier):
             # Default given; check if we need it
             if self._lookup_ontology_term(prefixed_name, check_optional=True) is None:
                 rhs = children[0]
-                rhs.xml_parent.safe_remove_child(rhs)
-                lhs = pycml.mathml_ci.create_new(rhs, prefixed_name)
-                defn = pycml.mathml_apply.create_new(rhs, u'eq', [lhs, rhs])
-                self.add_or_replace_equation(defn)
+                if self.expr_is_simple_constant(rhs) and self._get_cn_units(rhs):
+                    # Special simple case
+                    units = self.model.get_units_by_name(self._get_cn_units(rhs))
+                    var = self._create_annotated_variable(prefixed_name, units)
+                    var.initial_value = unicode(rhs.evaluate())
+                else:
+                    # General equation definition
+                    rhs.xml_parent.safe_remove_child(rhs)
+                    lhs = pycml.mathml_ci.create_new(rhs, prefixed_name)
+                    defn = pycml.mathml_apply.create_new(rhs, u'eq', [lhs, rhs])
+                    self.add_or_replace_equation(defn)
     
     def specify_output_variable(self, prefixed_name, units=None):
         """Specify the given variable as a protocol output, optionally in the given units.
@@ -268,7 +281,7 @@ class Protocol(processors.ModelModifier):
             prefixed_name = output_spec['prefixed_name']
             units = output_spec['units']
             try:
-                vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, check_optional=True)
+                vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, check_optional=True, transitive=True)
             except ValueError, e:
                 raise ProtocolError(str(e))
             if vars is None:
@@ -294,7 +307,7 @@ class Protocol(processors.ModelModifier):
         """
         # Re-lookup all the ontology terms that matched multiple variables
         for prefixed_name, units in self._vector_outputs_detail:
-            vars = self._lookup_ontology_term(prefixed_name, False)
+            vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, transitive=True)
             vector_name = prefixed_name.split(':')[1]
             for var in vars:
                 # Units convert if needed
@@ -341,14 +354,22 @@ class Protocol(processors.ModelModifier):
         assert lhs.operator().localName == u'diff', 'Expression is neither a straight assignment nor an ODE'
         dep_var = lhs.operands().next()
         assert dep_var.localName == u'ci', 'ODE is malformed'
-        if local_vars:
-            comp = expr.component
-            dep_var = comp.get_variable_by_name(self._split_name(unicode(dep_var))[1])
-            indep_var = comp.get_variable_by_name(self._split_name(unicode(lhs.bvar.ci))[1])
-        else:
-            dep_var = self.model.get_variable_by_name(*self._split_name(unicode(dep_var)))
-            indep_var = self.model.get_variable_by_name(*self._split_name(unicode(lhs.bvar.ci)))
+        def get_var(comp, name):
+            if u',' in name or not local_vars:
+                var = self.model.get_variable_by_name(*self._split_name(name))
+            else:
+                var = comp.get_variable_by_name(name)
+            return var
+        comp = expr.component
+        dep_var = get_var(comp, unicode(dep_var))
+        indep_var = get_var(comp, unicode(lhs.bvar.ci))
         return (dep_var, indep_var)
+    
+    def expr_is_simple_constant(self, expr):
+        """Check whether the given expression is a straight cn or -cn."""
+        return (isinstance(expr, mathml_cn) or
+                (isinstance(expr, mathml_apply) and hasattr(expr, u'minus') and len(expr.xml_children) == 2
+                 and isinstance(expr.xml_children[1], mathml_cn)))
     
     def process_input_declarations(self):
         """Finish processing input declarations after modifying the model equations.
@@ -385,9 +406,7 @@ class Protocol(processors.ModelModifier):
                 assert isinstance(deps[0], mathml_apply)
                 lhs, rhs = list(deps[0].operands())
                 if lhs.localName == u'ci':
-                    if not (isinstance(rhs, mathml_cn) or
-                            (isinstance(rhs, mathml_apply) and hasattr(rhs, u'minus') and len(rhs.xml_children) == 2
-                             and isinstance(rhs.xml_children[1], mathml_cn))):
+                    if not self.expr_is_simple_constant(rhs):
                         raise ProtocolError("The computed variable " + str(var) + " may not be specified as an input.")
                     # It's the special Computed case - convert to a constant
                     initial_value = rhs.evaluate()
@@ -602,7 +621,10 @@ class Protocol(processors.ModelModifier):
         
         We need to process variables in order sorted by the dependency graph, since some variables with magic units
         might be defined in terms of other variables with magic units.
+        
+        We also need to update the units of variables mapped to those we fix.
         """
+        magic_vars = set()
         for expr in self.model.get_assignments():
             if isinstance(expr, mathml_apply):
                 var = expr.assigned_variable()
@@ -611,6 +633,23 @@ class Protocol(processors.ModelModifier):
 #                     print 'Magic units for', var, 'defined by', defn, defn.get_units()
                     units = self.add_units(defn.get_units().extract())
                     var.units = units.name
+                    magic_vars.add(var)
+                elif isinstance(var, tuple):
+                    # It's an ODE; check the dependent var only
+                    (dep_var, indep_var) = var
+                    if dep_var.get_units() is self.magic_units:
+                        defn = expr.eq.rhs
+#                         print 'Magic ODE units for', dep_var, 'defined by', defn, defn.get_units()
+                        rhs_units = defn.get_units().extract()
+                        units = self.add_units(rhs_units.simplify(indep_var.get_units().extract()))
+                        dep_var.units = units.name
+                        magic_vars.add(dep_var)
+        for var in self.model.get_all_variables():
+            if var.get_units() is self.magic_units:
+                src = var.get_source_variable(recurse=True)
+                if src in magic_vars:
+#                     print 'Magic connection', var, src, var.units, src.units
+                    var.units = src.units
     
     def _check_equation_lhs(self, expr):
         """Check whether the variable on the LHS of a new equation exists, or whether we can create it.
@@ -630,7 +669,7 @@ class Protocol(processors.ModelModifier):
             except ValueError:
                 # Is this declared as an output with units?
                 for output_spec in self._output_specifications:
-                    if output_spec['prefixed_name'] == vname:
+                    if output_spec['prefixed_name'] == vname and output_spec['units']:
                         var = self._create_annotated_variable(vname, output_spec['units'])
 #                         print 'Created output', vname, '=', var, 'with units', var.units
                         return
@@ -638,6 +677,8 @@ class Protocol(processors.ModelModifier):
                 if vname in self._optional_vars:
 #                     print 'Creating', vname, 'with magic units'
                     var = self._create_annotated_variable(vname, self.magic_units)
+                else:
+                    raise ProtocolError("Variable %s on the LHS of a 'define' does not exist in the model and is not an output with units or optional." % vname)
     
     def report_stats(self):
         """Output a short report on what the modified model looks like.
@@ -730,14 +771,33 @@ class Protocol(processors.ModelModifier):
         input_var._cml_ok_as_input = True
         self.inputs.add(input_var)
         return input_var
+
+    def _add_converted_variable(self, orig_var, new_units):
+        """Add a new version of the given variable with different units.
         
+        An assignment will be added making the new variable equal to the old, so that a units conversion will happen.
+        We also ensure that the new units are added to the model if needed.
+        Used by _add_interpolation, and relies on being in the _add_maths_to_model processing phase.
+        
+        :returns: the new variable
+        """
+        new_units = self.add_units(new_units)
+        comp = orig_var.component
+        new_name = self._uniquify_var_name(orig_var.name, comp)
+        new_var = self.add_variable(comp, new_name, new_units)
+        cname = comp.name
+        assign = mathml_apply.create_new(new_var, 'eq', [cname + ',' + new_var.name, cname + ',' + orig_var.name])
+        self.inputs.add(assign)
+        self._add_maths_to_model(assign)
+        return new_var
+
     def _replace_variable(self, var, units, allow_existing=False):
         """Replace the given variable with a version in the given units in the protocol component.
-        
+
         Ensures that the units are added to the model if needed, and transfers the cmeta:id if
         present.  It doesn't transfer the initial_value, since this would break the output variable
         case.
-        
+
         The new variable will be given a local name equal to the full name of the original, to avoid
         potential conflicts.  If allow_existing is False then it's an error if the variable has
         already been replaced.  If allow_existing is True, then we just reuse the existing replacement.
@@ -862,15 +922,19 @@ class Protocol(processors.ModelModifier):
                     comp = expr.component
                     if comp.name != cname:
                         # Check for the special case of the referenced variable having a source in this component already
+                        # (ensuring either it has identical units or the expression will be units converted)
                         src_comp = self.model.get_component_by_name(cname)
-                        src_var = src_comp.get_variable_by_name(vname).get_source_variable(recurse=True)
+                        referenced_var = src_comp.get_variable_by_name(vname)
+                        src_var = referenced_var.get_source_variable(recurse=True)
                         if src_var.component is comp:
                             # Use the existing var
-#                             print 'Using existing var', src_var, 'for reference', unicode(ci_elt)
+#                             print 'Using existing var', src_var, 'for reference', unicode(ci_elt), 'in', comp.name
+                            if not src_var.get_units().equals(referenced_var.get_units()):
+                                self.assignments_to_convert.add(expr)
                             vname = src_var.name
                         else:
 #                             print 'Connecting to reference', unicode(ci_elt), 'from component', comp.name
-                            self.connect_variables(src_var, (comp.name,vname))
+                            self.connect_variables(referenced_var, (comp.name,vname))
                     # Now just rename to be local
                     ci_elt._rename(vname)
     
@@ -941,23 +1005,23 @@ class Protocol(processors.ModelModifier):
                 try:
                     var = self._get_protocol_component().get_variable_by_name(vname)
                 except KeyError:
-                    raise ValueError("The variable name '%s' has not been declared in the protocol"
-                                     % vname)
+                    raise ValueError("The variable name '%s' has not been declared in the protocol" % vname)
             full_name = var.component.name + u',' + var.name
             ci_elt._rename(full_name)
         return all_vars_found
     
-    def _lookup_ontology_term(self, prefixed_name, enforce_uniqueness=True, check_optional=False):
+    def _lookup_ontology_term(self, prefixed_name, enforce_uniqueness=True, check_optional=False, transitive=False):
         """Find the variable annotated with the given term, if it exists.
         
         The term should be given in prefixed form, with the prefix appearing in the protocol's namespace
         mapping (prefix->uri, as found e.g. at elt.rootNode.xmlns_prefixes).
         
         Will throw ValueError if the variable doesn't exist in the model, or the given term is invalid.
-        If enforce_uniqueness is True, also ensures there's only one variable with the annotation.
-        
-        If check_optional is True, we don't throw on missing ontology-annotated variables if they're
+        :param enforce_uniqueness: if True, also ensures there's only one variable with the annotation.
+        :param check_optional: if True, we don't throw on missing ontology-annotated variables if they're
         in the optional set, but just return None instead.
+        :param transitive: if True, look not just for direct annotations but also for terms belonging to
+        the class given by prefixed_name, searching transitively along rdf:type predicates.
         """
         try:
             prefix, _ = prefixed_name.split(':')
@@ -968,7 +1032,7 @@ class Protocol(processors.ModelModifier):
             nsuri = self._protocol_namespaces[prefix]
         except KeyError:
             raise ValueError("The namespace prefix '%s' has not been declared" % prefix)
-        vars = self.model.get_variables_by_ontology_term((prefixed_name, nsuri))
+        vars = self.model.get_variables_by_ontology_term((prefixed_name, nsuri), transitive=transitive)
         if len(vars) == 0:
             if check_optional and prefixed_name in self._optional_vars:
                 return None
@@ -1033,7 +1097,8 @@ class Protocol(processors.ModelModifier):
         self._fix_magic_units()
         proto_comp = self._get_protocol_component()
         converter.add_conversions_for_component(proto_comp)
-        converter.convert_assignments(filter(lambda i: isinstance(i, mathml_apply), self.inputs))
+        self.assignments_to_convert.update(filter(lambda i: isinstance(i, mathml_apply), self.inputs))
+        converter.convert_assignments(self.assignments_to_convert)
         converter.convert_connections(self.connections_made)
         converter.finalize(self._error_handler, check_units=False)
         notifier.flush()
@@ -1114,6 +1179,112 @@ class Protocol(processors.ModelModifier):
 #         print 'Evaluated', variable, 'to', value
         return value
 
+    def _add_interpolation(self, expr, lhs, rhs):
+        """Add/replace a model equation with linear interpolation from a data file.
+
+        This is a special case of the 'define' construct.  The rhs is an apply of the
+        interpolate csymbol with 4 arguments: a data file path (relative to the protocol),
+        an independent variable reference, units of the independent variable in the data,
+        and units of the lhs values in the data.  The data file contains two columns
+        of values for the independent variable and lhs, respectively.  We construct a new
+        piecewise definition for the lhs using linear interpolation on these values,
+        modifying the rhs of expr to contain this piecewise MathML, so that _add_maths_to_model
+        can continue as for normal 'define' constructs.
+
+        :param expr: the new equation
+        :param lhs: the left-hand side of the new equation
+        :param rhs: the right-hand side of the new equation 
+        """
+        # Extract operands with paranoia checks
+        operands = list(rhs.operands())
+        assert len(operands) == 4
+        assert operands[0].localName == u'csymbol' and getattr(operands[0], u'definitionURL', u'') == u'https://chaste.cs.ox.ac.uk/nss/protocol/string'
+        for i in [1, 2, 3]:
+            assert isinstance(operands[i], mathml_ci)
+        data_path, indep_var_name, indep_units, dep_units = map(unicode, operands)
+        # Load the data
+        data_path = os.path.join(self.base, data_path)
+        if not os.path.exists(data_path):
+            raise ProtocolError("Unable to load data file '%s' for interpolation." % data_path)
+        import numpy
+        data = numpy.loadtxt(data_path, dtype=float, delimiter=',', ndmin=2, unpack=True)
+        assert data.ndim == 2
+        if data.shape[0] != 2:
+            raise ProtocolError("The data file for an interpolate() must have 2 columns; file '%s' has %d." % (data_path, data.shape[0]))
+        # Get units objects so we can do conversions if necessary
+        indep_units = self._get_units_object(self.units[indep_units])
+        dep_units = self._get_units_object(self.units[dep_units])
+        # Check to see whether we can do a special-case optimisation for equally spaced independent variable points
+        steps = numpy.diff(data[0])
+        if abs(numpy.max(steps) - numpy.min(steps)) < 1e-6 * numpy.max(steps):
+            if steps[0] == 0.0:
+                raise ProtocolError("The data file for an interpolate() cannot have all zero table steps.")
+            # Find the independent variable, which must exist, to determine if we need a conversion
+            self._identify_referenced_variables(operands[1])
+            indep_var_name = unicode(operands[1])
+            indep_var = self.model.get_variable_by_name(*self._split_name(indep_var_name))
+            if not indep_var.get_units().equals(indep_units):
+                indep_var = self._add_converted_variable(indep_var, indep_units)
+                indep_var_name = indep_var.component.name + ',' + indep_var.name
+            # Create a 'magic' expression that code generation will comprehend
+            new_rhs = mathml_apply.create_new(rhs, 'csymbol', [indep_var_name])
+            new_rhs._cml_interp_data = data
+            new_rhs._cml_units = UnitsSet([dep_units], expression=new_rhs)
+            new_rhs.xml_set_attribute((u'pe:binding_time', NSS[u'pe']), u'dynamic')
+            new_rhs.operands().next().xml_set_attribute((u'pe:binding_time', NSS[u'pe']), u'dynamic')
+            new_rhs.operator().xml_set_attribute(u'definitionURL', u'https://chaste.cs.ox.ac.uk/nss/protocol/interp')
+            # Update list of interpolations on the model for convenience
+            self.model._cml_interp_exprs = getattr(self.model, '_cml_interp_exprs', [])
+            self.model._cml_interp_exprs.append(new_rhs)
+        else:
+            # Iterate over data rows to construct a piecewise representation for the interpolation
+            eqn = mathml_apply.create_new
+            pieces = []
+            for row in range(data.shape[1] - 1):
+                if data[0,row] == data[0,row+1]:
+                    # Vertical jumps are allowed in voltage clamp protocols, but trying to interpolate gives you a divide by zero.
+                    # Just skip the jump part, and we'll interpolate correctly at either side.
+                    continue
+                x1 = (data[0,row], indep_units.name)
+                x2 = (data[0,row+1], indep_units.name)
+                y1 = (data[1,row], dep_units.name)
+                y2 = (data[1,row+1], dep_units.name)
+                cond = eqn(rhs, 'and', [eqn(rhs, 'geq', [indep_var_name, x1]),
+                                        eqn(rhs, 'leq', [indep_var_name, x2])])
+                temp2 = eqn(rhs, 'divide', [eqn(rhs, 'minus', [y2, y1]),
+                                            eqn(rhs, 'minus', [x2, x1])])
+                temp1 = eqn(rhs, 'times', [temp2, eqn(rhs, 'minus', [indep_var_name, x1])])
+                case = eqn(rhs, 'plus', [y1, temp1])
+                pieces.append((case, cond))
+            new_rhs = mathml_piecewise.create_new(rhs, pieces)
+        # Insert and return the new rhs
+        expr.replace_child(rhs, new_rhs)
+        return new_rhs
+
+    def _get_cn_units(self, elt):
+        """Get the units name for a cn element, dereferencing a units_of() construct if present.
+        
+        Returns None if units_of() references a non-existent optional variable.
+        """
+        if isinstance(elt, mathml_apply):
+            # This is minus a cn; negative constants parse awkwardly due to precedence!
+            elt = elt.xml_children[-1]
+        assert isinstance(elt, mathml_cn)
+        if not hasattr(elt, u'units'):
+            raise ProtocolError("All numbers in model equations must have units; '%s' does not." % unicode(elt))
+        units = elt.units
+        if units.startswith('units_of('):
+            # Figure out the units of the variable referred to
+            vname = units[9:-1]
+            assert ':' in vname
+            var = self._lookup_ontology_term(vname, check_optional=True)
+            if var is None:
+                units = None
+            else:
+                print 'units_of(): using', var.units, 'from', var, 'for', elt.units
+                units = var.units
+        return units
+
     def _add_maths_to_model(self, expr):
         """Add or replace an equation in the model.
         
@@ -1129,8 +1300,13 @@ class Protocol(processors.ModelModifier):
         assert isinstance(expr, mathml_apply)
         assert expr.operator().localName == u'eq', 'Expression is not an assignment'
         lhs, rhs = list(expr.operands())
-        if not self._identify_referenced_variables(expr, check_optional=True):
-            # Some optional variables weren't present in the model, so we can't use this equation.
+        if (isinstance(rhs, mathml_apply) and rhs.operator().localName == u'csymbol' and
+            getattr(rhs.operator(), u'definitionURL', u'') == u'https://chaste.cs.ox.ac.uk/nss/protocol/interpolate'):
+            # Special case for linear interpolation on a data file
+            rhs = self._add_interpolation(expr, lhs, rhs)
+        orig_defn_kw = u'original_definition' # References the original definition if it appears as a variable on the new RHS
+        def handle_unusable_expr():
+            """Some optional variables weren't present in the model, so we can't use this equation."""
             print >>sys.stderr, "Warning: optional model variables missing, so not using model interface equation:"
             if hasattr(expr, 'loc'):
                 print >>sys.stderr, "  ", expr.loc
@@ -1144,7 +1320,36 @@ class Protocol(processors.ModelModifier):
                         if output_spec['prefixed_name'] == vname and not output_spec['optional']:
                             raise ProtocolError("At least one optional variable required to override the definition of model output '%s' was not found and has no default value." % vname)
             self.inputs.remove(expr)
-            return
+        if not self._identify_referenced_variables(expr, check_optional=True, special_name=orig_defn_kw):
+            return handle_unusable_expr()
+        # Determine if the original_definition keyword occurs on the RHS, and check that all numbers have units
+        orig_defn_refs = []
+        def find_refs(elt):
+            if isinstance(elt, mathml_ci):
+                if unicode(elt) == orig_defn_kw:
+                    orig_defn_refs.append(elt)
+            elif isinstance(elt, mathml_cn):
+                units = self._get_cn_units(elt)
+                if units is None:
+                    return handle_unusable_expr()
+                elt.units = units
+            else:
+                for child in elt.xml_element_children():
+                    find_refs(child)
+        find_refs(lhs)
+        if orig_defn_refs:
+            raise ProtocolError("Cannot assign to the %s keyword." % orig_defn_kw)
+        find_refs(rhs)
+        def get_orig_defn(var):
+            """Find and store the original definition before removing it."""
+            orig_defn = var.get_all_expr_dependencies()
+            if orig_defn:
+                assert len(orig_defn) == 1
+                orig_defn = list(orig_defn[0].operands())[1] # Take the RHS of the defining ODE
+            else:
+                # It had better be a constant originally with initial_value
+                orig_defn = mathml_cn.create_new(var, var.initial_value, var.units)
+            return orig_defn
         # Figure out what's on the LHS of the assignment
         if lhs.localName == u'ci':
             # Straight assignment to variable
@@ -1162,12 +1367,12 @@ class Protocol(processors.ModelModifier):
 #                     import traceback
 #                     traceback.print_exc()
 #                     raise ProtocolError("No suitable value found for clamped variable " + unicode(lhs))
+            if orig_defn_refs:
+                orig_defn = get_orig_defn(assigned_var)
             self.remove_definition(assigned_var, keep_initial_value=clamping)
             if clamping:
-#                 print 'Clamping', assigned_var
                 self.inputs.remove(expr) # The equation isn't actually used in this case
             else:
-#                 print 'Redefining', assigned_var
                 self.add_expr_to_comp(cname, expr)
                 assigned_var._add_dependency(expr)
         else:
@@ -1178,11 +1383,16 @@ class Protocol(processors.ModelModifier):
             assert dep_var.localName == u'ci', 'ODE is malformed'
             cname, dep_var_name = self._split_name(unicode(dep_var))
             dep_var = self.model.get_variable_by_name(cname, dep_var_name)
-            self.remove_definition(dep_var, True)
+            if orig_defn_refs:
+                orig_defn = get_orig_defn(dep_var)
+            self.remove_definition(dep_var, keep_initial_value=True)
             self.add_expr_to_comp(cname, expr)
             indep_name = self._split_name(unicode(lhs.bvar.ci))
             indep_var = self.model.get_variable_by_name(*indep_name)
             dep_var._add_ode_dependency(indep_var, expr)
+        # Insert the original definition in the new RHS if needed
+        for ref in orig_defn_refs:
+            ref.xml_parent.replace_child(ref, orig_defn.clone_self())
 
     def _filter_assignments(self):
         """Apply protocol outputs to reduce the model size.
@@ -1205,10 +1415,11 @@ class Protocol(processors.ModelModifier):
         all_outputs = self.outputs | self._vector_outputs
         if all_outputs:
             # Remove parts of the model that aren't needed
-            needed_nodes = self.model.calculate_extended_dependencies(all_outputs,
-                                                                      state_vars_depend_on_odes=True)
+            needed_nodes = all_outputs.copy()
             needed_nodes.update([input for input in self.inputs
-                                 if isinstance(input, (mathml_apply, cellml_variable))])
+                                 if isinstance(input, cellml_variable)])
+            needed_nodes = self.model.calculate_extended_dependencies(needed_nodes,
+                                                                      state_vars_depend_on_odes=True)
             for node in self.model.get_assignments()[:]:
                 if node not in needed_nodes:
                     if isinstance(node, cellml_variable):
@@ -1240,10 +1451,18 @@ class Protocol(processors.ModelModifier):
                                      self.model.get_assignments())
             self.model._cml_assignments = new_assignments
         # Remove existing annotations
+        free_vars, unknown_vars = [], []
         for var in self.model.get_all_variables():
             var.set_pe_keep(False)
             var.set_is_derived_quantity(False)
             var.set_is_modifiable_parameter(False)
+            # An algebraic model might have no free vars left, but if there is a single unknown var then treat it as free
+            if var.get_type() == VarTypes.Free:
+                free_vars.append(var)
+            if var.get_type() == VarTypes.Unknown:
+                unknown_vars.append(var)
+        if len(free_vars) == 0 and len(unknown_vars) == 1:
+            unknown_vars[0]._set_type(VarTypes.Free)
         # Add annotations for inputs & outputs
         for var in [input for input in self.inputs if isinstance(input, cellml_variable)]:
             var.set_pe_keep(True)

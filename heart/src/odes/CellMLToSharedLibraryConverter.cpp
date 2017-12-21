@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,8 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     try {                       \
         code;                   \
     } catch (...) {}
-
-
 
 /** Set the .so suffix */
 #ifdef __APPLE__
@@ -170,11 +168,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             std::stringstream folder_name;
             folder_name << "dynamic/tmp_" << getpid() << "_" << time(NULL);
 
-#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
-#define COVERAGE_IGNORE
+#ifdef CHASTE_CMAKE
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
             build_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
-#undef COVERAGE_IGNORE
 #else
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
             build_folder.SetPath(component_dir.GetAbsolutePath() + "/build/" + ChasteBuildDirName() + "/" + folder_name.str(), RelativeTo::Absolute);
@@ -198,11 +194,11 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                 r_cellml_file.CopyTo(tmp_folder);
             }
 
-#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
-#define COVERAGE_IGNORE
+#ifdef CHASTE_CMAKE
             std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
-            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.10)\n" <<
+            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
+                                      "add_compile_options(-std=c++11)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
@@ -221,12 +217,23 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             EXPECT0(chdir, tmp_folder.GetAbsolutePath());
             EXPECT0(system, "cmake" + cmake_args + " .");
             EXPECT0(system, "cmake --build . --config " + ChasteBuildType());
-#undef COVERAGE_IGNORE
 #else
             // Change to Chaste source folder
             EXPECT0(chdir, chaste_root.GetAbsolutePath());
             // Run scons to generate C++ code and compile it to a .so
             EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
+            if (mPreserveGeneratedSources)
+            {
+                // Copy the generated source (.hpp and .cpp) to the same place as the .so file is going.
+                // NB. CMake does this by default
+                FileFinder destination_folder_for_sources(rCellmlFolder, RelativeTo::Absolute);
+                // Copy generated source code as well
+                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
+                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
+                {
+                    r_generated_file.CopyTo(destination_folder_for_sources);
+                }
+            }
 #endif
 
             FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
@@ -238,15 +245,6 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             FileFinder destination_folder(rCellmlFolder, RelativeTo::Absolute);
             so_file.CopyTo(destination_folder);
 
-            if (mPreserveGeneratedSources)
-            {
-                // Copy generated source code as well
-                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
-                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
-                {
-                    r_generated_file.CopyTo(destination_folder);
-                }
-            }
             // Delete the temporary folders
             build_folder.DangerousRemove();
             tmp_folder.DangerousRemove();

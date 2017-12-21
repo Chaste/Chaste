@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,6 +54,28 @@ VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::VanLeeuwen2009WntSwatCellCycle
     }
 }
 
+VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::VanLeeuwen2009WntSwatCellCycleModelHypothesisOne(const VanLeeuwen2009WntSwatCellCycleModelHypothesisOne& rModel)
+   : AbstractVanLeeuwen2009WntSwatCellCycleModel(rModel)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     * Create the new cell-cycle model's ODE system and use the current
+     * values of the state variables in mpOdeSystem as an initial condition.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
+    assert(rModel.GetOdeSystem());
+    double wnt_level = rModel.GetWntLevel();
+    InitialiseOdeSystem(wnt_level, rModel.mpCell->GetMutationState());
+    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+}
+
 void VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::InitialiseOdeSystem(double wntConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState)
 {
     mpOdeSystem = new VanLeeuwen2009WntSwatCellCycleOdeSystem(1, wntConcentration, pMutationState);
@@ -61,44 +83,7 @@ void VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::InitialiseOdeSystem(doubl
 
 AbstractCellCycleModel* VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::CreateCellCycleModel()
 {
-    // Create a new cell-cycle model
-    VanLeeuwen2009WntSwatCellCycleModelHypothesisOne* p_model = new VanLeeuwen2009WntSwatCellCycleModelHypothesisOne(mpOdeSolver);
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mDt, mpOdeSolver)
-     * will already have been correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetDivideTime(mDivideTime);
-    p_model->SetFinishedRunningOdes(mFinishedRunningOdes);
-    p_model->SetG2PhaseStartTime(mG2PhaseStartTime);
-    p_model->SetLastTime(mLastTime);
-
-    /*
-     * Create the new cell-cycle model's ODE system and use the current values
-     * of the state variables in mpOdeSystem as an initial condition.
-     */
-    assert(mpOdeSystem);
-    double wnt_level = GetWntLevel();
-    p_model->InitialiseOdeSystem(wnt_level, mpCell->GetMutationState());
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
-
-    return p_model;
+    return new VanLeeuwen2009WntSwatCellCycleModelHypothesisOne(*this);
 }
 
 void VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::OutputCellCycleModelParameters(out_stream& rParamsFile)

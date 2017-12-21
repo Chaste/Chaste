@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,16 +39,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "FineCoarseMeshPair.hpp"
 #include "TetrahedralMesh.hpp"
-//#include "DistributedTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
-//#include "PetscSetupAndFinalize.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestFineCoarseMeshPair : public CxxTest::TestSuite
 {
 public:
 
     // Simple test where the whole of the coarse mesh is in one fine element
-    void TestComputeFineElemsAndWeightsForQuadPointsSimple() throw(Exception)
+    void TestComputeFineElemsAndWeightsForQuadPointsSimple()
     {
         TetrahedralMesh<2,2> fine_mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -65,6 +64,8 @@ public:
 
         mesh_pair.SetUpBoxesOnFineMesh();
         GaussianQuadratureRule<2> quad_rule(3);
+        unsigned num_quads_per_element = quad_rule.GetNumQuadPoints();
+        TS_ASSERT_EQUALS(num_quads_per_element, 6u);
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
         // All coarse quadrature points should have been found in the fine mesh
@@ -72,16 +73,14 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 0u);
 
         // Check the elements and weights have been set up correctly
+        // Each item corresponds to a quad point in an element in the coarse mesh with 6 quad points per element
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), num_quads_per_element*coarse_mesh.GetNumAllElements());
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 12u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {
+            // All coarse mesh quad points are in the same fine element
             TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[i].ElementNum, 1u);
-        }
-
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
-        {
-            TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].ElementNum, fine_mesh.GetNumElements());
 
             /*
              * All the weights should be between 0 and 1 as no coarse nodes are.
@@ -95,12 +94,11 @@ public:
                 TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].Weights(j), 1.0+1e-14);
             }
         }
-
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[0], 12u);
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[1], 0u);
     }
 
-    void TestWithCoarseContainedInFine() throw(Exception)
+    void TestWithCoarseContainedInFine()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
         TetrahedralMesh<3,3> fine_mesh;
@@ -119,15 +117,17 @@ public:
         for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
         {
             unsigned box_index = mesh_pair.mpFineMeshBoxCollection->CalculateContainingBox(fine_mesh.GetNode(i));
-
-            assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
-
-            for (std::set<unsigned>::iterator iter = fine_mesh.GetNode(i)->rGetContainingElementIndices().begin();
-                iter != fine_mesh.GetNode(i)->rGetContainingElementIndices().end();
-                ++iter)
+            if (mesh_pair.mpFineMeshBoxCollection->IsBoxOwned(box_index))
             {
-                Element<3,3>* p_element = fine_mesh.GetElement(*iter);
-                TS_ASSERT_DIFFERS( mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end() )
+                assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
+
+                for (std::set<unsigned>::iterator iter = fine_mesh.GetNode(i)->rGetContainingElementIndices().begin();
+                        iter != fine_mesh.GetNode(i)->rGetContainingElementIndices().end();
+                        ++iter)
+                {
+                    Element<3,3>* p_element = fine_mesh.GetElement(*iter);
+                    TS_ASSERT_DIFFERS( mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end() )
+                }
             }
         }
 
@@ -173,7 +173,7 @@ public:
         TS_ASSERT(mesh_pair.mpFineMeshBoxCollection==NULL);
     }
 
-    void TestWithCoarseSlightlyOutsideFine() throw(Exception)
+    void TestWithCoarseSlightlyOutsideFine()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
         TetrahedralMesh<3,3> fine_mesh;
@@ -195,9 +195,13 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
 
+        ///\todo #2308 These quantities are not shared yet...
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        }
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
@@ -226,12 +230,16 @@ public:
 
         mesh_pair.PrintStatistics();
 
-        TS_ASSERT_EQUALS( Warnings::Instance()->GetNumWarnings(), 1u);
+        ///\todo #2308 warnings may or may not be triggered locally
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS( Warnings::Instance()->GetNumWarnings(), 1u);
+        }
         Warnings::Instance()->QuietDestroy();
     }
 
 ////Bring back this functionality if needed
-//    void dontTestWithIdenticalMeshes() throw(Exception)
+//    void dontTestWithIdenticalMeshes()
 //    {
 //        TrianglesMeshReader<1,1> reader1("mesh/test/data/1D_0_to_1_10_elements");
 //        TetrahedralMesh<1,1> fine_mesh;
@@ -252,7 +260,7 @@ public:
 //        TS_ASSERT_THROWS_NOTHING(mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true));
 //    }
 
-    void TestWithDefaultBoxWidth() throw(Exception)
+    void TestWithDefaultBoxWidth()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0);
@@ -298,7 +306,7 @@ public:
      * that are too small), so we just test we get the same results as in
      * safe mode.
      */
-    void TestNonSafeMode() throw(Exception)
+    void TestNonSafeMode()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
         TetrahedralMesh<3,3> fine_mesh;
@@ -321,8 +329,12 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, false /* non-safe mode*/);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        ///\todo #2308 These quantities are not shared yet...
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
+            TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        }
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
@@ -349,7 +361,7 @@ public:
     }
 
     // Covers some bits that aren't covered in the tests above,
-    void TestOtherCoverage() throw(Exception)
+    void TestOtherCoverage()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0);
@@ -388,7 +400,7 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 0u);
     }
 
-    void TestComputeCoarseElementsForFineNodes() throw(Exception)
+    void TestComputeCoarseElementsForFineNodes()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.2, 1.0, 1.0);
@@ -419,11 +431,11 @@ public:
             double x = fine_mesh.GetNode(i)->rGetLocation()[0];
             double y = fine_mesh.GetNode(i)->rGetLocation()[1];
 
-            if ( x+y < 1.0 - 1e-5 )  // x+y < 1
+            if (x+y < 1.0 - 1e-5)  // x+y < 1
             {
                 TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
             }
-            else if ( x+y > 1.0 + 1e-5 )  // x+y > 1
+            else if (x+y > 1.0 + 1e-5)  // x+y > 1
             {
                 TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], upper_right_element_index);
             }
@@ -447,9 +459,10 @@ public:
         {
             TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
         }
-
-        // Call again with safeMode=false this time (same results, faster)
+        // A little reset
+        TS_ASSERT_DIFFERS(mesh_pair.rGetCoarseElementsForFineNodes()[0], 0u);
         mesh_pair.rGetCoarseElementsForFineNodes()[0] = 189342958;
+        // Call again with safeMode=false this time (same results, faster)
         mesh_pair.ComputeCoarseElementsForFineNodes(false);
         for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
         {
@@ -463,7 +476,7 @@ public:
         mesh_pair.DeleteCoarseBoxCollection();
     }
 
-    void TestComputeCoarseElementsForFineElementCentroids() throw(Exception)
+    void TestComputeCoarseElementsForFineElementCentroids()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.2, 1.0, 1.0);
@@ -529,7 +542,7 @@ public:
         }
     }
 
-    void TestComputeFineElemsAndWeightsForCoarseNodes() throw(Exception)
+    void TestComputeFineElemsAndWeightsForCoarseNodes()
     {
         TetrahedralMesh<2,2> fine_mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");

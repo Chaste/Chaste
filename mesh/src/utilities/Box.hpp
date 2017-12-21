@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,9 +51,6 @@ class Box
 {
 private:
 
-    /** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
-    c_vector<double, 2*DIM> mMinAndMaxValues;
-
     /** Nodes contained in this box. */
     std::set< Node<DIM>* > mNodesContained;
 
@@ -61,16 +58,6 @@ private:
     std::set< Element<DIM,DIM>* > mElementsContained;
 
 public:
-
-    /**
-     * Constructor just takes in the extremal values of the box.
-     *
-     * @param rMinAndMaxValues the extremal values. Of the from (for 2D, etc): xmin, xmax, ymin, ymax
-     */
-    Box(c_vector<double, 2*DIM>& rMinAndMaxValues);
-
-    /** @return the coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
-    c_vector<double, 2*DIM>& rGetMinAndMaxValues();
 
     /**
      * Add a node to this box.
@@ -101,7 +88,5 @@ public:
     /** @return all the elements in this box. */
     std::set< Element<DIM,DIM>* >& rGetElementsContained();
 };
-
-
 
 #endif /*BOX_HPP_*/

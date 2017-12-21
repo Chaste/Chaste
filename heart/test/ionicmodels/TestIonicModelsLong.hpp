@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestIonicModelsLong : public CxxTest::TestSuite
 {
 public:
-    void TestOdeSolverForFox2002WithRegularStimulus(void) throw (Exception)
+    void TestOdeSolverForFox2002WithRegularStimulus(void)
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -125,7 +125,7 @@ public:
      *  The idea is to set the scale factors for the 3 different cell types (epi, mid and endo)
      *  and check that the rsulting APD makes sense if compared to experiemntal results
      */
-    void TestScaleFactorsForMahajanModel(void) throw(Exception)
+    void TestScaleFactorsForMahajanModel(void)
     {
         double end_time=300;
         double time_step=0.01;
@@ -332,7 +332,7 @@ public:
         TS_ASSERT_DELTA(LQT_APD , 347.8374, 0.1);
      }
 
-    void TestScaleFactorsMaleckar(void) throw (Exception)
+    void TestScaleFactorsMaleckar(void)
     {
         double end_time =500;
         boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-5.6,

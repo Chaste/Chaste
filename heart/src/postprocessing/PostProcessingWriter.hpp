@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,6 +68,7 @@ private:
     unsigned mLo; /**< Cache of mLo from the mesh DitributedVectorFactory */
     unsigned mHi; /**< Cache of mHi from the mesh DitributedVectorFactory */
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& mrMesh;/**< A mesh used to calculate the distance map to pass to the conduction velocity calculator*/
+    hsize_t mHdf5DataWriterChunkSize; /**< Chunk size parameter for Hdf5DataWriter */
 
 public:
     /**
@@ -78,11 +79,13 @@ public:
      * @param rHdf5FileName The file the data is in.
      * @param rVoltageName  (Optional) The name of the variable representing the
      *     membrane potential. It is used in the creation of the PropagationPropertiesCalculator object. Defaults to "V".
+     * @param hdf5DataWriterChunkSize (Optional) Chunk size and alignment parameter to pass to Hdf5DataWriter
      */
     PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                          const FileFinder& rDirectory,
                          const std::string& rHdf5FileName,
-                         const std::string& rVoltageName = "V");
+                         const std::string& rVoltageName = "V",
+                         hsize_t hdf5DataWriterChunkSize=0);
 
     /**
      *  Write out data files. The data that is written depends on which maps have been requested using
@@ -235,7 +238,6 @@ private:
      * @return  A string version of the number without minuses or decimal points.
      */
     std::string ConvertToHdf5FriendlyString(double threshold);
-
 };
 
 #endif /*POSTPROCESSINGWRITER_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PetscErrorCode ComputeTestResidual(SNES snes, Vec solution_guess, Vec residual, void* pContext);
 PetscErrorCode ComputeTestResidual3d(SNES snes, Vec solution_guess, Vec residual, void* pContext);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
 PetscErrorCode ComputeTestJacobian(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext);
 PetscErrorCode ComputeTestJacobian3d(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext);
 #else
@@ -59,7 +59,7 @@ PetscErrorCode ComputeTestJacobian3d(SNES snes,Vec input,Mat* pJacobian ,Mat* pP
 class TestNonlinearSolvers : public CxxTest::TestSuite
 {
 public:
-    void TestNonlinearProblemException() throw (Exception)
+    void TestNonlinearProblemException()
     {
         SimpleNewtonNonlinearSolver solver_newton;
 
@@ -76,7 +76,7 @@ public:
         PetscTools::Destroy(initial_guess);
     }
 
-    void TestOn2dNonlinearProblem() throw (Exception)
+    void TestOn2dNonlinearProblem()
     {
         SimplePetscNonlinearSolver solver_petsc;
         SimpleNewtonNonlinearSolver solver_newton;
@@ -116,7 +116,7 @@ public:
         PetscTools::Destroy(answer_newton);
     }
 
-    void TestOn3dNonlinearProblem() throw (Exception)
+    void TestOn3dNonlinearProblem()
     {
         SimplePetscNonlinearSolver solver_petsc;
         SimpleNewtonNonlinearSolver solver_newton;
@@ -207,7 +207,7 @@ PetscErrorCode ComputeTestResidual3d(SNES snes, Vec solution_guess, Vec residual
     return 0;
 }
 
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
 PetscErrorCode ComputeTestJacobian(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext)
 {
 #else
@@ -232,7 +232,7 @@ PetscErrorCode ComputeTestJacobian(SNES snes, Vec input, Mat* pJacobian, Mat* pP
 }
 
 
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+#if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
 PetscErrorCode ComputeTestJacobian3d(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext)
 {
 #else
@@ -262,7 +262,5 @@ PetscErrorCode ComputeTestJacobian3d(SNES snes, Vec input, Mat* pJacobian, Mat* 
 
     return 0;
 }
-
-
 
 #endif //_TESTNONLINEARSOLVERS_HPP_

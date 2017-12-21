@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,11 +48,7 @@ double StimulusBoundaryCondition<SPACE_DIM>::GetValue(const ChastePoint<SPACE_DI
     return mpStimulus->GetStimulus(PdeSimulationTime::GetTime());
 }
 
-
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class StimulusBoundaryCondition<1>;
 template class StimulusBoundaryCondition<2>;
 template class StimulusBoundaryCondition<3>;

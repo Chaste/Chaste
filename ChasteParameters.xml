@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4 heart/src/io/ChasteParameters_3_4.xsd">
+    xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1 heart/src/io/ChasteParameters_2017_1.xsd">
 
     <!--
         Note: all unit attributes must be included, but their content cannot be changed.

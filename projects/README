@@ -1,12 +1,6 @@
 
-If you wish to checkout a user project then you're looking in the wrong
-place.
+You can put user projects in this directory, to make use of the Chaste build system.
 
-This location is
-https://chaste.cs.ox.ac.uk/svn/chaste/trunk/projects
-                                      ^^^^^ 
-                                     (relative to trunk)
+We recommend that user projects be standalone Git repositories, hosted by the user, based on our template project.
 
-The location you are looking for is
-https://chaste.cs.ox.ac.uk/svn/chaste/projects
-
+See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserProjects for more information.

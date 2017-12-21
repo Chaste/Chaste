@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,9 +49,11 @@ class AirwayBranch
 public:
 
     /**
-     * Constructor
+     * Constructor.
+     *
+     * @param radiusOnEdge Specifies whether radii are specified on nodes or on elements
      */
-    AirwayBranch();
+    AirwayBranch(bool radiusOnEdge = false);
 
     /**
      * Adds an element to the branch list
@@ -234,7 +236,9 @@ private:
 
     /** Branch index.  Currently optional and set in AirwayPropertiesCalculator. \todo: add index into constructors */
     unsigned mIndex;
-};
 
+    /** Flag to indicate whether airway radii are specified on nodes or edges */
+    bool mRadiusOnEdge;
+};
 
 #endif // AIRWAY_BRANCH

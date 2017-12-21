@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,10 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
 
+#include "SmartPointers.hpp"
 #include "PetscTools.hpp"
 #include "DistributedBoxCollection.hpp"
 #include "MutableMesh.hpp"
-
 /**
  * Mesh class for storing lists of nodes (no elements). This inherits from MutableMesh
  * because we want to be able to add and delete nodes.
@@ -70,13 +70,47 @@ private:
      * @param version the current version of this class
      */
     template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    void save(Archive & archive, const unsigned int version) const
     {
         archive & mMaximumInteractionDistance;
         archive & mMinimumNodeDomainBoundarySeparation;
+        std::vector<unsigned> indices = GetAllNodeIndices();
+        archive & indices;
         archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
     }
 
+    /**
+     * Load member variables of the object which have to be preserved
+     * during its lifetime.
+     *
+     * Note that we must archive any member variables FIRST so that this
+     * method can call a ReMesh (to convert from TrianglesMeshReader input
+     * format into our native format).
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void load(Archive & archive, const unsigned int version)
+    {
+        archive & mMaximumInteractionDistance;
+        archive & mMinimumNodeDomainBoundarySeparation;
+        std::vector<unsigned> indices;
+        archive & indices;
+        archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
+        // Re-index the nodes according to what we've just read
+        assert(GetNumNodes() == indices.size());
+        this->mNodesMapping.clear();
+        for (unsigned i=0; i<this->mNodes.size(); i++)
+        {
+            unsigned new_index = indices[i];
+            this->mNodes[i]->SetIndex(new_index);
+            this->mNodesMapping[new_index] = i;
+        }
+        mMaxAddedNodeIndex = *(std::max_element(indices.begin(), indices.end()));
+        mIndexCounter = mMaxAddedNodeIndex + 1; // Next available fresh index
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
     /** Vector of shared-pointers to halo nodes used by this process. */
     std::vector<boost::shared_ptr<Node<SPACE_DIM> > > mHaloNodes;
 
@@ -212,6 +246,19 @@ public:
     void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance);
 
     /**
+     * Construct the mesh using only nodes. No mesh is created, but the nodes are stored.
+     * The original vector of nodes is deep-copied: new node objects are made with are
+     * independent of the pointers in the input so that they can be safely deleted.
+     *
+     * If this is the only way of constructing a mesh of this type, then we can be certain that
+     * elements and boundary elements are always unused.
+     *
+     * @param rNodes a vector of shared pointers to nodes.
+     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
+     */
+    void ConstructNodesWithoutMesh(const std::vector<boost::shared_ptr<Node<SPACE_DIM> > >& rNodes, double maxInteractionDistance);
+
+    /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
      * TetrahedralMesh, this calls the ConstructNodesWithoutMesh method with the nodes
      *
@@ -295,17 +342,15 @@ public:
      * Calculate pairs of nodes from interior boxes using the BoxCollection.
      *
      * @param rNodePairs reference to the set of node pairs to populate.
-     * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs);
 
     /**
      * Calculate pairs of nodes from boxes on the process boundary using the BoxCollection
      *
      * @param rNodePairs reference to the set of node pairs to populate.
-     * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs);
 
     /**
      * Overridden ReMesh() method. Since only Nodes are stored, this method cleans up mNodes by
@@ -381,12 +426,12 @@ public:
     void ClearHaloNodes();
 
     /**
-    * Overridden SetNode() method.
-    *
-    * @param nodeIndex is the index of the node to be moved
-    * @param point is the new target location of the node
-    * @param concreteMove is set to false if we want to skip the signed area tests in the parent Class Note this should always be false here
-    */
+     * Overridden SetNode() method.
+     *
+     * @param nodeIndex is the index of the node to be moved
+     * @param point is the new target location of the node
+     * @param concreteMove is set to false if we want to skip the signed area tests in the parent Class Note this should always be false here
+     */
     void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove = false);
 
     /**
@@ -436,6 +481,12 @@ public:
      * @param rMeshReader the mesh reader for input.
      */
     void ConstructFromMeshReader(AbstractMeshReader<SPACE_DIM, SPACE_DIM>& rMeshReader);
+
+    /**
+     * Get all node indices in order of appearance.
+     * @return Node vector of node indices for this process ignoring all delete nodes
+     */
+    std::vector<unsigned> GetAllNodeIndices() const;
 };
 
 #include "SerializationExportWrapper.hpp"

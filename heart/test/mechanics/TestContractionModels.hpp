@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,7 +78,7 @@ double MyLamDeriv(double t, double endTime, double minLam)
 class TestContractionModels : public CxxTest::TestSuite
 {
 public :
-    void TestNonPhysiologicalContractionModel() throw(Exception)
+    void TestNonPhysiologicalContractionModel()
     {
         NonPhysiologicalContractionModel model1(1);
         NonPhysiologicalContractionModel model2(2);
@@ -120,7 +120,7 @@ public :
     }
 
 
-    void TestNhsContractionModelSimple() throw(Exception)
+    void TestNhsContractionModelSimple()
     {
         NhsContractionModel nhs_system;
 
@@ -170,8 +170,6 @@ public :
         TS_ASSERT_DELTA( nhs_system.rGetStateVariables()[4],  20.6006, 1e-2 );
     }
 
-
-
     /*
      *  A test which couples the NHS model with the Lr91 model, via CaI
      *
@@ -180,7 +178,7 @@ public :
      *  and stimulate an action potential in a Lr91 cell, in order to get
      *  active tension in the NHS model
      */
-    void TestNhsConstantStretchVaryingCa() throw(Exception)
+    void TestNhsConstantStretchVaryingCa()
     {
         // setup
         double magnitude =  -25.5;
@@ -220,7 +218,7 @@ public :
 
 
         // time loop
-        for(double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+        for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
         {
             // solve electrophys model
             electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
@@ -242,7 +240,7 @@ public :
             // cellular mechanics models and send to electrophy model
             TS_ASSERT_EQUALS(has_Ca_trop, false);//NOTE - The following code is never activated....
 
-            if(has_Ca_trop)
+            if (has_Ca_trop)
             {
                 std::vector<double>& electrophys_model_state_vars = electrophys_model.rGetStateVariables();
                 electrophys_model_state_vars[Ca_trop_index] = cellmech_model.GetCalciumTroponinValue();
@@ -291,7 +289,7 @@ public :
      *  solving a Lr91 model with no stimulus, and specify non-zero lambda. We specify
      *  a functional form of lambda rather than get it from a mechanics model
      */
-    void TestNhsConstantCaVaryingStretch() throw(Exception)
+    void TestNhsConstantCaVaryingStretch()
     {
         boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
         double end_time = 100.0;
@@ -325,7 +323,7 @@ public :
         std::vector<double> Q2;
         std::vector<double> Q3;
         // time loop
-        for(double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+        for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
         {
             // solve electrophys model
             electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
@@ -351,7 +349,7 @@ public :
             // cellular mechanics models and send to electrophy model
 
             TS_ASSERT_EQUALS(has_Ca_trop, false);//NOTE - The following code is never activated....
-            if(has_Ca_trop)
+            if (has_Ca_trop)
             {
                 std::vector<double>& electrophys_model_state_vars = electrophys_model.rGetStateVariables();
                 electrophys_model_state_vars[Ca_trop_index] = cellmech_model.GetCalciumTroponinValue();
@@ -393,7 +391,7 @@ public :
      *  A test which couples the NHS model with the Lr91 model, via CaI, with different constant stretches.
      *  The stretches are 0.9, 1.0, 1.1
      */
-    void TestNhsIsometricTwitch() throw(Exception)
+    void TestNhsIsometricTwitch()
     {
         // setup
         double magnitude =  -25.5;
@@ -412,7 +410,7 @@ public :
         //  ==> bad things will happen (?) around and above this..
         double stretch[3] = {0.9,1.0,1.1};
 
-        for(unsigned run=0; run<3; run++)
+        for (unsigned run=0; run<3; run++)
         {
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
@@ -424,7 +422,7 @@ public :
             std::vector<double> active_tensions;
 
             // time loop
-            for(double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
+            for (double current_time = 0; current_time<end_time; current_time+=HeartConfig::Instance()->GetOdeTimeStep())
             {
                 // solve electrophys model
                 electrophys_model.Compute(current_time, current_time+HeartConfig::Instance()->GetOdeTimeStep());
@@ -446,7 +444,7 @@ public :
 
             }
 
-            if(run==0)
+            if (run==0)
             {
                 data.push_back(times);
             }
@@ -465,7 +463,7 @@ public :
     }
 
 
-    void TestRunDoNotUpdateEtcUsingKerchoff() throw(Exception)
+    void TestRunDoNotUpdateEtcUsingKerchoff()
     {
         Kerchoffs2003ContractionModel kerchoffs_model;
         kerchoffs_model.SetStretchAndStretchRate(0.85,0.0);
@@ -519,7 +517,7 @@ public :
     // results to be compared with Figure 1D in Kerchoffs et al, Electromechanics of
     // paced left ventricle simulated by straightforward mathematical model: comparison
     // with experiments.
-    void TestKerchoffs2003ContractionModelIsometricTwitch() throw(Exception)
+    void TestKerchoffs2003ContractionModelIsometricTwitch()
     {
         std::vector<std::vector<double> > data;
 
@@ -529,7 +527,7 @@ public :
         // mentioned above
         double stretch[3] = {1.6/1.9/*=0.842*/, 1.0, 2.2/1.9/*=1.158*/};
 
-        for(unsigned run=0; run<3; run++)
+        for (unsigned run=0; run<3; run++)
         {
             Kerchoffs2003ContractionModel kerchoffs_model;
             TS_ASSERT_EQUALS(kerchoffs_model.IsStretchDependent(), true);
@@ -549,13 +547,13 @@ public :
             times.push_back(stepper.GetTime());
             active_tensions.push_back(kerchoffs_model.GetActiveTension());
 
-            while(!stepper.IsTimeAtEnd())
+            while (!stepper.IsTimeAtEnd())
             {
                 // specify a step-change voltage since this model gets activated
                 // at V=0 and deactivated at V=-70
                 // Specify 300ms of activity - the resultant force should be
                 // non-zero for greater than 300ms..
-                if( (stepper.GetTime()>100) && (stepper.GetTime()<400) )
+                if ((stepper.GetTime()>100) && (stepper.GetTime()<400))
                 {
                     input_params.voltage = 50;
                 }
@@ -574,7 +572,7 @@ public :
                 stepper.AdvanceOneTimeStep();
             }
 
-            if(run==0)
+            if (run==0)
             {
                 data.push_back(times);
             }
@@ -591,7 +589,7 @@ public :
         TS_ASSERT_DELTA(data[1].back(), 0.0,  1e-2);
     }
 
-    void TestKerchoffs2003ContractionModelVaryingStetch() throw(Exception)
+    void TestKerchoffs2003ContractionModelVaryingStetch()
     {
         Kerchoffs2003ContractionModel kerchoffs_model;
         TS_ASSERT_EQUALS(kerchoffs_model.IsStretchDependent(), true);
@@ -610,10 +608,10 @@ public :
 
         TimeStepper stepper(0, 600, 1.0);  //ms
 
-        while(!stepper.IsTimeAtEnd())
+        while (!stepper.IsTimeAtEnd())
         {
-            // specify a step-change voltage since this model gets activated at V=0 and deactivated at V=-70
-            if( (stepper.GetTime()>0) && (stepper.GetTime()<500) )
+            // Specify a step-change voltage since this model gets activated at V=0 and deactivated at V=-70
+            if ((stepper.GetTime()>0) && (stepper.GetTime()<500))
             {
                 input_params.voltage = 50;
             }
@@ -671,7 +669,7 @@ public :
     }
 
 
-    void TestNash2004ContractionLaw() throw(Exception)
+    void TestNash2004ContractionLaw()
     {
         Nash2004ContractionModel nash_model;
         TS_ASSERT_EQUALS(nash_model.IsStretchDependent(), false);
@@ -693,7 +691,7 @@ public :
         double dt = 0.01;
 
         // time loop
-        for(double time = 0; time<end_time; time+=dt)
+        for (double time = 0; time<end_time; time+=dt)
         {
             // solve electrophys model
             electrophys_model.Compute(time, time+dt);
@@ -724,9 +722,13 @@ public :
         // towards the end
         TS_ASSERT_DELTA(times[100000],1000,1e-3);
         TS_ASSERT_DELTA(active_tensions[100000],0.2496,1e-2);
+
+        // Coverage
+        nash_model.RunDoNotUpdate(0,dt,dt);
+        TS_ASSERT_DELTA(nash_model.GetNextActiveTension(),active_tensions.back(),1e-4);
     }
 
-    void TestFakeBathContractionModel() throw(Exception)
+    void TestFakeBathContractionModel()
     {
         FakeBathContractionModel model1;
         ContractionModelInputParameters input_parameters;

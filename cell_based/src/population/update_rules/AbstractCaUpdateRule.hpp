@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,20 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCAUPDATERULE_HPP_
 #define ABSTRACTCAUPDATERULE_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-
+#include "AbstractUpdateRule.hpp"
 #include "CaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 class CaBasedCellPopulation; // Circular definition
 
 /**
- * An abstract CA update rule class, for use in cell-based simulations
- * using the cellular automaton model.
+ * An abstract CA update rule class, for use in CA simulations.
  */
 template<unsigned DIM>
-class AbstractCaUpdateRule : public Identifiable
+class AbstractCaUpdateRule : public AbstractUpdateRule<DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -63,6 +60,7 @@ class AbstractCaUpdateRule : public Identifiable
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & boost::serialization::base_object<AbstractUpdateRule<DIM> >(*this);
     }
 
 public:
@@ -82,6 +80,9 @@ public:
      *
      * Uses random diffusion to each neighbouring node, scaled according to distance.
      *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param currentNodeIndex The index of the current node/lattice site
      * @param targetNodeIndex The index of the target node/lattice site
      * @param rCellPopulation The cell population
@@ -95,27 +96,14 @@ public:
                                        CaBasedCellPopulation<DIM>& rCellPopulation,
                                        double dt,
                                        double deltaX,
-                                       CellPtr cell) = 0;
+                                       CellPtr cell)=0;
 
     /**
-     * Output update rule to file. Call OutputUpdateRuleParameters() to output
-     * all member variables to file.
+     * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile a file stream
      */
-    void OutputUpdateRuleInfo(out_stream& rParamsFile);
-
-    /**
-     * Output update rule parameters to file.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param rParamsFile a file stream
-     */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
 };
-
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCaUpdateRule)
 
 #endif /*ABSTRACTCAUPDATERULE_HPP_*/

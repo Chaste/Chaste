@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,11 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CITATIONS_HPP_
 #define CITATIONS_HPP_
 
-#include <vector>
-#include <iostream>
 #include <fstream>
-#include "PetscTools.hpp"
+#include <iostream>
+#include <vector>
 #include "CommandLineArguments.hpp"
+#include "PetscTools.hpp"
 
 /**
  * A class to register citations placed throughout the codebase, and pass them
@@ -75,8 +75,11 @@ public:
     static void Print();
 
 private:
+    // We need to manually switch on mCitations for testing.
+    friend class TestCitations;
+
     /** The list of citations if using Chaste's built-in manager (pre-PETSc 3.5 or PETSc not initialised). */
-    static std::vector<const char *> mCitations;
+    static std::vector<const char*> mCitations;
 
     /** Whether to use Chaste's own implementation rather than the PETSc one (e.g. if PETSc hasn't been initialised, or is too old). */
     static bool mUseChasteImplementation;

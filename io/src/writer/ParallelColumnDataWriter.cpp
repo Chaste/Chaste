@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,7 +41,7 @@ ParallelColumnDataWriter::ParallelColumnDataWriter(const std::string& rDirectory
                                                    const std::string& rBaseName,
                                                    bool cleanDirectory)
     : ColumnDataWriter(rDirectory, rBaseName, cleanDirectory),
-      mConcentrated(NULL)
+      mConcentrated(nullptr)
 {
     int num_procs;
     MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
@@ -66,7 +66,7 @@ void ParallelColumnDataWriter::PutVector(int variableID, Vec petscVector)
     }
 
     // Construct the appropriate "scatter" object to concentrate the vector on the master
-    if (mConcentrated==NULL)
+    if (mConcentrated==nullptr)
     {
         VecScatterCreateToZero(petscVector, &mToMaster, &mConcentrated);
     }
@@ -76,7 +76,7 @@ void ParallelColumnDataWriter::PutVector(int variableID, Vec petscVector)
 //    std::cout << "Vector size=" << size << "," << size2 << std::endl << std::flush;
 
 //PETSc-3.x.x or PETSc-2.3.3
-#if ( (PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
     VecScatterBegin(mToMaster, petscVector, mConcentrated, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd(mToMaster, petscVector, mConcentrated, INSERT_VALUES, SCATTER_FORWARD);
 #else
@@ -147,7 +147,7 @@ void ParallelColumnDataWriter::PutVariable(int variableID, double variableValue,
 
 ParallelColumnDataWriter::~ParallelColumnDataWriter()
 {
-    if (mConcentrated != NULL)
+    if (mConcentrated != nullptr)
     {
         VecScatterDestroy(PETSC_DESTROY_PARAM(mToMaster));
         PetscTools::Destroy(mConcentrated);

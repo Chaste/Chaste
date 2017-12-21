@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -165,7 +165,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblemSimplestMesh1D() throw(Exception)
+    void TestMonodomainProblemSimplestMesh1D()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -225,7 +225,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblem1D() throw(Exception)
+    void TestMonodomainProblem1D()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
@@ -302,7 +302,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblem1DWithRelativeTolerance() throw(Exception)
+    void TestMonodomainProblem1DWithRelativeTolerance()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
@@ -339,7 +339,6 @@ public:
         {
             TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index], 5e-3);
         }
-
     }
 
     // Same as TestMonodomainProblem1D, except the 1D mesh is embedded in 3D space.
@@ -348,7 +347,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblem1Din3D() throw(Exception)
+    void TestMonodomainProblem1Din3D()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
@@ -396,7 +395,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblem1DWithAbsoluteTolerance() throw (Exception)
+    void TestMonodomainProblem1DWithAbsoluteTolerance()
     {
         double atol = 1e-4;
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
@@ -434,7 +433,6 @@ public:
         {
             TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index],  5e-3);
         }
-
     }
 
     // Solve on a 2D 1mm by 1mm mesh (space step = 0.1mm), stimulating the left
@@ -446,7 +444,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblem2DWithEdgeStimulus() throw(Exception)
+    void TestMonodomainProblem2DWithEdgeStimulus()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
         HeartConfig::Instance()->SetSimulationDuration(2); //ms
@@ -527,9 +525,7 @@ public:
                 TS_ASSERT_DELTA(voltage_replicated[i], -59.6488, 5e-4);
             }
         }
-
     }
-
 
     // Solve on a 2D 1mm by 1mm mesh (space step = 0.1mm), stimulating in the
     // very centre of the mesh.
@@ -538,7 +534,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainProblem2DWithPointStimulusInTheVeryCentreOfTheMesh() throw(Exception)
+    void TestMonodomainProblem2DWithPointStimulusInTheVeryCentreOfTheMesh()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
         HeartConfig::Instance()->SetSimulationDuration(1.3); //ms - needs to be 1.3 ms to pass test
@@ -664,7 +660,7 @@ public:
     // Solve a simple simulation and check the output was only
     // printed out at the correct times
     ///////////////////////////////////////////////////////////////////
-    void TestMonodomainProblemPrintsOnlyAtRequestedTimes() throw(Exception)
+    void TestMonodomainProblemPrintsOnlyAtRequestedTimes()
     {
         HeartConfig::Instance()->SetPrintingTimeStep(0.1);
         HeartConfig::Instance()->SetSimulationDuration(0.3); //ms
@@ -701,7 +697,7 @@ public:
     // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
     // the equations have been divided through by the surface-area-to-volume ratio.
     // (Historical reasons...)
-    void TestMonodomainWithMeshInMemoryToMeshalyzer() throw(Exception)
+    void TestMonodomainWithMeshInMemoryToMeshalyzer()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
         HeartConfig::Instance()->SetSimulationDuration(0.1);  //ms
@@ -987,7 +983,7 @@ public:
     }
 
     // Test the functionality for outputing the values of requested cell state variables
-    void TestMonodomainProblemPrintsMultipleVariables() throw (Exception)
+    void TestMonodomainProblemPrintsMultipleVariables()
     {
         // Set configuration file
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/MultipleVariablesMonodomain.xml");
@@ -1025,7 +1021,7 @@ public:
         TS_ASSERT_EQUALS( node_5_ki.size(), 11U);
     }
 
-    void TestMonodomainProblemExceptions() throw (Exception)
+    void TestMonodomainProblemExceptions()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
 
@@ -1096,7 +1092,7 @@ public:
      *
      * This test relies on the h5 file generated in TestMonodomainProblem1D. Always run after!
      */
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         // Based on TestMonodomainProblem1D()
         FileFinder archive_dir("monodomain_problem_archive", RelativeTo::ChasteTestOutput);
@@ -1146,6 +1142,7 @@ public:
             // Check values
             TS_ASSERT_EQUALS(p_monodomain_problem->GetTissue()->rGetCellsDistributed().size(),
                              num_cells);
+            TS_ASSERT(!p_monodomain_problem->mUseHdf5DataWriterCache);
 
             HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
             p_monodomain_problem->Solve();
@@ -1187,7 +1184,7 @@ public:
      *
      * This test relies on the h5 file generated in TestMonodomainProblem1D. Always run after!
      */
-    void TestMonodomainProblem1dInTwoHalves() throw(Exception)
+    void TestMonodomainProblem1dInTwoHalves()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
@@ -1237,7 +1234,7 @@ public:
     }
 
 
-    void TestMonodomain2dOriginalPermutationInParallel() throw(Exception)
+    void TestMonodomain2dOriginalPermutationInParallel()
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
         HeartConfig::Instance()->SetSimulationDuration(0.5); //ms
@@ -1344,12 +1341,12 @@ public:
     }
 
 
-    void TestOutputDoesNotDependOnPrintTimestep() throw(Exception)
+    void TestOutputDoesNotDependOnPrintTimestep()
     {
 #ifdef CHASTE_CVODE
 
         // Switch this back on to watch linear solver converge on each step.
-        //PetscOptionsSetValue("-ksp_monitor", "");
+        //PetscTools::SetOption("-ksp_monitor", "");
 
         // Make sure that this test isn't having problems because of PDE tolerances.
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
@@ -1425,7 +1422,7 @@ public:
      *
      * It covers code that we have introduced for #2594, see that for more details.
      */
-    void TestCvodeErrorHandling() throw(Exception)
+    void TestCvodeErrorHandling()
     {
 #ifdef CHASTE_CVODE
         std::cout << "Don't worry about a few errors below here, we are testing that we can recover from them!" << std::endl;
@@ -1450,7 +1447,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestArchivingOfSingleTraceOutputModifier() throw(Exception)
+    void TestArchivingOfSingleTraceOutputModifier()
     {
         OutputFileHandler handler("TestArchivingOfSingleTraceOutputModifier", false);
         // The next two lines ensure that different processes read/write different archive files when running in parallel
@@ -1502,7 +1499,7 @@ public:
 
         }
     }
-    void TestMonodomainProblem2DWithArchiving() throw(Exception)
+    void TestMonodomainProblem2DWithArchiving()
     {
 
         // Names of output and archive directories
@@ -1531,7 +1528,7 @@ public:
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
             MonodomainProblem<2> monodomain_problem( &cell_factory );
             monodomain_problem.Initialise();
-
+            monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on, for coveraging of archiving this
 
             HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
             HeartConfig::Instance()->SetCapacitance(1.0);
@@ -1557,6 +1554,7 @@ public:
         { // Load and run - first go
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_1);
             HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
+            TS_ASSERT(p_monodomain_problem->mUseHdf5DataWriterCache);
             p_monodomain_problem->Solve();
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_2);
             delete p_monodomain_problem;
@@ -1566,6 +1564,7 @@ public:
         { // Load and run - second go
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_2);
             HeartConfig::Instance()->SetSimulationDuration(1.5); //ms
+            TS_ASSERT(p_monodomain_problem->mUseHdf5DataWriterCache);
             p_monodomain_problem->Solve();
             { // Check that the modifiers are still there
                 TS_ASSERT_EQUALS(p_monodomain_problem->mOutputModifiers.size(), 2u);
@@ -1582,6 +1581,176 @@ public:
         std::string file2="heart/test/data/MonoProblem2dOriginalPermutation/AfterArchivingTwice_V.dat";
         NumericFileComparison comp_meshalyzer_original_order(file1, file2);
         TS_ASSERT(comp_meshalyzer_original_order.CompareFiles(1e-3));
+    }
+
+    /*
+     * HOW_TO_TAG Cardiac/Output
+     * On large-scale parallel simulations it is advantageous to cache HDF5 output and only
+     * write to disk at end of simulation (or at checkpoint).  This is achieved with `SetUseHdf5DataWriterCache()`
+     */
+    void TestMonodomainProblemWithWriterCache()
+    {
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("MonodomainWithWriterCache");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache");
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        monodomain_problem.Initialise();
+        monodomain_problem.Solve();
+        TS_ASSERT(monodomain_problem.mUseHdf5DataWriterCache);
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", true,
+                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache", false,
+                                                2e-4));
+    }
+
+    void TestMonodomainProblemWithWriterCacheIncomplete()
+    {
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+        HeartConfig::Instance()->SetOutputDirectory("MonodomainWithWriterCacheIncomplete");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_with_cache_incomplete");
+        HeartConfig::Instance()->SetSimulationDuration(1.0);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetUseHdf5DataWriterCache(true); // cache on
+
+        std::vector<unsigned> nodes_to_be_output;
+        nodes_to_be_output.push_back(0);
+        nodes_to_be_output.push_back(5);
+        nodes_to_be_output.push_back(10);
+        monodomain_problem.SetOutputNodes(nodes_to_be_output);
+
+        monodomain_problem.Initialise();
+        monodomain_problem.Solve();
+        TS_ASSERT(monodomain_problem.mUseHdf5DataWriterCache);
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("MonodomainWithWriterCacheIncomplete", "MonodomainLR91_1d_with_cache_incomplete", true,
+                                                "heart/test/data/MonodomainWithWriterCache", "MonodomainLR91_1d_with_cache_incomplete", false,
+                                                1e-4));
+    }
+
+    void TestMonodomainProblemWithTargetChunkSizeAndAlignment()
+    {
+        {
+            DistributedTetrahedralMesh<3,3> mesh;
+            mesh.ConstructRegularSlabMesh(0.01, 0.42, 0.12, 0.03);
+
+            HeartConfig::Instance()->SetOutputDirectory("MonodomainWithTargetChunkSizeAndAlignment");
+            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+            HeartConfig::Instance()->SetSimulationDuration(10.0);
+            // Some postprocessing to test passing chunk size through to PostProcessingWriter
+            std::vector<double> upstroke_voltages;
+            upstroke_voltages.push_back(0.0);
+            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
+
+            PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-600 * 5000);
+
+            MonodomainProblem<3> monodomain_problem( &cell_factory );
+            monodomain_problem.SetMesh(&mesh);
+            monodomain_problem.SetHdf5DataWriterTargetChunkSizeAndAlignment(0x2000); // 8 K
+
+            monodomain_problem.Initialise();
+            monodomain_problem.Solve();
+
+            CardiacSimulationArchiver<MonodomainProblem<3> >::Save(monodomain_problem, "MonodomainWithTargetChunkSizeAndAlignment/checkpoint");
+        }
+
+        // Open file
+        OutputFileHandler file_handler("MonodomainWithTargetChunkSizeAndAlignment", false);
+        FileFinder file = file_handler.FindFile("results.h5");
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        /* Need this next line as using the 1.8 API in this test suite
+         * (haven't explicitly included AbstractHdf5Access.hpp) */
+        hid_t dset = H5Dopen(h5_file, "Data", H5P_DEFAULT); // open dataset
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+
+        /* Check chunk dimensions */
+        hsize_t expected_dims[3] = {32, 32, 1}; //(exactly 8K!)
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+
+        /*
+         * Check the "location" of the datasets (the offset from the start of
+         * file, a bit like a pointer to the start of the dataset) to get a
+         * hint that  alignment was switched on. It's not the most specific
+         * test but I can't think of a better way.
+         * (These numbers might be machine-dependent!)
+         */
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 0x8000u); // 32 KB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 18735104u); // About 17.8 MB
+        H5Dclose(dset);
+
+        dset = H5Dopen(h5_file, "UpstrokeTimeMap_0", H5P_DEFAULT);
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_EQUALS(data_info.addr, 18809856u); // About 17.9 MB
+        // And chunk dims for this one
+        hsize_t expected_dims_upstroke[3] = {1, 746, 1};
+        dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims_upstroke[i]);
+        }
+        // Close
+        H5Dclose(dset);
+        H5Fclose(h5_file);
+    }
+
+    void TestResumeMonodomainProblemWithTargetChunkSizeAndAlignment()
+    {
+        // Resume from previous test
+        {
+            MonodomainProblem<3> * p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<3> >::Load("MonodomainWithTargetChunkSizeAndAlignment/checkpoint");
+            HeartConfig::Instance()->SetSimulationDuration(11.0);
+            std::vector<double> upstroke_voltages;
+            upstroke_voltages.push_back(3.0);
+            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_voltages);
+
+            p_monodomain_problem->Solve();
+            //Tidy up
+            delete p_monodomain_problem;
+        }
+        /* Check new dataset has the right chunk dims. This will confirm that
+         * the option was unarchived properly and that it works correctly when
+         * adding a new dataset to an existing file. */
+        // Open file
+        OutputFileHandler file_handler("MonodomainWithTargetChunkSizeAndAlignment", false);
+        FileFinder file = file_handler.FindFile("results.h5");
+        TS_ASSERT(file.IsFile());
+        hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+        hid_t dapl = H5Pcreate(H5P_DATASET_ACCESS);
+        hid_t dset = H5Dopen(h5_file, "UpstrokeTimeMap_3", dapl); // open dataset
+        hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
+        // Check chunk dimensions
+        hsize_t expected_dims[3] = {1, 746, 1};
+        hsize_t chunk_dims[3];
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i=0; i<3; ++i)
+        {
+            TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
+        }
+        // Check location
+        H5O_info_t data_info;
+        H5Oget_info(dset, &data_info);
+        TS_ASSERT_DELTA(data_info.addr, 20567968u, 41u); // About 19.6 MB with a little leeway
+        H5Dclose(dset);
+        H5Fclose(h5_file);
     }
 };
 

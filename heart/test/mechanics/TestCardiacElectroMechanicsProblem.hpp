@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,13 +69,11 @@ public:
     }
 };
 
-
-
 class TestCardiacElectroMechanicsProblem : public CxxTest::TestSuite
 {
 public:
 
-    void TestExceptions() throw(Exception)
+    void TestExceptions()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -134,7 +132,7 @@ public:
     // free - ie sliding boundary conditions. With a homogeneous
     // force this means the solution should be a perfect rectangle,
     // ie x=alpha*X, y=beta*Y for some alpha, beta.
-    void TestWithHomogeneousEverythingCompressible() throw(Exception)
+    void TestWithHomogeneousEverythingCompressible()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -152,9 +150,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -200,7 +198,7 @@ public:
 
         std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -220,7 +218,7 @@ public:
      * This test is the same as above but with bidomain instead of monodomain.
      * Extracellular conductivities are set very high so the results should be the same.
      */
-    void TestWithHomogeneousEverythingCompressibleBidomain() throw(Exception)
+    void TestWithHomogeneousEverythingCompressibleBidomain()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -238,9 +236,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -288,7 +286,7 @@ public:
 
         std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -308,7 +306,7 @@ public:
         TS_ASSERT_DELTA(problem.mInterpolatedCalciumConcs[0],0.001464,1e-6);
 
         //for the rest, we check that, at the end of this simulation, all quad nodes have V and Ca above a certain threshold
-        for(unsigned i = 0; i < quad_points; i++)
+        for (unsigned i = 0; i < quad_points; i++)
         {
             TS_ASSERT_LESS_THAN(9.2,problem.mInterpolatedVoltages[i]);
             TS_ASSERT_LESS_THAN(0.0014,problem.mInterpolatedCalciumConcs[i]);
@@ -326,7 +324,7 @@ public:
     // except it uses incompressible solid mechanics. Since the solution should be
     // x=alpha*X, y=beta*Y for some alpha, beta (see comments for above test),
     // we also test that alpha*beta = 1.0
-    void TestWithHomogeneousEverythingIncompressible() throw(Exception)
+    void TestWithHomogeneousEverythingIncompressible()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -340,9 +338,9 @@ public:
         std::vector<c_vector<double,2> > fixed_node_locations;
         fixed_nodes.push_back(0);
         fixed_node_locations.push_back(zero_vector<double>(2));
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -390,7 +388,7 @@ public:
 
         std::cout << "Scale_factors = " << X_scale_factor << " " << Y_scale_factor << ", product = " << X_scale_factor*Y_scale_factor<<"\n";
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -407,7 +405,7 @@ public:
     //We construct the electrics mesh in a  way that most of it is bath
     // We then fix the only nodes in the mechanics mesh which are not bath
     //and then we check that nothing moved
-    void TestMechanicsWithBidomainAndBathImplicit() throw(Exception)
+    void TestMechanicsWithBidomainAndBathImplicit()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -435,7 +433,7 @@ public:
         //store the original node positions
         std::vector<c_vector<double,2> > original_node_position;
         c_vector<double,2> pos = zero_vector<double>(2);
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -450,9 +448,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -486,7 +484,7 @@ public:
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA( r_deformed_position[i](0), original_node_position[i](0), 1e-6);
             TS_ASSERT_DELTA( r_deformed_position[i](1), original_node_position[i](1), 1e-6);
@@ -494,7 +492,7 @@ public:
     }
 
     //This test is identical to the test above, just that we use a model that requires an explicit solver
-    void TestMechanicsWithBidomainAndBathExplicit() throw(Exception)
+    void TestMechanicsWithBidomainAndBathExplicit()
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
@@ -522,7 +520,7 @@ public:
         //store the original node positions
         std::vector<c_vector<double,2> > original_node_position;
         c_vector<double,2> pos = zero_vector<double>(2);
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             pos(1) = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -537,9 +535,9 @@ public:
         fixed_node_locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if they lie on X=0, fix x=0 but leave y free.
-        for(unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); i++)
         {
-            if(fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
+            if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
                 c_vector<double,2> new_position;
                 new_position(0) = 0.0;
@@ -573,7 +571,7 @@ public:
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[1] - 0.05)<1e-8);
 
-        for(unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA( r_deformed_position[i](0), original_node_position[i](0), 1e-6);
             TS_ASSERT_DELTA( r_deformed_position[i](1), original_node_position[i](1), 1e-6);
@@ -581,7 +579,7 @@ public:
     }
 
     // These tests are older than the above tests..
-    void TestImplicitNhs2dOneMechanicsElement() throw(Exception)
+    void TestImplicitNhs2dOneMechanicsElement()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -601,8 +599,6 @@ public:
         pos(1) = 0.0;
 
         problem.SetWatchedPosition(pos);
-
-
 
         TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
         problem.SetOutputDeformationGradientsAndStress(3.0);
@@ -630,8 +626,6 @@ public:
         TS_ASSERT(handler.FindFile("deformation/second_PK_3.stress").Exists());
         TS_ASSERT(handler.FindFile("deformation/second_PK_6.stress").Exists());
 
-
-
         // coverage
 
         HeartConfig::Instance()->SetSimulationDuration(10.0); // has to be reset after a solve, it seems..
@@ -651,7 +645,7 @@ public:
         MechanicsEventHandler::Report();
     }
 
-    void TestWithKerchoffs() throw(Exception)
+    void TestWithKerchoffs()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -692,7 +686,7 @@ public:
     //
     //  Now removed
     //
-    void removedTestExplicitSolverWithNash2004() throw(Exception)
+    void removedTestExplicitSolverWithNash2004()
     {
 #ifdef MECH_USE_HYPRE
         TS_FAIL("This test is known to fail with HYPRE - see comments in test");
@@ -730,7 +724,7 @@ public:
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[1](0), 0.0419, 0.0002);
     }
 
-    void TestWithCompressibleApproach() throw(Exception)
+    void TestWithCompressibleApproach()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 

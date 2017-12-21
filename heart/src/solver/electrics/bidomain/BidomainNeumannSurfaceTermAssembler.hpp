@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BIDOMAINNEUMANNSURFACETERMASSEMBLER_HPP_
 
 #include "AbstractFeSurfaceIntegralAssembler.hpp"
-
-
 
 /**
  *  Assembler which sets up the surface integral integrals for the bidomain equations, assuming
@@ -86,8 +84,6 @@ public:
     {
     }
 };
-
-
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2*ELEMENT_DIM> BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeVectorSurfaceTerm(

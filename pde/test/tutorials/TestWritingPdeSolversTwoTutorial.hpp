@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -136,14 +136,14 @@ private:
 
         double dt = PdeSimulationTime::GetPdeTimeStep();
 
-        for(unsigned i=0; i<ELEMENT_DIM+1; i++) // essentially a loop over the basis functions
+        for (unsigned i=0; i<ELEMENT_DIM+1; i++) // essentially a loop over the basis functions
         {
-            for(unsigned j=0; j<ELEMENT_DIM+1; j++) // essentially a loop over the basis functions
+            for (unsigned j=0; j<ELEMENT_DIM+1; j++) // essentially a loop over the basis functions
             {
                 // mass matrix
                 ret(i,j) = rPhi(i)*rPhi(j);
                 // -dt * stiffness matrix
-                for(unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim=0; dim<SPACE_DIM; dim++)
                 {
                     ret(i,j) -= dt * rGradPhi(dim,i)*rGradPhi(dim,j);
                 }
@@ -197,7 +197,7 @@ private:
          * at the current timestep), this needs to be passed to the assembler, as in the commented
          * line below.
          */
-        if(computeMatrix)
+        if (computeMatrix)
         {
             MassMatrixAssembler<DIM,DIM> mass_matrix_assembler(this->mpMesh);
             RhsMatrixAssembler<DIM> rhs_matrix_assembler(this->mpMesh);
@@ -272,7 +272,7 @@ public:
 class TestWritingPdeSolversTwoTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestExplicitSolver() throw (Exception)
+    void TestExplicitSolver()
     {
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
@@ -292,12 +292,12 @@ public:
         solver.SetTimes(0.0, 0.2);
 
         std::vector<double> init_cond(mesh.GetNumNodes(), 0.0);
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double distance_from_centre = sqrt( (x-0.5)*(x-0.5) + (y-0.5)*(y-0.5) );
-            if(distance_from_centre < 1.0/3.0)
+            if (distance_from_centre < 1.0/3.0)
             {
                 init_cond[i] = 1.0;
             }

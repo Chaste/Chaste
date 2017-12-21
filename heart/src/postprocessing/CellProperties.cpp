@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,15 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <sstream>
-#include <cassert>
+
+//// Useful for debugging...
+//#include <iostream>
+//#include <iomanip>
 
 #include "CellProperties.hpp"
 #include "Exception.hpp"
+#include "Warnings.hpp"
 
-
-enum APPhases { BELOWTHRESHOLD , ABOVETHRESHOLD };
+enum APPhases
+{
+    BELOWTHRESHOLD,
+    ABOVETHRESHOLD
+};
 
 void CellProperties::CalculateProperties()
 {
@@ -56,21 +65,21 @@ void CellProperties::CalculateProperties()
         EXCEPTION("Time and Voltage series should be the same length. Time.size() = " << mrTime.size() << ", Voltage.size() = " << mrVoltage.size());
     }
 
-
     double max_upstroke_velocity = -DBL_MAX;
     double current_time_of_upstroke_velocity = 0;
-    double current_resting_value=DBL_MAX;
-    double current_peak=-DBL_MAX;
-    double current_minimum_velocity=DBL_MAX;
-    double prev_voltage_derivative=0;
+    double current_resting_value = DBL_MAX;
+    double current_peak = -DBL_MAX;
+    double current_peak_time = -DBL_MAX;
+    double current_minimum_velocity = DBL_MAX;
+    double prev_voltage_derivative = 0;
     unsigned ap_counter = 0;
     unsigned counter_of_plateau_depolarisations = 0;
     //boolean to keep track whether we are switching phase from BELOWTHRESHOLD to ABOVETHRESHOLD
     bool switching_phase = false;
-    bool found_a_flat_bit=false;
+    bool found_a_flat_bit = false;
     APPhases ap_phase = BELOWTHRESHOLD;
 
-    unsigned time_steps = mrTime.size()-1; //The number of time steps is the number of intervals
+    unsigned time_steps = mrTime.size() - 1; //The number of time steps is the number of intervals
 
     double v = mrVoltage[0];
     double t = mrTime[0];
@@ -79,7 +88,7 @@ void CellProperties::CalculateProperties()
     double voltage_derivative;
     const double resting_potential_gradient_threshold = 1e-2; /// \todo #1495 a horrible magic number but seems to work OK.
 
-    for (unsigned i=1; i<=time_steps; i++)
+    for (unsigned i = 1; i <= time_steps; i++)
     {
         v = mrVoltage[i];
         t = mrTime[i];
@@ -90,7 +99,6 @@ void CellProperties::CalculateProperties()
         {
             max_upstroke_velocity = voltage_derivative;
             current_time_of_upstroke_velocity = t;
-
         }
 
         switch (ap_phase)
@@ -99,19 +107,19 @@ void CellProperties::CalculateProperties()
                 //while below threshold, find the resting value by checking where the velocity is minimal
                 //i.e. when it is flattest. If we can't find a flat bit, instead go for the minimum voltage
                 //seen before the threshold.
-                if (fabs(voltage_derivative)<=current_minimum_velocity && fabs(voltage_derivative)<=resting_potential_gradient_threshold)
+                if (fabs(voltage_derivative) <= current_minimum_velocity && fabs(voltage_derivative) <= resting_potential_gradient_threshold)
                 {
-                    current_minimum_velocity=fabs(voltage_derivative);
+                    current_minimum_velocity = fabs(voltage_derivative);
                     current_resting_value = prev_v;
-                    found_a_flat_bit=true;
+                    found_a_flat_bit = true;
                 }
-                else if(prev_v < current_resting_value && !found_a_flat_bit)
+                else if (prev_v < current_resting_value && !found_a_flat_bit)
                 {
                     current_resting_value = prev_v;
                 }
 
                 // If we cross the threshold, this counts as an AP
-                if ( v>mThreshold && prev_v <= mThreshold )
+                if (v > mThreshold && prev_v <= mThreshold)
                 {
                     //register the resting value and re-initialise the minimum velocity
                     mRestingValues.push_back(current_resting_value);
@@ -119,35 +127,36 @@ void CellProperties::CalculateProperties()
                     current_resting_value = DBL_MAX;
 
                     //Register the onset time. Linear interpolation.
-                    mOnsets.push_back(prev_t + (t-prev_t)/(v-prev_v)*(mThreshold-prev_v));
+                    mOnsets.push_back(prev_t + (t - prev_t) / (v - prev_v) * (mThreshold - prev_v));
 
                     //If it is not the first AP, calculate cycle length for the last two APs
-                    if (ap_counter>0)
+                    if (ap_counter > 0)
                     {
-                        mCycleLengths.push_back( mOnsets[ap_counter]-mOnsets[ap_counter-1] );
+                        mCycleLengths.push_back(mOnsets[ap_counter] - mOnsets[ap_counter - 1]);
                     }
 
                     switching_phase = true;
                     found_a_flat_bit = false;
                     ap_phase = ABOVETHRESHOLD;
-                    // no break here - deliberate fall through to next case
                 }
                 else
                 {
                     break;
                 }
+            // no break here - deliberate fall through to next case
 
             case ABOVETHRESHOLD:
                 //While above threshold, look for the peak potential for the current AP
-                if (v>current_peak)
+                if (v > current_peak)
                 {
-                   current_peak = v;
+                    current_peak = v;
+                    current_peak_time = t;
                 }
 
                 // we check whether we have above threshold depolarisations
                 // and only if if we haven't just switched from below threshold at this time step.
                 // The latter is to avoid recording things depending on resting behaviour (in case of sudden upstroke from rest)
-                if (prev_voltage_derivative<=0 && voltage_derivative>0 && !switching_phase)
+                if (prev_voltage_derivative <= 0 && voltage_derivative > 0 && !switching_phase)
                 {
                     counter_of_plateau_depolarisations++;
                 }
@@ -158,21 +167,23 @@ void CellProperties::CalculateProperties()
 
                 // If we cross the threshold again, the AP is over
                 // and we register all the parameters.
-                if ( v<mThreshold && prev_v >= mThreshold )
+                if (v < mThreshold && prev_v >= mThreshold)
                 {
-                    //register peak value for this AP
+                    // Register peak value for this AP
                     mPeakValues.push_back(current_peak);
-                    //Re-initialise the current_peak.
+                    mTimesAtPeakValues.push_back(current_peak_time);
+                    // Re-initialise the current_peak.
                     current_peak = mThreshold;
+                    current_peak_time = -DBL_MAX;
 
-                    //register maximum upstroke velocity for this AP
+                    // Register maximum upstroke velocity for this AP
                     mMaxUpstrokeVelocities.push_back(max_upstroke_velocity);
-                    //re-initialise max_upstroke_velocity
+                    // Re-initialise max_upstroke_velocity
                     max_upstroke_velocity = -DBL_MAX;
 
-                    //register time when maximum upstroke velocity occurred for this AP
+                    // Register time when maximum upstroke velocity occurred for this AP
                     mTimesAtMaxUpstrokeVelocity.push_back(current_time_of_upstroke_velocity);
-                    //re-initialise current_time_of_upstroke_velocity=t;
+                    // Re-initialise current_time_of_upstroke_velocity=t;
                     current_time_of_upstroke_velocity = 0.0;
 
                     mCounterOfPlateauDepolarisations.push_back(counter_of_plateau_depolarisations);
@@ -191,74 +202,117 @@ void CellProperties::CalculateProperties()
         prev_voltage_derivative = voltage_derivative;
     }
 
-
     // One last check. If the simulation ends halfway through an AP
     // i.e. if the vectors of onsets has more elements than the vectors
     // of peak and upstroke properties (that are updated at the end of the AP),
     // then we register the peak and upstroke values so far
     // for the last incomplete AP.
-    if (mOnsets.size()>mMaxUpstrokeVelocities.size())
+    if (mOnsets.size() > mMaxUpstrokeVelocities.size())
     {
         mMaxUpstrokeVelocities.push_back(max_upstroke_velocity);
         mPeakValues.push_back(current_peak);
+        mTimesAtPeakValues.push_back(current_peak_time);
         mTimesAtMaxUpstrokeVelocity.push_back(current_time_of_upstroke_velocity);
         mUnfinishedActionPotentials = true;
     }
 }
-
 
 std::vector<double> CellProperties::CalculateActionPotentialDurations(const double percentage)
 {
     CheckExceededThreshold();
 
     double prev_v = mrVoltage[0];
-    unsigned APcounter=0;//will keep count of the APDs that we calculate
-    bool apd_is_calculated=true;//this will ensure we hit the target only once per AP.
+    double prev_t = mrTime[0];
     std::vector<double> apds;
-    double target = DBL_MAX;
-    bool apd_starting_time_found=false;
-    double apd_start_time=DBL_MAX;
+    std::vector<double> targets;
+    double apd_start_time = DOUBLE_UNSET;
+    double apd_end_time = DOUBLE_UNSET;
 
-    double t;
-    double v;
-    for (unsigned i=1; i<mrTime.size(); i++)
+    unsigned apd_starting_index = UNSIGNED_UNSET;
+
+    // New algorithm is to loop over APs instead of time.
+    for (unsigned ap_index = 0; ap_index < mPeakValues.size(); ap_index++)
     {
-        t = mrTime[i];
-        v = mrVoltage[i];
+        targets.push_back(mRestingValues[ap_index] + 0.01 * (100 - percentage) * (mPeakValues[ap_index] - mRestingValues[ap_index]));
 
-        //First we make sure we stop calculating after the last AP has been calculated
-        if (APcounter<mPeakValues.size())
+        // We need to look from starting_time_index (just before threshold is reached)
+        unsigned starting_time_index = std::lower_bound(mrTime.begin(), mrTime.end(), mOnsets[ap_index]) - mrTime.begin() - 1u;
+
+        // Now if the target voltage for depolarisation is above the threshold,
+        // we'll need to look forwards in time for the crossing point.
+        if (targets[ap_index] >= mThreshold)
         {
-            //Set the target potential
-            target = mRestingValues[APcounter]+0.01*(100-percentage)*(mPeakValues[APcounter]-mRestingValues[APcounter]);
-
-            //if we reach the peak, we need to start to calculate an APD
-            if (fabs(v-mPeakValues[APcounter])<=1e-6)
+            //std::cout << "Looking forwards\n";
+            prev_v = mrVoltage[starting_time_index];
+            prev_t = mrTime[starting_time_index];
+            for (unsigned t = starting_time_index + 1u; t < mrTime.size(); t++)
             {
-                apd_is_calculated = false;
-            }
-
-            // Start the timing where we first cross the target voltage
-            if ( prev_v<v && prev_v<=target && v>=target && apd_starting_time_found==false)
-            {
-                // Linear interpolation of target crossing time.
-                apd_start_time=t+( (target-prev_v)/(v-prev_v) )*(t-mrTime[i-1]);
-                apd_starting_time_found = true;
-            }
-
-            //if we hit the target while repolarising
-            //and we are told this apd is not calculated yet.
-            if ( prev_v>v && prev_v>=target && v<=target && apd_is_calculated==false)
-            {
-                // Linear interpolation of target crossing time.
-                apds.push_back (t - apd_start_time + ( (target-prev_v)/(v-prev_v) )*(t-mrTime[i-1]) );
-                APcounter++;
-                apd_is_calculated = true;
-                apd_starting_time_found = false;
+                if (mrVoltage[t] > targets[ap_index])
+                {
+                    apd_start_time = prev_t + ((targets[ap_index] - prev_v) / (mrVoltage[t] - prev_v)) * (mrTime[t] - prev_t);
+                    apd_starting_index = t;
+                    break;
+                }
+                prev_t = mrTime[t];
+                prev_v = mrVoltage[t];
             }
         }
-        prev_v = v;
+        else // otherwise, we'll need to look backwards.
+        {
+            //std::cout << "Looking backwards\n";
+            prev_v = mrVoltage[starting_time_index + 1];
+            prev_t = mrTime[starting_time_index + 1];
+            for (int t = starting_time_index; t >= 0; t--)
+            {
+                if (mrVoltage[t] < targets[ap_index])
+                {
+                    apd_start_time = prev_t + ((targets[ap_index] - prev_v) / (mrVoltage[t] - prev_v)) * (mrTime[t] - prev_t);
+                    apd_starting_index = (unsigned)(t + 1); // Should be a safe conversion since t not allowed to go negative in this loop.
+                    break;
+                }
+                prev_t = mrTime[t];
+                prev_v = mrVoltage[t];
+            }
+        }
+
+        // If the start of this AP crossing threshold is before the last one finished,
+        // we are in a wacky regime (see TestCellProperties::TestVeryLongApDetection() for examples of this)
+        // and we need to skip the second one's evaluation.
+        if (apd_end_time != DOUBLE_UNSET && apd_start_time != DOUBLE_UNSET && apd_start_time < apd_end_time)
+        {
+            continue; // Skip to next AP
+        }
+
+        // If there was a previous AP just check for common sense things (to help alert people to above situations)
+        if (ap_index > 0u)
+        {
+            if (fabs(targets[ap_index] - targets[ap_index - 1u]) > 2) // If we see more than a 2mV shift in AP threshold
+            {
+                WARNING("The voltage threshold for measuring APD" << percentage << " changed from "
+                                                                  << targets[ap_index - 1u] << " to " << targets[ap_index] << " in this AP trace, which may suggest CellProperties isn't telling you anything very sensible!");
+            }
+        }
+
+        // Now just look forwards for the repolarisation time.
+        if (apd_starting_index != UNSIGNED_UNSET)
+        {
+            prev_t = mrTime[apd_starting_index - 1u];
+            prev_v = mrVoltage[apd_starting_index - 1u];
+            // Now look for a fall below threshold after 1 past the Onset index
+            for (unsigned t = apd_starting_index; t < mrTime.size(); t++)
+            {
+                if (mrVoltage[t] < targets[ap_index])
+                {
+                    apd_end_time = mrTime[t - 1] + ((targets[ap_index] - prev_v) / (mrVoltage[t] - prev_v)) * (mrTime[t] - mrTime[t - 1]);
+                    apds.push_back(apd_end_time - apd_start_time);
+                    break;
+                }
+                prev_t = mrTime[t];
+                prev_v = mrVoltage[t];
+            }
+        }
     }
+
     if (apds.size() == 0)
     {
         EXCEPTION("No full action potential was recorded");
@@ -271,7 +325,7 @@ std::vector<double> CellProperties::GetActionPotentialAmplitudes()
     CheckExceededThreshold();
     unsigned size = mPeakValues.size();
     std::vector<double> amplitudes(size);
-    for (unsigned i=0; i< size ;i++)
+    for (unsigned i = 0; i < size; i++)
     {
         amplitudes[i] = (mPeakValues[i] - mRestingValues[i]);
     }
@@ -325,6 +379,12 @@ std::vector<double> CellProperties::GetPeakPotentials()
     return mPeakValues;
 }
 
+std::vector<double> CellProperties::GetTimesAtPeakPotentials()
+{
+    CheckReturnedToThreshold();
+    return mTimesAtPeakValues;
+}
+
 std::vector<double> CellProperties::GetMaxUpstrokeVelocities()
 {
     CheckReturnedToThreshold();
@@ -360,11 +420,11 @@ double CellProperties::GetLastCompletePeakPotential()
 {
     CheckReturnedToThreshold();
     double peak_value;
-    if (mUnfinishedActionPotentials && mPeakValues.size()>1u)
+    if (mUnfinishedActionPotentials && mPeakValues.size() > 1u)
     {
-        peak_value = mPeakValues[mPeakValues.size()-2u];
+        peak_value = mPeakValues[mPeakValues.size() - 2u];
     }
-    else if  (mUnfinishedActionPotentials && mPeakValues.size()==1u)
+    else if (mUnfinishedActionPotentials && mPeakValues.size() == 1u)
     {
         EXCEPTION("No peak potential matching a full action potential was recorded.");
     }
@@ -373,6 +433,25 @@ double CellProperties::GetLastCompletePeakPotential()
         peak_value = mPeakValues.back();
     }
     return peak_value;
+}
+
+double CellProperties::GetTimeAtLastCompletePeakPotential()
+{
+    CheckReturnedToThreshold();
+    double peak_value_time;
+    if (mUnfinishedActionPotentials && mTimesAtPeakValues.size() > 1u)
+    {
+        peak_value_time = mTimesAtPeakValues[mTimesAtPeakValues.size() - 2u];
+    }
+    else if (mUnfinishedActionPotentials && mTimesAtPeakValues.size() == 1u)
+    {
+        EXCEPTION("No peak potential matching a full action potential was recorded.");
+    }
+    else
+    {
+        peak_value_time = mTimesAtPeakValues.back();
+    }
+    return peak_value_time;
 }
 
 double CellProperties::GetLastMaxUpstrokeVelocity()
@@ -385,11 +464,11 @@ double CellProperties::GetLastCompleteMaxUpstrokeVelocity()
 {
     CheckReturnedToThreshold();
     double max_upstroke;
-    if (mUnfinishedActionPotentials && mMaxUpstrokeVelocities.size()>1u)
+    if (mUnfinishedActionPotentials && mMaxUpstrokeVelocities.size() > 1u)
     {
-        max_upstroke = mMaxUpstrokeVelocities[mMaxUpstrokeVelocities.size()-2u];
+        max_upstroke = mMaxUpstrokeVelocities[mMaxUpstrokeVelocities.size() - 2u];
     }
-    else if  (mUnfinishedActionPotentials && mMaxUpstrokeVelocities.size()==1u)
+    else if (mUnfinishedActionPotentials && mMaxUpstrokeVelocities.size() == 1u)
     {
         EXCEPTION("No MaxUpstrokeVelocity matching a full action potential was recorded.");
     }
@@ -406,15 +485,21 @@ double CellProperties::GetTimeAtLastMaxUpstrokeVelocity()
     return mTimesAtMaxUpstrokeVelocity.back();
 }
 
+double CellProperties::GetTimeAtLastPeakPotential()
+{
+    CheckReturnedToThreshold();
+    return mTimesAtPeakValues.back();
+}
+
 double CellProperties::GetTimeAtLastCompleteMaxUpstrokeVelocity()
 {
     CheckReturnedToThreshold();
     double max_upstroke_time;
-    if (mUnfinishedActionPotentials && mTimesAtMaxUpstrokeVelocity.size()>1u)
+    if (mUnfinishedActionPotentials && mTimesAtMaxUpstrokeVelocity.size() > 1u)
     {
-        max_upstroke_time = mTimesAtMaxUpstrokeVelocity[mTimesAtMaxUpstrokeVelocity.size()-2u];
+        max_upstroke_time = mTimesAtMaxUpstrokeVelocity[mTimesAtMaxUpstrokeVelocity.size() - 2u];
     }
-    else if  (mUnfinishedActionPotentials && mTimesAtMaxUpstrokeVelocity.size()==1u)
+    else if (mUnfinishedActionPotentials && mTimesAtMaxUpstrokeVelocity.size() == 1u)
     {
         EXCEPTION("No TimeAtMaxUpstrokeVelocity matching a full action potential was recorded.");
     }

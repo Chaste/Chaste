@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSTATICVENTILATIONTUTORIAL_HPP_
 #define TESTSTATICVENTILATIONTUTORIAL_HPP_
 
-/* HOW_TO_TAG Lung/simulations
+/* HOW_TO_TAG Lung/Simulation
  * Calculate ventilation distribution in an airway tree for a given flow rate at the trachea
  */
 
@@ -75,7 +75,7 @@ class TestStaticVentilationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestCalculatePressureDrop() throw (Exception)
+    void TestCalculatePressureDrop()
     {
         EXIT_IF_PARALLEL;
 
@@ -119,6 +119,7 @@ public: // Tests should be public!
         flows.push_back(0.00017);
         flows.push_back(0.00083);
         flows.push_back(0.00167);
+        flows.push_back(0.003);
 
         /* Loop over the tracheal flow rates and solve */
         for (unsigned i = 0; i < flows.size(); ++i)
@@ -140,6 +141,11 @@ public: // Tests should be public!
              * airways.
              */
             std::cout << "Total bronchial pressure drop for a tracheal flow rate of " << flows[i] << " m^3/s is " << pressure[0] << " Pa.\n";
+
+
+           // cout << pressure[1] << endl;
+
+
         }
     }
 

@@ -3,9 +3,12 @@ bidomain/TestBidomainTissue.hpp
 bidomain/TestBidomainProblem.hpp
 bidomain/TestBidomainWithBathProblem.hpp
 convergence/TestConvergenceTester.hpp
+fibres/TestStreeterFibreGenerator.hpp
 monodomain/TestMonodomainConductionVelocity.hpp
 monodomain/TestMonodomainProblem.hpp
+monodomain/TestMonodomainPurkinjeProblem.hpp
 monodomain/TestMonodomainTissue.hpp
 monodomain/TestMonodomainWithSvi.hpp
+postprocessing/TestPostProcessingWriter.hpp
 TestCardiacSimulationArchiver.hpp
 TestElectrodes.hpp

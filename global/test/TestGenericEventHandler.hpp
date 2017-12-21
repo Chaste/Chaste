@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,8 +58,14 @@ class TestGenericEventHandler : public CxxTest::TestSuite
 {
 public:
 
-    void TestEvents() throw(Exception)
+    void TestEvents()
     {
+        // Coverage
+        AnEventHandler::Instance()->DisableImpl();
+        TS_ASSERT_THROWS_THIS(AnEventHandler::Instance()->GetElapsedTime(AnEventHandler::TEST1),
+                "Asked to report on a disabled event handler.  Check for contributory errors above.");
+        AnEventHandler::Instance()->EnableImpl();
+
         AnEventHandler::BeginEvent(AnEventHandler::TEST1);
         // The first BeginEvent implicitly calls:
         // AnEventHandler::BeginEvent(AnEventHandler::TEST3);
@@ -81,7 +87,7 @@ public:
         TS_ASSERT_THROWS_THIS(AnEventHandler::Report(),"Asked to report on an event handler which is set to zero.");
     }
 
-    void TestEventExceptions() throw(Exception)
+    void TestEventExceptions()
     {
         // Should not be able to end an event that has not yet begun
         TS_ASSERT_THROWS_THIS(AnEventHandler::EndEvent(AnEventHandler::TEST1),
@@ -146,7 +152,7 @@ public:
 
         // Test in milliseconds (at least 10 and not too much)
         TS_ASSERT_LESS_THAN_EQUALS(10.0, AnEventHandler::GetElapsedTime(AnEventHandler::TEST2));
-        TS_ASSERT_LESS_THAN_EQUALS(AnEventHandler::GetElapsedTime(AnEventHandler::TEST2), 35.0);
+        TS_ASSERT_LESS_THAN_EQUALS(AnEventHandler::GetElapsedTime(AnEventHandler::TEST2), 60.0);
     }
 
     void TestSilentlyCloseEvent()

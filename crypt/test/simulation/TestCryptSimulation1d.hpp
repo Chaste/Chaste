@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,12 +45,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation1d.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SloughingCellKiller.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
 #include "WntCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
+#include "WildTypeCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "StemCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
@@ -73,7 +77,7 @@ public:
      * into the simulation. We just perturb one of the nodes and check that
      * each spring relaxes to its rest length.
      */
-    void Test1dCryptWithNoBirthOrDeath() throw(Exception)
+    void Test1dCryptWithNoBirthOrDeath()
     {
         // Create a mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -89,7 +93,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -140,7 +144,7 @@ public:
      * In this test, we pass a sloughing cell killer into the simulation, and
      * check that a cell starting at the end of the crypt is sloughed off.
      */
-    void Test1dCryptWithDeathButNoBirth() throw(Exception)
+    void Test1dCryptWithDeathButNoBirth()
     {
         double crypt_length = 22.0;
 
@@ -154,7 +158,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = 0.0 - node_index;
@@ -202,7 +206,7 @@ public:
     /**
      * In this test, we allow cells to proliferate.
      */
-    void Test1dCryptWithBirthButNoDeath() throw (Exception)
+    void Test1dCryptWithBirthButNoDeath()
     {
         // Get pointers to singleton objects
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
@@ -220,7 +224,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
 
             double birth_time = 0;
             if (i == 0)
@@ -307,7 +311,7 @@ public:
      * In this test, we check that the daughters of a cell that has just divided
      * are put in the correct positions.
      */
-    void TestCalculateCellDivisionVector() throw (Exception)
+    void TestCalculateCellDivisionVector()
     {
         // Create a mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -329,7 +333,7 @@ public:
                 birth_time = -1.0;
             }
 
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
@@ -371,7 +375,7 @@ public:
     /**
      * In this test, we include cell birth and cell death.
      */
-    void Test1dCryptWithBirthAndDeath() throw (Exception)
+    void Test1dCryptWithBirthAndDeath()
     {
         double crypt_length = 22.0;
 
@@ -391,7 +395,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -464,7 +468,7 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizelements").CompareFiles();
     }
 
-    void Test1DChainWithTysonNovakCellsAndNoDeath() throw (Exception)
+    void Test1DChainWithTysonNovakCellsAndNoDeath()
     {
         // Get pointers to singleton objects
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
@@ -486,27 +490,28 @@ public:
         {
             TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
 
-            // For Tyson-Novak cells
-            p_model->SetStemCellG1Duration(0.12);
-            p_model->SetTransitCellG1Duration(0.12);
-            p_model->SetSDuration(0.01);
-            p_model->SetG2Duration(0.01);
-            p_model->SetMDuration(0.01);
-
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             double birth_time;
             if (i == 0)
             {
                 p_cell->SetCellProliferativeType(p_stem_type);
-                birth_time = -p_rand_gen->ranf()*(p_model->GetStemCellG1Duration()
-                                                  + p_model->GetSG2MDuration());
+                /* Note we can't set the age of the cell to be too large or the ODE solver may
+                 * not converge in the first timestep.
+                 * Numerical value chosen so results are unchanged with old revisions.
+                 * See #2788#comment:56
+                 */
+                birth_time = -p_rand_gen->ranf()*0.15; //(p_model->GetAverageStemCellCycleTime());
             }
             else if (i < 15)
             {
                 p_cell->SetCellProliferativeType(p_transit_type);
-                birth_time = -p_rand_gen->ranf()*(p_model->GetTransitCellG1Duration()
-                                                    + p_model->GetSG2MDuration());
+                /* Note we can't set the age of the cell to be too large or the ODE solver may
+                 * not converge in the first timestep.
+                 * Numerical value chosen so results are unchanged with old revisions.
+                 * See #2788#comment:56
+                 */
+                birth_time = -p_rand_gen->ranf()*0.15; //(p_model->GetAverageTransitCellCycleTime());
             }
             else
             {
@@ -529,8 +534,8 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
 
-        // Set the MeinekeSpringGrowthDuration to be the default MPhase Duration
-        p_linear_force->SetMeinekeSpringGrowthDuration(crypt.rGetCells().front()->GetCellCycleModel()->GetMDuration());
+        // Set the MeinekeSpringGrowthDuration to be the shorter than the default MPhase Duration as Tyson Novak sells divide every 1.25 hours.
+        p_linear_force->SetMeinekeSpringGrowthDuration(0.1);
 
         simulator.AddForce(p_linear_force);
 
@@ -575,7 +580,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<num_cells; i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation = 4;
@@ -666,7 +671,7 @@ public:
     /**
      * Test with Wnt-dependent cells.
      */
-    void TestWntCellsCannotMoveAcrossYEqualsZero() throw (Exception)
+    void TestWntCellsCannotMoveAcrossYEqualsZero()
     {
         double crypt_length = 5.0;
 
@@ -764,7 +769,7 @@ public:
     /**
      * Test saving a CryptSimulation1d object.
      */
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         double crypt_length = 22.0;
 
@@ -784,7 +789,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
@@ -844,7 +849,7 @@ public:
     /**
      * Test loading a CryptSimulation1d object.
      */
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 0.2
@@ -913,7 +918,7 @@ public:
     /**
      * In this test, we include cell birth and cell death.
      */
-    void TestCryptSimulation1DParameterOutput() throw (Exception)
+    void TestCryptSimulation1DParameterOutput()
     {
         double crypt_length = 22.0;
 
@@ -933,7 +938,7 @@ public:
         std::vector<CellPtr> cells;
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
+            UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
 
             unsigned generation;

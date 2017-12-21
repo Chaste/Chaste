@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -72,7 +72,7 @@ public:
      * Create and simulate a simple 3D cell population with a cuboid
      * mesh, with ghost nodes around the outside
      */
-    void Test3DHoneycombMeshWithGhostNodes() throw (Exception)
+    void Test3DHoneycombMeshWithGhostNodes()
     {
         /*          _ _ _ _ _
          *        /        /|
@@ -193,7 +193,7 @@ public:
                                             real_node_iter != real_node_indices.end();
                                             ++real_node_iter)
         {
-            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_diff_type);
             cells.push_back(p_cell);

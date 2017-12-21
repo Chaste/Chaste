@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -218,12 +218,12 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
                 // If the containing element info was given, we must have found the face first time
                 if (boundary_element_file_has_containing_element_info && !found_this_boundary_element)
                 {
-                    #define COVERAGE_IGNORE
+                    // LCOV_EXCL_START
                     //std::cout << (*iter)->GetIndex() << " " <<  pMeshReader->GetNextFaceData().ContainingElement << "\n";
                     EXCEPTION("Boundary element " << (*iter)->GetIndex()
                               << "wasn't found in the containing element given for it "
                               << elem_index);
-                    #undef COVERAGE_IGNORE
+                    // LCOV_EXCL_STOP
                 }
 
                 if (found_this_boundary_element)
@@ -234,9 +234,9 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
 
             if (!found_this_boundary_element)
             {
-                #define COVERAGE_IGNORE
+                // LCOV_EXCL_START
                 EXCEPTION("Unable to find a face of an element which matches one of the boundary elements");
-                #undef COVERAGE_IGNORE
+                // LCOV_EXCL_STOP
             }
         }
     }
@@ -262,7 +262,7 @@ void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(AbstractTetrahedralMesh<
                                                         BoundaryElement<DIM-1,DIM>* pBoundaryElement,
                                                         Node<DIM>* pNode)
 {
-    assert(DIM > 1);
+    assert(DIM > 1); // LCOV_EXCL_LINE
 
     // Add node to the boundary node list
     if (!pNode->IsBoundaryNode())
@@ -280,7 +280,7 @@ void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(AbstractTetrahedralMesh<
                                                         Element<DIM,DIM>* pElement,
                                                         unsigned internalNode)
 {
-    assert(DIM > 1);
+    assert(DIM > 1); // LCOV_EXCL_LINE
     assert(internalNode >= DIM+1);
     assert(internalNode < (DIM+1)*(DIM+2)/2);
     Node<DIM>* p_internal_node = pElement->GetNode(internalNode);
@@ -293,7 +293,7 @@ void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(AbstractTetrahedralMesh<DIM
                                                      Element<DIM,DIM>* pElement,
                                                      unsigned nodeIndexOppositeToFace)
 {
-    assert(DIM!=1);
+    assert(DIM!=1); // LCOV_EXCL_LINE
     if (DIM==2)
     {
         assert(nodeIndexOppositeToFace<3);
@@ -342,7 +342,7 @@ void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(AbstractTetrahedralMesh<DIM
 // two unpleasant helper methods for AddExtraBoundaryNodes()
 ///////////////////////////////////////////////////////////////////////////////
 
-#define COVERAGE_IGNORE /// \todo These helper methods aren't properly covered
+// LCOV_EXCL_START /// \todo These helper methods aren't properly covered
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::HelperMethod1(unsigned boundaryElemNode0, unsigned boundaryElemNode1,
                                              Element<DIM,DIM>* pElement,
@@ -391,10 +391,10 @@ void QuadraticMeshHelper<DIM>::HelperMethod1(unsigned boundaryElemNode0, unsigne
         }
     }
 }
-#undef COVERAGE_IGNORE /// \todo These helper methods aren't properly covered
+// LCOV_EXCL_STOP /// \todo These helper methods aren't properly covered
 
 
-#define COVERAGE_IGNORE /// \todo These helper methods aren't properly covered
+// LCOV_EXCL_START /// \todo These helper methods aren't properly covered
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::HelperMethod2(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                                              BoundaryElement<DIM-1,DIM>* pBoundaryElement,
@@ -429,12 +429,9 @@ void QuadraticMeshHelper<DIM>::HelperMethod2(AbstractTetrahedralMesh<DIM, DIM>* 
     AddNodeToBoundaryElement(pMesh, pBoundaryElement, pElement, internalNode1);
     AddNodeToBoundaryElement(pMesh, pBoundaryElement, pElement, internalNode2);
 }
-#undef COVERAGE_IGNORE /// \todo These helper methods aren't properly covered
+// LCOV_EXCL_STOP /// \todo These helper methods aren't properly covered
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class QuadraticMeshHelper<1>;
 template class QuadraticMeshHelper<2>;
 template class QuadraticMeshHelper<3>;

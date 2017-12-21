@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,10 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 
 #include "CellLabel.hpp"
-#include "Exception.hpp"
 
 Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)
     {
@@ -49,10 +48,38 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost
     SetDt(0.0001);
 }
 
+Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel)
+    : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
+{
+    /*
+     * Initialize only those member variables defined in this class.
+     * Create the new cell-cycle model's ODE system and use the current
+     * values of the state variables in mpOdeSystem as an initial condition.
+     *
+     * The member variables mCurrentCellCyclePhase, mG1Duration,
+     * mMinimumGapDuration, mStemCellG1Duration, mTransitCellG1Duration,
+     * mSDuration, mG2Duration and mMDuration are initialized in the
+     * AbstractPhaseBasedCellCycleModel constructor.
+     *
+     * The member variables mBirthTime, mReadyToDivide and mDimension
+     * are initialized in the AbstractCellCycleModel constructor.
+     */
+
+    assert(rModel.GetOdeSystem());
+    bool is_labelled = rModel.mpCell->HasCellProperty<CellLabel>();
+    SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(rModel.mpCell->GetCellData()->GetItem("oxygen"), is_labelled));
+    SetStateVariables(rModel.GetOdeSystem()->rGetStateVariables());
+}
+
+AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleModel()
+{
+    return new Alarcon2004OxygenBasedCellCycleModel(*this);
+}
+
 void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
 {
-    AbstractOdeBasedCellCycleModel::ResetForDivision();
-    assert(mpOdeSystem != NULL);
+    AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision();
+    assert(mpOdeSystem != nullptr);
 
     // This model needs the protein concentrations and phase resetting to G0/G1.
     // Keep the oxygen concentration the same but reset everything else
@@ -63,64 +90,21 @@ void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
     }
 }
 
-AbstractCellCycleModel* Alarcon2004OxygenBasedCellCycleModel::CreateCellCycleModel()
-{
-    // Create a new cell-cycle model
-    Alarcon2004OxygenBasedCellCycleModel* p_model = new Alarcon2004OxygenBasedCellCycleModel(mpOdeSolver);
-
-    /*
-     * Set each member variable of the new cell-cycle model that inherits
-     * its value from the parent.
-     *
-     * Note 1: some of the new cell-cycle model's member variables (namely
-     * mBirthTime, mCurrentCellCyclePhase, mReadyToDivide, mDt, mpOdeSolver)
-     * will already have been correctly initialized in its constructor.
-     *
-     * Note 2: one or more of the new cell-cycle model's member variables
-     * may be set/overwritten as soon as InitialiseDaughterCell() is called on
-     * the new cell-cycle model.
-     */
-    p_model->SetBirthTime(mBirthTime);
-    p_model->SetDimension(mDimension);
-    p_model->SetMinimumGapDuration(mMinimumGapDuration);
-    p_model->SetStemCellG1Duration(mStemCellG1Duration);
-    p_model->SetTransitCellG1Duration(mTransitCellG1Duration);
-    p_model->SetSDuration(mSDuration);
-    p_model->SetG2Duration(mG2Duration);
-    p_model->SetMDuration(mMDuration);
-    p_model->SetDivideTime(mDivideTime);
-    p_model->SetFinishedRunningOdes(mFinishedRunningOdes);
-    p_model->SetG2PhaseStartTime(mG2PhaseStartTime);
-    p_model->SetLastTime(mLastTime);
-
-    /*
-     * Create the new cell-cycle model's ODE system and use the current values
-     * of the state variables in mpOdeSystem as an initial condition.
-     */
-    assert(mpOdeSystem);
-    bool is_labelled = mpCell->HasCellProperty<CellLabel>();
-    p_model->SetOdeSystem(new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled));
-    p_model->SetStateVariables(mpOdeSystem->rGetStateVariables());
-
-    return p_model;
-}
-
 void Alarcon2004OxygenBasedCellCycleModel::Initialise()
 {
-    assert(mpOdeSystem == NULL);
-    assert(mpCell != NULL);
+    assert(mpOdeSystem == nullptr);
+    assert(mpCell != nullptr);
 
     bool is_labelled = mpCell->HasCellProperty<CellLabel>();
-
     mpOdeSystem = new Alarcon2004OxygenBasedCellCycleOdeSystem(mpCell->GetCellData()->GetItem("oxygen"), is_labelled);
-
     mpOdeSystem->SetStateVariables(mpOdeSystem->GetInitialConditions());
+
+    AbstractOdeBasedPhaseBasedCellCycleModel::Initialise();
 }
 
 void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTime)
 {
-    // Pass this time step's oxygen concentration into the solver as a constant over this timestep
-
+    // Pass this time step's oxygen concentration into the solver as a constant over this time step
     mpOdeSystem->rGetStateVariables()[5] = mpCell->GetCellData()->GetItem("oxygen");
 
     // Use whether the cell is currently labelled as another input
@@ -130,10 +114,8 @@ void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTim
 
 void Alarcon2004OxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
-    AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    // No new parameters to output, so just call method on direct parent class
+    AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

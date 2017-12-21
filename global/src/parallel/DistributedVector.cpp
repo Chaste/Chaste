@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
       mpFactory(pFactory),
       mReadOnly(readOnly)
 {
-    assert(pFactory != NULL);
+    assert(pFactory != nullptr);
 
     // Set local copies of problem size, etc.
     mProblemSize = pFactory->GetProblemSize();
@@ -75,7 +75,7 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
     assert ((mSizeMultiplier * mProblemSize) == (unsigned)size);
 }
 
-double& DistributedVector::operator[](unsigned globalIndex) throw (DistributedVectorException)
+double& DistributedVector::operator[](unsigned globalIndex)
 {
     assert(mSizeMultiplier == 1);
     if (mLo<=globalIndex && globalIndex<mHi)
@@ -85,7 +85,7 @@ double& DistributedVector::operator[](unsigned globalIndex) throw (DistributedVe
     throw DistributedVectorException();
 }
 
-double& DistributedVector::operator[](Iterator index) throw (DistributedVectorException)
+double& DistributedVector::operator[](Iterator index)
 {
     assert(mSizeMultiplier==1);
     return mpVec[index.Local];

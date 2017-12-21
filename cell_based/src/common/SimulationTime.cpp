@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,14 +38,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 /** Pointer to the single instance */
-SimulationTime* SimulationTime::mpInstance = NULL;
+SimulationTime* SimulationTime::mpInstance = nullptr;
 
 /** Shared pointer to the delegated class */
 boost::shared_ptr<TimeStepper> SimulationTime::mpTimeStepper;
 
 SimulationTime* SimulationTime::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new SimulationTime;
         mpTimeStepper.reset();
@@ -59,7 +59,7 @@ SimulationTime::SimulationTime()
       mStartTime(DOUBLE_UNSET)
 {
     // Make sure there's only one instance - enforces correct serialization
-    assert(mpInstance == NULL);
+    assert(mpInstance == nullptr);
 }
 
 void SimulationTime::Destroy()
@@ -67,7 +67,7 @@ void SimulationTime::Destroy()
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 

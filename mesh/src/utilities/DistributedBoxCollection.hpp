@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,9 +74,6 @@ private:
     /** Set of Nodes that are halos of adjacent left process, but lie locally */
     std::vector<unsigned> mHaloNodesLeft;
 
-    /** Map of global to local indices of boxes. **/
-    std::map<unsigned, unsigned> mBoxesMapping;
-
     /** Map of global to local indices of halo boxes in mHaloBoxes. **/
     std::map<unsigned, unsigned> mHaloBoxesMapping;
 
@@ -118,6 +115,14 @@ private:
 
     /** A flag that can be set to not save rNodeNeighbours in CalculateNodePairs - for efficiency */
     bool mCalculateNodeNeighbours;
+
+    /**
+     * Setup the halo box structure on this process.
+     * (Private method since this is called as a helper method by the constructor.)
+     *
+     * Sets up the containers mHaloBoxes, mHalosRight, mHalosLeft
+     */
+    void SetupHaloBoxes();
 
     /** Needed for serialization **/
     friend class boost::serialization::access;
@@ -161,13 +166,6 @@ public:
     void EmptyBoxes();
 
     /**
-     * Setup the halo box structure on this process.
-     *
-     * Sets up the containers mHaloBoxes, mHalosRight, mHalosLeft
-     */
-    void SetupHaloBoxes();
-
-    /**
      * Update the halo boxes on this process, by transferring
      * the nodes to be sent into the lists mHaloNodesRight / Left.
      */
@@ -182,7 +180,7 @@ public:
      * @param globalIndex the global index of the box.
      * @return whether the box with global index globalIndex is owned by this process.
      */
-    bool GetBoxOwnership(unsigned globalIndex);
+    bool IsBoxOwned(unsigned globalIndex);
 
     /**
      * Get whether the box with global index globalIndex is interior on this process.
@@ -197,15 +195,15 @@ public:
      * @param globalIndex the global index of the box.
      * @return whether the box with global index globalIndex is a halo to this process.
      */
-    bool GetHaloBoxOwnership(unsigned globalIndex);
+    bool IsHaloBox(unsigned globalIndex);
 
     /**
-     * Given the (i,j,k) co-ordniates of a box in the collection, calculate its global index.
+     * Given the (i,j,k) grid indices of a box in the collection, calculate its global index.
      *
-     * @param coordinateIndices the co-ordinate indices of the box (across, up, deep)
+     * @param gridIndices the (i,j,k) grid indices of the box
      * @return the global index of the box in the collection.
      */
-    unsigned CalculateGlobalIndex(c_vector<unsigned, DIM> coordinateIndices);
+    unsigned CalculateGlobalIndex(c_vector<unsigned, DIM> gridIndices);
 
     /**
      * @param pNode address of the node
@@ -223,11 +221,13 @@ public:
      * Calculate x,y,z indices of box given its 'global' index.
      *
      * @param globalIndex the global index of the box
-     * @return the co-ordinate indicies (boxes across, boxes up, boxes deep) of a box
+     * @return the grid indices (boxes across, boxes up, boxes deep) of a box
      */
-    c_vector<unsigned, DIM> CalculateCoordinateIndices(unsigned globalIndex);
+    c_vector<unsigned, DIM> CalculateGridIndices(unsigned globalIndex);
 
     /**
+     * If this box is out-of-bounds to the local process then it will attempt to return
+     * a halo box (and trip an assertion is the box is completely out of scope.
      * @param boxIndex the index of the box to return
      * @return a reference to the box with global index boxIndex.
      */
@@ -241,7 +241,7 @@ public:
     Box<DIM>& rGetHaloBox(unsigned boxIndex);
 
     /**
-     * @return the total global number of boxes.
+     * @return the total (global) number of boxes.
      */
     unsigned GetNumBoxes();
 
@@ -264,6 +264,11 @@ public:
      * @return #mBoxWidth
      */
     double GetBoxWidth() const;
+
+    /**
+     * @return Whether the domain is periodic in x
+     */
+    bool GetIsPeriodicInX() const;
 
     /**
      * @return the number of rows in the DIM-1th direction on this process.
@@ -295,9 +300,9 @@ public:
      * Get the set of all the local boxes, i.e. itself and its nearest-neighbours.
      *
      * @param boxIndex the index of the box
-     * @return the set containing the indices of boxes local to box boxIndex.
+     * @return the set containing the indices of boxes local to box boxIndex.  i.e. the box boxIndex itself and its nearest-neighbours.
      */
-    std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
+    std::set<unsigned>& rGetLocalBoxes(unsigned boxIndex);
 
     /**
      * @param pNode the node to test.
@@ -345,36 +350,32 @@ public:
      *
      *  @param rNodes all the nodes to be consider
      *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      *  The same as CalculateNodePairs() only we only work on boxes that are interior on this process. I.e. none of their local boxes are halo boxes.
      *
      *  @param rNodes all the nodes to be consider
      *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      *  The same as CalculateNodePairs() only we only work on boxes that are ''not'' interior on this process. I.e. some of their local boxes are halo boxes.
      *
      *  @param rNodes all the nodes to be consider
      *  @param rNodePairs the return value, a set of pairs of nodes
-     *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      * A method pulled out of CalculateNodePairs methods that adds all pairs of nodes from neighbouring boxes of the box with index boxIndex.
      *
      * @param boxIndex the box to add neighbours to.
      * @param rNodePairs the return value, a set of pairs of nodes
-     * @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**
      * Calculate how many cells lie in each strip / face of boxes, used in load balancing
@@ -470,7 +471,6 @@ inline void load_construct_data(
 
     if (are_boxes_set)
     {
-        t->SetupHaloBoxes();
         t->SetupLocalBoxesHalfOnly();
     }
 }

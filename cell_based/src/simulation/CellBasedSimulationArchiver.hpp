@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2016, University of Oxford.
+Copyright (c) 2005-2017, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,13 +40,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 
 #include <string>
-#include <iostream>
 
-#include "OutputFileHandler.hpp"
-#include "SimulationTime.hpp"
+// The headers below are needed by the templated implementation, which is in this header
+#include <fstream>
+#include <sstream>
+
 #include "ArchiveLocationInfo.hpp"
 #include "ArchiveOpener.hpp"
 #include "FileFinder.hpp"
+#include "SimulationTime.hpp"
 
 /**
  * CellBasedSimulationArchiver handles the checkpointing (saving and loading)
