@@ -244,7 +244,16 @@ def DetermineCvodeVersion(includePath):
                 conf.cvode_version = str(major*10000 + minor*100 + patch)
                 break
         else:
-            ConfigError('Unable to find version string within sundials_config.h')
+            version_re = re.compile(r'#define SUNDIALS_VERSION "?(\d+).(\d+).(\d+)"?')
+            m = version_re.match(line)
+            if m:
+                major = int(m.group(1))
+                minor = int(m.group(2))
+                patch = int(m.group(3))
+                conf.cvode_version = str(major*10000 + minor*100 + patch)
+                break
+            else: 
+                ConfigError('Unable to find version string within sundials_config.h')
     else:
         ConfigError('Unable to find sundials_config.h to read CVODE version')
 
