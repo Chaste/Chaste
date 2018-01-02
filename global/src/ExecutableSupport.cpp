@@ -69,9 +69,14 @@ typedef std::pair<std::string, std::string> StringPair;
 #ifdef CHASTE_CVODE
 #include <sundials/sundials_config.h>
 #if CHASTE_SUNDIALS_VERSION >= 20600
-// SUNDIALS 2.6 defined SUNDIALS_PACKAGE_VERSION without quotes...
+// SUNDIALS 2.6 upwards defines SUNDIALS_PACKAGE_VERSION with quotes...
 #include <boost/preprocessor/stringize.hpp>
+if CHASTE_SUNDIALS_VERSION >= 30000
+// SUNDIALS 3.0 upwards uses SUNDIALS_VERSION instead of SUNDIALS_PACKAGE_VERSION.
+#define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_VERSION)
+#else
 #define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
+#endif // SUNDIALS >= 3.0.0
 #else
 #define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
 #endif // SUNDIALS >= 2.6.0
