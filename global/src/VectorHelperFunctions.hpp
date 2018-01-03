@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef CHASTE_CVODE
 // CVODE headers
 #include <nvector/nvector_serial.h>
+
 #endif
 
 /**
@@ -62,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param rVec  the vector to access
  * @param index  the index of the component to get
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline double GetVectorComponent(const VECTOR& rVec, unsigned index);
 
 /**
@@ -75,7 +76,7 @@ inline double GetVectorComponent(const VECTOR& rVec, unsigned index);
  * @param index  the index of the component to set
  * @param value  the new value
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline void SetVectorComponent(VECTOR& rVec, unsigned index, double value);
 
 /**
@@ -87,7 +88,7 @@ inline void SetVectorComponent(VECTOR& rVec, unsigned index, double value);
  * @param rVec  the vector
  * @return  its size
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline unsigned GetVectorSize(const VECTOR& rVec);
 
 /**
@@ -98,7 +99,7 @@ inline unsigned GetVectorSize(const VECTOR& rVec);
  *
  * @param rVec  the vector
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline void InitialiseEmptyVector(VECTOR& rVec);
 
 /**
@@ -111,7 +112,7 @@ inline void InitialiseEmptyVector(VECTOR& rVec);
  * @param rVec  the empty vector
  * @param size  the size to create it as
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline void CreateVectorIfEmpty(VECTOR& rVec, unsigned size);
 
 /**
@@ -119,7 +120,7 @@ inline void CreateVectorIfEmpty(VECTOR& rVec, unsigned size);
  *
  * @return a new vector
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline VECTOR CreateEmptyVector();
 
 /**
@@ -128,7 +129,7 @@ inline VECTOR CreateEmptyVector();
  * @param rVec  the vector
  * @return true if empty
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline bool IsEmptyVector(VECTOR& rVec);
 
 /**
@@ -139,7 +140,7 @@ inline bool IsEmptyVector(VECTOR& rVec);
  *
  * @param rVec  the vector
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline void DeleteVector(VECTOR& rVec);
 
 /**
@@ -151,7 +152,7 @@ inline void DeleteVector(VECTOR& rVec);
  * @param rVec  the vector to copy
  * @return A copy
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline VECTOR CopyVector(VECTOR& rVec);
 
 /**
@@ -163,7 +164,7 @@ inline VECTOR CopyVector(VECTOR& rVec);
  * @param rSrc  source vector
  * @param rDest  destination vector; will be resized and filled
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline void CopyToStdVector(const VECTOR& rSrc, std::vector<double>& rDest);
 
 /**
@@ -175,7 +176,7 @@ inline void CopyToStdVector(const VECTOR& rSrc, std::vector<double>& rDest);
  * @param rSrc  source vector
  * @param rDest  destination vector; must exist and be the correct size
  */
-template<typename VECTOR>
+template <typename VECTOR>
 inline void CopyFromStdVector(const std::vector<double>& rSrc, VECTOR& rDest);
 
 // Specialisations for std::vector<double>
@@ -186,7 +187,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, VECTOR& rDest);
  * @param index
  * @return vector component
  */
-template<>
+template <>
 inline double GetVectorComponent(const std::vector<double>& rVec, unsigned index)
 {
     assert(index < rVec.size());
@@ -199,7 +200,7 @@ inline double GetVectorComponent(const std::vector<double>& rVec, unsigned index
  * @param index
  * @param value
  */
-template<>
+template <>
 inline void SetVectorComponent(std::vector<double>& rVec, unsigned index, double value)
 {
     assert(index < rVec.size());
@@ -211,7 +212,7 @@ inline void SetVectorComponent(std::vector<double>& rVec, unsigned index, double
  * @param rVec
  * @return size
  */
-template<>
+template <>
 inline unsigned GetVectorSize(const std::vector<double>& rVec)
 {
     return rVec.size();
@@ -221,7 +222,7 @@ inline unsigned GetVectorSize(const std::vector<double>& rVec)
  * Specialisation for std::vector<double>.
  * @param rVec
  */
-template<>
+template <>
 inline void InitialiseEmptyVector(std::vector<double>& rVec)
 {
 }
@@ -231,7 +232,7 @@ inline void InitialiseEmptyVector(std::vector<double>& rVec)
  * @param rVec
  * @param size
  */
-template<>
+template <>
 inline void CreateVectorIfEmpty(std::vector<double>& rVec, unsigned size)
 {
     if (rVec.empty())
@@ -244,7 +245,7 @@ inline void CreateVectorIfEmpty(std::vector<double>& rVec, unsigned size)
  * Specialisation for std::vector<double>.
  * @return empty vector
  */
-template<>
+template <>
 inline std::vector<double> CreateEmptyVector()
 {
     return std::vector<double>();
@@ -255,7 +256,7 @@ inline std::vector<double> CreateEmptyVector()
  * @param rVec
  * @return true if empty
  */
-template<>
+template <>
 inline bool IsEmptyVector(std::vector<double>& rVec)
 {
     return rVec.empty();
@@ -265,7 +266,7 @@ inline bool IsEmptyVector(std::vector<double>& rVec)
  * Specialisation for std::vector<double>.
  * @param rVec
  */
-template<>
+template <>
 inline void DeleteVector(std::vector<double>& rVec)
 {
 }
@@ -275,7 +276,7 @@ inline void DeleteVector(std::vector<double>& rVec)
  * @param rVec
  * @return copy
  */
-template<>
+template <>
 inline std::vector<double> CopyVector(std::vector<double>& rVec)
 {
     return rVec;
@@ -286,7 +287,7 @@ inline std::vector<double> CopyVector(std::vector<double>& rVec)
  * @param rSrc
  * @param rDest
  */
-template<>
+template <>
 inline void CopyToStdVector(const std::vector<double>& rSrc, std::vector<double>& rDest)
 {
     rDest = rSrc;
@@ -297,7 +298,7 @@ inline void CopyToStdVector(const std::vector<double>& rSrc, std::vector<double>
  * @param rSrc
  * @param rDest
  */
-template<>
+template <>
 inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<double>& rDest)
 {
     rDest = rSrc;
@@ -313,7 +314,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<doubl
  * @param index
  * @return the vector component
  */
-template<>
+template <>
 inline double GetVectorComponent(const N_Vector& rVec, unsigned index)
 {
     assert(rVec != nullptr);
@@ -326,7 +327,7 @@ inline double GetVectorComponent(const N_Vector& rVec, unsigned index)
  * @param index
  * @param value
  */
-template<>
+template <>
 inline void SetVectorComponent(N_Vector& rVec, unsigned index, double value)
 {
     assert(rVec != nullptr);
@@ -338,7 +339,7 @@ inline void SetVectorComponent(N_Vector& rVec, unsigned index, double value)
  * @param rVec
  * @return size
  */
-template<>
+template <>
 inline unsigned GetVectorSize(const N_Vector& rVec)
 {
     assert(rVec != nullptr);
@@ -349,7 +350,7 @@ inline unsigned GetVectorSize(const N_Vector& rVec)
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
  */
-template<>
+template <>
 inline void InitialiseEmptyVector(N_Vector& rVec)
 {
     rVec = nullptr;
@@ -360,7 +361,7 @@ inline void InitialiseEmptyVector(N_Vector& rVec)
  * @param rVec
  * @param size
  */
-template<>
+template <>
 inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
 {
     if (rVec == nullptr)
@@ -373,7 +374,7 @@ inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
  * Specialisation for CVODE's N_Vector type.
  * @return empty vector
  */
-template<>
+template <>
 inline N_Vector CreateEmptyVector()
 {
     return nullptr;
@@ -384,7 +385,7 @@ inline N_Vector CreateEmptyVector()
  * @param rVec
  * @return true if empty
  */
-template<>
+template <>
 inline bool IsEmptyVector(N_Vector& rVec)
 {
     return rVec == nullptr;
@@ -394,7 +395,7 @@ inline bool IsEmptyVector(N_Vector& rVec)
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
  */
-template<>
+template <>
 inline void DeleteVector(N_Vector& rVec)
 {
     if (rVec)
@@ -409,7 +410,7 @@ inline void DeleteVector(N_Vector& rVec)
  * @param rVec
  * @return copy
  */
-template<>
+template <>
 inline N_Vector CopyVector(N_Vector& rVec)
 {
     N_Vector copy = nullptr;
@@ -417,7 +418,7 @@ inline N_Vector CopyVector(N_Vector& rVec)
     {
         copy = N_VClone(rVec);
         unsigned size = NV_LENGTH_S(rVec);
-        for (unsigned i=0; i<size; i++)
+        for (unsigned i = 0; i < size; i++)
         {
             NV_Ith_S(copy, i) = NV_Ith_S(rVec, i);
         }
@@ -431,17 +432,18 @@ inline N_Vector CopyVector(N_Vector& rVec)
  * @param rSrc  source vector
  * @param rDest  destination vector; will be resized and filled
  */
-template<>
+template <>
 inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
 {
     // Check for no-op
     realtype* p_src = NV_DATA_S(rSrc);
-    if (!rDest.empty() && p_src == &(rDest[0])) return;
+    if (!rDest.empty() && p_src == &(rDest[0]))
+        return;
     // Set dest size
     long size = NV_LENGTH_S(rSrc);
     rDest.resize(size);
     // Copy data
-    for (long i=0; i<size; i++)
+    for (long i = 0; i < size; i++)
     {
         rDest[i] = p_src[i];
     }
@@ -453,19 +455,20 @@ inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
  * @param rSrc  source vector
  * @param rDest  destination vector; must exist and be the correct size
  */
-template<>
+template <>
 inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
 {
     // Check for no-op
     realtype* p_dest = NV_DATA_S(rDest);
-    if (p_dest == &(rSrc[0])) return;
+    if (p_dest == &(rSrc[0]))
+        return;
 
     // Check dest size
     long size = NV_LENGTH_S(rDest);
     assert(size == (long)rSrc.size());
 
     // Copy data
-    for (long i=0; i<size; i++)
+    for (long i = 0; i < size; i++)
     {
         p_dest[i] = rSrc[i];
     }
@@ -494,7 +497,7 @@ inline N_Vector MakeNVector(const std::vector<double>& rSrc)
 {
     N_Vector nv = nullptr;
     CreateVectorIfEmpty(nv, rSrc.size());
-    CopyFromStdVector(rSrc,nv);
+    CopyFromStdVector(rSrc, nv);
     return nv;
 }
 
