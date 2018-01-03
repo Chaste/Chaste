@@ -420,7 +420,11 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t\t<Optional>\n";
 #ifdef CHASTE_CVODE
-    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
+    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS>";
+#if CHASTE_SUNDIALS_VERSION < 30000
+    output << "<!-- includes Cvode of a different version number -->";
+#endif
+    output << std::endl;
 #else
     output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
 #endif

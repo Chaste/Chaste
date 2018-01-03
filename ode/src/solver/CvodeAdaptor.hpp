@@ -49,6 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cvode/cvode.h>
 #include <nvector/nvector_serial.h>
 
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
+#include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
+#endif
+
 /**
  * CVODE error handling function.
  *
@@ -108,15 +113,15 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractIvpOdeSolver>(*this);
-        archive & mRelTol;
-        archive & mAbsTol;
-        archive & mLastInternalStepSize;
-        archive & mMaxSteps;
-        archive & mCheckForRoots;
+        archive& boost::serialization::base_object<AbstractIvpOdeSolver>(*this);
+        archive& mRelTol;
+        archive& mAbsTol;
+        archive& mLastInternalStepSize;
+        archive& mMaxSteps;
+        archive& mCheckForRoots;
         // All other member variables given values on each call.
     }
 
@@ -155,6 +160,13 @@ private:
 
     /** Whether to ignore changes in the state variables when deciding whether to reset. */
     bool mForceMinimalReset;
+
+#if CHASTE_SUNDIALS_VERSION >= 30000
+    /** Working memory for CVODE to store a dense matrix */
+    SUNMatrix mpSundialsDenseMatrix;
+    /** Working memory for CVODE's linear solver */
+    SUNLinearSolver mpSundialsLinearSolver;
+#endif
 
     /**
      * Record where the last solve got to so we know whether to re-initialise.

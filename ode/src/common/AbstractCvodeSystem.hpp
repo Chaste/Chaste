@@ -58,13 +58,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // CVODE headers
 #include <nvector/nvector_serial.h>
+
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#include <cvode/cvode_direct.h> /* access to CVDls interface            */
+#include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
+#include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
+#include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
+#else
 #include <sundials/sundials_dense.h> /* definitions DlsMat DENSE_ELEM */
+#endif
 
 // CVODE changed their dense matrix type...
-#if CHASTE_SUNDIALS_VERSION >= 20400
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#define CHASTE_CVODE_DENSE_MATRIX SUNMatrix
+#elif CHASTE_SUNDIALS_VERSION >= 20400
 #define CHASTE_CVODE_DENSE_MATRIX DlsMat
 #else
 #define CHASTE_CVODE_DENSE_MATRIX DenseMat
+#endif
+
+// CVODE changed their way of referencing elements of a matrix. So we will copy their notation in examples.
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#define IJth(A, i, j) SM_ELEMENT_D(A, i, j)
+#else
+#define IJth(A, i, j) DENSE_ELEM(A, i, j)
 #endif
 
 /**
@@ -259,6 +276,13 @@ private:
     /** Whether to ignore changes in the state variables when deciding whether to reset. */
     bool mForceMinimalReset;
 
+#if CHASTE_SUNDIALS_VERSION >= 30000
+    /** Working memory for CVODE to store a dense matrix */
+    SUNMatrix mpSundialsDenseMatrix;
+    /** Working memory for CVODE's linear solver */
+    SUNLinearSolver mpSundialsLinearSolver;
+#endif
+
 protected:
     /** Whether we have an analytic Jacobian. */
     bool mHasAnalyticJacobian;
@@ -321,7 +345,6 @@ public:
      * It provides an interface between the methods different versions of CVODE are expecting and the
      * Jacobians provided by Chaste CVODE systems.
      *
-     * @param N  the size of the ODE system
      * @param time  the current time (used by ODE systems like y' = f(t,y) only I guess)
      * @param y  the current state variables y for y' = f(t,y)
      * @param ydot  the current set of derivatives y' = f(t,y)
@@ -331,7 +354,7 @@ public:
      * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
      *
      */
-    virtual void EvaluateAnalyticJacobian(long int N, realtype time, N_Vector y, N_Vector ydot,
+    virtual void EvaluateAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
                                           CHASTE_CVODE_DENSE_MATRIX jacobian,
                                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
     {
