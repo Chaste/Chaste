@@ -37,40 +37,63 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ABSTRACTCVODESYSTEM_HPP_
 #define _ABSTRACTCVODESYSTEM_HPP_
 
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 // This is only needed to prevent compilation errors on PETSc 2.2/Boost 1.33.1 combo
 #include "UblasVectorInclude.hpp"
 
 // Chaste includes
-#include "OdeSolution.hpp"
 #include "AbstractParameterisedSystem.hpp"
 #include "Exception.hpp"
+#include "OdeSolution.hpp"
 #include "VectorHelperFunctions.hpp"
 
 // Serialiazation
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
 // CVODE headers
 #include <nvector/nvector_serial.h>
+
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#include <cvode/cvode_direct.h> /* access to CVDls interface            */
+#include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
+#include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
+#include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
+#else
 #include <sundials/sundials_dense.h> /* definitions DlsMat DENSE_ELEM */
+#endif
 
 // CVODE changed their dense matrix type...
-#if CHASTE_SUNDIALS_VERSION >= 20400
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#define CHASTE_CVODE_DENSE_MATRIX SUNMatrix
+#elif CHASTE_SUNDIALS_VERSION >= 20400
 #define CHASTE_CVODE_DENSE_MATRIX DlsMat
 #else
 #define CHASTE_CVODE_DENSE_MATRIX DenseMat
 #endif
 
+// CVODE changed their way of referencing elements of a matrix. So we will copy their notation in examples.
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#define IJth(A, i, j) SM_ELEMENT_D(A, i, j)
+#else
+#define IJth(A, i, j) DENSE_ELEM(A, i, j)
+#endif
+
 /**
  * Abstract OdeSystem class for Cvode systems (N_Vector instead of std::vector)
  *
- * Sets up variables and functions for a general CVODE system.
+ * Sets up variables and functions for a general CVODE system, and uses an inbuilt CVODE solver.
+ *
+ * N.B. The CvodeAdaptor solver is not used by AbstractCvodeSystems, it is only used to translate when
+ * the ODE system uses the normal std::vector<double> state variables.
+ * For Chaste developers - this means there is some duplication of code between this class
+ * and CvodeAdaptor as both set up and use CVODE to solve systems. If you change one you should
+ * probably change both!
  *
  * ODE systems are specified primarily by the EvaluateYDerivatives() method,
  * which calculates the right-hand side of the system.
@@ -128,38 +151,37 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void save(Archive & archive, const unsigned int version) const
+    template <class Archive>
+    void save(Archive& archive, const unsigned int version) const
     {
         // Despite the fact that 3 of these variables actually live in our base class,
         // we still archive them here to maintain backwards compatibility,
         // this doesn't hurt
-        archive & mNumberOfStateVariables;
-        archive & mUseAnalyticJacobian;
+        archive& mNumberOfStateVariables;
+        archive& mUseAnalyticJacobian;
 
         if (version >= 1u)
         {
-            archive & mHasAnalyticJacobian;
+            archive& mHasAnalyticJacobian;
         }
 
         // Convert from N_Vector to std::vector for serialization
         const std::vector<double> state_vars = MakeStdVec(mStateVariables);
-        archive & state_vars;
+        archive& state_vars;
         const std::vector<double> params = MakeStdVec(mParameters);
-        archive & params;
-        archive & rGetParameterNames();
+        archive& params;
+        archive& rGetParameterNames();
 
-        archive & mLastSolutionTime;
-        archive & mForceReset;
-        archive & mForceMinimalReset;
-        archive & mRelTol;
-        archive & mAbsTol;
-        archive & mMaxSteps;
-        archive & mLastInternalStepSize;
+        archive& mLastSolutionTime;
+        archive& mForceReset;
+        archive& mForceMinimalReset;
+        archive& mRelTol;
+        archive& mAbsTol;
+        archive& mMaxSteps;
+        archive& mLastInternalStepSize;
 
         // We don't bother archiving CVODE's internal data, because it is missing then we'll just
         // get a new solver being initialised after a save/load.
-
 
         // This is always set up by subclass constructors, and is essentially
         // 'static' data, so shouldn't go in the archive.
@@ -171,41 +193,41 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void load(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void load(Archive& archive, const unsigned int version)
     {
-        archive & mNumberOfStateVariables;
-        archive & mUseAnalyticJacobian;
+        archive& mNumberOfStateVariables;
+        archive& mUseAnalyticJacobian;
 
         // This is pretty much what the code was saying before.
         mHasAnalyticJacobian = mUseAnalyticJacobian;
         if (version >= 1u)
-        {   // Overwrite if it has been archived though
-            archive & mHasAnalyticJacobian;
+        { // Overwrite if it has been archived though
+            archive& mHasAnalyticJacobian;
         }
 
         std::vector<double> state_vars;
-        archive & state_vars;
-        CopyFromStdVector(state_vars,mStateVariables);
+        archive& state_vars;
+        CopyFromStdVector(state_vars, mStateVariables);
 
         std::vector<double> parameters;
-        archive & parameters;
+        archive& parameters;
 
         std::vector<std::string> param_names;
-        archive & param_names;
-        archive & mLastSolutionTime;
-        archive & mForceReset;
-        archive & mForceMinimalReset;
-        archive & mRelTol;
-        archive & mAbsTol;
-        archive & mMaxSteps;
-        archive & mLastInternalStepSize;
+        archive& param_names;
+        archive& mLastSolutionTime;
+        archive& mForceReset;
+        archive& mForceMinimalReset;
+        archive& mRelTol;
+        archive& mAbsTol;
+        archive& mMaxSteps;
+        archive& mLastInternalStepSize;
 
         // We don't bother archiving CVODE's internal data, because it is missing then we'll just
         // get a new solver being initialised after a save/load.
 
         // Do some checking on the parameters
-        CheckParametersOnLoad(parameters,param_names);
+        CheckParametersOnLoad(parameters, param_names);
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -239,7 +261,7 @@ private:
      * @param rEndTime  The time that the solver was supposed to solve up to.
      *
      */
-    void CvodeError(int flag, const char * msg, const double& rTime,
+    void CvodeError(int flag, const char* msg, const double& rTime,
                     const double& rStartTime, const double& rEndTime);
 
     /** Remember where the last solve got to so we know whether to re-initialise. */
@@ -254,8 +276,14 @@ private:
     /** Whether to ignore changes in the state variables when deciding whether to reset. */
     bool mForceMinimalReset;
 
-protected:
+#if CHASTE_SUNDIALS_VERSION >= 30000
+    /** Working memory for CVODE to store a dense matrix */
+    SUNMatrix mpSundialsDenseMatrix;
+    /** Working memory for CVODE's linear solver */
+    SUNLinearSolver mpSundialsLinearSolver;
+#endif
 
+protected:
     /** Whether we have an analytic Jacobian. */
     bool mHasAnalyticJacobian;
 
@@ -287,7 +315,6 @@ protected:
     void Init();
 
 public:
-
     /**
      * Constructor.
      *
@@ -309,8 +336,8 @@ public:
      */
     virtual void EvaluateYDerivatives(realtype time,
                                       const N_Vector y,
-                                      N_Vector ydot)=0;
-
+                                      N_Vector ydot)
+        = 0;
 
     /**
      * This method is called by AbstractCvodeSystemJacAdaptor method in the .cpp file.
@@ -318,7 +345,6 @@ public:
      * It provides an interface between the methods different versions of CVODE are expecting and the
      * Jacobians provided by Chaste CVODE systems.
      *
-     * @param N  the size of the ODE system
      * @param time  the current time (used by ODE systems like y' = f(t,y) only I guess)
      * @param y  the current state variables y for y' = f(t,y)
      * @param ydot  the current set of derivatives y' = f(t,y)
@@ -328,7 +354,7 @@ public:
      * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
      *
      */
-    virtual void EvaluateAnalyticJacobian(long int N, realtype time, N_Vector y, N_Vector ydot,
+    virtual void EvaluateAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
                                           CHASTE_CVODE_DENSE_MATRIX jacobian,
                                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
     {
@@ -433,7 +459,7 @@ public:
      * @param relTol  the relative tolerance for the solver (defaults to 1e-5)
      * @param absTol  the absolute tolerance for the solver (defaults to 1e-7)
      */
-    void SetTolerances(double relTol=1e-5, double absTol=1e-7);
+    void SetTolerances(double relTol = 1e-5, double absTol = 1e-7);
 
     /**
      * @return the relative tolerance.
@@ -450,7 +476,6 @@ public:
      */
     double GetLastStepSize();
 
-
     /* NB This needs making into a doxygen comment if you bring the method back in.
      *
      * An alternative approach to stopping events; currently only useful with CVODE.
@@ -462,7 +487,7 @@ public:
      * @param time  the current time
      * @param rY  the current values of the state variables
      */
-//    virtual double CalculateRootFunction(double time, const std::vector<double>& rY);
+    //    virtual double CalculateRootFunction(double time, const std::vector<double>& rY);
 
     /**
      * @return whether an analytic Jacobian is used (#mUseAnalyticJacobian).
@@ -482,22 +507,22 @@ public:
      */
     void ForceUseOfNumericalJacobian(bool useNumericalJacobian = true);
 
-// The following method may be useful to identify problems with the Analytic Jacobians, if anything goes wrong,
-// but #1795 seems to have got these working OK, so commented out for now.
+    // The following method may be useful to identify problems with the Analytic Jacobians, if anything goes wrong,
+    // but #1795 seems to have got these working OK, so commented out for now.
 
-//    /*
-//     * Compare the calculated analytic jacobian to a numerical approximation, and throw if it looks silly.
-//     *
-//     * @param time  the current time
-//     * @param y  the current state variables
-//     * @param jacobian  the analytic jacobian matrix
-//     * @param tmp1  working memory of the correct size provided by CVODE for temporary calculations
-//     * @param tmp2  working memory of the correct size provided by CVODE for temporary calculations
-//     * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
-//     */
-//    void CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
-//                               CHASTE_CVODE_DENSE_MATRIX jacobian,
-//                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    //    /*
+    //     * Compare the calculated analytic jacobian to a numerical approximation, and throw if it looks silly.
+    //     *
+    //     * @param time  the current time
+    //     * @param y  the current state variables
+    //     * @param jacobian  the analytic jacobian matrix
+    //     * @param tmp1  working memory of the correct size provided by CVODE for temporary calculations
+    //     * @param tmp2  working memory of the correct size provided by CVODE for temporary calculations
+    //     * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
+    //     */
+    //    void CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
+    //                               CHASTE_CVODE_DENSE_MATRIX jacobian,
+    //                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeSystem)
