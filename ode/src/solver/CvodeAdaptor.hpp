@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "AbstractIvpOdeSolver.hpp"
 #include "OdeSolution.hpp"
@@ -49,23 +49,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cvode/cvode.h>
 #include <nvector/nvector_serial.h>
 
-
 /**
  * CVODE error handling function.
  *
  * Throw an Exception to report errors, rather than the CVODE approach of magic
  * return codes.
  */
-void CvodeErrorHandler(int errorCode, const char *module, const char *function,
-                       char *message, void* pData);
+void CvodeErrorHandler(int errorCode, const char* module, const char* function,
+                       char* message, void* pData);
 // Note: declared here since it's also used by AbstractCvodeCell.
-
 
 /**
  * Data structure passed to CVODE calls, allowing our callback functions
  * to access the Chaste objects.
  */
-typedef struct CvodeData_ {
+typedef struct CvodeData_
+{
     /** Working memory. */
     std::vector<realtype>* pY;
     /** The ODE system being solved. */
@@ -73,9 +72,18 @@ typedef struct CvodeData_ {
 } CvodeData;
 
 /**
- * The CVODE adaptor ODE solver class.
+ * The CVODE adaptor ODE solver class. This class is used as a solver for Chaste standard
+ * AbstractOdeSystems that have a native vector type of std::vector<double> and so can be used
+ * to apply CVODE to systems that could also be solved with the other solvers in this folder.
  *
- * Assumes that it will be solving stiff systems, so uses BDF/Newton.
+ * N.B. If you know you are always going to want to use CVODE to solve your system,
+ * then it will be faster to write your system so it uses N_Vectors natively as an AbstractCvodeSystem.
+ * AbstractCvodeSystems have an in-built CVODE solver, and therefore don't need to use this class.
+ * For Chaste developers - this means there is some duplication of code between this class
+ * and AbstractCvodeSystem as both set up and use CVODE to solve systems. If you change one you should
+ * probably change both!
+ *
+ * This class assumes that it will be solving stiff systems, so uses BDF/Newton.
  *
  * The timeStep parameters of the abstract class are here used to specify
  * *maximum* steps, since the solver is adaptive.
@@ -156,7 +164,6 @@ private:
     void RecordStoppingPoint(double stopTime, N_Vector yEnd);
 
 protected:
-
     /**
      * Set up the CVODE data structures needed to solve the given system.
      *
@@ -183,10 +190,9 @@ protected:
      * @param flag  error flag
      * @param msg  error message
      */
-    void CvodeError(int flag, const char * msg);
+    void CvodeError(int flag, const char* msg);
 
 public:
-
     /**
      * Default constructor.
      * Can optionally set relative and absolute tolerances.
@@ -194,7 +200,7 @@ public:
      * @param relTol the relative tolerance for the solver
      * @param absTol the absolute tolerance for the solver
      */
-    CvodeAdaptor(double relTol=1e-4, double absTol=1e-6);
+    CvodeAdaptor(double relTol = 1e-4, double absTol = 1e-6);
 
     /**
      * Destructor.
@@ -209,7 +215,7 @@ public:
      * @param relTol the relative tolerance for the solver
      * @param absTol the absolute tolerance for the solver
      */
-    void SetTolerances(double relTol=1e-4, double absTol=1e-6);
+    void SetTolerances(double relTol = 1e-4, double absTol = 1e-6);
 
     /**
      * @return the relative tolerance.
