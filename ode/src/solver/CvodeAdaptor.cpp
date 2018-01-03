@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
 #else
-#include <sundials/sundials_dense.h> /* definitions DlsMat DENSE_ELEM */
+#include <cvode/cvode_dense.h> 
 #endif
 
 /**
