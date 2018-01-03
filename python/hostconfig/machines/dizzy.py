@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -284,6 +284,8 @@ def Configure(prefs, build):
                 cvode_path = BASE+'cvode_2_8'
         elif prefs['cvode'] == '2.9':
             cvode_path = BASE+'cvode_2_9'
+        elif prefs['cvode'] == '3.1':
+            cvode_path = BASE+'cvode_3_1'
         else:
             raise ValueError('Unsupported CVODE version "%s" requested' % prefs['cvode'])
         cvode_inc = os.path.join(cvode_path, 'include')
