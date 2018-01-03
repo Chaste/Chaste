@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
 #else
-#include <cvode/cvode_dense.h> 
+#include <cvode/cvode_dense.h>
 #endif
 
 /**
@@ -285,6 +285,17 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 #endif
 
 #if CHASTE_SUNDIALS_VERSION >= 30000
+        if (mpSundialsLinearSolver)
+        {
+            /* Free the linear solver memory */
+            SUNLinSolFree(mpSundialsLinearSolver);
+        }
+        if (mpSundialsDenseMatrix)
+        {
+            /* Free the matrix memory */
+            SUNMatDestroy(mpSundialsDenseMatrix);
+        }
+
         /* Create dense SUNMatrix for use in linear solves */
         mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size());
 
