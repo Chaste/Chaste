@@ -316,12 +316,18 @@ def InspectFile(fileName):
 if __name__ == '__main__':
     # Check, apply or modify the copyright notices.
     # .cpp, .hpp., .py, .java are C++, Python and Java code.
-    exts = ['.cpp', '.hpp', '.py', '.java']
+    exts = ['.cpp', '.hpp', '.py', '.java', '.cmake']
 
     # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
-    # Version.cpp.in is the provenance file
-    named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
+    # Version.cpp.in is the provenance file for SCons builds
+    # Version_cmake.cpp.in is the provenance file for CMake builds
+    # CMakeLists.txt are the CMake infrastructure files
+    named_files = ['SConscript', 'SConstruct',
+                   'output.chaste',
+                   'Version.cpp.in',
+                   'Version_cmake.cpp.in',
+                   'CMakeLists.txt']
 
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
     startchar_ignores = ['_', '.']
