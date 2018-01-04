@@ -133,6 +133,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 py_current_notice='"""'+current_notice+'"""\n'
 cpp_current_notice='/*\n\n'+current_notice+'\n*/'
 cpp_notice_to_add = cpp_current_notice + "\n\n"
+cmake_current_notice = '# ' + current_notice.strip().replace('\n', '\n# ')
+cmake_notice_to_add = cmake_current_notice + '\n\n'
 
 # This is used when replacing a deprecated notice with the latest version,
 # to account for the optional text.
@@ -253,6 +255,7 @@ def InspectFile(fileName):
     valid_notice = False
     if (CheckForCopyrightNotice(cpp_current_notice, file_in) or
         CheckForCopyrightNotice(py_current_notice, file_in) or
+        CheckForCopyrightNotice(cmake_current_notice, file_in) or
         CheckForCopyrightNotice(output_notice, file_in)):
         #print 'Found current notice in '+file_name
         valid_notice=True
@@ -295,11 +298,15 @@ def InspectFile(fileName):
 
     print 'Found no copyright notice for', fileName
     if apply_new:
-        if fileName[-3:] == '.py':
+        if fileName.lower().endswith('.py'):
             print 'Not implemented for .py files'
             return False
-        else:
+        elif fileName.lower().endswith(('.cpp', '.hpp', '.java')):
             HeadAppendStringInFile(cpp_notice_to_add, fileName)
+        elif fileName.lower().endswith(('.cmake', 'cmakelists.txt')):
+            HeadAppendStringInFile(cmake_notice_to_add, fileName)
+        else:
+            print 'Not applying new notice: unrecognised file extension?'
         return True
     else:
         print 'Fix this by doing:',sys.argv[0],'-new'
