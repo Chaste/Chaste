@@ -391,8 +391,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     {
         //std::cout << "New CVODE solver\n";
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == nullptr)
-            EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
+        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
 
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);

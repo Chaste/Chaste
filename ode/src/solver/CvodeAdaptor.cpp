@@ -219,8 +219,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     {
         // Set up CVODE's memory.
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == nullptr)
-            EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
+        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
         // Set the user data
