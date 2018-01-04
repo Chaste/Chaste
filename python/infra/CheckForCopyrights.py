@@ -69,6 +69,8 @@ LIABILITY, OR TORT \(INCLUDING NEGLIGENCE OR OTHERWISE\) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """, re.MULTILINE)
 
+deprecated_date_string = re.compile('Copyright \(c\) 2005-\d{4}, University of Oxford.')
+
 deprecated_notice_GPL = re.compile(r"""Copyright \(C\) University of Oxford, 2005-\d{4}
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,6 +95,8 @@ being under the jurisdiction of the English Courts.
 You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 """, re.MULTILINE)
+
+current_date_string = 'Copyright (c) 2005-2018, University of Oxford.'
 
 current_notice="""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
@@ -273,7 +277,8 @@ def InspectFile(fileName):
     if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
-            ReplaceStringInFile(deprecated_notice, replacement_notice, fileName)
+            # The notice is deprecated, but it's not the GPL notice, so all that can be wrong is the date
+            ReplaceStringInFile(deprecated_date_string, current_date_string, fileName)
             return True
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
