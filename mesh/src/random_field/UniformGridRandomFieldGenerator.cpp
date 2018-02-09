@@ -578,7 +578,7 @@ long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long,
 template <unsigned SPACE_DIM>
 std::array<double, SPACE_DIM> UniformGridRandomFieldGenerator<SPACE_DIM>::GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept
 {
-    std::array<double, SPACE_DIM> position{};
+    std::array<double, SPACE_DIM> position = {{}};
 
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
