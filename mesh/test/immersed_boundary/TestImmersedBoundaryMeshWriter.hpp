@@ -134,13 +134,13 @@ public:
         lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes_lam1));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes_lam2));
 
-        ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, lams, 8, 8);
+        ImmersedBoundaryMesh<2, 2> mesh(nodes, elems, lams, 8, 8);
 
         // Create a vertex mesh writer
         ImmersedBoundaryMeshWriter<2,2> ib_mesh_writer("TestIbMeshWriterIn2d", "ib_mesh_2d");
 
         // Test files are written correctly
-        ib_mesh_writer.WriteFilesUsingMesh(*p_mesh);
+        ib_mesh_writer.WriteFilesUsingMesh(mesh);
 
         OutputFileHandler handler("TestVertexMeshWriterIn2d", false);
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.node";

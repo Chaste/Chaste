@@ -80,6 +80,12 @@ public:
 
         element.SetAverageNodeSpacing(0.123);
         TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), 0.123, 1e-6);
+
+        // Clean up
+        for(auto& p_node : nodes)
+        {
+            delete(p_node);
+        }
     }
 };
 

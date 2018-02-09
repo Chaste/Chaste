@@ -483,9 +483,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             *p_element_file << "\t" << elem_data.AttributeValue;
 
-            *p_element_file << "\t" << elem_data.SpringConstant;
-
-            *p_element_file << "\t" << elem_data.RestLength;
+            //\todo: add fluid source and other Element members
 
             // New line
             *p_element_file << "\n";
@@ -528,9 +526,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             *p_lamina_file << "\t" << lamina_data.AttributeValue;
 
-            *p_lamina_file << "\t" << lamina_data.SpringConstant;
-
-            *p_lamina_file << "\t" << lamina_data.RestLength;
+            //\todo: add fluid source and other Element members
 
             // New line
             *p_lamina_file << "\n";

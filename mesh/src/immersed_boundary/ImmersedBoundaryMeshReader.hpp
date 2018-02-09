@@ -52,8 +52,7 @@ struct ImmersedBoundaryElementData
 {
     std::vector<unsigned> NodeIndices; /**< Vector of Node indices owned by the element. */
     unsigned AttributeValue; /**< Attribute value associated with the element. */
-    double SpringConstant; /**< Spring constant associated with the element. */
-    double RestLength; /**< Spring rest length associated with the element. */
+    //\todo: add fluid source and other Element members
 };
 
 /**
