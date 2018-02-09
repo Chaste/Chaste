@@ -195,7 +195,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 
         // Calculate about a quarter of the eigenvalues \todo: remove this magic number
         const double total_gridpts = std::accumulate(num_grid_pts.begin(), num_grid_pts.end(), 1.0, std::multiplies<double>());
-        const unsigned num_eigenvals = 0.25 * total_gridpts;
+        const double trace_proportion = 0.8;
 
         // Warn at this point if parameters are not sensible
         if (mNumGridPtsX % mNoiseSkip != 0)
@@ -213,7 +213,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
                 upper_corner,
                 num_grid_pts,
                 periodicity,
-                num_eigenvals,
+                trace_proportion,
                 mNoiseLengthScale
         );
 
@@ -694,6 +694,9 @@ void ImmersedBoundarySimulationModifier<DIM>::AddNormalNoise() const noexcept
 {
     auto& r_force_grids = mpArrays->rGetModifiableForceGrids();
 
+    // This scaling is to ensure "correct" scaling with timestep
+    const double force_scale_factor = std::sqrt(2.0 * mNoiseStrength / SimulationTime::Instance()->GetTimeStep());
+
     // Add the noise
     for (unsigned dim = 0; dim < r_force_grids.shape()[0]; dim++)
     {
@@ -708,7 +711,7 @@ void ImmersedBoundarySimulationModifier<DIM>::AddNormalNoise() const noexcept
             for (unsigned y = 0; y < r_force_grids.shape()[2]; y += mNoiseSkip, idx++)
             {
                 // Value from the random grid at this location
-                const double val = mNoiseStrength * (field[idx] - adjustment);
+                const double val = force_scale_factor * (field[idx] - adjustment);
 
                 // Fill in the mSkip x mSkip square of points
                 for (unsigned i = 0; i < mNoiseSkip; ++i)
