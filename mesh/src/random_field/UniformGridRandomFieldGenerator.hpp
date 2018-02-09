@@ -98,6 +98,9 @@ private:
     /** Store the calculated grid spacings to avoid recalculation during interpolation */
     std::array<double, SPACE_DIM> mGridSpacing;
 
+    /** Store the calculated one over grid spacings to avoid recalculation during interpolation */
+    std::array<double, SPACE_DIM> mOneOverGridSpacing;
+
     /** The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached random fields will be saved */
     const std::string mCacheDir;
 
@@ -158,6 +161,24 @@ private:
      */
     double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
                               const c_vector<double, SPACE_DIM>& rLocation2) const noexcept;
+
+    /**
+     * Helper method for Interpolate()
+     * Get the linear index (along the flat vector representing a random field instance) given the grid index
+     * (x,y,z).
+     * @param gridIndex the (x,y,z) coordinate to translate into a linear index
+     * @return the linear index along the flat vector representing the (x,y,z) grid coordinate
+     */
+    long GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept;
+
+    /**
+     * Helper method for Interpolate()
+     * Get the position in space of the grid point with (x,y,z) grid index gridIndex.
+     * @param gridIndex the (x,y,z) coordinate to calculate the position of
+     * @return the position in space of the (x,y,z) coordinate
+     */
+    std::array<double, SPACE_DIM> GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept;
+
 
     /**
      * Get a unique representation of the parameters that can be used as a filename when saving or loading fields.

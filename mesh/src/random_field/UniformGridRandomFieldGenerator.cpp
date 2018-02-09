@@ -87,6 +87,7 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
         mGridSpacing[dim] = (mUpperCorner[dim] - mLowerCorner[dim]) / mNumGridPts[dim];
+        mOneOverGridSpacing[dim] = mNumGridPts[dim] / (mUpperCorner[dim] - mLowerCorner[dim]);
     }
 
     // Check if there's a cached random field matching these parameters
@@ -128,8 +129,7 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
     // \todo: refine how this is done. There should be a way to provide a good residual vec from previous calculation
     for (const double& proportion : {0.2, 0.4, 0.6, 0.8, 1.0})
     {
-        MARK;
-        const long num_evals_to_compute = std::lround(proportion * trace_threshold);
+        const long num_evals_to_compute = std::min(std::lround(proportion * trace_threshold) + 1l, mNumTotalGridPts - 1l);
 
         Spectra::SparseGenMatProd<double> op(cov_matrix);
         Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
@@ -146,7 +146,8 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
         PRINT_2_VARIABLES(eigs.eigenvalues().array().sum(), trace_threshold);
 
         // Go straight back to the top of the loop at this point if we didn't calculate enough eigenvalues
-        if (eigs.eigenvalues().array().sum() < trace_threshold)
+        // but only continue if we haven't already calculated the maximum number of eigenvalues
+        if (eigs.eigenvalues().array().sum() < trace_threshold && num_evals_to_compute < mNumTotalGridPts - 1l)
         {
             continue;
         }
@@ -157,7 +158,7 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
          * don't mind the slight error.
          */
         const Eigen::ArrayXd& evals = eigs.eigenvalues().array().max(0.0);
-        MARK;
+
         // Decide how many eigenvalues to keep
         double cumulative_sum = 0.0;
         mNumEigenvals = num_evals_to_compute;
@@ -171,7 +172,7 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
                 break;
             }
         }
-        MARK;
+
         // Store only those eigenvectors that we need
         const auto e_vectors = eigs.eigenvectors();
         mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
@@ -179,18 +180,19 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
         {
             mScaledEigenvecs.col(e_val) = std::sqrt(evals.coeffRef(e_val)) * e_vectors.col(e_val);
         }
-        MARK;
+
+        PRINT_VARIABLE(mNumEigenvals);
+
         // Break out of the loop to prevent any unnecessary eigenvalue calculations
         break;
     }
-    MARK;
 }
 
 template <unsigned SPACE_DIM>
 Eigen::SparseMatrix<double> UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateCovarianceMatrix() const noexcept
 {
     // Create a node at each grid location
-    std::vector<Node<2>> nodes;
+    std::vector<Node<SPACE_DIM>> nodes;
 
     // \todo: can probably remove this if I think about it...
     switch(SPACE_DIM)
@@ -201,7 +203,7 @@ Eigen::SparseMatrix<double> UniformGridRandomFieldGenerator<SPACE_DIM>::Calculat
             for (unsigned x = 0; x < mNumGridPts[0]; ++x)
             {
                 const double x_pos = mGridSpacing[0] * x;
-                nodes.emplace_back(Node<2>(idx, false, x_pos));
+                nodes.emplace_back(Node<SPACE_DIM>(idx, false, x_pos));
                 idx++;
             }
             break;
@@ -215,7 +217,7 @@ Eigen::SparseMatrix<double> UniformGridRandomFieldGenerator<SPACE_DIM>::Calculat
                 for (unsigned x = 0; x < mNumGridPts[0]; ++x)
                 {
                     const double x_pos = mGridSpacing[0] * x;
-                    nodes.emplace_back(Node<2>(idx, false, x_pos, y_pos));
+                    nodes.emplace_back(Node<SPACE_DIM>(idx, false, x_pos, y_pos));
                     idx++;
                 }
             }
@@ -233,7 +235,7 @@ Eigen::SparseMatrix<double> UniformGridRandomFieldGenerator<SPACE_DIM>::Calculat
                     for (unsigned x = 0; x < mNumGridPts[0]; ++x)
                     {
                         const double x_pos = mGridSpacing[0] * x;
-                        nodes.emplace_back(Node<2>(idx, false, x_pos, y_pos, z_pos));
+                        nodes.emplace_back(Node<SPACE_DIM>(idx, false, x_pos, y_pos, z_pos));
                         idx++;
                     }
                 }
@@ -383,6 +385,7 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::LoadFromCache(const std::string
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
         mGridSpacing[dim] = (mUpperCorner[dim] - mLowerCorner[dim]) / mNumGridPts[dim];
+        mOneOverGridSpacing[dim] = mNumGridPts[dim] / (mUpperCorner[dim] - mLowerCorner[dim]);
     }
 
     // Read the scaled eigenvectors into their respective data arrays
@@ -454,24 +457,94 @@ double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector
 {
     assert(mNumTotalGridPts == rRandomField.size());
 
-    std::array<long, SPACE_DIM> nearest_node;
+    // Find the nearest node
+    std::array<long, SPACE_DIM> lower_left;
 
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
-        nearest_node[dim] = std::floor((rLocation[dim] - mLowerCorner[dim]) / mGridSpacing[dim]);
+        lower_left[dim] = std::floor((rLocation[dim] - mLowerCorner[dim]) / mGridSpacing[dim]);
 
-        if (nearest_node[dim] < 0)
+        if (lower_left[dim] < 0)
         {
-            nearest_node[dim] = 0;
-            WARNING("Interpolating outside random field grid: does the random field need to be larger?");
+            lower_left[dim] = 0;
+            WARN_ONCE_ONLY("Interpolating outside random field grid: does the random field need to be larger?");
         }
-        else if (nearest_node[dim] >= mNumGridPts[dim])
+        else if (lower_left[dim] >= mNumGridPts[dim])
         {
-            nearest_node[dim] = mNumGridPts[dim] - 1;
-            WARNING("Interpolating outside random field grid: does the random field need to be larger?");
+            lower_left[dim] = mNumGridPts[dim] - 1;
+            WARN_ONCE_ONLY("Interpolating outside random field grid: does the random field need to be larger?");
         }
     }
 
+    double interpolated_value{};
+
+    // Perform the interpolation
+    switch(SPACE_DIM)
+    {
+        case 1:
+        {
+            // The value of the field at points either side of rLocation
+            std::array<long, SPACE_DIM> upper_idx = lower_left;
+            upper_idx[0] =  (upper_idx[0] + 1) % mNumGridPts[0];
+
+            const double field_at_lower = rRandomField[GetLinearIndex(lower_left)];
+            const double field_at_upper = rRandomField[GetLinearIndex(upper_idx)];
+
+            // Perform a simple linear interpolation
+            const std::array<double, SPACE_DIM> lower_location = GetPositionUsingGridIndex(lower_left);
+            const double interpolant = (rLocation[0] - lower_location[0]) * mOneOverGridSpacing[0];
+
+            interpolated_value = field_at_lower * (1.0 - interpolant) + field_at_upper * interpolant;
+            break;
+        }
+        case 2:
+        {
+            // The value of the field at the four points of the square containing rLocation
+            std::array<long, SPACE_DIM> x_upper = lower_left;
+            x_upper[0] = (x_upper[0] + 1) % mNumGridPts[0];
+
+            std::array<long, SPACE_DIM> y_upper = lower_left;
+            y_upper[1] = (y_upper[1] + 1) % mNumGridPts[1];
+
+            std::array<long, SPACE_DIM> xy_upper = x_upper;
+            xy_upper[1] = y_upper[1];
+
+            const double field_xy_lower = rRandomField[GetLinearIndex(lower_left)];
+            const double field_x_upper = rRandomField[GetLinearIndex(x_upper)];
+            const double field_y_upper = rRandomField[GetLinearIndex(y_upper)];
+            const double field_xy_upper = rRandomField[GetLinearIndex(xy_upper)];
+
+            // Perform a simple bilinear interpolation
+            const std::array<double, SPACE_DIM> lower_location = GetPositionUsingGridIndex(lower_left);
+            const double dist_x_lower = rLocation[0] - lower_location[0];
+            const double dist_x_upper = mGridSpacing[0] - dist_x_lower;
+            const double dist_y_lower = rLocation[1] - lower_location[1];
+            const double dist_y_upper = mGridSpacing[1] - dist_y_lower;
+
+            interpolated_value = mOneOverGridSpacing[0] * mOneOverGridSpacing[1] * (field_xy_lower * dist_x_upper * dist_y_upper +
+                                                                                    field_x_upper * dist_x_lower * dist_y_upper +
+                                                                                    field_y_upper * dist_x_upper * dist_y_lower +
+                                                                                    field_xy_upper * dist_x_lower * dist_y_lower);
+
+            break;
+        }
+        case 3:
+        {
+            // \todo: perform a suitable interpolation rather than just near neighbour
+            interpolated_value = rRandomField[GetLinearIndex(lower_left)];
+
+            break;
+        }
+        default:
+            NEVER_REACHED;
+    }
+
+    return interpolated_value;
+}
+
+template <unsigned SPACE_DIM>
+long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept
+{
     long linear_index;
 
     // \todo: double check I'm not calculating the transpose of each point
@@ -479,27 +552,40 @@ double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector
     {
         case 1:
         {
-            linear_index = nearest_node[0];
+            linear_index = gridIndex[0];
             break;
         }
         case 2:
         {
-            linear_index = nearest_node[0] +
-                           nearest_node[1] * mNumGridPts[0];
+            linear_index = gridIndex[0] +
+                           gridIndex[1] * mNumGridPts[0];
             break;
         }
         case 3:
         {
-            linear_index = nearest_node[0] +
-                           nearest_node[1] * mNumGridPts[0] +
-                           nearest_node[2] * mNumGridPts[0] * mNumGridPts[1];
+            linear_index = gridIndex[0] +
+                           gridIndex[1] * mNumGridPts[0] +
+                           gridIndex[2] * mNumGridPts[0] * mNumGridPts[1];
             break;
         }
         default:
             NEVER_REACHED;
     }
 
-    return rRandomField[linear_index];
+    return linear_index;
+}
+
+template <unsigned SPACE_DIM>
+std::array<double, SPACE_DIM> UniformGridRandomFieldGenerator<SPACE_DIM>::GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept
+{
+    std::array<double, SPACE_DIM> position{};
+
+    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
+    {
+        position[dim] = mLowerCorner[dim] + mGridSpacing[dim] * gridIndex[dim];
+    }
+
+    return position;
 }
 
 // Explicit instantiation
