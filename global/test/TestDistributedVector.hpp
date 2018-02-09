@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -416,7 +416,7 @@ public:
         // Where to archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("factory.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("factory.arch");
 
         // Archive
         {

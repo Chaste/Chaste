@@ -24,6 +24,6 @@ bibliography: docs/paper.bib
 
 Chaste [@Chaste] is a general purpose C++ simulation package aimed at multi-scale, computationally demanding problems arising in biology and physiology. Current functionality includes tissue and cell level electrophysiology, discrete tissue modelling, and soft tissue modelling. The package is being developed by a team mainly based in the Computational Biology Group at the Department of Computer Science, University of Oxford, and development draws on expertise from software engineering, high performance computing, mathematical modelling and scientific computing.
 
-TODO: Links to documentation, test results, publications.
+TODO: Links to documentation, test results, publications. 
 
 # References

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,12 +66,12 @@ std::string ChasteBuildInfo::GetVersionString()
 
 unsigned ChasteBuildInfo::GetMajorReleaseNumber()
 {
-    return 3u;
+    return 2017u;
 }
 
 unsigned ChasteBuildInfo::GetMinorReleaseNumber()
 {
-    return 4u;
+    return 1u;
 }
 
 unsigned long long ChasteBuildInfo::GetRevisionNumber()

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,21 +35,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_CVODE
 
-#include <sstream>
 #include <cassert>
+#include <sstream>
 
 #include "AbstractCvodeSystem.hpp"
+#include "CvodeAdaptor.hpp" // For CvodeErrorHandler
 #include "Exception.hpp"
-#include "VectorHelperFunctions.hpp"
 #include "MathsCustomFunctions.hpp" // For tolerance comparison
 #include "TimeStepper.hpp"
-#include "CvodeAdaptor.hpp" // For CvodeErrorHandler
+#include "VectorHelperFunctions.hpp"
 
 // CVODE headers
 #include <cvode/cvode.h>
-#include <sundials/sundials_nvector.h>
 #include <cvode/cvode_dense.h>
-
+#include <sundials/sundials_nvector.h>
 
 //#include "Debug.hpp"
 //void DebugSteps(void* pCvodeMem, AbstractCvodeSystem* pSys)
@@ -71,90 +70,98 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param ydot  derivatives vector to be filled in
  * @param pData  pointer to the cell being simulated
  */
-int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *pData)
+int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* pData)
 {
     assert(pData != nullptr);
-    AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
+    AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*)pData;
     try
     {
         p_ode_system->EvaluateYDerivatives(t, y, ydot);
     }
-    catch (const Exception &e)
+    catch (const Exception& e)
     {
 #if CHASTE_SUNDIALS_VERSION <= 20300
         // Really old CVODE used to solve past the requested time points and could trigger this exception unnecessarily...
-        if (e.CheckShortMessageContains("is outside the times stored in the data clamp")=="")
+        if (e.CheckShortMessageContains("is outside the times stored in the data clamp") == "")
         {
             return 1; // This may be a recoverable error!
         }
 #endif
 
         std::cerr << "CVODE RHS Exception: " << e.GetMessage()
-                  << std::endl << std::flush;
+                  << std::endl
+                  << std::flush;
         return -1;
     }
 
-//    // Something like this might help CVODE when things are a bit unstable...
-//    try
-//    {
-//        p_ode_system->VerifyStateVariables();
-//    }
-//    catch (const Exception &e)
-//    {
-//        std::cout << "t = " << t << ":\t" <<  e.GetMessage() << std::endl << std::flush;
-//        return 1; // A positive return flag to CVODE tells it there's been an error but it might be recoverable.
-//    }
+    //    // Something like this might help CVODE when things are a bit unstable...
+    //    try
+    //    {
+    //        p_ode_system->VerifyStateVariables();
+    //    }
+    //    catch (const Exception &e)
+    //    {
+    //        std::cout << "t = " << t << ":\t" <<  e.GetMessage() << std::endl << std::flush;
+    //        return 1; // A positive return flag to CVODE tells it there's been an error but it might be recoverable.
+    //    }
 
     return 0;
 }
 
-
 /*
- * Absolute chaos here with three different possible interfaces to the jacobian.
+ * Absolute chaos here with four different possible interfaces to the jacobian.
  */
-#if CHASTE_SUNDIALS_VERSION >= 20500
-    // Sundials 2.5
-    int AbstractCvodeSystemJacAdaptor(long int N, realtype t, N_Vector y, N_Vector ydot, DlsMat jacobian,
+#if CHASTE_SUNDIALS_VERSION >= 30000
+// Sundials 3.0 - has taken away the argument N at the top...
+int AbstractCvodeSystemJacAdaptor(realtype t, N_Vector y, N_Vector ydot, CHASTE_CVODE_DENSE_MATRIX jacobian,
+#elif CHASTE_SUNDIALS_VERSION >= 20500
+// Sundials 2.5
+int AbstractCvodeSystemJacAdaptor(long int N, realtype t, N_Vector y, N_Vector ydot, CHASTE_CVODE_DENSE_MATRIX jacobian,
 #elif CHASTE_SUNDIALS_VERSION >= 20400
-    // Sundials 2.4
-    int AbstractCvodeSystemJacAdaptor(int N, realtype t, N_Vector y, N_Vector ydot, DlsMat jacobian,
+// Sundials 2.4
+int AbstractCvodeSystemJacAdaptor(int N, realtype t, N_Vector y, N_Vector ydot, DlsMat jacobian,
 #else
-    // Sundials 2.3 and below (not sure how far below, but this is 2006 so old enough).
-    int AbstractCvodeSystemJacAdaptor(long int N, DenseMat jacobian, realtype t, N_Vector y, N_Vector ydot,
+// Sundials 2.3 and below (not sure how far below, but this is 2006 so old enough).
+int AbstractCvodeSystemJacAdaptor(long int N, DenseMat jacobian, realtype t, N_Vector y, N_Vector ydot,
 #endif
-    void *pData, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+                                  void* pData, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
 {
     assert(pData != nullptr);
-    AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*) pData;
+    AbstractCvodeSystem* p_ode_system = (AbstractCvodeSystem*)pData;
     try
     {
-        p_ode_system->EvaluateAnalyticJacobian((long)(N), t, y, ydot, jacobian, tmp1, tmp2, tmp3);
+        p_ode_system->EvaluateAnalyticJacobian(t, y, ydot, jacobian, tmp1, tmp2, tmp3);
     }
-    catch (const Exception &e)
+    catch (const Exception& e)
     {
-        std::cerr << "CVODE Jacobian Exception: " << e.GetMessage() << std::endl << std::flush;
+        std::cerr << "CVODE Jacobian Exception: " << e.GetMessage() << std::endl
+                  << std::flush;
         return -1;
     }
     return 0;
 }
 
 AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
-    : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
-      mLastSolutionState(nullptr),
-      mLastSolutionTime(0.0),
-#if CHASTE_SUNDIALS_VERSION >=20400
-      mForceReset(false),
+        : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
+          mLastSolutionState(nullptr),
+          mLastSolutionTime(0.0),
+#if CHASTE_SUNDIALS_VERSION >= 20400
+          mForceReset(false),
 #else
-      // Old Sundials don't seem to 'go back' when something has changed
-      // properly, and give more inaccurate answers.
-      mForceReset(true),
+          // Old Sundials don't seem to 'go back' when something has changed
+          // properly, and give more inaccurate answers.
+          mForceReset(true),
 #endif
-      mForceMinimalReset(false),
-      mHasAnalyticJacobian(false),
-      mUseAnalyticJacobian(false),
-      mpCvodeMem(nullptr),
-      mMaxSteps(0),
-      mLastInternalStepSize(0)
+          mForceMinimalReset(false),
+#if CHASTE_SUNDIALS_VERSION >= 30000
+          mpSundialsDenseMatrix(nullptr),
+          mpSundialsLinearSolver(nullptr),
+#endif
+          mHasAnalyticJacobian(false),
+          mUseAnalyticJacobian(false),
+          mpCvodeMem(nullptr),
+          mMaxSteps(0),
+          mLastInternalStepSize(0)
 {
     SetTolerances(); // Set the tolerances to the defaults.
 }
@@ -165,7 +172,7 @@ void AbstractCvodeSystem::Init()
     mStateVariables = GetInitialConditions();
     DeleteVector(mParameters);
     mParameters = N_VNew_Serial(rGetParameterNames().size());
-    for (int i=0; i<NV_LENGTH_S(mParameters); i++)
+    for (int i = 0; i < NV_LENGTH_S(mParameters); i++)
     {
         NV_Ith_S(mParameters, i) = 0.0;
     }
@@ -210,18 +217,19 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
     {
         // This should stop CVODE going past the end of where we wanted and interpolating back.
         int ierr = CVodeSetStopTime(mpCvodeMem, stepper.GetNextTime());
-        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+        assert(ierr == CV_SUCCESS);
+        UNUSED_OPT(ierr); // avoid unused var warning
 
-//        // This parameter governs how many times we allow a recoverable right hand side failure
-//        int ierr = CVodeSetMaxConvFails(mpCvodeMem, 1000);
-//        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+        //        // This parameter governs how many times we allow a recoverable right hand side failure
+        //        int ierr = CVodeSetMaxConvFails(mpCvodeMem, 1000);
+        //        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
 
         double cvode_stopped_at = stepper.GetTime();
         ierr = CVode(mpCvodeMem, stepper.GetNextTime(), mStateVariables,
-                         &cvode_stopped_at, CV_NORMAL);
-        if (ierr<0)
+                     &cvode_stopped_at, CV_NORMAL);
+        if (ierr < 0)
         {
-//            DebugSteps(mpCvodeMem, this);
+            //            DebugSteps(mpCvodeMem, this);
             CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at, stepper.GetTime(), stepper.GetNextTime());
         }
         // Not root finding, so should have reached requested time
@@ -239,7 +247,8 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
     solutions.SetNumberOfTimeSteps(stepper.GetTotalTimeStepsTaken());
 
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+    assert(ierr == CV_SUCCESS);
+    UNUSED_OPT(ierr); // avoid unused var warning
 
     RecordStoppingPoint(tEnd);
 
@@ -256,20 +265,22 @@ void AbstractCvodeSystem::Solve(realtype tStart,
 
     // This should stop CVODE going past the end of where we wanted and interpolating back.
     int ierr = CVodeSetStopTime(mpCvodeMem, tEnd);
-    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+    assert(ierr == CV_SUCCESS);
+    UNUSED_OPT(ierr); // avoid unused var warning
 
     double cvode_stopped_at = tStart;
     ierr = CVode(mpCvodeMem, tEnd, mStateVariables, &cvode_stopped_at, CV_NORMAL);
-    if (ierr<0)
+    if (ierr < 0)
     {
-//        DebugSteps(mpCvodeMem, this);
+        //        DebugSteps(mpCvodeMem, this);
         CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at, tStart, tEnd);
     }
     // Not root finding, so should have reached requested time
     assert(fabs(cvode_stopped_at - tEnd) < DBL_EPSILON);
 
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+    assert(ierr == CV_SUCCESS);
+    UNUSED_OPT(ierr); // avoid unused var warning
 
     RecordStoppingPoint(cvode_stopped_at);
 
@@ -297,7 +308,6 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     VerifyStateVariables();
 #endif
 }
-
 
 void AbstractCvodeSystem::SetMaxSteps(long int numSteps)
 {
@@ -349,12 +359,10 @@ void AbstractCvodeSystem::SetMinimalReset(bool minimalReset)
     }
 }
 
-
 void AbstractCvodeSystem::ResetSolver()
 {
     DeleteVector(mLastSolutionState);
 }
-
 
 void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
                                      realtype tStart,
@@ -369,7 +377,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetNumberOfStateVariables();
-        for (unsigned i=0; i<size; i++)
+        for (unsigned i = 0; i < size; i++)
         {
             if (!CompareDoubles::WithinAnyTolerance(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(mStateVariables, i)))
             {
@@ -387,13 +395,13 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
-        // Set the user data
+// Set the user data
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeSetUserData(mpCvodeMem, (void*)(this));
 #else
         CVodeSetFdata(mpCvodeMem, (void*)(this));
 #endif
-        // Setup CVODE
+// Setup CVODE
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeInit(mpCvodeMem, AbstractCvodeSystemRhsAdaptor, tStart, initialConditions);
         CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
@@ -401,12 +409,26 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
         CVodeMalloc(mpCvodeMem, AbstractCvodeSystemRhsAdaptor, tStart, initialConditions,
                     CV_SS, mRelTol, &mAbsTol);
 #endif
+
+#if CHASTE_SUNDIALS_VERSION >= 30000
+        /* Create dense SUNMatrix for use in linear solves */
+        mpSundialsDenseMatrix = SUNDenseMatrix(NV_LENGTH_S(initialConditions), NV_LENGTH_S(initialConditions));
+
+        /* Create dense SUNLinearSolver object for use by CVode */
+        mpSundialsLinearSolver = SUNDenseLinearSolver(initialConditions, mpSundialsDenseMatrix);
+
+        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#else
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, NV_LENGTH_S(initialConditions));
+#endif
 
         if (mUseAnalyticJacobian)
         {
-#if CHASTE_SUNDIALS_VERSION >= 20400
+#if CHASTE_SUNDIALS_VERSION >= 30000
+            CVDlsSetJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
+#elif CHASTE_SUNDIALS_VERSION >= 20400
             CVDlsSetDenseJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
 #else
             CVDenseSetJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor, (void*)(this));
@@ -415,7 +437,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     }
     else if (reinit)
     {
-        //std::cout << "Resetting CVODE solver\n";
+//std::cout << "Resetting CVODE solver\n";
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeReInit(mpCvodeMem, tStart, initialConditions);
         CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
@@ -434,27 +456,26 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     }
 }
 
-
 void AbstractCvodeSystem::RecordStoppingPoint(double stopTime)
 {
-//    DebugSteps(mpCvodeMem, this);
+    //    DebugSteps(mpCvodeMem, this);
 
     // If we're forcing a reset then we don't record the stopping time
     // as a result it won't match and we will force a reset in SetupCvode() on
     // the next solve call.
-    if (mForceReset) return;
+    if (mForceReset)
+        return;
 
     // Otherwise we will store the state variables and time for comparison on the
     // next solve call, to work out whether we need to reset.
     const unsigned size = GetNumberOfStateVariables();
     CreateVectorIfEmpty(mLastSolutionState, size);
-    for (unsigned i=0; i<size; i++)
+    for (unsigned i = 0; i < size; i++)
     {
         SetVectorComponent(mLastSolutionState, i, GetVectorComponent(mStateVariables, i));
     }
     mLastSolutionTime = stopTime;
 }
-
 
 void AbstractCvodeSystem::FreeCvodeMemory()
 {
@@ -463,10 +484,25 @@ void AbstractCvodeSystem::FreeCvodeMemory()
         CVodeFree(&mpCvodeMem);
     }
     mpCvodeMem = nullptr;
+
+#if CHASTE_SUNDIALS_VERSION >= 30000
+    if (mpSundialsLinearSolver)
+    {
+        /* Free the linear solver memory */
+        SUNLinSolFree(mpSundialsLinearSolver);
+    }
+    mpSundialsLinearSolver = nullptr;
+
+    if (mpSundialsDenseMatrix)
+    {
+        /* Free the matrix memory */
+        SUNMatDestroy(mpSundialsDenseMatrix);
+    }
+    mpSundialsDenseMatrix = nullptr;
+#endif
 }
 
-
-void AbstractCvodeSystem::CvodeError(int flag, const char * msg,
+void AbstractCvodeSystem::CvodeError(int flag, const char* msg,
                                      const double& rTime, const double& rStartTime, const double& rEndTime)
 {
     std::stringstream err;
@@ -496,13 +532,14 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg,
     err << "\nState variables are now:\n";
     std::vector<double> state_vars = MakeStdVec(mStateVariables);
     std::vector<std::string> state_var_names = rGetStateVariableNames();
-    for (unsigned i=0; i<state_vars.size(); i++)
+    for (unsigned i = 0; i < state_vars.size(); i++)
     {
         err << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << std::endl;
     }
 
     FreeCvodeMemory();
-    std::cerr << err.str() << std::endl << std::flush;
+    std::cerr << err.str() << std::endl
+              << std::flush;
     EXCEPTION(err.str());
 }
 
@@ -515,7 +552,6 @@ bool AbstractCvodeSystem::GetUseAnalyticJacobian() const
 {
     return mUseAnalyticJacobian;
 }
-
 
 void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 {
@@ -531,7 +567,6 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
         this->FreeCvodeMemory();
     }
 }
-
 
 //#include "MathsCustomFunctions.hpp"
 //#include <algorithm>
@@ -582,6 +617,5 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 //        }
 //    }
 //}
-
 
 #endif // CHASTE_CVODE

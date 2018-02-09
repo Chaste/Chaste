@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,13 +59,13 @@ void RKC21IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSyste
 
      /*
      * The General RKC scheme:
-     
+
     * w_{n0} = w_n;
     * w_{n1} = w_n + \tilde{\mu_1} * dt * F_{n0};
-    * w_{nj} = (1 - mu_j - nu_j) w_n + mu_j*w_{n,j-1} + nu_j*w_{n,j-2} + \tilde{\mu_j}*dt*F_{n,j-1} + \tilde{\gamma_j}*dt*F_{n,0}, 
+    * w_{nj} = (1 - mu_j - nu_j) w_n + mu_j*w_{n,j-1} + nu_j*w_{n,j-2} + \tilde{\mu_j}*dt*F_{n,j-1} + \tilde{\gamma_j}*dt*F_{n,0},
     * w_{n+1} = w_{ns}.
     * where:
-    *       j = 2,...,s; 
+    *       j = 2,...,s;
     *       F_{nk} = F(t_n + c_k*dt, w_{nk});
     *       c_k = T_s(w_0)*Tp_k(w_0) / (Tp_s(w_0)*T_k(w_0)) with T_k/Tp_k are k-th Chebyshev polynomials/ derivatives of them
     *       w_0 is specific parameters
@@ -97,7 +97,7 @@ void RKC21IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSyste
     for (unsigned i=0; i<num_equations; i++)
     {
         w1[i] = w0[i] + mu1_tilde * timeStep * F0[i];
-    } 
+    }
 
     // Work next step
     pAbstractOdeSystem->EvaluateYDerivatives(time + mu1_tilde * timeStep, w1, F1);
