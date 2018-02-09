@@ -61,7 +61,7 @@ typedef boost::multi_array<double, 3> real_array_3d;
 class TestFftwMethods : public CxxTest::TestSuite
 {
 public:
-    void TestLoadWisdom() throw(Exception)
+    void TestLoadWisdom()
     {
         std::string wisdom_filename = "fftw.wisdom";
         FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
@@ -81,7 +81,7 @@ public:
         }
     }
 
-    void Test2DR2C2R() throw(Exception)
+    void Test2DR2C2R()
     {
         /*
          * We create a 2D vector of doubles and carry out a real-to-complex transform, followed by a complex-to-real

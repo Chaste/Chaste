@@ -85,7 +85,7 @@ class TestImmersedBoundaryCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestGetAndSetMethods() throw(Exception)
+    void TestGetAndSetMethods()
     {
         // Create an immersed boundary cell population object
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
@@ -124,7 +124,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), 5u);
     }
 
-    void TestMeshMethods() throw(Exception)
+    void TestMeshMethods()
     {
         // Create an immersed boundary cell population object
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
@@ -198,7 +198,7 @@ public:
     }
 
     ///\todo Check output files by eye too
-    void TestWritersWithImmersedBoundaryCellPopulation() throw (Exception)
+    void TestWritersWithImmersedBoundaryCellPopulation()
     {
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);

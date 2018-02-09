@@ -52,31 +52,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestImmersedBoundaryMesh : public CxxTest::TestSuite
 {
 public:
-    void TestSolveNodeAndElementMapping() throw(Exception)
+    void TestSolveNodeAndElementMapping()
     {
     }
 
-    void TestClear() throw(Exception)
+    void TestClear()
     {
     }
 
-    void TestSetupFluidVelocityGrids() throw(Exception)
+    void TestSetupFluidVelocityGrids()
     {
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
     }
 
-    void TestElementIterator() throw(Exception)
+    void TestElementIterator()
     {
     }
 
-    void TestSetAndGetMethods() throw(Exception)
+    void TestSetAndGetMethods()
     {
     }
 
-    void TestGetVectorFromAtoB() throw(Exception)
+    void TestGetVectorFromAtoB()
     {
         // Create a small mesh
         ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
@@ -126,7 +126,7 @@ public:
         TS_ASSERT_DELTA(vec_a2b[1], -0.2, 1e-6);
     }
 
-    void TestGetSkewnessOfElementMassDistributionAboutAxis() throw(Exception)
+    void TestGetSkewnessOfElementMassDistributionAboutAxis()
     {
         // A square should have no skewness about any axis
         {
@@ -182,7 +182,7 @@ public:
         }
     }
 
-    void TestReMesh() throw(Exception)
+    void TestReMesh()
     {
         /*
          * In this test, we generate a mesh with multiple elements and lamina, in which nodes are already evenly spaced.
@@ -298,7 +298,7 @@ public:
         }
     }
 
-    void TestReMeshElement() throw(Exception)
+    void TestReMeshElement()
     {
         // ReMeshElement where nothing should change, no regions involved
         {
@@ -458,7 +458,7 @@ public:
         }
     }
 
-    void TestReMeshLamina() throw(Exception)
+    void TestReMeshLamina()
     {
         // ReMeshLamina where nothing should change
         {
@@ -530,7 +530,7 @@ public:
         }
     }
 
-    void TestNodesInDifferentElementOrLamina() throw(Exception)
+    void TestNodesInDifferentElementOrLamina()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
@@ -610,7 +610,7 @@ public:
         TS_ASSERT(!p_mesh->NodesInDifferentElementOrLamina(p_mesh->GetNode(9), p_mesh->GetNode(10)));
     }
 
-    void TestGeometricMethods() throw(Exception)
+    void TestGeometricMethods()
     {
         // Make six nodes
         std::vector<Node<2>*> nodes;
@@ -652,7 +652,7 @@ public:
         TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
     }
 
-    void TestGetNeighbouringElementIndices() throw(Exception)
+    void TestGetNeighbouringElementIndices()
     {
         /* This 3x3 honeycomb will look like:
          *    5
@@ -678,7 +678,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(8u), std::set<unsigned>({4u, 5u, 7u}));
     }
 
-    void TestGetPolygonDistribution() throw(Exception)
+    void TestGetPolygonDistribution()
     {
         // A 3x3 honeycomb will just have a single non-boundary element
         ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 5u, 0.05, 0.2);

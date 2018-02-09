@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestImmersedBoundarySimulationModifier : public AbstractCellBasedTestSuite
 {
 public:
-    void TestConstructorAndGetAndSetMethods() throw(Exception)
+    void TestConstructorAndGetAndSetMethods()
     {
         ImmersedBoundarySimulationModifier<2> modifier;
 
@@ -78,7 +78,7 @@ public:
         TS_ASSERT_DELTA(modifier.GetReynoldsNumber(), 1e-5, 1e-6);
     }
 
-    void TestOutputParametersWithImmersedBoundarySimulationModifier() throw(Exception)
+    void TestOutputParametersWithImmersedBoundarySimulationModifier()
     {
         std::string output_directory = "TestOutputParametersWithImmersedBoundarySimulationModifier";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -98,7 +98,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestSetupConstantMemberVariables() throw(Exception)
+    void TestSetupConstantMemberVariables()
     {
         // Set up SimulationTime - needed by SetupConstantMemberVariables()
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
@@ -143,7 +143,7 @@ public:
         TS_ASSERT(modifier.mpFftInterface != NULL);
     }
 
-    void TestClearForcesAndSources() throw(Exception)
+    void TestClearForcesAndSources()
     {
         // Set up SimulationTime - needed by SetupConstantMemberVariables()
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
@@ -200,37 +200,37 @@ public:
         }
     }
 
-    void TestPropagateForcesToFluidGrid() throw(Exception)
+    void TestPropagateForcesToFluidGrid()
     {
         ///\todo Test this method
     }
 
-    void TestPropagateFluidSourcesToGrid() throw(Exception)
+    void TestPropagateFluidSourcesToGrid()
     {
         ///\todo Test this method
     }
 
-    void TestSolveNavierStokesSpectral() throw(Exception)
+    void TestSolveNavierStokesSpectral()
     {
         ///\todo Test this method
     }
 
-    void TestUpdateFluidVelocityGrids() throw(Exception)
+    void TestUpdateFluidVelocityGrids()
     {
         ///\todo Test this method
     }
 
-    void TestDelta1D() throw(Exception)
+    void TestDelta1D()
     {
         ///\todo Test this method
     }
 
-    void TestUpwind2d() throw(Exception)
+    void TestUpwind2d()
     {
         ///\todo Test this method
     }
 
-    void TestSetMemberVariablesForTesting() throw(Exception)
+    void TestSetMemberVariablesForTesting()
     {
         ImmersedBoundarySimulationModifier<2> modifier;
 
@@ -243,17 +243,17 @@ public:
         TS_ASSERT_DELTA(modifier.mFftNorm, 15.0, 1e-4);
     }
 
-    void TestUpdateAtEndOfTimeStep() throw(Exception)
+    void TestUpdateAtEndOfTimeStep()
     {
         ///\todo Test this method
     }
 
-    void TestSetupSolve() throw(Exception)
+    void TestSetupSolve()
     {
         ///\todo Test this method
     }
 
-    void TestAddImmersedBoundaryForce() throw(Exception)
+    void TestAddImmersedBoundaryForce()
     {
         // Set up SimulationTime - needed by SetupConstantMemberVariables()
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);

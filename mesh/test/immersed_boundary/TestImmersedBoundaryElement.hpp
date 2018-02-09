@@ -51,7 +51,7 @@ public:
 
     // Note: the corner nodes and average node spacing of an element are set in the ImmersedBoundarMesh method DivideElement()
 
-    void TestFluidSourceMethods() throw(Exception)
+    void TestFluidSourceMethods()
     {
         // Make 4 nodes to assign to a square element
         std::vector<Node<2>*> nodes;

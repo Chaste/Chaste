@@ -51,7 +51,7 @@ class TestImmersedBoundaryHoneycombMeshGenerator : public CxxTest::TestSuite
 public:
 
     ///\todo Improve testing
-    void TestBoundaryElementsAreTaggedCorrectly() throw(Exception)
+    void TestBoundaryElementsAreTaggedCorrectly()
     {
         /*
          * Elements are numbered from bottom-left, upwards, then from left to right.  E.g. for a 3x3:

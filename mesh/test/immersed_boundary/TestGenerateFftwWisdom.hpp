@@ -65,7 +65,7 @@ private:
 
 public:
 
-    void TestSetupWisdomFileOneThread() throw(Exception)
+    void TestSetupWisdomFileOneThread()
     {
         std::string single_thread_file_name = "fftw.wisdom";
 
@@ -87,7 +87,7 @@ public:
         //mFftwFlag = FFTW_EXHAUSTIVE; // Much slower, but guaranteed to produce fastest transforms
     }
 
-    void TestGenerateManyR2CWisdomOneThread() throw(Exception)
+    void TestGenerateManyR2CWisdomOneThread()
     {
         /*
          * This test generates an fftw wisdom file telling fftw how to efficiently compute fourier transforms of a

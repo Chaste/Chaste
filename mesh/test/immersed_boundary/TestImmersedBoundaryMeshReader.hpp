@@ -54,7 +54,7 @@ class TestImmersedBoundaryMeshReader : public CxxTest::TestSuite
 public:
 
     ///\todo Improve testing
-    void TestNothingMuch() throw(Exception)
+    void TestNothingMuch()
     {
     }
 };

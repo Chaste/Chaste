@@ -47,7 +47,7 @@ class TestFluidSource : public CxxTest::TestSuite
 {
 public:
 
-    void TestConstructors() throw(Exception)
+    void TestConstructors()
     {
         ChastePoint<2> point(0.1, -5.0);
         FluidSource<2> source_by_point(1, point);
@@ -77,7 +77,7 @@ public:
         TS_ASSERT_DELTA(source_3d.rGetLocation()[2], 7.1, 1e-6);
     }
 
-    void TestIndexMethods() throw(Exception)
+    void TestIndexMethods()
     {
         FluidSource<2> source(0, 1.3, 6.7);
         TS_ASSERT_EQUALS(source.GetIndex(), 0u);
@@ -86,7 +86,7 @@ public:
         TS_ASSERT_EQUALS(source.GetIndex(), 132u);
     }
 
-    void TestStrengthMethods() throw(Exception)
+    void TestStrengthMethods()
     {
         FluidSource<2> source(1, 0.1, -5.0);
 
@@ -96,7 +96,7 @@ public:
         TS_ASSERT_DELTA(source.GetStrength(), 18.4, 1e-6);
     }
 
-    void TestLocationMethods() throw(Exception)
+    void TestLocationMethods()
     {
         FluidSource<3> source(0, 8.0, 9.7, 7.1);
 
@@ -117,7 +117,7 @@ public:
         TS_ASSERT_DELTA(new_location[2], 7.1, 1e-6);
     }
 
-    void TestElementMethods() throw(Exception)
+    void TestElementMethods()
     {
         FluidSource<2> source(0, 1.3, 6.7);
 

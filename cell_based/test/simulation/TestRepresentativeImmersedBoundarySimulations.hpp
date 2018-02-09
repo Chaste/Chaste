@@ -66,7 +66,7 @@ class TestShortImmersedBoundarySimulations : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestShortSingleCellSim() throw(Exception)
+    void TestShortSingleCellSim()
     {
         /*
          * 1: num nodes
@@ -123,7 +123,7 @@ public:
         simulator.Solve();
     }
 
-    void TestShortTwoCellSim() throw(Exception)
+    void TestShortTwoCellSim()
     {
         /*
          * 1: Num cells
@@ -175,7 +175,7 @@ public:
     }
 
 
-    void TestShortMultiCellSim() throw(Exception)
+    void TestShortMultiCellSim()
     {
         /*
          * 1: Num cells

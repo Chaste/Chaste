@@ -90,7 +90,7 @@ public:
      * variation in size, and a basement membrane is included. Each cell in the simulation is assigned a basic
      * cell-cycle model; no proliferation occurs.
      */
-    void TestImmersedBoundaryPalisadeSimulation() throw (Exception)
+    void TestImmersedBoundaryPalisadeSimulation()
     {
         /* The first thing we define is a 2D (specified by the <2,2>) mesh. This holds spatial information of the
          * simulation, including that of the underlying fluid grid as well as the location of cell boundary-points. To

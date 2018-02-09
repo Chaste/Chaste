@@ -70,7 +70,7 @@ class TestImmersedBoundaryForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestImmersedBoundaryLinearInteractionForceMethods() throw (Exception)
+    void TestImmersedBoundaryLinearInteractionForceMethods()
     {
         // Create a small 1x1 mesh
         ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
@@ -102,7 +102,7 @@ public:
         force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
     }
 
-    void TestArchivingOfImmersedBoundaryLinearInteractionForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryLinearInteractionForce()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -153,12 +153,12 @@ public:
         }
     }
 
-    void TestImmersedBoundaryMorseInteractionForceMethods() throw (Exception)
+    void TestImmersedBoundaryMorseInteractionForceMethods()
     {
         ///\todo Test this class
     }
 
-    void TestArchivingOfImmersedBoundaryMorseInteractionForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryMorseInteractionForce()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -211,12 +211,12 @@ public:
         }
     }
 
-    void TestImmersedBoundaryLinearMembraneForce() throw (Exception)
+    void TestImmersedBoundaryLinearMembraneForce()
     {
         ///\todo Test this class
     }
 
-    void TestArchivingOfImmersedBoundaryLinearMembraneForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryLinearMembraneForce()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -267,12 +267,12 @@ public:
         }
     }
 
-    void TestImmersedBoundaryMorseMembraneForce() throw (Exception)
+    void TestImmersedBoundaryMorseMembraneForce()
     {
         ///\todo Test this class
     }
 
-    void TestArchivingOfImmersedBoundaryMorseMembraneForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryMorseMembraneForce()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -326,7 +326,7 @@ public:
         }
     }
 
-    void TestImmersedBoundaryKinematicFeedbackForce() throw (Exception)
+    void TestImmersedBoundaryKinematicFeedbackForce()
     {
 //        // Test member variables
 //        {
@@ -491,7 +491,7 @@ public:
 
     }
 
-    void TestArchivingOfImmersedBoundaryKinematicFeedbackForce() throw (Exception)
+    void TestArchivingOfImmersedBoundaryKinematicFeedbackForce()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

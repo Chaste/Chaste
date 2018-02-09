@@ -49,17 +49,17 @@ class TestImmersedBoundaryFftInterface : public CxxTest::TestSuite
 {
 public:
 
-    void TestConstructor() throw(Exception)
+    void TestConstructor()
     {
         ///\todo Test this method
     }
 
-    void TestFftExecuteForward() throw(Exception)
+    void TestFftExecuteForward()
     {
         ///\todo Test this method
     }
 
-    void TestFftExecuteInverse() throw(Exception)
+    void TestFftExecuteInverse()
     {
         ///\todo Test this method
     }

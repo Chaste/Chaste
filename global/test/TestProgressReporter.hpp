@@ -104,7 +104,7 @@ public:
         FileComparison(results_dir + "progress_status.txt", "global/test/data/bad_progress_status.txt").CompareFiles();
     }
 
-    void TestGetTimeString() throw(Exception)
+    void TestGetTimeString()
     {
         // Invoke the default constructor
         ProgressReporter progress_reporter{};

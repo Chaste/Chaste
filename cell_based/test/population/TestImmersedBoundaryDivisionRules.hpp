@@ -91,7 +91,7 @@ public:
         TS_ASSERT_DELTA(short_axis[1], -1.0 / sqrt(2.0), 1e-9);
     }
 
-    void TestArchiveShortAxisImmersedBoundaryDivisionRule() throw(Exception)
+    void TestArchiveShortAxisImmersedBoundaryDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "ShortAxisImmersedBoundaryDivisionRule.arch";

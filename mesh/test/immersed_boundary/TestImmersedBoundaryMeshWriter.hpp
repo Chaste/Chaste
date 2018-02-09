@@ -52,7 +52,7 @@ class TestImmersedBoundaryMeshWriter : public CxxTest::TestSuite
 public:
 
     ///\todo Improve testing
-    void TestImmersedBoundaryMeshWriterIn2d() throw(Exception)
+    void TestImmersedBoundaryMeshWriterIn2d()
     {
         /*
          * In this test, we generate a mesh with multiple elements and lamina, and check that it is written correctly.

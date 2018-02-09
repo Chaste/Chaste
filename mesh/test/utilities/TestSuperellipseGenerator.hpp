@@ -48,7 +48,7 @@ class TestSuperellipseGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestCreateReferenceSuperellipse() throw(Exception)
+    void TestCreateReferenceSuperellipse()
     {
         // Generate an ellipse (superellipse with exponent 1.0) that should sit inside [0, 0.6]x[0, 0.8]
         unsigned num_points = 100;
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void TestGetTargetNodeSpacing() throw(Exception)
+    void TestGetTargetNodeSpacing()
     {
         /*
          * The target node spacing is the ellipse arclength divided by the number of points parameterising the ellipse.
@@ -140,7 +140,7 @@ public:
         TS_ASSERT_DELTA(gen_square.GetTargetNodeSpacing(), 4.0 / double(num_points), 1e-6);
     }
 
-    void TestGetHeightOfTopSurface() throw(Exception)
+    void TestGetHeightOfTopSurface()
     {
         //\todo implement this test
         {
@@ -152,7 +152,7 @@ public:
 
     }
 
-    void TestGetPointsAsChastePoints() throw(Exception)
+    void TestGetPointsAsChastePoints()
     {
         unsigned num_points = 123;
         double   exponent = 4.56;

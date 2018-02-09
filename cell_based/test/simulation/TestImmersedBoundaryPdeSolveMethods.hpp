@@ -67,7 +67,7 @@ class TestImmersedBoundaryPdeSolveMethods : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestForcePropagation() throw(Exception)
+    void TestForcePropagation()
     {
 //        // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
 //        std::vector<Node<2>*> nodes;
@@ -191,7 +191,7 @@ public:
 //        TS_ASSERT_DELTA(force_grid_y[2][4], 2.0 * small_delta * small_delta, 1e-10);
     }
 
-    void xTestUpwindSchemeImplementation() throw(Exception)
+    void xTestUpwindSchemeImplementation()
     {
 //        MAKE_PTR(ImmersedBoundarySimulationModifier < 2 > , p_mod);
 //
@@ -283,7 +283,7 @@ public:
 //        }
     }
 
-    void xTestFourierTransformMethods() throw(Exception)
+    void xTestFourierTransformMethods()
     {
 //        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_mod);
 //
@@ -414,7 +414,7 @@ public:
 //        }
     }
 
-    void TestBoostMultiarray() throw(Exception)
+    void TestBoostMultiarray()
     {
 //        std::string filename = "./projects/ImmersedBoundary/src/fftw.wisdom";
 //        int wisdom_flag = fftw_import_wisdom_from_filename(filename.c_str());
@@ -476,7 +476,7 @@ public:
 //        PRINT_2_VARIABLES(it_time, loop_time);
     }
 
-    void xTestFluidSolve() throw(Exception)
+    void xTestFluidSolve()
     {
 //        // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
 //        double irrational = 0.01 * sqrt(2); // ensure our point of interest isn't on a gird point
