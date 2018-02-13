@@ -292,6 +292,9 @@ public:
      */
     static void StopFaking();
 
+    /** Provide a sort operator to get a logical ordering from FindMatches */
+    bool operator<(const FileFinder& otherFinder) const;
+
 private:
     /** The absolute path to our file. */
     std::string mAbsPath;
@@ -313,7 +316,7 @@ private:
      *
      * @param dangerous  whether we are doing a dangerous remove.
      */
-    void PrivateRemove(bool dangerous=false) const;
+    void PrivateRemove(bool dangerous = false) const;
 };
 
 #endif /*FILEFINDER_HPP_*/
