@@ -98,6 +98,7 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->ClearForcesAndSources();
+    this->RecalculateAverageNodeSpacings();
     this->AddImmersedBoundaryForceContributions();
     this->PropagateForcesToFluidGrid();
 
@@ -258,6 +259,20 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
                 r_rhs_grid[2][x][y] = 0.0;
             }
         }
+    }
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::RecalculateAverageNodeSpacings()
+{
+    for (auto elem_it = mpMesh->GetElementIteratorBegin(false); elem_it != mpMesh->GetElementIteratorEnd(); ++elem_it)
+    {
+        mpMesh->GetAverageNodeSpacingOfElement(elem_it->GetIndex(), true);
+    }
+
+    for (auto lam_it = mpMesh->GetLaminaIteratorBegin(false); lam_it != mpMesh->GetLaminaIteratorEnd(); ++lam_it)
+    {
+        mpMesh->GetAverageNodeSpacingOfLamina(lam_it->GetIndex(), true);
     }
 }
 

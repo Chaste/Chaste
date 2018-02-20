@@ -186,6 +186,13 @@ private:
     void ClearForcesAndSources();
 
     /**
+     * Helper method for UpdateFluidVelocityGrids()
+     * Recalculate the average node spacings for elements and laminas.  This is performed at each timestep so as to
+     * cache the values for safe reuse without re-calculation by force classes and other methods.
+     */
+    void RecalculateAverageNodeSpacings();
+
+    /**
      * Loops over each immersed boundary force and invokes AddImmersedBoundaryForceContribution()
      */
     void AddImmersedBoundaryForceContributions();
