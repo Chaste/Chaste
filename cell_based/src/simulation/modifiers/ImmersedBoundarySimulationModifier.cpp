@@ -55,6 +55,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mNoiseStrength(0.0),
       mNoiseSkip(1u),
       mNoiseLengthScale(0.1),
+      mZeroFieldSums(false),
       mpBoxCollection(nullptr),
       mReynoldsNumber(1e-4),
       mI(0.0, 1.0),
@@ -397,6 +398,41 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
             }
         }
     }
+
+    // Finally, zero out any systematic small errors on the force grids that may lead to a drift, if required
+    if (mZeroFieldSums)
+    {
+        for (unsigned dim = 0; dim < 2; dim++)
+        {
+            double total_force = 0.0;
+            long count = 0;
+
+            for (unsigned x = 0; x < mNumGridPtsX; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                {
+                    if (force_grids[dim][x][y] != 0.0)
+                    {
+                        total_force += force_grids[dim][x][y];
+                        count++;
+                    }
+                }
+            }
+
+            const double average_force = (total_force / count);
+
+            for (unsigned x = 0; x < mNumGridPtsX; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                {
+                    if (force_grids[dim][x][y] != 0.0)
+                    {
+                        force_grids[dim][x][y] -= average_force;
+                    }
+                }
+            }
+        }
+    }
 }
 
 template<unsigned DIM>
@@ -594,6 +630,41 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
                 vel_grids[dim][x][y] /= mFftNorm;
+            }
+        }
+    }
+
+    // Finally, zero out any systematic small errors on the velocity grids that may lead to a drift, if required
+    if (mZeroFieldSums)
+    {
+        for (unsigned dim = 0; dim < 2; dim++)
+        {
+            double total_vel = 0.0;
+            long count = 0;
+
+            for (unsigned x = 0; x < mNumGridPtsX; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                {
+                    if (vel_grids[dim][x][y] != 0.0)
+                    {
+                        total_vel += vel_grids[dim][x][y];
+                        count++;
+                    }
+                }
+            }
+
+            const double average_vel = (total_vel / count);
+
+            for (unsigned x = 0; x < mNumGridPtsX; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                {
+                    if (vel_grids[dim][x][y] != 0.0)
+                    {
+                        vel_grids[dim][x][y] -= average_vel;
+                    }
+                }
             }
         }
     }
@@ -801,6 +872,18 @@ template <unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetNoiseLengthScale(double noiseLengthScale)
 {
     mNoiseLengthScale = noiseLengthScale;
+}
+
+template<unsigned int DIM>
+bool ImmersedBoundarySimulationModifier<DIM>::GetZeroFieldSums() const
+{
+    return mZeroFieldSums;
+}
+
+template<unsigned int DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetZeroFieldSums(bool zeroFieldSums)
+{
+    mZeroFieldSums = zeroFieldSums;
 }
 
 // Explicit instantiation

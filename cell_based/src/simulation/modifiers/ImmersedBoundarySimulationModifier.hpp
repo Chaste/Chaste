@@ -131,6 +131,9 @@ private:
     /** The length scale on which the Gaussian noise is correlated */
     double mNoiseLengthScale;
 
+    /** Whether to zero out the force and velocity fields to remove systematic drift */
+    bool mZeroFieldSums;
+
     /** An owning pointer to a box collection for efficiently keeping track of node neighbours */
     std::unique_ptr<ObsoleteBoxCollection<DIM>> mpBoxCollection;
 
@@ -309,16 +312,16 @@ public:
      */
     void AddNormalNoise() const noexcept;
 
-    /**
-     * Set #mReynoldsNumber.
-     *
-     * @param reynoldsNumber the new Reynolds number
-     */
+    /** @return mZeroFieldSums */
+    bool GetZeroFieldSums() const;
+
+    /** @param zeroFieldSums the new value of mZeroFieldSums */
+    void SetZeroFieldSums(bool zeroFieldSums);
+
+    /** @param reynoldsNumber the new Reynolds number */
     void SetReynoldsNumber(double reynoldsNumber);
 
-    /**
-     * @return #mReynoldsNumber
-     */
+    /** @return mReynoldsNumber */
     double GetReynoldsNumber();
 
     /** @return mAdditiveNormalNoise */
