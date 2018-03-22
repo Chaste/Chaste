@@ -153,14 +153,22 @@ public:
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
             }
         }
-        {
-            //Check that the post-processed file is there
-            TS_ASSERT(FileFinder("SaveMono2D/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput).Exists());
-        }
 
+        //Check that the post-processed file is there and remove it
+        FileFinder pseudoecg("SaveMono2D/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(pseudoecg.Exists());
+        if (PetscTools::AmMaster())
+        {
+            pseudoecg.Remove();
+            TS_ASSERT(pseudoecg.Exists() == false);
+        }
 
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume.xml");
+
+        //Check that the post-processed file is back after the simulation has been restarted
+        TS_ASSERT(pseudoecg.Exists());  // (Should check that it's bigger than the one we deleted)
+
         Warnings::QuietDestroy();
     }
 
