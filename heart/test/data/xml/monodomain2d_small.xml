@@ -55,5 +55,7 @@
 	<Numerical>
 		<TimeSteps ode="0.1" pde="0.1" printing="0.1" unit="ms"/>
 	</Numerical>		
-		    
+	<PostProcessing>
+	        <PseudoEcgElectrodePosition x="0.05" y="0.05" z="0" />
+	</PostProcessing>
 </ChasteParameters>

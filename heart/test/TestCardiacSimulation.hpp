@@ -153,6 +153,12 @@ public:
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
             }
         }
+        {
+            //Check that the post-processed file is there
+            TS_ASSERT(FileFinder("SaveMono2D/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput).Exists());
+        }
+
+
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume.xml");
         Warnings::QuietDestroy();
