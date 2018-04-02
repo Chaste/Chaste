@@ -174,6 +174,22 @@ double SafeDivide(double numerator, double divisor)
     return numerator/divisor;
 }
 
+unsigned AdvanceMod(const unsigned current_location, const int increment, const std::size_t range) noexcept
+{
+    int new_pos = current_location + increment;
+
+    while (new_pos < 0)
+    {
+        new_pos += range;
+    }
+    while (new_pos >= static_cast<int>(range))
+    {
+        new_pos -= range;
+    }
+
+    return static_cast<unsigned>(new_pos);
+}
+
 bool CompareDoubles::WithinRelativeTolerance(double number1, double number2, double tolerance)
 {
     double difference = fabs(number1 - number2);

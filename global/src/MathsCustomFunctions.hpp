@@ -98,6 +98,20 @@ double Signum(double value);
 double SafeDivide(double numerator, double divisor);
 
 /**
+ * Advance index by increment and return the result modulo range taking into account negative decrements. It is assumed
+ * that index + range does not overflow the int type, and that 0 < range < INT_MAX.
+ *
+ * Note that this function is designed to avoid integer division and is very efficient when (index + increment) is
+ * in [-range, 2*range).
+ *
+ * @param index the current index to increment
+ * @param increment the amount to increment the index by
+ * @param range the top of the range; [0, range)
+ * @return (current_location + increment) % range, accounting for negative values
+ */
+unsigned AdvanceMod(unsigned index, int increment, std::size_t range) noexcept;
+
+/**
  * Utility static methods for comparing floating point numbers, based on
  * boost/test/floating_point_comparison.hpp.
  */

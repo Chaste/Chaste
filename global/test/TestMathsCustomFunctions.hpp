@@ -99,6 +99,14 @@ public:
         TS_ASSERT_EQUALS(Signum(DBL_EPSILON), 1.0);
     }
 
+    void TestAdvanceMod()
+    {
+        TS_ASSERT_EQUALS(AdvanceMod(0u, 1, 2u), 1u);
+        TS_ASSERT_EQUALS(AdvanceMod(0u, -1, 2u), 1u);
+        TS_ASSERT_EQUALS(AdvanceMod(3u, 157, 23u), (3 + 157) % 23);
+        TS_ASSERT_EQUALS(AdvanceMod(3u, -1572, 27u), (3 + 100 * 27 - 1572) % 27);
+    }
+
     void TestCompareDoubles()
     {
         TS_ASSERT(CompareDoubles::IsNearZero(DBL_EPSILON, 2*DBL_EPSILON));
