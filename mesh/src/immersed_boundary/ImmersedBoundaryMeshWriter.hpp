@@ -83,20 +83,8 @@ private:
     /** The number of laminas in the mesh */
     unsigned mNumLaminas;
 
-    /** Vector storing whether elements overlap horizontally. */
-    std::vector<bool> mHOverlaps;
-
-    /** Vector storing whether elements overlap vertically. */
-    std::vector<bool> mVOverlaps;
-
-    /** Vectors storing the position of horizontal overlaps, if any */
-    std::vector<std::vector<unsigned> > mHOverlapPoints;
-
-    /** Vectors storing the position of vertical overlaps, if any */
-    std::vector<std::vector<unsigned> > mVOverlapPoints;
-
-    /** Vector containing number of cell parts */
-    std::vector<unsigned> mNumCellParts;
+    /** Vector containing, for each element, the node indices at which it must be split for visualisation */
+    std::vector<std::vector<unsigned>> mElementParts;
 
 #ifdef CHASTE_VTK
 //Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -115,7 +103,7 @@ public:
      */
     ImmersedBoundaryMeshWriter(const std::string& rDirectory,
                                const std::string& rBaseName,
-                               const bool clearOutputDir=true);
+                               bool clearOutputDir=true);
 
     /**
      * Destructor.
@@ -184,15 +172,14 @@ public:
     void WriteFiles();
 
     /**
-     * Analyses the mesh to determine which cells overlap due to the periodic boundaries, which is information
-     * needed when outputting the mesh.
+     * Analyses the mesh to determine where (if at all) each element overlaps due to the periodic boundaries.
+     *
+     * @param rMesh the immersed boundary mesh
      */
-    void CalculateCellOverlaps(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+    void FindElementOverlaps(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
-    /**
-     * Return a reference to the vector detailing how many cell parts are needed for each element
-     */
-    const std::vector<unsigned>& rGetNumCellParts() const;
+    /** @return reference to mElementParts */
+    const std::vector<std::vector<unsigned>>& rGetElementParts() const;
 };
 
 #endif /*IMMERSEDBOUNDARYMESHWRITER_HPP_*/

@@ -557,25 +557,24 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     // Create mesh writer for VTK output
     ImmersedBoundaryMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
-    // Calculated the cell overlap information, and get the number of cell parts needed for each element
-    mesh_writer.CalculateCellOverlaps(*mpImmersedBoundaryMesh);
-    std::vector<unsigned> num_cell_parts = mesh_writer.rGetNumCellParts();
+    // Find the cell overlap information, and get the number of cell parts needed for each element
+    mesh_writer.FindElementOverlaps(*mpImmersedBoundaryMesh);
+    const std::vector<std::vector<unsigned>>& r_elem_parts = mesh_writer.rGetElementParts();
 
     // Iterate over any cell writers that are present
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
+    for (auto cell_writer_iter = this->mCellWriters.begin(); cell_writer_iter != this->mCellWriters.end(); ++cell_writer_iter)
     {
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data;
 
         // Iterate over immersed boundary elements
-        for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
+        for (auto elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
              elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
              ++elem_iter)
         {
-            // Get index of this element in the mesh
-            unsigned elem_index = elem_iter->GetIndex();
+            // Get index of this element in the mesh, and the number of parts it is broken into for visualisation
+            const unsigned elem_index = elem_iter->GetIndex();
+            const auto num_elem_parts = r_elem_parts[elem_index].empty() ? 1 : r_elem_parts[elem_index].size();
 
             // Get the cell corresponding to this element
             CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
@@ -583,14 +582,14 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
 
             // Populate the vector of VTK cell data.  We loop over the number of output cells as this takes into
             // account that some elements will be broken into pieces for visualisation
-            for (unsigned cell_part = 0; cell_part < num_cell_parts[elem_index]; cell_part++)
+            for (unsigned elem_part = 0; elem_part < num_elem_parts; elem_part++)
             {
                 vtk_cell_data.push_back((*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this));
             }
         }
 
         // Iterate over immersed boundary laminas (no associated cell) to ensure vtk_cell_data is the correct size
-        for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryLaminaIterator lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
+        for (auto lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
              lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
              ++lam_iter)
         {
@@ -601,10 +600,10 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     }
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    const unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    std::vector<std::vector<double> > cell_data;
+    std::vector<std::vector<double>> cell_data;
     for (unsigned var = 0; var < num_cell_data_items; var++)
     {
         std::vector<double> cell_data_var;
@@ -612,12 +611,13 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     }
 
     // Iterate over immersed boundary elements
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
+    for (auto elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
          elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
-        // Get index of this element in the mesh
-        unsigned elem_index = elem_iter->GetIndex();
+        // Get index of this element in the mesh, and the number of parts it is broken into for visualisation
+        const unsigned elem_index = elem_iter->GetIndex();
+        const auto num_elem_parts = r_elem_parts[elem_index].empty() ? 1 : r_elem_parts[elem_index].size();
 
         // Get the cell corresponding to this element
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
@@ -627,7 +627,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
         {
             // Populate the vector of VTK cell data.  We loop over the number of output cells as this takes into
             // account that some elements will be broken into pieces for visualisation
-            for (unsigned cell_part = 0; cell_part < num_cell_parts[elem_index]; cell_part++)
+            for (unsigned elem_part = 0; elem_part < num_elem_parts; elem_part++)
             {
                 cell_data[var].push_back(p_cell->GetCellData()->GetItem(cell_data_names[var]));
             }
@@ -635,7 +635,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     }
 
     // Iterate over immersed boundary laminas (no associated cell) to ensure cell_data is the correct size
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryLaminaIterator lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
+    for (auto lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
          lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
          ++lam_iter)
     {

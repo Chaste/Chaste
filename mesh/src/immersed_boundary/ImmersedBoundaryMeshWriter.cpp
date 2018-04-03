@@ -34,9 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "ImmersedBoundaryMeshWriter.hpp"
+
+#include "MathsCustomFunctions.hpp"
 #include "Version.hpp"
-#include "Cylindrical2dVertexMesh.hpp"
-#include "Toroidal2dVertexMesh.hpp"
+
 #include <boost/multi_array.hpp>
 
 /**
@@ -208,7 +209,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
      * We overcome this by first identifying which cells overlap, and breaking them in to pieces as necessary, so that
      * each cell when displayed stays contiguous.
      *
-     * Cell overlaps should have already been calculated - this is done by a call to CalculateCellOverlaps() from
+     * Cell overlaps should have already been calculated - this is done by a call to FindElementOverlaps() from
      * ImmersedBoundaryCellPopulation::WriteVtkResultsToFile().
      *
      * Because no node can be present in more than one cell, it is safe to add points to mpVtkUnstructuredMesh as we go
@@ -223,107 +224,65 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
     p_pts->GetData()->SetName("Vertex positions");
 
     // Next, we decide how to output the VTK data for elements depending on the type of overlap
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator iter = rMesh.GetElementIteratorBegin();
-            iter != rMesh.GetElementIteratorEnd();
-            ++iter)
+    for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
     {
         unsigned elem_idx = iter->GetIndex();
         unsigned num_nodes = iter->GetNumNodes();
 
-        // Case 1:  no overlap at all
-        if ( !mHOverlaps[elem_idx] && !mVOverlaps[elem_idx] )
+        // Case 1: no overlap
+        if (mElementParts[elem_idx].empty())
         {
-            // Double check no points of overlap were found
-            assert( (mHOverlapPoints[elem_idx].size() == 0) && (mVOverlapPoints[elem_idx].size() == 0) );
-
             vtkCell* p_cell = vtkPolygon::New();
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-            p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
+            p_cell_id_list->SetNumberOfIds(num_nodes);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_local_idx = 0; node_local_idx < num_nodes; ++node_local_idx)
             {
                 // Get node, index and location
-                Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
-                unsigned global_idx = p_node->GetIndex();
-                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
+                unsigned global_idx = iter->GetNode(node_local_idx)->GetIndex();
+                const auto& r_location = iter->GetNode(node_local_idx)->rGetLocation();
 
-                p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
-
-                p_cell_id_list->SetId(node_idx, global_idx);
+                p_pts->InsertPoint(global_idx, r_location[0], r_location[1], 0.0);
+                p_cell_id_list->SetId(node_local_idx, global_idx);
             }
 
             mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
             p_cell->Delete(); // Reference counted
         }
-
-        // Case 2:  only horizontal OR vertical overlap (exclusive)
-        else if ( ( mHOverlaps[elem_idx] && !mVOverlaps[elem_idx] ) ||
-                  ( mVOverlaps[elem_idx] && !mHOverlaps[elem_idx] ) )
+        else  // Case 2: at least one overlap
         {
-            // There should be exactly two points of overlap found - if not, there is likely to be some weird geometry
-            // which has not been considered
-            assert( ( (mHOverlapPoints[elem_idx].size() == 2) && (mVOverlapPoints[elem_idx].size() == 0) ) ||
-                    ( (mVOverlapPoints[elem_idx].size() == 2) && (mHOverlapPoints[elem_idx].size() == 0) ) );
+            // Get the node index at the start of each part
+            const std::vector<unsigned>& start_idx_each_part = mElementParts[iter->GetIndex()];
 
-            // Decide whether we need the horizontal or vertical overlap points
-            std::vector<unsigned> overlap = (mHOverlapPoints[elem_idx].size() == 2) ? mHOverlapPoints[elem_idx] : mVOverlapPoints[elem_idx];
+            // Get the number of parts, and put the first index onto the back of the vector for convenience
+            const auto num_parts = start_idx_each_part.size();
 
-            // We will need to create two 'cells' for output.  First find number of nodes in each of these half-cells
-            //std::sort(overlap.begin(), overlap.end());
-            unsigned num_nodes_a = overlap[1] - overlap[0];
-            unsigned num_nodes_b = num_nodes - num_nodes_a;
-
-            vtkCell* p_cell_a = vtkPolygon::New();
-            vtkIdList* p_cell_id_list_a = p_cell_a->GetPointIds();
-            p_cell_id_list_a->SetNumberOfIds(num_nodes_a);
-
-            for (unsigned node_idx = 0; node_idx < num_nodes_a; node_idx++)
+            for (unsigned part = 0; part < num_parts; ++part)
             {
-                // Get node, index and location
-                Node<SPACE_DIM>* p_node = iter->GetNode(node_idx + overlap[0]);
-                unsigned global_idx = p_node->GetIndex();
-                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
+                const long this_start = start_idx_each_part[part];
+                const long next_start = start_idx_each_part[AdvanceMod(part, 1, num_parts)];
 
-                p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
+                const long num_nodes_this_part = next_start > this_start ? next_start - this_start : num_nodes + next_start - this_start;
 
-                p_cell_id_list_a->SetId(node_idx, global_idx);
+                vtkCell* p_cell = vtkPolygon::New();
+                vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+                p_cell_id_list->SetNumberOfIds(num_nodes_this_part);
+
+                for (long idx = 0; idx < num_nodes_this_part; ++idx)
+                {
+                    unsigned node_idx = AdvanceMod(idx, this_start, num_nodes);
+
+                    // Get index and location
+                    unsigned global_idx = iter->GetNode(node_idx)->GetIndex();
+                    const auto& r_location = iter->GetNode(node_idx)->rGetLocation();
+
+                    p_pts->InsertPoint(global_idx, r_location[0], r_location[1], 0.0);
+                    p_cell_id_list->SetId(idx, global_idx);
+                }
+
+                mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+                p_cell->Delete(); // Reference counted
             }
-
-            mpVtkUnstructedMesh->InsertNextCell(p_cell_a->GetCellType(), p_cell_id_list_a);
-            p_cell_a->Delete(); // Reference counted
-
-
-            vtkCell* p_cell_b = vtkPolygon::New();
-            vtkIdList* p_cell_id_list_b = p_cell_b->GetPointIds();
-            p_cell_id_list_b->SetNumberOfIds(num_nodes_b);
-
-            for (unsigned node_idx = 0; node_idx < num_nodes_b; node_idx++)
-            {
-                // Get node, index and location
-                Node<SPACE_DIM>* p_node = iter->GetNode((node_idx + overlap[1]) % num_nodes);
-                unsigned global_idx = p_node->GetIndex();
-                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
-
-                p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
-
-                p_cell_id_list_b->SetId(node_idx, global_idx);
-            }
-
-            mpVtkUnstructedMesh->InsertNextCell(p_cell_b->GetCellType(), p_cell_id_list_b);
-            p_cell_b->Delete(); // Reference counted
-        }
-
-
-        // Case 3:  multiple overlaps
-        else //( (h_overlaps[elem_idx] == true) && (v_overlaps[elem_idx] == true)
-        {
-            //\todo: implement this
-
-            // There should be exactly two points of overlap found - if not, there is likely to be some weird geometry
-            // which has not been considered
-            assert( (mHOverlapPoints[elem_idx].size() == 2) && (mVOverlapPoints[elem_idx].size() == 2) );
-
-            NEVER_REACHED;
         }
     }
 
@@ -574,79 +533,39 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::CalculateCellOverlaps(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
+void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::FindElementOverlaps(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
     assert(SPACE_DIM == 2);
 
-    // Initialise all vectors to the correct length
-    unsigned num_elem = rMesh.GetNumAllElements();
-    mHOverlaps.resize(num_elem);
-    mVOverlaps.resize(num_elem);
-    mHOverlapPoints.resize(num_elem);
-    mVOverlapPoints.resize(num_elem);
-    mNumCellParts.resize(num_elem);
-
-    // Helper variables
-    c_vector<double, SPACE_DIM> prev_location;
-    c_vector<double, SPACE_DIM> curr_location;
-
-    // We loop first over each element to work out which overlap due to periodic boundaries
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator iter = rMesh.GetElementIteratorBegin();
-         iter != rMesh.GetElementIteratorEnd();
-         ++iter)
+    // Resize and initialise the vector of overlaps (bools; whether each element has an overlap)
+    mElementParts.resize(rMesh.GetNumAllElements());
+    for (auto& parts : mElementParts)
     {
-        unsigned elem_idx = iter->GetIndex();
-
-        unsigned num_nodes = iter->GetNumNodes();
-        assert(num_nodes > 1);
-        prev_location = iter->GetNode(num_nodes - 1)->rGetLocation();
-
-        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-        {
-            // Get node, index and location
-            Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
-            c_vector<double, SPACE_DIM> curr_location = p_node->rGetLocation();
-
-            if ( fabs (curr_location[0] - prev_location[0]) > 0.5)
-            {
-                mHOverlaps[elem_idx] = true;
-                mHOverlapPoints[elem_idx].push_back(node_idx);
-            }
-
-            if ( fabs (curr_location[1] - prev_location[1]) > 0.5)
-            {
-                mVOverlaps[elem_idx] = true;
-                mVOverlapPoints[elem_idx].push_back(node_idx);
-            }
-            prev_location = curr_location;
-        }
+        parts.clear();
     }
 
-    // We then loop over each element again to determine how many 'cells' we need to split each output element in to
-    for (unsigned elem_idx = 0; elem_idx < num_elem; elem_idx++)
+    // We loop over each element and the node index at each discontinuity due to periodic boundaries
+    for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
     {
-        // If no overlap, we only need one cell
-        if (!mHOverlaps[elem_idx] && !mVOverlaps[elem_idx])
+        for (unsigned node_idx = 0; node_idx < iter->GetNumNodes(); ++node_idx)
         {
-            mNumCellParts[elem_idx] = 1;
-        }
-        // If only one overlap is false, then we need two cells
-        else if ( mHOverlaps[elem_idx] * mVOverlaps[elem_idx] == 0)
-        {
-            mNumCellParts[elem_idx] = 2;
-        }
-        // The remaining case is there is horizontal and vertical overlap.  We may need either 3 or 4 cells
-        else
-        {
-            mNumCellParts[elem_idx] = 3;
+            const unsigned prev_idx = AdvanceMod(node_idx, -1, iter->GetNumNodes());
+
+            const auto& this_location = iter->GetNode(node_idx)->rGetLocation();
+            const auto& prev_location = iter->GetNode(prev_idx)->rGetLocation();
+
+            if (norm_inf(this_location - prev_location) > 0.5)
+            {
+                mElementParts[iter->GetIndex()].emplace_back(node_idx);
+            }
         }
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<unsigned>& ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::rGetNumCellParts() const
+const std::vector<std::vector<unsigned>>& ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::rGetElementParts() const
 {
-    return mNumCellParts;
+    return mElementParts;
 }
 
 // Explicit instantiation
