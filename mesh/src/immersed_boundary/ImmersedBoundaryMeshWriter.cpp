@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMeshWriter.hpp"
 
 #include "MathsCustomFunctions.hpp"
+#include "UblasCustomFunctions.hpp"
 #include "Version.hpp"
 
 #include <boost/multi_array.hpp>
@@ -63,12 +64,33 @@ ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMeshWriter(c
                                                                                const std::string& rBaseName,
                                                                                const bool clearOutputDir)
         : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-          mpMesh(NULL),
+          mpMesh(nullptr),
           mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>)
 {
-    mpIters->pNodeIter = NULL;
-    mpIters->pElemIter = NULL;
-    mpIters->pLamIter = NULL;
+    mpIters->pNodeIter = nullptr;
+    mpIters->pElemIter = nullptr;
+    mpIters->pLamIter = nullptr;
+
+    switch (SPACE_DIM)
+    {
+        case 2:
+        {
+            geom_point corner_0(0.0, 0.0);
+            geom_point corner_1(1.0, 0.0);
+            geom_point corner_2(0.0, 1.0);
+            geom_point corner_3(1.0, 1.0);
+
+            mBoundaryEdges[0] = geom_segment(corner_0, corner_2);  // left edge
+            mBoundaryEdges[1] = geom_segment(corner_1, corner_3);  // right edge
+            mBoundaryEdges[2] = geom_segment(corner_0, corner_1);  // bottom edge
+            mBoundaryEdges[3] = geom_segment(corner_2, corner_3);  // top edge
+
+            break;
+        }
+
+        default:
+            NEVER_REACHED;
+    }
 
 #ifdef CHASTE_VTK
     // Dubious, since we shouldn't yet know what any details of the mesh are.
@@ -223,6 +245,9 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
 
+    // Keep a track of the number of extra points that have been added to the purpose of visualisation
+    unsigned num_pts_added = 0;
+
     // Next, we decide how to output the VTK data for elements depending on the type of overlap
     for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
     {
@@ -264,9 +289,37 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 
                 const long num_nodes_this_part = next_start > this_start ? next_start - this_start : num_nodes + next_start - this_start;
 
+                // Identify the extra points that need to be added
+                std::vector<c_vector<double, SPACE_DIM>> extra_locations;
+
+                // Start of the part
+                {
+                    const auto& r_start_pos = iter->GetNode(this_start)->rGetLocation();
+                    const auto& r_end_pos = iter->GetNode(AdvanceMod(this_start, -1, num_nodes))->rGetLocation();
+
+                    const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
+                    extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
+                }
+
+                // End of the part
+                {
+                    const auto& r_start_pos = iter->GetNode(AdvanceMod(next_start, -1, num_nodes))->rGetLocation();
+                    const auto& r_end_pos = iter->GetNode(next_start)->rGetLocation();
+
+                    const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
+                    extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
+                }
+
+                // If the two additional points are not on the same edge of the boundary, we also need to add a corner
+                if (std::fabs(extra_locations.front()[0] - extra_locations.back()[0]) > DBL_EPSILON &&
+                    std::fabs(extra_locations.front()[1] - extra_locations.back()[1]) > DBL_EPSILON)
+                {
+                    extra_locations.emplace_back(GetNearestCorner(extra_locations.front(), extra_locations.back()));
+                }
+
                 vtkCell* p_cell = vtkPolygon::New();
                 vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-                p_cell_id_list->SetNumberOfIds(num_nodes_this_part);
+                p_cell_id_list->SetNumberOfIds(num_nodes_this_part + extra_locations.size());
 
                 for (long idx = 0; idx < num_nodes_this_part; ++idx)
                 {
@@ -278,6 +331,38 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 
                     p_pts->InsertPoint(global_idx, r_location[0], r_location[1], 0.0);
                     p_cell_id_list->SetId(idx, global_idx);
+                }
+
+                // Now add the extra locations
+                if (extra_locations.size() == 2)
+                {
+                    const unsigned global_index = rMesh.GetNumNodes() + num_pts_added;
+
+                    p_pts->InsertPoint(global_index, extra_locations[1][0], extra_locations[1][1], 0.0);      // end
+                    p_pts->InsertPoint(global_index + 1, extra_locations[0][0], extra_locations[0][1], 0.0);  // start
+
+                    p_cell_id_list->SetId(num_nodes_this_part, global_index);
+                    p_cell_id_list->SetId(num_nodes_this_part + 1, global_index + 1);
+
+                    num_pts_added += 2;
+                }
+                else if (extra_locations.size() == 3)
+                {
+                    const unsigned global_index = rMesh.GetNumNodes() + num_pts_added;
+
+                    p_pts->InsertPoint(global_index, extra_locations[1][0], extra_locations[1][1], 0.0);      // end
+                    p_pts->InsertPoint(global_index + 1, extra_locations[2][0], extra_locations[2][1], 0.0);  // corner
+                    p_pts->InsertPoint(global_index + 2, extra_locations[0][0], extra_locations[0][1], 0.0);  // start
+
+                    p_cell_id_list->SetId(num_nodes_this_part, global_index);
+                    p_cell_id_list->SetId(num_nodes_this_part + 1, global_index + 1);
+                    p_cell_id_list->SetId(num_nodes_this_part + 2, global_index + 2);
+
+                    num_pts_added += 3;
+                }
+                else
+                {
+                    NEVER_REACHED;
                 }
 
                 mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
@@ -342,9 +427,9 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::strin
 #ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (double scalar : dataPayload)
     {
-        p_scalars->InsertNextValue(dataPayload[i]);
+        p_scalars->InsertNextValue(scalar);
     }
 
     vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
@@ -357,7 +442,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::strin
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
 {
-    this->mpMeshReader = NULL;
+    this->mpMeshReader = nullptr;
     mpMesh = &rMesh;
 
     this->mNumNodes = mpMesh->GetNumNodes();
@@ -435,9 +520,9 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             *p_element_file << item_num <<  "\t" << node_indices.size();
 
             // Write the node indices owned by this element to file
-            for (unsigned i=0; i<node_indices.size(); i++)
+            for (unsigned node_index : node_indices)
             {
-                *p_element_file << "\t" << node_indices[i];
+                *p_element_file << "\t" << node_index;
             }
 
             *p_element_file << "\t" << elem_data.AttributeValue;
@@ -560,6 +645,49 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::FindElementOverlaps(Imm
             }
         }
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetIntersectionOfEdgeWithBoundary(
+        const c_vector<double, SPACE_DIM>& rStart,
+        const c_vector<double, SPACE_DIM>& rEnd)
+{
+    // Note that this function relies on SPACE_DIM == 2
+
+    // Turn the c_vector start and end into a boost::geometry segment object
+    geom_point start(rStart[0], rStart[1]);
+    geom_point end(rEnd[0], rEnd[1]);
+    geom_segment edge(start, end);
+
+    // Identify which boundary edge the intersection is with
+    std::vector<geom_point> intersections;
+    for (const auto boundary_edge : mBoundaryEdges)
+    {
+        if (boost::geometry::intersects(edge, boundary_edge))
+        {
+            boost::geometry::intersection(edge, boundary_edge, intersections);
+            break;
+        }
+    }
+
+    // There should be exactly one intersection
+    if (intersections.size() != 1)
+    {
+        NEVER_REACHED;
+    }
+
+    return Create_c_vector(intersections.front().get<0>(), intersections.front().get<1>());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNearestCorner(
+        const c_vector<double, SPACE_DIM>& rA, const c_vector<double, SPACE_DIM>& rB) const noexcept
+{
+    // Identify the nearest corner to the average location of the two vectors
+    const double x = 0.5 * (rA[0] + rB[0]) < 0.5 ? 0.0 : 1.0;
+    const double y = 0.5 * (rA[1] + rB[1]) < 0.5 ? 0.0 : 1.0;
+
+    return Create_c_vector(x, y);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

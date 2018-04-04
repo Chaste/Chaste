@@ -54,8 +54,13 @@ class ImmersedBoundaryMesh;
 #include <vtkDataCompressor.h>
 #endif //CHASTE_VTK
 
-#include "ImmersedBoundaryMesh.hpp"
 #include "AbstractMeshWriter.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/segment.hpp>
+#include <boost/geometry/geometries/point.hpp>
+
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -85,6 +90,35 @@ private:
 
     /** Vector containing, for each element, the node indices at which it must be split for visualisation */
     std::vector<std::vector<unsigned>> mElementParts;
+
+    // Node that this assumes SPACE_DIM == 2
+    using geom_point = boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>;
+    using geom_segment = boost::geometry::model::segment<geom_point>;
+
+    /** Array of geom_segments; a helper array, filled by the constructor, for GetIntersectionOfEdgeWithBoundary */
+    std::array<geom_segment, 4> mBoundaryEdges;
+
+    /**
+     * When elements cross the periodic boundary they are broken up into pieces for visualisation. Some additional
+     * points are needed where the element edge crosses the boundary to produce good output polygons.
+     *
+     * This function returns the location on the boundary where an edge (given by rStart and rEnd) crosses d[0,1]x[0,1].
+     *
+     * @param rStart the start point of the edge that crosses the boundary
+     * @param rEnd the end point of the edge that crosses the boundary
+     * @return the point at which the edge rStart->rEnd crosses d[0,1]x[0,1]
+     */
+    c_vector<double, SPACE_DIM> GetIntersectionOfEdgeWithBoundary(const c_vector<double, SPACE_DIM>& rStart,
+                                                                  const c_vector<double, SPACE_DIM>& rEnd);
+
+    /**
+     * Helper function to get the nearest corner to the average of two points on the boundary.
+     * @param rA one of the boundary points
+     * @param rB the other boundary point
+     * @return the coordinates of the nearest corner of [0,1]x[0,1]
+     */
+    c_vector<double, SPACE_DIM> GetNearestCorner(const c_vector<double, SPACE_DIM>& rA,
+                                                 const c_vector<double, SPACE_DIM>& rB) const noexcept;
 
 #ifdef CHASTE_VTK
 //Requires  "sudo aptitude install libvtk5-dev" or similar
