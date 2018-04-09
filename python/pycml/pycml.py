@@ -76,7 +76,7 @@ import types
 from cStringIO import StringIO
 
 from utilities import *
-from enum import Enum # Pythonic enums
+from _enum import Enum # Pythonic enums
 
 import cellml_metadata # Handle RDF metadata for CellML
 
