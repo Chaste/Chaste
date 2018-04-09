@@ -45,6 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellLabel.hpp"
 
+#include <boost/polygon/voronoi.hpp>
+#include <set>
+#include <utility>
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::HeterotypicBoundaryLengthWriter()
     : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("heterotypicboundary.dat")
@@ -430,59 +434,79 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedC
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    auto& r_mesh = pCellPopulation->rGetMesh();
+
     // Initialise helper variables
     double heterotypic_boundary_length = 0.0;
     double total_shared_edges_length = 0.0;
-    double num_heterotypic_pairs = 0.0;
-    double total_num_pairs = 0.0;
 
-    // Iterate over cells
-    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    // Keep track of which elements are interacting with which others
+    std::set<std::pair<unsigned, unsigned>> total_elem_pairs;
+    std::set<std::pair<unsigned, unsigned>> heterotypic_elem_pairs;
+
+    // Get the updated voronoi diagram for nodes
+    const bool update_diagram = true;
+    const boost::polygon::voronoi_diagram<double>& vd = r_mesh.rGetNodeLocationsVoronoiDiagram(update_diagram);
+
+    // Get the vector that allows us to map between node index and voronoi cell ID
+    const std::vector<unsigned>& node_idx_to_voronoi_cell_id_map = r_mesh.GetVoronoiCellIdsIndexedByNodeIndex();
+
+    for (const auto& p_node : r_mesh.rGetNodes())
     {
-//        // Store whether this cell is labelled
-//        bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
-//
-//        // Get the set of neighbouring element indices
-//        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
-//        std::set<unsigned> neighbour_elem_indices = pCellPopulation->rGetMesh().GetNeighbouringElementIndices(elem_index);
-//
-//        // Iterate over these neighbours
-//        for (std::set<unsigned>::iterator neighbour_iter = neighbour_elem_indices.begin();
-//             neighbour_iter != neighbour_elem_indices.end();
-//             ++neighbour_iter)
-//        {
-//            // Get the length of the edge shared with this neighbour
-//            unsigned neighbour_index = *neighbour_iter;
-//            double edge_length = pCellPopulation->rGetMesh().GetEdgeLength(elem_index, neighbour_index);
-//
-//            total_shared_edges_length += edge_length;
-//            total_num_pairs += 1.0;
-//
-//            // Store whether this neighbour is labelled
-//            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
-//            bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
-//
-//            // If this cell is labelled and its neighbour is not, or vice versa...
-//            if (cell_is_labelled != neighbour_is_labelled)
-//            {
-//                // ... then increment the fractional boundary length
-//                heterotypic_boundary_length += edge_length;
-//                num_heterotypic_pairs += 1.0;
-//            }
-//        }
+        const unsigned this_node_idx = p_node->GetIndex();
+        const unsigned this_elem_idx = *p_node->ContainingElementsBegin();
+
+        // Get the voronoi cell that corresponds to this node
+        const unsigned voronoi_cell_id = node_idx_to_voronoi_cell_id_map[this_node_idx];
+        const auto& voronoi_cell = vd.cells()[voronoi_cell_id];
+
+        // Iterate over the edges of this cell.  Note that due to the halo region none of these edges should be infinite.
+        auto p_edge = voronoi_cell.incident_edge();
+        do
+        {
+            // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
+            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+            const unsigned twin_elem_idx = *r_mesh.GetNode(twin_node_idx)->ContainingElementsBegin();
+
+            // Conditions to continue
+            const bool different_elems = this_elem_idx != twin_elem_idx;
+            const bool within_thrshold = r_mesh.GetDistanceBetweenNodes(this_node_idx, twin_node_idx) < r_mesh.GetNeighbourDist();
+            const bool both_boundary = r_mesh.GetElement(this_elem_idx)->IsElementOnBoundary() && r_mesh.GetElement(twin_elem_idx)->IsElementOnBoundary();
+
+            // Check if the nodes are in different elements and within the neighbour distance
+            if (different_elems && within_thrshold && !both_boundary)
+            {
+                // Add a pair to the set, which will record the total number of unique elem-elem interactions
+                const unsigned lo_idx = std::min(this_elem_idx, twin_elem_idx);
+                const unsigned hi_idx = std::max(this_elem_idx, twin_elem_idx);
+                total_elem_pairs.insert(std::make_pair(lo_idx, hi_idx));
+
+                const bool this_is_labelled = pCellPopulation->GetCellUsingLocationIndex(this_elem_idx)->template HasCellProperty<CellLabel>();
+                const bool twin_is_labelled = pCellPopulation->GetCellUsingLocationIndex(twin_elem_idx)->template HasCellProperty<CellLabel>();
+
+                const double edge_length = r_mesh.CalculateLengthOfVoronoiEdge(*p_edge);
+
+                total_shared_edges_length += edge_length;
+
+                if (this_is_labelled != twin_is_labelled)
+                {
+                    heterotypic_boundary_length += edge_length;
+                    heterotypic_elem_pairs.insert(std::make_pair(lo_idx, hi_idx));
+                }
+            }
+
+            p_edge = p_edge->next();
+        } while (p_edge != voronoi_cell.incident_edge());
     }
 
-    // We have counted each cell-cell edge twice
+    // Every edge has been counted twice
     heterotypic_boundary_length *= 0.5;
     total_shared_edges_length *= 0.5;
 
-    // We have counted each pair of neighbouring cells twice
-    num_heterotypic_pairs *= 0.5;
-    total_num_pairs *= 0.5;
-
-    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+    *this->mpOutStream << heterotypic_boundary_length << '\t'
+                       << total_shared_edges_length << '\t'
+                       << heterotypic_elem_pairs.size() << '\t'
+                       << total_elem_pairs.size();
 }
 
 // Explicit instantiation

@@ -153,8 +153,6 @@ public:
      * Outputs a line of tab-separated values of the form:
      * [fractional_length] [total_length] [fractional_neighbours] [total_neighbours]
      *
-     * Here the indexing of nodes is as given by the NodeIterator.
-     *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
      * value [present simulation time], followed by a tab.
      *
