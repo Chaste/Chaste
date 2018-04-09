@@ -158,6 +158,20 @@ public:
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
+     * Visit the population and write the average radial distribution of the CellData item,
+     * from the centroid of the cell population outward, in the prescribed number of bins.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [smaller radius of interval i] [average value]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
      * Set mVariableName.
      *
      * @param variableName the name of the CellData item to write to file

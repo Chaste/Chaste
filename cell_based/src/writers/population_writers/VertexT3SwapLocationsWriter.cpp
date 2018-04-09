@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexT3SwapLocationsWriter()
@@ -82,6 +83,11 @@ void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
     }
 
     pCellPopulation->rGetMesh().ClearLocationsOfT3Swaps();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
 }
 
 // Explicit instantiation

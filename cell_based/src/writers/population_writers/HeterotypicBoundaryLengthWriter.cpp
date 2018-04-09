@@ -36,8 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeterotypicBoundaryLengthWriter.hpp"
 
 #include "AbstractCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -413,6 +414,64 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedC
                 num_heterotypic_pairs += 1.0;
             }
         }
+    }
+
+    // We have counted each cell-cell edge twice
+    heterotypic_boundary_length *= 0.5;
+    total_shared_edges_length *= 0.5;
+
+    // We have counted each pair of neighbouring cells twice
+    num_heterotypic_pairs *= 0.5;
+    total_num_pairs *= 0.5;
+
+    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    // Initialise helper variables
+    double heterotypic_boundary_length = 0.0;
+    double total_shared_edges_length = 0.0;
+    double num_heterotypic_pairs = 0.0;
+    double total_num_pairs = 0.0;
+
+    // Iterate over cells
+    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+         cell_iter != pCellPopulation->End();
+         ++cell_iter)
+    {
+//        // Store whether this cell is labelled
+//        bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
+//
+//        // Get the set of neighbouring element indices
+//        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+//        std::set<unsigned> neighbour_elem_indices = pCellPopulation->rGetMesh().GetNeighbouringElementIndices(elem_index);
+//
+//        // Iterate over these neighbours
+//        for (std::set<unsigned>::iterator neighbour_iter = neighbour_elem_indices.begin();
+//             neighbour_iter != neighbour_elem_indices.end();
+//             ++neighbour_iter)
+//        {
+//            // Get the length of the edge shared with this neighbour
+//            unsigned neighbour_index = *neighbour_iter;
+//            double edge_length = pCellPopulation->rGetMesh().GetEdgeLength(elem_index, neighbour_index);
+//
+//            total_shared_edges_length += edge_length;
+//            total_num_pairs += 1.0;
+//
+//            // Store whether this neighbour is labelled
+//            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+//            bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
+//
+//            // If this cell is labelled and its neighbour is not, or vice versa...
+//            if (cell_is_labelled != neighbour_is_labelled)
+//            {
+//                // ... then increment the fractional boundary length
+//                heterotypic_boundary_length += edge_length;
+//                num_heterotypic_pairs += 1.0;
+//            }
+//        }
     }
 
     // We have counted each cell-cell edge twice
