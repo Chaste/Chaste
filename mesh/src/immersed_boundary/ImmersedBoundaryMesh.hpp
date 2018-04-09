@@ -58,6 +58,8 @@ class ImmersedBoundaryMeshWriter;
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "Node.hpp"
 
+
+
 /**
  * An immersed boundary mesh class, in which elements may contain different numbers of nodes.
  * This is facilitated by the ImmersedBoundaryElement class.
@@ -91,6 +93,11 @@ protected:
      */
     double mSummaryOfNodeLocations;
 
+    /**
+     * A halo distance around the unit square, used when calculating the node voronoi diagram
+     */
+    static constexpr double mVoronoiHalo = 0.1;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -121,10 +128,13 @@ protected:
     boost::polygon::voronoi_diagram<double> mNodeLocationsVoronoiDiagram;
 
     /**
-     * A vector keeping track voronoi cell indices in order of global node indices. This vector is the length of the
-     * largest node index, and is updated by UpdateNodeLocationsVoronoiDiagramIfOutOfDate().
+     * A vector keeping track voronoi cell IDs indexed by node index.  This vector is the length of the largest node
+     * index, and is updated by UpdateNodeLocationsVoronoiDiagramIfOutOfDate().
+     *
+     * The value mVoronoiCellIdsIndexedByNodeIndex[node_idx] gives the ID of the voronoi cell corresponding to the node
+     * with index node_idx.
      */
-    std::vector<unsigned> mVoronoiCellIdsInNodeOrder;
+    std::vector<unsigned> mVoronoiCellIdsIndexedByNodeIndex;
 
     /**
      * Solve node mapping method. This overridden method is required
@@ -154,10 +164,14 @@ protected:
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
     /**
-     * Update mNodeLocationsVoronoiDiagram if it is out of date, which is the case when
-     * mNodeLocationsVoronoiDiagramLastUpdated < SimulationTime::Instance()->GetTimeStepsElapsed()
+     * Determine whether each element is on the boundary or not, and call the element's SetIsBoundaryElement() method.
+     *
+     * It is not possible to define in precise terms whether an element is on the boundary (as there is no commonality
+     * of nodes as in a vertex population).  Instead we use information from the node locations voronoi diagram.  Any
+     * nodes with infinite voronoi edges are certainly in boundary elements, as well as nodes in elements whose voronoi
+     * cells are "too big".
      */
-    void UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
+    void TagBoundaryElements();
 
     /**
      * Divide an element along the axis passing through two of its nodes.
@@ -617,6 +631,12 @@ public:
     void SetKochanekParams(const std::array<double, 3>& rKochanekParams);
 
     /**
+     * Update mNodeLocationsVoronoiDiagram if it is out of date, which is the case when mSummaryOfNodeLocations is
+     * out-of-date, i.e. nodes have moved location.  This ensures the update is performed at most once per time step.
+     */
+    void UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
+
+    /**
      * ReMesh method that evenly redistributes nodes around each element and lamina.
      */
     void ReMesh();
@@ -653,6 +673,14 @@ public:
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elemIdx);
 
     /**
+     * Get the length of an edge in the voronoi diagram mNodeLocationsVoronoiDiagram. This gives the "real" length after
+     * undoing the scaling required when calculating the diagram.
+     * @param rEdge the edge to calculate the length of
+     * @return the length of rEdge
+     */
+    double CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge) noexcept;
+
+    /**
      * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..., 12+}-gons.
      * Note that the vector will always begin {0, 0, 0, ...} as there can be no 0, 1, or 2-gons, but this choice means
      * that accessing the nth element of the vector gives you the number of n-gons which seems to be most natural.
@@ -663,14 +691,31 @@ public:
     std::array<unsigned, 13> GetPolygonDistribution();
 
     /**
-     * Determine whether each element is on the boundary or not, and call the element's SetIsBoundaryElement() method.
-     *
-     * It is not possible to define in precise terms whether an element is on the boundary (as there is no commonality
-     * of nodes as in a vertex population.  Instead we take the centroid of each element, calculate the voronoi diagram
-     * of this set of centroids, and define an element to be on the boundary if its corresponding voronoi cell is
-     * infinite.
+     * Get the voronoi diagram of node locations. This may be needed for population writers and others.
+     * @param update whether to update the diagram before returning the reference (default true)
+     * @return mNodeLocationsVoronoiDiagram
      */
-    void TagBoundaryElements();
+    const boost::polygon::voronoi_diagram<double>& rGetNodeLocationsVoronoiDiagram(bool update=true);
+
+    /** @return mVoronoiCellIdsIndexedByNodeIndex */
+    const std::vector<unsigned int>& GetVoronoiCellIdsIndexedByNodeIndex() const;
+
+    /**
+     * Helper method for voronoi functions.  Scale a location up to the integer grid needed by boost voronoi.
+     *
+     * @param location a location in [-mVoronoiHalo, 1.0 + mVoronoiHalo]
+     * @return a corresponding integer location scaled to [INT_MIN, INT_MAX]
+     */
+    int ScaleUpToVoronoiCoordinate(double location) const noexcept;
+
+    /**
+     * Helper method for voronoi functions.  Scale a distance down from the voronoi coordinates.
+     *
+     * @param distance a distance in the voronoi diagram
+     * @return a distance in the immersed boundary domain
+     */
+    double ScaleDistanceDownFromVoronoi(const double distance) const noexcept;
+
 
     /**
      * A smart iterator over the elements in the mesh.

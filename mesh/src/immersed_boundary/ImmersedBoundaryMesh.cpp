@@ -1749,7 +1749,6 @@ bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::NodesInDifferentElementOrLami
     }
 }
 
-#include "Debug.hpp"
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementIndices(unsigned elemIdx)
 {
@@ -1772,7 +1771,7 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
     for (unsigned node_local_idx = 0; node_local_idx < this->GetElement(elemIdx)->GetNumNodes(); ++node_local_idx)
     {
         const unsigned node_global_idx = this->GetElement(elemIdx)->GetNodeGlobalIndex(node_local_idx);
-        const unsigned voronoi_cell_id = mVoronoiCellIdsInNodeOrder[node_global_idx];
+        const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[node_global_idx];
 
         /*
          * Iterate over the edges of the voronoi cell corresponding to the current node.  Each primary edge has a twin
@@ -1825,6 +1824,15 @@ std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygo
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge) noexcept
+{
+    const double d_x = rEdge.vertex1()->x() - rEdge.vertex0()->x();
+    const double d_y = rEdge.vertex1()->y() - rEdge.vertex0()->y();
+
+    return ScaleDistanceDownFromVoronoi(std::sqrt(d_x * d_x + d_y * d_y));
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
 {
     if (!mLaminas.empty())
@@ -1855,22 +1863,12 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
         elem_length_factors[idx] = 1.8 * sqrt(this->GetVolumeOfElement(p_elem->GetIndex()));
     }
 
-    // Lambda to get the length of a voronoi edge
-    auto length_of_voronoi_edge = [](const boost::polygon::voronoi_diagram<double>::edge_type* p_edge) -> double
-    {
-        constexpr double scale_factor = 1.0 / (2.0 * INT_MAX);
-        const double d_x = p_edge->vertex1()->x() - p_edge->vertex0()->x();
-        const double d_y = p_edge->vertex1()->y() - p_edge->vertex0()->y();
-
-        return scale_factor * std::sqrt(d_x * d_x + d_y * d_y);
-    };
-
     // For each node, check whether corresponding voronoi cell is infinite or not.
     // If so, tag its containing element as being on the boundary.
     for (const auto& p_node : this->mNodes)
     {
         const unsigned containing_elem_idx = *p_node->ContainingElementsBegin();
-        const unsigned voronoi_cell_id = mVoronoiCellIdsInNodeOrder[p_node->GetIndex()];
+        const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[p_node->GetIndex()];
         const auto voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
 
 
@@ -1886,7 +1884,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
                 break;
             }
 
-            voronoi_perimter += length_of_voronoi_edge(p_edge);
+            voronoi_perimter += CalculateLengthOfVoronoiEdge(*p_edge);
 
             p_edge = p_edge->next();
         } while (p_edge != voronoi_cell.incident_edge());
@@ -1902,6 +1900,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDiagramIfOutOfDate()
 {
+    using boost_point = boost::polygon::point_data<int>;
+
     /*
      * The voronoi diagram needs updating only if the node locations have changed (i.e. not more than once per
      * timestep).  We test a chosen summary of node locations against the cached mSummaryOfNodeLocations to determine
@@ -1918,40 +1918,154 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
     {
         mSummaryOfNodeLocations = new_location_summary;
 
-        // We need to translate node locations into boost points, which take integer values. We scale by INT_MAX.
-        using boost_point = boost::polygon::point_data<int>;
+        // Helper c_vectors for halo region
+        const c_vector<double, SPACE_DIM> halo_up = Create_c_vector(0.0, 1.0);
+        const c_vector<double, SPACE_DIM> halo_down = Create_c_vector(0.0, -1.0);
+        const c_vector<double, SPACE_DIM> halo_left = Create_c_vector(-1.0, 0.0);
+        const c_vector<double, SPACE_DIM> halo_right = Create_c_vector(1.0, 0.0);
 
+        std::vector<c_vector<double, SPACE_DIM>> additional_locations;
+        std::vector<unsigned> additional_node_indices;
+
+        // We need to translate node locations into boost points, which are scaled to an integer grid
         std::vector<boost_point> points;
+
+        // First add a point for each node, and calculate any additional locations needed within the halo
         for (const auto& p_node : this->mNodes)
         {
-            int x_pos = std::lround((2.0 * p_node->rGetLocation()[0] - 1.0) * INT_MAX);
-            int y_pos = std::lround((2.0 * p_node->rGetLocation()[1] - 1.0) * INT_MAX);
-            points.emplace_back(boost_point(x_pos, y_pos));
+            const double x_pos = p_node->rGetLocation()[0];
+            const double y_pos = p_node->rGetLocation()[1];
+
+            // Put the integer voronoi coordinate in for this node's location
+            const int y_coord = ScaleUpToVoronoiCoordinate(x_pos);
+            const int x_coord = ScaleUpToVoronoiCoordinate(y_pos);
+            points.emplace_back(boost_point(x_coord, y_coord));
+
+            // Now, for this location, decide whether any copies of this location are needed in the halo region
+            const bool needed_up = y_pos < mVoronoiHalo;
+            const bool needed_down = y_pos > 1.0 - mVoronoiHalo;
+            const bool needed_left = x_pos > 1.0 - mVoronoiHalo;
+            const bool needed_right = x_pos < mVoronoiHalo;
+
+            if (needed_up)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_up);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_down)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_down);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_left)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_left);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_right)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_right);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_up && needed_left)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_up + halo_left);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_up && needed_right)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_up + halo_right);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_down && needed_left)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_down + halo_left);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
+            if (needed_down && needed_right)
+            {
+                additional_locations.emplace_back(p_node->rGetLocation() + halo_down + halo_right);
+                additional_node_indices.emplace_back(p_node->GetIndex());
+            }
         }
 
+        // Next add the additional points
+        // First add a point for each node, and calculate any additional locations needed within the halo
+        for (const auto& location : additional_locations)
+        {
+            const int x_coord = ScaleUpToVoronoiCoordinate(location[0]);
+            const int y_coord = ScaleUpToVoronoiCoordinate(location[1]);
+            points.emplace_back(boost_point(x_coord, y_coord));
+        }
+
+        // Construct the voronoi diagram.  This is the costly part of this method.
         mNodeLocationsVoronoiDiagram.clear();
         construct_voronoi(std::begin(points), std::end(points), &mNodeLocationsVoronoiDiagram);
 
-        // We need an efficient map from node global index to the voronoi cell representing it
+        // We need an efficient map from node global index to the voronoi cell representing it, and we can't assume
+        // that the nodes are ordered sequentially.  We first identify the largest node index.
         const auto node_with_max_idx = *std::max_element(std::begin(this->mNodes), std::end(this->mNodes),
                                                          [](Node<SPACE_DIM>* a, Node<SPACE_DIM>* b) -> bool
-                                                         {
-                                                            return a->GetIndex() < b->GetIndex();
-                                                         });
-        mVoronoiCellIdsInNodeOrder.resize(node_with_max_idx->GetIndex() + 1);
+        {
+            return a->GetIndex() < b->GetIndex();
+        });
 
-        for (unsigned voronoi_cell_id = 0 ; voronoi_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++voronoi_cell_id)
+        mVoronoiCellIdsIndexedByNodeIndex.resize(node_with_max_idx->GetIndex() + 1);
+
+        for (unsigned vor_cell_id = 0; vor_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++vor_cell_id)
         {
             // Source index is incrementally given to each input point, which is in order of nodes in this->mNodes.
-            // We need to identify the current voronoi_cell_id by the global node index
-            const unsigned source_idx = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id].source_index();
-            const unsigned node_idx = this->mNodes[source_idx]->GetIndex();
-            mVoronoiCellIdsInNodeOrder[node_idx] = voronoi_cell_id;
+            // We need to be able to identify each vor_cell_id by the global node index
 
-            // Also keep the global node index in the cell "color"
-            mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id].color(node_idx);
+            auto& r_this_cell = mNodeLocationsVoronoiDiagram.cells()[vor_cell_id];
+            const auto source_idx = r_this_cell.source_index();
+
+            // Identify whether this is a genuine node location, or one of the additional locations added later
+            if (source_idx < this->mNodes.size())
+            {
+                const unsigned node_idx = this->mNodes[source_idx]->GetIndex();
+                mVoronoiCellIdsIndexedByNodeIndex[node_idx] = vor_cell_id;
+
+                // Store the node index in the cell's "color" for efficient reverse-lookup
+                r_this_cell.color(node_idx);
+            }
+            else
+            {
+                // One of the additional points in the halo region.  We still need to associate a node in the cell's "color"
+                const auto additional_idx = source_idx - this->mNodes.size();
+                r_this_cell.color(additional_node_indices[additional_idx]);
+            }
         }
+
+        // Finally, if the diagram was out-of-date, we will need to re-tag boundary elements.
+        this->TagBoundaryElements();
     }
+
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+int ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleUpToVoronoiCoordinate(const double location) const noexcept
+{
+    assert(location >= -mVoronoiHalo);
+    assert(location <= 1.0 + mVoronoiHalo);
+
+    constexpr auto DBL_INT_MIN = static_cast<double>(INT_MIN);
+    constexpr auto DBL_INT_RANGE = static_cast<double>(INT_MAX) - static_cast<double>(INT_MIN);
+
+    // To handle periodicity, we add (again) any nodes within a halo region of the unit square
+    constexpr double scale_factor = DBL_INT_RANGE / (1.0 + 2.0 * mVoronoiHalo);
+
+    // By construction there is no narrowing, so this static_cast might not be necessary
+    return static_cast<int>(std::lround(DBL_INT_MIN + (mVoronoiHalo + location) * scale_factor));
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleDistanceDownFromVoronoi(const double distance) const noexcept
+{
+    constexpr auto DBL_INT_RANGE = static_cast<double>(INT_MAX) - static_cast<double>(INT_MIN);
+    constexpr double scale_factor = (1.0 + 2.0 * mVoronoiHalo) / DBL_INT_RANGE;
+
+    return scale_factor * distance;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1964,6 +2078,23 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetKochanekParams(const std::array<double, 3>& rKochanekParams)
 {
     mKochanekParams = rKochanekParams;
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+const boost::polygon::voronoi_diagram<double>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodeLocationsVoronoiDiagram(bool update)
+{
+    if (update)
+    {
+        this->UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
+    }
+
+    return mNodeLocationsVoronoiDiagram;
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+const std::vector<unsigned int>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiCellIdsIndexedByNodeIndex() const
+{
+    return mVoronoiCellIdsIndexedByNodeIndex;
 }
 
 // Explicit instantiation
