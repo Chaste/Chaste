@@ -464,11 +464,6 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(C
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    if (this->template HasWriter<ImmersedBoundaryBoundaryCellWriter>())
-    {
-        mpImmersedBoundaryMesh->TagBoundaryElements();
-    }
-
     // If the first cell has target atea property, assume there is a target area modifier in place
     if (this->Begin()->GetCellData()->HasItem("target area"))
     {
@@ -523,13 +518,13 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(unsigned nod
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
-    //pPopulationWriter->Visit(this);
+    pPopulationWriter->Visit(this);
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
-    //pPopulationCountWriter->Visit(this);
+//    pPopulationCountWriter->Visit(this);
 }
 
 template <unsigned DIM>

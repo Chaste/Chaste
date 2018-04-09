@@ -47,6 +47,10 @@ ImmersedBoundaryBoundaryCellWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryBoun
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryBoundaryCellWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
+    // Ensure the boundary cells are tagged correctly.
+    // This will only do much work at most once per time step (the other times will be a low-cost check).
+    dynamic_cast<ImmersedBoundaryCellPopulation<SPACE_DIM>*>(pCellPopulation)->rGetMesh().UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
+
     bool boundary = dynamic_cast<ImmersedBoundaryCellPopulation<SPACE_DIM>*>(pCellPopulation)->IsCellOnBoundary(pCell);
 
     return static_cast<double>(boundary);

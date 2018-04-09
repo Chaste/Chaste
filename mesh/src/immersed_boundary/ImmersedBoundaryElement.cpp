@@ -83,44 +83,6 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetAverageNodeSpacing(doub
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
 {
-//    // We count the number of nodes that are within interaction distance of only this element.  Certainly will include
-//    // all "boundary" nodes.
-//    unsigned num_nodes_only_near_this_elem = 0u;
-//
-//    // Note: method Node::rGetNeighbours() returns a vector of global node indices.  There is no efficient way to obtain
-//    // the node from its global index from within an element.  We therefore implement the following:
-//
-//    // Get global indices of all nodes in this element
-//    std::set<unsigned> gbl_indices_this_elem;
-//    for (unsigned node_idx = 0; node_idx < this->mNodes.size(); ++node_idx)
-//    {
-//        gbl_indices_this_elem.insert(this->GetNodeGlobalIndex(node_idx));
-//    }
-//
-//    // If any node has a neighbour not in the set of global indies, it's interacting with a different element.
-//    for (unsigned node_idx = 0; node_idx < this->mNodes.size(); ++node_idx)
-//    {
-//        const std::vector<unsigned>& node_neighbours = this->GetNode(node_idx)->rGetNeighbours();
-//
-//        bool interacts_with_different_elem = false;
-//
-//        for (unsigned nbr_idx = 0; nbr_idx < node_neighbours.size(); ++nbr_idx)
-//        {
-//            if (gbl_indices_this_elem.find(node_neighbours[nbr_idx]) == gbl_indices_this_elem.end())
-//            {
-//                interacts_with_different_elem = true;
-//                break;
-//            }
-//        }
-//
-//        if (!interacts_with_different_elem)
-//        {
-//            num_nodes_only_near_this_elem++;
-//        }
-//    }
-//
-//    // \todo remove magic number
-//    return num_nodes_only_near_this_elem >= std::max(1.0, 0.1 * this->mNodes.size());
     return mIsBoundaryElement;
 }
 
