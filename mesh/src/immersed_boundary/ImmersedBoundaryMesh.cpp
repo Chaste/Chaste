@@ -39,16 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 #include "ImmersedBoundaryEnumerations.hpp"
+#include "MeshUtilityFunctions.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 
-#ifdef CHASTE_VTK
-#include <vtkKochanekSpline.h>
-#include <vtkParametricSpline.h>
-#include <vtkPoints.h>
-#include <vtkSmartPointer.h>
-#endif // CHASTE_VTK
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -157,8 +152,6 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         // Increment the current location
         current_location += balancing_source_spacing;
     }
-
-    mKochanekParams = {{1.0, -1.0, 0.0}};
 
     // Calculate a default neighbour dist, as half the root of the average element volume
     constexpr double power = 1.0 / SPACE_DIM;
@@ -1485,252 +1478,148 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(bool randomOrder)
 {
     // Iterate over elements and remesh each one
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElementIterator elem_it = this->GetElementIteratorBegin();
-         elem_it != this->GetElementIteratorEnd();
-         ++elem_it)
+    for (auto p_elem : mElements)
     {
-        ReMeshElement(&*elem_it);
+        ReMeshElement(p_elem, randomOrder);
     }
 
     // Iterate over laminas and remesh each one
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryLaminaIterator lam_it = this->GetLaminaIteratorBegin();
-         lam_it != this->GetLaminaIteratorEnd();
-         ++lam_it)
+    for (auto p_lam : mLaminas)
     {
-        ReMeshLamina(&*lam_it);
+        ReMeshLamina(p_lam, randomOrder);
     }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement)
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                                                 bool randomOrder)
 {
     assert(SPACE_DIM == 2);
 
-    /*
-     * Method outline:
-     *
-     * Re-position nodes around the element so as to have them evenly spaced along the boundary.  We keep track of the
-     * node regions, so that individual regions remain the same size after a re-mesh, but regions will not necessarily
-     * retain the same numbers of nodes.  We proceed as follows:
-     *
-     * 1. Loop through all nodes and gather necessary information: a record of the current node locations, the distances
-     *    between nodes, and information on node regions.
-     *
-     * 2. Decide on the start index (chosen either to be the first node after the first region-change, or node 0 if
-     *    there are no regions) and post-process the region information to be more useful.
-     *
-     * 3. Reposition each node to be a target distance from the previous, by linear interpolation around the original
-     *    shape, and calculate the correct region information.
-     */
+    const unsigned num_nodes = pElement->GetNumNodes();
 
-    unsigned num_nodes = pElement->GetNumNodes();
+    // Start at a random location in the vector of element nodes if requested
+    const unsigned start_idx = randomOrder ? RandomNumberGenerator::Instance()->randMod(num_nodes) : 0u;
 
-    // Two vectors the same length as teh number of nodes
-    std::vector<c_vector<double, SPACE_DIM> > old_locations(num_nodes);
-    std::vector<double> distances(num_nodes); // distances[i] is dist between node i and node i+1
+    // Straighten out locations to a contiguous polygon rather than wrapped around the domain due to periodicity
+    std::vector<c_vector<double, SPACE_DIM>> locations_straightened;
+    locations_straightened.reserve(num_nodes);
 
-    /*
-     * Need to store information about node region changes, which we do as illustrated in the following example:
-     *
-     *   Node idx:         0 1 2 3 4 5 6 7 8 9 ...
-     *   Node region:      0 0 0 0 3 3 5 5 5 5 ...
-     *   region_changes:           ^   ^           ... record the first index after region changes (i.e. {4, 6, ...})
-     *   region_at_change:         3   5           ... record the region number at the changes (i.e. {3, 5, ...})
-     *   region_dists:     |<---->|
-     *                     |<-------->|
-     *                     |<---------------...    ... record the cumulative dists from node 0 at which regions change
-     */
-    std::vector<unsigned> region_changes;
-    std::vector<unsigned> region_at_change;
-    std::vector<double> region_dists;
+    locations_straightened.emplace_back(pElement->GetNodeLocation(start_idx));
 
-    // Initialise the region of node 0, and the total distance (which will be accumulated through the loop)
-    unsigned this_region = pElement->GetNode(0)->GetRegion();
-    double total_dist = 0.0;
-
-    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-    {
-        // Global indices of the node at this local index, and the next one
-        unsigned next_local_idx = (node_idx + 1) % num_nodes;
-        unsigned this_global_idx = pElement->GetNode(node_idx)->GetIndex();
-        unsigned next_global_idx = pElement->GetNode(next_local_idx)->GetIndex();
-
-        double local_dist = this->GetDistanceBetweenNodes(this_global_idx, next_global_idx);
-        distances[node_idx] = local_dist;
-        total_dist += local_dist;
-
-        // Store a copy of the node location: this allows us to directly update nodes positions in the next loop
-        old_locations[node_idx] = c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation());
-
-        // If the region is changing, add this change to the region vectors
-        if (pElement->GetNode(next_local_idx)->GetRegion() != this_region)
-        {
-            this_region = pElement->GetNode(next_local_idx)->GetRegion();
-
-            region_changes.push_back(next_local_idx);
-            region_at_change.push_back(this_region);
-            region_dists.push_back(total_dist);
-        }
-    }
-
-    // Are there any region changes in this element?  If so, start from the first region change, else at node 0
-    bool multiple_regions = region_changes.size() > 0;
-    unsigned start_idx = multiple_regions ? region_changes[0] : 0;
-    unsigned end_idx = start_idx + num_nodes;
-
-    // Process region_dists so that region_dists[i] is the cumulative distance, offset from start of the first region
-    if (multiple_regions)
-    {
-        // There must be at least two changes in region in a closed boundary with more than one region
-        assert(region_changes.size() > 1);
-
-        double region_offset = region_dists[0];
-
-        for (unsigned region_idx = 0; region_idx < region_changes.size() - 1; region_idx++)
-        {
-            // Subtract an additional fudge factor of 1e-15 so that, if nodes are already evenly spaced, the regions
-            // do not get offset by one place due to a strict equality in position
-            region_dists[region_idx] = region_dists[region_idx + 1] - region_offset - 1e-15;
-        }
-
-        region_dists.back() = total_dist - 1e-15;
-    }
-    else // one one region, which we can represent in the following way:
-    {
-        region_changes.push_back(0);
-        region_at_change.push_back(pElement->GetNode(0)->GetRegion());
-        region_dists.push_back(total_dist);
-    }
-
-    // Loop through nodes and update their locations and region information
-    double node_spacing = total_dist / num_nodes;
-    double cumulative_dist = 0.0;
-
-    for (unsigned new_idx = 1 + start_idx, old_idx = start_idx, region_idx = 0; new_idx < end_idx; new_idx++)
-    {
-        double target_dist = node_spacing * (new_idx - start_idx);
-
-        while (target_dist > cumulative_dist)
-        {
-            cumulative_dist += distances[old_idx % num_nodes];
-            old_idx++;
-
-            while (target_dist > region_dists[region_idx])
-            {
-                region_idx++;
-            }
-        }
-
-        // Cumulative distance around the old shape is now at least the target distance, so the new location lies
-        // somewhere between the nodes at old_idx and old_idx-1
-        double extra_dist = cumulative_dist - target_dist;
-        double ratio = extra_dist / distances[(old_idx - 1) % num_nodes];
-
-        c_vector<double, SPACE_DIM>& r_a = old_locations[(old_idx - 1) % num_nodes];
-        c_vector<double, SPACE_DIM>& r_b = old_locations[(old_idx) % num_nodes];
-
-        // Calculate new point, and account for periodicity
-        c_vector<double, SPACE_DIM> new_location = r_b + ratio * this->GetVectorFromAtoB(r_b, r_a);
-        for (unsigned dim = 0; dim < SPACE_DIM; dim++)
-        {
-            if (new_location[dim] < 0.0 || new_location[dim] >= 1.0)
-            {
-                new_location[dim] = fmod(new_location[dim] + 1.0, 1.0);
-            }
-        }
-
-        Node<SPACE_DIM>* p_node = pElement->GetNode(new_idx % num_nodes);
-        p_node->SetPoint(ChastePoint<SPACE_DIM>(new_location));
-        p_node->SetRegion(region_at_change[region_idx]);
-    }
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina)
-{
-    assert(SPACE_DIM == 2);
-
-    /*
-     * This is a specialisation of ReMeshElement() which, because there will only be one region for the entire lamina,
-     * can be simplified significantly.
-     *
-     * Re-position nodes along the lamina so as to have them evenly spaced along the boundary.
-     *
-     * We do so making use of the VTK Kochanek Spline implementation:
-     *     https://www.vtk.org/doc/nightly/html/classvtkKochanekSpline.html
-     *     https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
-     * which has three parameters that can be altered if necessary to change the shape of the interpolating function.
-     */
-
-    auto x_spline = vtkSmartPointer<vtkKochanekSpline>::New();
-    x_spline->SetDefaultTension(mKochanekParams[0]);
-    x_spline->SetDefaultContinuity(mKochanekParams[1]);
-    x_spline->SetDefaultBias(mKochanekParams[2]);
-
-    auto y_spline = vtkSmartPointer<vtkKochanekSpline>::New();
-    y_spline->SetDefaultTension(mKochanekParams[0]);
-    y_spline->SetDefaultContinuity(mKochanekParams[1]);
-    y_spline->SetDefaultBias(mKochanekParams[2]);
-
-    auto vtk_spline = vtkSmartPointer<vtkParametricSpline>::New();
-    vtk_spline->SetXSpline(x_spline);
-    vtk_spline->SetYSpline(y_spline);
-
-    unsigned num_nodes = pLamina->GetNumNodes();
-    unsigned leftmost_idx = 0u;
-    double leftmost_val = pLamina->GetNode(0u)->rGetLocation()[0];
     for (unsigned node_idx = 1; node_idx < num_nodes; ++node_idx)
     {
-        const double x_val = pLamina->GetNode(node_idx)->rGetLocation()[0];
-        if (x_val < leftmost_val)
-        {
-            leftmost_val = x_val;
-            leftmost_idx = node_idx;
-        }
+        const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+
+        const auto& prev_location = locations_straightened.back();
+        const auto this_location = pElement->GetNodeLocation(this_idx);
+
+        locations_straightened.emplace_back(prev_location + this->GetVectorFromAtoB(prev_location, this_location));
     }
 
-    // Iterate through nodes left-to-right
-    auto vtk_points = vtkSmartPointer<vtkPoints>::New();
-    for (unsigned node_num = 0; node_num < num_nodes; ++node_num)
-    {
-        const unsigned node_idx = (node_num + leftmost_idx) % num_nodes;
-        const auto& location = pLamina->GetNode(node_idx)->rGetLocation();
+    assert(locations_straightened.size() == num_nodes);
 
-        vtk_points->InsertNextPoint(location[0], location[1], 0.0);
+    const bool closed_path = true;
+    const bool permute_order = false;
+    const std::size_t num_pts_to_place = num_nodes;
+
+    std::vector<c_vector<double, SPACE_DIM>> evenly_spaced_locations = EvenlySpaceAlongPath(
+            locations_straightened,
+            closed_path,
+            permute_order,
+            num_pts_to_place
+    );
+
+    assert(evenly_spaced_locations.size() == num_nodes);
+
+    // Conform all locations to geometry
+    for (c_vector<double, SPACE_DIM>& r_loc : evenly_spaced_locations)
+    {
+        ConformToGeometry(r_loc);
     }
 
-    // Add in a location identical to the first
-    const auto& leftmost_location = pLamina->GetNode(leftmost_idx)->rGetLocation();
-    vtk_points->InsertNextPoint(leftmost_location[0] + 1.0, leftmost_location[1], 0.0);
-
-    vtk_spline->SetPoints(vtk_points);
-
-    std::array<double, 3> interp_point;
-    std::array<double, 3> interp_location;
-
-    auto reposition = [](double& a) -> double
+    // Update the node locations
+    for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
     {
-        if (a > 1.0)
-        {
-            a -= 1.0;
-        }
-        else if (a < 0.0)
-        {
-            a += 1.0;
-        }
-        return a;
-    };
+        const unsigned this_idx = AdvanceMod(node_idx, start_idx, num_nodes);
+        pElement->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
+    }
+}
 
-    for (unsigned node_num = 0; node_num < num_nodes; ++node_num)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina,
+                                                                bool randomOrder)
+{
+    assert(SPACE_DIM == 2);
+
+    const unsigned num_nodes = pLamina->GetNumNodes();
+
+    // Start at a random location in the vector of element nodes
+    const unsigned start_idx = randomOrder ? RandomNumberGenerator::Instance()->randMod(num_nodes) : 0u;
+
+    // Straighten out locations to a contiguous line rather than wrapped around the domain due to periodicity
+    std::vector<c_vector<double, SPACE_DIM>> locations_straightened;
+    locations_straightened.reserve(1 + num_nodes);
+
+    locations_straightened.emplace_back(pLamina->GetNodeLocation(start_idx));
+
+    // We go to 1 + num_nodes so that we add on a node in a location congruent to the first location added
+    for (unsigned node_idx = 1; node_idx < 1 + num_nodes; ++node_idx)
     {
-        interp_point[0] = static_cast<double>(node_num) / num_nodes;
-        vtk_spline->Evaluate(&interp_point[0], &interp_location[0], nullptr);
+        const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
 
-        pLamina->GetNode(node_num)->SetPoint(ChastePoint<SPACE_DIM>(reposition(interp_location[0]),
-                                                                    reposition(interp_location[1])));
+        const auto& prev_location = locations_straightened.back();
+        const auto this_location = pLamina->GetNodeLocation(this_idx);
+
+        locations_straightened.emplace_back(prev_location + this->GetVectorFromAtoB(prev_location, this_location));
+    }
+
+    assert(locations_straightened.size() == 1 + num_nodes);
+
+    const bool closed_path = false;
+    const bool permute_order = false;
+    const std::size_t num_pts_to_place = 1 + num_nodes;
+
+    std::vector<c_vector<double, SPACE_DIM>> evenly_spaced_locations = EvenlySpaceAlongPath(
+            locations_straightened,
+            closed_path,
+            permute_order,
+            num_pts_to_place
+    );
+
+    assert(evenly_spaced_locations.size() == 1 + num_nodes);
+
+    // Conform all locations to geometry
+    for (c_vector<double, SPACE_DIM>& r_loc : evenly_spaced_locations)
+    {
+        ConformToGeometry(r_loc);
+    }
+
+    // Update the node locations, ignoring the very last location that was added to make the path spacing even
+    for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
+    {
+        const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+        pLamina->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ConformToGeometry(c_vector<double, SPACE_DIM>& rLocation) noexcept
+{
+    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
+    {
+        while (rLocation[dim] < 0.0)
+        {
+            rLocation[dim] += 1.0;
+        }
+
+        while (rLocation[dim] >= 1.0)
+        {
+            rLocation[dim] -= 1.0;
+        }
     }
 }
 
@@ -1826,10 +1715,73 @@ std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygo
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge) noexcept
 {
+    assert(rEdge.is_finite());
+
     const double d_x = rEdge.vertex1()->x() - rEdge.vertex0()->x();
     const double d_y = rEdge.vertex1()->y() - rEdge.vertex0()->y();
 
     return ScaleDistanceDownFromVoronoi(std::sqrt(d_x * d_x + d_y * d_y));
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex() const noexcept
+{
+    if (this->mNodes.begin() == this->mNodes.end())
+    {
+        return UINT_MAX;
+    }
+    else
+    {
+        const auto max_idx_it = std::max_element(this->mNodes.begin(), this->mNodes.end(),
+                                                 [](Node<SPACE_DIM>* const a, Node<SPACE_DIM>* const b)
+                                                 {
+                                                     return a->GetIndex() < b->GetIndex();
+                                                 });
+
+        return (*max_idx_it)->GetIndex();
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxElementIndex() const noexcept
+{
+    if (this->mElements.begin() == this->mElements.end())
+    {
+        return UINT_MAX;
+    }
+    else
+    {
+        using IbElem = ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>;
+
+        const auto max_idx_it = std::max_element(this->mElements.begin(), this->mElements.end(),
+                                                 [](IbElem* const a, IbElem* const b)
+                                                 {
+                                                     return a->GetIndex() < b->GetIndex();
+                                                 });
+
+        return (*max_idx_it)->GetIndex();
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxLaminaIndex() const noexcept
+{
+    if (this->mLaminas.begin() == this->mLaminas.end())
+    {
+        return UINT_MAX;
+    }
+    else
+    {
+        using IbLam = ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>;
+
+        const auto max_idx_it = std::max_element(this->mLaminas.begin(), this->mLaminas.end(),
+                                                 [](IbLam* const a, IbLam* const b)
+                                                 {
+                                                     return a->GetIndex() < b->GetIndex();
+                                                 });
+
+        return (*max_idx_it)->GetIndex();
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1853,16 +1805,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
      */
     UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
 
-    // Calculate the maximum element index in the mesh
-    using IbElem = ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>;
-
-    const auto max_idx_it = std::max_element(this->mElements.begin(), this->mElements.end(),
-                                             [](IbElem* const a, IbElem* const b)
-                                             {
-                                                 return a->GetIndex() < b->GetIndex();
-                                             });
-
-    const unsigned max_elem_idx = (*max_idx_it)->GetIndex();
+    // Get the maximum element index in the mesh
+    const unsigned max_elem_idx = GetMaxElementIndex();
 
     // Keep track of all finite shared edge lengths (between two elements), as well as (for each element) the maximum
     // shared edge length.
@@ -1882,29 +1826,29 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
         // Iterate over the edges of this cell.  Note that due to the halo region none of these edges should be infinite.
         auto p_edge = voronoi_cell.incident_edge();
 
-        // If the edge is infinite, the element containing it must be on the boundary regardless of shared edge length
-        if (p_edge->is_infinite())
-        {
-            max_shared_lengths[this_elem_idx] = LARGE_DOUBLE;
-            voronoi_perimeter[this_elem_idx] += LARGE_DOUBLE;
-            continue;
-        }
-
         // Loop over the voronoi edges associated with this node's voronoi cell
         do
         {
-            // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
-            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
-            const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
-
-            // If the edge is between two elements, it counts
-            if (this_elem_idx != twin_elem_idx)
+            // If the edge is infinite, the element containing it must be on the boundary
+            if (p_edge->is_infinite())
             {
-                const double edge_length = CalculateLengthOfVoronoiEdge(*p_edge);
-                max_shared_lengths[this_elem_idx] = std::max(max_shared_lengths[this_elem_idx], edge_length);
-                voronoi_perimeter[this_elem_idx] += edge_length;
+                max_shared_lengths[this_elem_idx] = LARGE_DOUBLE;
+                voronoi_perimeter[this_elem_idx] += LARGE_DOUBLE;
             }
+            else
+            {
+                // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
+                const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+                const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
 
+                // If the edge is between two elements, it counts
+                if (this_elem_idx != twin_elem_idx)
+                {
+                    const double edge_length = CalculateLengthOfVoronoiEdge(*p_edge);
+                    max_shared_lengths[this_elem_idx] = std::max(max_shared_lengths[this_elem_idx], edge_length);
+                    voronoi_perimeter[this_elem_idx] += edge_length;
+                }
+            }
             p_edge = p_edge->next();
         } while (p_edge != voronoi_cell.incident_edge());
     }
@@ -1934,8 +1878,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
     std::nth_element(copy_max_shared_lengths.begin(), copy_max_shared_lengths.begin() + half_way, copy_max_shared_lengths.end());
     std::nth_element(copy_perimeter_multiples.begin(), copy_perimeter_multiples.begin() + half_way, copy_perimeter_multiples.end());
 
-    const double median_max_edge_length = copy_max_shared_lengths[half_way];
-    const double median_perimeter_multiple = copy_perimeter_multiples[half_way];
+    double median_max_edge_length = copy_max_shared_lengths[half_way];
+    double median_perimeter_multiple = copy_perimeter_multiples[half_way];
+
+    // In the event that most elements have infinite edges, for instance if there are a small number of elements,
+    // a reduced median can be used
+    if (median_max_edge_length == LARGE_DOUBLE || median_perimeter_multiple >= LARGE_DOUBLE)
+    {
+        median_max_edge_length = 0.5 * LARGE_DOUBLE;
+        median_perimeter_multiple = 0.5 * LARGE_DOUBLE;
+    }
 
     // Finally, tag the boundary elements
     for (const auto& p_elem : this->mElements)
@@ -2069,13 +2021,9 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
 
         // We need an efficient map from node global index to the voronoi cell representing it, and we can't assume
         // that the nodes are ordered sequentially.  We first identify the largest node index.
-        const auto node_with_max_idx = *std::max_element(std::begin(this->mNodes), std::end(this->mNodes),
-                                                         [](Node<SPACE_DIM>* a, Node<SPACE_DIM>* b) -> bool
-        {
-            return a->GetIndex() < b->GetIndex();
-        });
+        const unsigned max_node_idx = GetMaxNodeIndex();
 
-        mVoronoiCellIdsIndexedByNodeIndex.resize(node_with_max_idx->GetIndex() + 1);
+        mVoronoiCellIdsIndexedByNodeIndex.resize(1 + max_node_idx);
 
         for (unsigned vor_cell_id = 0; vor_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++vor_cell_id)
         {
@@ -2122,18 +2070,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleDistanceDownFromVorono
     constexpr double scale_factor = (1.0 + 2.0 * mVoronoiHalo) / DBL_INT_RANGE;
 
     return scale_factor * distance;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetKochanekParams() const
-{
-    return mKochanekParams;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetKochanekParams(const std::array<double, 3>& rKochanekParams)
-{
-    mKochanekParams = rKochanekParams;
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>

@@ -38,25 +38,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
-#include "ImmersedBoundaryEnumerations.hpp"
 
+#include "ImmersedBoundaryEnumerations.hpp"
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
-#include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+#include "Node.hpp"
+#include "RandomNumberGenerator.hpp"
+#include "UblasVectorInclude.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-#include "Debug.hpp"
 
 class TestImmersedBoundaryMesh : public CxxTest::TestSuite
 {
 public:
     void TestSolveNodeAndElementMapping()
-    {
-    }
-
-    void TestClear()
     {
     }
 
@@ -68,12 +66,77 @@ public:
     {
     }
 
-    void TestElementIterator()
+    void TestImmersedBoundaryElementAndLaminaIterators()
     {
+        // Empty mesh object with no elements (we only have a != operator available)
+        {
+            ImmersedBoundaryMesh<2, 2> ib_mesh;
+            TS_ASSERT_EQUALS(ib_mesh.GetElementIteratorBegin() != ib_mesh.GetElementIteratorEnd(), false);
+            TS_ASSERT_EQUALS(ib_mesh.GetLaminaIteratorBegin() != ib_mesh.GetLaminaIteratorEnd(), false);
+        }
+
+        // Mesh with elements and laminas
+        {
+            // Make a few nodes
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
+            nodes.push_back(new Node<2>(2, true, 0.3, 0.2));
+
+            // Make two elements
+            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
+
+            // Make four laminas
+            std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(3, nodes));
+
+            // Make a mesh
+            ImmersedBoundaryMesh<2, 2> ib_mesh(nodes, elements, lams);
+
+            unsigned elem_count = 0u;
+            for (auto elem_it = ib_mesh.GetElementIteratorBegin(); elem_it != ib_mesh.GetElementIteratorEnd(); ++elem_it)
+            {
+                TS_ASSERT_EQUALS(elem_it->GetIndex(), elem_count);
+                elem_count++;
+            }
+
+            unsigned lam_count = 0u;
+            for (auto lam_it = ib_mesh.GetLaminaIteratorBegin(); lam_it != ib_mesh.GetLaminaIteratorBegin(); ++lam_it)
+            {
+                TS_ASSERT_EQUALS(lam_it->GetIndex(), lam_count);
+                lam_count++;
+            }
+        }
     }
 
     void TestSetAndGetMethods()
     {
+        // Default-construct a mesh object
+        ImmersedBoundaryMesh<2, 2> ib_mesh;
+
+        ib_mesh.SetNeighbourDist(1.23);
+        ib_mesh.SetCharacteristicNodeSpacing(2.34);
+        ib_mesh.SetElementDivisionSpacing(3.45);
+        ib_mesh.SetNumGridPtsXAndY(678u);
+
+        TS_ASSERT_DELTA(ib_mesh.GetNeighbourDist(), 1.23, 1e-12);
+        TS_ASSERT_DELTA(ib_mesh.GetCharacteristicNodeSpacing(), 2.34, 1e-12);
+        TS_ASSERT_DELTA(ib_mesh.GetElementDivisionSpacing(), 3.45, 1e-12);
+        TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 678u);
+        TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 678u);
+
+
+        ib_mesh.SetNumGridPtsX(456u);
+        ib_mesh.SetNumGridPtsY(567u);
+        TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 456u);
+        TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 567u);
+
+
     }
 
     void TestGetVectorFromAtoB()
@@ -184,7 +247,7 @@ public:
     {
         /*
          * In this test, we generate a mesh with multiple elements and lamina, in which nodes are already evenly spaced.
-         * We simply check that none of the node locations or regions are altered in a ReMesh.
+         * We simply check that none of the node locations are altered in a ReMesh.
          *
          * The specific ReMeshElements and ReMeshLaminas methods are tested separately.
          */
@@ -268,37 +331,27 @@ public:
         
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
 
-        // Label every node uniquely by region
+        // Make a copy of the node locations prior to ReMesh
+        std::vector<c_vector<double, 2> > old_locations;
         for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); node_idx++)
         {
-            mesh.GetNode(node_idx)->SetRegion(node_idx);
+            old_locations.push_back(mesh.GetNode(node_idx)->rGetLocation());
         }
 
-        // Make a copy of the node locations and regions prior to ReMesh
-        std::vector<c_vector<double, 2> > old_locations(mesh.GetNumNodes());
-        for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); node_idx++)
-        {
-            const c_vector<double, 2> this_location = mesh.GetNode(node_idx)->rGetLocation();
-            old_locations[node_idx][0] = this_location[0];
-            old_locations[node_idx][1] = this_location[1];
-        }
-
-        // Second ReMesh - node locations should remain largely unchanged and regions should be the same
+        // Second ReMesh - node locations should remain unchanged
         mesh.ReMesh();
 
         // Verify everything's still the same
         for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); node_idx++)
         {
-            TS_ASSERT_DELTA(old_locations[node_idx][0], mesh.GetNode(node_idx)->rGetLocation()[0], 1e-6);
-            TS_ASSERT_DELTA(old_locations[node_idx][1], mesh.GetNode(node_idx)->rGetLocation()[1], 1e-6);
-
-            TS_ASSERT_EQUALS(node_idx, mesh.GetNode(node_idx)->GetRegion());
+            TS_ASSERT_DELTA(old_locations[node_idx][0], mesh.GetNode(node_idx)->rGetLocation()[0], 1e-12);
+            TS_ASSERT_DELTA(old_locations[node_idx][1], mesh.GetNode(node_idx)->rGetLocation()[1], 1e-12);
         }
     }
 
     void TestReMeshElement()
     {
-        // ReMeshElement where nothing should change, no regions involved
+        // ReMeshElement where nothing should change
         {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -320,7 +373,16 @@ public:
                 old_pos.push_back(norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()));
             }
 
-            mesh.ReMesh();
+            // Remesh fixing the first location
+            mesh.ReMesh(false);
+
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
+            }
+
+            // Remesh starting from a random location
+            mesh.ReMesh(true);
 
             for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
@@ -328,13 +390,13 @@ public:
             }
         }
 
-        // ReMeshElement where nothing should change, with regions involved
+        // ReMeshElement where nothing should change, coping with an overlap
         {
             std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+            nodes.push_back(new Node<2>(0, true, 0.95, 0.1));
+            nodes.push_back(new Node<2>(1, true, 0.05, 0.1));
+            nodes.push_back(new Node<2>(2, true, 0.05, 0.2));
+            nodes.push_back(new Node<2>(3, true, 0.95, 0.2));
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
@@ -343,30 +405,24 @@ public:
 
             unsigned num_nodes = mesh.GetElement(0)->GetNumNodes();
 
-            mesh.GetElement(0)->GetNode(0)->SetRegion(1);
-            mesh.GetElement(0)->GetNode(1)->SetRegion(1);
-            mesh.GetElement(0)->GetNode(2)->SetRegion(2);
-            mesh.GetElement(0)->GetNode(3)->SetRegion(2);
-
             // Get locations before ReMesh
-            std::vector<double> old_pos;
-            std::vector<unsigned> old_regions;
+            std::vector<c_vector<double, 2>> old_pos;
             for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
-                old_pos.push_back(norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()));
-                old_regions.push_back(mesh.GetElement(0)->GetNode(node_idx)->GetRegion());
+                old_pos.push_back(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation());
             }
 
-            mesh.ReMesh();
+            // Remesh with random location
+            mesh.ReMesh(true);
 
             for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
-                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
-                TS_ASSERT_EQUALS(old_regions[node_idx], mesh.GetElement(0)->GetNode(node_idx)->GetRegion());
+                TS_ASSERT_DELTA(old_pos[node_idx][0], mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()[0], 1e-12);
+                TS_ASSERT_DELTA(old_pos[node_idx][1], mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()[1], 1e-12);
             }
         }
 
-        // ReMeshElement where positions should change, no regions involved
+        // ReMeshElement where positions should change
         {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -377,12 +433,13 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-
-            mesh.ReMesh();
 
             double cumulative_dist = 0.2 + sqrt(0.02);
             double node_spacing = cumulative_dist / 3.0;
             double epsilon = node_spacing - 0.1;
+
+            // Remesh fixing the first location
+            mesh.ReMesh(false);
 
             // First node should not move
             TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(0)->rGetLocation()[0], 0.0, 1e-12);
@@ -393,62 +450,48 @@ public:
             TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(1)->rGetLocation()[1], epsilon, 1e-12);
 
             // Third node down diagonal towards (0,0)
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(2)->rGetLocation()[0], 0.1 - 0.2 * epsilon / sqrt(0.02), 1e-12);
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(2)->rGetLocation()[1], 0.1 - 0.2 * epsilon / sqrt(0.02), 1e-12);
+            double down_diagonal = 0.1 - 0.2 * epsilon / sqrt(0.02);
+            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(2)->rGetLocation()[0], down_diagonal, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(2)->rGetLocation()[1], down_diagonal, 1e-12);
         }
 
-        // ReMeshElement where positions should change, with regions involved
+        // ReMeshElement where positions should change
         {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
             nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
-            nodes.push_back(new Node<2>(4, true, 0.0, 0.03));
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
-            mesh.GetElement(0)->GetNode(0)->SetRegion(1);
-            mesh.GetElement(0)->GetNode(1)->SetRegion(1);
-            mesh.GetElement(0)->GetNode(2)->SetRegion(2);
-            mesh.GetElement(0)->GetNode(3)->SetRegion(2);
-            mesh.GetElement(0)->GetNode(4)->SetRegion(1);
+            double cumulative_dist = 0.2 + sqrt(0.02);
+            double node_spacing = cumulative_dist / 3.0;
+            double epsilon = node_spacing - 0.1;
 
-            mesh.ReMesh();
+            // Remesh using a random location (fixes the second index)
+            RandomNumberGenerator::Instance()->Reseed(0u);
+            mesh.ReMesh(true);
 
             // Third node should not move
             TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(2)->rGetLocation()[0], 0.1, 1e-12);
             TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(2)->rGetLocation()[1], 0.1, 1e-12);
 
-            // Fourth moves towards third
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(3)->rGetLocation()[0], 0.02, 1e-12);
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(3)->rGetLocation()[1], 0.1, 1e-12);
+            // First node up diagonal slightly
+            double up_diagonal = (sqrt(0.02) - node_spacing) / sqrt(2.0);
+            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(0)->rGetLocation()[0], up_diagonal, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(0)->rGetLocation()[1], up_diagonal, 1e-12);
 
-            // Fifth moves towards fourth
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(4)->rGetLocation()[0], 0.0, 1e-12);
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(4)->rGetLocation()[1], 0.04, 1e-12);
-
-            // First moves towards second
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(0)->rGetLocation()[0], 0.04, 1e-12);
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(0)->rGetLocation()[1], 0.0, 1e-12);
-
-            // Second moves towards third
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(1)->rGetLocation()[0], 0.1, 1e-12);
-            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(1)->rGetLocation()[1], 0.02, 1e-12);
-
-            // Due to reposition of nodes, node 4 should now be part of region 2
-            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(0)->GetRegion(), 1u);
-            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(1)->GetRegion(), 1u);
-            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(2)->GetRegion(), 2u);
-            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(3)->GetRegion(), 2u);
-            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNode(4)->GetRegion(), 2u);
+            // Second node should be along the first edge, near (0.1, 0)
+            double along_edge = 2.0 * node_spacing - sqrt(0.02);
+            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(1)->rGetLocation()[0], along_edge, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetElement(0)->GetNode(1)->rGetLocation()[1], 0.0, 1e-12);
         }
     }
 
-    void TestReMeshLamina()
+    void TestReMeshLamina() throw(Exception)
     {
         // ReMeshLamina where nothing should change
         {
@@ -468,21 +511,23 @@ public:
             unsigned num_nodes = mesh.GetLamina(0)->GetNumNodes();
 
             // Get locations before ReMesh
-            std::vector<double> old_pos;
+            std::vector<c_vector<double, 2>> old_pos;
             for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
-                old_pos.push_back(norm_2(mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation()));
+                old_pos.push_back(mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation());
             }
 
-            mesh.ReMesh();
+            // Should make no different at all which node is selected
+            mesh.ReMesh(true);
 
             for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
             {
-                TS_ASSERT_DELTA(old_pos[node_idx], norm_2(mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation()), 1e-6);
+                TS_ASSERT_DELTA(old_pos[node_idx][0], mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation()[0], 1e-12);
+                TS_ASSERT_DELTA(old_pos[node_idx][1], mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation()[1], 1e-12);
             }
         }
 
-        // ReMeshLamina where points should become more evenly distributed than they were
+        // ReMeshLamina where the points should become evenly spaced
         {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.1, 0.3));
@@ -497,22 +542,22 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
 
-            mesh.ReMesh();
+            mesh.ReMesh(false);
 
-            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(0)->rGetLocation()[0], 0.1, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(0)->rGetLocation()[1], 0.3, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(0)->rGetLocation()[0], 0.1, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(0)->rGetLocation()[1], 0.3, 1e-12);
 
-            TS_ASSERT_LESS_THAN(mesh.GetLamina(0)->GetNode(1)->rGetLocation()[0], 0.32);
-            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(1)->rGetLocation()[1], 0.3, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(1)->rGetLocation()[0], 0.3, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(1)->rGetLocation()[1], 0.3, 1e-12);
 
-            TS_ASSERT_LESS_THAN(mesh.GetLamina(0)->GetNode(2)->rGetLocation()[0], 0.53);
-            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(2)->rGetLocation()[1], 0.3, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(2)->rGetLocation()[0], 0.5, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(2)->rGetLocation()[1], 0.3, 1e-12);
 
-            TS_ASSERT_LESS_THAN(0.64, mesh.GetLamina(0)->GetNode(3)->rGetLocation()[0]);
-            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(3)->rGetLocation()[1], 0.3, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(3)->rGetLocation()[0], 0.7, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(3)->rGetLocation()[1], 0.3, 1e-12);
 
-            TS_ASSERT_LESS_THAN(0.88, mesh.GetLamina(0)->GetNode(4)->rGetLocation()[0]);
-            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(4)->rGetLocation()[1], 0.3, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(4)->rGetLocation()[0], 0.9, 1e-12);
+            TS_ASSERT_DELTA(mesh.GetLamina(0)->GetNode(4)->rGetLocation()[1], 0.3, 1e-12);
         }
     }
 
@@ -616,7 +661,7 @@ public:
         std::vector<ImmersedBoundaryElement<2,2>*> elements;
         elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem));
 
-        // Make a vertex mesh
+        // Make a mesh
         ImmersedBoundaryMesh<2,2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
@@ -708,6 +753,48 @@ public:
         TS_ASSERT_EQUALS(new_polygon_dist[11], 0u);
         TS_ASSERT_EQUALS(new_polygon_dist[12], 0u);
     }
+
+    void TestGetMaxIndexMethods()
+    {
+        // Get default mesh with no nodes, elements, or laminas
+        {
+            ImmersedBoundaryMesh<2, 2> ib_mesh;
+
+            TS_ASSERT_EQUALS(ib_mesh.GetMaxNodeIndex(), UINT_MAX);
+            TS_ASSERT_EQUALS(ib_mesh.GetMaxElementIndex(), UINT_MAX);
+            TS_ASSERT_EQUALS(ib_mesh.GetMaxLaminaIndex(), UINT_MAX);
+        }
+
+        // Get real mesh with nodes, elements, and laminas
+        {
+            // Make a few nodes
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
+            nodes.push_back(new Node<2>(2, true, 0.3, 0.2));
+
+            // Make two elements
+            std::vector<ImmersedBoundaryElement<2,2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+            elements.push_back(new ImmersedBoundaryElement<2,2>(1, nodes));
+
+            // Make four laminas
+            std::vector<ImmersedBoundaryElement<1,2>*> lams;
+            lams.push_back(new ImmersedBoundaryElement<1,2>(0, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1,2>(1, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1,2>(2, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1,2>(3, nodes));
+
+            // Make a mesh
+            ImmersedBoundaryMesh<2,2> ib_mesh(nodes, elements, lams);
+
+            TS_ASSERT_EQUALS(ib_mesh.GetMaxNodeIndex(), 2);
+            TS_ASSERT_EQUALS(ib_mesh.GetMaxElementIndex(), 1);
+            TS_ASSERT_EQUALS(ib_mesh.GetMaxLaminaIndex(), 3);
+        }
+    }
+
+
 };
 
 #endif /*TESTIMMERSEDBOUNDARYMESH_HPP_*/

@@ -59,7 +59,6 @@ class ImmersedBoundaryMeshWriter;
 #include "Node.hpp"
 
 
-
 /**
  * An immersed boundary mesh class, in which elements may contain different numbers of nodes.
  * This is facilitated by the ImmersedBoundaryElement class.
@@ -120,9 +119,6 @@ protected:
 
     /** Vector of fluid sources used to balance those of the elements. */
     std::vector<FluidSource<SPACE_DIM>*> mBalancingFluidSources;
-
-    /** Array to store the three Kochanek parameters for spline interpolation */
-    std::array<double, 3> mKochanekParams;
 
     /** A voronoi diagram of the node locations, used to determine the element neighbours */
     boost::polygon::voronoi_diagram<double> mNodeLocationsVoronoiDiagram;
@@ -326,6 +322,21 @@ public:
     double GetSpacingRatio() const;
 
     /**
+     * @return the maximum node index (nodes may not be indexed consecutively), or UINT_MAX if there are none
+     */
+    unsigned GetMaxNodeIndex() const noexcept;
+
+    /**
+     * @return the maximum element index (elements may not be indexed consecutively), or UINT_MAX if there are none
+     */
+    unsigned GetMaxElementIndex() const noexcept;
+
+    /**
+     * @return the maximum lamina index (laminas may not be indexed consecutively), or UINT_MAX if there are none
+     */
+    unsigned GetMaxLaminaIndex() const noexcept;
+
+    /**
      * Overridden GetVectorFromAtoB() method.
      *
      * Evaluates the (surface) distance between two points in a periodic
@@ -344,6 +355,15 @@ public:
      * @param point the new target location of the node
      */
     void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point);
+
+    /**
+     * Transform a location so that it lies within the domain [0,1)x[0,1).  This method assumes the location is already
+     * 'close' to the domain, for instance because a location has previously been 'straightened out' for geometric
+     * calculations that require no looping due to periodicity.
+     *
+     * @param rLocation the location to transform
+     */
+    void ConformToGeometry(c_vector<double, SPACE_DIM>& rLocation) noexcept;
 
     /**
      * @return reference to non-modifiable 2d fluid velocity grids.
@@ -624,12 +644,6 @@ public:
      */
     void SetNeighbourDist(double neighbourDist);
 
-    /** @return reference to mKochanekParams */
-    const std::array<double, 3>& rGetKochanekParams() const;
-
-    /** @param rKochanekParams the new array of Kochanek spline parameters */
-    void SetKochanekParams(const std::array<double, 3>& rKochanekParams);
-
     /**
      * Update mNodeLocationsVoronoiDiagram if it is out of date, which is the case when mSummaryOfNodeLocations is
      * out-of-date, i.e. nodes have moved location.  This ensures the update is performed at most once per time step.
@@ -638,22 +652,26 @@ public:
 
     /**
      * ReMesh method that evenly redistributes nodes around each element and lamina.
+     *
+     * @param randomOrder whether to remesh elements and laminas starting from a random location. Defaults to false.
      */
-    void ReMesh();
+    void ReMesh(bool randomOrder=false);
 
     /**
      * ReMesh method that evenly redistributes nodes around a specific element.
      *
      * @param pElement the element to remesh
+     * @param randomOrder whether to remesh elements and laminas starting from a random location
      */
-    void ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement);
+    void ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement, bool randomOrder);
 
     /**
      * ReMesh method that evenly redistributes nodes along a specific lamina.
      *
      * @param pLamina the lamina to remesh
+     * @param randomOrder whether to remesh elements and laminas starting from a random location
      */
-    void ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina);
+    void ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina, bool randomOrder);
 
     /**
      * Determine whether two nodes belong to the same element, or the same lamina
