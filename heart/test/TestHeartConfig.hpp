@@ -1463,6 +1463,15 @@ public:
             TS_ASSERT_EQUALS(apd_maps.size(), 1u);
             TS_ASSERT_DELTA(apd_maps[0].first, 70.0, 1e-12);
             TS_ASSERT_DELTA(apd_maps[0].second, -20.0, 1e-12);
+            TS_ASSERT(HeartConfig::Instance()->IsPseudoEcgCalculationRequested());
+            std::vector<ChastePoint<3> > pseudo_ecg_parameters;
+            HeartConfig::Instance()->GetPseudoEcgElectrodePositions(pseudo_ecg_parameters);
+            TS_ASSERT_EQUALS(pseudo_ecg_parameters.size(), 1u);
+            for (unsigned dim=0; dim<3u; dim++)
+            {
+                TS_ASSERT_EQUALS(pseudo_ecg_parameters[0][dim], -(double)dim);
+            }
+
         }
 
         {

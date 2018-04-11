@@ -61,6 +61,7 @@
         <UpstrokeTimeMap threshold="-20" threshold_unit="mV"/>
         <MaxUpstrokeVelocityMap threshold="-20" threshold_unit="mV"/>
         <ConductionVelocityMap origin_node="1"/>
+        <PseudoEcgElectrodePosition x="0.0" y="-1.0" z="-2.0"/>
     </PostProcessing>
 
 </ChasteParameters>
