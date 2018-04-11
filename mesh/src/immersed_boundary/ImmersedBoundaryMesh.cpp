@@ -1840,60 +1840,112 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
         EXCEPTION("This method does not yet work in the presence of laminas");
     }
 
+    // Need a large double, but since we also perform calculations with it, we can't really use DBL_MAX
+    const double LARGE_DOUBLE = 1e6;
+
     /*
      * This method uses geometric information from a voronoi diagram of every node.
      *
-     * Nodes with infinite voronoi cells must be on the boundary.  In addition, if a node is on a free edge, the
-     * perimeter of its voronoi cell will be much larger than the "size" of the element.
+     * Nodes with infinite voronoi cells must be in a boundary element.
+     * In addition, some nodes in boundary elements will have unusually long shared-edges, and the voronoi perimeter
+     * of boundary elements will exceed the true perimeter by an unusually large amount.
+     * We use a threshold on the median values of these identifiers to robustly determine boundary elements.
      */
     UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
 
-    // Begin by resetting mesh to have no boundary elements, and caching length factors associated with each element
-    std::vector<double> elem_length_factors(this->mElements.size());
-    for (const auto& p_elem : this->mElements)
-    {
-        p_elem->SetIsBoundaryElement(false);
+    // Calculate the maximum element index in the mesh
+    using IbElem = ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>;
 
-        const unsigned idx = p_elem->GetIndex();
-        if (idx >= elem_length_factors.size())
-        {
-            elem_length_factors.resize(1 + idx);    // Resize, in case elements aren't contiguously numbered
-        }
-        // \todo remove this magic number
-        elem_length_factors[idx] = 1.8 * sqrt(this->GetVolumeOfElement(p_elem->GetIndex()));
-    }
+    const auto max_idx_it = std::max_element(this->mElements.begin(), this->mElements.end(),
+                                             [](IbElem* const a, IbElem* const b)
+                                             {
+                                                 return a->GetIndex() < b->GetIndex();
+                                             });
 
-    // For each node, check whether corresponding voronoi cell is infinite or not.
-    // If so, tag its containing element as being on the boundary.
+    const unsigned max_elem_idx = (*max_idx_it)->GetIndex();
+
+    // Keep track of all finite shared edge lengths (between two elements), as well as (for each element) the maximum
+    // shared edge length.
+    std::vector<double> max_shared_lengths(1 + max_elem_idx, 0.0);
+    std::vector<double> voronoi_perimeter(1 + max_elem_idx, 0.0);
+
+    // Loop over nodes and calculate values to fill the containers defined above
     for (const auto& p_node : this->mNodes)
     {
-        const unsigned containing_elem_idx = *p_node->ContainingElementsBegin();
-        const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[p_node->GetIndex()];
-        const auto voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
+        const unsigned this_node_idx = p_node->GetIndex();
+        const unsigned this_elem_idx = *p_node->ContainingElementsBegin();
 
+        // Get the voronoi cell that corresponds to this node
+        const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[this_node_idx];
+        const auto& voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
 
+        // Iterate over the edges of this cell.  Note that due to the halo region none of these edges should be infinite.
         auto p_edge = voronoi_cell.incident_edge();
 
-        // Loop over the voronoi cell, check for infinite edges, and calculate cell perimeter
-        double voronoi_perimter = 0.0;
+        // If the edge is infinite, the element containing it must be on the boundary regardless of shared edge length
+        if (p_edge->is_infinite())
+        {
+            max_shared_lengths[this_elem_idx] = LARGE_DOUBLE;
+            voronoi_perimeter[this_elem_idx] += LARGE_DOUBLE;
+            continue;
+        }
+
+        // Loop over the voronoi edges associated with this node's voronoi cell
         do
         {
-            if (p_edge->is_infinite())
-            {
-                this->GetElement(containing_elem_idx)->SetIsBoundaryElement(true);
-                break;
-            }
+            // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
+            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+            const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
 
-            voronoi_perimter += CalculateLengthOfVoronoiEdge(*p_edge);
+            // If the edge is between two elements, it counts
+            if (this_elem_idx != twin_elem_idx)
+            {
+                const double edge_length = CalculateLengthOfVoronoiEdge(*p_edge);
+                max_shared_lengths[this_elem_idx] = std::max(max_shared_lengths[this_elem_idx], edge_length);
+                voronoi_perimeter[this_elem_idx] += edge_length;
+            }
 
             p_edge = p_edge->next();
         } while (p_edge != voronoi_cell.incident_edge());
+    }
 
-        // The node is "free" (on the boundary) if its voronoi cell perimeter is bigger than would be expected
-        if (voronoi_perimter > elem_length_factors[containing_elem_idx])
-        {
-            this->GetElement(containing_elem_idx)->SetIsBoundaryElement(true);
-        }
+    // Calculate what proportion bigger the voronoi perimeter is than the actual one
+    std::vector<double> perimeter_multiples(voronoi_perimeter.size());
+    for (const auto& p_elem : this->mElements)
+    {
+        const unsigned idx = p_elem->GetIndex();
+        perimeter_multiples[idx] = voronoi_perimeter[idx] / this->GetSurfaceAreaOfElement(idx);
+    }
+
+    // Calculate the medians of each vector.  Copy the vector accounting for possible non-contiguous element indices.
+    std::vector<double> copy_max_shared_lengths;
+    std::vector<double> copy_perimeter_multiples;
+
+    for (const auto& p_elem : this->mElements)
+    {
+        const unsigned idx = p_elem->GetIndex();
+        copy_max_shared_lengths.emplace_back(max_shared_lengths[idx]);
+        copy_perimeter_multiples.emplace_back(perimeter_multiples[idx]);
+    }
+
+    const long half_way = copy_max_shared_lengths.size() / 2;
+    assert(half_way == copy_perimeter_multiples.size() / 2);
+
+    std::nth_element(copy_max_shared_lengths.begin(), copy_max_shared_lengths.begin() + half_way, copy_max_shared_lengths.end());
+    std::nth_element(copy_perimeter_multiples.begin(), copy_perimeter_multiples.begin() + half_way, copy_perimeter_multiples.end());
+
+    const double median_max_edge_length = copy_max_shared_lengths[half_way];
+    const double median_perimeter_multiple = copy_perimeter_multiples[half_way];
+
+    // Finally, tag the boundary elements
+    for (const auto& p_elem : this->mElements)
+    {
+        const unsigned idx = p_elem->GetIndex();
+
+        const bool large_shared_edge = max_shared_lengths[idx] > 1.1 * median_max_edge_length;
+        const bool large_perimeter = perimeter_multiples[idx] > 1.1 * median_perimeter_multiple;
+
+        p_elem->SetIsBoundaryElement(large_shared_edge && large_perimeter);
     }
 }
 
@@ -1914,6 +1966,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
 
     bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
 
+    /*
+     * Method outline:
+     * - Add all node locations as boost points, correctly scaled
+     * - Add extra locations for any nodes within distance mVoronoiHalo of the domain edge for periodicity
+     * - Calculate the voronoi diagram
+     * - Populate mVoronoiCellIdsIndexedByNodeIndex for efficient mapping between node index and corresponding voronoi
+     *   cell
+     * - Store the corresponding node index in each voronoi cell's "color" variable for efficient reverse-lookup
+     * - Tag boundary elements
+     */
     if (voronoi_needs_updating)
     {
         mSummaryOfNodeLocations = new_location_summary;
@@ -1924,8 +1986,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
         const c_vector<double, SPACE_DIM> halo_left = Create_c_vector(-1.0, 0.0);
         const c_vector<double, SPACE_DIM> halo_right = Create_c_vector(1.0, 0.0);
 
-        std::vector<c_vector<double, SPACE_DIM>> additional_locations;
-        std::vector<unsigned> additional_node_indices;
+        std::vector<std::pair<unsigned, c_vector<double, SPACE_DIM>>> halo_ids_and_locations;
+        std::vector<unsigned> node_ids_in_source_idx_order;
 
         // We need to translate node locations into boost points, which are scaled to an integer grid
         std::vector<boost_point> points;
@@ -1937,9 +1999,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
             const double y_pos = p_node->rGetLocation()[1];
 
             // Put the integer voronoi coordinate in for this node's location
-            const int y_coord = ScaleUpToVoronoiCoordinate(x_pos);
-            const int x_coord = ScaleUpToVoronoiCoordinate(y_pos);
-            points.emplace_back(boost_point(x_coord, y_coord));
+            points.emplace_back(boost_point(ScaleUpToVoronoiCoordinate(x_pos), ScaleUpToVoronoiCoordinate(y_pos)));
+            node_ids_in_source_idx_order.emplace_back(p_node->GetIndex());
 
             // Now, for this location, decide whether any copies of this location are needed in the halo region
             const bool needed_up = y_pos < mVoronoiHalo;
@@ -1949,53 +2010,57 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
 
             if (needed_up)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_up);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_up));
             }
             if (needed_down)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_down);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_down));
             }
             if (needed_left)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_left);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_left));
             }
             if (needed_right)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_right);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_right));
             }
             if (needed_up && needed_left)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_up + halo_left);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_up + halo_left));
             }
             if (needed_up && needed_right)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_up + halo_right);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_up + halo_right));
             }
             if (needed_down && needed_left)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_down + halo_left);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_down + halo_left));
             }
             if (needed_down && needed_right)
             {
-                additional_locations.emplace_back(p_node->rGetLocation() + halo_down + halo_right);
-                additional_node_indices.emplace_back(p_node->GetIndex());
+                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                   p_node->rGetLocation() + halo_down + halo_right));
             }
         }
 
         // Next add the additional points
-        // First add a point for each node, and calculate any additional locations needed within the halo
-        for (const auto& location : additional_locations)
+        for (const auto& pair : halo_ids_and_locations)
         {
+            const unsigned node_idx = pair.first;
+            const c_vector<double, SPACE_DIM> location = pair.second;
+
             const int x_coord = ScaleUpToVoronoiCoordinate(location[0]);
             const int y_coord = ScaleUpToVoronoiCoordinate(location[1]);
+
             points.emplace_back(boost_point(x_coord, y_coord));
+            node_ids_in_source_idx_order.emplace_back(node_idx);
         }
 
         // Construct the voronoi diagram.  This is the costly part of this method.
@@ -2019,28 +2084,19 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
 
             auto& r_this_cell = mNodeLocationsVoronoiDiagram.cells()[vor_cell_id];
             const auto source_idx = r_this_cell.source_index();
+            const unsigned node_idx = node_ids_in_source_idx_order[source_idx];
 
-            // Identify whether this is a genuine node location, or one of the additional locations added later
+            r_this_cell.color(node_idx);
+
             if (source_idx < this->mNodes.size())
             {
-                const unsigned node_idx = this->mNodes[source_idx]->GetIndex();
                 mVoronoiCellIdsIndexedByNodeIndex[node_idx] = vor_cell_id;
-
-                // Store the node index in the cell's "color" for efficient reverse-lookup
-                r_this_cell.color(node_idx);
-            }
-            else
-            {
-                // One of the additional points in the halo region.  We still need to associate a node in the cell's "color"
-                const auto additional_idx = source_idx - this->mNodes.size();
-                r_this_cell.color(additional_node_indices[additional_idx]);
             }
         }
 
         // Finally, if the diagram was out-of-date, we will need to re-tag boundary elements.
         this->TagBoundaryElements();
     }
-
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
