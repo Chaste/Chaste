@@ -469,7 +469,6 @@ public:
 
             double cumulative_dist = 0.2 + sqrt(0.02);
             double node_spacing = cumulative_dist / 3.0;
-            double epsilon = node_spacing - 0.1;
 
             // Remesh using a random location (fixes the second index)
             RandomNumberGenerator::Instance()->Reseed(0u);
