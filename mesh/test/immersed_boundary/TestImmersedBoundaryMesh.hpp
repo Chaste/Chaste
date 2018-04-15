@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "Node.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "UblasCustomFunctions.hpp"
 #include "UblasVectorInclude.hpp"
 
 // This test is never run in parallel
@@ -793,6 +794,76 @@ public:
         }
     }
 
+    void TestConformToGeometry()
+    {
+        // Generate some specific points and verify they conform properly
+        {
+            ImmersedBoundaryMesh<2, 2> ib_mesh;
+
+            c_vector<double, 2> below_zero = Create_c_vector(-DBL_EPSILON, -DBL_EPSILON);
+            ib_mesh.ConformToGeometry(below_zero);
+
+            c_vector<double, 2> zero = Create_c_vector(0.0, 0.0);
+            ib_mesh.ConformToGeometry(zero);
+
+            c_vector<double, 2> above_zero = Create_c_vector(DBL_EPSILON, DBL_EPSILON);
+            ib_mesh.ConformToGeometry(above_zero);
+
+            c_vector<double, 2> below_one = Create_c_vector(1.0 - DBL_EPSILON, 1.0 - DBL_EPSILON);
+            ib_mesh.ConformToGeometry(below_one);
+
+            c_vector<double, 2> one = Create_c_vector(1.0, 1.0);
+            ib_mesh.ConformToGeometry(one);
+
+            c_vector<double, 2> above_one = Create_c_vector(1.0 + DBL_EPSILON, 1.0 + DBL_EPSILON);
+            ib_mesh.ConformToGeometry(above_one);
+
+            TS_ASSERT_DELTA(below_zero[0], 1.0 - DBL_EPSILON, 1e-12);
+            TS_ASSERT_DELTA(below_zero[1], 1.0 - DBL_EPSILON, 1e-12);
+
+            TS_ASSERT_DELTA(zero[0], 0.0, 1e-12);
+            TS_ASSERT_DELTA(zero[1], 0.0, 1e-12);
+
+            TS_ASSERT_DELTA(above_zero[0], DBL_EPSILON, 1e-12);
+            TS_ASSERT_DELTA(above_zero[1], DBL_EPSILON, 1e-12);
+
+            TS_ASSERT_DELTA(below_one[0], 1.0 - DBL_EPSILON, 1e-12);
+            TS_ASSERT_DELTA(below_one[1], 1.0 - DBL_EPSILON, 1e-12);
+
+            TS_ASSERT_DELTA(one[0], 0.0, 1e-12);
+            TS_ASSERT_DELTA(one[1], 0.0, 1e-12);
+
+            TS_ASSERT_DELTA(above_one[0], DBL_EPSILON, 1e-12);
+            TS_ASSERT_DELTA(above_one[1], DBL_EPSILON, 1e-12);
+        }
+
+        // Generate random points within [-2, 3) and verify they are conformed to the correct location in [0,1)
+        {
+            ImmersedBoundaryMesh<2, 2> ib_mesh;
+            RandomNumberGenerator::Instance()->Reseed(0);
+
+            std::vector<c_vector<double, 2>> originals;
+
+            for (unsigned i = 0; i < 100u; ++i)
+            {
+                const double x = 5.0 * RandomNumberGenerator::Instance()->ranf() - 2.0;
+                const double y = 5.0 * RandomNumberGenerator::Instance()->ranf() - 2.0;
+                originals.emplace_back(Create_c_vector(x, y));
+            }
+
+            std::vector<c_vector<double, 2>> copies = originals;
+            for(auto& copy : copies)
+            {
+                ib_mesh.ConformToGeometry(copy);
+            }
+
+            for (unsigned i = 0; i < originals.size(); ++i)
+            {
+                TS_ASSERT_DELTA(copies[i][0], std::fmod(originals[i][0] + 100.0, 1.0), 1e-12);
+                TS_ASSERT_DELTA(copies[i][1], std::fmod(originals[i][1] + 100.0, 1.0), 1e-12);
+            }
+        }
+    }
 
 };
 

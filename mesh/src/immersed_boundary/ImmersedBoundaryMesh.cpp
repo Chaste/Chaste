@@ -1512,12 +1512,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
 
     for (unsigned node_idx = 1; node_idx < num_nodes; ++node_idx)
     {
+        const unsigned prev_idx = AdvanceMod(start_idx, node_idx - 1, num_nodes);
         const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
 
-        const auto& prev_location = locations_straightened.back();
-        const auto this_location = pElement->GetNodeLocation(this_idx);
+        const c_vector<double, SPACE_DIM>& r_last_location_added = locations_straightened.back();
 
-        locations_straightened.emplace_back(prev_location + this->GetVectorFromAtoB(prev_location, this_location));
+        const c_vector<double, SPACE_DIM>& r_prev_location = pElement->GetNodeLocation(prev_idx);
+        const c_vector<double, SPACE_DIM>& r_this_location = pElement->GetNodeLocation(this_idx);
+
+        locations_straightened.emplace_back(r_last_location_added +
+                                            this->GetVectorFromAtoB(r_prev_location, r_this_location));
     }
 
     assert(locations_straightened.size() == num_nodes);
@@ -1611,6 +1615,9 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ConformToGeometry(c_vector<do
 {
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
+        assert(rLocation[dim] >= -2.0);  // It's expected that the location is near the domain.  This method is
+        assert(rLocation[dim] < 3.0);    // inefficient if the location is far away.
+
         while (rLocation[dim] < 0.0)
         {
             rLocation[dim] += 1.0;
