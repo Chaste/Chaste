@@ -1879,7 +1879,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
         copy_perimeter_multiples.emplace_back(perimeter_multiples[idx]);
     }
 
-    const long half_way = copy_max_shared_lengths.size() / 2;
+    const std::size_t half_way = copy_max_shared_lengths.size() / 2;
     assert(half_way == copy_perimeter_multiples.size() / 2);
 
     std::nth_element(copy_max_shared_lengths.begin(), copy_max_shared_lengths.begin() + half_way, copy_max_shared_lengths.end());
