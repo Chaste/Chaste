@@ -156,9 +156,10 @@ public:
 
         //Check that the post-processed file is there and remove it
         FileFinder pseudoecg("SaveMono2D/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput);
-        TS_ASSERT(pseudoecg.Exists());
+
         if (PetscTools::AmMaster())
         {
+            TS_ASSERT(pseudoecg.Exists()); // Only master tests. This prevents master from removing file before other processes have seen it
             pseudoecg.Remove();
             TS_ASSERT(pseudoecg.Exists() == false);
         }
