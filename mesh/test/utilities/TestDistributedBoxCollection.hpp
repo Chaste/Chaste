@@ -104,12 +104,10 @@ private:
         {
             if (box_collection.IsBoxOwned(i))
             {
-                std::set<Node<DIM>* > nodes = box_collection.rGetBox(i).rGetNodesContained();
-                for (typename std::set<Node<DIM>* >::iterator node_iter = nodes.begin();
-                     node_iter != nodes.end();
-                     ++node_iter)
+                std::vector<Node<DIM>* > nodes = box_collection.rGetBox(i).rGetNodesContained();
+                for (Node<DIM>* p_node : nodes)
                 {
-                    delete (*node_iter);
+                    delete p_node;
                 }
             }
         }
@@ -248,13 +246,13 @@ public:
         Node<2> test_node(213, node_location);
 
         test_box.AddNode(&test_node);
-        std::set< Node<2>* > nodes_contained_before = test_box.rGetNodesContained();
+        std::vector< Node<2>* >& nodes_contained_before = test_box.rGetNodesContained();
 
         TS_ASSERT_EQUALS(*(nodes_contained_before.begin()), &test_node);
         TS_ASSERT_EQUALS((*(nodes_contained_before.begin()))->GetIndex(), 213u);
 
         test_box.RemoveNode(&test_node);
-        std::set< Node<2>* > nodes_contained_after = test_box.rGetNodesContained();
+        std::vector< Node<2>* >& nodes_contained_after = test_box.rGetNodesContained();
         TS_ASSERT(nodes_contained_after.empty());
     }
 
@@ -308,33 +306,33 @@ public:
 
         if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-            std::set<unsigned> correct_answer_0;
-            correct_answer_0.insert(0);
-            correct_answer_0.insert(1); // Halo above
+            std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+            std::vector<unsigned> correct_answer_0;
+            correct_answer_0.emplace_back(0);
+            correct_answer_0.emplace_back(1); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
 
         if (box_collection.IsBoxOwned(1))
         {
-            std::set<unsigned>& local_boxes_to_box_1 = box_collection.rGetLocalBoxes(1);
-            std::set<unsigned> correct_answer_1;
-            correct_answer_1.insert(0); // Halo below
-            correct_answer_1.insert(1);
-            correct_answer_1.insert(2);// Halo above
+            std::vector<unsigned>& local_boxes_to_box_1 = box_collection.rGetLocalBoxes(1);
+            std::vector<unsigned> correct_answer_1;
+            correct_answer_1.emplace_back(0); // Halo below
+            correct_answer_1.emplace_back(1);
+            correct_answer_1.emplace_back(2); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_1, correct_answer_1);
         }
 
         if (box_collection.IsBoxOwned(4))
         {
-            std::set<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
-            std::set<unsigned> correct_answer_4;
-            correct_answer_4.insert(3); // Halo below
-            correct_answer_4.insert(4);
+            std::vector<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
+            std::vector<unsigned> correct_answer_4;
+            correct_answer_4.emplace_back(3); // Halo below
+            correct_answer_4.emplace_back(4);
             if (PetscTools::GetNumProcs() > 5u)
             {
                 // There's a process (spinning) which requires an extra halo box
-                correct_answer_4.insert(5);
+                correct_answer_4.emplace_back(5);
             }
             TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
         }
@@ -424,56 +422,56 @@ public:
 
         if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+            std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
-            std::set<unsigned> correct_answer_0;
-            correct_answer_0.insert(0);
-            correct_answer_0.insert(1);
-            correct_answer_0.insert(4); // Halo above
-            correct_answer_0.insert(5); // Halo above
+            std::vector<unsigned> correct_answer_0;
+            correct_answer_0.emplace_back(0);
+            correct_answer_0.emplace_back(1);
+            correct_answer_0.emplace_back(4); // Halo above
+            correct_answer_0.emplace_back(5); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
         if (box_collection.IsBoxOwned(3))
         {
-            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
-            std::set<unsigned> correct_answer_3;
-            correct_answer_3.insert(3);
-            correct_answer_3.insert(2);
-            correct_answer_3.insert(6);
-            correct_answer_3.insert(7);
+            std::vector<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
+            std::vector<unsigned> correct_answer_3;
+            correct_answer_3.emplace_back(2);
+            correct_answer_3.emplace_back(3);
+            correct_answer_3.emplace_back(6);
+            correct_answer_3.emplace_back(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
         }
         if (box_collection.IsBoxOwned(5))
         {
-            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
-            std::set<unsigned> correct_answer_5;
-            correct_answer_5.insert(0);
-            correct_answer_5.insert(1);
-            correct_answer_5.insert(2);
-            correct_answer_5.insert(4);
-            correct_answer_5.insert(5);
-            correct_answer_5.insert(6);
-            correct_answer_5.insert(8);
-            correct_answer_5.insert(9);
-            correct_answer_5.insert(10);
+            std::vector<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
+            std::vector<unsigned> correct_answer_5;
+            correct_answer_5.emplace_back(0);
+            correct_answer_5.emplace_back(1);
+            correct_answer_5.emplace_back(2);
+            correct_answer_5.emplace_back(4);
+            correct_answer_5.emplace_back(5);
+            correct_answer_5.emplace_back(6);
+            correct_answer_5.emplace_back(8);
+            correct_answer_5.emplace_back(9);
+            correct_answer_5.emplace_back(10);
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
         }
         if (box_collection.IsBoxOwned(10))
         {
-            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
-            std::set<unsigned> correct_answer_10;
-            correct_answer_10.insert(5); // Halo below 9
-            correct_answer_10.insert(6); // Halo below 10
-            correct_answer_10.insert(7); // Halo below 11
-            correct_answer_10.insert(9);
-            correct_answer_10.insert(10);
-            correct_answer_10.insert(11);
+            std::vector<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
+            std::vector<unsigned> correct_answer_10;
+            correct_answer_10.emplace_back(5); // Halo below 9
+            correct_answer_10.emplace_back(6); // Halo below 10
+            correct_answer_10.emplace_back(7); // Halo below 11
+            correct_answer_10.emplace_back(9);
+            correct_answer_10.emplace_back(10);
+            correct_answer_10.emplace_back(11);
             if (PetscTools::GetNumProcs() > 3u)
             {
                 // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
-                correct_answer_10.insert(13); // Halo above 9
-                correct_answer_10.insert(14); // Halo above 10
-                correct_answer_10.insert(15); // Halo above 11
+                correct_answer_10.emplace_back(13); // Halo above 9
+                correct_answer_10.emplace_back(14); // Halo above 10
+                correct_answer_10.emplace_back(15); // Halo above 11
             }
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
@@ -510,79 +508,79 @@ public:
         box_collection.SetupAllLocalBoxes();
         if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+            std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
-            std::set<unsigned> correct_answer_0;
-            correct_answer_0.insert(0);
-            correct_answer_0.insert(1);
-            correct_answer_0.insert(3);
-            correct_answer_0.insert(4);
-            correct_answer_0.insert(5);
-            correct_answer_0.insert(7);
+            std::vector<unsigned> correct_answer_0;
+            correct_answer_0.emplace_back(0);
+            correct_answer_0.emplace_back(1);
+            correct_answer_0.emplace_back(3);
+            correct_answer_0.emplace_back(4);
+            correct_answer_0.emplace_back(5);
+            correct_answer_0.emplace_back(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
         if (box_collection.IsBoxOwned(3))
         {
-            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
-            std::set<unsigned> correct_answer_3;
-            correct_answer_3.insert(0);
-            correct_answer_3.insert(2);
-            correct_answer_3.insert(3);
-            correct_answer_3.insert(4);
-            correct_answer_3.insert(6);
-            correct_answer_3.insert(7);
+            std::vector<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
+            std::vector<unsigned> correct_answer_3;
+            correct_answer_3.emplace_back(0);
+            correct_answer_3.emplace_back(2);
+            correct_answer_3.emplace_back(3);
+            correct_answer_3.emplace_back(4);
+            correct_answer_3.emplace_back(6);
+            correct_answer_3.emplace_back(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
         }
         if (box_collection.IsBoxOwned(5))
         {
-            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
-            std::set<unsigned> correct_answer_5;
-            correct_answer_5.insert(0);
-            correct_answer_5.insert(1);
-            correct_answer_5.insert(2);
-            correct_answer_5.insert(4);
-            correct_answer_5.insert(5);
-            correct_answer_5.insert(6);
-            correct_answer_5.insert(8);
-            correct_answer_5.insert(9);
-            correct_answer_5.insert(10);
+            std::vector<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
+            std::vector<unsigned> correct_answer_5;
+            correct_answer_5.emplace_back(0);
+            correct_answer_5.emplace_back(1);
+            correct_answer_5.emplace_back(2);
+            correct_answer_5.emplace_back(4);
+            correct_answer_5.emplace_back(5);
+            correct_answer_5.emplace_back(6);
+            correct_answer_5.emplace_back(8);
+            correct_answer_5.emplace_back(9);
+            correct_answer_5.emplace_back(10);
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
         }
         if (box_collection.IsBoxOwned(10))
         {
-            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
-            std::set<unsigned> correct_answer_10;
-            correct_answer_10.insert(5);
-            correct_answer_10.insert(6);
-            correct_answer_10.insert(7);
-            correct_answer_10.insert(9);
-            correct_answer_10.insert(10);
-            correct_answer_10.insert(11);
+            std::vector<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
+            std::vector<unsigned> correct_answer_10;
+            correct_answer_10.emplace_back(5);
+            correct_answer_10.emplace_back(6);
+            correct_answer_10.emplace_back(7);
+            correct_answer_10.emplace_back(9);
+            correct_answer_10.emplace_back(10);
+            correct_answer_10.emplace_back(11);
             if (PetscTools::GetNumProcs() > 3u)
             {
                 // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
-                correct_answer_10.insert(13); // Halo above 9
-                correct_answer_10.insert(14); // Halo above 10
-                correct_answer_10.insert(15); // Halo above 11
+                correct_answer_10.emplace_back(13); // Halo above 9
+                correct_answer_10.emplace_back(14); // Halo above 10
+                correct_answer_10.emplace_back(15); // Halo above 11
             }
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
         if (box_collection.IsBoxOwned(11))
         {
-            std::set<unsigned>& local_boxes_to_box_11 = box_collection.rGetLocalBoxes(11);
-            std::set<unsigned> correct_answer_11;
-            correct_answer_11.insert(4);
-            correct_answer_11.insert(6);
-            correct_answer_11.insert(7);
-            correct_answer_11.insert(8);
-            correct_answer_11.insert(10);
-            correct_answer_11.insert(11);
+            std::vector<unsigned>& local_boxes_to_box_11 = box_collection.rGetLocalBoxes(11);
+            std::vector<unsigned> correct_answer_11;
+            correct_answer_11.emplace_back(4);
+            correct_answer_11.emplace_back(6);
+            correct_answer_11.emplace_back(7);
+            correct_answer_11.emplace_back(8);
+            correct_answer_11.emplace_back(10);
+            correct_answer_11.emplace_back(11);
             if (PetscTools::GetNumProcs() > 3u)
             {
                 // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
-                correct_answer_11.insert(14); // Halo above 10
-                correct_answer_11.insert(15); // Halo above 11
-                correct_answer_11.insert(12); // Halo above 8 (Periodic in x)
+                correct_answer_11.emplace_back(14); // Halo above 10
+                correct_answer_11.emplace_back(15); // Halo above 11
+                correct_answer_11.emplace_back(12); // Halo above 8 (Periodic in x)
             }
            TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
         }
@@ -613,92 +611,92 @@ public:
         box_collection.SetupAllLocalBoxes();
         if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+            std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
 
-            std::set<unsigned> correct_answer_0;
-            correct_answer_0.insert(0);
-            correct_answer_0.insert(1);
-            correct_answer_0.insert(4);
-            correct_answer_0.insert(5);
-            correct_answer_0.insert(12);
-            correct_answer_0.insert(13);
-            correct_answer_0.insert(16);
-            correct_answer_0.insert(17);
+            std::vector<unsigned> correct_answer_0;
+            correct_answer_0.emplace_back(0);
+            correct_answer_0.emplace_back(1);
+            correct_answer_0.emplace_back(4);
+            correct_answer_0.emplace_back(5);
+            correct_answer_0.emplace_back(12);
+            correct_answer_0.emplace_back(13);
+            correct_answer_0.emplace_back(16);
+            correct_answer_0.emplace_back(17);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
         if (box_collection.IsBoxOwned(3))
         {
-            std::set<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
-            std::set<unsigned> correct_answer_3;
-            correct_answer_3.insert(3);
-            correct_answer_3.insert(2);
-            correct_answer_3.insert(6);
-            correct_answer_3.insert(7);
-            correct_answer_3.insert(14);
-            correct_answer_3.insert(15);
-            correct_answer_3.insert(18);
-            correct_answer_3.insert(19);
+            std::vector<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
+            std::vector<unsigned> correct_answer_3;
+            correct_answer_3.emplace_back(2);
+            correct_answer_3.emplace_back(3);
+            correct_answer_3.emplace_back(6);
+            correct_answer_3.emplace_back(7);
+            correct_answer_3.emplace_back(14);
+            correct_answer_3.emplace_back(15);
+            correct_answer_3.emplace_back(18);
+            correct_answer_3.emplace_back(19);
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
         }
         if (box_collection.IsBoxOwned(5))
         {
-            std::set<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
-            std::set<unsigned> correct_answer_5;
-            correct_answer_5.insert(0);
-            correct_answer_5.insert(1);
-            correct_answer_5.insert(2);
-            correct_answer_5.insert(4);
-            correct_answer_5.insert(5);
-            correct_answer_5.insert(6);
-            correct_answer_5.insert(8);
-            correct_answer_5.insert(9);
-            correct_answer_5.insert(10);
-            correct_answer_5.insert(12);
-            correct_answer_5.insert(13);
-            correct_answer_5.insert(14);
-            correct_answer_5.insert(16);
-            correct_answer_5.insert(17);
-            correct_answer_5.insert(18);
-            correct_answer_5.insert(20);
-            correct_answer_5.insert(21);
-            correct_answer_5.insert(22);
+            std::vector<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
+            std::vector<unsigned> correct_answer_5;
+            correct_answer_5.emplace_back(0);
+            correct_answer_5.emplace_back(1);
+            correct_answer_5.emplace_back(2);
+            correct_answer_5.emplace_back(4);
+            correct_answer_5.emplace_back(5);
+            correct_answer_5.emplace_back(6);
+            correct_answer_5.emplace_back(8);
+            correct_answer_5.emplace_back(9);
+            correct_answer_5.emplace_back(10);
+            correct_answer_5.emplace_back(12);
+            correct_answer_5.emplace_back(13);
+            correct_answer_5.emplace_back(14);
+            correct_answer_5.emplace_back(16);
+            correct_answer_5.emplace_back(17);
+            correct_answer_5.emplace_back(18);
+            correct_answer_5.emplace_back(20);
+            correct_answer_5.emplace_back(21);
+            correct_answer_5.emplace_back(22);
 
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
         }
         if (box_collection.IsBoxOwned(19))
         {
-            std::set<unsigned>& local_boxes_to_box_19 = box_collection.rGetLocalBoxes(19);
-            std::set<unsigned> correct_answer_19;
-            correct_answer_19.insert(2);
-            correct_answer_19.insert(3);
-            correct_answer_19.insert(6);
-            correct_answer_19.insert(7);
-            correct_answer_19.insert(10);
-            correct_answer_19.insert(11);
-            correct_answer_19.insert(14);
-            correct_answer_19.insert(15);
-            correct_answer_19.insert(18);
-            correct_answer_19.insert(19);
-            correct_answer_19.insert(22);
-            correct_answer_19.insert(23);
+            std::vector<unsigned>& local_boxes_to_box_19 = box_collection.rGetLocalBoxes(19);
+            std::vector<unsigned> correct_answer_19;
+            correct_answer_19.emplace_back(2);
+            correct_answer_19.emplace_back(3);
+            correct_answer_19.emplace_back(6);
+            correct_answer_19.emplace_back(7);
+            correct_answer_19.emplace_back(10);
+            correct_answer_19.emplace_back(11);
+            correct_answer_19.emplace_back(14);
+            correct_answer_19.emplace_back(15);
+            correct_answer_19.emplace_back(18);
+            correct_answer_19.emplace_back(19);
+            correct_answer_19.emplace_back(22);
+            correct_answer_19.emplace_back(23);
             TS_ASSERT_EQUALS(local_boxes_to_box_19, correct_answer_19);
         }
         if (box_collection.IsBoxOwned(22))
         {
-            std::set<unsigned>& local_boxes_to_box_22 = box_collection.rGetLocalBoxes(22);
-            std::set<unsigned> correct_answer_22;
-            correct_answer_22.insert(5);
-            correct_answer_22.insert(6);
-            correct_answer_22.insert(7);
-            correct_answer_22.insert(9);
-            correct_answer_22.insert(10);
-            correct_answer_22.insert(11);
-            correct_answer_22.insert(17);
-            correct_answer_22.insert(18);
-            correct_answer_22.insert(19);
-            correct_answer_22.insert(21);
-            correct_answer_22.insert(22);
-            correct_answer_22.insert(23);
+            std::vector<unsigned>& local_boxes_to_box_22 = box_collection.rGetLocalBoxes(22);
+            std::vector<unsigned> correct_answer_22;
+            correct_answer_22.emplace_back(5);
+            correct_answer_22.emplace_back(6);
+            correct_answer_22.emplace_back(7);
+            correct_answer_22.emplace_back(9);
+            correct_answer_22.emplace_back(10);
+            correct_answer_22.emplace_back(11);
+            correct_answer_22.emplace_back(17);
+            correct_answer_22.emplace_back(18);
+            correct_answer_22.emplace_back(19);
+            correct_answer_22.emplace_back(21);
+            correct_answer_22.emplace_back(22);
+            correct_answer_22.emplace_back(23);
             TS_ASSERT_EQUALS(local_boxes_to_box_22, correct_answer_22);
         }
     }
@@ -776,38 +774,37 @@ public:
         std::vector< std::pair<Node<1>*, Node<1>* > > pairs_returned_vector;
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
-        std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
+        std::vector< std::pair<Node<1>*, Node<1>* > > pairs_returned;
         for (unsigned i=0; i<pairs_returned_vector.size(); i++)
         {
-            pairs_returned.insert(pairs_returned_vector[i]);
+            pairs_returned.emplace_back(pairs_returned_vector[i]);
         }
 
         switch (PetscTools::GetNumProcs())
         {
             case 1:
             {
-                std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                neighbours_should_be[0].insert(1);
-                neighbours_should_be[0].insert(2);
-                neighbours_should_be[1].insert(0);
-                neighbours_should_be[1].insert(2);
-                neighbours_should_be[2].insert(0);
-                neighbours_should_be[2].insert(1);
-                neighbours_should_be[2].insert(3);
-                neighbours_should_be[3].insert(2);
-                neighbours_should_be[4] = std::set<unsigned>();
+                std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                neighbours_should_be[0].emplace_back(1);
+                neighbours_should_be[0].emplace_back(2);
+                neighbours_should_be[1].emplace_back(0);
+                neighbours_should_be[1].emplace_back(2);
+                neighbours_should_be[2].emplace_back(0);
+                neighbours_should_be[2].emplace_back(1);
+                neighbours_should_be[2].emplace_back(3);
+                neighbours_should_be[3].emplace_back(2);
+                neighbours_should_be[4] = {};
 
                 for (unsigned i=0; i<nodes.size(); i++)
                 {
-                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
-                    TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+                    TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), neighbours_should_be[i]);
                 }
 
-                std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
-                pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
-                pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
-                pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[1],nodes[2]));
-                pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[2],nodes[3]));
+                std::vector< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
+                pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[2]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[1],nodes[2]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[3]));
 
                 TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
@@ -815,35 +812,33 @@ public:
             }
             case  2:
             {
-                std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
+                std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                std::vector< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
                 switch (PetscTools::GetMyRank())
                 {
                     case 0:
                     {
-                        neighbours_should_be[0].insert(1);
-                        neighbours_should_be[0].insert(2);
-                        neighbours_should_be[1].insert(0);
-                        neighbours_should_be[1].insert(2);
-                        neighbours_should_be[2].insert(0);
-                        neighbours_should_be[2].insert(1);
-                        neighbours_should_be[2].insert(3);
-                        neighbours_should_be[3].insert(2);
+                        neighbours_should_be[0].emplace_back(1);
+                        neighbours_should_be[0].emplace_back(2);
+                        neighbours_should_be[1].emplace_back(0);
+                        neighbours_should_be[1].emplace_back(2);
+                        neighbours_should_be[2].emplace_back(0);
+                        neighbours_should_be[2].emplace_back(1);
+                        neighbours_should_be[2].emplace_back(3);
+                        neighbours_should_be[3].emplace_back(2);
 
                         unsigned nodes_on_this_process[4] = {0,1,2,3};
 
                         for (unsigned i=0; i<4; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[1],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[2],nodes[3]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[1],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[3]));
 
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
@@ -851,16 +846,14 @@ public:
                     }
                     case 1:
                     {
-                        neighbours_should_be[4] = std::set<unsigned>();
+                        neighbours_should_be[4] = std::vector<unsigned>();
 
                         unsigned nodes_on_this_process[1] = {4};
 
                         for (unsigned i=0; i<1; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
@@ -877,35 +870,33 @@ public:
 
             case  3:
             {
-                std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
+                std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                std::vector< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
                 switch (PetscTools::GetMyRank())
                 {
                     case 0:
                     {
-                        neighbours_should_be[0].insert(1);
-                        neighbours_should_be[0].insert(2);
-                        neighbours_should_be[1].insert(0);
-                        neighbours_should_be[1].insert(2);
-                        neighbours_should_be[2].insert(0);
-                        neighbours_should_be[2].insert(1);
-                        neighbours_should_be[2].insert(3);
-                        neighbours_should_be[3].insert(2);
+                        neighbours_should_be[0].emplace_back(1);
+                        neighbours_should_be[0].emplace_back(2);
+                        neighbours_should_be[1].emplace_back(0);
+                        neighbours_should_be[1].emplace_back(2);
+                        neighbours_should_be[2].emplace_back(0);
+                        neighbours_should_be[2].emplace_back(1);
+                        neighbours_should_be[2].emplace_back(3);
+                        neighbours_should_be[3].emplace_back(2);
 
                         unsigned nodes_on_this_process[4] = {0,1,2,3};
 
                         for (unsigned i=0; i<4; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[1]));
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[0],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[1],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<1>*, Node<1>*>(nodes[2],nodes[3]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[1],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[3]));
 
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
                         break;
@@ -920,16 +911,14 @@ public:
                     }
                     case 2:
                     {
-                        neighbours_should_be[4] = std::set<unsigned>();
+                        neighbours_should_be[4] = std::vector<unsigned>();
 
                         unsigned nodes_on_this_process[1] = {4};
 
                         for (unsigned i=0; i<1; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
                         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
@@ -998,41 +987,41 @@ public:
         // hardcode a few checks on the 6 by 6 grid.
         if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-            std::set<unsigned> correct_answer_0;
-            correct_answer_0.insert(0);
-            correct_answer_0.insert(1);
-            correct_answer_0.insert(6);
-            correct_answer_0.insert(7);
+            std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+            std::vector<unsigned> correct_answer_0;
+            correct_answer_0.emplace_back(0);
+            correct_answer_0.emplace_back(1);
+            correct_answer_0.emplace_back(6);
+            correct_answer_0.emplace_back(7);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
         if (box_collection.IsBoxOwned(4))
         {
-            std::set<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
-            std::set<unsigned> correct_answer_4;
-            correct_answer_4.insert(4);
-            correct_answer_4.insert(5);
-            correct_answer_4.insert(9);
-            correct_answer_4.insert(10);
-            correct_answer_4.insert(11);
+            std::vector<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
+            std::vector<unsigned> correct_answer_4;
+            correct_answer_4.emplace_back(4);
+            correct_answer_4.emplace_back(5);
+            correct_answer_4.emplace_back(9);
+            correct_answer_4.emplace_back(10);
+            correct_answer_4.emplace_back(11);
             TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
         }
         if (box_collection.IsBoxOwned(10))
         {
-            std::set<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
-            std::set<unsigned> correct_answer_10;
-            correct_answer_10.insert(10);
-            correct_answer_10.insert(11);
-            correct_answer_10.insert(15);
-            correct_answer_10.insert(16);
-            correct_answer_10.insert(17);
+            std::vector<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
+            std::vector<unsigned> correct_answer_10;
+            correct_answer_10.emplace_back(10);
+            correct_answer_10.emplace_back(11);
+            correct_answer_10.emplace_back(15);
+            correct_answer_10.emplace_back(16);
+            correct_answer_10.emplace_back(17);
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
         if (box_collection.IsBoxOwned(35))
         {
-            std::set<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
-            std::set<unsigned> correct_answer_35;
-            correct_answer_35.insert(35);
+            std::vector<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
+            std::vector<unsigned> correct_answer_35;
+            correct_answer_35.emplace_back(35);
             TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
         }
 
@@ -1144,90 +1133,85 @@ public:
             }
         }
 
+        // Calculate the node pairs, and sort it for easier comparison
         std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
-
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
-
-        // Put these into a set as they are easier to compare as they are ordered
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
-        {
-            pairs_returned.insert(pairs_returned_vector[i]);
-        }
+        std::sort(pairs_returned_vector.begin(), pairs_returned_vector.end());
 
         switch (PetscTools::GetNumProcs())
         {
             case 1:
             {
-                std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                neighbours_should_be[0].insert(1);
-                neighbours_should_be[1].insert(0);
-                neighbours_should_be[2].insert(3);
-                neighbours_should_be[2].insert(4);
-                neighbours_should_be[2].insert(5);
-                neighbours_should_be[2].insert(7);
-                neighbours_should_be[2].insert(8);
-                neighbours_should_be[3].insert(2);
-                neighbours_should_be[3].insert(4);
-                neighbours_should_be[3].insert(5);
-                neighbours_should_be[3].insert(7);
-                neighbours_should_be[3].insert(8);
-                neighbours_should_be[4].insert(2);
-                neighbours_should_be[4].insert(3);
-                neighbours_should_be[4].insert(5);
-                neighbours_should_be[4].insert(7);
-                neighbours_should_be[4].insert(8);
-                neighbours_should_be[5].insert(2);
-                neighbours_should_be[5].insert(3);
-                neighbours_should_be[5].insert(4);
-                neighbours_should_be[5].insert(6);
-                neighbours_should_be[5].insert(7);
-                neighbours_should_be[5].insert(8);
-                neighbours_should_be[6].insert(5);
-                neighbours_should_be[6].insert(7);
-                neighbours_should_be[6].insert(8);
-                neighbours_should_be[7].insert(2);
-                neighbours_should_be[7].insert(3);
-                neighbours_should_be[7].insert(4);
-                neighbours_should_be[7].insert(5);
-                neighbours_should_be[7].insert(6);
-                neighbours_should_be[7].insert(8);
-                neighbours_should_be[8].insert(2);
-                neighbours_should_be[8].insert(3);
-                neighbours_should_be[8].insert(4);
-                neighbours_should_be[8].insert(5);
-                neighbours_should_be[8].insert(6);
-                neighbours_should_be[8].insert(7);
-                neighbours_should_be[9] = std::set<unsigned>();
+                std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                neighbours_should_be[0].emplace_back(1);
+                neighbours_should_be[1].emplace_back(0);
+                neighbours_should_be[2].emplace_back(3);
+                neighbours_should_be[2].emplace_back(4);
+                neighbours_should_be[2].emplace_back(5);
+                neighbours_should_be[2].emplace_back(7);
+                neighbours_should_be[2].emplace_back(8);
+                neighbours_should_be[3].emplace_back(2);
+                neighbours_should_be[3].emplace_back(4);
+                neighbours_should_be[3].emplace_back(5);
+                neighbours_should_be[3].emplace_back(7);
+                neighbours_should_be[3].emplace_back(8);
+                neighbours_should_be[4].emplace_back(2);
+                neighbours_should_be[4].emplace_back(3);
+                neighbours_should_be[4].emplace_back(5);
+                neighbours_should_be[4].emplace_back(7);
+                neighbours_should_be[4].emplace_back(8);
+                neighbours_should_be[5].emplace_back(2);
+                neighbours_should_be[5].emplace_back(3);
+                neighbours_should_be[5].emplace_back(4);
+                neighbours_should_be[5].emplace_back(6);
+                neighbours_should_be[5].emplace_back(7);
+                neighbours_should_be[5].emplace_back(8);
+                neighbours_should_be[6].emplace_back(5);
+                neighbours_should_be[6].emplace_back(7);
+                neighbours_should_be[6].emplace_back(8);
+                neighbours_should_be[7].emplace_back(2);
+                neighbours_should_be[7].emplace_back(3);
+                neighbours_should_be[7].emplace_back(4);
+                neighbours_should_be[7].emplace_back(5);
+                neighbours_should_be[7].emplace_back(6);
+                neighbours_should_be[7].emplace_back(8);
+                neighbours_should_be[8].emplace_back(2);
+                neighbours_should_be[8].emplace_back(3);
+                neighbours_should_be[8].emplace_back(4);
+                neighbours_should_be[8].emplace_back(5);
+                neighbours_should_be[8].emplace_back(6);
+                neighbours_should_be[8].emplace_back(7);
+                neighbours_should_be[9] = {};
 
                 for (unsigned i=0; i<nodes.size(); i++)
                 {
-                    std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
-                    TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+                    TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), neighbours_should_be[i]);
                 }
 
-                std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
-                pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
+                std::vector< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+                pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[7]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[8]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[4]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[5]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[7]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[8]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[2]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[5]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[7]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[8]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[2]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[6]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[7]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[8]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[2]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[6],nodes[7]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[6],nodes[8]));
+                pairs_should_be.emplace_back(std::make_pair(nodes[7],nodes[8]));
 
-                TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+                std::sort(pairs_should_be.begin(), pairs_should_be.end());
+
+                TS_ASSERT_EQUALS(pairs_should_be, pairs_returned_vector);
                 break;
             }
             case 2:
@@ -1236,87 +1220,87 @@ public:
                 {
                     case 0:
                     {
-                        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                        neighbours_should_be[2].insert(3);
-                        neighbours_should_be[2].insert(4);
-                        neighbours_should_be[2].insert(5);
-                        neighbours_should_be[2].insert(7);
-                        neighbours_should_be[2].insert(8);
-                        neighbours_should_be[3].insert(2);
-                        neighbours_should_be[3].insert(4);
-                        neighbours_should_be[3].insert(5);
-                        neighbours_should_be[3].insert(7);
-                        neighbours_should_be[3].insert(8);
-                        neighbours_should_be[4].insert(2);
-                        neighbours_should_be[4].insert(3);
-                        neighbours_should_be[4].insert(5);
-                        neighbours_should_be[4].insert(7);
-                        neighbours_should_be[4].insert(8);
-                        neighbours_should_be[5].insert(2);
-                        neighbours_should_be[5].insert(3);
-                        neighbours_should_be[5].insert(4);
-                        neighbours_should_be[5].insert(6);
-                        neighbours_should_be[5].insert(7);
-                        neighbours_should_be[5].insert(8);
-                        neighbours_should_be[6].insert(5);
-                        neighbours_should_be[6].insert(7);
-                        neighbours_should_be[6].insert(8);
-                        neighbours_should_be[7].insert(2);
-                        neighbours_should_be[7].insert(3);
-                        neighbours_should_be[7].insert(4);
-                        neighbours_should_be[7].insert(5);
-                        neighbours_should_be[7].insert(6);
-                        neighbours_should_be[7].insert(8);
-                        neighbours_should_be[8].insert(2);
-                        neighbours_should_be[8].insert(3);
-                        neighbours_should_be[8].insert(4);
-                        neighbours_should_be[8].insert(5);
-                        neighbours_should_be[8].insert(6);
-                        neighbours_should_be[8].insert(7);
+                        std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                        neighbours_should_be[2].emplace_back(3);
+                        neighbours_should_be[2].emplace_back(4);
+                        neighbours_should_be[2].emplace_back(5);
+                        neighbours_should_be[2].emplace_back(7);
+                        neighbours_should_be[2].emplace_back(8);
+                        neighbours_should_be[3].emplace_back(2);
+                        neighbours_should_be[3].emplace_back(4);
+                        neighbours_should_be[3].emplace_back(5);
+                        neighbours_should_be[3].emplace_back(7);
+                        neighbours_should_be[3].emplace_back(8);
+                        neighbours_should_be[4].emplace_back(2);
+                        neighbours_should_be[4].emplace_back(3);
+                        neighbours_should_be[4].emplace_back(5);
+                        neighbours_should_be[4].emplace_back(7);
+                        neighbours_should_be[4].emplace_back(8);
+                        neighbours_should_be[5].emplace_back(2);
+                        neighbours_should_be[5].emplace_back(3);
+                        neighbours_should_be[5].emplace_back(4);
+                        neighbours_should_be[5].emplace_back(6);
+                        neighbours_should_be[5].emplace_back(7);
+                        neighbours_should_be[5].emplace_back(8);
+                        neighbours_should_be[6].emplace_back(5);
+                        neighbours_should_be[6].emplace_back(7);
+                        neighbours_should_be[6].emplace_back(8);
+                        neighbours_should_be[7].emplace_back(2);
+                        neighbours_should_be[7].emplace_back(3);
+                        neighbours_should_be[7].emplace_back(4);
+                        neighbours_should_be[7].emplace_back(5);
+                        neighbours_should_be[7].emplace_back(6);
+                        neighbours_should_be[7].emplace_back(8);
+                        neighbours_should_be[8].emplace_back(2);
+                        neighbours_should_be[8].emplace_back(3);
+                        neighbours_should_be[8].emplace_back(4);
+                        neighbours_should_be[8].emplace_back(5);
+                        neighbours_should_be[8].emplace_back(6);
+                        neighbours_should_be[8].emplace_back(7);
 
                         unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
 
                         for (unsigned i=0; i<7; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
-                        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
+                        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+                        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[4]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[5]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[5]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[6]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[6],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[6],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[7],nodes[8]));
 
-                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+                        std::sort(pairs_should_be.begin(), pairs_should_be.end());
+
+                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned_vector);
                         break;
                     }
                     case 1:
                     {
-                        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                        neighbours_should_be[0].insert(1);
-                        neighbours_should_be[1].insert(0);
+                        std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                        neighbours_should_be[0].emplace_back(1);
+                        neighbours_should_be[1].emplace_back(0);
 
-                        neighbours_should_be[9] = std::set<unsigned>();
+                        neighbours_should_be[9] = std::vector<unsigned>();
 
-                        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
+                        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+                        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
 
 
                         unsigned nodes_on_this_process[2] = {0,1};
@@ -1324,9 +1308,7 @@ public:
                         for (unsigned i=0; i<2; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
                         break;
@@ -1345,75 +1327,75 @@ public:
                 {
                     case 0:
                     {
-                        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                        neighbours_should_be[2].insert(3);
-                        neighbours_should_be[2].insert(4);
-                        neighbours_should_be[2].insert(5);
-                        neighbours_should_be[2].insert(7);
-                        neighbours_should_be[2].insert(8);
-                        neighbours_should_be[3].insert(2);
-                        neighbours_should_be[3].insert(4);
-                        neighbours_should_be[3].insert(5);
-                        neighbours_should_be[3].insert(7);
-                        neighbours_should_be[3].insert(8);
-                        neighbours_should_be[4].insert(2);
-                        neighbours_should_be[4].insert(3);
-                        neighbours_should_be[4].insert(5);
-                        neighbours_should_be[4].insert(7);
-                        neighbours_should_be[4].insert(8);
-                        neighbours_should_be[5].insert(2);
-                        neighbours_should_be[5].insert(3);
-                        neighbours_should_be[5].insert(4);
-                        neighbours_should_be[5].insert(6);
-                        neighbours_should_be[5].insert(7);
-                        neighbours_should_be[5].insert(8);
-                        neighbours_should_be[6].insert(5);
-                        neighbours_should_be[6].insert(7);
-                        neighbours_should_be[6].insert(8);
-                        neighbours_should_be[7].insert(2);
-                        neighbours_should_be[7].insert(3);
-                        neighbours_should_be[7].insert(4);
-                        neighbours_should_be[7].insert(5);
-                        neighbours_should_be[7].insert(6);
-                        neighbours_should_be[7].insert(8);
-                        neighbours_should_be[8].insert(2);
-                        neighbours_should_be[8].insert(3);
-                        neighbours_should_be[8].insert(4);
-                        neighbours_should_be[8].insert(5);
-                        neighbours_should_be[8].insert(6);
-                        neighbours_should_be[8].insert(7);
+                        std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                        neighbours_should_be[2].emplace_back(3);
+                        neighbours_should_be[2].emplace_back(4);
+                        neighbours_should_be[2].emplace_back(5);
+                        neighbours_should_be[2].emplace_back(7);
+                        neighbours_should_be[2].emplace_back(8);
+                        neighbours_should_be[3].emplace_back(2);
+                        neighbours_should_be[3].emplace_back(4);
+                        neighbours_should_be[3].emplace_back(5);
+                        neighbours_should_be[3].emplace_back(7);
+                        neighbours_should_be[3].emplace_back(8);
+                        neighbours_should_be[4].emplace_back(2);
+                        neighbours_should_be[4].emplace_back(3);
+                        neighbours_should_be[4].emplace_back(5);
+                        neighbours_should_be[4].emplace_back(7);
+                        neighbours_should_be[4].emplace_back(8);
+                        neighbours_should_be[5].emplace_back(2);
+                        neighbours_should_be[5].emplace_back(3);
+                        neighbours_should_be[5].emplace_back(4);
+                        neighbours_should_be[5].emplace_back(6);
+                        neighbours_should_be[5].emplace_back(7);
+                        neighbours_should_be[5].emplace_back(8);
+                        neighbours_should_be[6].emplace_back(5);
+                        neighbours_should_be[6].emplace_back(7);
+                        neighbours_should_be[6].emplace_back(8);
+                        neighbours_should_be[7].emplace_back(2);
+                        neighbours_should_be[7].emplace_back(3);
+                        neighbours_should_be[7].emplace_back(4);
+                        neighbours_should_be[7].emplace_back(5);
+                        neighbours_should_be[7].emplace_back(6);
+                        neighbours_should_be[7].emplace_back(8);
+                        neighbours_should_be[8].emplace_back(2);
+                        neighbours_should_be[8].emplace_back(3);
+                        neighbours_should_be[8].emplace_back(4);
+                        neighbours_should_be[8].emplace_back(5);
+                        neighbours_should_be[8].emplace_back(6);
+                        neighbours_should_be[8].emplace_back(7);
 
                         unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
 
                         for (unsigned i=0; i<7; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
-                        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
+                        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+                        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[4]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[5]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[5]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[6]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[2]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[6],nodes[7]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[6],nodes[8]));
+                        pairs_should_be.emplace_back(std::make_pair(nodes[7],nodes[8]));
 
-                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+                        std::sort(pairs_should_be.begin(), pairs_should_be.end());
+
+                        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned_vector);
                         break;
                     }
                     case 1:
@@ -1423,22 +1405,20 @@ public:
                     }
                     case 2:
                     {
-                        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-                        neighbours_should_be[0].insert(1);
-                        neighbours_should_be[1].insert(0);
+                        std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+                        neighbours_should_be[0].emplace_back(1);
+                        neighbours_should_be[1].emplace_back(0);
 
-                        neighbours_should_be[9] = std::set<unsigned>();
-                        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-                        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
+                        neighbours_should_be[9] = std::vector<unsigned>();
+                        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+                        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
 
                         unsigned nodes_on_this_process[2] = {0,1};
 
                         for (unsigned i=0; i<2; i++)
                         {
                             unsigned node_index = nodes_on_this_process[i];
-                            std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
-                                                           neighbours_should_be[node_index].end());
-                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), expected);
+                            TS_ASSERT_EQUALS(nodes[node_index]->rGetNeighbours(), neighbours_should_be[node_index]);
                         }
 
                         break;
@@ -1916,34 +1896,34 @@ public:
         }
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
+        pairs_should_be.insert(std::make_pair(nodes[0],nodes[1]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
+        pairs_should_be.insert(std::make_pair(nodes[2],nodes[7]));
+        pairs_should_be.insert(std::make_pair(nodes[2],nodes[8]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
+        pairs_should_be.insert(std::make_pair(nodes[3],nodes[4]));
+        pairs_should_be.insert(std::make_pair(nodes[3],nodes[5]));
+        pairs_should_be.insert(std::make_pair(nodes[3],nodes[7]));
+        pairs_should_be.insert(std::make_pair(nodes[3],nodes[8]));
+        pairs_should_be.insert(std::make_pair(nodes[3],nodes[2]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
+        pairs_should_be.insert(std::make_pair(nodes[4],nodes[5]));
+        pairs_should_be.insert(std::make_pair(nodes[4],nodes[7]));
+        pairs_should_be.insert(std::make_pair(nodes[4],nodes[8]));
+        pairs_should_be.insert(std::make_pair(nodes[4],nodes[2]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[2]));
+        pairs_should_be.insert(std::make_pair(nodes[5],nodes[6]));
+        pairs_should_be.insert(std::make_pair(nodes[5],nodes[7]));
+        pairs_should_be.insert(std::make_pair(nodes[5],nodes[8]));
+        pairs_should_be.insert(std::make_pair(nodes[5],nodes[2]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[6],nodes[8]));
+        pairs_should_be.insert(std::make_pair(nodes[6],nodes[7]));
+        pairs_should_be.insert(std::make_pair(nodes[6],nodes[8]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
+        pairs_should_be.insert(std::make_pair(nodes[7],nodes[8]));
 
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[9],nodes[0]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[9],nodes[1]));
+        pairs_should_be.insert(std::make_pair(nodes[9],nodes[0]));
+        pairs_should_be.insert(std::make_pair(nodes[9],nodes[1]));
 
         TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
@@ -1990,16 +1970,16 @@ public:
 
         if (box_collection.IsBoxOwned(0))
         {
-            std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-            std::set<unsigned> correct_answer_0;
-            correct_answer_0.insert(0);
-            correct_answer_0.insert(1);
-            correct_answer_0.insert(3);
-            correct_answer_0.insert(4);
-            correct_answer_0.insert(9);
-            correct_answer_0.insert(10);
-            correct_answer_0.insert(12);
-            correct_answer_0.insert(13);
+            std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+            std::vector<unsigned> correct_answer_0;
+            correct_answer_0.emplace_back(0);
+            correct_answer_0.emplace_back(1);
+            correct_answer_0.emplace_back(3);
+            correct_answer_0.emplace_back(4);
+            correct_answer_0.emplace_back(9);
+            correct_answer_0.emplace_back(10);
+            correct_answer_0.emplace_back(12);
+            correct_answer_0.emplace_back(13);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
         if (PetscTools::GetNumProcs() <= 3u)
@@ -2008,61 +1988,63 @@ public:
             // We won't test for that here - there is a 2-d equivalent test.
             if (box_collection.IsBoxOwned(13))
             {
-                std::set<unsigned>& local_boxes_to_box_13 = box_collection.rGetLocalBoxes(13);
-                std::set<unsigned> correct_answer_13;
-                correct_answer_13.insert(5);
-                correct_answer_13.insert(6);
-                correct_answer_13.insert(7);
-                correct_answer_13.insert(8);
-                correct_answer_13.insert(13);
-                correct_answer_13.insert(14);
-                correct_answer_13.insert(15);
-                correct_answer_13.insert(16);
-                correct_answer_13.insert(17);
-                correct_answer_13.insert(22);
-                correct_answer_13.insert(23);
-                correct_answer_13.insert(24);
-                correct_answer_13.insert(25);
-                correct_answer_13.insert(26);
+                std::vector<unsigned>& local_boxes_to_box_13 = box_collection.rGetLocalBoxes(13);
+                std::vector<unsigned> correct_answer_13;
+                correct_answer_13.emplace_back(5);
+                correct_answer_13.emplace_back(6);
+                correct_answer_13.emplace_back(7);
+                correct_answer_13.emplace_back(8);
+                correct_answer_13.emplace_back(13);
+                correct_answer_13.emplace_back(14);
+                correct_answer_13.emplace_back(15);
+                correct_answer_13.emplace_back(16);
+                correct_answer_13.emplace_back(17);
+                correct_answer_13.emplace_back(22);
+                correct_answer_13.emplace_back(23);
+                correct_answer_13.emplace_back(24);
+                correct_answer_13.emplace_back(25);
+                correct_answer_13.emplace_back(26);
                 if (PetscTools::GetNumProcs() > 1)
                 {
-                    correct_answer_13.insert(18);
-                    correct_answer_13.insert(19);
-                    correct_answer_13.insert(20);
-                    correct_answer_13.insert(21);
+                    correct_answer_13.emplace_back(18);
+                    correct_answer_13.emplace_back(19);
+                    correct_answer_13.emplace_back(20);
+                    correct_answer_13.emplace_back(21);
+
+                    std::sort(correct_answer_13.begin(), correct_answer_13.end());
                 }
                 TS_ASSERT_EQUALS(local_boxes_to_box_13, correct_answer_13);
             }
 
             if (box_collection.IsBoxOwned(34))
             {
-                std::set<unsigned>& local_boxes_to_box_34 = box_collection.rGetLocalBoxes(34);
-                std::set<unsigned> correct_answer_34;
-                correct_answer_34.insert(26);
-                correct_answer_34.insert(34);
-                correct_answer_34.insert(35);
+                std::vector<unsigned>& local_boxes_to_box_34 = box_collection.rGetLocalBoxes(34);
+                std::vector<unsigned> correct_answer_34;
+                correct_answer_34.emplace_back(26);
+                correct_answer_34.emplace_back(34);
+                correct_answer_34.emplace_back(35);
                 if (PetscTools::GetNumProcs() == 3)
                 {
-                    correct_answer_34.insert(21);
-                    correct_answer_34.insert(22);
-                    correct_answer_34.insert(23);
-                    correct_answer_34.insert(24);
-                    correct_answer_34.insert(25);
+                    correct_answer_34.emplace_back(21);
+                    correct_answer_34.emplace_back(22);
+                    correct_answer_34.emplace_back(23);
+                    correct_answer_34.emplace_back(24);
+                    correct_answer_34.emplace_back(25);
                 }
                 TS_ASSERT_EQUALS(local_boxes_to_box_34, correct_answer_34);
             }
 
             if (box_collection.IsBoxOwned(35))
             {
-                std::set<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
-                std::set<unsigned> correct_answer_35;
-                correct_answer_35.insert(35);
+                std::vector<unsigned>& local_boxes_to_box_35 = box_collection.rGetLocalBoxes(35);
+                std::vector<unsigned> correct_answer_35;
+                correct_answer_35.emplace_back(35);
                 if (PetscTools::GetNumProcs() == 3)
                 {
-                    correct_answer_35.insert(22);
-                    correct_answer_35.insert(23);
-                    correct_answer_35.insert(25);
-                    correct_answer_35.insert(26);
+                    correct_answer_35.emplace_back(22);
+                    correct_answer_35.emplace_back(23);
+                    correct_answer_35.emplace_back(25);
+                    correct_answer_35.emplace_back(26);
                 }
                 TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
             }

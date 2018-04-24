@@ -60,13 +60,13 @@ public:
         Node<2> test_node(213, node_location);
 
         test_box.AddNode(&test_node);
-        std::set< Node<2>* > nodes_contained_before = test_box.rGetNodesContained();
+        std::vector< Node<2>* > nodes_contained_before = test_box.rGetNodesContained();
 
         TS_ASSERT_EQUALS(*(nodes_contained_before.begin()), &test_node);
         TS_ASSERT_EQUALS((*(nodes_contained_before.begin()))->GetIndex(), 213u);
 
         test_box.RemoveNode(&test_node);
-        std::set< Node<2>* > nodes_contained_after = test_box.rGetNodesContained();
+        std::vector< Node<2>* > nodes_contained_after = test_box.rGetNodesContained();
         TS_ASSERT(nodes_contained_after.empty());
     }
 
@@ -151,17 +151,14 @@ public:
 
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            std::set< Node<1>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
+            std::vector< Node<1>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
             c_vector<double, 2> box_min_max_values;
             box_min_max_values(0) = i * cut_off_length - 0.1;
             box_min_max_values(1) = (i+1) * cut_off_length - 0.1;
 
-            for (std::set< Node<1>* >::iterator it_nodes_in_box = nodes_in_box.begin();
-                 it_nodes_in_box != nodes_in_box.end();
-                 it_nodes_in_box++)
+            for (Node<1>* p_node : nodes_in_box)
             {
-                Node<1>* current_node = *it_nodes_in_box;
-                double x_position = current_node->rGetLocation()[0];
+                double x_position = p_node->rGetLocation()[0];
 
                 double epsilon = 1e-12;
 
@@ -170,23 +167,16 @@ public:
             }
         }
 
-        std::set<unsigned> local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-        std::set<unsigned> correct_answer_0;
-        correct_answer_0.insert(0);
-        correct_answer_0.insert(1);
+        std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+        std::vector<unsigned> correct_answer_0 = {0, 1};
         TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
 
-        std::set<unsigned> local_boxes_to_box_1 = box_collection.rGetLocalBoxes(1);
-        std::set<unsigned> correct_answer_1;
-        correct_answer_1.insert(0);
-        correct_answer_1.insert(1);
-        correct_answer_1.insert(2);
+        std::vector<unsigned>& local_boxes_to_box_1 = box_collection.rGetLocalBoxes(1);
+        std::vector<unsigned> correct_answer_1 = {0, 1, 2};
         TS_ASSERT_EQUALS(local_boxes_to_box_1, correct_answer_1);
 
-        std::set<unsigned> local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
-        std::set<unsigned> correct_answer_4;
-        correct_answer_4.insert(3);
-        correct_answer_4.insert(4);
+        std::vector<unsigned>& local_boxes_to_box_4 = box_collection.rGetLocalBoxes(4);
+        std::vector<unsigned> correct_answer_4 = {3, 4};
         TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
 
         c_vector<double,1> miles_away;
@@ -228,24 +218,20 @@ public:
 
         box_collection.SetupAllLocalBoxes();
 
-        std::set<unsigned> local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-        unsigned correct_0[]= {0, 1, 4, 5};
-        std::set<unsigned> correct_answer_0(correct_0, correct_0 + 4);
+        std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+        std::vector<unsigned> correct_answer_0 = {0, 1, 4, 5};
         TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
 
-        std::set<unsigned> local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
-        unsigned correct_3[]= {3, 2, 6, 7};
-        std::set<unsigned> correct_answer_3(correct_3, correct_3 + 4);
+        std::vector<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
+        std::vector<unsigned> correct_answer_3 = {2, 3, 6, 7};
         TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
 
-        std::set<unsigned> local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
-        unsigned correct_5[] = {0, 1, 2, 4, 5, 6, 8, 9, 10};
-        std::set<unsigned> correct_answer_5(correct_5, correct_5 + 9);
+        std::vector<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
+        std::vector<unsigned> correct_answer_5 = {0, 1, 2, 4, 5, 6, 8, 9, 10};
         TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
 
-        std::set<unsigned> local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
-        unsigned correct_10[] = {5, 6, 7, 9, 10, 11};
-        std::set<unsigned> correct_answer_10(correct_10, correct_10 + 6);
+        std::vector<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
+        std::vector<unsigned> correct_answer_10 = {5, 6, 7, 9, 10, 11};
         TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
     }
 
@@ -264,29 +250,24 @@ public:
 
         box_collection.SetupAllLocalBoxes();
 
-        std::set<unsigned> local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-        unsigned correct_0[] = {0, 1, 3, 4, 5, 7};
-        std::set<unsigned> correct_answer_0(correct_0, correct_0 + 6);
+        std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+        std::vector<unsigned> correct_answer_0 = {0, 1, 3, 4, 5, 7};
         TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
 
-        std::set<unsigned> local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
-        unsigned correct_3[] = {0, 2, 3, 4, 6, 7};
-        std::set<unsigned> correct_answer_3(correct_3, correct_3 + 6);
+        std::vector<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
+        std::vector<unsigned> correct_answer_3 = {0, 2, 3, 4, 6, 7};
         TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
 
-        std::set<unsigned> local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
-        unsigned correct_5[] = {0, 1, 2, 4, 5, 6, 8, 9, 10};
-        std::set<unsigned> correct_answer_5(correct_5, correct_5 + 9);
+        std::vector<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
+        std::vector<unsigned> correct_answer_5 = {0, 1, 2, 4, 5, 6, 8, 9, 10};
         TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
 
-        std::set<unsigned> local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
-        unsigned correct_10[] = {4, 5, 6, 7, 8, 9, 10, 11};
-        std::set<unsigned> correct_answer_10(correct_10, correct_10 + 8);
+        std::vector<unsigned>& local_boxes_to_box_10 = box_collection.rGetLocalBoxes(10);
+        std::vector<unsigned> correct_answer_10 = {4, 5, 6, 7, 8, 9, 10, 11};
         TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
 
-        std::set<unsigned> local_boxes_to_box_11 = box_collection.rGetLocalBoxes(11);
-        unsigned correct_11[] = {4, 6, 7, 8, 10, 11};
-        std::set<unsigned> correct_answer_11(correct_11, correct_11 + 6);
+        std::vector<unsigned>& local_boxes_to_box_11 = box_collection.rGetLocalBoxes(11);
+        std::vector<unsigned> correct_answer_11 = {4, 6, 7, 8, 10, 11};
         TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
     }
 
@@ -407,29 +388,24 @@ public:
 
         box_collection.SetupAllLocalBoxes();
 
-        std::set<unsigned> local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
-        unsigned correct_0[] = {0, 1, 4, 5, 12, 13, 16, 17};
-        std::set<unsigned> correct_answer_0(correct_0, correct_0 + 8);
+        std::vector<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
+        std::vector<unsigned> correct_answer_0 = {0, 1, 4, 5, 12, 13, 16, 17};
         TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
 
-        std::set<unsigned> local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
-        unsigned correct_3[] = {3, 2, 6, 7, 14, 15, 18, 19};
-        std::set<unsigned> correct_answer_3(correct_3, correct_3 + 8);
+        std::vector<unsigned>& local_boxes_to_box_3 = box_collection.rGetLocalBoxes(3);
+        std::vector<unsigned> correct_answer_3 = {2, 3, 6, 7, 14, 15, 18, 19};
         TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
 
-        std::set<unsigned> local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
-        unsigned correct_5[] = {0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22};
-        std::set<unsigned> correct_answer_5(correct_5, correct_5 + 18);
+        std::vector<unsigned>& local_boxes_to_box_5 = box_collection.rGetLocalBoxes(5);
+        std::vector<unsigned> correct_answer_5 = {0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22};
         TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
 
-        std::set<unsigned> local_boxes_to_box_19 = box_collection.rGetLocalBoxes(19);
-        unsigned correct_19[] = {2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23};
-        std::set<unsigned> correct_answer_19(correct_19, correct_19 + 12);
+        std::vector<unsigned>& local_boxes_to_box_19 = box_collection.rGetLocalBoxes(19);
+        std::vector<unsigned> correct_answer_19 = {2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23};
         TS_ASSERT_EQUALS(local_boxes_to_box_19, correct_answer_19);
 
-        std::set<unsigned> local_boxes_to_box_22 = box_collection.rGetLocalBoxes(22);
-        unsigned correct_22[] = {5, 6, 7, 9, 10, 11, 17, 18, 19, 21, 22, 23};
-        std::set<unsigned> correct_answer_22(correct_22, correct_22 + 12);
+        std::vector<unsigned>& local_boxes_to_box_22 = box_collection.rGetLocalBoxes(22);
+        std::vector<unsigned> correct_answer_22 = {5, 6, 7, 9, 10, 11, 17, 18, 19, 21, 22, 23};
         TS_ASSERT_EQUALS(local_boxes_to_box_22, correct_answer_22);
     }
 
@@ -474,19 +450,16 @@ public:
             pairs_returned.insert(pairs_returned_vector[i]);
         }
 
-        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-        neighbours_should_be[0].insert(1);
-        neighbours_should_be[0].insert(2);
-        neighbours_should_be[1].insert(0);
-        neighbours_should_be[1].insert(2);
-        neighbours_should_be[2].insert(0);
-        neighbours_should_be[2].insert(1);
-        neighbours_should_be[2].insert(3);
-        neighbours_should_be[3].insert(2);
-        neighbours_should_be[4] = std::set<unsigned>();
-        for (unsigned i=0; i<nodes.size(); i++){
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
-            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+        std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+        neighbours_should_be[0] = {1, 2};
+        neighbours_should_be[1] = {0, 2};
+        neighbours_should_be[2] = {0, 1, 3};
+        neighbours_should_be[3] = {2};
+        neighbours_should_be[4] = {};
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), neighbours_should_be[i]);
         }
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_should_be;
@@ -540,7 +513,7 @@ public:
 
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            std::set< Node<2>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
+            std::vector< Node<2>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
 
             c_vector<double, 2*2> box_min_max_values;
             c_vector<unsigned, 2> indices = box_collection.GetGridIndices(i);
@@ -550,13 +523,10 @@ public:
             box_min_max_values(3) = (indices(1)+1)*cut_off_length - 0.1;
 
 
-            for (std::set< Node<2>* >::iterator it_nodes_in_box = nodes_in_box.begin();
-                 it_nodes_in_box != nodes_in_box.end();
-                 it_nodes_in_box++)
+            for (Node<2>* p_node : nodes_in_box)
             {
-                Node<2>* current_node = *it_nodes_in_box;
-                double x_position = current_node->rGetLocation()[0];
-                double y_position = current_node->rGetLocation()[1];
+                double x_position = p_node->rGetLocation()[0];
+                double y_position = p_node->rGetLocation()[1];
 
                 double epsilon = 1e-12;
 
@@ -644,80 +614,46 @@ public:
 
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
-        {
-            pairs_returned.insert(pairs_returned_vector[i]);
-        }
+        std::map<unsigned, std::vector<unsigned> > neighbours_should_be;
+        neighbours_should_be[0] = {1u};
+        neighbours_should_be[1] = {0u};
+        neighbours_should_be[2] = {3, 4, 5, 7, 8};
+        neighbours_should_be[3] = {2, 4, 5, 7, 8};
+        neighbours_should_be[4] = {2, 3, 5, 7, 8};
+        neighbours_should_be[5] = {2, 3, 4, 6, 7, 8};
+        neighbours_should_be[6] = {5, 7, 8};
+        neighbours_should_be[7] = {2, 3, 4, 5, 6, 8};
+        neighbours_should_be[8] = {2, 3, 4, 5, 6, 7};
+        neighbours_should_be[9] = {};
 
-        std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-        neighbours_should_be[0].insert(1);
-        neighbours_should_be[1].insert(0);
-        neighbours_should_be[2].insert(3);
-        neighbours_should_be[2].insert(4);
-        neighbours_should_be[2].insert(5);
-        neighbours_should_be[2].insert(7);
-        neighbours_should_be[2].insert(8);
-        neighbours_should_be[3].insert(2);
-        neighbours_should_be[3].insert(4);
-        neighbours_should_be[3].insert(5);
-        neighbours_should_be[3].insert(7);
-        neighbours_should_be[3].insert(8);
-        neighbours_should_be[4].insert(2);
-        neighbours_should_be[4].insert(3);
-        neighbours_should_be[4].insert(5);
-        neighbours_should_be[4].insert(7);
-        neighbours_should_be[4].insert(8);
-        neighbours_should_be[5].insert(2);
-        neighbours_should_be[5].insert(3);
-        neighbours_should_be[5].insert(4);
-        neighbours_should_be[5].insert(6);
-        neighbours_should_be[5].insert(7);
-        neighbours_should_be[5].insert(8);
-        neighbours_should_be[6].insert(5);
-        neighbours_should_be[6].insert(7);
-        neighbours_should_be[6].insert(8);
-        neighbours_should_be[7].insert(2);
-        neighbours_should_be[7].insert(3);
-        neighbours_should_be[7].insert(4);
-        neighbours_should_be[7].insert(5);
-        neighbours_should_be[7].insert(6);
-        neighbours_should_be[7].insert(8);
-        neighbours_should_be[8].insert(2);
-        neighbours_should_be[8].insert(3);
-        neighbours_should_be[8].insert(4);
-        neighbours_should_be[8].insert(5);
-        neighbours_should_be[8].insert(6);
-        neighbours_should_be[8].insert(7);
-        neighbours_should_be[9] = std::set<unsigned>();
         for (unsigned i=0; i<nodes.size(); i++){
-            std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
-            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
+            TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), neighbours_should_be[i]);
         }
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[0],nodes[1]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[2],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[2]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[4]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[3],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[2]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[5]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[4],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[6]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[7]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[5],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[6]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[7],nodes[8]));
-        pairs_should_be.insert(std::pair<Node<2>*, Node<2>*>(nodes[8],nodes[6]));
+        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_should_be;
+        pairs_should_be.emplace_back(std::make_pair(nodes[0],nodes[1]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[5]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[7]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[2],nodes[8]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[2]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[4]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[5]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[7]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[3],nodes[8]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[2]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[5]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[7]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[4],nodes[8]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[6]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[7]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[5],nodes[8]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[7],nodes[6]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[7],nodes[8]));
+        pairs_should_be.emplace_back(std::make_pair(nodes[8],nodes[6]));
 
-        TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
-        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
+        std::sort(pairs_returned_vector.begin(), pairs_returned_vector.end());
+        std::sort(pairs_should_be.begin(), pairs_should_be.end());
+        TS_ASSERT_EQUALS(pairs_should_be, pairs_returned_vector);
 
         // Avoid memory leaks
         for (unsigned i=0; i<points.size(); i++)
@@ -842,7 +778,8 @@ public:
         }
 
         // Check the neighbour lists
-        for (unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
@@ -873,54 +810,46 @@ public:
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
 
-            std::set<unsigned> calculated_neighbours;
+            std::vector<unsigned> calculated_neighbours;
 
             // Test box 0
             calculated_neighbours = box_collection.rGetLocalBoxes(0);
-            unsigned correct_0[] = {0, 10, 11, 1};
-            std::set<unsigned> correct_neighbours_0(correct_0, correct_0 + 4);
+            std::vector<unsigned> correct_neighbours_0 = {0, 1, 10, 11};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_0);
 
             // Test representative box
             calculated_neighbours = box_collection.rGetLocalBoxes(54);
-            unsigned correct_54[] = {54, 64, 65, 55, 45};
-            std::set<unsigned> correct_neighbours_54(correct_54, correct_54 + 5);
+            std::vector<unsigned> correct_neighbours_54 = {45, 54, 55, 64, 65};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_54);
 
             // Test top-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(92);
-            unsigned correct_92[] = {92, 93, 83};
-            std::set<unsigned> correct_neighbours_92(correct_92, correct_92 + 3);
+            std::vector<unsigned> correct_neighbours_92 = {83, 92, 93};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_92);
 
             // Test penultimate-top box
             calculated_neighbours = box_collection.rGetLocalBoxes(81);
-            unsigned correct_81[] = {81, 91, 92, 82, 72};
-            std::set<unsigned> correct_neighbours_81(correct_81, correct_81 + 5);
+            std::vector<unsigned> correct_neighbours_81 = {72, 81, 82, 91, 92};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_81);
 
             // Test right-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(49);
-            unsigned correct_49[] = {49, 59};
-            std::set<unsigned> correct_neighbours_49(correct_49, correct_49 + 2);
+            std::vector<unsigned> correct_neighbours_49 = {49, 59};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_49);
 
             // Test penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(58);
-            unsigned correct_58[] = {58, 68, 69, 59, 49};
-            std::set<unsigned> correct_neighbours_58(correct_58, correct_58 + 5);
+            std::vector<unsigned> correct_neighbours_58 = {49, 58, 59, 68, 69};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_58);
 
             // Test top-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(99);
-            unsigned correct_99[] = {99};
-            std::set<unsigned> correct_neighbours_99(correct_99, correct_99 + 1);
+            std::vector<unsigned> correct_neighbours_99 = {99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_99);
 
             // Test penultimate-top penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(88);
-            unsigned correct_88[] = {88, 98, 99, 89, 79};
-            std::set<unsigned> correct_neighbours_88(correct_88, correct_88 + 5);
+            std::vector<unsigned> correct_neighbours_88 = {79, 88, 89, 98, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_88);
         }
 
@@ -931,54 +860,46 @@ public:
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
 
-            std::set<unsigned> calculated_neighbours;
+            std::vector<unsigned> calculated_neighbours;
 
             // Test box 0
             calculated_neighbours = box_collection.rGetLocalBoxes(0);
-            unsigned correct_0[] = {0, 10, 11, 1};
-            std::set<unsigned> correct_neighbours_0(correct_0, correct_0 + 4);
+            std::vector<unsigned> correct_neighbours_0 = {0, 1, 10, 11};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_0);
 
             // Test representative box
             calculated_neighbours = box_collection.rGetLocalBoxes(54);
-            unsigned correct_54[] = {54, 64, 65, 55, 45};
-            std::set<unsigned> correct_neighbours_54(correct_54, correct_54 + 5);
+            std::vector<unsigned> correct_neighbours_54 = {45, 54, 55, 64, 65};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_54);
 
             // Test top-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(92);
-            unsigned correct_92[] = {92, 93, 83};
-            std::set<unsigned> correct_neighbours_92(correct_92, correct_92 + 3);
+            std::vector<unsigned> correct_neighbours_92 = {83, 92, 93};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_92);
 
             // Test penultimate-top box
             calculated_neighbours = box_collection.rGetLocalBoxes(81);
-            unsigned correct_81[] = {81, 91, 92, 82, 72};
-            std::set<unsigned> correct_neighbours_81(correct_81, correct_81 + 5);
+            std::vector<unsigned> correct_neighbours_81 = {72, 81, 82, 91, 92};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_81);
 
             // Test right-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(49);
-            unsigned correct_49[] = {49, 59, 50, 40, 30};
-            std::set<unsigned> correct_neighbours_49(correct_49, correct_49 + 5);
+            std::vector<unsigned> correct_neighbours_49 = {30, 40, 49, 50, 59};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_49);
 
             // Test penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(58);
-            unsigned correct_58[] = {58, 68, 69, 59, 49, 60, 50, 40};
-            std::set<unsigned> correct_neighbours_58(correct_58, correct_58 + 8);
+            std::vector<unsigned> correct_neighbours_58 = {40, 49, 50, 58, 59, 60, 68, 69};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_58);
 
             // Test top-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(99);
-            unsigned correct_99[] = {99, 90, 80};
-            std::set<unsigned> correct_neighbours_99(correct_99, correct_99 + 3);
+            std::vector<unsigned> correct_neighbours_99 = {80, 90, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_99);
 
             // Test penultimate-top penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(88);
-            unsigned correct_88[] = {88, 98, 99, 89, 79, 90, 80, 70};
-            std::set<unsigned> correct_neighbours_88(correct_88, correct_88 + 8);
+            std::vector<unsigned> correct_neighbours_88 = {70, 79, 80, 88, 89, 90, 98, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_88);
         }
 
@@ -989,54 +910,46 @@ public:
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
 
-            std::set<unsigned> calculated_neighbours;
+            std::vector<unsigned> calculated_neighbours;
 
             // Test box 0
             calculated_neighbours = box_collection.rGetLocalBoxes(0);
-            unsigned correct_0[] = {0, 10, 11, 1, 91};
-            std::set<unsigned> correct_neighbours_0(correct_0, correct_0 + 5);
+            std::vector<unsigned> correct_neighbours_0 = {0, 1, 10, 11, 91};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_0);
 
             // Test representative box
             calculated_neighbours = box_collection.rGetLocalBoxes(54);
-            unsigned correct_54[] = {54, 64, 65, 55, 45};
-            std::set<unsigned> correct_neighbours_54(correct_54, correct_54 + 5);
+            std::vector<unsigned> correct_neighbours_54 = {45, 54, 55, 64, 65};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_54);
 
             // Test top-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(92);
-            unsigned correct_92[] = {92, 2, 3, 93, 83};
-            std::set<unsigned> correct_neighbours_92(correct_92, correct_92 + 5);
+            std::vector<unsigned> correct_neighbours_92 = {2, 3, 83, 92, 93};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_92);
 
             // Test penultimate-top box
             calculated_neighbours = box_collection.rGetLocalBoxes(81);
-            unsigned correct_81[] = {81, 91, 92, 82, 72, 1, 2};
-            std::set<unsigned> correct_neighbours_81(correct_81, correct_81 + 7);
+            std::vector<unsigned> correct_neighbours_81 = {1, 2, 72, 81, 82, 91, 92};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_81);
 
             // Test right-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(49);
-            unsigned correct_49[] = {49, 59};
-            std::set<unsigned> correct_neighbours_49(correct_49, correct_49 + 2);
+            std::vector<unsigned> correct_neighbours_49 = {49, 59};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_49);
 
             // Test penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(58);
-            unsigned correct_58[] = {58, 68, 69, 59, 49};
-            std::set<unsigned> correct_neighbours_58(correct_58, correct_58 + 5);
+            std::vector<unsigned> correct_neighbours_58 = {49, 58, 59, 68, 69};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_58);
 
             // Test top-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(99);
-            unsigned correct_99[] = {99, 9};
-            std::set<unsigned> correct_neighbours_99(correct_99, correct_99 + 2);
+            std::vector<unsigned> correct_neighbours_99 = {9, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_99);
 
             // Test penultimate-top penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(88);
-            unsigned correct_88[] = {88, 98, 99, 89, 79, 8, 9};
-            std::set<unsigned> correct_neighbours_88(correct_88, correct_88 + 7);
+            std::vector<unsigned> correct_neighbours_88 = {8, 9, 79, 88, 89, 98, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_88);
         }
 
@@ -1047,54 +960,46 @@ public:
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 100u);
 
-            std::set<unsigned> calculated_neighbours;
+            std::vector<unsigned> calculated_neighbours;
 
             // Test box 0
             calculated_neighbours = box_collection.rGetLocalBoxes(0);
-            unsigned correct_0[] = {0, 10, 11, 1, 91};
-            std::set<unsigned> correct_neighbours_0(correct_0, correct_0 + 5);
+            std::vector<unsigned> correct_neighbours_0 = {0, 1, 10, 11, 91};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_0);
 
             // Test representative box
             calculated_neighbours = box_collection.rGetLocalBoxes(54);
-            unsigned correct_54[] = {54, 64, 65, 55, 45};
-            std::set<unsigned> correct_neighbours_54(correct_54, correct_54 + 5);
+            std::vector<unsigned> correct_neighbours_54 = {45, 54, 55, 64, 65};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_54);
 
             // Test top-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(92);
-            unsigned correct_92[] = {92, 2, 3, 93, 83};
-            std::set<unsigned> correct_neighbours_92(correct_92, correct_92 + 5);
+            std::vector<unsigned> correct_neighbours_92 = {2, 3, 83, 92, 93};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_92);
 
             // Test penultimate-top box
             calculated_neighbours = box_collection.rGetLocalBoxes(81);
-            unsigned correct_81[] = {81, 91, 92, 82, 72, 1, 2};
-            std::set<unsigned> correct_neighbours_81(correct_81, correct_81 + 7);
+            std::vector<unsigned> correct_neighbours_81 = {1, 2, 72, 81, 82, 91, 92};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_81);
 
             // Test right-edge box
             calculated_neighbours = box_collection.rGetLocalBoxes(49);
-            unsigned correct_49[] = {49, 59, 50, 40, 30};
-            std::set<unsigned> correct_neighbours_49(correct_49, correct_49 + 5);
+            std::vector<unsigned> correct_neighbours_49 = {30, 40, 49, 50, 59};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_49);
 
             // Test penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(58);
-            unsigned correct_58[] = {58, 68, 69, 59, 49, 60, 50, 40};
-            std::set<unsigned> correct_neighbours_58(correct_58, correct_58 + 8);
+            std::vector<unsigned> correct_neighbours_58 = {40, 49, 50, 58, 59, 60, 68, 69};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_58);
 
             // Test top-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(99);
-            unsigned correct_99[] = {99, 9, 0, 90, 80};
-            std::set<unsigned> correct_neighbours_99(correct_99, correct_99 + 5);
+            std::vector<unsigned> correct_neighbours_99 = {0, 9, 80, 90, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_99);
 
             // Test penultimate-top penultimate-right box
             calculated_neighbours = box_collection.rGetLocalBoxes(88);
-            unsigned correct_88[] = {88, 98, 99, 89, 79, 8, 9, 90, 80, 70, 0};
-            std::set<unsigned> correct_neighbours_88(correct_88, correct_88 + 11);
+            std::vector<unsigned> correct_neighbours_88 = {0, 8, 9, 70, 79, 80, 88, 89, 90, 98, 99};
             TS_ASSERT_EQUALS(calculated_neighbours, correct_neighbours_88);
         }
     }

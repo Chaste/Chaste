@@ -32,28 +32,31 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "Box.hpp"
+
+#include <algorithm>
 
 template<unsigned DIM>
 void Box<DIM>::AddNode(Node<DIM>* pNode)
 {
-    mNodesContained.insert(pNode);
+    mNodesContained.emplace_back(pNode);
 }
 
 template<unsigned DIM>
 void Box<DIM>::RemoveNode(Node<DIM>* pNode)
 {
-    mNodesContained.erase(pNode);
+    mNodesContained.erase(std::remove(mNodesContained.begin(), mNodesContained.end(), pNode), mNodesContained.end());
 }
 
 template<unsigned DIM>
 void Box<DIM>::ClearNodes()
 {
-    mNodesContained = std::set< Node<DIM>* >();
+    mNodesContained.clear();
 }
 
 template<unsigned DIM>
-std::set< Node<DIM>* >& Box<DIM>::rGetNodesContained()
+std::vector< Node<DIM>* >& Box<DIM>::rGetNodesContained()
 {
     return mNodesContained;
 }
@@ -61,13 +64,13 @@ std::set< Node<DIM>* >& Box<DIM>::rGetNodesContained()
 template<unsigned DIM>
 void Box<DIM>::AddElement(Element<DIM,DIM>* pElement)
 {
-    mElementsContained.insert(pElement);
+    mElementsContained.push_back(pElement);
 }
 
 ///\todo #2308 there are no methods to remove or clear elements
 
 template<unsigned DIM>
-std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
+std::vector< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
 {
     return mElementsContained;
 }

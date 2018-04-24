@@ -121,12 +121,13 @@ public:
             {
                 assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
 
-                for (std::set<unsigned>::iterator iter = fine_mesh.GetNode(i)->rGetContainingElementIndices().begin();
-                        iter != fine_mesh.GetNode(i)->rGetContainingElementIndices().end();
-                        ++iter)
+                for (unsigned elem_idx : fine_mesh.GetNode(i)->rGetContainingElementIndices())
                 {
-                    Element<3,3>* p_element = fine_mesh.GetElement(*iter);
-                    TS_ASSERT_DIFFERS( mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end() )
+                    Element<3,3>* p_element = fine_mesh.GetElement(elem_idx);
+
+                    std::vector<Element<3,3>*> contained_elems = mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained();
+
+                    TS_ASSERT(std::find(contained_elems.begin(), contained_elems.end(), p_element) != contained_elems.end());
                 }
             }
         }

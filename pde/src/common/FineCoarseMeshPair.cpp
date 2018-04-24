@@ -562,11 +562,9 @@ void FineCoarseMeshPair<DIM>::CollectElementsInContainingBox(DistributedBoxColle
                                                              unsigned boxIndex,
                                                              std::set<unsigned>& rElementIndices)
 {
-    for (typename std::set<Element<DIM,DIM>*>::iterator elem_iter = rpBoxCollection->rGetBox(boxIndex).rGetElementsContained().begin();
-         elem_iter != rpBoxCollection->rGetBox(boxIndex).rGetElementsContained().end();
-         ++elem_iter)
+    for (Element<DIM,DIM>* p_elem : rpBoxCollection->rGetBox(boxIndex).rGetElementsContained())
     {
-        rElementIndices.insert((*elem_iter)->GetIndex());
+        rElementIndices.insert(p_elem->GetIndex());
     }
 }
 
@@ -575,16 +573,12 @@ void FineCoarseMeshPair<DIM>::CollectElementsInLocalBoxes(DistributedBoxCollecti
                                                           unsigned boxIndex,
                                                           std::set<unsigned>& rElementIndices)
 {
-    std::set<unsigned> local_boxes = rpBoxCollection->rGetLocalBoxes(boxIndex);
-    for (std::set<unsigned>::iterator local_box_iter = local_boxes.begin();
-         local_box_iter != local_boxes.end();
-         ++local_box_iter)
+    std::vector<unsigned> local_boxes = rpBoxCollection->rGetLocalBoxes(boxIndex);
+    for (unsigned local_box_idx : local_boxes)
     {
-        for (typename std::set<Element<DIM,DIM>*>::iterator elem_iter = rpBoxCollection->rGetBox(*local_box_iter).rGetElementsContained().begin();
-             elem_iter != rpBoxCollection->rGetBox(*local_box_iter).rGetElementsContained().end();
-             ++elem_iter)
+        for (Element<DIM,DIM>* p_elem : rpBoxCollection->rGetBox(local_box_idx).rGetElementsContained())
         {
-            rElementIndices.insert((*elem_iter)->GetIndex());
+            rElementIndices.insert(p_elem->GetIndex());
         }
     }
 }

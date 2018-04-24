@@ -67,7 +67,7 @@ private:
     c_vector<unsigned, DIM> mNumBoxesEachDirection;
 
     /** The boxes local (itself and nearest neighbour) to a given box. */
-    std::vector< std::set<unsigned> > mLocalBoxes;
+    std::vector< std::vector<unsigned> > mLocalBoxes;
 
     /** Whether the domain is periodic */
     c_vector<bool, DIM> mIsDomainPeriodic;
@@ -176,9 +176,9 @@ public:
      * Get the set of all the local boxes, i.e. itself and its nearest-neighbours.
      *
      * @param boxIndex the index of the box
-     * @return the set containing the indices of boxes local to box boxIndex.  i.e. the box boxIndex itself and its nearest-neighbours.
+     * @return the vector containing the indices of boxes local to box boxIndex.  i.e. the box boxIndex itself and its nearest-neighbours.
      */
-    std::set<unsigned>& rGetLocalBoxes(unsigned boxIndex);
+    std::vector<unsigned>& rGetLocalBoxes(unsigned boxIndex);
 
     /**
      * Return the size of the domain partitioned by this collection

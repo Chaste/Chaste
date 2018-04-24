@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BOX_HPP_
 #define BOX_HPP_
 
-#include <set>
+#include <vector>
 
 #include "UblasVectorInclude.hpp"
 #include "Node.hpp"
@@ -52,10 +52,10 @@ class Box
 private:
 
     /** Nodes contained in this box. */
-    std::set< Node<DIM>* > mNodesContained;
+    std::vector< Node<DIM>* > mNodesContained;
 
     /** Elements contained in this box. */
-    std::set< Element<DIM,DIM>* > mElementsContained;
+    std::vector< Element<DIM,DIM>* > mElementsContained;
 
 public:
 
@@ -83,10 +83,10 @@ public:
     void AddElement(Element<DIM,DIM>* pElement);
 
     /** @return all the nodes in this box. */
-    std::set< Node<DIM>* >& rGetNodesContained();
+    std::vector< Node<DIM>* >& rGetNodesContained();
 
     /** @return all the elements in this box. */
-    std::set< Element<DIM,DIM>* >& rGetElementsContained();
+    std::vector< Element<DIM,DIM>* >& rGetElementsContained();
 };
 
 #endif /*BOX_HPP_*/

@@ -169,25 +169,21 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
 {
     mHaloNodesLeft.clear();
-    for (unsigned i=0; i<mHalosLeft.size(); i++)
+    for (unsigned index : mHalosLeft)
     {
-        for (typename std::set<Node<DIM>* >::iterator iter=this->rGetBox(mHalosLeft[i]).rGetNodesContained().begin();
-                iter!=this->rGetBox(mHalosLeft[i]).rGetNodesContained().end();
-                iter++)
+        for (Node<DIM>* p_node : this->rGetBox(index).rGetNodesContained())
         {
-            mHaloNodesLeft.push_back((*iter)->GetIndex());
+            mHaloNodesLeft.emplace_back(p_node->GetIndex());
         }
     }
 
     // Send right
     mHaloNodesRight.clear();
-    for (unsigned i=0; i<mHalosRight.size(); i++)
+    for (unsigned index : mHalosRight)
     {
-        for (typename std::set<Node<DIM>* >::iterator iter=this->rGetBox(mHalosRight[i]).rGetNodesContained().begin();
-                iter!=this->rGetBox(mHalosRight[i]).rGetNodesContained().end();
-                iter++)
+        for (Node<DIM>* p_node : this->rGetBox(index).rGetNodesContained())
         {
-            mHaloNodesRight.push_back((*iter)->GetIndex());
+            mHaloNodesRight.emplace_back(p_node->GetIndex());
         }
     }
 }
@@ -535,7 +531,8 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         local_boxes.insert(global_index-1);
                     }
 
-                    mLocalBoxes.push_back(local_boxes);
+                    // Turn the set into a vector
+                    mLocalBoxes.emplace_back(local_boxes.begin(), local_boxes.end());
                 }
                 break;
             }
@@ -607,7 +604,8 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         }
                     }
 
-                    mLocalBoxes.push_back(local_boxes);
+                    // Turn the set into a vector
+                    mLocalBoxes.emplace_back(local_boxes.begin(), local_boxes.end());
                 }
                 break;
             }
@@ -743,7 +741,9 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                             }
                         }
                     }
-                    mLocalBoxes.push_back(local_boxes);
+
+                    // Turn the set into a vector
+                    mLocalBoxes.emplace_back(local_boxes.begin(), local_boxes.end());
                 }
 
                 break;
@@ -779,7 +779,8 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     local_boxes.insert(i+1);
                 }
 
-                mLocalBoxes.push_back(local_boxes);
+                // Turn the set into a vector
+                mLocalBoxes.emplace_back(local_boxes.begin(), local_boxes.end());
             }
             break;
         }
@@ -887,7 +888,8 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     }
                 }
 
-                mLocalBoxes.push_back(local_boxes);
+                // Turn the set into a vector
+                mLocalBoxes.emplace_back(local_boxes.begin(), local_boxes.end());
             }
             break;
         }
@@ -1067,7 +1069,8 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     local_boxes.insert(i+1+M+M*N);
                 }
 
-                mLocalBoxes.push_back(local_boxes);
+                // Turn the set into a vector
+                mLocalBoxes.emplace_back(local_boxes.begin(), local_boxes.end());
             }
             break;
         }
@@ -1077,7 +1080,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
 }
 
 template<unsigned DIM>
-std::set<unsigned>& DistributedBoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
+std::vector<unsigned>& DistributedBoxCollection<DIM>::rGetLocalBoxes(unsigned boxIndex)
 {
     // Make sure the box is locally owned
     assert(!(boxIndex < mMinBoxIndex) && !(mMaxBoxIndex<boxIndex));
@@ -1255,55 +1258,49 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
     Box<DIM>& r_box = rGetBox(boxIndex);
 
     // Get the set of nodes in this box
-    const std::set< Node<DIM>* >& r_contained_nodes = r_box.rGetNodesContained();
+    const std::vector< Node<DIM>* >& r_contained_nodes = r_box.rGetNodesContained();
 
     // Get the local boxes to this box
-    const std::set<unsigned>& local_boxes_indices = rGetLocalBoxes(boxIndex);
+    const std::vector<unsigned>& local_boxes_indices = rGetLocalBoxes(boxIndex);
 
     // Loop over all the local boxes
-    for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
-         box_iter != local_boxes_indices.end();
-         box_iter++)
+    for (unsigned local_box_idx : local_boxes_indices)
     {
         Box<DIM>* p_neighbour_box;
 
         // Establish whether box is locally owned or halo.
-        if (IsBoxOwned(*box_iter))
+        if (IsBoxOwned(local_box_idx))
         {
-            p_neighbour_box = &mBoxes[*box_iter - mMinBoxIndex];
+            p_neighbour_box = &mBoxes[local_box_idx - mMinBoxIndex];
         }
         else // Assume it is a halo.
         {
-            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
+            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[local_box_idx]];
         }
         assert(p_neighbour_box);
 
         // Get the set of nodes contained in this box
-        std::set< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
+        std::vector< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
 
         // Loop over these nodes
-        for (typename std::set<Node<DIM>*>::iterator neighbour_node_iter = r_contained_neighbour_nodes.begin();
-             neighbour_node_iter != r_contained_neighbour_nodes.end();
-             ++neighbour_node_iter)
+        for (Node<DIM>* p_neighbour_node : r_contained_neighbour_nodes)
         {
             // Get the index of the other node
-            unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
+            unsigned other_node_index = p_neighbour_node->GetIndex();
 
             // Loop over nodes in this box
-            for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
-                 node_iter != r_contained_nodes.end();
-                 ++node_iter)
+            for (Node<DIM>* p_this_node_node : r_contained_nodes)
             {
-                unsigned node_index = (*node_iter)->GetIndex();
+                unsigned node_index = p_this_node_node->GetIndex();
 
                 // If we're in the same box, then take care not to store the node pair twice
-                if (*box_iter != boxIndex || other_node_index > node_index)
+                if (local_box_idx != boxIndex || other_node_index > node_index)
                 {
-                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+                    rNodePairs.emplace_back(std::make_pair(p_this_node_node, p_neighbour_node));
                     if (mCalculateNodeNeighbours)
                     {
-                        (*node_iter)->AddNeighbour(other_node_index);
-                        (*neighbour_node_iter)->AddNeighbour(node_index);
+                        p_this_node_node->AddNeighbour(other_node_index);
+                        p_neighbour_node->AddNeighbour(node_index);
                     }
                 }
 
