@@ -52,6 +52,9 @@ if ubuntu_ver == 'Trusty':
 else:
     ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
+if ubuntu_ver >= [18,04]:
+    petsc_ver = 3.7
+    petsc_path = '/usr/lib/petscdir/3.7/'
 if ubuntu_ver >= [17,10]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.6/'
@@ -151,8 +154,12 @@ try:
 except:
     xerces3 = False
 if xerces3:
-    # Xerces 3.1
-    xerces_lib = 'xerces-c-3.1'
+    if ubuntu_ver >= [18,04]:
+        # Xerces 3.2
+        xerces_lib = 'xerces-c-3.2'
+    else:
+        # Xerces 3.1
+        xerces_lib = 'xerces-c-3.1'
 else:
     # Xerces 2.8
     xerces_lib = 'xerces-c'
@@ -191,10 +198,13 @@ def Configure(prefs, build):
     vtk_base = '/usr/include/vtk-'
     vtk5_include_path = filter(os.path.isdir, glob.glob(vtk_base + '5*'))
     vtk6_include_path = filter(os.path.isdir, glob.glob(vtk_base + '6*'))
+    vtk7_include_path = filter(os.path.isdir, glob.glob(vtk_base + '7*'))
     if vtk5_include_path:
         vtk_include_path = vtk5_include_path[0]
     elif vtk6_include_path:
         vtk_include_path = vtk6_include_path[0]
+    elif vtk7_include_path:
+        vtk_include_path = vtk7_include_path[0]
     else:
         vtk_include_path = ''
     use_vtk = int(prefs.get('use-vtk', True))
@@ -202,9 +212,10 @@ def Configure(prefs, build):
     if use_vtk:
         # Note: 10.10 uses VTK 5.4, 10.04 uses 5.2, and early use 5.0.
         # Some systems may have VTK6 but not VTK5.
+        # Ubuntu 18,04 has VTK7.
         vtk_version = vtk_include_path[len(vtk_base):]
         other_includepaths.append(vtk_include_path)
-        if vtk_version[0] == '6':
+        if vtk_version[0] >= '6':
             vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources','FiltersGeneral']
             vtk_ver = map(int, vtk_version.split('.')[:2])
             if vtk_ver >= [6,2]:
