@@ -97,9 +97,9 @@ public:
          * Some are hard to throw in normal circumstances --
          * "Unknown KSP error code" ought never to be thrown.
          */
-        TS_ASSERT_THROWS_CONTAINS( KSPEXCEPT(KSP_DIVERGED_ITS), "DIVERGED_ITS in function \'User provided function\' on line");
+        TS_ASSERT_THROWS_CONTAINS( KSPEXCEPT(KSP_DIVERGED_ITS), "DIVERGED_ITS in function \'TestKspExceptionsForCoverage\' on line");
         // The next one is deliberately fragile because it contains the line number in this test suite (to check that the line number is output correctly).
-        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'User provided function\' on line 102 of file ./global/test/TestPetscSetup.hpp");
+        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line 102 of file ./global/test/TestPetscSetup.hpp");
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN), Exception );
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN_BICG), Exception );
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_NONSYMMETRIC), Exception );
