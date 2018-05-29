@@ -36,6 +36,21 @@ if (XSD_EXECUTABLE)
               PATHS /usr/include
               /usr/local/opt/libxsd)
 
+    # Idenfity the XSD version from the executable
+    # Look for X.Y.Z in the result of xsd --version
+    execute_process(COMMAND ${XSD_EXECUTABLE} "--version" OUTPUT_VARIABLE xsd_version_full)
+
+    string(REGEX REPLACE
+           ".*([0-9]+\\.[0-9]+\\.[0-9]+).*"
+           "\\1"
+           xsd_version
+           "${xsd_version_full}")
+
+    if (NOT xsd_version MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+        set(xsd_version "undertermined")
+        message(WARNING "XSD found, but version undetermined")
+    endif()
+
 endif (XSD_EXECUTABLE)
 
 
