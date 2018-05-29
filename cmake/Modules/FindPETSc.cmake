@@ -72,7 +72,7 @@ function (petsc_get_version)
       set (PETSC_VERSION "${PETSC_VERSION_MAJOR}.${PETSC_VERSION_MINOR}.${PETSC_VERSION_SUBMINOR}.99" PARENT_SCOPE)
     endif ()
   else ()
-    message (SEND_ERROR "PETSC_DIR can not be used, ${PETSC_DIR}/include/petscversion.h does not exist")
+    message (SEND_ERROR "PETSC_DIR can not be used, ${VERSION_HEADER_PATH}/include/petscversion.h does not exist")
   endif ()
 endfunction ()
 
@@ -122,6 +122,16 @@ if(NOT DEFINED PETSC_DIR)
     # ... Ubuntu 17.04
     elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.5/x86_64-linux-gnu-real")
       set(PETSC_DIR "/usr/lib/petscdir/3.7.5" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 17.10
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.6/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/3.7.6" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 18.04
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/3.7.7/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/3.7.7" CACHE FILEPATH "PETSc install directory")
       set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
       message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Anything else with dir /usr/lib/petscdir
