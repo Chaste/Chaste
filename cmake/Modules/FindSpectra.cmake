@@ -8,8 +8,8 @@
 #  SPECTRA_FOUND      - True if Spectra is found
 
 if (SPECTRA_INCLUDES)
-  # Already in cache, be silent
-  set (SPECTRA_FIND_QUIETLY TRUE)
+    # Already in cache, be silent
+    set (SPECTRA_FIND_QUIETLY TRUE)
 endif (SPECTRA_INCLUDES)
 
 find_path (SPECTRA_INCLUDES GenEigsComplexShiftSolver.h HINTS $ENV{SPECTRA_ROOT} $ENV{SPECTRA_ROOT}/include PATH_SUFFIXES)
