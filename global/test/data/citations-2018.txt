@@ -1,0 +1,33 @@
+If you publish results based on this computation please cite the following:
+===========================================================================
+@TechReport{petsc-user-ref,
+  Author = {Satish Balay and Shrirang Abhyankar and Mark F. Adams and Jed Brown and Peter Brune
+            and Kris Buschelman and Lisandro Dalcin and Victor Eijkhout and William D. Gropp
+            and Dinesh Kaushik and Matthew G. Knepley and Dave A. May and Lois Curfman McInnes
+            and Richard Tran Mills and Todd Munson and Karl Rupp and Patrick Sanan
+            and Barry F. Smith and Stefano Zampini and Hong Zhang and Hong Zhang},
+  Title = {{PETS}c Users Manual},
+  Number = {ANL-95/11 - Revision 3.9},
+  Institution = {Argonne National Laboratory},
+  Year = {2018}
+}
+@InProceedings{petsc-efficient,
+  Author = {Satish Balay and William D. Gropp and Lois Curfman McInnes and Barry F. Smith},
+  Title = {Efficient Management of Parallelism in Object Oriented Numerical Software Libraries},
+  Booktitle = {Modern Software Tools in Scientific Computing},
+  Editor = {E. Arge and A. M. Bruaset and H. P. Langtangen},
+  Pages = {163--202},
+  Publisher = {Birkh{\"{a}}user Press},
+  Year = {1997}
+}
+@article{mirams2013chaste,
+  author    = {Mirams, G.R. and Arthurs, C.J. and Bernabeu, M.O. and Bordas, R. and Cooper, J. and Corrias, A. and Davit, Y. and Dunn, S-J. and Fletcher, A.G. and Harvey, D.G. and Marsh, M.E. and Osborne, J.M. and Pathmanathan, P. and Pitt-Francis, J. and Southern, J. and Zemzemi, N. and Gavaghan, D.J.},
+  title     = {Chaste: an open source C++ library for computational physiology and biology},
+  journal   = {PLoS computational biology},
+  volume    = {9},
+  number    = {3},
+  pages     = {e1002970},
+  year      = {2013},
+  publisher = {Public Library of Science}
+}
+===========================================================================

@@ -18,7 +18,7 @@ The following new files/directories were created:
 --------.chaste_deletable_folder
 --------1ms
 ------------.chaste_deletable_folder
-------------ChasteParameters_3_4.xsd
+------------ChasteParameters_2017_1.xsd
 ------------ResumeParameters.xml
 ------------ChasteResults
 ----------------.chaste_deletable_folder
@@ -36,7 +36,7 @@ The following new files/directories were created:
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
 ----------------ChasteParameters.xml
-----------------ChasteParameters_3_4.xsd
+----------------ChasteParameters_2017_1.xsd
 ----------------archive.arch
 ----------------archive.arch.0
 ----------------archive.info
@@ -47,7 +47,7 @@ The following new files/directories were created:
 ----------------mesh.ortho
 --------2ms
 ------------.chaste_deletable_folder
-------------ChasteParameters_3_4.xsd
+------------ChasteParameters_2017_1.xsd
 ------------ResumeParameters.xml
 ------------ChasteResults
 ----------------.chaste_deletable_folder
@@ -65,7 +65,7 @@ The following new files/directories were created:
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
 ----------------ChasteParameters.xml
-----------------ChasteParameters_3_4.xsd
+----------------ChasteParameters_2017_1.xsd
 ----------------archive.arch
 ----------------archive.arch.0
 ----------------archive.info
@@ -76,7 +76,7 @@ The following new files/directories were created:
 ----------------mesh.ortho
 --------3ms
 ------------.chaste_deletable_folder
-------------ChasteParameters_3_4.xsd
+------------ChasteParameters_2017_1.xsd
 ------------ResumeParameters.xml
 ------------ChasteResults
 ----------------.chaste_deletable_folder
@@ -94,7 +94,7 @@ The following new files/directories were created:
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
 ----------------ChasteParameters.xml
-----------------ChasteParameters_3_4.xsd
+----------------ChasteParameters_2017_1.xsd
 ----------------archive.arch
 ----------------archive.arch.0
 ----------------archive.info
@@ -105,7 +105,7 @@ The following new files/directories were created:
 ----------------mesh.ortho
 --------4ms
 ------------.chaste_deletable_folder
-------------ChasteParameters_3_4.xsd
+------------ChasteParameters_2017_1.xsd
 ------------ResumeParameters.xml
 ------------ChasteResults
 ----------------.chaste_deletable_folder
@@ -123,7 +123,7 @@ The following new files/directories were created:
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
 ----------------ChasteParameters.xml
-----------------ChasteParameters_3_4.xsd
+----------------ChasteParameters_2017_1.xsd
 ----------------archive.arch
 ----------------archive.arch.0
 ----------------archive.info
@@ -134,7 +134,7 @@ The following new files/directories were created:
 ----------------mesh.ortho
 --------5ms
 ------------.chaste_deletable_folder
-------------ChasteParameters_3_4.xsd
+------------ChasteParameters_2017_1.xsd
 ------------ResumeParameters.xml
 ------------ChasteResults
 ----------------.chaste_deletable_folder
@@ -152,7 +152,7 @@ The following new files/directories were created:
 ----------------.chaste_deletable_folder
 ----------------AbstractCardiacProblem_mSolution.h5
 ----------------ChasteParameters.xml
-----------------ChasteParameters_3_4.xsd
+----------------ChasteParameters_2017_1.xsd
 ----------------archive.arch
 ----------------archive.arch.0
 ----------------archive.info

@@ -39,7 +39,7 @@ add_custom_command(OUTPUT
         "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
         "-DChaste_BUILD_TYPE=$<CONFIGURATION>"
         "-Dtimekeeper_exe=$<TARGET_FILE:timekeeper>"
-        "-DXSD_EXECUTABLE=${XSD_EXECUTABLE}"
+        "-Dxsd_version=${xsd_version}"
         "-Dgenerate_dir=${generate_dir}"
         "-DChaste_UPDATE_PROVENANCE=${Chaste_UPDATE_PROVENANCE}"
         "-DChaste_PROJECTS=${Chaste_PROJECTS}"

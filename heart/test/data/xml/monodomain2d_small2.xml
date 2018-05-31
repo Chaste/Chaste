@@ -36,7 +36,7 @@
 			</Stimulus>	
 		</Stimuli>
 		
-		<OutputDirectory>SaveMono2D</OutputDirectory>
+		<OutputDirectory>SaveMono2D2</OutputDirectory>
 		<CheckpointSimulation timestep="0.1" unit="ms" max_checkpoints_on_disk="3"/>
 	</Simulation>
 	
@@ -55,7 +55,4 @@
 	<Numerical>
 		<TimeSteps ode="0.1" pde="0.1" printing="0.1" unit="ms"/>
 	</Numerical>
-	<PostProcessing>
-	        <PseudoEcgElectrodePosition x="0.05" y="0.05" z="0" />
-	</PostProcessing>
 </ChasteParameters>

@@ -658,6 +658,10 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
         {
             r_user.ConductionVelocityMap() = r_resume.ConductionVelocityMap();
         }
+        if (!r_resume.PseudoEcgElectrodePosition().empty())
+        {
+            r_user.PseudoEcgElectrodePosition() = r_resume.PseudoEcgElectrodePosition();
+        }
     }
 }
 
