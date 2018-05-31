@@ -11,7 +11,7 @@ Chaste is distributed as open source software under the [3-clause BSD licence](h
 For full details see the file [Copying.pdf](docs/licencing/Copying.pdf).
 Chaste uses various third party libraries which have their own licences. 
 For details of these licences and the impact they may have on your use of 
-Chaste please see [Licences.html](docslicencing/Licences.html).
+Chaste please see [Licences.html](docs/licencing/Licences.html).
 
 Chaste includes a complete test suite covering all the source code. 
 The easiest way to use existing source codes is to create a test file 
@@ -33,3 +33,5 @@ https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2017.1
 
 API documentation generated from the code by Doxygen is available at:
 https://chaste.cs.ox.ac.uk/chaste/docs/release_2017.1
+
+For information on how to contribute to Chaste, please see the file [CONTRIBUTING.md](docs/CONTRIBUTING.md).
