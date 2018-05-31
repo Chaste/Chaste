@@ -69,6 +69,7 @@ public:
      * @param apicalLamina whether the palisade has an apical lamina (defaults to false)
      * @param leakyLaminas whether the laminas should have a deliberately course node-spacing (defaults to false)
      * @param numFluidMeshPoints number of fluid mesh points (X and Y).  Overrides numNodesPerCell (defaults to UINT_MAX)
+     * @param absoluteGap the required gap between cells (defaults to DOUBLE_UNSET)
      */
     ImmersedBoundaryPalisadeMeshGenerator(unsigned numCellsWide,
                                           unsigned numNodesPerCell=100,
@@ -78,7 +79,8 @@ public:
                                           bool basalLamina=false,
                                           bool apicalLamina=false,
                                           bool leakyLaminas=false,
-                                          unsigned numFluidMeshPoints=UINT_MAX);
+                                          unsigned numFluidMeshPoints=UINT_MAX,
+                                          double absoluteGap=DOUBLE_UNSET);
 
     /**
      * Null constructor for derived classes to call.

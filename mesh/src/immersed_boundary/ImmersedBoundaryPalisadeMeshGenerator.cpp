@@ -46,7 +46,8 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
                                                                              bool basalLamina,
                                                                              bool apicalLamina,
                                                                              bool leakyLaminas,
-                                                                             unsigned numFluidMeshPoints)
+                                                                             unsigned numFluidMeshPoints,
+                                                                             double absoluteGap)
         : mpMesh(NULL)
 {
     // Check for sensible input
@@ -82,6 +83,8 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         double target_node_spacing = 0.5 * fluid_mesh_spacing;
         numNodesPerCell = static_cast<unsigned>(cell_perimeter / target_node_spacing);
     }
+
+    const double width_scale_fac = absoluteGap == DOUBLE_UNSET ? 0.95 : (cell_width - absoluteGap) / cell_width;
 
     // Generate a reference superellipse
     std::unique_ptr<SuperellipseGenerator> p_gen(new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0));
@@ -198,7 +201,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     if (basalLamina)
     {
         // The height of the lamina is offset by a proportion of the cell height
-        double lam_hight = y_offset[1] - 0.05 * cell_height;
+        double lam_hight = absoluteGap == DOUBLE_UNSET ? y_offset[1] - 0.05 * cell_height : y_offset[1] - absoluteGap;
 
         unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / lamina_node_spacing));
 
@@ -263,7 +266,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         for (unsigned location = 0; location < locations.size(); location++)
         {
             unsigned node_index = nodes.size();
-            c_vector<double, 2> scaled_location = 0.95 * locations[location] + x_offset * (elem_idx + 0.5);
+            c_vector<double, 2> scaled_location = width_scale_fac * locations[location] + x_offset * (elem_idx + 0.5);
 
             scaled_location[0] = fmod(scaled_location[0], 1.0);
             scaled_location[1] *= (1.0 + random_variation);
