@@ -39,7 +39,7 @@ import subprocess
 # If you are an active developer, committing back to the trunk, 
 # please uncomment the following line to run tests on duplicate file names, 
 # orphaned tests and copyright notices.
-do_inf_tests = 1
+# do_inf_tests = 1
 
 # Check which version of Ubuntu this is
 fp = open('/etc/issue')
