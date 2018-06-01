@@ -407,7 +407,8 @@ class Gcc(BuildType):
             self._compiler_type = 'gcc'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
             if self.GetCompilerVersion() >= 7:
-                self._cc_flags.extend(['-Wimplicit-fallthrough'])
+                self._cc_flags.extend(['-Wimplicit-fallthrough=3'])
+                # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
 
     def GetCompilerVersion(self):
         """Get the major version number of the compiler being used."""

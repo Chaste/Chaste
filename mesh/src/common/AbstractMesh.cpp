@@ -353,10 +353,14 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(
     {
         case 3:
             displacement[2] = zMovement;
+            // purposeful fallthrough - Note the presence of this comment stops compiler warning for gcc >= 7!
+            // See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
         case 2:
             displacement[1] = yMovement;
+            // fallthrough
         case 1:
             displacement[0] = xMovement;
+            // fallthrough
     }
 
     Translate(displacement);
