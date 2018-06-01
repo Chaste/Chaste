@@ -39,7 +39,7 @@ import subprocess
 # If you are an active developer, committing back to the trunk, 
 # please uncomment the following line to run tests on duplicate file names, 
 # orphaned tests and copyright notices.
-# do_inf_tests = 1
+do_inf_tests = 1
 
 # Check which version of Ubuntu this is
 fp = open('/etc/issue')
@@ -54,8 +54,10 @@ else:
 
 if ubuntu_ver >= [18,04]:
     petsc_ver = 3.7
-    petsc_path = '/usr/lib/petscdir/3.7/'
-if ubuntu_ver >= [17,10]:
+    petsc_path = '/usr/lib/petscdir/'
+    petsc_build_name = '3.7'
+    petsc_build_name_optimized = '3.7-real'
+elif ubuntu_ver >= [17,10]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.6/'
 elif ubuntu_ver >= [17,04]:
@@ -84,16 +86,18 @@ else:
     petsc_2_3_path = '/usr/lib/petscdir/2.3.3/'
 
 petsc_2_2_path = ''
-if ubuntu_ver >= [16,04]:
-    petsc_build_name_optimized = os.path.basename(glob.glob(os.path.join(petsc_path, '*-real'))[0])
-    _dbg = glob.glob(os.path.join(petsc_path, '*-real-debug'))
-    if _dbg:
-        petsc_build_name = os.path.basename(_dbg[0])
+if ubuntu_ver < [18,04]:
+    if ubuntu_ver >= [16,04]:
+        petsc_build_name_optimized = os.path.basename(glob.glob(os.path.join(petsc_path, '*-real'))[0])
+        _dbg = glob.glob(os.path.join(petsc_path, '*-real-debug'))
+        if _dbg:
+            petsc_build_name = os.path.basename(_dbg[0])
+        else:
+            petsc_build_name = petsc_build_name_optimized
     else:
-        petsc_build_name = petsc_build_name_optimized
-else:
-    petsc_build_name = 'linux-gnu-c-debug'
-    petsc_build_name_optimized = 'linux-gnu-c-opt'
+        petsc_build_name = 'linux-gnu-c-debug'
+        petsc_build_name_optimized = 'linux-gnu-c-opt'
+
 petsc_build_name_profile = petsc_build_name
 
 dealii_path = None
