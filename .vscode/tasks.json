@@ -1,0 +1,20 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "command": "scons",
+    "isShellCommand": true,
+    "args": ["${relativeFile}"],
+    "showOutput": "always",
+    "suppressTaskName":  true,
+    "echoCommand": true,
+    "tasks":[
+        {"taskName": "Optimised",
+        "args": ["b=GccOpt"],
+        "isBuildCommand": true
+        },
+        {"taskName": "Debug",
+        "args": ["co=1"]
+        }
+    ]
+}

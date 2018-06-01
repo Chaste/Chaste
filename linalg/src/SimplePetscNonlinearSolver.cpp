@@ -43,6 +43,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 
+
+SimplePetscNonlinearSolver::SimplePetscNonlinearSolver(){
+    // Default tolerance
+    mTolerance = 1e-5;
+}
+
+
+void SimplePetscNonlinearSolver::SetTolerance(double inputTol){
+    mTolerance = inputTol;
+};
+
 Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
 #if (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5)
                                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat,Mat,void*),
@@ -79,7 +90,7 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
     SNESSetType(snes, SNESLS);
 #endif
 
-    SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+    SNESSetTolerances(snes,mTolerance,mTolerance,mTolerance,PETSC_DEFAULT,PETSC_DEFAULT);
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 3) //PETSc 3.3
     SNESLineSearch linesearch;
     SNESGetSNESLineSearch(snes, &linesearch);

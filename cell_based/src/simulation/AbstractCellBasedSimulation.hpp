@@ -150,6 +150,9 @@ protected:
     /** Output file for location of division events. */
     out_stream mpDivisionLocationFile;
 
+    /** Results file for timesteps. */
+    out_stream mpTimestepsFile;
+
     /**
      * Whether to write the cell velocities to a file.
      * Initialised to false in constructor.

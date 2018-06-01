@@ -367,6 +367,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
     }
 
+    OutputFileHandler output_file_handler3(this->mSimulationOutputDirectory+"/", false);
+    mpTimestepsFile = output_file_handler3.OpenOutputFile("timesteps.dat");
+
     if (PetscTools::AmMaster())
     {
         mpVizSetupFile = output_file_handler.OpenOutputFile("results.vizsetup");
@@ -551,6 +554,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         mpCellVelocitiesFile->close();
     }
+    mpTimestepsFile->close();
 
     if (PetscTools::AmMaster())
     {
