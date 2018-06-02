@@ -40,19 +40,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>::AbstractMesh()
-    : mpDistributedVectorFactory(nullptr),
-      mMeshFileBaseName(""),
-      mMeshChangesDuringSimulation(false)
+        : mpDistributedVectorFactory(nullptr),
+          mMeshFileBaseName(""),
+          mMeshChangesDuringSimulation(false)
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
 {
     // Iterate over nodes and free the memory
-    for (unsigned i=0; i<mNodes.size(); i++)
+    for (unsigned i = 0; i < mNodes.size(); i++)
     {
         delete mNodes[i];
     }
@@ -62,25 +62,25 @@ AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {
     return mNodes.size();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumBoundaryNodes() const
 {
     return mBoundaryNodes.size();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllNodes() const
 {
     return mNodes.size();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodeAttributes() const
 {
     /* Note, this implementation assumes that all nodes have the same number of attributes
@@ -89,7 +89,7 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodeAttributes() const
     return mNodes[0]->GetNumNodeAttributes();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index) const
 {
     unsigned local_index = SolveNodeMapping(index);
@@ -102,7 +102,7 @@ Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeOrHaloNode(unsigne
     return GetNode(index);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeFromPrePermutationIndex(unsigned index) const
 {
     if (mNodePermutation.empty())
@@ -116,7 +116,7 @@ Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeFromPrePermutation
 }
 
 // LCOV_EXCL_START
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const std::string& rNodesPerProcessorFile)
 {
     NEVER_REACHED;
@@ -129,7 +129,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
     // Does nothing, since an AbstractMesh has no elements
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedVectorFactory* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetDistributedVectorFactory()
 {
     if (mpDistributedVectorFactory == nullptr)
@@ -143,8 +143,8 @@ DistributedVectorFactory* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetDistributedVe
     return mpDistributedVectorFactory;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(DistributedVectorFactory *pFactory)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(DistributedVectorFactory* pFactory)
 {
     if (mpDistributedVectorFactory)
     {
@@ -224,7 +224,7 @@ double AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetWidth(const unsigned& rDimension
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox(const std::vector<Node<SPACE_DIM> *>& rNodes) const
+ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox(const std::vector<Node<SPACE_DIM>*>& rNodes) const
 {
     // Work out the max and min location in each co-ordinate direction.
     c_vector<double, SPACE_DIM> minimum_point;
@@ -243,7 +243,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
 
         // Iterate through nodes
         /// \todo #1322 use a const version of NodeIterator here
-        for (unsigned index=0; index<rNodes.size(); index++)
+        for (unsigned index = 0; index < rNodes.size(); index++)
         {
             if (!rNodes[index]->IsDeleted())
             {
@@ -252,7 +252,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
                 position = rNodes[index]->rGetLocation();
 
                 // Update max/min
-                for (unsigned i=0; i<SPACE_DIM; i++)
+                for (unsigned i = 0; i < SPACE_DIM; i++)
                 {
                     if (position[i] < minimum_point[i])
                     {
@@ -291,7 +291,7 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
          * This case is covered in TestDistributedTetrahedralMesh::TestConstructLinearMeshSmallest
          * but only when there are 3 or more processes
          */
-        return UINT_MAX;  // LCOV_EXCL_LINE
+        return UINT_MAX; // LCOV_EXCL_LINE
     }
     // Hold the best distance from node to point found so far
     // and the (local) node at which this was recorded
@@ -303,7 +303,7 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
     for (unsigned node_index = 0; node_index < mNodes.size(); node_index++)
     {
         // Calculate the distance from the chosen point to the current node
-        double node_point_distance = norm_2( GetVectorFromAtoB(mNodes[node_index]->rGetLocation(), test_location) );
+        double node_point_distance = norm_2(GetVectorFromAtoB(mNodes[node_index]->rGetLocation(), test_location));
         // Update the "best" distance and node index if necessary
         if (node_point_distance < best_node_point_distance)
         {
@@ -318,20 +318,19 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
     return mNodes[best_node_index]->GetIndex();
 }
 
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xScale, const double yScale, const double zScale)
 {
     unsigned num_nodes = mNodes.size();
 
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; i++)
     {
         c_vector<double, SPACE_DIM>& r_location = mNodes[i]->rGetModifiableLocation();
-        if (SPACE_DIM>=3)
+        if (SPACE_DIM >= 3)
         {
             r_location[2] *= zScale;
         }
-        if (SPACE_DIM>=2)
+        if (SPACE_DIM >= 2)
         {
             r_location[1] *= yScale;
         }
@@ -353,25 +352,25 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(
     {
         case 3:
             displacement[2] = zMovement;
-            // purposeful fallthrough - Note the presence of this comment stops compiler warning for gcc >= 7!
-            // See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
+        // purposeful fallthrough - Note the presence of this comment stops compiler warning for gcc >= 7!
+        // See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
         case 2:
             displacement[1] = yMovement;
-            // fallthrough
+        // fallthrough on purpose
         case 1:
             displacement[0] = xMovement;
-            // fallthrough
+            // fallthrough on purpose
     }
 
     Translate(displacement);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rDisplacement)
 {
     unsigned num_nodes = this->mNodes.size();
 
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; i++)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location += rDisplacement;
@@ -381,11 +380,11 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPAC
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double , SPACE_DIM, SPACE_DIM> rotationMatrix)
+void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double, SPACE_DIM, SPACE_DIM> rotationMatrix)
 {
     unsigned num_nodes = this->mNodes.size();
 
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; i++)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location = prod(rotationMatrix, r_location);
@@ -394,27 +393,27 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double , SPACE_DIM, S
     RefreshMesh();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_vector<double,3> axis, double angle)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_vector<double, 3> axis, double angle)
 {
     assert(SPACE_DIM == 3); // LCOV_EXCL_LINE
     double norm = norm_2(axis);
-    c_vector<double,3> unit_axis=axis/norm;
+    c_vector<double, 3> unit_axis = axis / norm;
 
-    c_matrix<double, SPACE_DIM,SPACE_DIM> rotation_matrix;
+    c_matrix<double, SPACE_DIM, SPACE_DIM> rotation_matrix;
 
     double c = cos(angle);
     double s = sin(angle);
 
-    rotation_matrix(0,0) = unit_axis(0)*unit_axis(0)+c*(1-unit_axis(0)*unit_axis(0));
-    rotation_matrix(0,1) = unit_axis(0)*unit_axis(1)*(1-c) - unit_axis(2)*s;
-    rotation_matrix(1,0) = unit_axis(0)*unit_axis(1)*(1-c) + unit_axis(2)*s;
-    rotation_matrix(1,1) = unit_axis(1)*unit_axis(1)+c*(1-unit_axis(1)*unit_axis(1));
-    rotation_matrix(0,2) = unit_axis(0)*unit_axis(2)*(1-c)+unit_axis(1)*s;
-    rotation_matrix(1,2) = unit_axis(1)*unit_axis(2)*(1-c)-unit_axis(0)*s;
-    rotation_matrix(2,0) = unit_axis(0)*unit_axis(2)*(1-c)-unit_axis(1)*s;
-    rotation_matrix(2,1) = unit_axis(1)*unit_axis(2)*(1-c)+unit_axis(0)*s;
-    rotation_matrix(2,2) = unit_axis(2)*unit_axis(2)+c*(1-unit_axis(2)*unit_axis(2));
+    rotation_matrix(0, 0) = unit_axis(0) * unit_axis(0) + c * (1 - unit_axis(0) * unit_axis(0));
+    rotation_matrix(0, 1) = unit_axis(0) * unit_axis(1) * (1 - c) - unit_axis(2) * s;
+    rotation_matrix(1, 0) = unit_axis(0) * unit_axis(1) * (1 - c) + unit_axis(2) * s;
+    rotation_matrix(1, 1) = unit_axis(1) * unit_axis(1) + c * (1 - unit_axis(1) * unit_axis(1));
+    rotation_matrix(0, 2) = unit_axis(0) * unit_axis(2) * (1 - c) + unit_axis(1) * s;
+    rotation_matrix(1, 2) = unit_axis(1) * unit_axis(2) * (1 - c) - unit_axis(0) * s;
+    rotation_matrix(2, 0) = unit_axis(0) * unit_axis(2) * (1 - c) - unit_axis(1) * s;
+    rotation_matrix(2, 1) = unit_axis(1) * unit_axis(2) * (1 - c) + unit_axis(0) * s;
+    rotation_matrix(2, 2) = unit_axis(2) * unit_axis(2) + c * (1 - unit_axis(2) * unit_axis(2));
 
     Rotate(rotation_matrix);
 }
@@ -426,12 +425,12 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::RotateX(const double theta)
     {
         EXCEPTION("This rotation is only valid in 3D");
     }
-    c_matrix<double , SPACE_DIM, SPACE_DIM> x_rotation_matrix=identity_matrix<double>(SPACE_DIM);
+    c_matrix<double, SPACE_DIM, SPACE_DIM> x_rotation_matrix = identity_matrix<double>(SPACE_DIM);
 
-    x_rotation_matrix(1,1) = cos(theta);
-    x_rotation_matrix(1,2) = sin(theta);
-    x_rotation_matrix(2,1) = -sin(theta);
-    x_rotation_matrix(2,2) = cos(theta);
+    x_rotation_matrix(1, 1) = cos(theta);
+    x_rotation_matrix(1, 2) = sin(theta);
+    x_rotation_matrix(2, 1) = -sin(theta);
+    x_rotation_matrix(2, 2) = cos(theta);
     Rotate(x_rotation_matrix);
 }
 
@@ -442,13 +441,12 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::RotateY(const double theta)
     {
         EXCEPTION("This rotation is only valid in 3D");
     }
-    c_matrix<double , SPACE_DIM, SPACE_DIM> y_rotation_matrix=identity_matrix<double>(SPACE_DIM);
+    c_matrix<double, SPACE_DIM, SPACE_DIM> y_rotation_matrix = identity_matrix<double>(SPACE_DIM);
 
-    y_rotation_matrix(0,0) = cos(theta);
-    y_rotation_matrix(0,2) = -sin(theta);
-    y_rotation_matrix(2,0) = sin(theta);
-    y_rotation_matrix(2,2) = cos(theta);
-
+    y_rotation_matrix(0, 0) = cos(theta);
+    y_rotation_matrix(0, 2) = -sin(theta);
+    y_rotation_matrix(2, 0) = sin(theta);
+    y_rotation_matrix(2, 2) = cos(theta);
 
     Rotate(y_rotation_matrix);
 }
@@ -460,13 +458,12 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::RotateZ(const double theta)
     {
         EXCEPTION("This rotation is not valid in less than 2D");
     }
-    c_matrix<double , SPACE_DIM, SPACE_DIM> z_rotation_matrix=identity_matrix<double>(SPACE_DIM);
+    c_matrix<double, SPACE_DIM, SPACE_DIM> z_rotation_matrix = identity_matrix<double>(SPACE_DIM);
 
-
-    z_rotation_matrix(0,0) = cos(theta);
-    z_rotation_matrix(0,1) = sin(theta);
-    z_rotation_matrix(1,0) = -sin(theta);
-    z_rotation_matrix(1,1) = cos(theta);
+    z_rotation_matrix(0, 0) = cos(theta);
+    z_rotation_matrix(0, 1) = sin(theta);
+    z_rotation_matrix(1, 0) = -sin(theta);
+    z_rotation_matrix(1, 1) = cos(theta);
 
     Rotate(z_rotation_matrix);
 }
@@ -491,19 +488,19 @@ bool AbstractMesh<ELEMENT_DIM, SPACE_DIM>::IsMeshChanging() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumContainingElementsPerProcess() const
 {
-    unsigned max_num=0u;
-    for (unsigned local_node_index=0; local_node_index<mNodes.size(); local_node_index++)
+    unsigned max_num = 0u;
+    for (unsigned local_node_index = 0; local_node_index < mNodes.size(); local_node_index++)
     {
-        unsigned num=mNodes[local_node_index]->GetNumContainingElements();
-        if (num>max_num)
+        unsigned num = mNodes[local_node_index]->GetNumContainingElements();
+        if (num > max_num)
         {
-            max_num=num;
+            max_num = num;
         }
     }
     return max_num;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshHasChangedSinceLoading()
 {
     // We just forget what the original file was, which has the desired effect
@@ -511,9 +508,9 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshHasChangedSinceLoading()
 }
 
 // Explicit instantiation
-template class AbstractMesh<1,1>;
-template class AbstractMesh<1,2>;
-template class AbstractMesh<1,3>;
-template class AbstractMesh<2,2>;
-template class AbstractMesh<2,3>;
-template class AbstractMesh<3,3>;
+template class AbstractMesh<1, 1>;
+template class AbstractMesh<1, 2>;
+template class AbstractMesh<1, 3>;
+template class AbstractMesh<2, 2>;
+template class AbstractMesh<2, 3>;
+template class AbstractMesh<3, 3>;
