@@ -353,7 +353,12 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
         //If the displacement is too big, warn the user once and scale it back
         if (norm_2(displacement) > characteristic_spacing)
         {
-            WARN_ONCE_ONLY("Nodes are moving more than half the CharacteristicNodeSpacing. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+            if (norm_2(displacement) > 10.0 * characteristic_spacing)
+            {
+                EXCEPTION("Nodes are moving more than 10x CharacteristicNodeSpacing. Aborting.");
+            }
+
+            WARN_ONCE_ONLY("Nodes are moving more than the CharacteristicNodeSpacing. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
             displacement *= characteristic_spacing / norm_2(displacement);
         }
 
@@ -424,7 +429,12 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
             //If the displacement is too big, warn the user once and scale it back
             if (norm_2(displacement) > characteristic_spacing)
             {
-                WARN_ONCE_ONLY("Sources are moving more than half the CharacteristicNodeSpacing. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+                if (norm_2(displacement) > 10.0 * characteristic_spacing)
+                {
+                    EXCEPTION("Sources are moving more than 10x CharacteristicNodeSpacing. Aborting.");
+                }
+
+                WARN_ONCE_ONLY("Sources are moving more than the CharacteristicNodeSpacing. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
                 displacement *= characteristic_spacing / norm_2(displacement);
             }
 
