@@ -1573,12 +1573,16 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
     // We go to 1 + num_nodes so that we add on a node in a location congruent to the first location added
     for (unsigned node_idx = 1; node_idx < 1 + num_nodes; ++node_idx)
     {
+        const unsigned prev_idx = AdvanceMod(start_idx, node_idx - 1, num_nodes);
         const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
 
-        const auto& prev_location = locations_straightened.back();
-        const auto this_location = pLamina->GetNodeLocation(this_idx);
+        const c_vector<double, SPACE_DIM>& r_last_location_added = locations_straightened.back();
 
-        locations_straightened.emplace_back(prev_location + this->GetVectorFromAtoB(prev_location, this_location));
+        const c_vector<double, SPACE_DIM>& r_prev_location = pLamina->GetNodeLocation(prev_idx);
+        const c_vector<double, SPACE_DIM>& r_this_location = pLamina->GetNodeLocation(this_idx);
+
+        locations_straightened.emplace_back(r_last_location_added +
+                                            this->GetVectorFromAtoB(r_prev_location, r_this_location));
     }
 
     assert(locations_straightened.size() == 1 + num_nodes);
