@@ -135,7 +135,7 @@ public:
     bool IsPathSet() const;
 
     /**
-     * @return true if we exist.
+     * @return true if we exist (as either a file or a directory).
      */
     bool Exists() const;
 
