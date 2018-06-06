@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MathsCustomFunctions.hpp"
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 
@@ -188,6 +189,17 @@ unsigned AdvanceMod(const unsigned current_location, const int increment, const 
     }
 
     return static_cast<unsigned>(new_pos);
+}
+
+unsigned SmallDifferenceMod(const unsigned idxA, const unsigned idxB, const std::size_t range) noexcept
+{
+    assert(idxA < range);
+    assert(idxB < range);
+
+    const unsigned min = idxA < idxB ? idxA : idxB;
+    const unsigned max = idxA < idxB ? idxB : idxA;
+
+    return std::min<unsigned>(max - min, (range + min) - max);
 }
 
 bool CompareDoubles::WithinRelativeTolerance(double number1, double number2, double tolerance)

@@ -113,6 +113,17 @@ double SafeDivide(double numerator, double divisor);
 unsigned AdvanceMod(unsigned index, int increment, std::size_t range) noexcept;
 
 /**
+ * Calculate the smaller of the two differences between two indices, modulo N.  I.e. the smallest number of increments
+ * from idxA required to get to idxB, modulo range.
+ *
+ * @param idxA first index, in [0, range)
+ * @param idxB second index, in [0, range)
+ * @param range the top of the range; [0, range)
+ * @return the smallest difference between idxA and idxB
+ */
+unsigned SmallDifferenceMod(unsigned idxA, unsigned idxB, std::size_t range) noexcept;
+
+/**
  * Utility static methods for comparing floating point numbers, based on
  * boost/test/floating_point_comparison.hpp.
  */

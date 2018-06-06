@@ -107,6 +107,16 @@ public:
         TS_ASSERT_EQUALS(AdvanceMod(3u, -1572, 27u), (3 + 100 * 27 - 1572) % 27);
     }
 
+    void TestSmallDifferenceMod()
+    {
+        TS_ASSERT_EQUALS(SmallDifferenceMod(0u, 0u, 2u), 0u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(123u, 123u, 125u), 0u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(1u, 3u, 125u), 2u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(3u, 1u, 125u), 2u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(0u, 124u, 125u), 1u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(124u, 0u, 125u), 1u);
+    }
+
     void TestCompareDoubles()
     {
         TS_ASSERT(CompareDoubles::IsNearZero(DBL_EPSILON, 2*DBL_EPSILON));
