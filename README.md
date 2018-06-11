@@ -34,4 +34,5 @@ https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2017.1
 API documentation generated from the code by Doxygen is available at:
 https://chaste.cs.ox.ac.uk/chaste/docs/release_2017.1
 
+Chaste welcomes contributions from the community.
 For information on how to contribute to Chaste, please see the file [CONTRIBUTING.md](docs/CONTRIBUTING.md).
