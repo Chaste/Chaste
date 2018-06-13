@@ -223,6 +223,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
     }
     mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)));
     mpNumericalMethod->SetForceCollection(&mForceCollection);
+    mpNumericalMethod->SetBoundaryConditions(&mBoundaryConditions);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
