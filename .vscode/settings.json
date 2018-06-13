@@ -46,6 +46,9 @@
         "mutex": "cpp",
         "ratio": "cpp",
         "system_error": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "__nullptr": "cpp",
+        "algorithm": "cpp",
+        "cfenv": "cpp"
     }
 }
