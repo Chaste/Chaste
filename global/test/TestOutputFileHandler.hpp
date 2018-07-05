@@ -127,22 +127,25 @@ public:
 
         // Test that the environment variable actually influences the location of files
         {
+
             setenv("CHASTE_TEST_OUTPUT", "", 1/*Overwrite*/);
             // Check this folder is not present
-            FileFinder test_folder("testoutput/whatever", RelativeTo::ChasteSourceRoot);
+            FileFinder test_folder(chaste_test_output+"NoEnvironmentForTestoutput", RelativeTo::Absolute);
             TS_ASSERT(!test_folder.Exists());
 
             PetscTools::Barrier("TestOutputFileHandler-2");
 
             // Make a folder and erase it - NB only master can erase files and check it is successful!
-            OutputFileHandler handler4("whatever");
+            OutputFileHandler handler4("NoEnvironmentForTestoutput");
+
             TS_ASSERT(test_folder.Exists());
             PetscTools::Barrier("TestOutputFileHandler-2b");
             if (PetscTools::AmMaster())
             {
                 test_folder.Remove();
                 // If we've not written anything else to the testoutput folder, remove that too
-                // rather than leaving an empty folder lieing around in the source tree!
+                // rather than leaving an empty folder lying around in the source tree!
+                ///\todo #2966 If we make a permenent change then this bit of code is dangerous...
                 FileFinder output_root("", RelativeTo::ChasteTestOutput);
                 if (output_root.IsEmpty())
                 {
