@@ -143,14 +143,6 @@ public:
             if (PetscTools::AmMaster())
             {
                 test_folder.Remove();
-                // If we've not written anything else to the testoutput folder, remove that too
-                // rather than leaving an empty folder lying around in the source tree!
-                ///\todo #2966 If we make a permenent change then this bit of code is dangerous...
-                FileFinder output_root("", RelativeTo::ChasteTestOutput);
-                if (output_root.IsEmpty())
-                {
-                    output_root.DangerousRemove();
-                }
             }
             PetscTools::Barrier("TestOutputFileHandler-2c");
         }
