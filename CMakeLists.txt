@@ -418,6 +418,11 @@ if (Chaste_MEMORY_TESTING)
     endif ()
 endif ()
 
+message (STATUS "Found MPIEXEC_EXECUTABLE: ${MPIEXEC_EXECUTABLE}")
+message (STATUS "Found MPIEXEC: ${MPIEXEC}")
+message (STATUS "Found MPI_CXX_HEADER_DIR: ${MPI_CXX_HEADER_DIR}")
+message (STATUS "Found MPI_C_COMPILER: ${MPI_C_COMPILER}")
+
 
 ################################
 ####  Find ParMETIS and METIS
