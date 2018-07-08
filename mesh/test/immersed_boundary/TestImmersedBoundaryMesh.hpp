@@ -491,7 +491,7 @@ public:
         }
     }
 
-    void TestReMeshLamina() throw(Exception)
+    void TestReMeshLamina()
     {
         // ReMeshLamina where nothing should change
         {
