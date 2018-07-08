@@ -284,8 +284,11 @@ VertexMesh<3,3>::VertexMesh(TetrahedralMesh<3,3>& rMesh)
 
             unsigned element0_index = *(edge_element_indices.begin());
 
-            c_vector<double,3> basis_vector1 = mNodes[element0_index]->rGetLocation() - mid_edge;
-            c_vector<double,3> basis_vector2 = VectorProduct(edge_vector, basis_vector1);
+            c_vector<double,3> basis_vector1;
+            basis_vector1 = mNodes[element0_index]->rGetLocation() - mid_edge;
+
+            c_vector<double,3> basis_vector2;
+            basis_vector2 = VectorProduct(edge_vector, basis_vector1);
 
             /**
              * Create a std::vector of pairs, where each pair comprises the angle

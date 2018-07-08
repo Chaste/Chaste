@@ -359,7 +359,9 @@ public:
             mesh.GetElement(i)->CalculateJacobian(element_jacobian, element_jacobian_determinant);
             jacobian.push_back(element_jacobian);
 
-            c_matrix<double, 2, 2> squared_element_jacobian = prod(element_jacobian, element_jacobian);
+            c_matrix<double, 2, 2> squared_element_jacobian;
+            squared_element_jacobian = prod(element_jacobian, element_jacobian);
+
             c_vector<double, 3> tri_squared_element_jacobian;
             //We store [T00 T01 T02 T11 T12 T22]
             tri_squared_element_jacobian(0) = squared_element_jacobian(0, 0);
