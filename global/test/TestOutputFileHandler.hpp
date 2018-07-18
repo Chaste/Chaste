@@ -129,8 +129,11 @@ public:
         {
 
             setenv("CHASTE_TEST_OUTPUT", "", 1/*Overwrite*/);
+            // Predict where Chaste puts output when CHASTE_TEST_OUTPUT is not set
+            std::stringstream  tmp_directory;
+            tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/NoEnvironmentForTestoutput";
             // Check this folder is not present
-            FileFinder test_folder(chaste_test_output+"NoEnvironmentForTestoutput", RelativeTo::Absolute);
+            FileFinder test_folder(tmp_directory.str(), RelativeTo::Absolute);
             TS_ASSERT(!test_folder.Exists());
 
             PetscTools::Barrier("TestOutputFileHandler-2");
