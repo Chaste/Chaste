@@ -481,6 +481,16 @@ public:
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
+     * Compute the surface area (or perimeter in 2D) of the Voronoi cell of an element.
+     * The voronoi cell of an element is the union of the voronoi cells of all nodes
+     * in the element.
+     *
+     * @param index  the global index of a specified immersed boundary element
+     * @return the voronoi surface area of the element
+     */
+    double GetVoronoiSurfaceAreaOfElement(unsigned elemIdx) noexcept;
+
+    /**
      * Compute the average node spacing of an element.
      *
      * @param index  the global index of a specified immersed boundary element

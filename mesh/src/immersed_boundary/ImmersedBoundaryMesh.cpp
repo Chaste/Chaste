@@ -956,6 +956,45 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx) noexcept
+{
+    assert(SPACE_DIM == 2);
+
+    UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
+    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elemIdx);
+    double surface_area = 0.0;
+
+    // Sum contributions from each node in the element
+    for (unsigned local_idx = 0; local_idx < p_element->GetNumNodes(); local_idx++)
+    {
+        const unsigned global_node_idx = p_element->GetNodeGlobalIndex(local_idx);
+
+        // Get the voronoi cell that corresponds to this node
+        const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[global_node_idx];
+        const auto& voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
+
+        // Iterate over the edges of this voronoi cell
+        auto p_edge = voronoi_cell.incident_edge();
+        do
+        {
+            // The global node index corresponding to a voronoi cell is encoded in its 'color' variable
+            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+            const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
+
+            // Check if the nodes are in different elements
+            if (elemIdx != twin_elem_idx)
+            {
+                surface_area += this->CalculateLengthOfVoronoiEdge(*p_edge);
+            }
+
+            p_edge = p_edge->next();
+        } while (p_edge != voronoi_cell.incident_edge());
+    }
+
+    return surface_area;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElement(unsigned index, bool recalculate)
 {
     if (recalculate || (this->GetElement(index)->GetAverageNodeSpacing() == DOUBLE_UNSET))
