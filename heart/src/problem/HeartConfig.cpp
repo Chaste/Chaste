@@ -33,34 +33,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// Work-around for newer Boost versions
-#include "CheckpointArchiveTypesIfNeeded.hpp"
+#include "CheckpointArchiveTypes.hpp"
 
 #include "UblasCustomFunctions.hpp"
 
-#include "HeartConfig.hpp"
-#include "ArchiveLocationInfo.hpp"
-#include "OutputFileHandler.hpp"
-#include "Exception.hpp"
-#include "ChastePoint.hpp"
-#include "Version.hpp"
 #include "AbstractChasteRegion.hpp"
+#include "ArchiveLocationInfo.hpp"
+#include "ChastePoint.hpp"
+#include "Exception.hpp"
+#include "HeartConfig.hpp"
 #include "HeartFileFinder.hpp"
+#include "OutputFileHandler.hpp"
+#include "Version.hpp"
 #include "Warnings.hpp"
 
 #include "HeartRegionCodes.hpp"
 
-#include "SimpleStimulus.hpp"
 #include "RegularStimulus.hpp"
+#include "SimpleStimulus.hpp"
 
-#include <string>
-#include <istream>
-#include <fstream>
 #include <cassert>
+#include <fstream>
+#include <istream>
 #include <map>
+#include <string>
 
-#include "XmlTools.hpp"
 #include <xsd/cxx/tree/exceptions.hxx>
+#include "XmlTools.hpp"
 using namespace xsd::cxx::tree;
 
 // Coping with changes to XSD interface
@@ -124,12 +123,14 @@ using namespace xsd::cxx::tree;
  * @param path  the XML path you're looking for
  */
 #define CHECK_EXISTS(test, path)                                                         \
-    do {                                                                                 \
-        if (!test) {                                                                     \
+    do                                                                                   \
+    {                                                                                    \
+        if (!test)                                                                       \
+        {                                                                                \
             EXCEPTION("No XML element " << path << " found in parameters when calling '" \
-                      << BOOST_CURRENT_FUNCTION << "'");                                 \
-    }} while (false)
-
+                                        << BOOST_CURRENT_FUNCTION << "'");               \
+        }                                                                                \
+    } while (false)
 
 /**
  * A class of utility methods for transforming parameters files from previous versions
@@ -214,10 +215,10 @@ HeartConfig* HeartConfig::Instance()
 }
 
 HeartConfig::HeartConfig()
-    : mUseMassLumping(false),
-      mUseMassLumpingForPrecond(false),
-      mUseFixedNumberIterations(false),
-      mEvaluateNumItsEveryNSolves(UINT_MAX)
+        : mUseMassLumping(false),
+          mUseMassLumpingForPrecond(false),
+          mUseFixedNumberIterations(false),
+          mEvaluateNumItsEveryNSolves(UINT_MAX)
 {
     assert(mpInstance.get() == NULL);
     mUseFixedSchemaLocation = true;
@@ -228,15 +229,15 @@ HeartConfig::HeartConfig()
 
     //initialise the member variable of the layers
     mEpiFraction = -1.0;
-    mEndoFraction =  -1.0;
+    mEndoFraction = -1.0;
     mMidFraction = -1.0;
     mUserAskedForCellularTransmuralHeterogeneities = false;
     // initialise to senseless values (these should be only 0, 1 and 2)
     // note: the 'minus 3' is for checking purposes as we need to add 0, 1 or 2 to this initial value
     // and UINT_MAX+1 seems to be 0
-    mIndexMid = UINT_MAX-3u;
-    mIndexEpi = UINT_MAX-3u;
-    mIndexEndo = UINT_MAX-3u;
+    mIndexMid = UINT_MAX - 3u;
+    mIndexEpi = UINT_MAX - 3u;
+    mIndexEndo = UINT_MAX - 3u;
 
     mUseReactionDiffusionOperatorSplitting = false;
 
@@ -248,7 +249,6 @@ HeartConfig::HeartConfig()
 HeartConfig::~HeartConfig()
 {
 }
-
 
 void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
 {
@@ -273,7 +273,7 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
         return;
     }
 
-    out_stream p_parameters_file( new std::ofstream( (output_dirname+"ChasteParameters.xml").c_str() ) );
+    out_stream p_parameters_file(new std::ofstream((output_dirname + "ChasteParameters.xml").c_str()));
 
     if (!p_parameters_file->is_open())
     {
@@ -302,7 +302,7 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     map["cp33"].schema = "ChasteParameters_3_3.xsd";
     map["cp34"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
     map["cp34"].schema = "ChasteParameters_3_4.xsd";
-   // We use 'cp' as prefix for the latest version to avoid having to change saved
+    // We use 'cp' as prefix for the latest version to avoid having to change saved
     // versions for comparison at every release.
     map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/2017_1";
     map["cp"].schema = "ChasteParameters_2017_1.xsd";
@@ -314,7 +314,6 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     {
         CopySchema(output_dirname);
     }
-
 }
 
 void HeartConfig::LoadFromCheckpoint()
@@ -377,8 +376,7 @@ void HeartConfig::CopySchema(const std::string& rToDirectory)
         if (!schema_location.Exists())
         {
             // Warn the user
-            std::string message("Unable to locate schema file " + schema_name +
-                                ". You will need to ensure it is available when resuming from the checkpoint.");
+            std::string message("Unable to locate schema file " + schema_name + ". You will need to ensure it is available when resuming from the checkpoint.");
             WARN_ONCE_ONLY(message);
         }
     }
@@ -554,7 +552,7 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
 {
     // Check for user foolishness
     if ((pResumeParameters->ResumeSimulation()->SpaceDimension() != HeartConfig::Instance()->GetSpaceDimension())
-         ||(pResumeParameters->ResumeSimulation()->Domain() != HeartConfig::Instance()->GetDomain()))
+        || (pResumeParameters->ResumeSimulation()->Domain() != HeartConfig::Instance()->GetDomain()))
     {
         EXCEPTION("Problem type and space dimension should match when restarting a simulation.");
     }
@@ -580,10 +578,8 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
         else
         {
             // Need to append the new heterogeneity defitions to the original sequence
-            XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)&
-                new_seq = pResumeParameters->ResumeSimulation()->CellHeterogeneities()->CellHeterogeneity();
-            XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)&
-                orig_seq = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
+            XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)& new_seq = pResumeParameters->ResumeSimulation()->CellHeterogeneities()->CellHeterogeneity();
+            XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)& orig_seq = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
             for (XSD_ITERATOR_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity) i = new_seq.begin();
                  i != new_seq.end();
                  ++i)
@@ -665,7 +661,6 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
     }
 }
 
-
 void HeartConfig::Reset()
 {
     // Throw it away first, so that mpInstance is NULL when we...
@@ -683,7 +678,6 @@ bool HeartConfig::IsSimulationResumed() const
 {
     return mpParameters->ResumeSimulation().present();
 }
-
 
 void HeartConfig::CheckSimulationIsDefined(std::string callingMethod) const
 {
@@ -747,7 +741,7 @@ cp::ionic_model_selection_type HeartConfig::GetDefaultIonicModel() const
     return mpParameters->Simulation()->IonicModels()->Default();
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& definedRegions,
                                        std::vector<cp::ionic_model_selection_type>& ionicModels) const
 {
@@ -755,8 +749,7 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
     definedRegions.clear();
     ionicModels.clear();
 
-    XSD_SEQUENCE_TYPE(cp::ionic_models_type::Region)&
-         regions = mpParameters->Simulation()->IonicModels()->Region();
+    XSD_SEQUENCE_TYPE(cp::ionic_models_type::Region)& regions = mpParameters->Simulation()->IonicModels()->Region();
 
     for (XSD_ITERATOR_TYPE(cp::ionic_models_type::Region) i = regions.begin();
          i != regions.end();
@@ -775,23 +768,23 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
                 {
                     case 1:
                     {
-                        ChastePoint<DIM> chaste_point_a ( point_a.x() );
-                        ChastePoint<DIM> chaste_point_b ( point_b.x() );
-                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>( chaste_point_a, chaste_point_b )));
+                        ChastePoint<DIM> chaste_point_a(point_a.x());
+                        ChastePoint<DIM> chaste_point_b(point_b.x());
+                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b)));
                         break;
                     }
                     case 2:
                     {
-                        ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y() );
-                        ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y() );
-                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>( chaste_point_a, chaste_point_b )));
+                        ChastePoint<DIM> chaste_point_a(point_a.x(), point_a.y());
+                        ChastePoint<DIM> chaste_point_b(point_b.x(), point_b.y());
+                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b)));
                         break;
                     }
                     case 3:
                     {
-                        ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y(), point_a.z() );
-                        ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y(), point_b.z() );
-                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>( chaste_point_a, chaste_point_b )) );
+                        ChastePoint<DIM> chaste_point_a(point_a.x(), point_a.y(), point_a.z());
+                        ChastePoint<DIM> chaste_point_b(point_b.x(), point_b.y(), point_b.z());
+                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b)));
                         break;
                     }
                     default:
@@ -802,28 +795,28 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
             else if (ionic_model_region.Location().Ellipsoid().present())
             {
                 cp::point_type centre = ionic_model_region.Location().Ellipsoid()->Centre();
-                cp::point_type radii  = ionic_model_region.Location().Ellipsoid()->Radii();
+                cp::point_type radii = ionic_model_region.Location().Ellipsoid()->Radii();
                 switch (DIM)
                 {
                     case 1:
                     {
-                        ChastePoint<DIM> chaste_point_a ( centre.x() );
-                        ChastePoint<DIM> chaste_point_b ( radii.x() );
-                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
+                        ChastePoint<DIM> chaste_point_a(centre.x());
+                        ChastePoint<DIM> chaste_point_b(radii.x());
+                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b)));
                         break;
                     }
                     case 2:
                     {
-                        ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y() );
-                        ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y() );
-                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
+                        ChastePoint<DIM> chaste_point_a(centre.x(), centre.y());
+                        ChastePoint<DIM> chaste_point_b(radii.x(), radii.y());
+                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b)));
                         break;
                     }
                     case 3:
                     {
-                        ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y(), centre.z() );
-                        ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y(), radii.z() );
-                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
+                        ChastePoint<DIM> chaste_point_a(centre.x(), centre.y(), centre.z());
+                        ChastePoint<DIM> chaste_point_b(radii.x(), radii.y(), radii.z());
+                        definedRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b)));
                         break;
                     }
                     default:
@@ -840,7 +833,7 @@ void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractCha
 
             ionicModels.push_back(ionic_model_region.IonicModel());
         }
-        else if (ionic_model_region.Location().EpiLayer().present() || ionic_model_region.Location().MidLayer().present() || ionic_model_region.Location().EndoLayer().present() )
+        else if (ionic_model_region.Location().EpiLayer().present() || ionic_model_region.Location().MidLayer().present() || ionic_model_region.Location().EndoLayer().present())
         {
             ///\todo When this is implemented, then we require an example in ChasteParametersFullFormat.xml
             EXCEPTION("Definition of transmural layers is not yet supported for defining different ionic models, please use cuboids instead");
@@ -890,7 +883,6 @@ bool HeartConfig::GetCreateFibre() const
     return (mesh.Fibre().present());
 }
 
-
 bool HeartConfig::GetLoadMesh() const
 {
     CheckSimulationIsDefined("Mesh");
@@ -902,7 +894,7 @@ void HeartConfig::GetSlabDimensions(c_vector<double, 3>& slabDimensions) const
 {
     CheckSimulationIsDefined("Slab");
 
-    if (GetSpaceDimension()!=3 || !GetCreateSlab())
+    if (GetSpaceDimension() != 3 || !GetCreateSlab())
     {
         EXCEPTION("Tissue slabs can only be defined in 3D");
     }
@@ -918,7 +910,7 @@ void HeartConfig::GetSheetDimensions(c_vector<double, 2>& sheetDimensions) const
 {
     CheckSimulationIsDefined("Sheet");
 
-    if (GetSpaceDimension()!=2 || !GetCreateSheet())
+    if (GetSpaceDimension() != 2 || !GetCreateSheet())
     {
         EXCEPTION("Tissue sheets can only be defined in 2D");
     }
@@ -933,7 +925,7 @@ void HeartConfig::GetFibreLength(c_vector<double, 1>& fibreLength) const
 {
     CheckSimulationIsDefined("Fibre");
 
-    if (GetSpaceDimension()!=1 || !GetCreateFibre())
+    if (GetSpaceDimension() != 1 || !GetCreateFibre())
     {
         EXCEPTION("Tissue fibres can only be defined in 1D");
     }
@@ -963,9 +955,9 @@ double HeartConfig::GetInterNodeSpace() const
             break;
         default:
             NEVER_REACHED;
-// LCOV_EXCL_START
+            // LCOV_EXCL_START
             return 0.0; //To fool the compiler
-// LCOV_EXCL_STOP
+            // LCOV_EXCL_STOP
     }
 }
 
@@ -998,7 +990,8 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
         return;
     }
 
-    XSD_SEQUENCE_TYPE(cp::stimuli_type::Stimulus) stimuli = mpParameters->Simulation()->Stimuli()->Stimulus();
+    XSD_SEQUENCE_TYPE(cp::stimuli_type::Stimulus)
+    stimuli = mpParameters->Simulation()->Stimuli()->Stimulus();
 
     for (XSD_ITERATOR_TYPE(cp::stimuli_type::Stimulus) i = stimuli.begin();
          i != stimuli.end();
@@ -1008,7 +1001,7 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
         if (stimulus.Location().Cuboid().present() || stimulus.Location().Ellipsoid().present())
         {
             boost::shared_ptr<AbstractChasteRegion<DIM> > area_ptr;
-            if (stimulus.Location().Cuboid().present() )
+            if (stimulus.Location().Cuboid().present())
             {
                 cp::point_type point_a = stimulus.Location().Cuboid()->LowerCoordinates();
                 cp::point_type point_b = stimulus.Location().Cuboid()->UpperCoordinates();
@@ -1016,23 +1009,23 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
                 {
                     case 1:
                     {
-                        ChastePoint<DIM> chaste_point_a ( point_a.x() );
-                        ChastePoint<DIM> chaste_point_b ( point_b.x() );
-                        area_ptr.reset(new ChasteCuboid<DIM>( chaste_point_a, chaste_point_b ) );
+                        ChastePoint<DIM> chaste_point_a(point_a.x());
+                        ChastePoint<DIM> chaste_point_b(point_b.x());
+                        area_ptr.reset(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b));
                         break;
                     }
                     case 2:
                     {
-                        ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y() );
-                        ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y() );
-                        area_ptr.reset(new ChasteCuboid<DIM>( chaste_point_a, chaste_point_b ) );
+                        ChastePoint<DIM> chaste_point_a(point_a.x(), point_a.y());
+                        ChastePoint<DIM> chaste_point_b(point_b.x(), point_b.y());
+                        area_ptr.reset(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b));
                         break;
                     }
                     case 3:
                     {
-                        ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y(), point_a.z() );
-                        ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y(), point_b.z() );
-                        area_ptr.reset(new ChasteCuboid<DIM>( chaste_point_a, chaste_point_b ) );
+                        ChastePoint<DIM> chaste_point_a(point_a.x(), point_a.y(), point_a.z());
+                        ChastePoint<DIM> chaste_point_b(point_b.x(), point_b.y(), point_b.z());
+                        area_ptr.reset(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b));
                         break;
                     }
                     default:
@@ -1043,28 +1036,28 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
             else if (stimulus.Location().Ellipsoid().present())
             {
                 cp::point_type centre = stimulus.Location().Ellipsoid()->Centre();
-                cp::point_type radii  = stimulus.Location().Ellipsoid()->Radii();
+                cp::point_type radii = stimulus.Location().Ellipsoid()->Radii();
                 switch (DIM)
                 {
                     case 1:
                     {
-                        ChastePoint<DIM> chaste_point_a ( centre.x() );
-                        ChastePoint<DIM> chaste_point_b ( radii.x() );
-                        area_ptr.reset( new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b ) );
+                        ChastePoint<DIM> chaste_point_a(centre.x());
+                        ChastePoint<DIM> chaste_point_b(radii.x());
+                        area_ptr.reset(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b));
                         break;
                     }
                     case 2:
                     {
-                        ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y() );
-                        ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y() );
-                        area_ptr.reset( new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b ) );
+                        ChastePoint<DIM> chaste_point_a(centre.x(), centre.y());
+                        ChastePoint<DIM> chaste_point_b(radii.x(), radii.y());
+                        area_ptr.reset(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b));
                         break;
                     }
                     case 3:
                     {
-                        ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y(), centre.z() );
-                        ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y(), radii.z() );
-                        area_ptr.reset( new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b ) );
+                        ChastePoint<DIM> chaste_point_a(centre.x(), centre.y(), centre.z());
+                        ChastePoint<DIM> chaste_point_b(radii.x(), radii.y(), radii.z());
+                        area_ptr.reset(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b));
                         break;
                     }
                     default:
@@ -1095,7 +1088,6 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
                                                    stimulus.Period().get(),
                                                    stimulus.Delay()));
                 }
-
             }
             else
             {
@@ -1108,9 +1100,9 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
                                               stimulus.Duration(),
                                               stimulus.Delay()));
             }
-            rStimuliApplied.push_back( stim );
+            rStimuliApplied.push_back(stim);
         }
-        else if (stimulus.Location().EpiLayer().present() || stimulus.Location().MidLayer().present() || stimulus.Location().EndoLayer().present() )
+        else if (stimulus.Location().EpiLayer().present() || stimulus.Location().MidLayer().present() || stimulus.Location().EndoLayer().present())
         {
             EXCEPTION("Definition of transmural layers is not yet supported for specifying stimulated areas, please use cuboids instead");
         }
@@ -1121,7 +1113,7 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
     }
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
                                          std::vector<double>& rScaleFactorGks,
                                          std::vector<double>& rScaleFactorIto,
@@ -1135,8 +1127,9 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         // finding no heterogeneities defined is allowed
         return;
     }
-    XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity) cell_heterogeneity
-            = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
+    XSD_SEQUENCE_TYPE(cp::cell_heterogeneities_type::CellHeterogeneity)
+    cell_heterogeneity
+        = mpParameters->Simulation()->CellHeterogeneities()->CellHeterogeneity();
 
     bool user_supplied_negative_value = false;
     mUserAskedForCellularTransmuralHeterogeneities = false; // overwritten with true below if necessary
@@ -1155,53 +1148,53 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
             cp::point_type point_a = ht.Location().Cuboid()->LowerCoordinates();
             cp::point_type point_b = ht.Location().Cuboid()->UpperCoordinates();
 
-            ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y(), point_a.z() );
-            ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y(), point_b.z() );
+            ChastePoint<DIM> chaste_point_a(point_a.x(), point_a.y(), point_a.z());
+            ChastePoint<DIM> chaste_point_b(point_b.x(), point_b.y(), point_b.z());
 
-            rCellHeterogeneityRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM> ( chaste_point_a, chaste_point_b )) );
+            rCellHeterogeneityRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b)));
         }
         else if (ht.Location().Ellipsoid().present())
         {
             user_asked_for_cuboids_or_ellipsoids = true;
             cp::point_type centre = ht.Location().Ellipsoid()->Centre();
-            cp::point_type radii  = ht.Location().Ellipsoid()->Radii();
+            cp::point_type radii = ht.Location().Ellipsoid()->Radii();
 
-            ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y(), centre.z() );
-            ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y(), radii.z() );
-            rCellHeterogeneityRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
+            ChastePoint<DIM> chaste_point_a(centre.x(), centre.y(), centre.z());
+            ChastePoint<DIM> chaste_point_b(radii.x(), radii.y(), radii.z());
+            rCellHeterogeneityRegions.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b)));
         }
         else if (ht.Location().EpiLayer().present())
         {
-            mEpiFraction  =  ht.Location().EpiLayer().get();
+            mEpiFraction = ht.Location().EpiLayer().get();
 
             mUserAskedForCellularTransmuralHeterogeneities = true;
-            if (mEpiFraction <0)
+            if (mEpiFraction < 0)
             {
-                user_supplied_negative_value=true;
+                user_supplied_negative_value = true;
             }
             mIndexEpi = counter_of_heterogeneities;
         }
         else if (ht.Location().EndoLayer().present())
         {
-            mEndoFraction  =  ht.Location().EndoLayer().get();
+            mEndoFraction = ht.Location().EndoLayer().get();
 
             mUserAskedForCellularTransmuralHeterogeneities = true;
-            if (mEndoFraction <0)
+            if (mEndoFraction < 0)
             {
-                user_supplied_negative_value=true;
+                user_supplied_negative_value = true;
             }
             mIndexEndo = counter_of_heterogeneities;
         }
         else if (ht.Location().MidLayer().present())
         {
-            mMidFraction  =  ht.Location().MidLayer().get();
+            mMidFraction = ht.Location().MidLayer().get();
 
             mUserAskedForCellularTransmuralHeterogeneities = true;
-            if (mMidFraction <0)
+            if (mMidFraction < 0)
             {
-                user_supplied_negative_value=true;
+                user_supplied_negative_value = true;
             }
-            mIndexMid =  counter_of_heterogeneities;
+            mIndexMid = counter_of_heterogeneities;
         }
         else
         {
@@ -1231,28 +1224,28 @@ void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractC
         counter_of_heterogeneities++;
     }
 
-    if (mUserAskedForCellularTransmuralHeterogeneities )
+    if (mUserAskedForCellularTransmuralHeterogeneities)
     {
         // cuboids/ellipsoids and layers at the same time are not yet supported
-        if (user_asked_for_cuboids_or_ellipsoids )
+        if (user_asked_for_cuboids_or_ellipsoids)
         {
-            EXCEPTION ("Specification of cellular heterogeneities by cuboids/ellipsoids and layers at the same time is not yet supported");
+            EXCEPTION("Specification of cellular heterogeneities by cuboids/ellipsoids and layers at the same time is not yet supported");
         }
 
         //check that the user supplied all three layers, the indexes should be 0, 1 and 2.
         // As they are initialised to a higher value, if their summation is higher than 3,
         // one (or more) is missing
-        if ((mIndexMid+mIndexEndo+mIndexEpi) > 3)
+        if ((mIndexMid + mIndexEndo + mIndexEpi) > 3)
         {
-            EXCEPTION ("Three specifications of layers must be supplied");
+            EXCEPTION("Three specifications of layers must be supplied");
         }
-        if (fabs((mEndoFraction+mMidFraction+mEpiFraction)-1)>1e-2)
+        if (fabs((mEndoFraction + mMidFraction + mEpiFraction) - 1) > 1e-2)
         {
-            EXCEPTION ("Summation of epicardial, midmyocardial and endocardial fractions should be 1");
+            EXCEPTION("Summation of epicardial, midmyocardial and endocardial fractions should be 1");
         }
         if (user_supplied_negative_value)
         {
-           EXCEPTION ("Fractions must be positive");
+            EXCEPTION("Fractions must be positive");
         }
     }
 }
@@ -1298,16 +1291,15 @@ bool HeartConfig::GetConductivityHeterogeneitiesProvided() const
     return mpParameters->Physiological().ConductivityHeterogeneities().present();
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 void HeartConfig::GetConductivityHeterogeneities(
-        std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rConductivitiesHeterogeneityAreas,
-        std::vector< c_vector<double,3> >& rIntraConductivities,
-        std::vector< c_vector<double,3> >& rExtraConductivities) const
+    std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rConductivitiesHeterogeneityAreas,
+    std::vector<c_vector<double, 3> >& rIntraConductivities,
+    std::vector<c_vector<double, 3> >& rExtraConductivities) const
 {
     CheckSimulationIsDefined("ConductivityHeterogeneities");
     CHECK_EXISTS(GetConductivityHeterogeneitiesProvided(), "Physiological/ConductivityHeterogeneities");
-    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity)&
-         conductivity_heterogeneity = mpParameters->Physiological().ConductivityHeterogeneities()->ConductivityHeterogeneity();
+    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity)& conductivity_heterogeneity = mpParameters->Physiological().ConductivityHeterogeneities()->ConductivityHeterogeneity();
 
     for (XSD_ANON_ITERATOR_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) i = conductivity_heterogeneity.begin();
          i != conductivity_heterogeneity.end();
@@ -1319,19 +1311,19 @@ void HeartConfig::GetConductivityHeterogeneities(
         {
             cp::point_type point_a = ht.Location().Cuboid()->LowerCoordinates();
             cp::point_type point_b = ht.Location().Cuboid()->UpperCoordinates();
-            ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y(), point_a.z() );
-            ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y(), point_b.z() );
-            rConductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteCuboid<DIM> ( chaste_point_a, chaste_point_b )) );
+            ChastePoint<DIM> chaste_point_a(point_a.x(), point_a.y(), point_a.z());
+            ChastePoint<DIM> chaste_point_b(point_b.x(), point_b.y(), point_b.z());
+            rConductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteCuboid<DIM>(chaste_point_a, chaste_point_b)));
         }
         else if (ht.Location().Ellipsoid().present())
         {
             cp::point_type centre = ht.Location().Ellipsoid()->Centre();
-            cp::point_type radii  = ht.Location().Ellipsoid()->Radii();
-            ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y(), centre.z() );
-            ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y(), radii.z() );
-            rConductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
+            cp::point_type radii = ht.Location().Ellipsoid()->Radii();
+            ChastePoint<DIM> chaste_point_a(centre.x(), centre.y(), centre.z());
+            ChastePoint<DIM> chaste_point_b(radii.x(), radii.y(), radii.z());
+            rConductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >(new ChasteEllipsoid<DIM>(chaste_point_a, chaste_point_b)));
         }
-        else if (ht.Location().EpiLayer().present() || ht.Location().MidLayer().present() || ht.Location().EndoLayer().present() )
+        else if (ht.Location().EpiLayer().present() || ht.Location().MidLayer().present() || ht.Location().EndoLayer().present())
         {
             ///\todo When this is implemented, then we require an example in ChasteParametersFullFormat.xml
             EXCEPTION("Definition of transmural layers is not allowed for conductivities heterogeneities, you may use fibre orientation support instead");
@@ -1347,7 +1339,7 @@ void HeartConfig::GetConductivityHeterogeneities(
             double intra_y = ht.IntracellularConductivities()->trans();
             double intra_z = ht.IntracellularConductivities()->normal();
 
-            rIntraConductivities.push_back( Create_c_vector(intra_x, intra_y, intra_z) );
+            rIntraConductivities.push_back(Create_c_vector(intra_x, intra_y, intra_z));
         }
         else
         {
@@ -1362,7 +1354,7 @@ void HeartConfig::GetConductivityHeterogeneities(
             double extra_y = ht.ExtracellularConductivities()->trans();
             double extra_z = ht.ExtracellularConductivities()->normal();
 
-            rExtraConductivities.push_back( Create_c_vector(extra_x, extra_y, extra_z) );
+            rExtraConductivities.push_back(Create_c_vector(extra_x, extra_y, extra_z));
         }
         else
         {
@@ -1396,8 +1388,7 @@ bool HeartConfig::GetOutputVariablesProvided() const
 void HeartConfig::GetOutputVariables(std::vector<std::string>& rOutputVariables) const
 {
     CHECK_EXISTS(GetOutputVariablesProvided(), "Simulation/OutputVariables");
-    XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)&
-         output_variables = mpParameters->Simulation()->OutputVariables()->Var();
+    XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)& output_variables = mpParameters->Simulation()->OutputVariables()->Var();
     rOutputVariables.clear();
 
     for (XSD_ITERATOR_TYPE(cp::output_variables_type::Var) i = output_variables.begin();
@@ -1439,14 +1430,12 @@ unsigned HeartConfig::GetMaxCheckpointsOnDisk() const
     return mpParameters->Simulation()->CheckpointSimulation()->max_checkpoints_on_disk();
 }
 
-
 HeartFileFinder HeartConfig::GetArchivedSimulationDir() const
 {
     CheckResumeSimulationIsDefined("GetArchivedSimulationDir");
 
     return HeartFileFinder(mpParameters->ResumeSimulation()->ArchiveDirectory());
 }
-
 
 void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& rIntraConductivities) const
 {
@@ -1455,7 +1444,8 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& rIntraCond
         = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
     double intra_y_cond = intra_conductivities.trans();
-    double intra_z_cond = intra_conductivities.normal();;
+    double intra_z_cond = intra_conductivities.normal();
+    ;
 
     assert(intra_y_cond != DBL_MAX);
     assert(intra_z_cond != DBL_MAX);
@@ -1496,7 +1486,8 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& rExtraCond
         = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
     double extra_y_cond = extra_conductivities.trans();
-    double extra_z_cond = extra_conductivities.normal();;
+    double extra_z_cond = extra_conductivities.normal();
+    ;
 
     assert(extra_y_cond != DBL_MAX);
     assert(extra_z_cond != DBL_MAX);
@@ -1565,12 +1556,12 @@ double HeartConfig::GetBathConductivity(unsigned bathRegion) const
         }
     }
 }
-const std::set<unsigned>&  HeartConfig::rGetTissueIdentifiers()
+const std::set<unsigned>& HeartConfig::rGetTissueIdentifiers()
 {
     return mTissueIdentifiers;
 }
 
-const std::set<unsigned>&  HeartConfig::rGetBathIdentifiers()
+const std::set<unsigned>& HeartConfig::rGetBathIdentifiers()
 {
     return mBathIdentifiers;
 }
@@ -1642,67 +1633,66 @@ const char* HeartConfig::GetKSPSolver() const
     CHECK_EXISTS(mpParameters->Numerical().KSPSolver().present(), "Numerical/KSPSolver");
     switch (mpParameters->Numerical().KSPSolver().get())
     {
-        case cp::ksp_solver_type::gmres :
+        case cp::ksp_solver_type::gmres:
             return "gmres";
-        case cp::ksp_solver_type::cg :
+        case cp::ksp_solver_type::cg:
             return "cg";
-        case cp::ksp_solver_type::symmlq :
+        case cp::ksp_solver_type::symmlq:
             return "symmlq";
-        case cp::ksp_solver_type::chebychev :
+        case cp::ksp_solver_type::chebychev:
             return "chebychev";
     }
-// LCOV_EXCL_START
+    // LCOV_EXCL_START
     EXCEPTION("Unknown ksp solver");
-// LCOV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 const char* HeartConfig::GetKSPPreconditioner() const
 {
     CHECK_EXISTS(mpParameters->Numerical().KSPPreconditioner().present(), "Numerical/KSPPreconditioner");
-    switch ( mpParameters->Numerical().KSPPreconditioner().get() )
+    switch (mpParameters->Numerical().KSPPreconditioner().get())
     {
-        case cp::ksp_preconditioner_type::jacobi :
+        case cp::ksp_preconditioner_type::jacobi:
             return "jacobi";
-        case cp::ksp_preconditioner_type::bjacobi :
+        case cp::ksp_preconditioner_type::bjacobi:
             return "bjacobi";
-        case cp::ksp_preconditioner_type::hypre :
+        case cp::ksp_preconditioner_type::hypre:
             return "hypre";
-        case cp::ksp_preconditioner_type::ml :
+        case cp::ksp_preconditioner_type::ml:
             return "ml";
-        case cp::ksp_preconditioner_type::spai :
+        case cp::ksp_preconditioner_type::spai:
             return "spai";
-        case cp::ksp_preconditioner_type::blockdiagonal :
+        case cp::ksp_preconditioner_type::blockdiagonal:
             return "blockdiagonal";
-        case cp::ksp_preconditioner_type::ldufactorisation :
+        case cp::ksp_preconditioner_type::ldufactorisation:
             return "ldufactorisation";
-        case cp::ksp_preconditioner_type::twolevelsblockdiagonal :
+        case cp::ksp_preconditioner_type::twolevelsblockdiagonal:
             return "twolevelsblockdiagonal";
-        case cp::ksp_preconditioner_type::none :
+        case cp::ksp_preconditioner_type::none:
             return "none";
-
     }
-// LCOV_EXCL_START
+    // LCOV_EXCL_START
     EXCEPTION("Unknown ksp preconditioner");
-// LCOV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 DistributedTetrahedralMeshPartitionType::type HeartConfig::GetMeshPartitioning() const
 {
     CHECK_EXISTS(mpParameters->Numerical().MeshPartitioning().present(), "Numerical/MeshPartitioning");
-    switch ( mpParameters->Numerical().MeshPartitioning().get() )
+    switch (mpParameters->Numerical().MeshPartitioning().get())
     {
-        case cp::mesh_partitioning_type::dumb :
+        case cp::mesh_partitioning_type::dumb:
             return DistributedTetrahedralMeshPartitionType::DUMB;
-        case cp::mesh_partitioning_type::metis :
+        case cp::mesh_partitioning_type::metis:
             return DistributedTetrahedralMeshPartitionType::METIS_LIBRARY;
-        case cp::mesh_partitioning_type::parmetis :
+        case cp::mesh_partitioning_type::parmetis:
             return DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
-        case cp::mesh_partitioning_type::petsc :
+        case cp::mesh_partitioning_type::petsc:
             return DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION;
     }
-// LCOV_EXCL_START
+    // LCOV_EXCL_START
     EXCEPTION("Unknown mesh partitioning type");
-// LCOV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 bool HeartConfig::IsAdaptivityParametersPresent() const
@@ -1737,12 +1727,7 @@ bool HeartConfig::IsPostProcessingRequested() const
     }
     else
     {
-        return(IsApdMapsRequested() ||
-               IsUpstrokeTimeMapsRequested() ||
-               IsMaxUpstrokeVelocityMapRequested() ||
-               IsConductionVelocityMapsRequested() ||
-               IsAnyNodalTimeTraceRequested()||
-               IsPseudoEcgCalculationRequested());
+        return (IsApdMapsRequested() || IsUpstrokeTimeMapsRequested() || IsMaxUpstrokeVelocityMapRequested() || IsConductionVelocityMapsRequested() || IsAnyNodalTimeTraceRequested() || IsPseudoEcgCalculationRequested());
     }
 }
 bool HeartConfig::IsApdMapsRequested() const
@@ -1750,26 +1735,24 @@ bool HeartConfig::IsApdMapsRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)&
-                apd_maps = mpParameters->PostProcessing()->ActionPotentialDurationMap();
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps = mpParameters->PostProcessing()->ActionPotentialDurationMap();
         result = (apd_maps.begin() != apd_maps.end());
     }
     return result;
 }
 
-void HeartConfig::GetApdMaps(std::vector<std::pair<double,double> >& apd_maps) const
+void HeartConfig::GetApdMaps(std::vector<std::pair<double, double> >& apd_maps) const
 {
     CHECK_EXISTS(IsApdMapsRequested(), "PostProcessing/ActionPotentialDurationMap");
     apd_maps.clear();
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)&
-        apd_maps_sequence = mpParameters->PostProcessing()->ActionPotentialDurationMap();
+    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps_sequence = mpParameters->PostProcessing()->ActionPotentialDurationMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::ActionPotentialDurationMap) i = apd_maps_sequence.begin();
          i != apd_maps_sequence.end();
          ++i)
     {
-        std::pair<double,double> map(i->repolarisation_percentage(),i->threshold());
+        std::pair<double, double> map(i->repolarisation_percentage(), i->threshold());
 
         apd_maps.push_back(map);
     }
@@ -1780,19 +1763,17 @@ bool HeartConfig::IsUpstrokeTimeMapsRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)&
-            upstroke_map = mpParameters->PostProcessing()->UpstrokeTimeMap();
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& upstroke_map = mpParameters->PostProcessing()->UpstrokeTimeMap();
         result = (upstroke_map.begin() != upstroke_map.end());
     }
     return result;
 }
-void HeartConfig::GetUpstrokeTimeMaps (std::vector<double>& upstroke_time_maps) const
+void HeartConfig::GetUpstrokeTimeMaps(std::vector<double>& upstroke_time_maps) const
 {
     CHECK_EXISTS(IsUpstrokeTimeMapsRequested(), "PostProcessing/UpstrokeTimeMap");
     assert(upstroke_time_maps.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)&
-        upstroke_maps_sequence = mpParameters->PostProcessing()->UpstrokeTimeMap();
+    XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& upstroke_maps_sequence = mpParameters->PostProcessing()->UpstrokeTimeMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::UpstrokeTimeMap) i = upstroke_maps_sequence.begin();
          i != upstroke_maps_sequence.end();
@@ -1807,8 +1788,7 @@ bool HeartConfig::IsMaxUpstrokeVelocityMapRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)&
-            max_upstroke_velocity_map = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_map = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
         result = (max_upstroke_velocity_map.begin() != max_upstroke_velocity_map.end());
     }
     return result;
@@ -1819,8 +1799,7 @@ void HeartConfig::GetMaxUpstrokeVelocityMaps(std::vector<double>& upstroke_veloc
     CHECK_EXISTS(IsMaxUpstrokeVelocityMapRequested(), "PostProcessing/MaxUpstrokeVelocityMap");
     assert(upstroke_velocity_maps.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)&
-        max_upstroke_velocity_maps_sequence = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
+    XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_maps_sequence = mpParameters->PostProcessing()->MaxUpstrokeVelocityMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap) i = max_upstroke_velocity_maps_sequence.begin();
          i != max_upstroke_velocity_maps_sequence.end();
@@ -1835,8 +1814,7 @@ bool HeartConfig::IsConductionVelocityMapsRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)&
-            cond_vel_maps = mpParameters->PostProcessing()->ConductionVelocityMap();
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& cond_vel_maps = mpParameters->PostProcessing()->ConductionVelocityMap();
         result = (cond_vel_maps.begin() != cond_vel_maps.end());
     }
     return result;
@@ -1847,8 +1825,7 @@ void HeartConfig::GetConductionVelocityMaps(std::vector<unsigned>& conduction_ve
     CHECK_EXISTS(IsConductionVelocityMapsRequested(), "PostProcessing/ConductionVelocityMap");
     assert(conduction_velocity_maps.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)&
-        cond_vel_maps_sequence = mpParameters->PostProcessing()->ConductionVelocityMap();
+    XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& cond_vel_maps_sequence = mpParameters->PostProcessing()->ConductionVelocityMap();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::ConductionVelocityMap) i = cond_vel_maps_sequence.begin();
          i != cond_vel_maps_sequence.end();
@@ -1863,8 +1840,7 @@ bool HeartConfig::IsAnyNodalTimeTraceRequested() const
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)&
-            requested_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& requested_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
         result = (requested_nodes.begin() != requested_nodes.end());
     }
     return result;
@@ -1875,8 +1851,7 @@ void HeartConfig::GetNodalTimeTraceRequested(std::vector<unsigned>& rRequestedNo
     CHECK_EXISTS(IsAnyNodalTimeTraceRequested(), "PostProcessing/TimeTraceAtNode");
     assert(rRequestedNodes.size() == 0);
 
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)&
-        req_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
+    XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& req_nodes = mpParameters->PostProcessing()->TimeTraceAtNode();
 
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::TimeTraceAtNode) i = req_nodes.begin();
          i != req_nodes.end();
@@ -1886,25 +1861,22 @@ void HeartConfig::GetNodalTimeTraceRequested(std::vector<unsigned>& rRequestedNo
     }
 }
 
-
 bool HeartConfig::IsPseudoEcgCalculationRequested() const
 {
     bool result = false;
     if (IsPostProcessingSectionPresent())
     {
-        XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)&
-            electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
+        XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)& electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
         result = (electrodes.begin() != electrodes.end());
     }
     return result;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodePositions) const
 {
     rPseudoEcgElectrodePositions.clear();
-    XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)&
-        electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
+    XSD_SEQUENCE_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition)& electrodes = mpParameters->PostProcessing()->PseudoEcgElectrodePosition();
     for (XSD_ITERATOR_TYPE(cp::postprocessing_type::PseudoEcgElectrodePosition) i = electrodes.begin();
          i != electrodes.end();
          ++i)
@@ -1912,7 +1884,6 @@ void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<SPACE_D
         rPseudoEcgElectrodePositions.push_back(ChastePoint<SPACE_DIM>(i->x(), i->y(), i->z()));
     }
 }
-
 
 /*
  * Output visualization
@@ -1984,7 +1955,6 @@ unsigned HeartConfig::GetVisualizerOutputPrecision()
         return mpParameters->Simulation()->OutputVisualizer()->precision();
     }
 }
-
 
 bool HeartConfig::IsElectrodesPresent() const
 {
@@ -2062,7 +2032,8 @@ void HeartConfig::SetMeshFileName(std::string meshPrefix, cp::media_type fibreDe
         mpParameters->Simulation()->Mesh().set(mesh_to_load);
     }
 
-    XSD_NESTED_TYPE(cp::mesh_type::LoadMesh) mesh_prefix(meshPrefix, fibreDefinition);
+    XSD_NESTED_TYPE(cp::mesh_type::LoadMesh)
+    mesh_prefix(meshPrefix, fibreDefinition);
     mpParameters->Simulation()->Mesh()->LoadMesh().set(mesh_prefix);
 }
 
@@ -2072,10 +2043,9 @@ void HeartConfig::SetIonicModelRegions(std::vector<ChasteCuboid<3> >& rDefinedRe
     assert(rDefinedRegions.size() == rIonicModels.size());
     // You need to have defined a default model first...
     assert(mpParameters->Simulation()->IonicModels().present());
-    XSD_SEQUENCE_TYPE(cp::ionic_models_type::Region)&
-        regions = mpParameters->Simulation()->IonicModels()->Region();
+    XSD_SEQUENCE_TYPE(cp::ionic_models_type::Region)& regions = mpParameters->Simulation()->IonicModels()->Region();
     regions.clear();
-    for (unsigned region_index=0; region_index<rDefinedRegions.size(); region_index++)
+    for (unsigned region_index = 0; region_index < rDefinedRegions.size(); region_index++)
     {
         cp::point_type point_a(rDefinedRegions[region_index].rGetLowerCorner()[0],
                                rDefinedRegions[region_index].rGetLowerCorner()[1],
@@ -2094,15 +2064,16 @@ void HeartConfig::SetIonicModelRegions(std::vector<ChasteCuboid<3> >& rDefinedRe
 }
 
 void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& rConductivityAreas,
-        std::vector< c_vector<double,3> >& rIntraConductivities,
-        std::vector< c_vector<double,3> >& rExtraConductivities)
+                                                 std::vector<c_vector<double, 3> >& rIntraConductivities,
+                                                 std::vector<c_vector<double, 3> >& rExtraConductivities)
 {
-    assert ( rConductivityAreas.size() == rIntraConductivities.size() );
-    assert ( rIntraConductivities.size() == rExtraConductivities.size());
+    assert(rConductivityAreas.size() == rIntraConductivities.size());
+    assert(rIntraConductivities.size() == rExtraConductivities.size());
 
-    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
+    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity)
+    heterogeneities_container;
 
-    for (unsigned region_index=0; region_index<rConductivityAreas.size(); region_index++)
+    for (unsigned region_index = 0; region_index < rConductivityAreas.size(); region_index++)
     {
         cp::point_type point_a(rConductivityAreas[region_index].rGetLowerCorner()[0],
                                rConductivityAreas[region_index].rGetLowerCorner()[1],
@@ -2135,22 +2106,24 @@ void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& 
         heterogeneities_container.push_back(ht);
     }
 
-    XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities) heterogeneities_object;
+    XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities)
+    heterogeneities_object;
     heterogeneities_object.ConductivityHeterogeneity(heterogeneities_container);
 
     mpParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
 }
 
 void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& rConductivityAreas,
-        std::vector< c_vector<double,3> >& rIntraConductivities,
-        std::vector< c_vector<double,3> >& rExtraConductivities)
+                                                          std::vector<c_vector<double, 3> >& rIntraConductivities,
+                                                          std::vector<c_vector<double, 3> >& rExtraConductivities)
 {
-    assert ( rConductivityAreas.size() == rIntraConductivities.size() );
-    assert ( rIntraConductivities.size() == rExtraConductivities.size());
+    assert(rConductivityAreas.size() == rIntraConductivities.size());
+    assert(rIntraConductivities.size() == rExtraConductivities.size());
 
-    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
+    XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity)
+    heterogeneities_container;
 
-    for (unsigned region_index=0; region_index<rConductivityAreas.size(); region_index++)
+    for (unsigned region_index = 0; region_index < rConductivityAreas.size(); region_index++)
     {
         cp::point_type centre(rConductivityAreas[region_index].rGetCentre()[0],
                               rConductivityAreas[region_index].rGetCentre()[1],
@@ -2183,7 +2156,8 @@ void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteElli
         heterogeneities_container.push_back(ht);
     }
 
-    XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities) heterogeneities_object;
+    XSD_ANON_TYPE(cp::physiological_type, ConductivityHeterogeneities)
+    heterogeneities_object;
     heterogeneities_object.ConductivityHeterogeneity(heterogeneities_container);
 
     mpParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
@@ -2207,22 +2181,21 @@ void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVari
         mpParameters->Simulation()->OutputVariables().set(variables_requested);
     }
 
-    XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)&
-        var_type_sequence = mpParameters->Simulation()->OutputVariables()->Var();
+    XSD_SEQUENCE_TYPE(cp::output_variables_type::Var)& var_type_sequence = mpParameters->Simulation()->OutputVariables()->Var();
     // Erase or create a sequence
     var_type_sequence.clear();
 
-    for (unsigned i=0; i<rOutputVariables.size(); i++)
+    for (unsigned i = 0; i < rOutputVariables.size(); i++)
     {
         cp::var_type temp(rOutputVariables[i]);
         var_type_sequence.push_back(temp);
     }
 }
 
-void  HeartConfig::SetOutputUsingOriginalNodeOrdering(bool useOriginal)
+void HeartConfig::SetOutputUsingOriginalNodeOrdering(bool useOriginal)
 {
     //What if it doesn't exist?
-    mpParameters->Simulation()->OutputUsingOriginalNodeOrdering().set(useOriginal? cp::yesno_type::yes : cp::yesno_type::no);
+    mpParameters->Simulation()->OutputUsingOriginalNodeOrdering().set(useOriginal ? cp::yesno_type::yes : cp::yesno_type::no);
 }
 
 void HeartConfig::SetCheckpointSimulation(bool saveSimulation, double checkpointTimestep, unsigned maxCheckpointsOnDisk)
@@ -2230,7 +2203,7 @@ void HeartConfig::SetCheckpointSimulation(bool saveSimulation, double checkpoint
     if (saveSimulation)
     {
         // Make sure values for the optional parameters have been provided
-        assert(checkpointTimestep!=-1.0 && maxCheckpointsOnDisk!=UINT_MAX);
+        assert(checkpointTimestep != -1.0 && maxCheckpointsOnDisk != UINT_MAX);
 
         XSD_CREATE_WITH_FIXED_ATTR2(cp::simulation_type::XSD_NESTED_TYPE(CheckpointSimulation),
                                     cs,
@@ -2329,7 +2302,7 @@ void HeartConfig::SetBathMultipleConductivities(std::map<unsigned, double> bathC
 
 void HeartConfig::SetTissueAndBathIdentifiers(const std::set<unsigned>& tissueIds, const std::set<unsigned>& bathIds)
 {
-    if (tissueIds.empty() || bathIds.empty() )
+    if (tissueIds.empty() || bathIds.empty())
     {
         EXCEPTION("Identifying set must be non-empty");
     }
@@ -2344,8 +2317,8 @@ void HeartConfig::SetTissueAndBathIdentifiers(const std::set<unsigned>& tissueId
     {
         EXCEPTION("Tissue identifiers and bath identifiers overlap");
     }
-    mTissueIdentifiers=tissueIds;
-    mBathIdentifiers=bathIds;
+    mTissueIdentifiers = tissueIds;
+    mBathIdentifiers = bathIds;
 }
 
 void HeartConfig::SetSurfaceAreaToVolumeRatio(double ratio)
@@ -2359,7 +2332,6 @@ void HeartConfig::SetCapacitance(double capacitance)
     XSD_CREATE_WITH_FIXED_ATTR1(cp::capacitance_type, capacitance_object, capacitance, "uF/cm^2");
     mpParameters->Physiological().Capacitance().set(capacitance_object);
 }
-
 
 // Numerical
 void HeartConfig::SetOdePdeAndPrintingTimeSteps(double odeTimeStep, double pdeTimeStep, double printingTimeStep)
@@ -2400,7 +2372,7 @@ void HeartConfig::CheckTimeSteps() const
         EXCEPTION("Printing time-step should be positive");
     }
 
-    if (GetPdeTimeStep()>GetPrintingTimeStep())
+    if (GetPdeTimeStep() > GetPrintingTimeStep())
     {
         EXCEPTION("Printing time-step should not be smaller than PDE time-step");
     }
@@ -2450,7 +2422,7 @@ void HeartConfig::SetKSPSolver(const char* kspSolver, bool warnOfChange)
     if (warnOfChange && strcmp(GetKSPSolver(), kspSolver) != 0)
     {
         //Warn
-        WARNING("Code has changed the KSP solver type from "<<GetKSPSolver()<<" to "<< kspSolver);
+        WARNING("Code has changed the KSP solver type from " << GetKSPSolver() << " to " << kspSolver);
     }
 
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
@@ -2557,8 +2529,7 @@ void HeartConfig::SetMeshPartitioning(const char* meshPartioningMethod)
     EXCEPTION("Unknown mesh partitioning method provided");
 }
 
-
-void HeartConfig::SetApdMaps(const std::vector<std::pair<double,double> >& apdMaps)
+void HeartConfig::SetApdMaps(const std::vector<std::pair<double, double> >& apdMaps)
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::ActionPotentialDurationMap)& apd_maps_sequence
@@ -2566,17 +2537,16 @@ void HeartConfig::SetApdMaps(const std::vector<std::pair<double,double> >& apdMa
     //Erase or create a sequence
     apd_maps_sequence.clear();
 
-    for (unsigned i=0; i<apdMaps.size(); i++)
+    for (unsigned i = 0; i < apdMaps.size(); i++)
     {
         XSD_CREATE_WITH_FIXED_ATTR2(cp::apd_map_type, temp,
                                     apdMaps[i].first, apdMaps[i].second,
                                     "mV");
-        apd_maps_sequence.push_back( temp);
+        apd_maps_sequence.push_back(temp);
     }
 }
 
-
-void HeartConfig::SetUpstrokeTimeMaps (std::vector<double>& upstrokeTimeMaps)
+void HeartConfig::SetUpstrokeTimeMaps(std::vector<double>& upstrokeTimeMaps)
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::UpstrokeTimeMap)& var_type_sequence
@@ -2585,7 +2555,7 @@ void HeartConfig::SetUpstrokeTimeMaps (std::vector<double>& upstrokeTimeMaps)
     //Erase or create a sequence
     var_type_sequence.clear();
 
-    for (unsigned i=0; i<upstrokeTimeMaps.size(); i++)
+    for (unsigned i = 0; i < upstrokeTimeMaps.size(); i++)
     {
         XSD_CREATE_WITH_FIXED_ATTR1(cp::upstrokes_map_type, temp,
                                     upstrokeTimeMaps[i],
@@ -2594,7 +2564,7 @@ void HeartConfig::SetUpstrokeTimeMaps (std::vector<double>& upstrokeTimeMaps)
     }
 }
 
-void HeartConfig::SetMaxUpstrokeVelocityMaps (std::vector<double>& maxUpstrokeVelocityMaps)
+void HeartConfig::SetMaxUpstrokeVelocityMaps(std::vector<double>& maxUpstrokeVelocityMaps)
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::MaxUpstrokeVelocityMap)& max_upstroke_velocity_maps_sequence
@@ -2603,19 +2573,17 @@ void HeartConfig::SetMaxUpstrokeVelocityMaps (std::vector<double>& maxUpstrokeVe
     //Erase or create a sequence
     max_upstroke_velocity_maps_sequence.clear();
 
-    for (unsigned i=0; i<maxUpstrokeVelocityMaps.size(); i++)
+    for (unsigned i = 0; i < maxUpstrokeVelocityMaps.size(); i++)
     {
         XSD_CREATE_WITH_FIXED_ATTR1(cp::max_upstrokes_velocity_map_type, temp,
                                     maxUpstrokeVelocityMaps[i],
                                     "mV");
 
-
         max_upstroke_velocity_maps_sequence.push_back(temp);
     }
-
 }
 
-void HeartConfig::SetConductionVelocityMaps (std::vector<unsigned>& conductionVelocityMaps)
+void HeartConfig::SetConductionVelocityMaps(std::vector<unsigned>& conductionVelocityMaps)
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::ConductionVelocityMap)& conduction_velocity_maps_sequence
@@ -2624,14 +2592,14 @@ void HeartConfig::SetConductionVelocityMaps (std::vector<unsigned>& conductionVe
     //Erase or create a sequence
     conduction_velocity_maps_sequence.clear();
 
-    for (unsigned i=0; i<conductionVelocityMaps.size(); i++)
+    for (unsigned i = 0; i < conductionVelocityMaps.size(); i++)
     {
         cp::conduction_velocity_map_type temp(conductionVelocityMaps[i]);
         conduction_velocity_maps_sequence.push_back(temp);
     }
 }
 
-void HeartConfig::SetRequestedNodalTimeTraces (std::vector<unsigned>& requestedNodes)
+void HeartConfig::SetRequestedNodalTimeTraces(std::vector<unsigned>& requestedNodes)
 {
     EnsurePostProcessingSectionPresent();
     XSD_SEQUENCE_TYPE(cp::postprocessing_type::TimeTraceAtNode)& requested_nodes_sequence
@@ -2640,14 +2608,14 @@ void HeartConfig::SetRequestedNodalTimeTraces (std::vector<unsigned>& requestedN
     //Erase or create a sequence
     requested_nodes_sequence.clear();
 
-    for (unsigned i=0; i<requestedNodes.size(); i++)
+    for (unsigned i = 0; i < requestedNodes.size(); i++)
     {
         cp::node_number_type temp(requestedNodes[i]);
         requested_nodes_sequence.push_back(temp);
     }
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodePositions)
 {
     EnsurePostProcessingSectionPresent();
@@ -2657,7 +2625,7 @@ void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<S
     //Erase or create a sequence
     electrodes_sequence.clear();
 
-    for (unsigned i=0; i<rPseudoEcgElectrodePositions.size(); i++)
+    for (unsigned i = 0; i < rPseudoEcgElectrodePositions.size(); i++)
     {
         cp::point_type temp(rPseudoEcgElectrodePositions[i].GetWithDefault(0),
                             rPseudoEcgElectrodePositions[i].GetWithDefault(1),
@@ -2665,7 +2633,6 @@ void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<S
         electrodes_sequence.push_back(temp);
     }
 }
-
 
 /*
  * Output visualizer
@@ -2715,19 +2682,18 @@ void HeartConfig::SetVisualizerOutputPrecision(unsigned numberOfDigits)
     mpParameters->Simulation()->OutputVisualizer()->precision(numberOfDigits);
 }
 
-
 void HeartConfig::SetElectrodeParameters(bool groundSecondElectrode,
                                          unsigned index, double magnitude,
-                                         double startTime, double duration )
+                                         double startTime, double duration)
 {
     assert(index < 3);
 
     cp::axis_type axis = cp::axis_type::x;
-    if (index==1)
+    if (index == 1)
     {
         axis = cp::axis_type::y;
     }
-    else if (index==2)
+    else if (index == 2)
     {
         axis = cp::axis_type::z;
     }
@@ -2738,11 +2704,11 @@ void HeartConfig::SetElectrodeParameters(bool groundSecondElectrode,
 
     if (!IsElectrodesPresent())
     {
-        cp::electrodes_type element( groundSecondElectrode ? cp::yesno_type::yes : cp::yesno_type::no,
-                                     axis,
-                                     strength,
-                                     start_time,
-                                     duration_time );
+        cp::electrodes_type element(groundSecondElectrode ? cp::yesno_type::yes : cp::yesno_type::no,
+                                    axis,
+                                    strength,
+                                    start_time,
+                                    duration_time);
         mpParameters->Simulation()->Electrodes().set(element);
     }
     else
@@ -2757,7 +2723,7 @@ void HeartConfig::SetElectrodeParameters(bool groundSecondElectrode,
 
 void HeartConfig::GetElectrodeParameters(bool& rGroundSecondElectrode,
                                          unsigned& rIndex, double& rMagnitude,
-                                         double& rStartTime, double& rDuration )
+                                         double& rStartTime, double& rDuration)
 {
     if (!IsElectrodesPresent())
     {
@@ -2765,14 +2731,14 @@ void HeartConfig::GetElectrodeParameters(bool& rGroundSecondElectrode,
     }
     else
     {
-        rGroundSecondElectrode = (mpParameters->Simulation()->Electrodes()->GroundSecondElectrode()==cp::yesno_type::yes);
+        rGroundSecondElectrode = (mpParameters->Simulation()->Electrodes()->GroundSecondElectrode() == cp::yesno_type::yes);
 
         cp::axis_type axis = mpParameters->Simulation()->Electrodes()->PerpendicularToAxis();
-        if (axis==cp::axis_type::x)
+        if (axis == cp::axis_type::x)
         {
             rIndex = 0;
         }
-        else if (axis==cp::axis_type::y)
+        else if (axis == cp::axis_type::y)
         {
             rIndex = 1;
         }
@@ -2785,7 +2751,6 @@ void HeartConfig::GetElectrodeParameters(bool& rGroundSecondElectrode,
         rStartTime = mpParameters->Simulation()->Electrodes()->StartTime();
         rDuration = mpParameters->Simulation()->Electrodes()->Duration();
     }
-
 }
 
 bool HeartConfig::GetUseStateVariableInterpolation() const
@@ -2840,8 +2805,7 @@ std::map<std::string, std::pair<double, double> > HeartConfig::GetIc50Values()
     CHECK_EXISTS(HasDrugDose(), "Physiological/ApplyDrug");
     std::map<std::string, std::pair<double, double> > ic50s;
 
-    XSD_SEQUENCE_TYPE(cp::apply_drug_type::IC50)&
-        ic50_seq = mpParameters->Physiological().ApplyDrug()->IC50();
+    XSD_SEQUENCE_TYPE(cp::apply_drug_type::IC50)& ic50_seq = mpParameters->Physiological().ApplyDrug()->IC50();
 
     for (XSD_ITERATOR_TYPE(cp::apply_drug_type::IC50) i = ic50_seq.begin();
          i != ic50_seq.end();
@@ -2958,7 +2922,6 @@ void HeartConfig::SetPurkinjeCapacitance(double capacitance)
     mpParameters->Physiological().Purkinje()->Capacitance().set(purk_Cm);
 }
 
-
 double HeartConfig::GetPurkinjeSurfaceAreaToVolumeRatio()
 {
     CHECK_EXISTS(mpParameters->Physiological().Purkinje().present(), "Physiological/Purkinje");
@@ -2978,7 +2941,7 @@ double HeartConfig::GetPurkinjeConductivity()
 {
     CHECK_EXISTS(mpParameters->Physiological().Purkinje().present(), "Physiological/Purkinje");
     CHECK_EXISTS(mpParameters->Physiological().Purkinje()->Conductivity().present(),
-            "Physiological/Purkinje/Conductivity");
+                 "Physiological/Purkinje/Conductivity");
     return mpParameters->Physiological().Purkinje()->Conductivity().get();
 }
 
@@ -2996,7 +2959,6 @@ void HeartConfig::SetPurkinjeConductivity(double conductivity)
  *                                                                    *
  *                                                                    *
  **********************************************************************/
-
 
 void XmlTransforms::TransformArchiveDirectory(xercesc::DOMDocument* pDocument,
                                               xercesc::DOMElement* pRootElement)
@@ -3026,7 +2988,7 @@ void XmlTransforms::TransformIonicModelDefinitions(xercesc::DOMDocument* pDocume
         XmlTools::WrapContentInElement(pDocument, p_elt_list[0], X("Hardcoded"));
         // Now do any region-specific definitions
         p_elt_list = XmlTools::FindElements(pRootElement, "Simulation/IonicModels/Region/IonicModel");
-        for (unsigned i=0; i<p_elt_list.size(); i++)
+        for (unsigned i = 0; i < p_elt_list.size(); i++)
         {
             XmlTools::WrapContentInElement(pDocument, p_elt_list[i], X("Hardcoded"));
         }
@@ -3054,8 +3016,8 @@ void XmlTransforms::MoveConductivityHeterogeneities(xercesc::DOMDocument* pDocum
                                                     xercesc::DOMElement* pRootElement)
 {
     std::vector<xercesc::DOMElement*> p_elt_list = XmlTools::FindElements(
-            pRootElement,
-            "Simulation/ConductivityHeterogeneities");
+        pRootElement,
+        "Simulation/ConductivityHeterogeneities");
     if (p_elt_list.size() > 0)
     {
         assert(p_elt_list.size() == 1); // Asserted by schema
@@ -3092,20 +3054,20 @@ void XmlTransforms::SetDefaultVisualizer(xercesc::DOMDocument* pDocument,
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template void HeartConfig::GetIonicModelRegions<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
-template void HeartConfig::GetStimuli<3u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
-template void HeartConfig::GetConductivityHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
+template void HeartConfig::GetIonicModelRegions<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >&, std::vector<cp::ionic_model_selection_type>&) const;
+template void HeartConfig::GetStimuli<3u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >&, std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >&) const;
+template void HeartConfig::GetCellHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >&, std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<std::map<std::string, double> >*);
+template void HeartConfig::GetConductivityHeterogeneities<3u>(std::vector<boost::shared_ptr<AbstractChasteRegion<3u> > >&, std::vector<c_vector<double, 3> >&, std::vector<c_vector<double, 3> >&) const;
 
-template void HeartConfig::GetIonicModelRegions<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
-template void HeartConfig::GetStimuli<2u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
-template void HeartConfig::GetConductivityHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
+template void HeartConfig::GetIonicModelRegions<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >&, std::vector<cp::ionic_model_selection_type>&) const;
+template void HeartConfig::GetStimuli<2u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >&, std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >&) const;
+template void HeartConfig::GetCellHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >&, std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<std::map<std::string, double> >*);
+template void HeartConfig::GetConductivityHeterogeneities<2u>(std::vector<boost::shared_ptr<AbstractChasteRegion<2u> > >&, std::vector<c_vector<double, 3> >&, std::vector<c_vector<double, 3> >&) const;
 
-template void HeartConfig::GetIonicModelRegions<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >& , std::vector<cp::ionic_model_selection_type>&) const;
-template void HeartConfig::GetStimuli<1u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& , std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >& ) const;
-template void HeartConfig::GetCellHeterogeneities<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >& ,std::vector<double>& ,std::vector<double>& ,std::vector<double>& ,std::vector<std::map<std::string, double> >*);
-template void HeartConfig::GetConductivityHeterogeneities<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >& ,std::vector< c_vector<double,3> >& ,std::vector< c_vector<double,3> >& ) const;
+template void HeartConfig::GetIonicModelRegions<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >&, std::vector<cp::ionic_model_selection_type>&) const;
+template void HeartConfig::GetStimuli<1u>(std::vector<boost::shared_ptr<AbstractStimulusFunction> >&, std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >&) const;
+template void HeartConfig::GetCellHeterogeneities<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >&, std::vector<double>&, std::vector<double>&, std::vector<double>&, std::vector<std::map<std::string, double> >*);
+template void HeartConfig::GetConductivityHeterogeneities<1u>(std::vector<boost::shared_ptr<AbstractChasteRegion<1u> > >&, std::vector<c_vector<double, 3> >&, std::vector<c_vector<double, 3> >&) const;
 
 template void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<1u> >& rPseudoEcgElectrodePositions) const;
 template void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<2u> >& rPseudoEcgElectrodePositions) const;
@@ -3119,7 +3081,6 @@ template void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<Chas
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 // LCOV_EXCL_STOP //These methods are covered above with DIM=1,2,3 but the instantiations may fail spuriously
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
