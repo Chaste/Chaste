@@ -468,13 +468,8 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoun
             const unsigned twin_node_idx = p_edge->twin()->cell()->color();
             const unsigned twin_elem_idx = *r_mesh.GetNode(twin_node_idx)->ContainingElementsBegin();
 
-            // Conditions to continue
-            const bool different_elems = this_elem_idx != twin_elem_idx;
-            const bool within_thrshold = r_mesh.GetDistanceBetweenNodes(this_node_idx, twin_node_idx) < r_mesh.GetNeighbourDist();
-            const bool both_boundary = r_mesh.GetElement(this_elem_idx)->IsElementOnBoundary() && r_mesh.GetElement(twin_elem_idx)->IsElementOnBoundary();
-
-            // Check if the nodes are in different elements and within the neighbour distance
-            if (different_elems && within_thrshold && !both_boundary)
+            // Check if the nodes are in different elements
+            if (this_elem_idx != twin_elem_idx)
             {
                 // Add a pair to the set, which will record the total number of unique elem-elem interactions
                 const unsigned lo_idx = std::min(this_elem_idx, twin_elem_idx);
