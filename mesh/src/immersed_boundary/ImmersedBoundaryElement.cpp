@@ -40,7 +40,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigned index,
                                                                          const std::vector<Node<SPACE_DIM>*>& rNodes)
         : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
-          mpFluidSource(NULL),
+          mpFluidSource(nullptr),
           mAverageNodeSpacing(DOUBLE_UNSET),
           mIsBoundaryElement(false)
 {
@@ -105,7 +105,7 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetIsBoundaryElement(bool 
 template<unsigned SPACE_DIM>
 ImmersedBoundaryElement<1, SPACE_DIM>::ImmersedBoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : MutableElement<1, SPACE_DIM>(index, rNodes),
-      mpFluidSource(NULL),
+      mpFluidSource(nullptr),
       mAverageNodeSpacing(DOUBLE_UNSET)
 {
 }
@@ -118,7 +118,7 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM
 template<unsigned SPACE_DIM>
 FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource()
 {
-    return NULL;
+    return nullptr;
 }
 
 template<unsigned SPACE_DIM>
