@@ -1530,6 +1530,12 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(bool randomOrder)
     {
         ReMeshLamina(p_lam, randomOrder);
     }
+
+    // Reposition fluid sources to the centroid of cells
+    for (auto& p_source : mElementFluidSources)
+    {
+        p_source->rGetModifiableLocation() = this->GetCentroidOfElement(p_source->GetAssociatedElementIndex());
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
