@@ -72,7 +72,7 @@ public:
         }
     }
 
-    void TestMeshGetWidth()
+    void TestMeshGetAndSetWidthAndHeight()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -92,6 +92,16 @@ public:
 
         TS_ASSERT_DELTA(width, 4.0, 1e-4);
         TS_ASSERT_DELTA(height, 6.0/sqrt(3.0), 1e-4);
+
+        // Test SetWidth() method
+        p_mesh->SetWidth(61.47);
+        width = p_mesh->GetWidth(0);
+        TS_ASSERT_DELTA(width, 61.47, 1e-4);
+
+        // Test SetHeight() method
+        p_mesh->SetHeight(123.89);
+        height = p_mesh->GetWidth(1);
+        TS_ASSERT_DELTA(height, 123.89, 1e-4);
     }
 
     void TestGetVectorFromAtoB()

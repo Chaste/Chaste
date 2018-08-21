@@ -147,6 +147,20 @@ public:
     double GetWidth(const unsigned& rDimension) const;
 
     /**
+     * Set mHeight.
+     *
+     * @param height the new value of mHeight
+     */
+    void SetHeight(double height);
+
+    /**
+     * Set mWidth.
+     *
+     * @param width the new value of mWidth
+     */
+    void SetWidth(double width);
+
+    /**
      * Overridden AddNode() method.
      *
      * @param pNewNode the node to be added to the mesh

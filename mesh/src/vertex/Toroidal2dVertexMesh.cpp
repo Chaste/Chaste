@@ -132,6 +132,18 @@ double Toroidal2dVertexMesh::GetWidth(const unsigned& rDimension) const
     return width;
 }
 
+void Toroidal2dVertexMesh::SetHeight(double height)
+{
+    assert(height > 0);
+    mHeight = height;
+}
+
+void Toroidal2dVertexMesh::SetWidth(double width)
+{
+    assert(width > 0);
+    mWidth = width;
+}
+
 unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
     unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
