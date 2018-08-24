@@ -585,6 +585,16 @@ public:
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
 
     /**
+     * Return a pointer to the vertex mesh
+     *
+     * This method may be overridden in daughter classes for non-Euclidean metrics.
+     * This can then be used when writing to VTK.
+     *
+     * @return a pointer to the vertex mesh
+     */
+    virtual VertexMesh<ELEMENT_DIM, SPACE_DIM>* GetMeshForVtk();
+
+    /**
      * A smart iterator over the elements in the mesh.
      *
      * \todo This is the same as in AbstractTetrahedralMesh and PottsMesh - merge? (#1379)

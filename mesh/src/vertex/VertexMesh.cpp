@@ -810,6 +810,12 @@ std::set<unsigned> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementInd
     return neighbouring_element_indices;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VertexMesh<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetMeshForVtk()
+{
+    return this;
+}
+
 /// \cond Get Doxygen to ignore, since it's confused by these templates
 template<>
 void VertexMesh<1,1>::ConstructFromMeshReader(AbstractMeshReader<1,1>& rMeshReader)

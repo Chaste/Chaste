@@ -251,26 +251,8 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
 {
 #ifdef CHASTE_VTK
     // Create VTK mesh
-    if (dynamic_cast<Toroidal2dVertexMesh*>(&rMesh))
-    {
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
-        MakeVtkMesh(*p_mesh_for_vtk);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
-    }
-    else if (dynamic_cast<Cylindrical2dVertexMesh*>(&rMesh))
-    {
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Cylindrical2dVertexMesh*>(&rMesh)->GetMeshForVtk();
-        MakeVtkMesh(*p_mesh_for_vtk);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
-    }
-    else
-    {
-        MakeVtkMesh(rMesh);
-    }
+    VertexMesh<2, 2>* p_mesh_for_vtk = rMesh.GetMeshForVtk();
+    MakeVtkMesh(*p_mesh_for_vtk);
 
     // Now write VTK mesh to file
     assert(mpVtkUnstructedMesh->CheckAttributes() == 0);

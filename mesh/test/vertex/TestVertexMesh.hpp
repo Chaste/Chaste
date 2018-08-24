@@ -2124,7 +2124,6 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetSurfaceAreaOfElement(0), 9.0*sqrt(3.0)/2.0, 1e-4);
     }
 
-
     void TestTessellationConstructor3dWithRepeatedCircumcentres()
     {
         std::vector<Node<3>*> nodes;
@@ -2180,6 +2179,21 @@ public:
             volume += voronoi_mesh.GetVolumeOfElement(i);
         }
         TS_ASSERT_DELTA(volume, 31.5, 1e-4); // Agrees with Paraview
+    }
+
+    void TestGetMeshForVtk()
+    {
+        // Create mesh
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Test GetMeshForVtk() method
+        VertexMesh<2, 2>* p_mesh_for_vtk = mesh.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements and nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 9u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 30u);
     }
 };
 

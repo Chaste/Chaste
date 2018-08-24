@@ -42,7 +42,8 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  double cellRearrangementThreshold,
                                                  double t2Threshold)
     : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
-      mWidth(width)
+      mWidth(width),
+      mpMeshForVtk(nullptr)
 {
     // ReMesh to remove any deleted nodes and relabel
     ReMesh();
@@ -150,6 +151,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()
 
 Cylindrical2dVertexMesh::~Cylindrical2dVertexMesh()
 {
+    delete mpMeshForVtk;
 }
 
 c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
@@ -227,7 +229,7 @@ void Cylindrical2dVertexMesh::Scale(const double xScale, const double yScale, co
     mWidth *= xScale;
 }
 
-MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
+VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
@@ -319,8 +321,8 @@ MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         }
     }
 
-    MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
-    return p_mesh;
+    mpMeshForVtk = new MutableVertexMesh<2,2>(nodes, elements);
+    return mpMeshForVtk;
 }
 
 // Serialization for Boost >= 1.36
