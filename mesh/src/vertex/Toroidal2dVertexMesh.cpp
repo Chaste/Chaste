@@ -56,7 +56,10 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh()
 
 Toroidal2dVertexMesh::~Toroidal2dVertexMesh()
 {
-    delete mpMeshForVtk;
+    if (mpMeshForVtk != NULL)
+    {
+         delete mpMeshForVtk;
+    }
 }
 
 c_vector<double, 2> Toroidal2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
@@ -274,7 +277,12 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         }
     }
 
-    mpMeshForVtk = new MutableVertexMesh<2,2>(nodes, elements);
+    if (mpMeshForVtk != nullptr)
+    {
+        delete mpMeshForVtk;
+    }
+
+    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
     return mpMeshForVtk;
 }
 

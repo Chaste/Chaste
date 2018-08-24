@@ -45,12 +45,13 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
       mWidth(width),
       mpMeshForVtk(nullptr)
 {
-    // ReMesh to remove any deleted nodes and relabel
+    // Call ReMesh() to remove any deleted nodes and relabel
     ReMesh();
 }
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
-    : mWidth(rMesh.GetWidth(0))
+    : mWidth(rMesh.GetWidth(0)),
+      mpMeshForVtk(nullptr)
 {
     mpDelaunayMesh = &rMesh;
 
@@ -79,11 +80,11 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
     for (unsigned i=0; i<num_nodes; i++)
     {
         double x_location = mNodes[i]->rGetLocation()[0];
-        if (x_location < 0 )
+        if (x_location < 0)
         {
             mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
         }
-        else if (x_location > mWidth )
+        else if (x_location > mWidth)
         {
             mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
         }
@@ -151,7 +152,10 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()
 
 Cylindrical2dVertexMesh::~Cylindrical2dVertexMesh()
 {
-    delete mpMeshForVtk;
+    if (mpMeshForVtk != NULL)
+    {
+         delete mpMeshForVtk;
+    }
 }
 
 c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
@@ -321,7 +325,12 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         }
     }
 
-    mpMeshForVtk = new MutableVertexMesh<2,2>(nodes, elements);
+    if (mpMeshForVtk != nullptr)
+    {
+        delete mpMeshForVtk;
+    }
+
+    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
     return mpMeshForVtk;
 }
 
