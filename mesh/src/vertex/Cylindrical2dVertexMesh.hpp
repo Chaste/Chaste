@@ -82,7 +82,6 @@ private:
     {
         archive & boost::serialization::base_object<MutableVertexMesh<2,2> >(*this);
         archive & mWidth;
-        mpMeshForVtk = nullptr;
     }
 
     /**

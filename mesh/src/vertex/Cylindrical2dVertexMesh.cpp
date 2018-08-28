@@ -147,12 +147,13 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
 }
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()
+    : mpMeshForVtk(nullptr)
 {
 }
 
 Cylindrical2dVertexMesh::~Cylindrical2dVertexMesh()
 {
-    if (mpMeshForVtk != NULL)
+    if (mpMeshForVtk != nullptr)
     {
          delete mpMeshForVtk;
     }
