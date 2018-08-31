@@ -38,11 +38,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+/**
+ * The parent class for all of the linear PDEs in Chaste. 
+ * 
+ * This is the most generic thing that you should generally 
+ * use as a pointer for your PDE in other code, works with
+ * boost serialization.
+ */
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class AbstractLinearPde
 {
 private:
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -51,24 +57,25 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
     }
 
 public:
-
     /**
      * Constructor.
      */
     AbstractLinearPde()
-    {}
+    {
+    }
 
     /**
      * Destructor.
      */
     virtual ~AbstractLinearPde()
-    {}
+    {
+    }
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractLinearPde)
