@@ -47,8 +47,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // CVODE headers
 #include <cvode/cvode.h>
-#include <cvode/cvode_dense.h>
 #include <sundials/sundials_nvector.h>
+
+#if CHASTE_SUNDIALS_VERSION >= 30000
+#include <cvode/cvode_direct.h> /* access to CVDls interface            */
+#include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
+#include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
+#include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
+#else
+#include <cvode/cvode_dense.h>
+#endif
 
 //#include "Debug.hpp"
 //void DebugSteps(void* pCvodeMem, AbstractCvodeSystem* pSys)
