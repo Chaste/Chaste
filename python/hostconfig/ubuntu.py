@@ -55,7 +55,7 @@ for item in whole_file.split("\n"):
     if "DISTRIB_RELEASE=" in item:
         version_line = item.strip()
 
-version_line = version_line.replace('DISTRIB_RELEASE=','')
+ubuntu_ver = version_line.replace('DISTRIB_RELEASE=','')
 ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
 if ubuntu_ver >= [18,04]:
