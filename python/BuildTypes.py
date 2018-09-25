@@ -409,6 +409,9 @@ class Gcc(BuildType):
             if self.GetCompilerVersion() >= 7:
                 self._cc_flags.extend(['-Wimplicit-fallthrough=2'])
                 # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
+            if self.GetCompilerVersion() >= 8:
+                self._cc_flags.extend(['-Wno-ignored-qualifiers'])
+                # To deal with a problem in cxxtest
 
     def GetCompilerVersion(self):
         """Get the major version number of the compiler being used."""

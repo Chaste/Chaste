@@ -42,15 +42,21 @@ import subprocess
 # do_inf_tests = 1
 
 # Check which version of Ubuntu this is
-fp = open('/etc/issue')
-ubuntu_ver = fp.read().split()[1]
+# fp = open('/etc/issue')
+# ubuntu_ver = fp.read().split()[1]
+# fp.close()
+
+## A more robust way of finding the Ubuntu version (works with Betas too)
+fp = open('/etc/lsb-release')
+whole_file = fp.read()
 fp.close()
 
-# First deal with special cases for beta releases etc.
-if ubuntu_ver == 'Trusty':
-    ubuntu_ver = [14,04]
-else:
-    ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
+for item in whole_file.split("\n"):
+    if "DISTRIB_RELEASE=" in item:
+        version_line = item.strip()
+
+version_line = version_line.replace('DISTRIB_RELEASE=','')
+ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
 if ubuntu_ver >= [18,04]:
     petsc_ver = 3.7
