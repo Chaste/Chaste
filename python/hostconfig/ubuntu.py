@@ -58,7 +58,11 @@ for item in whole_file.split("\n"):
 ubuntu_ver = version_line.replace('DISTRIB_RELEASE=','')
 ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
-if ubuntu_ver >= [18,04]:
+if ubuntu_ver >= [18,10]:
+    petsc_ver = 3.9
+    petsc_path = '/usr/lib/petscdir/'
+    petsc_build_name = '3.9'
+elif ubuntu_ver >= [18,04]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/'
     petsc_build_name = '3.7'
