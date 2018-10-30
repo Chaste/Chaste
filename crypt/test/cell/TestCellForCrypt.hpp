@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ public:
      * ReadyToDivide() now calls UpdateCellProliferativeType() where appropriate.
      * (at the moment in Wnt-dependent cells).
      */
-    void TestUpdateCellProliferativeTypes() throw (Exception)
+    void TestUpdateCellProliferativeTypes()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(200, 20);
@@ -128,7 +128,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithWntCellCycleModel() throw(Exception)
+    void TestWithWntCellCycleModel()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
@@ -211,7 +211,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithStochasticWntCellCycleModel() throw(Exception)
+    void TestWithStochasticWntCellCycleModel()
     {
         // If random number generation changes, then print these three lines to get the numbers to go in below
 //        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(4, 0.9) << "\n";
@@ -305,7 +305,7 @@ public:
      * (these test that the cell cycle times are correct for the
      * various mutant cells)
      */
-    void TestWntMutantVariantsAndLabelling() throw(Exception)
+    void TestWntMutantVariantsAndLabelling()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 

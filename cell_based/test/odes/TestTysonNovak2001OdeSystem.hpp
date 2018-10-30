@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ public:
         TS_ASSERT_DELTA(derivs[5], 7.777500000000001e-03*60.0, 1e-5);
     }
 
-    void TestTysonNovakSolver() throw(Exception)
+    void TestTysonNovakSolver()
     {
         TysonNovak2001OdeSystem tyson_novak_system;
 

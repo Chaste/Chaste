@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ class TestCryptSimulationBoundaryCondition : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestSetAndGetUseJiggledBottomCells() throw (Exception)
+    void TestSetAndGetUseJiggledBottomCells()
     {
         CryptSimulationBoundaryCondition<1> boundary_condition1d(NULL);
         TS_ASSERT_EQUALS(boundary_condition1d.GetUseJiggledBottomCells(), false);
@@ -73,7 +73,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition2d.GetUseJiggledBottomCells(), true);
     }
 
-    void TestConstructorWithCellPopulation1d() throw (Exception)
+    void TestConstructorWithCellPopulation1d()
     {
         // Create 1D cell population
         unsigned num_cells = 5;
@@ -93,7 +93,7 @@ public:
         TS_ASSERT(p_population1d != NULL);
     }
 
-    void TestConstructorWithCellPopulation2d() throw (Exception)
+    void TestConstructorWithCellPopulation2d()
     {
         // Create a 2d mesh-based cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
@@ -114,7 +114,7 @@ public:
         TS_ASSERT(p_population != NULL);
     }
 
-    void TestOutputParameters1d() throw(Exception)
+    void TestOutputParameters1d()
     {
         std::string output_directory = "TestOutputParameters1d";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -137,7 +137,7 @@ public:
         FileComparison( boundary_condition_results_dir + "results1d.info", "crypt/test/data/TestCryptSimulationBoundaryCondition/results1d.info").CompareFiles();
     }
 
-    void TestOutputParameters2d() throw(Exception)
+    void TestOutputParameters2d()
     {
         std::string output_directory = "TestOutputParameters2d";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -160,7 +160,7 @@ public:
         FileComparison( boundary_condition_results_dir + "results2d.info", "crypt/test/data/TestCryptSimulationBoundaryCondition/results2d.info").CompareFiles();
     }
 
-    void TestImposeBoundaryConditionWithNoWnt1d() throw(Exception)
+    void TestImposeBoundaryConditionWithNoWnt1d()
     {
         // Create 1D cell population
         unsigned num_cells = 5;
@@ -218,7 +218,7 @@ public:
         }
     }
 
-    void TestImposeBoundaryConditionWithNoWntOrJiggling2d() throw(Exception)
+    void TestImposeBoundaryConditionWithNoWntOrJiggling2d()
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
@@ -268,7 +268,7 @@ public:
         }
     }
 
-    void TestImposeBoundaryConditionWithNoWntButWithJiggling() throw(Exception)
+    void TestImposeBoundaryConditionWithNoWntButWithJiggling()
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
@@ -321,7 +321,7 @@ public:
         TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(*cell_iter2)[1]);
     }
 
-    void TestImposeBoundaryConditionWithWnt1d() throw(Exception)
+    void TestImposeBoundaryConditionWithWnt1d()
     {
         // Create 1D cell population
         unsigned num_cells = 5;
@@ -368,7 +368,7 @@ public:
         WntConcentration<1>::Destroy();
     }
 
-    void TestImposeBoundaryConditionWithWntButNoJiggling() throw(Exception)
+    void TestImposeBoundaryConditionWithWntButNoJiggling()
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
@@ -419,7 +419,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestVerifyBoundaryCondition1d() throw(Exception)
+    void TestVerifyBoundaryCondition1d()
     {
         // Create 1D cell population
         unsigned num_cells = 5;
@@ -459,7 +459,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
     }
 
-    void TestVerifyBoundaryCondition2d() throw(Exception)
+    void TestVerifyBoundaryCondition2d()
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
@@ -494,7 +494,7 @@ public:
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
     }
 
-    void TestArchiving1d() throw (Exception)
+    void TestArchiving1d()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false); // don't erase contents of folder
@@ -531,7 +531,7 @@ public:
        }
     }
 
-    void TestArchiving2d() throw (Exception)
+    void TestArchiving2d()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false); // don't erase contents of folder

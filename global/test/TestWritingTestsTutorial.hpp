@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,10 +83,10 @@ public:
     }
 /*
  * This second test shows some of the other {{{TS_ASSERT}}} macros that are available.
- * The {{{throw (Exception)}} part of the signature is there to make sure that full details of any
+ * The {{{}} part of the signature is there to make sure that full details of any
  * uncaught exceptions are reported.
  */
-    void TestSomeOtherStuff() throw (Exception)
+    void TestSomeOtherStuff()
     {
         TS_ASSERT(1==1); // however, it is better to use TS_ASSERT_EQUALS, below
         TS_ASSERT_EQUALS((true||false), true);

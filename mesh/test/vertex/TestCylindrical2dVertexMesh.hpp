@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,7 +101,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(0), 2, 1e-4);
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
@@ -130,7 +130,7 @@ public:
         TS_ASSERT_DELTA(vector[1], 0.0000, 1e-4);
     }
 
-    void TestSetNodeLocationForCylindricalMesh() throw (Exception)
+    void TestSetNodeLocationForCylindricalMesh()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
@@ -159,7 +159,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(6, 6);
@@ -350,7 +350,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(17)->GetNode(4)->GetIndex(), 43u);
     }
 
-    void TestTessellationConstructor() throw (Exception)
+    void TestTessellationConstructor()
     {
         // Create a simple Cylindrical2dMesh, the Delaunay triangulation
         unsigned cells_across = 3;
@@ -431,7 +431,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), sqrt(3.0)/12.0, 1e-6);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "cylindrical_vertex_mesh_base.arch";
@@ -522,7 +522,7 @@ public:
         }
     }
 
-    void TestCylindricalReMesh() throw (Exception)
+    void TestCylindricalReMesh()
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -541,7 +541,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
     }
 
-    void TestCylindricalReMeshAfterDelete() throw (Exception)
+    void TestCylindricalReMeshAfterDelete()
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -623,7 +623,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
         // Test GetMeshForVtk() method
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
@@ -674,9 +674,6 @@ public:
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 47u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 35u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
     }
 };
 

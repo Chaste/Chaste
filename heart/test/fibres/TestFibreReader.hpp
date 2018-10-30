@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ double UblasMatrixInfinityNorm(c_matrix<double,DIM,DIM> mat)
 class TestFibreReader : public CxxTest::TestSuite
 {
 public:
-    void TestOrthoReaderSetup() throw(Exception)
+    void TestOrthoReaderSetup()
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, ORTHO);
@@ -110,7 +110,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(fibre_reader.GetFibreSheetAndNormalMatrix(5u, fibre_matrix), "End of file")
    }
 
-    void TestOrthoReaderSkipping() throw(Exception) // Cf above test
+    void TestOrthoReaderSkipping()  // Cf above test
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, ORTHO);
@@ -132,7 +132,7 @@ public:
         TS_ASSERT_DELTA(UblasMatrixInfinityNorm<2>(fibre_matrix-correct_matrix), 0, 1e-9);
     }
 
-    void TestAxiReaderSetup() throw(Exception)
+    void TestAxiReaderSetup()
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.axi", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, AXISYM);
@@ -164,7 +164,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(fibre_reader.GetFibreVector(4u, fibre_vector), "End of file")
     }
 
-    void TestAxiReaderSkipping() throw(Exception) // Cf above test
+    void TestAxiReaderSkipping()  // Cf above test
     {
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.axi", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, AXISYM);
@@ -180,7 +180,7 @@ public:
     }
 
 
-    void TestFibreConvenienceMethodsForVtk() throw(Exception)
+    void TestFibreConvenienceMethodsForVtk()
     {
 
         {
@@ -229,7 +229,7 @@ public:
         }
     }
 
-    void TestFibretoVtk() throw(Exception)
+    void TestFibretoVtk()
     {
 #ifdef CHASTE_VTK
         //See TestConductivityTensors
@@ -273,7 +273,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestFibreReaderExceptions() throw(Exception)
+    void TestFibreReaderExceptions()
     {
         c_matrix<double, 2, 2> fibre_matrix;
 
@@ -324,7 +324,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(fibre_reader7.GetFibreVector(0u, fibre_vector), "A line is incomplete in");
     }
 
-    void TestAxiBinaryFileReader() throw (Exception)
+    void TestAxiBinaryFileReader()
     {
         // Read in a binary fibres file.
         FileFinder file_finder_bin("heart/test/data/fibre_tests/SimpleAxisymmetric2Bin.axi", RelativeTo::ChasteSourceRoot);
@@ -351,7 +351,7 @@ public:
         }
     }
 
-    void TestAxiBinaryFileReaderWithSkipping() throw (Exception)
+    void TestAxiBinaryFileReaderWithSkipping()
     {
         c_vector<double, 3> binary_vector;
         c_vector<double, 3> ascii_vector;
@@ -374,7 +374,7 @@ public:
         }
     }
 
-    void TestOrthoBinaryFileReader() throw (Exception)
+    void TestOrthoBinaryFileReader()
     {
         // Read in a binary fibres file.
         FileFinder file_finder_bin("heart/test/data/fibre_tests/Orthotropic3DBin.ortho", RelativeTo::ChasteSourceRoot);
@@ -408,7 +408,7 @@ public:
         }
     }
 
-    void TestOrthoBinaryFileReaderWithSkipping() throw (Exception)
+    void TestOrthoBinaryFileReaderWithSkipping()
     {
         // Read in a binary fibres file.
         FileFinder file_finder_bin("heart/test/data/fibre_tests/Orthotropic3DBin.ortho", RelativeTo::ChasteSourceRoot);

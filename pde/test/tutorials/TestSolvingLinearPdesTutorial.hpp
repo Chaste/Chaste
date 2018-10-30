@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -148,7 +148,7 @@ class TestSolvingLinearPdesTutorial : public CxxTest::TestSuite
 {
 /* All individual test defined in this test suite '''must''' be declared as public. */
 public:
-    void TestSolvingEllipticPde() throw(Exception)
+    void TestSolvingEllipticPde()
     {
         /* First we declare a mesh reader which reads mesh data files of the 'Triangle'
          * format. The path given is relative to the main Chaste directory. As we are in 2d,
@@ -301,7 +301,7 @@ public:
      * conditions u=1.
      *
      */
-    void TestSolvingParabolicPde() throw(Exception)
+    void TestSolvingParabolicPde()
     {
         /* Create a 10 by 10 by 10 mesh in 3D, this time using the {{{ConstructRegularSlabMesh}}} method
          * on the mesh. The first parameter is the cartesian space-step and the other three parameters are the width, height and depth of the mesh.*/

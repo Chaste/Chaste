@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ class TestStaticVentilationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestCalculatePressureDrop() throw (Exception)
+    void TestCalculatePressureDrop()
     {
         EXIT_IF_PARALLEL;
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestOffLatticeCryptProjectionSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
-    void TestOutputStatistics() throw(Exception)
+    void TestOutputStatistics()
     {
         EXIT_IF_PARALLEL; // defined in PetscTools
 
@@ -150,7 +150,7 @@ public:
      * depends on a radial Wnt gradient, and the crypt projection model spring
      * system, and store the results for use in later archiving tests.
      */
-    void TestOffLatticeSimulationWithCryptProjectionSpringSystem() throw(Exception)
+    void TestOffLatticeSimulationWithCryptProjectionSpringSystem()
     {
         double a = 0.2;
         double b = 2.0;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ class TestObjectCommunicator: public CxxTest::TestSuite
 
 public:
 
-    void TestSendingClass() throw (Exception)
+    void TestSendingClass()
     {
         MPI_Status status;
         ObjectCommunicator<ClassOfSimpleVariables> communicator;
@@ -103,7 +103,7 @@ public:
     }
 
     /* This test *may* deadlock if we don't use non-blocking communication */
-    void TestNonBlockingSendingClass() throw (Exception)
+    void TestNonBlockingSendingClass()
     {
         ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
@@ -161,7 +161,7 @@ public:
     }
 
     /** We cannot pre-post Irecv because we need to know the (dynamic) size of the object being sent first */
-    void TestNonBlockingRecvClass() throw (Exception)
+    void TestNonBlockingRecvClass()
     {
         ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
@@ -215,7 +215,7 @@ public:
         PetscTools::Barrier("Make sure that no ISendObject buffers are in use before proceeding");
     }
 
-    void TestSendRecv() throw (Exception)
+    void TestSendRecv()
     {
         if (PetscTools::GetNumProcs() == 2)
         {

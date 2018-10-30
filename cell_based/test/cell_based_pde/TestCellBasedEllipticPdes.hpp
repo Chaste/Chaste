@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,7 +95,7 @@ public:
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, p_mesh->GetElement(0)), 0.05, 1e-6);
     }
 
-    void TestUniformSourceEllipticPdeArchiving() throw(Exception)
+    void TestUniformSourceEllipticPdeArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "UniformSourceEllipticPde.arch";
@@ -179,7 +179,7 @@ public:
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_1), 0.05, 1e-6);
     }
 
-    void TestCellwiseSourceEllipticPdeArchiving() throw(Exception)
+    void TestCellwiseSourceEllipticPdeArchiving()
     {
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -303,7 +303,7 @@ public:
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(1), 0.0, 1e-6);
     }
 
-    void TestAveragedSourceEllipticPdeArchiving() throw(Exception)
+    void TestAveragedSourceEllipticPdeArchiving()
     {
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -353,7 +353,7 @@ public:
         }
     }
 
-    void TestVolumeDependentAveragedSourceEllipticPde() throw(Exception)
+    void TestVolumeDependentAveragedSourceEllipticPde()
     {
         // Create a cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -403,7 +403,7 @@ public:
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
     }
 
-    void TestVolumeDependentAveragedSourceEllipticPdeArchiving() throw(Exception)
+    void TestVolumeDependentAveragedSourceEllipticPdeArchiving()
     {
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);

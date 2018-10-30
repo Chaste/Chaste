@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Chaste. If not, see <http://www.gnu.org/licenses/>.
 """, re.MULTILINE)
 
-current_notice="""Copyright (c) 2005-2017, University of Oxford.
+current_notice="""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -313,7 +313,7 @@ if __name__ == '__main__':
 
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
     startchar_ignores = ['_', '.']
-    exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
+    exclusions = ['python/pycml/_enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
 
     apply_update = '-update' in sys.argv
     apply_new = '-new' in sys.argv

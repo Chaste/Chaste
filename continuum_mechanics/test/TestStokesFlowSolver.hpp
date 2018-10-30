@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,7 +60,7 @@ public:
      * Dirichlet BC applied on three sides, zero-stress on the other (so pressure is fully defined)
      * Just two elements.
      */
-    void TestStokesExactSolutionSimple() throw(Exception)
+    void TestStokesExactSolutionSimple()
     {
         for (unsigned run=0; run<2; run++)
         {
@@ -137,7 +137,7 @@ public:
     // For this flow: sigma = mu(grad u + (grad u)^T) - pI = mu*0 - pI = -pI
     // Again, exact solution is in FEM space so would work, up to
     // linear solve tolerance, with 1 element
-    void TestStokesExactSolutionLessSimple() throw(Exception)
+    void TestStokesExactSolutionLessSimple()
     {
         // Set up a mesh on [0 1]x[0 1]
         unsigned num_elem = 3;
@@ -202,7 +202,7 @@ public:
      * Solution is u = [y(1-y), 0], p = 2(1-x) + const
      * Dirichlet BC applied on all four sides
      */
-    void TestStokesWithImposedPipeCondition() throw(Exception)
+    void TestStokesWithImposedPipeCondition()
     {
         // Note: we could have num_elem=1 and test still pass, as FE solution is the same as the true
         // solution (analytic soln is in the FE space, ignoring linear solve errors.
@@ -295,7 +295,7 @@ public:
     // For this flow: sigma = mu(grad u + (grad u)^T) - pI = mu*0 - pI = -pI
     // Again, exact solution is in FEM space so would work, up to
     // linear solve tolerance, with 1 element
-    void TestStokesExactSolutionNonzeroNeumann() throw(Exception)
+    void TestStokesExactSolutionNonzeroNeumann()
     {
         // Set up a mesh on [0 1]x[0 1]
         unsigned num_elem = 3;
@@ -389,7 +389,7 @@ public:
      * Solution is u = [20xy^3, 5x^4-5y^4], p = 60x^2y-20y^3+const.
      * Dirichlet BC applied on all 4 sides so pressure is not fully defined.
      */
-    void TestConvergenceWithAnalyticSolution() throw(Exception)
+    void TestConvergenceWithAnalyticSolution()
     {
         unsigned num_runs = 4;
         std::vector<double> L_inf_error_flow(num_runs, -1.0);
@@ -508,7 +508,7 @@ public:
     // Using this top to compare with independently written code.
     // Alternatively, could use u=1-x^4 on the top (with geometry [-1,1]^2)
     // and compare with plots in Andy Wathen's fluids FEM book
-    void TestStokesWithLidDrivenCavity() throw(Exception)
+    void TestStokesWithLidDrivenCavity()
     {
         unsigned num_elem = 5;
         QuadraticMesh<2> mesh(1.0/num_elem, 1.0, 1.0);
@@ -616,7 +616,7 @@ public:
 
 
     // solve problem for which solution is u=(x,y,-2z), p=const.
-    void TestStokesSimple3d() throw(Exception)
+    void TestStokesSimple3d()
     {
         unsigned num_elem = 2;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);
@@ -686,7 +686,7 @@ public:
         }
     }
 
-    void TestStokesWithLidDrivenCavity3d() throw(Exception)
+    void TestStokesWithLidDrivenCavity3d()
     {
         unsigned num_elem = 5;
         QuadraticMesh<3> mesh(1.0/num_elem, 1.0, 1.0, 1.0);

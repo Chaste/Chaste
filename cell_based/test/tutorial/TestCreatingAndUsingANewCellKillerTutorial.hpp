@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -202,7 +202,7 @@ public:
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
-    void TestMyCellKiller() throw(Exception)
+    void TestMyCellKiller()
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh. */
         HoneycombMeshGenerator generator(20, 20, 0);
@@ -294,7 +294,7 @@ public:
      * We now provide a test demonstrating how {{{MyCellKiller}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyCellKiller() throw(Exception)
+    void TestOffLatticeSimulationWithMyCellKiller()
     {
         /* We proceed as before, creating a mesh-based cell population. */
         HoneycombMeshGenerator generator(20, 20, 0);

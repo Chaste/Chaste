@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,7 +60,7 @@ class TestCellDataMaps : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellData() throw (Exception)
+    void TestCellData()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -100,7 +100,7 @@ public:
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
     }
 
-    void TestCellVecData() throw (Exception)
+    void TestCellVecData()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);

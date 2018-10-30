@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -99,7 +99,7 @@ public:
     //
     // Here we run on a fine (as opposed to v fine) mesh and with a normal dt, and check that the solutions
     // are near.
-    void TestComparisonOnNormalMeshes() throw(Exception)
+    void TestComparisonOnNormalMeshes()
     {
         ReplicatableVector final_voltage_normal;
         ReplicatableVector final_voltage_operator_splitting;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -111,7 +111,7 @@ private:
 
 public:
 
-    void TestBoundaryConditionsAtCryptBase() throw (Exception)
+    void TestBoundaryConditionsAtCryptBase()
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -236,7 +236,7 @@ public:
     /**
      * Test that a short crypt simulation without cell birth runs without throwing any errors.
      */
-    void TestCryptWithNoBirth() throw (Exception)
+    void TestCryptWithNoBirth()
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -281,7 +281,7 @@ public:
      * Test that a short crypt simulation, in which cell birth occurs,
      * runs without throwing any errors.
      */
-    void TestCryptWithBirth() throw (Exception)
+    void TestCryptWithBirth()
     {
         double crypt_length = 5.0;
 
@@ -337,7 +337,7 @@ public:
      * Commented test of a long crypt simulation. Used to generate attachment
      * VertexSimulation.mpeg on #1095.
      */
-    void noTestCryptSimulationLong() throw (Exception)
+    void noTestCryptSimulationLong()
     {
         double crypt_length = 20.0;
 
@@ -387,7 +387,7 @@ public:
      * cell proliferation is Wnt-based, to check that WntConcentration
      * doesn't throw a wobbly.
      */
-    void TestShortWntBasedCryptSimulation() throw (Exception)
+    void TestShortWntBasedCryptSimulation()
     {
         double crypt_length = 10.0;
 
@@ -442,7 +442,7 @@ public:
 
     /** Longer Wnt based simulation
      */
-    void noTestWntBasedCryptSimulationLong() throw (Exception)
+    void noTestWntBasedCryptSimulationLong()
     {
         double crypt_length = 20.0;
 
@@ -496,7 +496,7 @@ public:
     }
 
     // Test a crypt simulation with a boundary force on the crypt base.
-    void TestCryptSimulationWithBoundaryForce() throw (Exception)
+    void TestCryptSimulationWithBoundaryForce()
     {
         double crypt_length = 6.0;
 
@@ -553,7 +553,7 @@ public:
     /**
      * Test that archiving a crypt simulation correctly archives its mesh.
      */
-    void TestMeshSurvivesSaveLoad() throw (Exception)
+    void TestMeshSurvivesSaveLoad()
     {
         // Create mesh
         unsigned crypt_width = 4;
@@ -612,7 +612,7 @@ public:
         delete p_simulator;
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         double crypt_length = 22.0;
 
@@ -679,7 +679,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestVertexCryptSimulation2DParameterOutput() throw (Exception)
+    void TestVertexCryptSimulation2DParameterOutput()
     {
         double crypt_length = 22.0;
 
@@ -726,7 +726,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         double crypt_length = 22.0;
 
@@ -784,7 +784,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 0.2
@@ -842,7 +842,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWriteBetaCateninAndAncestors() throw (Exception)
+    void TestWriteBetaCateninAndAncestors()
     {
         // Create mesh
         unsigned crypt_width = 6;

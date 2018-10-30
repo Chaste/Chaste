@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ class TestCellwiseDataGradient : public AbstractCellBasedTestSuite
 
 public:
 
-    void TestCellwiseDataGradientVerySmallMesh() throw(Exception)
+    void TestCellwiseDataGradientVerySmallMesh()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    void TestCellwiseDataGradientFineMesh() throw(Exception)
+    void TestCellwiseDataGradientFineMesh()
     {
         // Create a mesh: [0,2]x[0,2]
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
@@ -162,7 +162,7 @@ public:
     }
 
 ///\todo uncomment this test or remove it
-//    void TestCellwiseDataGradientWithGhostNodes() throw(Exception)
+//    void TestCellwiseDataGradientWithGhostNodes()
 //    {
 //        // Create a mesh: [0,2]x[0,2]
 //        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");

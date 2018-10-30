@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ public:
 class TestCardiacElectroMechanicsOnEllipsoid : public CxxTest::TestSuite
 {
 public:
-    void TestOnEllipsoid() throw(Exception)
+    void TestOnEllipsoid()
     {
         EXIT_IF_PARALLEL; // needs investigation, possibly related to #2057
 

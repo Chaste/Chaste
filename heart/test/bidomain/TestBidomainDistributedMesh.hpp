@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ class TestBidomainDistributedMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestBidomainProblemWithDistributedMesh2D() throw(Exception)
+    void TestBidomainProblemWithDistributedMesh2D()
     {
         HeartConfig::Instance()->SetSimulationDuration(1);  //ms
         HeartConfig::Instance()->SetOutputDirectory("DistributedMesh2d");
@@ -159,7 +159,7 @@ public:
         }
     }
 
-    void TestBidomainProblemWithDistributedMesh2DParMetis() throw(Exception)
+    void TestBidomainProblemWithDistributedMesh2DParMetis()
     {
         HeartConfig::Instance()->SetSimulationDuration(1);  //ms
         HeartConfig::Instance()->SetOutputDirectory("DistributedMesh2d");
@@ -267,7 +267,7 @@ public:
             TS_ASSERT_DELTA(seq_ave_voltage, para_ave_voltage, 1.0);
         }
     }
-    void TestBidomainProblemWithDistributedMeshFromMemfem3DParMetis() throw(Exception)
+    void TestBidomainProblemWithDistributedMeshFromMemfem3DParMetis()
     {
         HeartConfig::Instance()->SetSimulationDuration(1);  //ms
         HeartConfig::Instance()->SetOutputDirectory("DistributedMesh3dRepViaTri");

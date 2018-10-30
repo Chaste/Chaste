@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,7 +66,7 @@ public:
     /**
      * Check that input files are opened correctly.
      */
-    void TestFilesOpen() throw(Exception)
+    void TestFilesOpen()
     {
 
         TS_ASSERT_THROWS_THIS(READER_2D mesh_reader1("no_mesh_files"),"Could not open data file: no_mesh_files.node");
@@ -85,7 +85,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing nodes) then an exception is thrown.
      */
-    void TestNodesDataRead() throw(Exception)
+    void TestNodesDataRead()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
 
@@ -104,7 +104,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing elements) then an exception is thrown.
      */
-    void TestElementsDataRead() throw(Exception)
+    void TestElementsDataRead()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
 
@@ -136,7 +136,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing faces) then an exception is thrown.
      */
-    void TestFacesDataRead() throw(Exception)
+    void TestFacesDataRead()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
 
@@ -160,7 +160,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing faces) then an exception is thrown.
      */
-    void TestFacesDataReadWithAttributes() throw(Exception)
+    void TestFacesDataReadWithAttributes()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart_nonnegative_flags");
 
@@ -186,7 +186,7 @@ public:
      * as the previously considered (2-d) Triangles files. Checks that the
      * element output vector for a given input file is the correct length.
      */
-    void Test3dDataRead() throw(Exception)
+    void Test3dDataRead()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/slab_138_elements");
         TS_ASSERT_EQUALS(mesh_reader.GetNodeAttributes().size(), 0u);//no nodal attributes in this mesh
@@ -199,7 +199,7 @@ public:
      * number is only stored as the index of the vector in which the coordinates
      * are stored.)
      */
-    void TestPermutedNodesFail() throw(Exception)
+    void TestPermutedNodesFail()
     {
         TS_ASSERT_THROWS_THIS(READER_2D reader("mesh/test/data/baddata/permuted_nodes_disk_522_elements"),"Data for item 0 missing")
     }
@@ -209,7 +209,7 @@ public:
      * node than the dimension of the mesh). If quadratic basis functions are
      * required this should be dealt with elsewhere.
      */
-    void TestOrder2ElementsFail() throw(Exception)
+    void TestOrder2ElementsFail()
     {
         TS_ASSERT_THROWS_THIS(new READER_2D("mesh/test/data/baddata/disk_522_order_2_elements"),
                 "Number of nodes per elem, 6, does not match expected number, 3 "
@@ -222,7 +222,7 @@ public:
      * values, checks that no errors are thrown for the remaining nodes and
      * that an error is thrown if we try to call the function too many times.
      */
-    void TestGetNextNode() throw(Exception)
+    void TestGetNextNode()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 
@@ -254,7 +254,7 @@ public:
                               "File contains incomplete data: unexpected end of file.");
     }
 
-    void TestGetNextNodeWithNodeAttributes() throw(Exception)
+    void TestGetNextNodeWithNodeAttributes()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements_with_node_attributes");
 
@@ -307,7 +307,7 @@ public:
      * all of the elements and that an error is thrown if we try to call the
      * function too many times.
      */
-    void TestGetNextElementData() throw(Exception)
+    void TestGetNextElementData()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 
@@ -327,7 +327,7 @@ public:
      * all of the edges and that an error is thrown if we try to call the
      * function too many times.
      */
-    void TestGetNextEdgeData() throw(Exception)
+    void TestGetNextEdgeData()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 
@@ -349,7 +349,7 @@ public:
      * Check that the 1D data are read correctly. Check that the output vector
      * for a given input file is the correct length.
      */
-    void Test1DMeshRead() throw(Exception)
+    void Test1DMeshRead()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/trivial_1d_mesh");
 
@@ -358,13 +358,13 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 2u);
     }
 
-    void Test0DMeshIn1DSpaceFails() throw(Exception)
+    void Test0DMeshIn1DSpaceFails()
     {
         TS_ASSERT_THROWS_THIS(new READER_0D_IN_1D("mesh/test/data/trivial_1d_mesh"),
                 "Can\'t have a zero-dimensional mesh in a one-dimensional space");
     }
 
-    void Test1DMeshIn2DSpace() throw(Exception)
+    void Test1DMeshIn2DSpace()
     {
         TrianglesMeshReader<1,2> mesh_reader("mesh/test/data/circle_outline");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 100u);
@@ -376,14 +376,14 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 50u);
     }
 
-    void Test1DMeshIn3DSpace() throw(Exception)
+    void Test1DMeshIn3DSpace()
     {
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/trivial_1d_in_3d_mesh");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 11u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
     }
 
-    void Test2DMeshIn3DSpace() throw(Exception)
+    void Test2DMeshIn3DSpace()
     {
         TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/slab_395_elements");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 132u);
@@ -397,7 +397,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumFaces(), 100u); // just boundary faces are read
     }
 
-    void TestOtherExceptions() throw(Exception)
+    void TestOtherExceptions()
     {
         // This should fail because SPACE_DIM doesn't match the dimension in the file
         TS_ASSERT_THROWS_THIS( READER_1D mesh_reader("mesh/test/data/disk_984_elements"),
@@ -419,7 +419,7 @@ public:
     ////////////////////////////////////////////////////////
     // Quadratic tests
     ////////////////////////////////////////////////////////
-    void TestReadingQuadraticMesh1d() throw(Exception)
+    void TestReadingQuadraticMesh1d()
     {
         TS_ASSERT_THROWS_THIS( READER_1D wrong_reader("mesh/test/data/1D_0_to_1_10_elements_quadratics", 1),
                 "Could not open data file: mesh/test/data/1D_0_to_1_10_elements_quadratics.node");
@@ -443,7 +443,7 @@ public:
         }
     }
 
-    void TestReadingQuadraticMesh2d() throw(Exception)
+    void TestReadingQuadraticMesh2d()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 17u*17u);
@@ -467,7 +467,7 @@ public:
         }
     }
 
-    void TestReadingQuadraticMesh3d() throw(Exception)
+    void TestReadingQuadraticMesh3d()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic", 2);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 10u);
@@ -483,7 +483,7 @@ public:
         }
     }
 
-    void TestReadingElementAttributes() throw(Exception)
+    void TestReadingElementAttributes()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
 
@@ -508,7 +508,7 @@ public:
         }
     }
 
-    void TestReadingContainingElementsOfBoundaryElements() throw(Exception)
+    void TestReadingContainingElementsOfBoundaryElements()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v2", 1, 1, true);
 
@@ -521,7 +521,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNextFaceData().ContainingElement, 4u);  //face 5
     }
 
-    void TestReadingBinary1D() throw(Exception)
+    void TestReadingBinary1D()
     {
         TrianglesMeshReader<1,1> mesh_reader_ascii("mesh/test/data/trivial_1d_mesh");
         //TrianglesMeshWriter<1,1> writer("","trivial_1d_mesh_binary");
@@ -537,7 +537,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader_bin.GetNumNodes(), 11u);
     }
 
-    void TestReadingBinary() throw(Exception)
+    void TestReadingBinary()
     {
         TrianglesMeshReader<3,3> mesh_reader_ascii("mesh/test/data/squashed_cube");
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/squashed_cube_binary");
@@ -857,7 +857,7 @@ public:
         TS_ASSERT_THROWS_THIS(mesh_reader.GetContainingElementIndices(0u), "No NCL file available for this mesh.");
     }
 
-    void TestReadingHexMesh() throw(Exception)
+    void TestReadingHexMesh()
     {
         TrianglesMeshReader<2,2> mesh_reader_2d("mesh/test/data/rectangle_608_hexa_elements");
 
@@ -872,7 +872,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader_3d.GetNumFaces(), 166u);
     }
 
-    void TestReadingWithGenericReader() throw(Exception)
+    void TestReadingWithGenericReader()
     {
         std::shared_ptr<AbstractMeshReader<2,2> > p_mesh_reader = GenericMeshReader<2,2>("mesh/test/data/disk_522_elements");
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 312u);
@@ -884,7 +884,7 @@ public:
                                   "Could not open appropriate mesh files for mesh/test/data/no_such_file");
     }
 
-    void TestReadingNclInformation() throw(Exception)
+    void TestReadingNclInformation()
     {
         TrianglesMeshReader<3,3> mesh_reader_3d("mesh/test/data/simple_cube_binary");
 
@@ -915,7 +915,7 @@ public:
 
     }
 
-    void TestReading3dMeshWithPermutation() throw (Exception)
+    void TestReading3dMeshWithPermutation()
     {
         const unsigned ELEMENT_DIM = 3;
         const unsigned SPACE_DIM = 3;
@@ -974,7 +974,7 @@ public:
         }
     }
 
-    void TestReadingMissingAttributes() throw(Exception)
+    void TestReadingMissingAttributes()
     {
         // The reader immediately reads and caches face data so missing attributes
         // immediately cause an Exception to be thrown

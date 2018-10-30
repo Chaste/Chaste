@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,7 +101,7 @@ public:
 class TestBidomainWithBathLong : public CxxTest::TestSuite
 {
 public:
-    void Test3dBathIntracellularStimulation() throw (Exception)
+    void Test3dBathIntracellularStimulation()
     {
         HeartConfig::Instance()->SetSimulationDuration(1);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath3d");
@@ -152,7 +152,7 @@ public:
     }
 
 // see #1061
-    void Test2dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge() throw (Exception)
+    void Test2dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge()
     {
         HeartConfig::Instance()->SetSimulationDuration(40);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2dExtraStimGrounded");
@@ -219,7 +219,7 @@ public:
     }
 
 // see #1061
-    void Test3dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge() throw (Exception)
+    void Test3dBathExtracellularStimulusOneEdgeGroundedOnOppositeEdge()
     {
         HeartConfig::Instance()->SetSimulationDuration(6);  //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath3dExtraStimGrounded");

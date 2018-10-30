@@ -29,7 +29,7 @@ Information on changes in this release can be found in the file
 [ReleaseNotes.html](docs/ReleaseNotes.html).
 
 Tutorial examples for this release are available at:
-https://chaste.cs.ox.ac.uk/chaste/tutorials/release_3.4
+https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2017.1
 
 API documentation generated from the code by Doxygen is available at:
-https://chaste.cs.ox.ac.uk/chaste/docs/release_3.4
+https://chaste.cs.ox.ac.uk/chaste/docs/release_2017.1

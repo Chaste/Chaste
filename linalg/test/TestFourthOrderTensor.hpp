@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ class TestFourthOrderTensor : public CxxTest::TestSuite
 {
 public:
 
-    void TestFourthOrderTensorAllSameDimensions() throw(Exception)
+    void TestFourthOrderTensorAllSameDimensions()
     {
         FourthOrderTensor<2,2,2,2> x;
 
@@ -125,7 +125,7 @@ public:
         }
     }
 
-    void TestSetAsContractionOnFirstDimensionSameDimensions() throw(Exception)
+    void TestSetAsContractionOnFirstDimensionSameDimensions()
     {
         FourthOrderTensor<3,3,3,3> X;
         c_matrix<double,3,3> A;
@@ -162,7 +162,7 @@ public:
         }
     }
 
-    void TestSetAsContractionOnSecondDimensionSameDimensions() throw(Exception)
+    void TestSetAsContractionOnSecondDimensionSameDimensions()
     {
         FourthOrderTensor<3,3,3,3> X;
         c_matrix<double,3,3> A;
@@ -200,7 +200,7 @@ public:
         }
     }
 
-    void TestSetAsContractionOnThirdDimensionSameDimensions() throw(Exception)
+    void TestSetAsContractionOnThirdDimensionSameDimensions()
     {
         FourthOrderTensor<3,3,3,3> X;
         c_matrix<double,3,3> A;
@@ -238,7 +238,7 @@ public:
         }
     }
 
-    void TestSetAsContractionOnFourthDimensionSameDimensions() throw(Exception)
+    void TestSetAsContractionOnFourthDimensionSameDimensions()
     {
         FourthOrderTensor<3,3,3,3> X;
         c_matrix<double,3,3> A;
@@ -276,7 +276,7 @@ public:
         }
     }
 
-    void TestFourthOrderTensorDifferentDimensions1() throw (Exception)
+    void TestFourthOrderTensorDifferentDimensions1()
     {
         FourthOrderTensor<2,3,1,1> X;
 
@@ -306,7 +306,7 @@ public:
         TS_ASSERT_DELTA( Y(0,2,0,0), 0.0,    1e-8);
     }
 
-    void TestFourthOrderTensorDifferentDimensions2() throw (Exception)
+    void TestFourthOrderTensorDifferentDimensions2()
     {
         FourthOrderTensor<2,3,1,1> X;
 
@@ -336,7 +336,7 @@ public:
         TS_ASSERT_DELTA( Y(1,0,0,0), A(0,1), 1e-8);
     }
 
-    void TestFourthOrderTensorDifferentDimensions3() throw (Exception)
+    void TestFourthOrderTensorDifferentDimensions3()
     {
         FourthOrderTensor<1,1,2,3> X;
 
@@ -366,7 +366,7 @@ public:
         TS_ASSERT_DELTA( Y(0,0,0,2), 0.0,    1e-8);
     }
 
-    void TestFourthOrderTensorDifferentDimensions4() throw (Exception)
+    void TestFourthOrderTensorDifferentDimensions4()
     {
         FourthOrderTensor<1,1,2,3> X;
 

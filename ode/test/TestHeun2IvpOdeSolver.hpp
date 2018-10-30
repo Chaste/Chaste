@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -389,11 +389,11 @@ public:
         TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)heun_order), 1e-1);
     }
 
-    void TestArchivingSolvers() throw(Exception)
+    void TestArchivingSolvers()
     {
         OutputFileHandler handler("archive",false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("heun_ode_solver.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("heun_ode_solver.arch");
 
         // Archive
         {

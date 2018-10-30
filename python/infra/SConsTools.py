@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -548,7 +548,9 @@ def GetPathRevision(path):
         except:
             revision = 'UINT_MAX'
     else:
-        revision, modified = 'Unknown', False
+        # In abscence of git, subversion (or ReleaseVersion.txt) we report revision=0
+        # This allows a zip download from github to be compiled with SCons
+        revision, modified = 0, False
     return (revision, modified)
 
 def GetProjectVersions(projectsRoot, default_revision=None):

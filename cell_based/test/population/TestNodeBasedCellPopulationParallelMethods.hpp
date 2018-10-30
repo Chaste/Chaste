@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -109,7 +109,7 @@ private:
     }
 public:
 
-    void TestGetCellAndNodePair() throw (Exception)
+    void TestGetCellAndNodePair()
     {
         unsigned node_index = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
 
@@ -121,7 +121,7 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetLocationIndexUsingCell(p_returned_cell), node_index);
     }
 
-    void TestAddNodeAndCellsToSend() throw (Exception)
+    void TestAddNodeAndCellsToSend()
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -137,7 +137,7 @@ public:
         TS_ASSERT_EQUALS(node_left_index, index_of_node_to_send);
     }
 
-    void TestSendAndReceiveCells() throw (Exception)
+    void TestSendAndReceiveCells()
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -166,7 +166,7 @@ public:
         }
     }
 
-    void TestSendAndReceiveCellsNonBlocking() throw (Exception)
+    void TestSendAndReceiveCellsNonBlocking()
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -197,7 +197,7 @@ public:
         }
     }
 
-    void TestUpdateCellProcessLocation() throw (Exception)
+    void TestUpdateCellProcessLocation()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -235,7 +235,7 @@ public:
         }
     }
 
-    void TestRefreshHaloCells() throw (Exception)
+    void TestRefreshHaloCells()
     {
         // Set up the halo boxes and nodes.
         mpNodeBasedCellPopulation->Update();
@@ -257,7 +257,7 @@ public:
         }
     }
 
-    void TestUpdateWithLoadBalanceDoesntThrow() throw (Exception)
+    void TestUpdateWithLoadBalanceDoesntThrow()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
@@ -271,7 +271,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->Update());
     }
 
-    void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)
+    void TestGetCellUsingLocationIndexWithHaloCell()
     {
         boost::shared_ptr<Node<3> > p_node(new Node<3>(10, false, 0.0, 0.0, 0.0));
 
@@ -288,7 +288,7 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetCellUsingLocationIndex(10), p_cell);
     }
 
-    void TestNodeBasedCellPopulationOutputInParallel() throw (Exception)
+    void TestNodeBasedCellPopulationOutputInParallel()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 

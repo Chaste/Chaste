@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -192,7 +192,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestGeneralisedLinearSpringForceWithEdgeLengthBasedSpring() throw (Exception)
+    void TestGeneralisedLinearSpringForceWithEdgeLengthBasedSpring()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -363,7 +363,7 @@ public:
         TS_ASSERT_DELTA(new_force[0]*new_force[0] + new_force[1]*new_force[1], 4.34024, 1e-3);
     }
 
-    void TestGeneralisedLinearSpringForceWithEdgeBasedSpringsOnPeriodicMesh() throw (Exception)
+    void TestGeneralisedLinearSpringForceWithEdgeBasedSpringsOnPeriodicMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -631,7 +631,7 @@ public:
         FileComparison( variable_force_results_dir + "variable_results.parameters", "crypt/test/data/TestForcesForCrypt/variable_results.parameters").CompareFiles();
     }
 
-    void TestLinearSpringWithVariableSpringConstantsForceArchiving() throw (Exception)
+    void TestLinearSpringWithVariableSpringConstantsForceArchiving()
     {
         EXIT_IF_PARALLEL; // Avoid race conditions
 
@@ -710,7 +710,7 @@ public:
         }
     }
 
-    void TestLinearSpringWithVariableSpringConstantsForceWithNodeBasedCellPopulation() throw (Exception)
+    void TestLinearSpringWithVariableSpringConstantsForceWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;

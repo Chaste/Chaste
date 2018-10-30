@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ public:
 class TestMonodomainWithTimeAdaptivity : public CxxTest::TestSuite
 {
 public:
-    void Test1dApd() throw(Exception)
+    void Test1dApd()
     {
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
         HeartConfig::Instance()->SetSimulationDuration(400); //ms

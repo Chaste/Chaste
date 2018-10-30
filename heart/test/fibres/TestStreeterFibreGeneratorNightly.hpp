@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestStreeterFibreGeneratorNightly : public CxxTest::TestSuite
 {
 private:
-    void CompareOrthoFiles(std::string orthoFile1Absolute, std::string orthoFile2Relative) throw (Exception)
+    void CompareOrthoFiles(std::string orthoFile1Absolute, std::string orthoFile2Relative)
     {
         //Read one
         FileFinder file_finder1(orthoFile1Absolute, RelativeTo::Absolute);
@@ -87,7 +87,7 @@ private:
     }
 
 public:
-    void TestSimpleOrthotropic() throw (Exception)
+    void TestSimpleOrthotropic()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
         std::string epi_face_file = "heart/test/data/point50_heart_mesh/epi.tri";
@@ -114,7 +114,7 @@ public:
         TS_ASSERT(comp_wall.CompareFiles(1e-11));
     }
 
-    void TestSimpleOrthotropicNotDistributed() throw (Exception)
+    void TestSimpleOrthotropicNotDistributed()
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
         std::string epi_face_file = "heart/test/data/point50_heart_mesh/epi.tri";
@@ -142,7 +142,7 @@ public:
         TS_ASSERT(comp_wall.CompareFiles(1e-11));
     }
 
-    void TestDownSampledRabbit() throw (Exception)
+    void TestDownSampledRabbit()
     {
 
         TrianglesMeshReader<3,3> mesh_reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");

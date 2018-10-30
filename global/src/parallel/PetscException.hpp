@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ std::string GetKspErrorMessage(PetscInt kspError);
  * Zero means success.
  * Negative codes should never happen, but we'll throw anyway.
  */
-#define PETSCEXCEPT(n) PetscException(n, __LINE__, __FUNCT__,__FILE__)
+#define PETSCEXCEPT(n) PetscException(n, __LINE__, __func__, __FILE__)
 
 /**
  * Positive codes mean that the KSP converged.
@@ -88,7 +88,7 @@ std::string GetKspErrorMessage(PetscInt kspError);
  *
  * Throw an Exception if KSP failed to solve.
  */
-#define KSPEXCEPT(n)  KspException(n, __LINE__, __FUNCT__,__FILE__)
+#define KSPEXCEPT(n)  KspException(n, __LINE__, __func__, __FILE__)
 
 /**
  * Positive codes mean that the KSP converged.

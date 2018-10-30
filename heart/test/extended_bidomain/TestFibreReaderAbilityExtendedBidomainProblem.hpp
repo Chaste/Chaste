@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,7 +83,7 @@ class TestFibreReaderAbilityExtendedBidomainProblem: public CxxTest::TestSuite
 
 public:
 
-    void TestFibreAbilityNoFibreExtendedProblem() throw (Exception)
+    void TestFibreAbilityNoFibreExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -134,7 +134,7 @@ public:
         }
     }
 
-    void TestOrthoFibreAbilityExtendedProblem() throw (Exception)
+    void TestOrthoFibreAbilityExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();
@@ -211,7 +211,7 @@ public:
         }
     }
 
-    void Test3DAxiFibreAbilityExtendedProblem() throw (Exception)
+    void Test3DAxiFibreAbilityExtendedProblem()
     {
         HeartConfig::Instance()->Reset();
         HeartEventHandler::Instance()->Reset();

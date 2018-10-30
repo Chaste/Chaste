@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestModifiers : public CxxTest::TestSuite
 {
 public:
-    void TestAccessingParametersWithoutModifiers() throw(Exception)
+    void TestAccessingParametersWithoutModifiers()
     {
         boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
@@ -74,7 +74,7 @@ public:
         delete p_shannon;
      }
 
-    void TestAssigningModifiersToACellModel() throw(Exception)
+    void TestAssigningModifiersToACellModel()
     {
         boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
@@ -102,7 +102,7 @@ public:
         delete p_shannon;
     }
 
-    void TestDummyModifiers(void) throw(Exception)
+    void TestDummyModifiers(void)
     {
         DummyModifier dummymod;
 
@@ -112,7 +112,7 @@ public:
         TS_ASSERT_DELTA(parameter, returned, 1e-9);
     }
 
-    void TestFactorModifiers(void) throw(Exception)
+    void TestFactorModifiers(void)
     {
         double factor = 2;
         FactorModifier mod(factor);
@@ -123,7 +123,7 @@ public:
         TS_ASSERT_DELTA(parameter*factor, returned, 1e-9);
     }
 
-    void TestFixedModifiers(void) throw(Exception)
+    void TestFixedModifiers(void)
     {
         double fixed = 32;
         FixedModifier mod(fixed);
@@ -134,7 +134,7 @@ public:
         TS_ASSERT_DELTA(fixed, returned, 1e-9);
     }
 
-    void TestTimeModifiers(void) throw(Exception)
+    void TestTimeModifiers(void)
     {
         // This class just provides an example of how to make a time modifier you might want.
         TimeModifier mod;
@@ -148,7 +148,7 @@ public:
         }
     }
 
-    void TestArchivingModifiers(void) throw(Exception)
+    void TestArchivingModifiers(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);

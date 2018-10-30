@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -407,7 +407,7 @@ public:
    /* Use the first solver to solve the static PDE. We apply zero Dirichlet boundary conditions
     * on the whole of the boundary for both variables.
     */
-    void TestMyTwoVariablePdeSolver() throw (Exception)
+    void TestMyTwoVariablePdeSolver()
     {
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.01 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
@@ -445,7 +445,7 @@ public:
     }
 
     /* Now run a test solving the parabolic-parabolic-parabolic PDE system. */
-    void TestMyParaEllipticSetOfPdesSolver() throw (Exception)
+    void TestMyParaEllipticSetOfPdesSolver()
     {
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);

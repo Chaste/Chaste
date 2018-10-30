@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,5 +77,7 @@ SimpleLinearParabolicSolver<ELEMENT_DIM,SPACE_DIM>::SimpleLinearParabolicSolver(
 
 // Explicit instantiation
 template class SimpleLinearParabolicSolver<1,1>;
+template class SimpleLinearParabolicSolver<1,2>;
+template class SimpleLinearParabolicSolver<1,3>;
 template class SimpleLinearParabolicSolver<2,2>;
 template class SimpleLinearParabolicSolver<3,3>;

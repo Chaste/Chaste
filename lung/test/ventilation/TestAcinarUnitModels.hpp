@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -138,7 +138,7 @@ class TestAcinarUnitModels: public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleBalloonAcinarUnitInspiration() throw (Exception)
+    void TestSimpleBalloonAcinarUnitInspiration()
     {
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
@@ -209,7 +209,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
-    void TestSimpleBalloonExplicitAcinarUnitInspiration() throw (Exception)
+    void TestSimpleBalloonExplicitAcinarUnitInspiration()
     {
        double viscosity = 1.92e-5;               //Pa s
        double terminal_airway_radius = 0.05;   //m
@@ -277,7 +277,7 @@ public:
        TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
    }
 
-    void TestSigmoidalAcinarUnitInspiration() throw (Exception)
+    void TestSigmoidalAcinarUnitInspiration()
     {
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
@@ -344,7 +344,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(acinus.SetTimestep(0.01));
     }
 
-    void TestSwan2012AcinarUnit() throw(Exception)
+    void TestSwan2012AcinarUnit()
     {
         Swan2012AcinarUnit acinus;
 

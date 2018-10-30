@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -173,7 +173,7 @@ class TestExtendedVsBidomainProblem : public CxxTest::TestSuite
 
 public:
 
-    void SetupParameters() throw (Exception)
+    void SetupParameters()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
@@ -190,7 +190,7 @@ public:
     // Tests and simulations for the setAveragePhie method
     //////////////////////////////////////////////////////////////////////////////
 
-    void RunExtendedBidomainStimulateFirstCell() throw (Exception)
+    void RunExtendedBidomainStimulateFirstCell()
     {
         SetupParameters();
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
@@ -211,7 +211,7 @@ public:
         extended_problem.Solve();
     }
 
-    void RunBidomain() throw (Exception)
+    void RunBidomain()
     {
         SetupParameters();
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
@@ -226,7 +226,7 @@ public:
         bidomain_problem.Solve();
     }
 
-    void TestCompareStimulationOfFirstCell() throw(Exception)
+    void TestCompareStimulationOfFirstCell()
     {
         //run the two simulations, bidomain and extended bidomain
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
@@ -274,7 +274,7 @@ public:
     }
 
 
-    void RunExtendedBidomainStimulateSecondCell() throw (Exception)
+    void RunExtendedBidomainStimulateSecondCell()
     {
         SetupParameters();
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
@@ -300,7 +300,7 @@ public:
     /**
      * This test is the same as TestCompareStimulationOfFirstCell above, but with the stimulus applied to the second cell instead of the first.
      */
-    void TestCompareStimulationOfSecondCell() throw (Exception)
+    void TestCompareStimulationOfSecondCell()
     {
         //first, run the extended bidomain simulation stimulating the second cell
         RunExtendedBidomainStimulateSecondCell();
@@ -350,7 +350,7 @@ public:
     // Tests and simulations for the null space solution
     //////////////////////////////////////////////////////////////////////////////
 
-    void RunExtendedSimulationWithNullBasis()  throw(Exception)
+    void RunExtendedSimulationWithNullBasis()
     {
         SetupParameters();
 
@@ -371,7 +371,7 @@ public:
         extended_problem.Solve();
     }
 
-    void RunBidomainNullBasis() throw (Exception)
+    void RunBidomainNullBasis()
     {
         SetupParameters();
 
@@ -385,7 +385,7 @@ public:
         bidomain_problem.Solve();
     }
 
-    void TestCompareNullBasis() throw (Exception)
+    void TestCompareNullBasis()
     {
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
 
@@ -435,7 +435,7 @@ public:
     // Tests and simulations for pinning a node
     //////////////////////////////////////////////////////////////////////////////
 
-    void RunExtendedSimulationPinnedNode()  throw(Exception)
+    void RunExtendedSimulationPinnedNode()
     {
         SetupParameters();
 
@@ -463,7 +463,7 @@ public:
         extended_problem.Solve();
     }
 
-    void RunBidomainPinnedNode() throw (Exception)
+    void RunBidomainPinnedNode()
     {
         SetupParameters();
 
@@ -484,7 +484,7 @@ public:
         bidomain_problem.Solve();
     }
 
-    void TestComparePinnedNode() throw (Exception)
+    void TestComparePinnedNode()
     {
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         //first, run the two simulations
@@ -531,7 +531,7 @@ public:
     // Tests for heterogeneous Ggap
     //////////////////////////////////////////////////////////////////////////////
 
-    void TestHeterogeneousGgap() throw (Exception)
+    void TestHeterogeneousGgap()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
@@ -621,7 +621,7 @@ public:
      * This test is just to try out (and cover) the WriteInfo method and the set  method of the extracellular stimulus
      * Also tests method for accessing the flag indicating whether the user suipplied an extracellular stimulus or not
      * */
-    void TestSomeOtherMethods() throw (Exception)
+    void TestSomeOtherMethods()
     {
         HeartEventHandler::Reset();
         HeartConfig::Instance()->Reset();
@@ -657,7 +657,7 @@ public:
         Warnings::Instance()->QuietDestroy();
     }
 
-    void TestExceptions() throw (Exception)
+    void TestExceptions()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms

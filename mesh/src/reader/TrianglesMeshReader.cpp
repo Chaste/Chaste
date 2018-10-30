@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -715,7 +715,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     if (mFilesAreBinary)
     {
         mElementFileDataStart = mElementsFile.tellg(); // Record the position of the first byte after the header.
-        mElementItemWidth = mNodesPerElement*sizeof(unsigned) +  extra_attributes*sizeof(double) ;
+        mElementItemWidth = mNodesPerElement*sizeof(unsigned) +  extra_attributes*sizeof(double);
     }
 
     /*

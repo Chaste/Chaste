@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -266,7 +266,7 @@ public:
         TS_ASSERT_EQUALS(diffusion_term(1,1), 25.0);
     }
 
-    void TestSimpleUniformSourceParabolicPdeMethods() throw(Exception)
+    void TestSimpleUniformSourceParabolicPdeMethods()
     {
         // Create a PDE object
         SimpleUniformSourceParabolicPde<2> pde(0.1);
@@ -293,7 +293,7 @@ public:
         }
     }
 
-    void TestSimpleUniformSourceParabolicPdeArchiving() throw(Exception)
+    void TestSimpleUniformSourceParabolicPdeArchiving()
     {
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);

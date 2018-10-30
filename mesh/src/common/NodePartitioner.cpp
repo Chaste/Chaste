@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -328,8 +328,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
         {
             bool boundary_check;
             boundary_check = ((location[d] > lower[d]) || sqrt((location[d]-lower[d])*(location[d]-lower[d])) < DBL_EPSILON);
-            boundary_check *= (location[d] < upper[d]);
-            does_contain *= boundary_check;
+            does_contain = (does_contain && boundary_check && (location[d] < upper[d]));
         }
 
         if (does_contain)

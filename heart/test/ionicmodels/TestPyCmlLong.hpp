@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -337,7 +337,7 @@ private:
     }
 
 public:
-    void TestNormalCells() throw(Exception)
+    void TestNormalCells()
     {
         std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
 
@@ -350,7 +350,7 @@ public:
         RunTests(dirname, models, args);
     }
 
-    void TestOptimisedCells() throw(Exception)
+    void TestOptimisedCells()
     {
         std::string dirname("TestPyCmlNightlyOpt");
         std::vector<std::string> args;
@@ -361,7 +361,7 @@ public:
         RunTests(dirname, models, args, true);
     }
 
-    void TestCvodeCells() throw(Exception)
+    void TestCvodeCells()
     {
 #ifdef CHASTE_CVODE
         std::string dirname("TestPyCmlNightlyCvodeNumericalJ");
@@ -376,7 +376,7 @@ public:
 #endif
     }
 
-    void TestAnalyticCvodeCells() throw(Exception)
+    void TestAnalyticCvodeCells()
     {
 #ifdef CHASTE_CVODE
         std::string dirname("TestPyCmlNightlyCvodeAnalyticJ");
@@ -398,7 +398,7 @@ public:
 #endif
     }
 
-    void TestBackwardEulerCells() throw(Exception)
+    void TestBackwardEulerCells()
     {
         std::string dirname("TestPyCmlNightlyBE");
         std::vector<std::string> args;
@@ -436,7 +436,7 @@ public:
         RunTests(dirname, diff_models, args, true);
     }
 
-    void TestRushLarsenCells() throw(Exception)
+    void TestRushLarsenCells()
     {
         std::string dirname("TestPyCmlNightlyRushLarsen");
         std::vector<std::string> args;
@@ -450,7 +450,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestRushLarsenOptCells() throw(Exception)
+    void TestRushLarsenOptCells()
     {
         std::string dirname("TestPyCmlNightlyRushLarsenOpt");
         std::vector<std::string> args;
@@ -462,7 +462,7 @@ public:
         RunTests(dirname, models, args, true, -1000, false);
     }
 
-    void TestGeneralizedRushLarsen1Cells() throw(Exception)
+    void TestGeneralizedRushLarsen1Cells()
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
         std::vector<std::string> args;
@@ -476,7 +476,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestGeneralizedRushLarsen1CellsOpt() throw(Exception)
+    void TestGeneralizedRushLarsen1CellsOpt()
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1Opt");
         std::vector<std::string> args;
@@ -491,7 +491,7 @@ public:
         RunTests(dirname, models, args, true, -1000, false);
     }
 
-    void TestGeneralizedRushLarsen2Cells() throw(Exception)
+    void TestGeneralizedRushLarsen2Cells()
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
         std::vector<std::string> args;
@@ -504,7 +504,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestGeneralizedRushLarsen2CellsOpt() throw(Exception)
+    void TestGeneralizedRushLarsen2CellsOpt()
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2Opt");
         std::vector<std::string> args;

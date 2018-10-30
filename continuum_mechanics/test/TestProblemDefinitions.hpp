@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,7 +98,7 @@ class TestProblemDefinitions : public CxxTest::TestSuite
 public:
     // Test all the functionality inside ContinuumMechanicsProblemDefinition,
     // which will be common to other problem definition classes
-    void TestContinuumMechanicsProblemDefinition() throw(Exception)
+    void TestContinuumMechanicsProblemDefinition()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
 
@@ -224,7 +224,7 @@ public:
     }
 
     // Test the functionality specific to SolidMechanicsProblemDefinition
-    void TestSolidMechanicsProblemDefinition() throw(Exception)
+    void TestSolidMechanicsProblemDefinition()
     {
         TS_ASSERT_EQUALS(SolidMechanicsProblemDefinition<2>::FREE, DBL_MAX);
         TS_ASSERT_LESS_THAN(0, SolidMechanicsProblemDefinition<2>::FREE);
@@ -403,7 +403,7 @@ public:
 
     }
 
-    void TestStokesFlowProblemDefinition() throw(Exception)
+    void TestStokesFlowProblemDefinition()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
 

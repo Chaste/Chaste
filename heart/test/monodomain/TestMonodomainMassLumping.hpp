@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ class TestMonodomainMassLumping : public CxxTest::TestSuite
 
 public:
 
-    void TestCompareCubePlaneStimulus() throw(Exception)
+    void TestCompareCubePlaneStimulus()
     {
         HeartConfig::Instance()->SetSimulationDuration(20); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
@@ -102,7 +102,7 @@ public:
         }
     }
 
-    void TestCompareCubePlaneStimulusOnlyPrecondLumping() throw(Exception)
+    void TestCompareCubePlaneStimulusOnlyPrecondLumping()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(20); //ms

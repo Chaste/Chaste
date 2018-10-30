@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ class TestGenericEventHandler : public CxxTest::TestSuite
 {
 public:
 
-    void TestEvents() throw(Exception)
+    void TestEvents()
     {
         // Coverage
         AnEventHandler::Instance()->DisableImpl();
@@ -87,7 +87,7 @@ public:
         TS_ASSERT_THROWS_THIS(AnEventHandler::Report(),"Asked to report on an event handler which is set to zero.");
     }
 
-    void TestEventExceptions() throw(Exception)
+    void TestEventExceptions()
     {
         // Should not be able to end an event that has not yet begun
         TS_ASSERT_THROWS_THIS(AnEventHandler::EndEvent(AnEventHandler::TEST1),

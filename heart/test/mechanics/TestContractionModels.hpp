@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,7 +78,7 @@ double MyLamDeriv(double t, double endTime, double minLam)
 class TestContractionModels : public CxxTest::TestSuite
 {
 public :
-    void TestNonPhysiologicalContractionModel() throw(Exception)
+    void TestNonPhysiologicalContractionModel()
     {
         NonPhysiologicalContractionModel model1(1);
         NonPhysiologicalContractionModel model2(2);
@@ -120,7 +120,7 @@ public :
     }
 
 
-    void TestNhsContractionModelSimple() throw(Exception)
+    void TestNhsContractionModelSimple()
     {
         NhsContractionModel nhs_system;
 
@@ -178,7 +178,7 @@ public :
      *  and stimulate an action potential in a Lr91 cell, in order to get
      *  active tension in the NHS model
      */
-    void TestNhsConstantStretchVaryingCa() throw(Exception)
+    void TestNhsConstantStretchVaryingCa()
     {
         // setup
         double magnitude =  -25.5;
@@ -289,7 +289,7 @@ public :
      *  solving a Lr91 model with no stimulus, and specify non-zero lambda. We specify
      *  a functional form of lambda rather than get it from a mechanics model
      */
-    void TestNhsConstantCaVaryingStretch() throw(Exception)
+    void TestNhsConstantCaVaryingStretch()
     {
         boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
         double end_time = 100.0;
@@ -391,7 +391,7 @@ public :
      *  A test which couples the NHS model with the Lr91 model, via CaI, with different constant stretches.
      *  The stretches are 0.9, 1.0, 1.1
      */
-    void TestNhsIsometricTwitch() throw(Exception)
+    void TestNhsIsometricTwitch()
     {
         // setup
         double magnitude =  -25.5;
@@ -463,7 +463,7 @@ public :
     }
 
 
-    void TestRunDoNotUpdateEtcUsingKerchoff() throw(Exception)
+    void TestRunDoNotUpdateEtcUsingKerchoff()
     {
         Kerchoffs2003ContractionModel kerchoffs_model;
         kerchoffs_model.SetStretchAndStretchRate(0.85,0.0);
@@ -517,7 +517,7 @@ public :
     // results to be compared with Figure 1D in Kerchoffs et al, Electromechanics of
     // paced left ventricle simulated by straightforward mathematical model: comparison
     // with experiments.
-    void TestKerchoffs2003ContractionModelIsometricTwitch() throw(Exception)
+    void TestKerchoffs2003ContractionModelIsometricTwitch()
     {
         std::vector<std::vector<double> > data;
 
@@ -589,7 +589,7 @@ public :
         TS_ASSERT_DELTA(data[1].back(), 0.0,  1e-2);
     }
 
-    void TestKerchoffs2003ContractionModelVaryingStetch() throw(Exception)
+    void TestKerchoffs2003ContractionModelVaryingStetch()
     {
         Kerchoffs2003ContractionModel kerchoffs_model;
         TS_ASSERT_EQUALS(kerchoffs_model.IsStretchDependent(), true);
@@ -669,7 +669,7 @@ public :
     }
 
 
-    void TestNash2004ContractionLaw() throw(Exception)
+    void TestNash2004ContractionLaw()
     {
         Nash2004ContractionModel nash_model;
         TS_ASSERT_EQUALS(nash_model.IsStretchDependent(), false);
@@ -728,7 +728,7 @@ public :
         TS_ASSERT_DELTA(nash_model.GetNextActiveTension(),active_tensions.back(),1e-4);
     }
 
-    void TestFakeBathContractionModel() throw(Exception)
+    void TestFakeBathContractionModel()
     {
         FakeBathContractionModel model1;
         ContractionModelInputParameters input_parameters;

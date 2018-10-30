@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ class TestCellCycleModelOdeSolver : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestMethods() throw(Exception)
+    void TestMethods()
     {
         typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel,RungeKutta4IvpOdeSolver> RkSolver;
 
@@ -170,7 +170,7 @@ public:
         TS_ASSERT_DELTA(p_solver->GetStoppingTime(), M_PI_2, 1e-4);
     }
 
-    void TestWithBackwardEulerIvpOdeSolver() throw(Exception)
+    void TestWithBackwardEulerIvpOdeSolver()
     {
         typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
 
@@ -216,7 +216,7 @@ public:
         TS_ASSERT_DELTA(p_solver->GetStoppingTime(), M_PI_2, 1e-2);
     }
 
-    void TestWithCvodeAdaptor() throw(Exception)
+    void TestWithCvodeAdaptor()
     {
 #ifdef CHASTE_CVODE
         typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor> CvodeSolver;
@@ -240,7 +240,7 @@ public:
 #endif //CHASTE_CVODE
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ode_solver.arch";

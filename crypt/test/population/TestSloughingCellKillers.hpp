@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ class TestSloughingCellKillers : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestSloughingCellKillerTopAndSides() throw(Exception)
+    void TestSloughingCellKillerTopAndSides()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void TestSloughingCellKillerTopOnly() throw(Exception)
+    void TestSloughingCellKillerTopOnly()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -162,7 +162,7 @@ public:
         }
     }
 
-    void TestSloughingCellKillerIn1d() throw(Exception)
+    void TestSloughingCellKillerIn1d()
     {
         // Create 1D mesh
         unsigned num_cells = 14;
@@ -212,7 +212,7 @@ public:
         }
     }
 
-    void TestSloughingCellKillerIn3d() throw(Exception)
+    void TestSloughingCellKillerIn3d()
     {
         // Create 3D mesh
         MutableMesh<3,3> mesh;
@@ -233,7 +233,7 @@ public:
         TS_ASSERT_THROWS_THIS(sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath(), "SloughingCellKiller is not yet implemented in 3D");
     }
 
-    void TestArchivingOfSloughingCellKiller() throw (Exception)
+    void TestArchivingOfSloughingCellKiller()
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
@@ -274,7 +274,7 @@ public:
         }
     }
 
-    void TestRadialSloughingCellKillerMethods() throw(Exception)
+    void TestRadialSloughingCellKillerMethods()
     {
         // Create mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -337,7 +337,7 @@ public:
         }
     }
 
-    void TestArchivingOfRadialSloughingCellKiller() throw (Exception)
+    void TestArchivingOfRadialSloughingCellKiller()
     {
         // Set up
         OutputFileHandler handler("archive", false);    // don't erase contents of folder

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -249,7 +249,7 @@ class TestCombinedOdeSystem : public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleCombinedOdeSystem() throw (Exception)
+    void TestSimpleCombinedOdeSystem()
     {
         // Create two ODE systems
         SimpleOde1 ode_for_y; // dy/dt = x

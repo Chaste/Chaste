@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ class TestHeartEventHandler : public CxxTest::TestSuite
 {
 public:
 
-    void TestEvents() throw(Exception)
+    void TestEvents()
     {
         HeartEventHandler::BeginEvent(HeartEventHandler::EVERYTHING);
         HeartEventHandler::BeginEvent(HeartEventHandler::SOLVE_ODES);
@@ -70,7 +70,7 @@ public:
         HeartEventHandler::Report();
     }
 
-    void TestParallelPrinting() throw (Exception)
+    void TestParallelPrinting()
     {
         std::cout.flush();
         std::cerr.flush();
@@ -99,7 +99,7 @@ public:
 
     }
 
-    void TestEventExceptions() throw(Exception)
+    void TestEventExceptions()
     {
         // Should not be able to end and event that has not yet begun
         TS_ASSERT_THROWS_THIS(HeartEventHandler::EndEvent(HeartEventHandler::EVERYTHING),

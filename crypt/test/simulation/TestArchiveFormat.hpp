@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,7 +90,7 @@ public:
      *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/
      *
      */
-    void TestLoadArchive() throw (Exception)
+    void TestLoadArchive()
     {
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);

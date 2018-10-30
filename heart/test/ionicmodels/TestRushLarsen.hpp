@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ class TestRushLarsen : public CxxTest::TestSuite
     AbstractCardiacCell* mpRushLarsenCell;
     AbstractCardiacCell* mpRushLarsenCellOpt;
 
-    void GenerateCells() throw (Exception)
+    void GenerateCells()
     {
         // Do the conversions preserving generated sources
         CellMLToSharedLibraryConverter converter(true);

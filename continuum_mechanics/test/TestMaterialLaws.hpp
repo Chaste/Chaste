@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -817,7 +817,7 @@ public:
         TS_ASSERT_DELTA(pole_zero_law.mB[0][0], 7, 1e-12);
     }
 
-    void TestNashHunterPoleZeroLaw3d() throw(Exception)
+    void TestNashHunterPoleZeroLaw3d()
     {
         NashHunterPoleZeroLaw<3> law;
 
@@ -864,7 +864,7 @@ public:
         TS_ASSERT_DELTA(T(0,0),1.7052,1e-3);
     }
 
-    void TestNashHunterPoleZeroLaw2d() throw(Exception)
+    void TestNashHunterPoleZeroLaw2d()
     {
         NashHunterPoleZeroLaw<2> law;
 
@@ -1095,7 +1095,7 @@ public:
         TS_ASSERT_DELTA(law_3d.Get_dW_dI3(3.0,3.0,1.0), -c1, 1e-12);
     }
 
-    void TestCompressibleExponentialLaw() throw(Exception)
+    void TestCompressibleExponentialLaw()
     {
         CompressibleExponentialLaw<2> law;
 
@@ -1143,7 +1143,7 @@ public:
         CheckDTdEComputation<2>(&law);
     }
 
-    void TestCompressibleExponentialLaw3d() throw(Exception)
+    void TestCompressibleExponentialLaw3d()
     {
         CompressibleExponentialLaw<3> law;
 

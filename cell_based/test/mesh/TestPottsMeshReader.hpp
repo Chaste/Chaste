@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ public:
     /**
      * Check that input files are opened correctly.
      */
-    void TestFilesOpen() throw(Exception)
+    void TestFilesOpen()
     {
         PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d");
     }
@@ -62,7 +62,7 @@ public:
     * for a given input file is the correct length and that if the input file
     * is corrupted (missing nodes) then an exception is thrown.
     */
-   void TestNodesDataRead() throw(Exception)
+   void TestNodesDataRead()
    {
        PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d");
 
@@ -82,7 +82,7 @@ public:
     * for a given input file is the correct length and that if the input file
     * is corrupted (missing elements) then an exception is thrown.
     */
-   void TestElementsDataRead() throw(Exception)
+   void TestElementsDataRead()
    {
        PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d");
 
@@ -130,7 +130,7 @@ public:
      * values, checks that no errors are thrown for the remaining nodes and
      * that an error is thrown if we try to call the function too many times.
      */
-    void TestGetNextNode() throw(Exception)
+    void TestGetNextNode()
     {
         PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshWriter/potts_mesh_2d");
 
@@ -155,7 +155,7 @@ public:
                 "Cannot get the next line from node or element file due to incomplete data");
     }
 
-    void TestReadingElementAttributes() throw(Exception)
+    void TestReadingElementAttributes()
     {
         PottsMeshReader<2> mesh_reader("cell_based/test/data/TestPottsMeshReader2d/potts_mesh_with_element_attributes");
 
@@ -191,7 +191,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 0u);
     }
 
-    void TestPottsMeshReader3d() throw(Exception)
+    void TestPottsMeshReader3d()
     {
         PottsMeshReader<3> mesh_reader("cell_based/test/data/TestPottsMeshWriter/potts_mesh_3d");
 
@@ -219,7 +219,7 @@ public:
         TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6)
     }
 
-    void TestOtherExceptions() throw(Exception)
+    void TestOtherExceptions()
     {
         TS_ASSERT_THROWS_THIS(PottsMeshReader<2> mesh_reader("cell_based/test/data/nonexistent_file"),
                 "Could not open data file: cell_based/test/data/nonexistent_file.node");

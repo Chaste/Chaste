@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,7 +69,7 @@ public:
      * change any model parameters around line 90,
      * and give the simulator options around line 95.
      */
-    void TestGenerateSteadyStateCryptArchives() throw (Exception)
+    void TestGenerateSteadyStateCryptArchives()
     {
         std::string output_directory = "SteadyStateCrypt";
 

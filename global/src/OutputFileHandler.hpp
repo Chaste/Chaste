@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef OUTPUTFILEHANDLER_HPP_
 #define OUTPUTFILEHANDLER_HPP_
 
-#include <string>
 #include <fstream>
 #include <ios>
 #include <memory>
+#include <string>
 
 class FileFinder; // Avoid circular includes
 
@@ -124,7 +124,7 @@ public:
      * @return  a managed pointer to the opened file stream.
      */
     out_stream OpenOutputFile(const std::string& rFileName,
-                              std::ios_base::openmode mode=std::ios::out | std::ios::trunc) const;
+                              std::ios_base::openmode mode = std::ios::out | std::ios::trunc) const;
 
     /**
      * This just calls the other OpenOutputFile after concatenating the first three arguments
@@ -134,7 +134,7 @@ public:
      *
      * @param rFileName  the root name of the file to open
      * @param number  the number to append to the root name of the file
-     * @param rFileFormat  the file format
+     * @param rFileFormat  the file format (extension)
      * @param mode  optionally, flags to use when opening the file (defaults are as for
      *         std::ofstream).
      * @return  a managed pointer to the opened file stream.
@@ -142,7 +142,7 @@ public:
     out_stream OpenOutputFile(const std::string& rFileName,
                               unsigned number,
                               const std::string& rFileFormat,
-                              std::ios_base::openmode mode=std::ios::out | std::ios::trunc) const;
+                              std::ios_base::openmode mode = std::ios::out | std::ios::trunc) const;
 
     /**
      * Copy the given file to this output directory.
@@ -165,7 +165,6 @@ public:
     static const std::string SIG_FILE_NAME;
 
 private:
-
     std::string mDirectory; ///< The directory to store output files in (always ends in "/")
 
     /**

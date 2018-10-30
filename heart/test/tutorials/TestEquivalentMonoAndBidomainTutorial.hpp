@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -152,9 +152,9 @@ class TestEquivalentMonoAndBidomainTutorial : public CxxTest::TestSuite
 {
 // Tests should be public...
 public:
-    // Define the test. Note the {{{throw(Exception)}}} - without this exception messages
+    // Define the test. Note the {{{}}} - without this exception messages
     // might not get printed out.
-    void TestCompareMonoAndBidomain() throw(Exception)
+    void TestCompareMonoAndBidomain()
     {
         /* The {{{HeartConfig}}} class is used to set various parameters (see the main ChasteGuides page
          * for information on default parameter values.

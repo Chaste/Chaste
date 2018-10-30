@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem.
      * Test that no exceptions are thrown, and write the results to file.
      */
-    void TestSimpleMonolayer() throw (Exception)
+    void TestSimpleMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -138,7 +138,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a Cylindrical2dNodesOnlyMesh
      * to test periodicity.
      */
-    void TestSimplePeriodicMonolayer() throw (Exception)
+    void TestSimplePeriodicMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -274,7 +274,7 @@ public:
     /**
      * Create a simulation of a NodeBasedCellPopulation with different cell radii.
      */
-    void TestSimpleMonolayerWithDifferentRadii() throw (Exception)
+    void TestSimpleMonolayerWithDifferentRadii()
     {
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
@@ -339,7 +339,7 @@ public:
     /**
      * Create a simulation of a NodeBasedCellPopulation with variable cell radii.
      */
-    void TestSimpleMonolayerWithVariableRadii() throw (Exception)
+    void TestSimpleMonolayerWithVariableRadii()
     {
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
@@ -423,7 +423,7 @@ public:
         }
     }
 
-    void TestSimulationWithBoxes() throw (Exception)
+    void TestSimulationWithBoxes()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -479,7 +479,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem
      * and a CellKiller. Test that no exceptions are thrown, and write the results to file.
      */
-    void TestCellDeath() throw (Exception)
+    void TestCellDeath()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -543,7 +543,7 @@ public:
 
     double mNode3x, mNode4x, mNode3y, mNode4y; // To preserve locations between the below test and test load.
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -600,7 +600,7 @@ public:
     }
 
     // Testing Save()
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenereator does not work in parallel
 
@@ -656,7 +656,7 @@ public:
     }
 
     // Testing Load() (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;    // Cell based archiving doesn't work in parallel.
 
@@ -697,7 +697,7 @@ public:
     /**
      * Create a simulation of a NodeBasedCellPopulation to test movement threshold.
      */
-    void TestMovementThreshold() throw (Exception)
+    void TestMovementThreshold()
     {
         EXIT_IF_PARALLEL;   // This test doesn't work in parallel because only one process will throw.
 
@@ -784,7 +784,7 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem
      * and a CellKiller. Test that the simulation can be archived and loaded after cells have been killed.
      */
-    void TestCellDeathWithArchiving() throw (Exception)
+    void TestCellDeathWithArchiving()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator and archiving do not work in parallel
         {

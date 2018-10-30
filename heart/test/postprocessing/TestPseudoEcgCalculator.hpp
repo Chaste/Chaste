@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ class TestPseudoEcgCalculator : public CxxTest::TestSuite
 
 public:
 
-    void TestCalculator1DLinearGradient() throw (Exception)
+    void TestCalculator1DLinearGradient()
     {
 
         //read in the 1D mesh, from 0 to 1
@@ -179,7 +179,7 @@ public:
 
     }
 
-    void TestCalculator1DParabolic() throw (Exception)
+    void TestCalculator1DParabolic()
     {
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         DistributedTetrahedralMesh<1,1> mesh;
@@ -282,7 +282,7 @@ public:
     /**
      * Test for BidomainWithBath problems.
      */
-    void TestBathEcgCalculations() throw (Exception)
+    void TestBathEcgCalculations()
     {
         HeartConfig::Instance()->SetSimulationDuration(2.0);  //ms - set to 500 to see whole AP trace.
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d_PseudoEcg");

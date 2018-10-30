@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ class Test1D3DLinearEllipticSolver : public CxxTest::TestSuite
 {
 public:
 
-    void TestWithPoissonsEquation1dMeshIn2dSpace() throw (Exception)
+    void TestWithPoissonsEquation1dMeshIn2dSpace()
     {
         const unsigned SPACE_DIM = 2;
         const unsigned ELEMENT_DIM = 1;
@@ -94,7 +94,7 @@ public:
         PetscTools::Destroy(result);
     }
 
-    void TestWithPoissonsEquation1dMeshIn3dSpace() throw (Exception)
+    void TestWithPoissonsEquation1dMeshIn3dSpace()
     {
         const unsigned SPACE_DIM = 3;
         const unsigned ELEMENT_DIM = 1;
@@ -130,7 +130,7 @@ public:
         PetscTools::Destroy(result);
     }
 
-    void TestBranchedPoissonsEquation1dMeshIn3dSpace() throw (Exception)
+    void TestBranchedPoissonsEquation1dMeshIn3dSpace()
     {
         const unsigned SPACE_DIM = 3;
         const unsigned ELEMENT_DIM = 1;

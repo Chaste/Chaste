@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -141,7 +141,7 @@ private:
 public:
 
     // Test construction, accessors and Iterator
-    void TestSmallMeshBasedCellPopulation1d2d3d() throw(Exception)
+    void TestSmallMeshBasedCellPopulation1d2d3d()
     {
         TestSmallMeshBasedCellPopulation<1,1>("mesh/test/data/1D_0_to_1_10_elements");
         TestSmallMeshBasedCellPopulation<2,2>("mesh/test/data/square_4_elements");
@@ -149,14 +149,14 @@ public:
     }
 
     // Test construction, accessors and Iterator
-    void TestSmallMeshBasedCellPopulation2dIn3d() throw(Exception)
+    void TestSmallMeshBasedCellPopulation2dIn3d()
     {
         TestSmallMeshBasedCellPopulation<2,3>("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
         TestSmallMeshBasedCellPopulation<2,3>("mesh/test/data/disk_in_3d");
     }
 
     // Test get centroid
-    void TestGetCentroidOfCellPopulation() throw(Exception)
+    void TestGetCentroidOfCellPopulation()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -1214,7 +1214,7 @@ public:
         }
     }
 
-    void TestGetLocationOfCellCentreAndGetNodeCorrespondingToCellAndGetWidth() throw (Exception)
+    void TestGetLocationOfCellCentreAndGetNodeCorrespondingToCellAndGetWidth()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -1296,7 +1296,7 @@ public:
     }
 
     // This test checks that the cells and nodes are correctly archived.
-    void TestArchivingMeshBasedCellPopulation() throw (Exception)
+    void TestArchivingMeshBasedCellPopulation()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mesh_based_cell_population.arch";
@@ -1477,7 +1477,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.IsMarkedSpring(cell_pair_1_2), false);
     }
 
-    void TestSettingCellAncestors() throw (Exception)
+    void TestSettingCellAncestors()
     {
         // Create a small mesh-based cell population
         std::vector<Node<2>*> nodes;
@@ -1526,7 +1526,7 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 1u);
     }
 
-    void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
+    void TestIsCellAssociatedWithADeletedLocation()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -1561,7 +1561,7 @@ public:
         }
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 

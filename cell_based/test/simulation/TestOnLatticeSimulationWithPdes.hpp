@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -100,7 +100,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 {
   public:
 
-    void TestPottsBasedWithCoarseMesh() throw(Exception)
+    void TestPottsBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -180,7 +180,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
     }
 
-    void TestCaBasedWithoutCoarseMesh() throw(Exception)
+    void TestCaBasedWithoutCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -256,7 +256,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // In this test there are only 9 cells but 100 lattice sites
-    void TestCaBasedWithCellwiseSourceEllipticPde() throw(Exception)
+    void TestCaBasedWithCellwiseSourceEllipticPde()
     {
         EXIT_IF_PARALLEL;
 
@@ -309,7 +309,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // In this test there are only 50 cells but 100 lattice sites
-    void TestCaBasedWithCellwiseSourceEllipticPdeWithTightBoundaries() throw(Exception)
+    void TestCaBasedWithCellwiseSourceEllipticPdeWithTightBoundaries()
     {
         EXIT_IF_PARALLEL;
 
@@ -365,7 +365,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    void TestCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
+    void TestCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid()
     {
         EXIT_IF_PARALLEL;
 
@@ -423,7 +423,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     /*
      * This tests that a sensible error is thrown if the coarse mesh is too small.
      */
-    void TestCaBasedCellsOutsideMesh() throw(Exception)
+    void TestCaBasedCellsOutsideMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -470,7 +470,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Point [6,0] is not in mesh - all elements tested");
     }
 
-    void TestCaBasedWithCoarseMesh() throw(Exception)
+    void TestCaBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -561,7 +561,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    void TestPottsBasedWithCoarseMeshTwoEquations() throw(Exception)
+    void TestPottsBasedWithCoarseMeshTwoEquations()
     {
         EXIT_IF_PARALLEL;
 
@@ -642,7 +642,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
     }
 
     // Under construction: Test growth of a population of cells that consumes nutrient
-    void TestOnLatticeSpheroidWithNutrient() throw(Exception)
+    void TestOnLatticeSpheroidWithNutrient()
     {
         EXIT_IF_PARALLEL;
 
@@ -710,7 +710,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    void TestPdeOutput() throw(Exception)
+    void TestPdeOutput()
     {
         EXIT_IF_PARALLEL;
 

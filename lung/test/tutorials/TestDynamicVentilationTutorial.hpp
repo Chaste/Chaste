@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -139,7 +139,7 @@ class TestDynamicVentilationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestSimulateTidalBreathing() throw (Exception)
+    void TestSimulateTidalBreathing()
     {
         /*
          * !DynamicVentilationProblem is not (yet) parallel.

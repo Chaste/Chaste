@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -179,7 +179,7 @@ public:
      * and the spring system will resemble a parallelogram. However we keep
      * the simulation time at 1.0 in order to keep the test short.
      */
-    void Test2DSpringSystem() throw (Exception)
+    void Test2DSpringSystem()
     {
         EXIT_IF_PARALLEL;    // Writing mesh based in parallel causes duplicated results.
 
@@ -241,7 +241,7 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt2DSpringsResults/results.vizelements").CompareFiles();
     }
 
-    void TestWithMultipleCellKillers() throw (Exception)
+    void TestWithMultipleCellKillers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -315,7 +315,7 @@ public:
        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), num_cells-2u);
     }
 
-    void TestUpdatePositions() throw (Exception)
+    void TestUpdatePositions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -397,7 +397,7 @@ public:
         }
     }
 
-    void Test2DCylindrical() throw (Exception)
+    void Test2DCylindrical()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -463,7 +463,7 @@ public:
         CellBasedEventHandler::Reset(); // otherwise event handler left in bad state after throw
     }
 
-    void Test2DCylindricalMultipleDivisions() throw (Exception)
+    void Test2DCylindricalMultipleDivisions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -556,7 +556,7 @@ public:
      *
      * Note - if the previous test is changed we need to update the file this test refers to.
      */
-    void TestVisualizerOutput() throw (Exception)
+    void TestVisualizerOutput()
     {
         EXIT_IF_PARALLEL;
 
@@ -582,7 +582,7 @@ public:
      * But at least it uses Wnt cell cycle and runs reasonably quickly...
      * For a better test with more randomly distributed cell ages see the Nightly test pack.
      */
-    void TestWithWntDependentCells() throw (Exception)
+    void TestWithWntDependentCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -640,7 +640,7 @@ public:
     }
 
     // A better check that the loaded mesh is the same as that saved
-    void TestMeshSurvivesSaveLoad() throw (Exception)
+    void TestMeshSurvivesSaveLoad()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -705,7 +705,7 @@ public:
     }
 
     // A check that save and load works when a Voronoi tessellation is involved
-    void TestMeshSurvivesSaveLoadWithVoronoiTessellation() throw (Exception)
+    void TestMeshSurvivesSaveLoadWithVoronoiTessellation()
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
@@ -764,7 +764,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestStandardResultForArchivingTestsBelow() throw (Exception)
+    void TestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -839,7 +839,7 @@ public:
     }
 
     // Testing Save
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -896,7 +896,7 @@ public:
     }
 
     // Testing Load (based on previous two tests)
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
 
@@ -964,7 +964,7 @@ public:
      * to be 'mature' cells which won't shrink together.
      * Limited this by using only four cells of minimum age.
      */
-    void TestWntCellsCannotMoveAcrossYEqualsZero() throw (Exception)
+    void TestWntCellsCannotMoveAcrossYEqualsZero()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1074,7 +1074,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCellIdOutput() throw (Exception)
+    void TestCellIdOutput()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1135,7 +1135,7 @@ public:
 
     // This is a strange test -- all cells divide within a quick time, it gives
     // good testing of the periodic boundaries though... [comment no longer valid?]
-    void TestWithTysonNovakCells() throw (Exception)
+    void TestWithTysonNovakCells()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1199,7 +1199,7 @@ public:
         TS_ASSERT_EQUALS(number_of_nodes, 123u);
     }
 
-    void TestAddCellKiller() throw (Exception)
+    void TestAddCellKiller()
     {
         EXIT_IF_PARALLEL;
 
@@ -1238,7 +1238,7 @@ public:
         TS_ASSERT_EQUALS(num_deaths, 11u);
     }
 
-    void TestCalculateCellDivisionVectorConfMesh() throw (Exception)
+    void TestCalculateCellDivisionVectorConfMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1280,7 +1280,7 @@ public:
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), conf_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    void TestCalculateCellDivisionVectorConfMeshStemCell() throw (Exception)
+    void TestCalculateCellDivisionVectorConfMeshStemCell()
     {
         EXIT_IF_PARALLEL;
 
@@ -1325,7 +1325,7 @@ public:
        }
     }
 
-    void TestCalculateCellDivisionVectorCylindricalMesh() throw (Exception)
+    void TestCalculateCellDivisionVectorCylindricalMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1360,7 +1360,7 @@ public:
         TS_ASSERT_DELTA(norm_2(parent_to_daughter), cyl_crypt.GetMeinekeDivisionSeparation(), 1e-7);
     }
 
-    void TestCalculateCellDivisionVectorCylindricalMeshStemCell() throw (Exception)
+    void TestCalculateCellDivisionVectorCylindricalMeshStemCell()
     {
         EXIT_IF_PARALLEL;
 
@@ -1399,7 +1399,7 @@ public:
     }
 
     // Short test which sets mNoBirth for coverage
-    void TestNoBirth() throw (Exception)
+    void TestNoBirth()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1457,7 +1457,7 @@ public:
     }
 
     // Test death on a non-periodic mesh. Note that birth does occur too.
-    void TestRandomDeathOnNonPeriodicCrypt() throw (Exception)
+    void TestRandomDeathOnNonPeriodicCrypt()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1760,7 +1760,7 @@ public:
         delete p_simulator;
     }
 
-    void TestWriteBetaCatenin() throw (Exception)
+    void TestWriteBetaCatenin()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1816,7 +1816,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCryptSimulation2DParameterOutput() throw (Exception)
+    void TestCryptSimulation2DParameterOutput()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -1862,7 +1862,7 @@ public:
         ///\todo check output of simulator.OutputSimulationSetup();
     }
 
-    void TestAncestorCryptSimulations() throw (Exception)
+    void TestAncestorCryptSimulations()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ private:
     bool expected_fail_result;
 public:
 
-    void TestBasicFunctionality() throw(Exception)
+    void TestBasicFunctionality()
     {
         CalledCollectively = true;
         SuppressOutput = true;
@@ -73,7 +73,7 @@ public:
         TS_ASSERT_EQUALS(different_data.CompareFiles(1e-9, 0, 1e-9, false), expected_fail_result);
     }
 
-    void TestIgnoreHeader() throw(Exception)
+    void TestIgnoreHeader()
     {
         std::string boost_33_file = "./global/test/data/fake_archive_boost_1_33.txt";
         std::string boost_34_file = "./global/test/data/fake_archive_boost_1_34.txt";
@@ -84,7 +84,7 @@ public:
         TS_ASSERT_EQUALS(same_data.CompareFiles(1e-9, 1, 1e-9, false), expected_fail_result);
     }
 
-    void TestIgnoreProvenanceComment() throw(Exception)
+    void TestIgnoreProvenanceComment()
     {
         std::string v1_file = "./global/test/data/fake_v_day_one.txt";
         std::string v2_file = "./global/test/data/fake_v_day_two.txt";
@@ -95,7 +95,7 @@ public:
         TS_ASSERT(same_data.CompareFiles(5e-3)); // Difference after comment is below this tolerance
     }
 
-    void TestRelativeDifference() throw(Exception)
+    void TestRelativeDifference()
     {
         std::string base_file = "./global/test/data/random_data.txt";
         std::string noised_file = "./global/test/data/same_random_data_with_1e-4_noise.txt";

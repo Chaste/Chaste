@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSimpleCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
-    void TestNoCellCycleModel() throw(Exception)
+    void TestNoCellCycleModel()
     {
         // Test constructor
         TS_ASSERT_THROWS_NOTHING(NoCellCycleModel cell_cycle_model);
@@ -106,7 +106,7 @@ public:
         }
     }
 
-    void TestFixedSequenceCellCycleModelMethods() throw(Exception)
+    void TestFixedSequenceCellCycleModelMethods()
     {
         CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
 
@@ -337,7 +337,7 @@ public:
         CellCycleTimesGenerator::Destroy();
     }
 
-    void TestBernoulliTrialCellCycleModel() throw(Exception)
+    void TestBernoulliTrialCellCycleModel()
     {
         TS_ASSERT_THROWS_NOTHING(BernoulliTrialCellCycleModel cell_model3);
 
@@ -399,7 +399,7 @@ public:
         TS_ASSERT_DELTA(p_transit_model2->GetAverageStemCellCycleTime(), 2.0, 1e-9);
     }
 
-    void TestFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestFixedG1GenerationalCellCycleModel()
     {
         TS_ASSERT_THROWS_NOTHING(FixedG1GenerationalCellCycleModel model3);
 
@@ -507,7 +507,7 @@ public:
         TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 9.4, 1e-9);
     }
 
-    void TestUniformG1GenerationalCellCycleModel() throw(Exception)
+    void TestUniformG1GenerationalCellCycleModel()
     {
         TS_ASSERT_THROWS_NOTHING(UniformG1GenerationalCellCycleModel cell_model3);
 
@@ -572,7 +572,7 @@ public:
         }
     }
 
-    void TestUniformCellCycleModel() throw(Exception)
+    void TestUniformCellCycleModel()
     {
         TS_ASSERT_THROWS_NOTHING(UniformCellCycleModel cell_model3);
 
@@ -641,7 +641,7 @@ public:
         }
     }
 
-    void TestGammaG1CellCycleModel() throw(Exception)
+    void TestGammaG1CellCycleModel()
     {
         TS_ASSERT_THROWS_NOTHING(GammaG1CellCycleModel cell_model);
 
@@ -706,7 +706,7 @@ public:
         TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
-    void TestExponentialG1GenerationalCellCycleModel() throw(Exception)
+    void TestExponentialG1GenerationalCellCycleModel()
     {
         // Make sure we can generate this model
         TS_ASSERT_THROWS_NOTHING(ExponentialG1GenerationalCellCycleModel cell_model);
@@ -800,7 +800,7 @@ public:
         TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
-    void TestSimpleOxygenBasedCellCycleModel() throw(Exception)
+    void TestSimpleOxygenBasedCellCycleModel()
     {
         // Check that mCurrentHypoxiaOnsetTime and mCurrentHypoxicDuration are updated correctly
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -937,7 +937,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model->GetCurrentHypoxicDuration(), 2.04);
     }
 
-    void TestContactInhibitionCellCycleModel() throw(Exception)
+    void TestContactInhibitionCellCycleModel()
     {
         // Check that mQuiescentVolumeFraction and mEquilibriumVolume are updated correctly
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -1052,7 +1052,7 @@ public:
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
-    void TestStochasticOxygenBasedCellCycleModel() throw(Exception)
+    void TestStochasticOxygenBasedCellCycleModel()
     {
         // Check that mCurrentHypoxiaOnsetTime and mCurrentHypoxicDuration are updated correctly
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -1214,7 +1214,7 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
-    void TestArchiveNoCellCycleModel() throw(Exception)
+    void TestArchiveNoCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NoCellCycleModel.arch";
@@ -1260,7 +1260,7 @@ public:
         }
     }
 
-    void TestArchiveBernoulliTrialCellCycleModel() throw(Exception)
+    void TestArchiveBernoulliTrialCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BernoulliTrialCellCycleModel.arch";
@@ -1309,7 +1309,7 @@ public:
         }
     }
 
-    void TestArchiveFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestArchiveFixedG1GenerationalCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "FixedG1GenerationalCellCycleModel.arch";
@@ -1554,7 +1554,7 @@ public:
         }
     }
 
-    void TestArchiveSimpleOxygenBasedCellCycleModel() throw(Exception)
+    void TestArchiveSimpleOxygenBasedCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "SimpleOxygenBasedCellCycleModel.arch";
@@ -1602,7 +1602,7 @@ public:
         }
     }
 
-    void TestArchiveStochasticOxygenBasedCellCycleModel() throw(Exception)
+    void TestArchiveStochasticOxygenBasedCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StochasticOxygenBasedCellCycleModel.arch";
@@ -1662,7 +1662,7 @@ public:
         }
     }
 
-    void TestArchiveContactInhibitionCellCycleModel() throw(Exception)
+    void TestArchiveContactInhibitionCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ContactInhibitionCellCycleModel.arch";

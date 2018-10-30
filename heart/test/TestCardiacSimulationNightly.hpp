@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacSimulationNightly : public CxxTest::TestSuite
 {
 public:
-    void TestCardiacSimulationBasicBidomain() throw(Exception)
+    void TestCardiacSimulationBasicBidomain()
     {
         // run a bidomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/base_bidomain.xml");
@@ -57,7 +57,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-3));
     }
 
-    void TestCardiacSimulationBasicMonodomain() throw(Exception)
+    void TestCardiacSimulationBasicMonodomain()
     {
         // run a monodomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/base_monodomain.xml");
@@ -68,7 +68,7 @@ public:
                                                  foldername, "SimulationResults", true, 1e-3));
     }
 
-    void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
+    void TestCardiacSimulationPostprocessMonodomain()
     {
         // run a monodomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/postprocess_monodomain.xml");
@@ -77,9 +77,18 @@ public:
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "postprocess_monodomain_results", false,
                                                  foldername, "SimulationResults", true, 1e-3));
+        {
+            // look for the existence of post-processing files
+            TS_ASSERT(FileFinder(foldername + "/output/Apd_90_minus_30_Map.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode10.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode20.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/MaxUpstrokeVelocityMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/UpstrokeTimeMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput).Exists());
+        }
     }
 
-    void TestCardiacSimulationSaveBidomain() throw(Exception)
+    void TestCardiacSimulationSaveBidomain()
     {
         // run a bidomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/save_bidomain.xml");
@@ -94,7 +103,7 @@ public:
         TS_ASSERT(file.Exists());
     }
 
-    void TestCardiacSimulationSaveMonodomain() throw(Exception)
+    void TestCardiacSimulationSaveMonodomain()
     {
         // run a monodomain simulation, Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/save_monodomain.xml");

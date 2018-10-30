@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -102,11 +102,17 @@ c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEM
 
     c_vector<double, 3*ELEMENT_DIM> ret;
 
-    for (unsigned i=0; i<3*ELEMENT_DIM; i = i + 3)
+//    for (unsigned i=0; i<3*ELEMENT_DIM; i = i + 3)
+//    {
+//        ret(i) = rPhi(i)*sigma_i_times_grad_phi_i_first_cell_dot_n;
+//        ret(i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;
+//        ret(i+2) = rPhi(i)*(sigma_i_times_grad_phi_i_first_cell_dot_n + sigma_i_times_grad_phi_i_second_cell_dot_n + sigma_e_times_grad_phi_e_dot_n);
+//    }
+    for (unsigned i=0; i<ELEMENT_DIM; i++)
     {
-        ret(i) = rPhi(i)*sigma_i_times_grad_phi_i_first_cell_dot_n;
-        ret(i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;
-        ret(i+2) = rPhi(i)*(sigma_i_times_grad_phi_i_first_cell_dot_n + sigma_i_times_grad_phi_i_second_cell_dot_n + sigma_e_times_grad_phi_e_dot_n);
+        ret(3*i) = rPhi(i)*sigma_i_times_grad_phi_i_first_cell_dot_n;
+        ret(3*i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;
+        ret(3*i+2) = rPhi(i)*(sigma_i_times_grad_phi_i_first_cell_dot_n + sigma_i_times_grad_phi_i_second_cell_dot_n + sigma_e_times_grad_phi_e_dot_n);
     }
     return ret;
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -135,7 +135,7 @@ public:
     bool IsPathSet() const;
 
     /**
-     * @return true if we exist.
+     * @return true if we exist (as either a file or a directory).
      */
     bool Exists() const;
 
@@ -252,7 +252,7 @@ public:
      * a subset of shell-style glob syntax.  A '?' anywhere in the string matches any single
      * character at that position.  A '*' may be used at the start or end of the string to
      * match any number of leading or trailing characters, respectively.
-     * Hidden files (names starting with a '.') will never be matched.
+     * Hidden files (names starting with a '.') will never be matched. Returns a sorted alphabetical list.
      *
      * @param rPattern  the pattern to match names against
      */
@@ -292,6 +292,14 @@ public:
      */
     static void StopFaking();
 
+    /**
+     * Provide a sort operator to get a logical ordering from FindMatches
+     * it orders by alphabetical (or ASCII really).
+     * @param otherFinder  Another FileFinder
+     * @return Whether this FileFinder is earlier in the alphabetical ordering than otherFinder
+     * */
+    bool operator<(const FileFinder& otherFinder) const;
+
 private:
     /** The absolute path to our file. */
     std::string mAbsPath;
@@ -313,7 +321,7 @@ private:
      *
      * @param dangerous  whether we are doing a dangerous remove.
      */
-    void PrivateRemove(bool dangerous=false) const;
+    void PrivateRemove(bool dangerous = false) const;
 };
 
 #endif /*FILEFINDER_HPP_*/

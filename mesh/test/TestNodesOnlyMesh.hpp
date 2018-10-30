@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -165,7 +165,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetMaximumInteractionDistance(), 5.0, 1e-4);
     }
 
-    void TestCalculateBoundingBox() throw (Exception)
+    void TestCalculateBoundingBox()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false, -1.0, 0.0, 0.0));
@@ -201,7 +201,7 @@ public:
         }
     }
 
-    void TestSetInitialBoxCollection() throw (Exception)
+    void TestSetInitialBoxCollection()
     {
         double cut_off = 1.0;
 
@@ -239,7 +239,7 @@ public:
         }
     }
 
-    void TestConstuctingAndEnlargingInitialBoxCollection() throw (Exception)
+    void TestConstuctingAndEnlargingInitialBoxCollection()
     {
         double cut_off = 0.5;
 
@@ -290,7 +290,7 @@ public:
         }
     }
 
-    void TestBoxCollectionSizeAndSwelling() throw (Exception)
+    void TestBoxCollectionSizeAndSwelling()
     {
         double cut_off = 0.5;
 
@@ -334,7 +334,7 @@ public:
         }
     }
 
-    void TestMovingNodesInBoxCollection() throw (Exception)
+    void TestMovingNodesInBoxCollection()
     {
         EXIT_IF_PARALLEL;    // This wont work until nodes can be re-assigned on re-mesh. #2260
 
@@ -606,7 +606,7 @@ public:
         }
     }
 
-    void TestAddNode() throw (Exception)
+    void TestAddNode()
     {
         std::vector<Node<2>*> nodes;
         Node<2> node0(0, true, 0.0, 0.0);
@@ -646,7 +646,7 @@ public:
         }
     }
 
-    void TestDeleteNodesAndRemesh() throw (Exception)
+    void TestDeleteNodesAndRemesh()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -732,7 +732,7 @@ public:
         }
     }
 
-    void TestCleanDeleteAndAddNode()    throw(Exception)
+    void TestCleanDeleteAndAddNode()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -769,7 +769,7 @@ public:
         }
     }
 
-    void TestHaloNodes()    throw (Exception)
+    void TestHaloNodes()
     {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -792,7 +792,7 @@ public:
         delete nodes[1];
     }
 
-    void TestGetNodesOutsideLocalDomain()   throw (Exception)
+    void TestGetNodesOutsideLocalDomain()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -840,7 +840,7 @@ public:
         }
     }
 
-    void TestAddAndGetHaloNodes()    throw (Exception)
+    void TestAddAndGetHaloNodes()
     {
         std::vector<Node<2>* > nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
@@ -866,7 +866,7 @@ public:
         delete nodes[0];
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.
 
@@ -956,7 +956,7 @@ public:
         }
     }
 
-    void TestArchiveNodesOnlyMeshWithNodeAttributes() throw (Exception)
+    void TestArchiveNodesOnlyMeshWithNodeAttributes()
     {
         EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.
 
@@ -1016,7 +1016,7 @@ public:
         }
     }
 
-    void TestLoadBalanceMesh()  throw (Exception)
+    void TestLoadBalanceMesh()
     {
         // Test designed for np=2
         if (PetscTools::GetNumProcs() == 2)

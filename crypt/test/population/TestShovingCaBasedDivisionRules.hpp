@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -193,7 +193,7 @@ public:
             "Cells reaching the boundary of the domain. Make the Potts mesh larger.");
     }
 
-    void TestArchivingShovingCaBasedDivisionRule() throw (Exception)
+    void TestArchivingShovingCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -383,7 +383,7 @@ public:
             "Cells reaching the top of the crypt need to increase length to at least double the sloughing height.");
     }
 
-    void TestArchivingCryptShovingCaBasedDivisionRule() throw (Exception)
+    void TestArchivingCryptShovingCaBasedDivisionRule()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

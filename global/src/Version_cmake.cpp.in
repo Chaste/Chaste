@@ -74,7 +74,7 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
     return ${Chaste_VERSION_MINOR}u;
 }
 
-unsigned ChasteBuildInfo::GetRevisionNumber()
+unsigned long long ChasteBuildInfo::GetRevisionNumber()
 {
     return 0x${Chaste_revision};
 }
@@ -114,17 +114,17 @@ const char* ChasteBuildInfo::GetBuildInformation()
 
 const char* ChasteBuildInfo::GetCompilerType()
 {
-	return "${CMAKE_CXX_COMPILER}";
+    return "${CMAKE_CXX_COMPILER}";
 }
 
 const char* ChasteBuildInfo::GetCompilerVersion()
 {
-	return "${CMAKE_CXX_COMPILER_VERSION}";
+    return "${CMAKE_CXX_COMPILER_VERSION}";
 }
 
 const char* ChasteBuildInfo::GetCompilerFlags()
 {
-	return "${CMAKE_CXX_FLAGS}";
+    return "${CMAKE_CXX_FLAGS}";
 }
 
 const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()
@@ -180,5 +180,5 @@ std::string ChasteBuildInfo::GetProvenanceString()
 
 const char* ChasteBuildInfo::GetXsdVersion()
 {
-	return "${xsd_version}";
+    return "${xsd_version}";
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ public:
      * Wnt concentration linearly to zero over the time interval 1<t<2, and the
      * cell doesn't divide.
      */
-    void TestWntCellCycleModelForVaryingWntStimulus() throw(Exception)
+    void TestWntCellCycleModelForVaryingWntStimulus()
     {
         // Set up Wnt concentration
         double wnt_level = 1.0;
@@ -214,7 +214,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisOne() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisOne()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -449,7 +449,7 @@ public:
         WntConcentration<3>::Destroy();
     }
 
-    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisTwo() throw(Exception)
+    void TestVanLeeuwen2009WntSwatCellCycleModelHypothesisTwo()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -519,7 +519,7 @@ public:
         WntConcentration<3>::Destroy();
     }
 
-    void TestWntCellCycleModelForAPCSingleHit() throw(Exception)
+    void TestWntCellCycleModelForAPCSingleHit()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -587,7 +587,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntCellCycleModelForBetaCatSingleHit() throw(Exception)
+    void TestWntCellCycleModelForBetaCatSingleHit()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -651,7 +651,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntCellCycleModelForAPCDoubleHit() throw(Exception)
+    void TestWntCellCycleModelForAPCDoubleHit()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -716,7 +716,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestWntCellCycleModelForConstantWntStimulusHealthyCell() throw(Exception)
+    void TestWntCellCycleModelForConstantWntStimulusHealthyCell()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -780,7 +780,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestStochasticWntCellCycleModel() throw (Exception)
+    void TestStochasticWntCellCycleModel()
     {
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();

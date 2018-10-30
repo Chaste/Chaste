@@ -1,7 +1,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -967,6 +967,11 @@ class CellMLTranslator(object):
         Generate a dictionary mapping tables to their index variables.
         """
         doc = self.doc
+        # Remove xml:base to work around Amara bug!
+        for elt in [doc, doc.model]:
+            if u'base' in getattr(elt, 'xml_attributes', {}):
+                print 'Delete base from', repr(elt)
+                del elt.xml_attributes[u'base']
         # Get list of suitable expressions
         doc.lookup_tables = doc.xml_xpath(u"//*[@lut:possible='yes']")
         doc.lookup_tables.sort(cmp=element_path_cmp)
@@ -3713,7 +3718,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
     def output_jacobian(self):
         """Output an analytic Jacobian for CVODE to use."""
         self.output_method_start('EvaluateAnalyticJacobian',
-                                 ['long int N', self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                 [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
                                   self.TYPE_VECTOR + 'rY', self.TYPE_VECTOR + 'rDY',
                                   'CHASTE_CVODE_DENSE_MATRIX rJacobian',
                                   self.TYPE_VECTOR + 'rTmp1', self.TYPE_VECTOR + 'rTmp2', self.TYPE_VECTOR + 'rTmp3'],
@@ -3744,7 +3749,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
                 entries.append((j, i, var_i is self.v_variable, entry))
         entries.sort()
         for j, i, is_V, entry in entries:
-            self.writeln('DENSE_ELEM(rJacobian, ', i, ', ', j, ') = ', self.code_name(self.config.dt_variable), ' * (', nl=False)
+            self.writeln('IJth(rJacobian, ', i, ', ', j, ') = ', self.code_name(self.config.dt_variable), ' * (', nl=False)
             paren = False
             if is_V:
                 self.write('mSetVoltageDerivativeToZero ? 0.0 : ')
@@ -3757,11 +3762,11 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
 #        self.open_block()
 #        self.writeln('for (long int i=0; i<N; i++)')
 #        self.open_block()
-#        self.writeln('if (std::isnan(DENSE_ELEM(rJacobian, i, j)))')
+#        self.writeln('if (std::isnan(IJth(rJacobian, i, j)))')
 #        self.open_block()
 #        self.writeln('std::cerr << "NAN at J(" << i << "," << j << ")" << DumpState("", rY);')
 #        self.close_block(blank_line=False)
-#        self.writeln('EXCEPT_IF_NOT(!std::isnan(DENSE_ELEM(rJacobian, i, j)));')
+#        self.writeln('EXCEPT_IF_NOT(!std::isnan(IJth(rJacobian, i, j)));')
 #        self.close_block(blank_line=False)
 #        self.close_block(blank_line=False)
 #        self.writeln('//CheckAnalyticJacobian(', self.code_name(self.free_vars[0]),

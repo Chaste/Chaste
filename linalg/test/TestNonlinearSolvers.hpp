@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ PetscErrorCode ComputeTestJacobian3d(SNES snes,Vec input,Mat* pJacobian ,Mat* pP
 class TestNonlinearSolvers : public CxxTest::TestSuite
 {
 public:
-    void TestNonlinearProblemException() throw (Exception)
+    void TestNonlinearProblemException()
     {
         SimpleNewtonNonlinearSolver solver_newton;
 
@@ -76,7 +76,7 @@ public:
         PetscTools::Destroy(initial_guess);
     }
 
-    void TestOn2dNonlinearProblem() throw (Exception)
+    void TestOn2dNonlinearProblem()
     {
         SimplePetscNonlinearSolver solver_petsc;
         SimpleNewtonNonlinearSolver solver_newton;
@@ -116,7 +116,7 @@ public:
         PetscTools::Destroy(answer_newton);
     }
 
-    void TestOn3dNonlinearProblem() throw (Exception)
+    void TestOn3dNonlinearProblem()
     {
         SimplePetscNonlinearSolver solver_petsc;
         SimpleNewtonNonlinearSolver solver_newton;

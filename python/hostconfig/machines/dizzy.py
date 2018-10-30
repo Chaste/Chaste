@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,8 +85,12 @@ try:
 except:
     xerces3 = False
 if xerces3:
-    # Xerces 3.1
-    xerces_lib = 'xerces-c-3.1'
+    if ubuntu_ver >= [18,04]:
+        # Xerces 3.2
+        xerces_lib = 'xerces-c-3.2'
+    else:
+        # Xerces 3.1
+        xerces_lib = 'xerces-c-3.1'
 else:
     # Xerces 2.8
     xerces_lib = 'xerces-c'
@@ -302,9 +306,20 @@ def Configure(prefs, build):
         vtk_62_include_path = '/usr/include/vtk-6.2'
         if (os.path.isdir(vtk_62_include_path)):
             default_vtk_version = '6.2'                       # (2) System-wide 6.2 (Ubuntu 16.04) 
+        vtk_71_include_path = '/usr/include/vtk-7.1'
+        if (os.path.isdir(vtk_71_include_path)):
+            default_vtk_version = '7.1'                       # Ubuntu 18,04
         prefs['vtk'] = prefs.get('vtk', default_vtk_version)  # (1) User's choice
         # Assume that the system wide version of VTK is 6.2 (on 16.04) and use this in preference
-        if prefs['vtk'] == '6.2':
+        if prefs['vtk'] == '7.1':
+            if (not os.path.isdir(vtk_71_include_path)):
+                raise ValueError("No system headers for VTK 7 found at "+vtk_71_include_path)
+            other_includepaths.append(vtk_71_include_path)
+            vtk_libs = ['CommonCore','CommonDataModel', 'IOParallelXML', 'IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources']
+            vtk_libs = map(lambda l: 'vtk' + l + '-7.1', vtk_libs)
+            other_libraries.extend(vtk_libs)
+        # Assume that the system wide version of VTK is 6.2 (on 16.04) and use this in preference
+        elif prefs['vtk'] == '6.2':
             if (not os.path.isdir(vtk_62_include_path)):
                 raise ValueError("No system headers for VTK 6 found at "+vtk_62_include_path)
             other_includepaths.append(vtk_62_include_path)

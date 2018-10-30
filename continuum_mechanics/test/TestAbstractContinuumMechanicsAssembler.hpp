@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -227,7 +227,7 @@ public:
 class TestAbstractContinuumMechanicsAssembler : public CxxTest::TestSuite
 {
 public:
-    void TestAssemblers1d() throw (Exception)
+    void TestAssemblers1d()
     {
         double h=0.1;
         QuadraticMesh<1> mesh(h,h); // require a one-element mesh
@@ -311,7 +311,7 @@ public:
     }
 
     // same to main part of TestAssemblers1d except 2d
-    void TestAssemblers2d() throw (Exception)
+    void TestAssemblers2d()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2d_single_triangular_element_quadratic",2,2,false);
@@ -385,7 +385,7 @@ public:
     }
 
     // same as main part of TestAssemblers1d except 3d
-    void TestAssemblers3d() throw (Exception)
+    void TestAssemblers3d()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -470,7 +470,7 @@ public:
         PetscTools::Destroy(mat);
     }
 
-    void TestWithMassMatrixInPressurePressureBlock() throw(Exception)
+    void TestWithMassMatrixInPressurePressureBlock()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
         TetrahedralMesh<2,2> linear_mesh;
@@ -534,7 +534,7 @@ public:
         PetscTools::Destroy(mat2);
     }
 
-    void TestAbstractContinuumMechanicsAssemblerMeshType() throw(Exception)
+    void TestAbstractContinuumMechanicsAssemblerMeshType()
     {
         TetrahedralMesh<2,2> mesh;
         TS_ASSERT_THROWS_CONTAINS(MyMatrixAssembler<2> assembler2d(&mesh),

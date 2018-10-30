@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -128,7 +128,7 @@ public:
 class TestCableTestProblem : public CxxTest::TestSuite
 {
 public:
-    void TestSolvingTestProblem() throw(Exception)
+    void TestSolvingTestProblem()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder");
         TrianglesMeshReader<3,3> reader(mesh_base);

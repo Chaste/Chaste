@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ private :
     }
 public:
 
-    void TestWith1dData(void) throw (Exception)
+    void TestWith1dData(void)
     {
         // firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestVoltageInterpolater1d,
         // as that is where the interpolater reads and writes to
@@ -132,7 +132,7 @@ public:
     }
 
     // the data in this test came from TestCardiacElectroMechanicsProblem::TestImplicitNhs2dOneMechanicsElement()
-    void TestWith2dData(void) throw (Exception)
+    void TestWith2dData(void)
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestVoltageInterpolater2d,
         // as that is where the interpolater reads and writes to
@@ -177,7 +177,7 @@ public:
         PetscTools::Destroy(voltage_fine);
     }
 
-    void TestWithMultipleVariables1D() throw (Exception)
+    void TestWithMultipleVariables1D()
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestWithMultipleVariables1D,
         // as that is where the interpolater reads and writes to

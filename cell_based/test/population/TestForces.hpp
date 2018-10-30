@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,7 @@ class TestForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestGeneralisedLinearSpringForceMethods() throw (Exception)
+    void TestGeneralisedLinearSpringForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -201,7 +201,7 @@ public:
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
     }
 
-    void TestGeneralisedLinearSpringForceCalculationIn1d() throw (Exception)
+    void TestGeneralisedLinearSpringForceCalculationIn1d()
     {
         // Create a 1D mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -300,7 +300,7 @@ public:
         TS_ASSERT_DELTA(cell_population2.GetNode(2)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness(), 1e-6);
     }
 
-    void TestGeneralisedLinearSpringForceCalculationIn3d() throw (Exception)
+    void TestGeneralisedLinearSpringForceCalculationIn3d()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
@@ -413,7 +413,7 @@ public:
         }
     }
 
-    void TestDifferentialAdhesionGeneralisedLinearSpringForceMethods() throw (Exception)
+    void TestDifferentialAdhesionGeneralisedLinearSpringForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -673,7 +673,7 @@ public:
         }
     }
 
-    void TestGeneralisedLinearSpringForceArchiving() throw (Exception)
+    void TestGeneralisedLinearSpringForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -715,7 +715,7 @@ public:
         }
     }
 
-    void TestDifferentialAdhesionGeneralisedLinearSpringForceArchiving() throw (Exception)
+    void TestDifferentialAdhesionGeneralisedLinearSpringForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -763,7 +763,7 @@ public:
         }
     }
 
-    void TestChemotacticForceMethods() throw (Exception)
+    void TestChemotacticForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -822,7 +822,7 @@ public:
         }
     }
 
-    void TestChemotacticForceArchiving() throw (Exception)
+    void TestChemotacticForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -859,7 +859,7 @@ public:
         }
     }
 
-    void TestRepulsionForceMethods() throw (Exception)
+    void TestRepulsionForceMethods()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -960,7 +960,7 @@ public:
         }
     }
 
-    void TestRepulsionForceArchiving() throw (Exception)
+    void TestRepulsionForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1002,7 +1002,7 @@ public:
         }
     }
 
-    void TestNagaiHondaForceMethods() throw (Exception)
+    void TestNagaiHondaForceMethods()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -1140,7 +1140,7 @@ public:
         }
     }
 
-    void TestNagaiHondaForceArchiving() throw (Exception)
+    void TestNagaiHondaForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1184,7 +1184,7 @@ public:
         }
     }
 
-    void TestNagaiHondaDifferentialAdhesionForceMethods() throw (Exception)
+    void TestNagaiHondaDifferentialAdhesionForceMethods()
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -1253,7 +1253,7 @@ public:
         TS_ASSERT_DELTA(adhesion_parameter_nodes_10_14, 2.8, 1e-6);
     }
 
-    void TestNagaiHondaDifferentialAdhesionForceArchiving() throw (Exception)
+    void TestNagaiHondaDifferentialAdhesionForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1295,7 +1295,7 @@ public:
         }
     }
 
-    void TestWelikyOsterForceMethods() throw (Exception)
+    void TestWelikyOsterForceMethods()
     {
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
@@ -1364,7 +1364,7 @@ public:
         }
     }
 
-    void TestWelikyOsterForceArchiving() throw (Exception)
+    void TestWelikyOsterForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1404,7 +1404,7 @@ public:
         }
     }
 
-    void TestFarhadifarForceMethods() throw (Exception)
+    void TestFarhadifarForceMethods()
     {
         // This is the same test as for other vertex based forces. It comprises a sanity check that forces point in the right direction.
         // Construct a 2D vertex mesh consisting of a single element
@@ -1542,7 +1542,7 @@ public:
         }
     }
 
-    void TestFarhadifarForceTerms() throw(Exception)
+    void TestFarhadifarForceTerms()
        {
         /**
          * Here we test that the forces are applied correctly to individual nodes.
@@ -1616,7 +1616,7 @@ public:
         TS_ASSERT_DELTA(applied_force_1[1], 6.76, 1e-10);
     }
 
-    void TestFarhadifarForceInSimulation() throw(Exception)
+    void TestFarhadifarForceInSimulation()
     {
         /**
          * This is the same test as above, just that now we don't check that the applied forces are calculated correctly,
@@ -1709,7 +1709,7 @@ public:
 
     }
 
-    void TestFarhadifarForceArchiving() throw (Exception)
+    void TestFarhadifarForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
@@ -1755,7 +1755,7 @@ public:
         }
     }
 
-    void TestCentreBasedForcesWithVertexCellPopulation() throw (Exception)
+    void TestCentreBasedForcesWithVertexCellPopulation()
     {
         // Construct simple vertex mesh
         std::vector<Node<2>*> nodes;
@@ -1796,7 +1796,7 @@ public:
                  "RepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
-    void TestIncorrectForcesWithNodeBasedCellPopulation() throw (Exception)
+    void TestIncorrectForcesWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
@@ -2132,7 +2132,7 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
-    void TestDiffusionForceArchiving() throw (Exception)
+    void TestDiffusionForceArchiving()
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);

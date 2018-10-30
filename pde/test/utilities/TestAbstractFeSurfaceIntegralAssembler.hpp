@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,7 +71,7 @@ class TestAbstractFeSurfaceIntegralAssembler : public CxxTest::TestSuite
 {
 public:
     // Test surface element intregral additions in 1d
-    void TestSurfaceElementContributions() throw(Exception)
+    void TestSurfaceElementContributions()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;
@@ -115,7 +115,7 @@ public:
 
 
     // Test surface element intregral additions in 2d
-    void TestSurfaceElementContributions2d() throw(Exception)
+    void TestSurfaceElementContributions2d()
     {
         // two element mesh
         TetrahedralMesh<2,2> mesh;

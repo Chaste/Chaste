@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -213,7 +213,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestAttributes() throw (Exception)
+    void TestAttributes()
     {
 #ifdef CHASTE_CVODE
         ParameterisedCvode ode;
@@ -234,7 +234,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestDerivedQuantities() throw (Exception)
+    void TestDerivedQuantities()
     {
 #ifdef CHASTE_CVODE
         ParameterisedCvode ode;
@@ -350,7 +350,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestSimpleSolveUsingCvode() throw (Exception)
+    void TestSimpleSolveUsingCvode()
     {
 #ifdef CHASTE_CVODE
         CvodeFirstOrder ode_system;
@@ -386,7 +386,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestSequentialSolveCalls() throw (Exception)
+    void TestSequentialSolveCalls()
     {
         /*
          * All of the tests in this section pass when using Sundials >= 2.4.0
@@ -453,7 +453,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -223,7 +223,7 @@ class TestCreatingAndUsingNewCellBasedWritersTutorial : public AbstractCellBased
 {
 public:
 
-    void TestOffLatticeSimulationWithMotileCellPropertyAndWriters() throw(Exception)
+    void TestOffLatticeSimulationWithMotileCellPropertyAndWriters()
     {
         /*
          * We begin by creating a {{{NodeBasedCellPopulation}}}, just as in [wiki:UserTutorials/CreatingAndUsingANewCellProperty].

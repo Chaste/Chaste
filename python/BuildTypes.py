@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -406,6 +406,21 @@ class Gcc(BuildType):
         else:
             self._compiler_type = 'gcc'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
+            if self.GetCompilerVersion() >= 7:
+                self._cc_flags.extend(['-Wimplicit-fallthrough=2'])
+                # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
+            if self.GetCompilerVersion() >= 8:
+                self._cc_flags.extend(['-Wno-ignored-qualifiers'])
+                # To deal with a problem in cxxtest
+
+    def GetCompilerVersion(self):
+        """Get the major version number of the compiler being used."""
+        version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
+        try:
+            return int(version_str.split('.')[0])
+        except:
+            return 0
+
 
 class GccDebug(Gcc):
     """

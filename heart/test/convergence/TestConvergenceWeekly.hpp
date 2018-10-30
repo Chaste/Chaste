@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ class TestConvergenceWeekly : public CxxTest::TestSuite
 {
 public:
 
-    void xxTest3DSpace() throw(Exception)
+    void xxTest3DSpace()
     {
 
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
@@ -73,7 +73,7 @@ public:
 
     //Experiments with ksp_atol follow.
     //This first one has to be done with GMRES as 1D are known to be a bit flakey
-    void TestSpaceConvergencein1DWithAtol() throw(Exception)
+    void TestSpaceConvergencein1DWithAtol()
     {
         HeartConfig::Instance()->SetKSPSolver("gmres");
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
@@ -90,7 +90,7 @@ public:
     }
 
 
-    void Test3DSpace10() throw(Exception)
+    void Test3DSpace10()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -108,7 +108,7 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void Test3DSpace10RampedQuarterStimulus() throw(Exception)
+    void Test3DSpace10RampedQuarterStimulus()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -128,7 +128,7 @@ public:
     }
 
     //More experiments with ksp_atol follow.
-    void TestSpaceConvergencein2DWithAtol() throw(Exception)
+    void TestSpaceConvergencein2DWithAtol()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -146,7 +146,7 @@ public:
     }
 
     //Copied from projects/jmpf since this converges on mesh4
-    void Test3DSpaceRelaxWidthWithAtol() throw(Exception)
+    void Test3DSpaceRelaxWidthWithAtol()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ class Test3dBidomainProblemWithPermForEfficiency :  public CxxTest::TestSuite
 {
 public:
 
-    void TestBidomain3d() throw (Exception)
+    void TestBidomain3d()
     {
 
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));

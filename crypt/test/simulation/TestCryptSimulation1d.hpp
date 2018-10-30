@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ public:
      * into the simulation. We just perturb one of the nodes and check that
      * each spring relaxes to its rest length.
      */
-    void Test1dCryptWithNoBirthOrDeath() throw(Exception)
+    void Test1dCryptWithNoBirthOrDeath()
     {
         // Create a mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -144,7 +144,7 @@ public:
      * In this test, we pass a sloughing cell killer into the simulation, and
      * check that a cell starting at the end of the crypt is sloughed off.
      */
-    void Test1dCryptWithDeathButNoBirth() throw(Exception)
+    void Test1dCryptWithDeathButNoBirth()
     {
         double crypt_length = 22.0;
 
@@ -206,7 +206,7 @@ public:
     /**
      * In this test, we allow cells to proliferate.
      */
-    void Test1dCryptWithBirthButNoDeath() throw (Exception)
+    void Test1dCryptWithBirthButNoDeath()
     {
         // Get pointers to singleton objects
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
@@ -311,7 +311,7 @@ public:
      * In this test, we check that the daughters of a cell that has just divided
      * are put in the correct positions.
      */
-    void TestCalculateCellDivisionVector() throw (Exception)
+    void TestCalculateCellDivisionVector()
     {
         // Create a mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -375,7 +375,7 @@ public:
     /**
      * In this test, we include cell birth and cell death.
      */
-    void Test1dCryptWithBirthAndDeath() throw (Exception)
+    void Test1dCryptWithBirthAndDeath()
     {
         double crypt_length = 22.0;
 
@@ -468,7 +468,7 @@ public:
         FileComparison( elem_results_file, "crypt/test/data/Crypt1dWithCellsAndGrowth/results.vizelements").CompareFiles();
     }
 
-    void Test1DChainWithTysonNovakCellsAndNoDeath() throw (Exception)
+    void Test1DChainWithTysonNovakCellsAndNoDeath()
     {
         // Get pointers to singleton objects
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
@@ -671,7 +671,7 @@ public:
     /**
      * Test with Wnt-dependent cells.
      */
-    void TestWntCellsCannotMoveAcrossYEqualsZero() throw (Exception)
+    void TestWntCellsCannotMoveAcrossYEqualsZero()
     {
         double crypt_length = 5.0;
 
@@ -769,7 +769,7 @@ public:
     /**
      * Test saving a CryptSimulation1d object.
      */
-    void TestSave() throw (Exception)
+    void TestSave()
     {
         double crypt_length = 22.0;
 
@@ -849,7 +849,7 @@ public:
     /**
      * Test loading a CryptSimulation1d object.
      */
-    void TestLoad() throw (Exception)
+    void TestLoad()
     {
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 0.2
@@ -918,7 +918,7 @@ public:
     /**
      * In this test, we include cell birth and cell death.
      */
-    void TestCryptSimulation1DParameterOutput() throw (Exception)
+    void TestCryptSimulation1DParameterOutput()
     {
         double crypt_length = 22.0;
 

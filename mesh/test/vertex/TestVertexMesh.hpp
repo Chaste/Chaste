@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -186,7 +186,7 @@ private:
 
 public:
 
-    void TestNodeIterator() throw (Exception)
+    void TestNodeIterator()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
@@ -236,7 +236,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(empty_mesh.SetElementOwnerships());
     }
 
-    void TestVertexElementIterator() throw (Exception)
+    void TestVertexElementIterator()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
@@ -274,7 +274,7 @@ public:
         TS_ASSERT_EQUALS(mesh.IsMeshChanging(), false);
     }
 
-    void TestBasic1dVertexMesh() throw(Exception)
+    void TestBasic1dVertexMesh()
     {
         // Create a 1D mesh comprising four nodes and three elements
         std::vector<Node<1>*> nodes_1d;
@@ -312,7 +312,7 @@ public:
         TS_ASSERT_DELTA(mesh_1d.GetElement(2)->GetNodeLocation(1)[0], 1.5, 1e-6);
     }
 
-    void TestBasic2dVertexMesh() throw(Exception)
+    void TestBasic2dVertexMesh()
     {
         // Create a 2D mesh comprising seven nodes and two elements
         std::vector<Node<2>*> nodes_2d;
@@ -792,7 +792,7 @@ public:
         TS_ASSERT_EQUALS(map.IsIdentityMap(), false);
     }
 
-    void TestNeighbouringNodeAndElementMethods() throw(Exception)
+    void TestNeighbouringNodeAndElementMethods()
     {
         // Test methods with a small regular mesh comprising hexagonal elements
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_2_by_2");
@@ -848,7 +848,7 @@ public:
         TS_ASSERT_EQUALS(element_neighbours, expected_element_neighbours);
     }
 
-    void TestGetRosetteRankOfElement() throw(Exception)
+    void TestGetRosetteRankOfElement()
     {
         // Test method on a honeycomb mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
@@ -919,7 +919,7 @@ public:
         }
     }
 
-    void TestGetCentroidOfElement() throw(Exception)
+    void TestGetCentroidOfElement()
     {
         // Test method with a 1D mesh
         std::vector<Node<1>*> nodes_1d;
@@ -1397,7 +1397,7 @@ public:
         TS_ASSERT_DELTA(height, 5.0/sqrt(3.0), 1e-4);
     }
 
-    void TestCalculateMomentsOfElement() throw(Exception)
+    void TestCalculateMomentsOfElement()
     {
         // Test method with a single triangular element
         std::vector<Node<2>*> isos_triangle_nodes;
@@ -1532,7 +1532,7 @@ public:
         }
     }
 
-    void TestGetShortAxisOfElement() throw(Exception)
+    void TestGetShortAxisOfElement()
     {
         // Test method with a single triangular element
         std::vector<Node<2>*> triangle_nodes;
@@ -1851,7 +1851,7 @@ public:
         TS_ASSERT_DELTA(new_location2[1], old_location2[1] + 3.0, 1e-6);
     }
 
-    void TestTranslation2DMethod() throw (Exception)
+    void TestTranslation2DMethod()
     {
         // Create mesh
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
@@ -1872,7 +1872,7 @@ public:
         TS_ASSERT_DELTA(original_coordinate[1], new_coordinate[1] - y_movement, 1e-6);
     }
 
-    void TestGenerateVerticesFromElementCircumcentres() throw (Exception)
+    void TestGenerateVerticesFromElementCircumcentres()
     {
         // Create a simple 3D tetrahedral mesh, the Delaunay triangulation
         std::vector<Node<3>*> nodes;
@@ -1921,7 +1921,7 @@ public:
         TS_ASSERT_DELTA(this_vertex[2], -1.5, 1e-7);
     }
 
-    void TestTessellationConstructor2d() throw (Exception)
+    void TestTessellationConstructor2d()
     {
         // Create a simple 2D tetrahedral mesh, the Delaunay triangulation
         std::vector<Node<2> *> delaunay_nodes;
@@ -1968,7 +1968,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
     }
 
-    void TestTessellationConstructor2dWithGhostNodes() throw (Exception)
+    void TestTessellationConstructor2dWithGhostNodes()
     {
         // Create a simple 2D tetrahedral mesh, the Delaunay triangulation
         std::vector<Node<2> *> delaunay_nodes;
@@ -2004,7 +2004,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
     }
 
-    void TestGetEdgeLengthWithSimpleMesh() throw (Exception)
+    void TestGetEdgeLengthWithSimpleMesh()
     {
         // Create a simple 2D tetrahedral mesh, the Delaunay triangulation
         std::vector<Node<2> *> nodes;
@@ -2038,7 +2038,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetSurfaceAreaOfElement(0), 2.0 + sqrt(3.0), 1e-6);
     }
 
-    void TestTessellationConstructor3dWithGhostNode() throw (Exception)
+    void TestTessellationConstructor3dWithGhostNode()
     {
         // Create a simple 3D tetrahedral mesh, the Delaunay triangulation
         std::vector<Node<3>*> nodes;
@@ -2124,8 +2124,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetSurfaceAreaOfElement(0), 9.0*sqrt(3.0)/2.0, 1e-4);
     }
 
-
-    void TestTessellationConstructor3dWithRepeatedCircumcentres() throw (Exception)
+    void TestTessellationConstructor3dWithRepeatedCircumcentres()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0,  false,  0.0, 0.0, 0.0));
@@ -2180,6 +2179,21 @@ public:
             volume += voronoi_mesh.GetVolumeOfElement(i);
         }
         TS_ASSERT_DELTA(volume, 31.5, 1e-4); // Agrees with Paraview
+    }
+
+    void TestGetMeshForVtk()
+    {
+        // Create mesh
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Test GetMeshForVtk() method
+        VertexMesh<2, 2>* p_mesh_for_vtk = mesh.GetMeshForVtk();
+
+        // The mesh for VTK should have the same number of elements and nodes
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 9u);
+        TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 30u);
     }
 };
 

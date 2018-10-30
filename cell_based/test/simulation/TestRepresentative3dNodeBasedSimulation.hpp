@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ public:
     /*
      * Create and simulate a simple 3D cell population of about 1000 cells within a cuboid box with sloughing on the top edge
      */
-    void Test3dNodeBasedInBoxWithSloughing() throw (Exception)
+    void Test3dNodeBasedInBoxWithSloughing()
     {
         double size_of_box = 8.0;
         unsigned cells_across = 12;

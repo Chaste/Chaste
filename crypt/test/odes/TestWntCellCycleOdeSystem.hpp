@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -187,7 +187,7 @@ public:
         TS_ASSERT_DELTA(derivs[8], 0.0, 1e-5);
     }
 
-    void TestWntCellCycleSolver() throw(Exception)
+    void TestWntCellCycleSolver()
     {
         double wnt_level = 1.0;
         boost::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
@@ -259,7 +259,7 @@ public:
         TS_ASSERT_DELTA(solutions_rkf.rGetSolutions()[end][8], 1.00, 1e-3);
     }
 
-    void TestWntCellCycleSolverWithAPCSingleHit() throw(Exception)
+    void TestWntCellCycleSolverWithAPCSingleHit()
     {
         double wnt_level = 1.0;
         boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
@@ -295,7 +295,7 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][8],1.00, 1e-3);
     }
 
-    void TestWntCellCycleSolverWithBetaCateninHit() throw(Exception)
+    void TestWntCellCycleSolverWithBetaCateninHit()
     {
         double wnt_level = 0.0;
         boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
@@ -333,7 +333,7 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][8], 0.00, 1e-3);
     }
 
-    void TestWntCellCycleSolverWithAPCDoubleHit() throw(Exception)
+    void TestWntCellCycleSolverWithAPCDoubleHit()
     {
         double wnt_level = 0.0;
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);

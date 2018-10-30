@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -130,7 +130,7 @@ public:
 class TestMonodomainTissue : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainTissueBasic() throw(Exception)
+    void TestMonodomainTissueBasic()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -236,7 +236,7 @@ public:
         PetscTools::Destroy(voltage);
     }
 
-    void TestMonodomainTissueGetCardiacCell() throw(Exception)
+    void TestMonodomainTissueGetCardiacCell()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -266,7 +266,7 @@ public:
         }
     }
 
-    void TestSolveCellSystemsInclUpdateVoltage() throw(Exception)
+    void TestSolveCellSystemsInclUpdateVoltage()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -322,7 +322,7 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestNodeExchange() throw(Exception)
+    void TestNodeExchange()
     {
         HeartConfig::Instance()->Reset();
 
@@ -373,7 +373,7 @@ public:
         }
     }
 
-    void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange() throw(Exception)
+    void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange()
     {
         if (PetscTools::GetNumProcs() > 2u)
         {
@@ -447,7 +447,7 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestSaveAndLoadCardiacTissue() throw (Exception)
+    void TestSaveAndLoadCardiacTissue()
     {
         HeartConfig::Instance()->Reset();
         // Archive settings
@@ -530,7 +530,7 @@ public:
         }
     }
 
-    void TestMonodomainTissueUsingPurkinjeCellFactory() throw(Exception)
+    void TestMonodomainTissueUsingPurkinjeCellFactory()
     {
         HeartConfig::Instance()->Reset();
 

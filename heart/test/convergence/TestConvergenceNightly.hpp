@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -129,18 +129,18 @@ public:
 
 public:
 
-    void TestStimulatePlanein1D() throw(Exception)
+    void TestStimulatePlanein1D()
     {
         ConvergeInVarious(PLANE);
     }
 
-    void TestStimulateRegionin1D() throw(Exception)
+    void TestStimulateRegionin1D()
     {
         ConvergeInVarious(QUARTER);
     }
 
 
-    void TestFullActionPotential() throw(Exception)
+    void TestFullActionPotential()
     {
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
@@ -159,7 +159,7 @@ public:
         TS_ASSERT_DELTA(0.0588, tester.ConductionVelocity, 1e-3);
     }
 
-    void TestFullActionPotentialWithRampedStimulus() throw(Exception)
+    void TestFullActionPotentialWithRampedStimulus()
     {
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
@@ -181,7 +181,7 @@ public:
 
     //Current test takes about 20 mins.
     //This is much longer (1 hour?) with default ksp
-    void Test2DSpaceSymmLq() throw(Exception)
+    void Test2DSpaceSymmLq()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -198,7 +198,7 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void Test2DSpaceWithRegionStimulus() throw(Exception)
+    void Test2DSpaceWithRegionStimulus()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -213,7 +213,7 @@ public:
     }
 
     //Currently takes about 15 seconds to do mesh0, mesh1 and mesh2
-    void Test3DSpace() throw(Exception)
+    void Test3DSpace()
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
@@ -227,7 +227,7 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void TestSpaceConvergencein1DWithBackwardN98() throw(Exception)
+    void TestSpaceConvergencein1DWithBackwardN98()
     {
         SpaceConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
@@ -237,7 +237,7 @@ public:
         TS_ASSERT_LESS_THAN(tester.LastDifference, 0.0041039);
     }
 
-    void TestOdeConvergencein1DWithBackwardN98() throw(Exception)
+    void TestOdeConvergencein1DWithBackwardN98()
     {
         OdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
@@ -246,7 +246,7 @@ public:
         TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
     }
 
-    void TestOdePdeConvergencein1DWithBackwardN98() throw(Exception)
+    void TestOdePdeConvergencein1DWithBackwardN98()
     {
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
@@ -257,7 +257,7 @@ public:
         TS_ASSERT_DELTA(tester.PdeTimeStep, 0.005, 1e-10);
     }
 
-    void TestOdePdeConvergencein1DWithForwardLookupN98() throw(Exception)
+    void TestOdePdeConvergencein1DWithForwardLookupN98()
     {
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
@@ -267,7 +267,7 @@ public:
         TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
         TS_ASSERT_DELTA(tester.PdeTimeStep, 0.0025, 1e-10);
     }
-    void TestOdePdeConvergencein1DWithForwardBasicN98() throw(Exception)
+    void TestOdePdeConvergencein1DWithForwardBasicN98()
     {
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellML,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;

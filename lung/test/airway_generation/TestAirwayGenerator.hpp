@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestAirwayGenerator : public CxxTest::TestSuite
 {
 public:
-    void TestCreatePointCloud() throw(Exception)
+    void TestCreatePointCloud()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -107,7 +107,7 @@ public:
 #endif
     }
 
-    void TestCreatePointCloudOtherMethods() throw(Exception)
+    void TestCreatePointCloudOtherMethods()
             {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
@@ -135,7 +135,7 @@ public:
 #endif
             }
 
-    void TestSplitPointCloud() throw(Exception)
+    void TestSplitPointCloud()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -180,7 +180,7 @@ public:
 #endif
     }
 
-    void TestAddInitialApex() throw(Exception)
+    void TestAddInitialApex()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -212,7 +212,7 @@ public:
     }
 
 
-    void TestInsertBranch() throw(Exception)
+    void TestInsertBranch()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -257,7 +257,7 @@ public:
 #endif
     }
 
-    void TestGrowApex() throw(Exception)
+    void TestGrowApex()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -322,7 +322,7 @@ public:
 #endif
     }
 
-    void TestInvalidateClosestPoint() throw(Exception)
+    void TestInvalidateClosestPoint()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -353,7 +353,7 @@ public:
 #endif
     }
 
-    void TestGrowTerminalLengthApex() throw(Exception)
+    void TestGrowTerminalLengthApex()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -382,7 +382,7 @@ public:
 #endif
     }
 //
-//    void xxxTestGrowTerminalPointsApex() throw(Exception)
+//    void xxxTestGrowTerminalPointsApex()
 //    {
 //#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //        EXIT_IF_PARALLEL;
@@ -408,7 +408,7 @@ public:
 //
 //
 //
-    void TestCheckAngleAndLength() throw(Exception)
+    void TestCheckAngleAndLength()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -471,7 +471,7 @@ public:
 #endif
     }
 
-    void TestOutsideHostVolume() throw(Exception)
+    void TestOutsideHostVolume()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -495,7 +495,7 @@ public:
 #endif
     }
 
-    void TestGenerate() throw(Exception)
+    void TestGenerate()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -536,7 +536,7 @@ public:
 #endif
     }
 
-    void TestHorsfieldOrder() throw(Exception)
+    void TestHorsfieldOrder()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -616,7 +616,7 @@ public:
     }
 
 
-    void TestGenerateDecomposedAirways() throw(Exception)
+    void TestGenerateDecomposedAirways()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
@@ -686,7 +686,7 @@ public:
     #endif
     }
 
-    void TestEndBranchDistanceLimit() throw(Exception)
+    void TestEndBranchDistanceLimit()
     {
     #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
         EXIT_IF_PARALLEL;
