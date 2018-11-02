@@ -56,7 +56,8 @@ class BuildType(object):
         """
         self.build_type = buildType
         self._compiler_type = 'unknown'
-        self._cc_flags = ['-Wall', '-Werror']
+        #self._cc_flags = ['-Wall', '-Werror']
+        self._cc_flags = []
         self._link_flags = []
         self.rdynamic_link_flag = '-rdynamic'
         self._include_flag = ['-isystem']
