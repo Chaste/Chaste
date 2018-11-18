@@ -55,6 +55,7 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mInitialiseCells(initialiseCells),
       mNoBirth(false),
       mUpdateCellPopulation(true),
+      mUpdateCellPopulationInterval(1),
       mOutputDirectory(""),
       mSimulationOutputDirectory(mOutputDirectory),
       mNumBirths(0),
@@ -254,6 +255,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetUpdateCellPopulationRule()
 {
     return mUpdateCellPopulation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetUpdateCellPopulationInterval(unsigned interval)
+{
+    assert(interval > 0);
+    mUpdateCellPopulationInterval = interval;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -594,7 +602,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
 
     // Update topology of cell population
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
-    if (mUpdateCellPopulation)
+    SimulationTime* p_time = SimulationTime::Instance();
+    if (mUpdateCellPopulation && (p_time->GetTimeStepsElapsed() % mUpdateCellPopulationInterval == 0) )
     {
         LOG(1, "\tUpdating cell population...");
         mrCellPopulation.Update(births_or_death_occurred);
@@ -699,6 +708,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
 {
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
+    *rParamsFile << "\t\t<UpdateCellPopulation>" << mUpdateCellPopulation << "</UpdateCellPopulation>\n";
+    *rParamsFile << "\t\t<UpdateCellPopulationInterval>" << mUpdateCellPopulationInterval << "</UpdateCellPopulationInterval>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
     *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
     *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
