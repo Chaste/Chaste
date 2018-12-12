@@ -183,62 +183,6 @@ public:
         mHelper.AddAllModels(models);
         mHelper.RunTests(dirname, models, args, true, -1000, false);
     }
-
-    void TestGeneralizedRushLarsen1Cells()
-    {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--grl1");
-        std::vector<std::string> models;
-        mHelper.AddAllModels(models);
-        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
-        // Winslow model needs a smaller timestep
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, false, 0, false);
-    }
-
-    void TestGeneralizedRushLarsen1CellsOpt()
-    {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1Opt");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--grl1");
-        args.push_back("--opt");
-        std::vector<std::string> models;
-        mHelper.AddAllModels(models);
-        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
-        // Winslow model needs a smaller timestep
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, true, -1000, false);
-    }
-
-    void TestGeneralizedRushLarsen2Cells()
-    {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--grl2");
-        std::vector<std::string> models;
-        mHelper.AddAllModels(models);
-        // Winslow model needs a smaller timestep
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, false, 0, false);
-    }
-
-    void TestGeneralizedRushLarsen2CellsOpt()
-    {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2Opt");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--grl2");
-        args.push_back("--opt");
-        std::vector<std::string> models;
-        mHelper.AddAllModels(models);
-        // Winslow model needs a smaller timestep
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, true, -1000, false);
-    }
 };
 
 #endif // TESTPYCMLNIGHTLY_HPP_
