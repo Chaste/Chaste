@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPYCMLNIGHTLY_HPP_
-#define TESTPYCMLNIGHTLY_HPP_
+#ifndef TESTPYCMLNIGHTLYGENERALISEDRUSHLARSONTWOCELL_HPP_
+#define TESTPYCMLNIGHTLYGENERALISEDRUSHLARSONTWOCELL_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlNightly : public CxxTest::TestSuite
+class TestPyCmlNightlyGeneralisedRushLarsonTwoCell : public CxxTest::TestSuite
 {
 private:
     PyCmlLongHelper mHelper;
@@ -88,4 +88,4 @@ public:
     }
 };
 
-#endif // TESTPYCMLNIGHTLY_HPP_
+#endif // TESTPYCMLNIGHTLYGENERALISEDRUSHLARSONTWOCELL_HPP_
