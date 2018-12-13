@@ -36,13 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTPYCMLLONG_HPP_
 #define TESTPYCMLLONG_HPP_
 
-#include <cxxtest/TestSuite.h>
+#include "PyCmlLongHelperTestSuite.hpp"
 
 #include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"
-#include "PyCmlLongHelperClass.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -53,11 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlLong : public CxxTest::TestSuite
+class TestPyCmlLong : public PyCmlLongHelperTestSuite
 {
-private:
-    PyCmlLongHelper mHelper;
-
 public:
     void TestNormalCells()
     {
@@ -67,9 +63,9 @@ public:
         std::vector<std::string> args;
         args.push_back("--Wu");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args);
+        RunTests(dirname, models, args);
     }
 
     void TestOptimisedCells()
@@ -79,8 +75,8 @@ public:
         args.push_back("--Wu");
         args.push_back("--opt");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
-        mHelper.RunTests(dirname, models, args, true);
+        AddAllModels(models);
+        RunTests(dirname, models, args, true);
     }
 
     void TestCvodeCells()
@@ -91,11 +87,11 @@ public:
         args.push_back("--Wu");
         args.push_back("--cvode");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
 
-        mHelper.SetUseCvodeJacobian(false);
-        mHelper.RunTests(dirname, models, args);
-        mHelper.SetUseCvodeJacobian(true);
+        SetUseCvodeJacobian(false);
+        RunTests(dirname, models, args);
+        SetUseCvodeJacobian(true);
 #endif
     }
 
@@ -107,7 +103,7 @@ public:
         args.push_back("--Wu");
         args.push_back("--cvode");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
 
         // These have NaN in the jacobian due to massive exponentials
         std::vector<std::string> bad_models = boost::assign::list_of("aslanidi_model_2009")("hund_rudy_2004_a")("livshitz_rudy_2007");
@@ -116,7 +112,7 @@ public:
             models.erase(std::find(models.begin(), models.end(), bad_model));
         }
 
-        mHelper.RunTests(dirname, models, args);
+        RunTests(dirname, models, args);
 #endif
     }
 
@@ -128,7 +124,7 @@ public:
         args.push_back("--backward-euler");
 
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
 
         std::vector<std::string> diff_models; // Models that need a smaller dt
         diff_models.push_back("iyer_model_2004");
@@ -151,11 +147,11 @@ public:
         }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, true);
+        RunTests(dirname, models, args, true);
 
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        mHelper.RunTests(dirname, diff_models, args, true);
+        RunTests(dirname, diff_models, args, true);
     }
 
     void TestRushLarsenCells()
@@ -165,11 +161,11 @@ public:
         args.push_back("--Wu");
         args.push_back("--rush-larsen");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
         // Three models require a slightly smaller timestep with RL than normal forward Euler:
         // Courtemanche 1998, Demir 1994, and Grandi 2010.
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, models, args, false, 0, false);
     }
 
     void TestRushLarsenOptCells()
@@ -180,8 +176,8 @@ public:
         args.push_back("--rush-larsen");
         args.push_back("--opt");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
-        mHelper.RunTests(dirname, models, args, true, -1000, false);
+        AddAllModels(models);
+        RunTests(dirname, models, args, true, -1000, false);
     }
 };
 

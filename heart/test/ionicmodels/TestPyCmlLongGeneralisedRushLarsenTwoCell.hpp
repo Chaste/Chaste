@@ -33,16 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSONTWOCELL_HPP_
-#define TESTPYCMLLONGGENERALISEDRUSHLARSONTWOCELL_HPP_
+#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSENTWOCELL_HPP_
+#define TESTPYCMLLONGGENERALISEDRUSHLARSENTWOCELL_HPP_
 
-#include <cxxtest/TestSuite.h>
+#include "PyCmlLongHelperTestSuite.hpp"
 
 #include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"
-#include "PyCmlLongHelperClass.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -53,13 +52,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlLongGeneralisedRushLarsonTwoCell : public CxxTest::TestSuite
+class TestPyCmlLongGeneralisedRushLarsenTwoCell : public PyCmlLongHelperTestSuite
 {
-private:
-    PyCmlLongHelper mHelper;
 
 public:
-
     void TestGeneralizedRushLarsen2Cells()
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
@@ -67,10 +63,10 @@ public:
         args.push_back("--Wu");
         args.push_back("--grl2");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, models, args, false, 0, false);
     }
 
     void TestGeneralizedRushLarsen2CellsOpt()
@@ -81,11 +77,11 @@ public:
         args.push_back("--grl2");
         args.push_back("--opt");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, true, -1000, false);
+        RunTests(dirname, models, args, true, -1000, false);
     }
 };
 
-#endif // TESTPYCMLLONGGENERALISEDRUSHLARSONTWOCELL_HPP_
+#endif // TESTPYCMLLONGGENERALISEDRUSHLARSENTWOCELL_HPP_

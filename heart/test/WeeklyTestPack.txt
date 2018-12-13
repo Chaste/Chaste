@@ -1,8 +1,8 @@
 bidomain/TestBidomainHeart.hpp
 convergence/TestConvergenceWeekly.hpp
 ionicmodels/TestPyCmlLong.hpp
-ionicmodels/TestPyCmlLongGeneralisedRushLarsonOneCell.hpp
-ionicmodels/TestPyCmlLongGeneralisedRushLarsonTwoCell.hpp
+ionicmodels/TestPyCmlLongGeneralisedRushLarsenOneCell.hpp
+ionicmodels/TestPyCmlLongGeneralisedRushLarsenTwoCell.hpp
 monodomain/TestMonodomainHeart.hpp
 monodomain/TestMonodomainMassLumpingLong.hpp
 monodomain/TestMonodomainSlabLong.hpp

@@ -33,16 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSONONECELL_HPP_
-#define TESTPYCMLLONGGENERALISEDRUSHLARSONONECELL_HPP_
+#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSENONECELL_HPP_
+#define TESTPYCMLLONGGENERALISEDRUSHLARSENONECELL_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include "PyCmlLongHelperTestSuite.hpp"
 
 #include <boost/foreach.hpp>
 #include <vector>
 
 #include "HeartConfig.hpp"
-#include "PyCmlLongHelperClass.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -53,13 +53,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlLongGeneralisedRushLarsonOneCell : public CxxTest::TestSuite
+class TestPyCmlLongGeneralisedRushLarsenOneCell : public PyCmlLongHelperTestSuite
 {
-private:
-    PyCmlLongHelper mHelper;
-
 public:
-
     void TestGeneralizedRushLarsen1Cells()
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
@@ -67,14 +63,14 @@ public:
         args.push_back("--Wu");
         args.push_back("--grl1");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestGeneralizedRushLarsen1CellsOpt()
+    void TestGeneralizedRushLarsen1CellsOpt() throw(Exception)
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1Opt");
         std::vector<std::string> args;
@@ -82,12 +78,12 @@ public:
         args.push_back("--grl1");
         args.push_back("--opt");
         std::vector<std::string> models;
-        mHelper.AddAllModels(models);
+        AddAllModels(models);
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        mHelper.RunTests(dirname, models, args, true, -1000, false);
+        RunTests(dirname, models, args, true, -1000, false);
     }
 };
 
-#endif // TESTPYCMLLONGGENERALISEDRUSHLARSONONECELL_HPP_
+#endif // TESTPYCMLLONGGENERALISEDRUSHLARSENONECELL_HPP_
