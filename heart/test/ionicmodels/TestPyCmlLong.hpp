@@ -59,7 +59,7 @@ public:
     {
         std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
 
-        std::string dirname("TestPyCmlNightlyNormal");
+        std::string dirname("TestPyCmlLongNormal");
         std::vector<std::string> args;
         args.push_back("--Wu");
         std::vector<std::string> models;
@@ -68,9 +68,9 @@ public:
         RunTests(dirname, models, args);
     }
 
-    void TestOptimisedCells()
+    void TestOptimisedCells() throw(Exception)
     {
-        std::string dirname("TestPyCmlNightlyOpt");
+        std::string dirname("TestPyCmlLongOpt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--opt");
@@ -82,7 +82,7 @@ public:
     void TestCvodeCells()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestPyCmlNightlyCvodeNumericalJ");
+        std::string dirname("TestPyCmlLongCvodeNumericalJ");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
@@ -98,7 +98,7 @@ public:
     void TestAnalyticCvodeCells()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestPyCmlNightlyCvodeAnalyticJ");
+        std::string dirname("TestPyCmlLongCvodeAnalyticJ");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
@@ -118,7 +118,7 @@ public:
 
     void TestBackwardEulerCells()
     {
-        std::string dirname("TestPyCmlNightlyBE");
+        std::string dirname("TestPyCmlLongBE");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--backward-euler");
@@ -156,7 +156,7 @@ public:
 
     void TestRushLarsenCells()
     {
-        std::string dirname("TestPyCmlNightlyRushLarsen");
+        std::string dirname("TestPyCmlLongRushLarsen");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--rush-larsen");
@@ -168,9 +168,9 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestRushLarsenOptCells()
+    void TestRushLarsenOptCells() throw(Exception)
     {
-        std::string dirname("TestPyCmlNightlyRushLarsenOpt");
+        std::string dirname("TestPyCmlLongRushLarsenOpt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--rush-larsen");

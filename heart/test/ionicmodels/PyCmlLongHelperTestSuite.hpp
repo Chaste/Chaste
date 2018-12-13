@@ -218,8 +218,7 @@ private:
         {
             double v = p_cell->GetVoltage();
             p_cell->SetVoltage(tableTestV);
-            TS_ASSERT_THROWS_THIS(EXCEPTION("Blah!"), "Blah!");
-            //TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
+            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
             p_cell->SetVoltage(v);
         }
         std::cout << "Running simulation...\n"

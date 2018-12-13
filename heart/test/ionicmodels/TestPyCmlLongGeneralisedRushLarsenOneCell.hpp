@@ -58,7 +58,7 @@ class TestPyCmlLongGeneralisedRushLarsenOneCell : public PyCmlLongHelperTestSuit
 public:
     void TestGeneralizedRushLarsen1Cells()
     {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
+        std::string dirname("TestPyCmlLongGeneralizedRushLarsen1");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl1");
@@ -72,7 +72,7 @@ public:
 
     void TestGeneralizedRushLarsen1CellsOpt() throw(Exception)
     {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1Opt");
+        std::string dirname("TestPyCmlLongGeneralizedRushLarsen1Opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl1");
