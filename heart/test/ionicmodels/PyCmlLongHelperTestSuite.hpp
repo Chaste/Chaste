@@ -218,7 +218,17 @@ private:
         {
             double v = p_cell->GetVoltage();
             p_cell->SetVoltage(tableTestV);
-            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
+
+          // This try catch used to be TS_ASSERT_THROWS_CONTAINS (see #2982)
+            try
+            {
+                p_cell->GetIIonic();
+            }
+            catch (const Exception& e)
+            {
+                TS_ASSERT(e.CheckShortMessageContains("outside lookup table range") == "");
+            }
+
             p_cell->SetVoltage(v);
         }
         std::cout << "Running simulation...\n"

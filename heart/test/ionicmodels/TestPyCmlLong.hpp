@@ -68,7 +68,7 @@ public:
         RunTests(dirname, models, args);
     }
 
-    void TestOptimisedCells() throw(Exception)
+    void TestOptimisedCells()
     {
         std::string dirname("TestPyCmlLongOpt");
         std::vector<std::string> args;
@@ -168,7 +168,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestRushLarsenOptCells() throw(Exception)
+    void TestRushLarsenOptCells()
     {
         std::string dirname("TestPyCmlLongRushLarsenOpt");
         std::vector<std::string> args;

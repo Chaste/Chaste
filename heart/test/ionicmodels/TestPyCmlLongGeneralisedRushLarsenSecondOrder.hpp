@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSENTWOCELL_HPP_
-#define TESTPYCMLLONGGENERALISEDRUSHLARSENTWOCELL_HPP_
+#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
+#define TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
 
 #include "PyCmlLongHelperTestSuite.hpp"
 
@@ -52,11 +52,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlLongGeneralisedRushLarsenTwoCell : public PyCmlLongHelperTestSuite
+class TestPyCmlLongGeneralisedRushLarsenSecondOrder : public PyCmlLongHelperTestSuite
 {
 
 public:
-    void TestGeneralizedRushLarsen2Cells()
+    void TestGeneralizedRushLarsenSecondOrder()
     {
         std::string dirname("TestPyCmlLongGeneralizedRushLarsen2");
         std::vector<std::string> args;
@@ -69,7 +69,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
-    void TestGeneralizedRushLarsen2CellsOpt() throw(Exception)
+    void TestGeneralizedRushLarsenSecondOrderOpt()
     {
         std::string dirname("TestPyCmlLongGeneralizedRushLarsen2Opt");
         std::vector<std::string> args;
@@ -84,4 +84,4 @@ public:
     }
 };
 
-#endif // TESTPYCMLLONGGENERALISEDRUSHLARSENTWOCELL_HPP_
+#endif // TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
