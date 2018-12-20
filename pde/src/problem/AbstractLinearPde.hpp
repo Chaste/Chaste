@@ -39,9 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 
 /**
- * The parent class for all of the linear PDEs in Chaste. 
- * 
- * This is the most generic thing that you should generally 
+ * The parent class for all of the linear PDEs in Chaste.
+ *
+ * This is the most generic thing that you should generally
  * use as a pointer for your PDE in other code, works with
  * boost serialization.
  */

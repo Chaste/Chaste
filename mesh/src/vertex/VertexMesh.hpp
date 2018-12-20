@@ -244,10 +244,10 @@ public:
                std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements);
 
     /**
-     * @brief  Alternative 2D 'Voronoi' constructor.  
-     * 
+     * @brief  Alternative 2D 'Voronoi' constructor.
+     *
      * This VertexMesh constructor is currently only defined for 2D meshes.
-     * 
+     *
      * Creates a Voronoi tessellation of a given tetrahedral mesh,
      * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
      *
