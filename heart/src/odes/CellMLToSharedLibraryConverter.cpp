@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,8 +80,9 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
     std::string absolute_path = rFilePath.GetAbsolutePath();
     // Find out whether rFilePath is a .cellml or .so
     size_t dot_position = absolute_path.find_last_of(".");
-    if (dot_position == std::string::npos)
+    if (dot_position == std::string::npos || absolute_path[dot_position+1] =='/')
     {
+        // Either there is no dot in the absolute path or there is one along the path (/home/user/chaste/../temp/stuff)
         EXCEPTION("File does not have an extension: " + absolute_path);
     }
     std::string extension = absolute_path.substr(dot_position+1);

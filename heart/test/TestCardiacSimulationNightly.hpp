@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,6 +77,15 @@ public:
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "postprocess_monodomain_results", false,
                                                  foldername, "SimulationResults", true, 1e-3));
+        {
+            // look for the existence of post-processing files
+            TS_ASSERT(FileFinder(foldername + "/output/Apd_90_minus_30_Map.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode10.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode20.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/MaxUpstrokeVelocityMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/UpstrokeTimeMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput).Exists());
+        }
     }
 
     void TestCardiacSimulationSaveBidomain()

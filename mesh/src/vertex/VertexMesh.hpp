@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,25 +36,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VERTEXMESH_HPP_
 
 // Forward declaration prevents circular include chain
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMeshWriter;
 
+#include <algorithm>
 #include <iostream>
 #include <map>
-#include <algorithm>
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/vector.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
+#include "ChasteSerialization.hpp"
 
 #include "AbstractMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
-#include "VertexMeshReader.hpp"
-#include "VertexMeshWriter.hpp"
+#include "TetrahedralMesh.hpp"
 #include "VertexElement.hpp"
 #include "VertexElementMap.hpp"
-#include "TetrahedralMesh.hpp"
+#include "VertexMeshReader.hpp"
+#include "VertexMeshWriter.hpp"
 
 /**
  * A vertex-based mesh class, in which elements may contain different numbers of nodes.
@@ -70,18 +70,17 @@ class VertexMeshWriter;
  * member of the VertexBasedCellPopulation class to represent the junctional network of
  * cells that forms the basis of simulations of off-lattice vertex-based models.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestVertexMesh;
 
 protected:
-
     /** Vector of pointers to VertexElements. */
     std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
     /** Vector of pointers to VertexElements. */
-    std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*> mFaces;
+    std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*> mFaces;
 
     /**
      * Map that is used only when the vertex mesh is used to represent
@@ -180,10 +179,10 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void save(Archive & archive, const unsigned int version) const
+    template <class Archive>
+    void save(Archive& archive, const unsigned int version) const
     {
-        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
 
         // Create a mesh writer pointing to the correct file and directory
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
@@ -198,18 +197,17 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void load(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void load(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
 
-        VertexMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
+        VertexMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
         this->ConstructFromMeshReader(mesh_reader);
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 public:
-
     /** Forward declaration of element iterator. */
     class VertexElementIterator;
 
@@ -218,7 +216,7 @@ public:
      *
      * @param skipDeletedElements whether to include deleted element
      */
-    inline VertexElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
+    inline VertexElementIterator GetElementIteratorBegin(bool skipDeletedElements = true);
 
     /**
      * @return an iterator to one past the last element in the mesh.
@@ -242,11 +240,15 @@ public:
      * @param vertexElements vector of pointers to VertexElement<3,3>s
      */
     VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
-               std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*> faces,
-               std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements);
+               std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*> faces,
+               std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements);
 
     /**
-     * Alternative 2D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,
+     * @brief  Alternative 2D 'Voronoi' constructor.
+     *
+     * This VertexMesh constructor is currently only defined for 2D meshes.
+     *
+     * Creates a Voronoi tessellation of a given tetrahedral mesh,
      * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
      *
      * \todo Merge with 3D Voronoi constructor? (see #1075)
@@ -254,7 +256,7 @@ public:
      * @param rMesh a tetrahedral mesh
      * @param isPeriodic a boolean that indicates whether the mesh is periodic or not
      */
-    VertexMesh(TetrahedralMesh<2,2>& rMesh, bool isPeriodic=false);
+    VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false);
 
     /**
      * Alternative 3D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,
@@ -264,7 +266,7 @@ public:
      *
      * @param rMesh a tetrahedral mesh
      */
-    VertexMesh(TetrahedralMesh<3,3>& rMesh);
+    VertexMesh(TetrahedralMesh<3, 3>& rMesh);
 
     /**
      * Default constructor for use by serializer.
@@ -308,7 +310,7 @@ public:
      *
      * @return a pointer to the face
      */
-    VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned index) const;
+    VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* GetFace(unsigned index) const;
 
     /**
      * Compute the centroid of an element.
@@ -332,7 +334,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
+    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader);
 
     /**
      * Delete mNodes, mFaces and mElements.
@@ -413,7 +415,7 @@ public:
      *
      * @return the gradient of the area of the element, evaluated at this node.
      */
-    c_vector<double, SPACE_DIM> GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
+    c_vector<double, SPACE_DIM> GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex);
 
     /**
      * Compute the gradient of the edge of a 2D element ending at its nodes.
@@ -426,7 +428,7 @@ public:
      *
      * @return the gradient of the edge of the element that ends at this node.
      */
-    c_vector<double, SPACE_DIM> GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
+    c_vector<double, SPACE_DIM> GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex);
 
     /**
      * Compute the gradient of the edge of a 2D element starting at its nodes.
@@ -439,7 +441,7 @@ public:
      *
      * @return the gradient of the edge of the element that starts at this node.
      */
-    c_vector<double, SPACE_DIM> GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
+    c_vector<double, SPACE_DIM> GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex);
 
     /**
      * Compute the gradient of the perimeter of a 2D element at its nodes.
@@ -450,7 +452,7 @@ public:
      *
      * @return the gradient of the perimeter of the element, evaluated at this node.
      */
-    c_vector<double, SPACE_DIM> GetPerimeterGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
+    c_vector<double, SPACE_DIM> GetPerimeterGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex);
 
     /**
      * Compute the second moments and product moment of area for a given 2D element
@@ -514,7 +516,7 @@ public:
      *
      * @return the area
      */
-    double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal);
+    double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal);
 
     /**
      * Get the area of a given face in 3D.  Uses CalculateUnitNormalToFaceWithArea
@@ -525,7 +527,7 @@ public:
      *
      * @return the area
      */
-    virtual double CalculateAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
+    virtual double CalculateAreaOfFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace);
 
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,
@@ -585,6 +587,16 @@ public:
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
 
     /**
+     * Return a pointer to the vertex mesh
+     *
+     * This method may be overridden in daughter classes for non-Euclidean metrics.
+     * This can then be used when writing to VTK.
+     *
+     * @return a pointer to the vertex mesh
+     */
+    virtual VertexMesh<ELEMENT_DIM, SPACE_DIM>* GetMeshForVtk();
+
+    /**
      * A smart iterator over the elements in the mesh.
      *
      * \todo This is the same as in AbstractTetrahedralMesh and PottsMesh - merge? (#1379)
@@ -629,15 +641,15 @@ public:
          * @param skipDeletedElements whether to include deleted elements
          */
         VertexElementIterator(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                        typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *>::iterator elementIter,
-                        bool skipDeletedElements=true);
+                              typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>::iterator elementIter,
+                              bool skipDeletedElements = true);
 
     private:
         /** The mesh we're iterating over. */
         VertexMesh& mrMesh;
 
         /** The actual element iterator. */
-        typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *>::iterator mElementIter;
+        typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>::iterator mElementIter;
 
         /** Whether to skip deleted elements. */
         bool mSkipDeletedElements;
@@ -659,64 +671,62 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMesh)
 
-
 //////////////////////////////////////////////////////////////////////////////
 // VertexElementIterator class implementation - most methods are inlined    //
 //////////////////////////////////////////////////////////////////////////////
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorBegin(
-        bool skipDeletedElements)
+    bool skipDeletedElements)
 {
     return VertexElementIterator(*this, mElements.begin(), skipDeletedElements);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorEnd()
 {
     return VertexElementIterator(*this, mElements.end());
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mElementIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mElementIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator!=(const typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator& rOther)
 {
     return mElementIter != rOther.mElementIter;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator& VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator++()
 {
     do
     {
         ++mElementIter;
-    }
-    while (!IsAtEnd() && !IsAllowedElement());
+    } while (!IsAtEnd() && !IsAllowedElement());
 
     return (*this);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::VertexElementIterator(
-        VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-        typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *>::iterator elementIter,
-        bool skipDeletedElements)
-    : mrMesh(rMesh),
-      mElementIter(elementIter),
-      mSkipDeletedElements(skipDeletedElements)
+    VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>::iterator elementIter,
+    bool skipDeletedElements)
+        : mrMesh(rMesh),
+          mElementIter(elementIter),
+          mSkipDeletedElements(skipDeletedElements)
 {
     if (mrMesh.mElements.empty())
     {
@@ -733,13 +743,13 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::VertexElementIterator
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::IsAtEnd()
 {
     return mElementIter == mrMesh.mElements.end();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,13 +42,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Boost library includes for the archive types used by Chaste.
  *
  * Intended for use by SerializationExportWrapper.hpp, by tests of
- * archiving, and by CheckpointArchiveTypesIfNeeded.hpp.
+ * archiving and code that needs to directly create an archive itself
+ * e.g. *SimulationArchiver classes.
  */
 
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
-#include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 
 #endif /*CHECKPOINTARCHIVETYPES_HPP_*/

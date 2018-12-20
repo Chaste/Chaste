@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -162,7 +162,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
 
 #ifdef CHASTE_VTK
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
         {
@@ -188,9 +188,6 @@ public:
             FileFinder vtk_file(results_file3, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -223,7 +220,7 @@ public:
         TS_ASSERT(comparer2.CompareFiles());
 
 #ifdef CHASTE_VTK
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
         {
@@ -250,8 +247,6 @@ public:
             TS_ASSERT(vtk_file.Exists());
         }
 
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
 #else
         std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;

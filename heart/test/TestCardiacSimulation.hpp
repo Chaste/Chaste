@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -153,8 +153,50 @@ public:
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
             }
         }
+
+        //Check that the post-processed file is there and remove it
+        FileFinder pseudoecg("SaveMono2D/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput);
+
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT(pseudoecg.Exists()); // Only master tests. This prevents master from removing file before other processes have seen it
+            pseudoecg.Remove();
+            TS_ASSERT(pseudoecg.Exists() == false);
+        }
+
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume.xml");
+
+        //Check that the post-processed file is back after the simulation has been restarted
+        TS_ASSERT(pseudoecg.Exists());  // (Should check that it's bigger than the one we deleted)
+
+        Warnings::QuietDestroy();
+    }
+
+    /* Do the same as before but ask for post-processing after the simulation has been run and checkpointed. */
+    void TestMono2dSmallAddPostprocessingOnResume()
+    {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
+        //Clear any warnings from previous tests
+        Warnings::QuietDestroy();
+        {
+            CardiacSimulation simulation("heart/test/data/xml/monodomain2d_small2.xml", false, true);
+        }
+
+        //Check that the post-processed file is not produced in the original simulation
+        FileFinder pseudoecg("SaveMono2D2/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(pseudoecg.Exists() == false);
+
+        //Check that archive which has just been produced can be read
+        CardiacSimulation simulation2("heart/test/data/xml/monodomain2d_resume2.xml");
+
+        //Check that the post-processed file is present after the simulation has been restarted
+        TS_ASSERT(pseudoecg.Exists());  // (Should check that it's bigger than the one we deleted)
+
         Warnings::QuietDestroy();
     }
 
@@ -297,6 +339,15 @@ public:
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "postprocess_monodomain_short_results", false,
                                                  foldername, "SimulationResults", true, 1e-6));
+        {
+            // look for the existence of post-processing files
+            TS_ASSERT(FileFinder(foldername + "/output/Apd_90_minus_30_Map.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode10.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/ConductionVelocityFromNode20.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/MaxUpstrokeVelocityMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/UpstrokeTimeMap_minus_30.dat", RelativeTo::ChasteTestOutput).Exists());
+            TS_ASSERT(FileFinder(foldername + "/output/PseudoEcgFromElectrodeAt_0.05_0.05_0.dat", RelativeTo::ChasteTestOutput).Exists());
+        }
     }
 
     void TestCardiacSimulationArchiveBidomain()

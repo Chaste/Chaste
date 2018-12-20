@@ -50,7 +50,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     message(STATUS "\t...for GNU compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
     if(NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=0")  # See #2933
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=2")  # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
     endif(NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")

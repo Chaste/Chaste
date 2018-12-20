@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -234,7 +234,7 @@ public:
         std::string results_dir = oh.GetOutputDirectoryFullPath();
         std::string file_name = results_dir + "vec.h5";
 
-        hsize_t file_id = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+        hsize_t file_id = H5Fopen(file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
         //H5Tget_nmembers(file_id);
         hsize_t dataset_id = H5Dopen(file_id, "TheVector", H5P_DEFAULT);
         hsize_t dxpl = H5Pcreate(H5P_DATASET_XFER);

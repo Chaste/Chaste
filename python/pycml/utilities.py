@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2018, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,7 +40,7 @@ from xml.dom import Node # For nodeType values
 
 import amara
 
-from enum import Enum
+from _enum import Enum
 
 __all__ = ['OnlyWarningsFilter', 'OnlyDebugFilter', 'OnlyTheseSourcesFilter', 'NotifyHandler',
            'DEBUG', 'LOG',
