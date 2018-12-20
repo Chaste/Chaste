@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2017, University of Oxford.
+# Copyright (c) 2005-2018, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ message ("####################################\n")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
 project (Chaste)
-set (Chaste_VERSION_MAJOR 2017 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MAJOR 2018 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 include (ChasteHostOperatingSystem)
