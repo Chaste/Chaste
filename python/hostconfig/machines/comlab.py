@@ -1,7 +1,7 @@
 # Configuration for machines following Comlab install guide located at
 # https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/Comlab
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the

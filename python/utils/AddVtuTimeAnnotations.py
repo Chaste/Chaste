@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Copyright (C) Victor Chang Cardiac Research Institute, 2012. (Original author A.Sadrieh)."""
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
