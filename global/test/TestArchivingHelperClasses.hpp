@@ -315,7 +315,7 @@ public:
         //Check testout/archive/specific_secondary.arch
         FileFinder archive_dir("global/test/data", RelativeTo::ChasteSourceRoot);
         std::string archive_file = "future_boost.arch";
-        // future_boost has got archive version 16 in it
+        // future_boost has got archive version 18 in it
         // 1.33 => 3
         // 1.34 => 4
         // 1.36 => 5
@@ -341,7 +341,9 @@ public:
         // 1.64 => 15
         // 1.65 => 15
         // 1.66 => 16
-        // 1.67 => 17
+        // 1.67 => 16
+        // 1.68 => 17
+        // 1.69 => 17
 
 #ifndef BOOST_VERSION
         TS_FAIL("This test needs to know the version of Boost with which it was compiled.");
