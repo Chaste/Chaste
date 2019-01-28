@@ -59,7 +59,6 @@
 #include "PetscSetupAndFinalize.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 
-#include "CellEdgeOdeSrnModel.hpp"
 
 /*
  * The next header file defines a simple subcellular reaction network model that includes the functionality
@@ -72,6 +71,8 @@
  * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta-Notch signalling.
  */
 #include "DeltaNotchTrackingModifier.hpp"
+
+#include "CellEdgeSrnModel.hpp"
 
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
@@ -112,14 +113,22 @@ public:
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
-            /* We choose to initialise the concentrations to random levels in each cell. */
-            std::vector<double> initial_conditions;
-            initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
-            initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
-            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
-            p_srn_model->SetInitialConditions(initial_conditions);
 
-            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
+            CellEdgeSrnModel* cellEdgeSrnModel = new CellEdgeSrnModel();
+
+            /* Adding 6 edges for the honeycomb */
+            for(int i = 0 ; i < 6 ; i ++)
+            {
+                /* We choose to initialise the concentrations to random levels in each cell edge. */
+                std::vector<double> initial_conditions;
+                initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+                initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+                boost::shared_ptr<AbstractOdeSrnModel> p_srn_model(new DeltaNotchSrnModel());
+                p_srn_model->SetInitialConditions(initial_conditions);
+                cellEdgeSrnModel->addEdgeSrn(p_srn_model);
+            }
+
+            CellPtr p_cell(new Cell(p_state, p_cc_model, cellEdgeSrnModel));
             p_cell->SetCellProliferativeType(p_diff_type);
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
@@ -139,7 +148,7 @@ public:
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
          * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestVertexBasedMonolayerWithDeltaNotch");
+        simulator.SetOutputDirectory("TestVertexBasedMonolayerCellEdgeODE");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 
