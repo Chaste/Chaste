@@ -2,8 +2,8 @@
 // Created by twin on 14/01/19.
 //
 
-#ifndef CHASTE_TESTRUNNINGMULTIODECELLS_HPP
-#define CHASTE_TESTRUNNINGMULTIODECELLS_HPP
+#ifndef TESTRUNNINGMULTIODECELLS_HPP_
+#define TESTRUNNINGMULTIODECELLS_HPP_
 
 /*
  * = An example showing how to run Delta/Notch simulations =
@@ -79,6 +79,8 @@
 class TestMultiODECells : public AbstractCellBasedTestSuite
 {
 public:
+
+
 
     /*
      * EMPTYLINE
@@ -170,4 +172,4 @@ public:
 };
 
 
-#endif //CHASTE_TESTRUNNINGMULTIODECELLS_HPP
+#endif //TESTRUNNINGMULTIODECELLS_HPP_
