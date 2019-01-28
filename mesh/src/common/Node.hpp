@@ -80,6 +80,10 @@ private:
      */
     bool mIsDeleted;
 
+
+    /** Set of indices of edges that contains this node **/
+    std::set<unsigned> mEdgeIndices;
+
     /** Set of indices of elements containing this node as a vertex. */
     std::set<unsigned> mElementIndices;
 

@@ -26,7 +26,6 @@ cell_based_pde/TestSimulationsWithParabolicBoxDomainPdeModifier.hpp
 cell_based_pde/TestSimulationsWithParabolicGrowingDomainPdeModifier.hpp
 common/TestOdeLinearSystemSolver.hpp
 common/TestSimulationTime.hpp
-mesh/TestMutableVertexEdges.hpp
 mesh/TestPottsElement.hpp
 mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
@@ -62,7 +61,7 @@ population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestNumericalMethods.hpp
-simulation/TestMultiODECells.hpp
+simulation/TestCellwiseVectorDeltaNotchODESimulation.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithBuskeForces.hpp

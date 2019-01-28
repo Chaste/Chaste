@@ -76,7 +76,7 @@
 
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
-class TestMultiODECells : public AbstractCellBasedTestSuite
+class TestCellwiseVectorDeltaNotchODESimulation : public AbstractCellBasedTestSuite
 {
 public:
 

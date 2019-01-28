@@ -36,6 +36,16 @@ public:
         this->mIndex = index;
     }
 
+    void SetIndex(unsigned index)
+    {
+        mIndex = index;
+    }
+
+    unsigned GetIndex()
+    {
+        return mIndex;
+    }
+
     void SetNodes(Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1)
     {
         mNodes.clear();
