@@ -59,8 +59,9 @@ public:
 
         std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
         elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes0));
+        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
 
+        //Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
 
 

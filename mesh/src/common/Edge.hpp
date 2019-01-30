@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "Node.hpp"
-#include "VertexElement.hpp"
 
 /**
  * An edge in a finite element mesh
@@ -88,12 +87,14 @@ public:
         }
 
         //Can't have associated elements if we're less than 2D
-        if(SPACE_DIM <= 1 && mElementIndices > 0){
+        if(SPACE_DIM <= 1 && mElementIndices.size() > 0)
+        {
             return false;
         }
 
         //An ege can only have a maximum of two elements in 2D
-        if(SPACE_DIM == 2 && mElementIndices > 2){
+        if(SPACE_DIM == 2 && mElementIndices.size() > 2)
+        {
             return false;
         }
 

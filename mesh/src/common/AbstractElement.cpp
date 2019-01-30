@@ -131,6 +131,28 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode)
     mNodes.push_back(pNode);
 }
 
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const {
+    assert((unsigned)localIndex < mEdges.size());
+    return mEdges[localIndex]->GetIndex();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+Edge<SPACE_DIM> *AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned localIndex) const {
+    assert((unsigned)localIndex < mEdges.size());
+    return mEdges[localIndex];
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdges.size();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddEdge(Edge<SPACE_DIM> *pEdge) {
+    mEdges.push_back(pEdge);
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::IsDeleted() const
 {
@@ -223,6 +245,8 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes()
 {
     return mpElementAttributes == nullptr ? 0 : mpElementAttributes->rGetAttributes().size();
 }
+
+
 
 // Explicit instantiation
 template class AbstractElement<0,1>;

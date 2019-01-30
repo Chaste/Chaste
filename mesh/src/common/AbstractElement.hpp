@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 #include "Node.hpp"
+#include "Edge.hpp"
 #include "ElementAttributes.hpp"
 
 /*
@@ -58,6 +59,9 @@ protected:
 
     /** The nodes forming this element. */
     std::vector<Node<SPACE_DIM>*> mNodes;
+
+    /** The edges forming this element **/
+    std::vector<Edge<SPACE_DIM>*> mEdges;
 
     /** The index of this element within the mesh */
     unsigned mIndex;
@@ -175,6 +179,30 @@ public:
      * @param pNode pointer to the new node
      */
     void AddNode(Node<SPACE_DIM>* pNode);
+
+
+    /**
+     * Gets the global index of the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return Global index of the edge
+     */
+    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
+
+    /**
+     * Gets the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return
+     */
+    Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
+
+    /**
+     *
+     * @return Number of edges associated with this element
+     */
+    unsigned GetNumEdges() const;
+
+    void AddEdge(Edge<SPACE_DIM>* pEdge);
+
 
     /**
      * Get whether the element is marked as deleted.

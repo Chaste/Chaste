@@ -97,6 +97,10 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         }
     }
 
+    this->mEdges.push_back(new Edge<SPACE_DIM>(1));
+
+    this->GenerateEdgesFromElements(mElements);
+
     this->mMeshChangesDuringSimulation = false;
 }
 
@@ -386,6 +390,41 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
+        std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *> &elements) {
+
+    std::set<std::set<Edge<SPACE_DIM>*>> createdEdges;
+
+    Node<SPACE_DIM> *node0, *node1;
+
+
+    //Build a list of unique edges from nodes
+    for(auto elem: elements)
+    {
+        for(unsigned i = 0; i < elem->GetNumNodes(); i++)
+        {
+            unsigned i_next = (i + 1) % elem->GetNumNodes();
+            node0 = elem->GetNode(i);
+            node1 = elem->GetNode(i_next);
+
+            assert(node0->GetIndex() != node1->GetIndex());
+
+            //We make sure that node0 always have a lower index
+            if(node0->GetIndex() > node1->GetIndex())
+            {
+                auto swapNode = node0;
+                node0 = node1;
+                node1 = swapNode;
+            }
+
+
+        }
+    }
+
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
@@ -598,6 +637,14 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete this->mNodes[i];
     }
     this->mNodes.clear();
+
+    //Delete edges
+    for (unsigned i = 0; i < this->mEdges.size(); i++)
+    {
+        delete this->mEdges[i];
+    }
+    this->mEdges.clear();
+
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1534,6 +1581,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELE
     c_vector<double, SPACE_DIM> unit_normal;
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
+
+
 
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)
