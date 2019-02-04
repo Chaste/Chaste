@@ -23,7 +23,7 @@ class TestMutableVertexEdges : public CxxTest::TestSuite
 {
 public:
 
-    void TestEdges()
+    void TestEdgesCreation()
     {
         const unsigned ELEMENT_DIM = 2;
         const unsigned SPACE_DIM = 2;
@@ -35,7 +35,6 @@ public:
         TS_ASSERT(!emptyEdge->IsEdgeValid());
 
         TS_ASSERT_EQUALS(exampleEdgeIndex, emptyEdge->GetIndex());
-
 
         //Generate two hex vertex elements
         std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
@@ -56,7 +55,6 @@ public:
         allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
         allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
 
-
         std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
         elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
         elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
@@ -64,6 +62,12 @@ public:
         //Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
 
+        TS_ASSERT_EQUALS(mesh->GetNumEdges(), 11);
+
+        for( unsigned i = 0 ; i < mesh->GetNumEdges(); i++)
+        {
+            TS_ASSERT(mesh->GetEdge(i)->IsEdgeValid());
+        }
 
 
 

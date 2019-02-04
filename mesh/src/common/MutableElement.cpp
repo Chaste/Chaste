@@ -161,6 +161,18 @@ unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocalIndex(unsigned glob
     return local_index;
 }
 
+template<unsigned int SPACE_DIM>
+void MutableElement<1, SPACE_DIM>::DeleteEdge(unsigned index) {
+
+    assert(index < this->mEdges.size());
+
+    // Remove element from the node at this location
+    this->mEdges[index]->RemoveElement(this->mIndex);
+
+    // Remove the node at rIndex (removes node from element)
+    this->mEdges.erase(this->mEdges.begin() + index);
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
 {
@@ -175,6 +187,8 @@ bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
     }
     return is_element_on_boundary;
 }
+
+
 
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //

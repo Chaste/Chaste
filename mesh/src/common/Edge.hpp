@@ -35,6 +35,15 @@ public:
         this->mIndex = index;
     }
 
+    ~Edge()
+    {
+        //Remove all previous nodes and references
+        for(auto node: mNodes)
+            node->RemoveEdge(this->GetIndex());
+        mNodes.clear();
+    }
+
+
     void SetIndex(unsigned index)
     {
         mIndex = index;
@@ -45,11 +54,27 @@ public:
         return mIndex;
     }
 
+    void RemoveNodes(){
+
+        //Remove all previous nodes and references
+        for(auto node: mNodes)
+            node->RemoveEdge(this->GetIndex());
+        mNodes.clear();
+
+    }
+
     void SetNodes(Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1)
     {
-        mNodes.clear();
+        //Clear the nodes first
+        this->RemoveNodes();
+
+        //Add nodes
         mNodes.push_back(node0);
         mNodes.push_back(node1);
+
+        for(auto node: mNodes)
+            node->AddEdge(this->GetIndex());
+
     }
 
     unsigned GetNumNodes()
@@ -62,7 +87,7 @@ public:
         mElementIndices.insert(elementIndex);
     }
 
-    void DeleteElement(unsigned elementIndex)
+    void RemoveElement(unsigned elementIndex)
     {
         mElementIndices.erase(elementIndex);
     }

@@ -247,6 +247,8 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
+    void DeleteEdge(unsigned index);
+
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
      *

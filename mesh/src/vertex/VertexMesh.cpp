@@ -395,12 +395,14 @@ template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
         std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *> &elements) {
 
-    std::set<std::set<Edge<SPACE_DIM>*>> createdEdges;
+
+    std::vector<Edge<SPACE_DIM>* > edgesVector;
+    std::map<unsigned , std::map<unsigned, Edge<SPACE_DIM>* >> edgesMap;
 
     Node<SPACE_DIM> *node0, *node1;
 
 
-    //Build a list of unique edges from nodes
+    //Build a list of unique edges from nodes within all the elements
     for(auto elem: elements)
     {
         for(unsigned i = 0; i < elem->GetNumNodes(); i++)
@@ -419,9 +421,34 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
                 node1 = swapNode;
             }
 
+            //Check that an edge hasn't been created already
+            Edge<SPACE_DIM>* edge = nullptr;
+
+            if(edgesMap.find(node0->GetIndex()) == edgesMap.end())
+            {
+                //Does not exist, make a new map
+                edgesMap[node0->GetIndex()] = std::map<unsigned, Edge<SPACE_DIM>* >();
+            }
+
+            auto edgeItt = edgesMap[node0->GetIndex()].find(node1->GetIndex());
+            if(edgeItt == edgesMap[node0->GetIndex()].end())
+            {
+                edge = new Edge<SPACE_DIM>(edgesVector.size());
+                edge->SetNodes(node0, node1);
+                edgesMap[node0->GetIndex()][node1->GetIndex()] = edge;
+                edgesVector.push_back(edge);
+            }
+            else{
+                edge = edgeItt->second;
+            }
+
+            edge->AddElement(elem->GetIndex());
 
         }
     }
+
+    //Copies to member variable
+    this->mEdges = edgesVector;
 
 }
 
@@ -631,6 +658,13 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     }
     mFaces.clear();
 
+    //Delete edges
+    for (unsigned i = 0; i < this->mEdges.size(); i++)
+    {
+        delete this->mEdges[i];
+    }
+    this->mEdges.clear();
+
     // Delete nodes
     for (unsigned i = 0; i < this->mNodes.size(); i++)
     {
@@ -638,12 +672,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     }
     this->mNodes.clear();
 
-    //Delete edges
-    for (unsigned i = 0; i < this->mEdges.size(); i++)
-    {
-        delete this->mEdges[i];
-    }
-    this->mEdges.clear();
+
 
 }
 
