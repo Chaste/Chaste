@@ -97,7 +97,6 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         }
     }
 
-    this->mEdges.push_back(new Edge<SPACE_DIM>(1));
 
     this->GenerateEdgesFromElements(mElements);
 
@@ -423,7 +422,6 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
 
             //Check that an edge hasn't been created already
             Edge<SPACE_DIM>* edge = nullptr;
-
             if(edgesMap.find(node0->GetIndex()) == edgesMap.end())
             {
                 //Does not exist, make a new map
@@ -442,7 +440,9 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
                 edge = edgeItt->second;
             }
 
-            edge->AddElement(elem->GetIndex());
+
+            //Insert to the end of the list
+            elem->AddEdge(edge, elem->GetNumEdges()-1);
 
         }
     }

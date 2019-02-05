@@ -61,21 +61,22 @@ public:
 
         //Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-
         TS_ASSERT_EQUALS(mesh->GetNumEdges(), 11);
-
         for( unsigned i = 0 ; i < mesh->GetNumEdges(); i++)
         {
             TS_ASSERT(mesh->GetEdge(i)->IsEdgeValid());
         }
 
 
+        //Also test with honeycomb mesh (MutableVertexMesh)
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+        TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19);
+        for( unsigned i = 0 ; i < honeycombMesh->GetNumEdges(); i++)
+        {
+            TS_ASSERT(honeycombMesh->GetEdge(i)->IsEdgeValid());
+        }
 
-
-
-        //Create a mesh, creating edges
-//        HoneycombVertexMeshGenerator generator(5, 5);
-//        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
 
     }

@@ -117,6 +117,8 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
         }
     }
 
+    this->GenerateEdgesFromElements(vertexElements);
+
     this->mMeshChangesDuringSimulation = true;
 }
 

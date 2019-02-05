@@ -148,9 +148,10 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
     return mEdges.size();
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddEdge(Edge<SPACE_DIM> *pEdge) {
     mEdges.push_back(pEdge);
+    pEdge->AddElement(this->mIndex);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

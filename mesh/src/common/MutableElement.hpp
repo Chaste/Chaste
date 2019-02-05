@@ -149,6 +149,10 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
+    void DeleteEdge(const unsigned index);
+    void AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index);
+    void RegisterWithEdges();
+
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
      *
@@ -238,6 +242,8 @@ public:
      */
     void AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
 
+
+
     /**
      * Calculate the local index of a node given a global index
      * if node is not contained in element return UINT_MAX
@@ -247,7 +253,10 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
-    void DeleteEdge(unsigned index);
+
+    void DeleteEdge(const unsigned index);
+    void AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index);
+    void RegisterWithEdges();
 
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.

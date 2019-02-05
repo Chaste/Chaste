@@ -56,6 +56,13 @@ AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
     {
         delete mNodes[i];
     }
+
+    // Iterate over edges and free the memory
+    for(auto edge: mEdges)
+    {
+        delete edge;
+    }
+
     if (mpDistributedVectorFactory)
     {
         delete mpDistributedVectorFactory;

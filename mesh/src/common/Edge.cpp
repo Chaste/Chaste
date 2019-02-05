@@ -3,3 +3,9 @@
 //
 
 #include "Edge.hpp"
+
+
+// Explicit instantiation
+template class Edge<1>;
+template class Edge<2>;
+template class Edge<3>;
