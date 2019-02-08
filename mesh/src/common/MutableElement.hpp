@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
+
+
 /**
  *  A mutable element containing functionality
  *  to add and remove nodes.
@@ -149,9 +151,6 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
-    void DeleteEdge(const unsigned index);
-    void AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index);
-    void RegisterWithEdges();
 
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
@@ -254,9 +253,6 @@ public:
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
 
-    void DeleteEdge(const unsigned index);
-    void AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index);
-    void RegisterWithEdges();
 
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.

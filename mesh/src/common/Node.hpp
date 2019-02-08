@@ -254,8 +254,6 @@ public:
      */
     bool IsBoundaryNode() const;
 
-    void AddEdge(unsigned index);
-    void RemoveEdge(unsigned index);
 
     /**
      * Add an element that contains this node.

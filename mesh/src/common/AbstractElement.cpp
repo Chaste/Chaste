@@ -54,6 +54,21 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
 {
     // Sanity checking
     assert(ELEMENT_DIM <= SPACE_DIM);
+
+    // If SPACE_DIM == 2 then we can assume that the node layout
+    // in the array corresponds to its connections
+    // We can then infer the edge connection information
+    if(SPACE_DIM == 2)
+    {
+        for(unsigned i = 0; i < mNodes.size(); i++)
+        {
+            unsigned i_next = (i+1) % mNodes.size();
+
+            mEdges.push_back(new Edge<SPACE_DIM>(mNodes[i], mNodes[i_next]));
+
+        }
+
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -67,6 +82,12 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
 {
+    // Delete all the edges before destructing
+    for(auto edge: mEdges)
+    {
+        delete edge;
+    }
+
     delete mpElementAttributes;
 }
 
@@ -83,6 +104,15 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldN
         }
     }
     EXCEPTION("You didn't have that node to start with.");
+
+    // Also replace nodes for edges
+    if(mEdges.size() > 0)
+    {
+        for(auto edge: mEdges)
+        {
+            edge->ReplaceNode(pOldNode, pNewNode);
+        }
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -131,11 +161,7 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode)
     mNodes.push_back(pNode);
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const {
-    assert((unsigned)localIndex < mEdges.size());
-    return mEdges[localIndex]->GetIndex();
-}
+
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned localIndex) const {
@@ -148,10 +174,30 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
     return mEdges.size();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddEdge(Edge<SPACE_DIM> *pEdge) {
-    mEdges.push_back(pEdge);
-    pEdge->AddElement(this->mIndex);
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::CheckEdgesAreValid() {
+
+    if(SPACE_DIM != 2)
+    {
+        return false;
+    }
+
+    if(mEdges.size() != mNodes.size())
+    {
+        return false;
+    }
+
+    for( unsigned i = 0; i < mEdges.size(); i++)
+    {
+        auto i_next = (i+1) % mEdges.size();
+        auto edge = mEdges[i];
+
+        // edge at index i must contain nodes at index i and i+1
+        if(!(edge->ContainsNode(mNodes[i]) && edge->ContainsNode(mNodes[i_next])))
+            return false;
+    }
+
+    return true;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -246,6 +292,7 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes()
 {
     return mpElementAttributes == nullptr ? 0 : mpElementAttributes->rGetAttributes().size();
 }
+
 
 
 

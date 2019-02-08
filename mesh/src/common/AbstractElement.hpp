@@ -181,12 +181,6 @@ public:
     void AddNode(Node<SPACE_DIM>* pNode);
 
 
-    /**
-     * Gets the global index of the edge at localIndex
-     * @param localIndex local index of the edge in this element
-     * @return Global index of the edge
-     */
-    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
 
     /**
      * Gets the edge at localIndex
@@ -201,7 +195,8 @@ public:
      */
     unsigned GetNumEdges() const;
 
-    void AddEdge(Edge<SPACE_DIM>* pEdge);
+
+    bool CheckEdgesAreValid();
 
 
     /**

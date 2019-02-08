@@ -74,12 +74,23 @@ public:
         return new CellEdgeSrnModel(*this);
     }
 
-    void addEdgeSrn(std::vector<boost::shared_ptr<AbstractSrnModel>> edgeSrn){
+    void AddEdgeSrn(std::vector<boost::shared_ptr<AbstractSrnModel>> edgeSrn){
         mEdgeSrnModels = edgeSrn;
     }
 
-    void addEdgeSrn(boost::shared_ptr<AbstractSrnModel> edgeSrn){
+    void AddEdgeSrn(boost::shared_ptr<AbstractSrnModel> edgeSrn){
         mEdgeSrnModels.push_back(edgeSrn);
+    }
+
+    unsigned GetNumEdgeSrn()
+    {
+        return mEdgeSrnModels.size();
+    }
+
+    boost::shared_ptr<AbstractSrnModel> GetEdgeSrn(unsigned index)
+    {
+        assert(index < mEdgeSrnModels.size());
+        return mEdgeSrnModels[index];
     }
 
 

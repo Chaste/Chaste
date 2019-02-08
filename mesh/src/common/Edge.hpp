@@ -18,8 +18,6 @@ class Edge {
 
 private:
 
-    /** Index of this edge within the mesh **/
-    unsigned mIndex;
 
     /** Nodes that form this edge **/
     std::vector<Node<SPACE_DIM>*> mNodes;
@@ -30,37 +28,21 @@ private:
 
 public:
 
-    Edge(unsigned index)
+    Edge(Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1)
     {
-        this->mIndex = index;
+        this->SetNodes(node0, node1);
     }
 
     ~Edge()
     {
-        //Remove all previous nodes and references
-        for(auto node: mNodes)
-            node->RemoveEdge(this->GetIndex());
-        mNodes.clear();
+
     }
 
 
-    void SetIndex(unsigned index)
-    {
-        mIndex = index;
-    }
-
-    unsigned GetIndex()
-    {
-        return mIndex;
-    }
 
     void RemoveNodes(){
 
-        //Remove all previous nodes and references
-        for(auto node: mNodes)
-            node->RemoveEdge(this->GetIndex());
         mNodes.clear();
-
     }
 
     void SetNodes(Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1)
@@ -72,14 +54,31 @@ public:
         mNodes.push_back(node0);
         mNodes.push_back(node1);
 
-        for(auto node: mNodes)
-            node->AddEdge(this->GetIndex());
+    }
 
+    void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
+    {
+        for(unsigned i = 0 ; i < mNodes.size(); i++)
+        {
+            if(mNodes[i] == pOldNode)
+                mNodes[i] = pNewNode;
+        }
     }
 
     unsigned GetNumNodes()
     {
         return mNodes.size();
+    }
+
+    bool ContainsNode(Node<SPACE_DIM>* pNode)
+    {
+        for(auto node: mNodes)
+        {
+            if(node == pNode)
+                return true;
+        }
+
+        return false;
     }
 
     void AddElement(unsigned elementIndex)
@@ -90,6 +89,28 @@ public:
     void RemoveElement(unsigned elementIndex)
     {
         mElementIndices.erase(elementIndex);
+    }
+
+    void GetNeighbouringElementIndices(std::set<unsigned>& neighbouring_element_indices)
+    {
+
+        neighbouring_element_indices.clear();
+
+        // Loop over nodes owned by this element
+        for (auto p_node: mNodes)
+        {
+            // Find the indices of the elements owned by this node
+            std::set<unsigned> containing_elem_indices = p_node->rGetContainingElementIndices();
+
+            // Form the union of this set with the current set of neighbouring element indices
+            std::set<unsigned> all_elements;
+            std::set_union(neighbouring_element_indices.begin(), neighbouring_element_indices.end(),
+                           containing_elem_indices.begin(), containing_elem_indices.end(),
+                           std::inserter(all_elements, all_elements.begin()));
+
+            // Update the set of neighbouring element indices
+            neighbouring_element_indices = all_elements;
+        }
     }
 
     unsigned GetNumElements()

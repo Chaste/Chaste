@@ -99,8 +99,7 @@ protected:  // Give access of these variables to subclasses
     /** Vector of pointers to boundary nodes in the mesh. */
     std::vector<Node<SPACE_DIM> *> mBoundaryNodes;
 
-    /** Vector of pointers to eges in the mesh **/
-    std::vector<Edge<SPACE_DIM> *> mEdges;
+
 
 
 
@@ -182,18 +181,7 @@ public:
      */
     virtual ~AbstractMesh();
 
-    /**
-     *
-     * @return The number of edges that are actually in use
-     */
-    unsigned GetNumEdges() const;
 
-    /**
-     *
-     * @param Global index of the edge
-     * @return Pointer to the edge at the index
-     */
-    Edge<SPACE_DIM> * GetEdge(unsigned index) const;
 
     /**
      * @return the number of nodes that are actually in use.

@@ -66,17 +66,16 @@
  * cells through the {{{CellData}}} class.
  */
 #include "DeltaNotchSrnModel.hpp"
-/*
- * The next header defines the simulation class modifier corresponding to the Delta-Notch SRN model.
- * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta-Notch signalling.
- */
-#include "DeltaNotchTrackingModifier.hpp"
 
 #include "CellEdgeSrnModel.hpp"
 
+#include "CellEdgeDeltaNotchTrackingModifier.hpp"
+
+
+
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
-class TestCellwiseVectorDeltaNotchODESimulation : public AbstractCellBasedTestSuite
+class TestVectorCellEdgeDeltaNotchODESimulation : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -127,11 +126,12 @@ public:
                 initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
                 boost::shared_ptr<AbstractOdeSrnModel> p_srn_model(new DeltaNotchSrnModel());
                 p_srn_model->SetInitialConditions(initial_conditions);
-                cellEdgeSrnModel->addEdgeSrn(p_srn_model);
+                cellEdgeSrnModel->AddEdgeSrn(p_srn_model);
             }
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, cellEdgeSrnModel));
             p_cell->SetCellProliferativeType(p_diff_type);
+
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
@@ -150,12 +150,12 @@ public:
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
          * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestVertexBasedMonolayerCellEdgeODE");
+        simulator.SetOutputDirectory("TestVectorCellEdgeDeltaNotchODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within the cells in {{{CellData}}} and passes it to the simulation.*/
-        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        MAKE_PTR(CellEdgeDeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
         MAKE_PTR(NagaiHondaForce<2>, p_force);

@@ -129,8 +129,6 @@ protected:
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
 
-    void GenerateEdgesFromElements(std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> &elements);
-
     /**
      * Populate mNodes with locations corresponding to the element
      * circumcentres of a given TetrahedralMesh. Used by 'Voronoi'
