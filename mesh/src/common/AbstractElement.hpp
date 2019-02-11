@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 #include "Node.hpp"
 #include "Edge.hpp"
+#include "EdgeHelper.hpp"
 #include "ElementAttributes.hpp"
 
 /*
@@ -62,6 +63,8 @@ protected:
 
     /** The edges forming this element **/
     std::vector<Edge<SPACE_DIM>*> mEdges;
+
+    EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
     /** The index of this element within the mesh */
     unsigned mIndex;
@@ -180,7 +183,18 @@ public:
      */
     void AddNode(Node<SPACE_DIM>* pNode);
 
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* edgeHelper);
 
+    void ClearEdges();
+
+    void BuildEdges();
+
+    /**
+     * Gets the global index of the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return Global index of the edge
+     */
+    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
 
     /**
      * Gets the edge at localIndex
@@ -188,6 +202,8 @@ public:
      * @return
      */
     Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
+
+
 
     /**
      *

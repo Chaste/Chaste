@@ -18,6 +18,8 @@ class Edge {
 
 private:
 
+    /** Index of this edge within the mesh **/
+    unsigned mIndex;
 
     /** Nodes that form this edge **/
     std::vector<Node<SPACE_DIM>*> mNodes;
@@ -28,20 +30,41 @@ private:
 
 public:
 
-    Edge(Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1)
+    Edge(unsigned index) : mIndex(index)
+    {
+        this->mIndex = index;
+    }
+
+    Edge(unsigned index, Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1) : mIndex(index)
     {
         this->SetNodes(node0, node1);
     }
 
     ~Edge()
     {
+        //Remove all previous nodes and references
+        for(auto node: mNodes)
+            node->RemoveEdge(this->GetIndex());
+        mNodes.clear();
 
     }
 
+    void SetIndex(unsigned index)
+    {
+        mIndex = index;
+    }
+
+    unsigned GetIndex()
+    {
+        return mIndex;
+    }
 
 
     void RemoveNodes(){
 
+        //Remove all previous nodes and references
+        for(auto node: mNodes)
+            node->RemoveEdge(this->GetIndex());
         mNodes.clear();
     }
 
@@ -53,6 +76,9 @@ public:
         //Add nodes
         mNodes.push_back(node0);
         mNodes.push_back(node1);
+
+        for(auto node: mNodes)
+            node->AddEdge(this->GetIndex());
 
     }
 

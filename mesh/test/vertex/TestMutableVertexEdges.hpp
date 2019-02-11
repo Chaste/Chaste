@@ -28,6 +28,14 @@ public:
         const unsigned ELEMENT_DIM = 2;
         const unsigned SPACE_DIM = 2;
 
+        unsigned exampleEdgeIndex = 1;
+
+        //Empty edge should be invalid
+        Edge<2>* emptyEdge = new Edge<2>(exampleEdgeIndex);
+        TS_ASSERT(!emptyEdge->IsEdgeValid());
+
+        TS_ASSERT_EQUALS(exampleEdgeIndex, emptyEdge->GetIndex());
+
 
         //Generate two hex vertex elements
         std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
@@ -72,6 +80,7 @@ public:
         //Also test with honeycomb mesh (MutableVertexMesh)
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+        TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19);
         for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
         {
             auto element = honeycombMesh->GetElement(i);

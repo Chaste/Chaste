@@ -56,6 +56,8 @@ class VertexMeshWriter;
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
 
+#include "EdgeHelper.hpp"
+
 /**
  * A vertex-based mesh class, in which elements may contain different numbers of nodes.
  * This is facilitated by the VertexElement class.
@@ -75,6 +77,9 @@ class VertexMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestVertexMesh;
 
+private:
+
+    EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
 protected:
     /** Vector of pointers to VertexElements. */
@@ -128,6 +133,7 @@ protected:
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
+    void GenerateEdgesFromElements(std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> &elements);
 
     /**
      * Populate mNodes with locations corresponding to the element

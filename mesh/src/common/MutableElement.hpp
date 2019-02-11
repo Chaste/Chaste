@@ -151,6 +151,9 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
+    void DeleteEdge(const unsigned index);
+    void AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index);
+    void RegisterWithEdges();
 
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
@@ -252,6 +255,9 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
+    void DeleteEdge(const unsigned index);
+    void AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index);
+    void RegisterWithEdges();
 
 
     /**
