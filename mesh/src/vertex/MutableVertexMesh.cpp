@@ -868,6 +868,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     {
         this->mNodes[i]->SetIndex(i);
     }
+
+    // Update the node-edge mapping
+    this->mEdges.UpdateEdgesMapKey();
+
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -911,6 +915,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
          * (see #2664).
          */
         this->CheckForRosettes();
+
+
     }
     else // 3D
     {

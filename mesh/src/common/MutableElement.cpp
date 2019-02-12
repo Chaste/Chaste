@@ -90,6 +90,12 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
     {
        this->mNodes[i]->RemoveElement(this->mIndex);
     }
+
+    for(unsigned i=0; i< this->GetNumEdges(); i++)
+    {
+        this->mEdges[i]->RemoveElement(this->mIndex);
+    }
+
     this->mIndex = index;
     RegisterWithNodes();
     RegisterWithEdges();
@@ -102,7 +108,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, 
     assert(rIndex < this->mNodes.size());
 
     // Update surrounding edges
-    if(SPACE_DIM == 2)
+    if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
     {
         auto pOldNode = this->mNodes[rIndex];
         unsigned rPrevIndex = (rIndex-1) % this->mEdges.size();
@@ -128,7 +134,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
     assert(rIndex < this->mNodes.size());
 
     // Update surrounding edges
-    if(SPACE_DIM == 2)
+    if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
     {
 
         unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
@@ -161,11 +167,11 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
      * require the two cases below for both edges and nodes.
      */
 
-    if(SPACE_DIM == 2)
+    if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
     {
         if(this->mEdges.empty())
         {
-            this->mEdges.push_back(new Edge<SPACE_DIM>(pNode, pNode));
+            this->mEdges.push_back(this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, pNode, pNode));
         }
         else
         {
@@ -181,7 +187,9 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
             auto nextNode = this->mNodes[rNextIndex];
 
             this->mEdges[rIndex]->SetNodes(prevNode, currentNode);
-            this->mEdges.insert(this->mEdges.begin() + rIndex+1, new Edge<SPACE_DIM>(currentNode, nextNode));
+
+            this->mEdges.insert(this->mEdges.begin() + rIndex+1,
+                    this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode));
         }
 
     }
@@ -222,42 +230,6 @@ unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocalIndex(unsigned glob
     return local_index;
 }
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteEdge(const unsigned index) {
-
-    assert(index < this->mEdges.size());
-
-    // Remove element from the node at this location
-    this->mEdges[index]->RemoveElement(this->GetIndex());
-
-    // Remove the node at index (removes node from element)
-    this->mEdges.erase(this->mEdges.begin() + index);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddEdge(Edge<SPACE_DIM> *pEdge, const unsigned index) {
-
-    if (this->mEdges.empty())
-    {
-        // Populate mNodes with pNode
-        this->mEdges.push_back(pEdge);
-
-
-    }
-    else
-    {
-        assert(index < this->mEdges.size());
-
-        // Add pNode to rIndex+1 element of mNodes pushing the others up
-        this->mEdges.insert(this->mEdges.begin() + index+1,  pEdge);
-
-    }
-
-    // Add element to this node
-    pEdge->AddElement(this->GetIndex());
-
-}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithEdges() {
@@ -338,14 +310,28 @@ void MutableElement<1, SPACE_DIM>::ResetIndex(unsigned index)
     {
        this->mNodes[i]->RemoveElement(this->mIndex);
     }
+    for (unsigned i=0; i<this->GetNumEdges(); i++)
+    {
+        this->mEdges[i]->RemoveElement(this->mIndex);
+    }
     this->mIndex = index;
     RegisterWithNodes();
+    RegisterWithEdges();
 }
 
 template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
 {
     assert(rIndex < this->mNodes.size());
+
+    // Update surrounding edges
+    if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
+    {
+        auto pOldNode = this->mNodes[rIndex];
+        unsigned rPrevIndex = (rIndex-1) % this->mEdges.size();
+        this->mEdges[rPrevIndex]->ReplaceNode(pOldNode, pNode);
+        this->mEdges[rIndex]->ReplaceNode(pOldNode, pNode);
+    }
 
     // Remove it from the node at this location
     this->mNodes[rIndex]->RemoveElement(this->mIndex);
@@ -362,6 +348,24 @@ void MutableElement<1, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
 
+    // Update surrounding edges
+    if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
+    {
+
+        unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
+        unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
+
+        auto currentNode = this->mNodes[rIndex];
+        auto nextNode = this->mNodes[rNextIndex];
+
+        // Connect the non-deleted edge
+        this->mEdges[rPrevIndex]->ReplaceNode(currentNode, nextNode);
+
+        // Delete the edge
+        this->mEdges.erase(this->mEdges.begin() + rIndex);
+
+    }
+
     // Remove element from the node at this location
     this->mNodes[rIndex]->RemoveElement(this->mIndex);
 
@@ -373,6 +377,33 @@ template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
+
+    if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
+    {
+        if(this->mEdges.empty())
+        {
+            this->mEdges.push_back(this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, pNode, pNode));
+        }
+        else
+        {
+            // Take the 3 node element as shown below (N# are nodes and E# are edges)
+            // N0 ==E0== N1 ==E1== N2 ==E2== N0
+            // If rIndex = 1, the new edge (NE) is added after the new node (NN)
+            // N0 ==E0== N1 ==E1== NN --NE-- N2 ==E2== N0
+
+            unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
+
+            auto prevNode = this->mNodes[rIndex];
+            auto currentNode = pNode;
+            auto nextNode = this->mNodes[rNextIndex];
+
+            this->mEdges[rIndex]->SetNodes(prevNode, currentNode);
+
+            this->mEdges.insert(this->mEdges.begin() + rIndex+1,
+                                this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode));
+        }
+
+    }
 
     // Add pNode to rIndex+1 element of mNodes pushing the others up
     this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
@@ -395,39 +426,6 @@ unsigned MutableElement<1, SPACE_DIM>::GetNodeLocalIndex(unsigned globalIndex) c
     return local_index;
 }
 
-template<unsigned SPACE_DIM>
-void MutableElement<1, SPACE_DIM>::DeleteEdge(const unsigned index){
-    assert(index < this->mEdges.size());
-
-    // Remove element from the node at this location
-    this->mEdges[index]->RemoveElement(this->GetIndex());
-
-    // Remove the node at index (removes node from element)
-    this->mEdges.erase(this->mEdges.begin() + index);
-
-}
-
-template<unsigned SPACE_DIM>
-void MutableElement<1, SPACE_DIM>::AddEdge(Edge<SPACE_DIM>* pEdge, const unsigned index){
-
-    if (this->mEdges.empty())
-    {
-        // Populate mNodes with pNode
-        this->mEdges.push_back(pEdge);
-    }
-    else
-    {
-        assert(index < this->mEdges.size());
-
-        // Add pNode to index+1 element of mNodes pushing the others up
-        this->mEdges.insert(this->mEdges.begin() + index+1,  pEdge);
-
-    }
-
-    // Add element to this node
-    pEdge->AddElement(this->GetIndex());
-
-}
 
 template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::RegisterWithEdges(){

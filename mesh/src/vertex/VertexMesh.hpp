@@ -56,7 +56,6 @@ class VertexMeshWriter;
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
 
-#include "EdgeHelper.hpp"
 
 /**
  * A vertex-based mesh class, in which elements may contain different numbers of nodes.
@@ -77,9 +76,6 @@ class VertexMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestVertexMesh;
 
-private:
-
-    EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
 protected:
     /** Vector of pointers to VertexElements. */

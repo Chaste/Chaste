@@ -66,6 +66,7 @@ protected:
 
     EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
+
     /** The index of this element within the mesh */
     unsigned mIndex;
 

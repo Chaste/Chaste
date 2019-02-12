@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Node.hpp"
 #include "Edge.hpp"
+#include "EdgeHelper.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "ProcessSpecificArchive.hpp"
 #include "ChasteCuboid.hpp"
@@ -100,7 +101,7 @@ protected:  // Give access of these variables to subclasses
     std::vector<Node<SPACE_DIM> *> mBoundaryNodes;
 
     /** Vector of pointers to eges in the mesh **/
-    std::vector<Edge<SPACE_DIM> *> mEdges;
+    EdgeHelper<SPACE_DIM> mEdges;
 
     /**
      * DistributedVectorFactory capable of reproducing the

@@ -57,11 +57,7 @@ AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
         delete mNodes[i];
     }
 
-    // Iterate over edges and free the memory
-    for(auto edge: mEdges)
-    {
-        delete edge;
-    }
+
 
     if (mpDistributedVectorFactory)
     {
@@ -71,7 +67,7 @@ AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
-    return this->mEdges.size();
+    return mEdges.GetNumEdges();
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>

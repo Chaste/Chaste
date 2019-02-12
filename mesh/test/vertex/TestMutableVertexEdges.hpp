@@ -30,14 +30,14 @@ public:
 
         unsigned exampleEdgeIndex = 1;
 
-        //Empty edge should be invalid
+        // Empty edge should be invalid
         Edge<2>* emptyEdge = new Edge<2>(exampleEdgeIndex);
         TS_ASSERT(!emptyEdge->IsEdgeValid());
 
         TS_ASSERT_EQUALS(exampleEdgeIndex, emptyEdge->GetIndex());
 
 
-        //Generate two hex vertex elements
+        // Generate two hex vertex elements
         std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
         nodes0.push_back(new Node<SPACE_DIM>(0));
         nodes0.push_back(new Node<SPACE_DIM>(1));
@@ -56,18 +56,11 @@ public:
         allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
         allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
 
-        auto element0 = new VertexElement<ELEMENT_DIM,SPACE_DIM>(0);
-        for(auto node: nodes0)
-        {
-            element0->AddNode(node, element0->GetNumNodes() -1);
-            TS_ASSERT(element0->CheckEdgesAreValid());
-        }
-
         std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
-        elements.push_back(element0);
+        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
         elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
 
-        //Generate a mesh which will automatically build the edges in the constructor
+        // Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
         for( unsigned i = 0; i < mesh->GetNumElements(); i++)
         {
@@ -75,9 +68,7 @@ public:
             TS_ASSERT(element->CheckEdgesAreValid());
         }
 
-
-
-        //Also test with honeycomb mesh (MutableVertexMesh)
+        // Also test with honeycomb mesh (MutableVertexMesh)
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
         TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19);
@@ -88,9 +79,27 @@ public:
         }
 
 
-        //Edges only for 2D elements
-        //Edges has same size as num nodes
-        //Edges position corresponds to nodes
+        // Perform a test T1 swap on a shared edge
+        for(unsigned i = 0 ;i < honeycombMesh->GetNumEdges(); i++)
+        {
+            auto edge = honeycombMesh->GetEdge(i);
+            if(edge->GetNumElements() > 1)
+            {
+                honeycombMesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
+                break;
+            }
+
+        }
+
+        honeycombMesh->mEdges.UpdateEdgesMapKey();
+
+        // Check edges again
+        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
+        {
+            auto element = honeycombMesh->GetElement(i);
+            TS_ASSERT(element->CheckEdgesAreValid());
+        }
+
 
     }
 

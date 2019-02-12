@@ -10,6 +10,8 @@
 
 #include "Node.hpp"
 
+typedef std::pair<unsigned ,unsigned> UIndexPair;
+
 /**
  * An edge in a finite element mesh
  */
@@ -21,6 +23,8 @@ private:
     /** Index of this edge within the mesh **/
     unsigned mIndex;
 
+    bool mIsDeleted;
+
     /** Nodes that form this edge **/
     std::vector<Node<SPACE_DIM>*> mNodes;
 
@@ -30,12 +34,12 @@ private:
 
 public:
 
-    Edge(unsigned index) : mIndex(index)
+    Edge(unsigned index) : mIndex(index), mIsDeleted(false)
     {
         this->mIndex = index;
     }
 
-    Edge(unsigned index, Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1) : mIndex(index)
+    Edge(unsigned index, Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1) : mIndex(index), mIsDeleted(false)
     {
         this->SetNodes(node0, node1);
     }
@@ -49,6 +53,16 @@ public:
 
     }
 
+    void MarkDeleted()
+    {
+        mIsDeleted = true;
+    }
+
+    bool IsDeleted()
+    {
+        return mIsDeleted;
+    }
+
     void SetIndex(unsigned index)
     {
         mIndex = index;
@@ -59,6 +73,20 @@ public:
         return mIndex;
     }
 
+    UIndexPair GetMapIndex()
+    {
+        assert(mNodes.size() == 2);
+        auto index0 = mNodes[0]->GetIndex();
+        auto index1 = mNodes[1]->GetIndex();
+        if(index0 > index1)
+        {
+            auto indexSwap = index0;
+            index0 = index1;
+            index1 = indexSwap;
+        }
+
+        return UIndexPair(index0, index1);
+    }
 
     void RemoveNodes(){
 
@@ -87,8 +115,17 @@ public:
         for(unsigned i = 0 ; i < mNodes.size(); i++)
         {
             if(mNodes[i] == pOldNode)
+            {
+                pOldNode->RemoveEdge(this->mIndex);
+                pNewNode->AddEdge(this->mIndex);
                 mNodes[i] = pNewNode;
+            }
         }
+    }
+
+    Node<SPACE_DIM>* GetNode(unsigned index)
+    {
+        return mNodes[index];
     }
 
     unsigned GetNumNodes()
@@ -100,7 +137,7 @@ public:
     {
         for(auto node: mNodes)
         {
-            if(node == pNode)
+            if(node->GetIndex() == pNode->GetIndex())
                 return true;
         }
 
