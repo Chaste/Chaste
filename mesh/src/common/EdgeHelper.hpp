@@ -50,8 +50,6 @@ public:
     {
         assert(node0->GetIndex() != node1->GetIndex());
 
-
-
         //Swap node so we always have the lower index as node 0
         if(node0->GetIndex() > node1->GetIndex())
         {
@@ -66,7 +64,7 @@ public:
         Edge<SPACE_DIM>* edge = nullptr;
 
         auto edgeItt = mEdgesMap.find(edgeMapIndices);
-        if(edgeItt == mEdgesMap.end())
+        if(edgeItt == mEdgesMap.end() || edgeItt->second->IsDeleted())
         {
             edge = new Edge<SPACE_DIM>(mEdges.size(), node0, node1);
             mEdgesMap[edgeMapIndices] = edge;

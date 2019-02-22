@@ -102,8 +102,8 @@ public:
         this->RemoveNodes();
 
         //Add nodes
-        mNodes.push_back(node0);
-        mNodes.push_back(node1);
+        this->mNodes.push_back(node0);
+        this->mNodes.push_back(node1);
 
         for(auto node: mNodes)
             node->AddEdge(this->GetIndex());
@@ -114,11 +114,12 @@ public:
     {
         for(unsigned i = 0 ; i < mNodes.size(); i++)
         {
-            if(mNodes[i] == pOldNode)
+            if(this->mNodes[i] == pOldNode)
             {
                 pOldNode->RemoveEdge(this->mIndex);
                 pNewNode->AddEdge(this->mIndex);
-                mNodes[i] = pNewNode;
+                this->mNodes[i] = pNewNode;
+                break;
             }
         }
     }
