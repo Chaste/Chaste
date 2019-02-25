@@ -215,6 +215,11 @@ bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::CheckEdgesAreValid() {
         auto i_next = (i+1) % mEdges.size();
         auto edge = mEdges[i];
 
+        if(!edge->IsEdgeValid())
+        {
+            return false;
+        }
+
         // edge at index i must contain nodes at index i and i+1
         if(!(edge->ContainsNode(mNodes[i]) && edge->ContainsNode(mNodes[i_next])))
             return false;

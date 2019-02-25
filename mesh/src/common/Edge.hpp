@@ -155,26 +155,19 @@ public:
         mElementIndices.erase(elementIndex);
     }
 
-    void GetNeighbouringElementIndices(std::set<unsigned>& neighbouring_element_indices)
+    std::set<unsigned> GetNeighbouringElementIndices()
     {
 
-        neighbouring_element_indices.clear();
+        std::set<unsigned> neighbouring_element_indices;
 
-        // Loop over nodes owned by this element
-        for (auto p_node: mNodes)
-        {
-            // Find the indices of the elements owned by this node
-            std::set<unsigned> containing_elem_indices = p_node->rGetContainingElementIndices();
+        auto elem_indices0 = mNodes[0]->rGetContainingElementIndices();
+        auto elem_indices1 = mNodes[1]->rGetContainingElementIndices();
 
-            // Form the union of this set with the current set of neighbouring element indices
-            std::set<unsigned> all_elements;
-            std::set_union(neighbouring_element_indices.begin(), neighbouring_element_indices.end(),
-                           containing_elem_indices.begin(), containing_elem_indices.end(),
-                           std::inserter(all_elements, all_elements.begin()));
+        std::set_intersection(elem_indices0.begin(), elem_indices0.end(),
+                elem_indices1.begin(), elem_indices1.end(),
+                std::inserter(neighbouring_element_indices, neighbouring_element_indices.begin()));
 
-            // Update the set of neighbouring element indices
-            neighbouring_element_indices = all_elements;
-        }
+        return neighbouring_element_indices;
     }
 
     unsigned GetNumElements()
@@ -207,7 +200,6 @@ public:
         {
             return false;
         }
-
 
         return true;
     }
