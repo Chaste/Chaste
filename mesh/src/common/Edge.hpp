@@ -46,9 +46,6 @@ public:
 
     ~Edge()
     {
-        //Remove all previous nodes and references
-        for(auto node: mNodes)
-            node->RemoveEdge(this->GetIndex());
         mNodes.clear();
 
     }
@@ -88,11 +85,8 @@ public:
         return UIndexPair(index0, index1);
     }
 
-    void RemoveNodes(){
-
-        //Remove all previous nodes and references
-        for(auto node: mNodes)
-            node->RemoveEdge(this->GetIndex());
+    void RemoveNodes()
+    {
         mNodes.clear();
     }
 
@@ -105,9 +99,6 @@ public:
         this->mNodes.push_back(node0);
         this->mNodes.push_back(node1);
 
-        for(auto node: mNodes)
-            node->AddEdge(this->GetIndex());
-
     }
 
     void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
@@ -116,8 +107,6 @@ public:
         {
             if(this->mNodes[i] == pOldNode)
             {
-                pOldNode->RemoveEdge(this->mIndex);
-                pNewNode->AddEdge(this->mIndex);
                 this->mNodes[i] = pNewNode;
                 break;
             }
@@ -197,6 +186,12 @@ public:
 
         //An ege can only have a maximum of two elements in 2D
         if(SPACE_DIM == 2 && mElementIndices.size() > 2)
+        {
+            return false;
+        }
+
+        auto neighbour_indices = GetNeighbouringElementIndices();
+        if(neighbour_indices != mElementIndices)
         {
             return false;
         }

@@ -86,19 +86,21 @@ public:
             if(edge->GetNumElements() > 1)
             {
                 honeycombMesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
-                break;
+                honeycombMesh->RemoveDeletedNodes();
+
+
             }
 
         }
-
-        honeycombMesh->mEdges.UpdateEdgesMapKey();
 
         // Check edges again
         for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
         {
             auto element = honeycombMesh->GetElement(i);
             TS_ASSERT(element->CheckEdgesAreValid());
+
         }
+
 
 
     }

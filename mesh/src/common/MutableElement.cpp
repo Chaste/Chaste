@@ -140,14 +140,17 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
         unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
         unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
 
-        auto currentNode = this->mNodes[rIndex];
+
+        auto prevNode = this->mNodes[rPrevIndex];
         auto nextNode = this->mNodes[rNextIndex];
 
-        // Connect the non-deleted edge
-        this->mEdges[rPrevIndex]->ReplaceNode(currentNode, nextNode);
+
+        // Replace the edge
+        this->mEdges[rPrevIndex]->RemoveElement(this->GetIndex());
+        this->mEdges[rPrevIndex] = this->mEdgeHelper->GetEdgeFromNodes(this->GetIndex(), prevNode, nextNode);
 
         // Delete the edge
-        this->mEdges[rIndex]->MarkDeleted();
+        this->mEdges[rIndex]->RemoveElement(this->GetIndex());
         this->mEdges.erase(this->mEdges.begin() + rIndex);
 
     }
@@ -180,7 +183,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
             // Take the 3 node element as shown below (N# are nodes and E# are edges)
             // N0 ==E0== N1 ==E1== N2 ==E2== N0
             // If rIndex = 1, the new edge (NE) is added after the new node (NN)
-            // N0 ==E0== N1 ==E1== NN --NE-- N2 ==E2== N0
+            // Edge ==E1== is marked for delete
+            // N0 ==E0== N1 --NE-- NN --NE-- N2 ==E2== N0
 
             unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
 
@@ -188,7 +192,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
             auto currentNode = pNode;
             auto nextNode = this->mNodes[rNextIndex];
 
-            this->mEdges[rIndex]->MarkDeleted();
+            this->mEdges[rIndex]->RemoveElement(this->GetIndex());
             this->mEdges[rIndex] = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, prevNode, currentNode);
 
             auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);

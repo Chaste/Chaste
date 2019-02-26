@@ -842,6 +842,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
+    // Remove deleted edges and update the node-edge mapping
+    this->mEdges.RemoveDeletedEdges();
+
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     std::vector<Node<SPACE_DIM>*> live_nodes;
     for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -871,6 +874,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 
     // Update the node-edge mapping
     this->mEdges.UpdateEdgesMapKey();
+
 
 }
 

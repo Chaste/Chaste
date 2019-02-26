@@ -222,7 +222,22 @@ bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::CheckEdgesAreValid() {
 
         // edge at index i must contain nodes at index i and i+1
         if(!(edge->ContainsNode(mNodes[i]) && edge->ContainsNode(mNodes[i_next])))
+        {
+            printf("Node Indices: ");
+            for(auto nodeOut: this->mNodes)
+            {
+                printf(" %i ", nodeOut->GetIndex());
+            }
+            printf("\n Edge-node indices");
+            for(auto edgeOut: this->mEdges)
+            {
+                printf(" %i (%i -> %i)", edgeOut->GetIndex(), edgeOut->GetNode(0)->GetIndex(), edgeOut->GetNode(1)->GetIndex());
+            }
+
+
             return false;
+        }
+
     }
 
     return true;
