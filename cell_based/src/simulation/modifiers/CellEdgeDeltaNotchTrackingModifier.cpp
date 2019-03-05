@@ -46,20 +46,26 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
     {
         auto p_celledge_model = static_cast<CellEdgeSrnModel*>(cell_iter->GetSrnModel());
 
+        std::vector<double> notches;
+        std::vector<double> deltas;
+
         for(unsigned i = 0 ; i  < p_celledge_model->GetNumEdgeSrn(); i++)
         {
             boost::shared_ptr<DeltaNotchSrnModel> p_model = boost::static_pointer_cast<DeltaNotchSrnModel>(p_celledge_model->GetEdgeSrn(i));
             double this_delta = p_model->GetDelta();
             double this_notch = p_model->GetNotch();
 
-            // TODO: CellEdgeData
-            // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
-            cell_iter->GetCellData()->SetItem("notch", this_notch);
-            cell_iter->GetCellData()->SetItem("delta", this_delta);
+            deltas.push_back(this_delta);
+            notches.push_back(this_notch);
+
         }
 
+        // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
+        cell_iter->GetCellEdgeData()->SetItem("notch", notches);
+        cell_iter->GetCellEdgeData()->SetItem("delta", deltas);
 
     }
+
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();

@@ -79,6 +79,23 @@ public:
         }
 
 
+
+    }
+
+    void TestT1Swap()
+    {
+
+        // Also test with honeycomb mesh (MutableVertexMesh)
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+        TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19);
+        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
+        {
+            auto element = honeycombMesh->GetElement(i);
+            TS_ASSERT(element->CheckEdgesAreValid());
+        }
+
+
         // Perform a test T1 swap on a shared edge
         for(unsigned i = 0 ;i < honeycombMesh->GetNumEdges(); i++)
         {
@@ -87,8 +104,6 @@ public:
             {
                 honeycombMesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
                 honeycombMesh->RemoveDeletedNodes();
-
-
             }
 
         }
@@ -102,6 +117,23 @@ public:
         }
 
 
+    }
+
+    void TestMeshElementDivide()
+    {
+        // Test cell deivision with honeycomb mesh
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+
+        honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
+
+        // Check edges again
+        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
+        {
+            auto element = honeycombMesh->GetElement(i);
+            TS_ASSERT(element->CheckEdgesAreValid());
+
+        }
 
     }
 

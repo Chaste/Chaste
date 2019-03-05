@@ -75,7 +75,7 @@
 
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
-class TestVectorCellEdgeDeltaNotchODESimulation : public AbstractCellBasedTestSuite
+class TestVertexCellEdgeDeltaNotchODESimulation : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -150,7 +150,7 @@ public:
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
          * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestVectorCellEdgeDeltaNotchODESimulation");
+        simulator.SetOutputDirectory("TestVertexCellEdgeDeltaNotchODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 

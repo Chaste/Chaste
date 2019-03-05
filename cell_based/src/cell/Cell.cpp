@@ -105,6 +105,13 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         mCellPropertyCollection.AddProperty(p_cell_data);
     }
 
+    if(!mCellPropertyCollection.HasPropertyType<CellEdgeData>())
+    {
+        // Add empty cell edge data
+        MAKE_PTR(CellEdgeData, p_cell_edge_data);
+        mCellPropertyCollection.AddProperty(p_cell_edge_data);
+    }
+
     /*
      * If a cell proliferative type was not passed in via the input
      * argument cellPropertyCollection (for example as in the case
@@ -265,6 +272,18 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
     assert(cell_data_collection.GetSize() <= 1);
 
     return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+}
+
+boost::shared_ptr<CellEdgeData> Cell::GetCellEdgeData() const {
+    CellPropertyCollection cell_edge_data_collection = mCellPropertyCollection.GetPropertiesType<CellEdgeData>();
+
+    /*
+     * Note: In its current form the code requires each cell to have exactly
+     * one CellEdgeData object. This is reflected in the assertion below.
+     */
+    assert(cell_edge_data_collection.GetSize() <= 1);
+
+    return boost::static_pointer_cast<CellEdgeData>(cell_edge_data_collection.GetProperty());
 }
 
 bool Cell::HasCellVecData() const
