@@ -174,6 +174,32 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
     return this->rGetMesh().GetNeighbouringElementIndices(elem_index);
 }
 
+template<unsigned int DIM>
+std::set<std::pair<unsigned int, unsigned int>>
+VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex) {
+
+    std::set<std::pair<unsigned, unsigned>> neighbours;
+
+    auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
+    auto element = this->GetElement(cellLocationIndex);
+    auto globalEdgeIndex = element->GetEdgeGlobalIndex(pEdgeLocalIndex);
+    auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(pEdgeLocalIndex);
+
+    for(auto neighbourElementIndex: neighbourElementIndices)
+    {
+        auto neighbourElement = this->GetElement(neighbourElementIndex);
+        for(unsigned eIndex = 0; eIndex < neighbourElement->GetNumEdges(); eIndex++)
+        {
+            if(neighbourElement->GetEdge(eIndex)->GetIndex() == globalEdgeIndex)
+            {
+                neighbours.insert(std::pair<unsigned, unsigned>(neighbourElementIndex, eIndex));
+            }
+        }
+    }
+
+    return neighbours;
+}
+
 template<unsigned DIM>
 unsigned VertexBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
@@ -839,6 +865,8 @@ void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restr
 {
     mRestrictVertexMovement = restrictMovement;
 }
+
+
 
 // Explicit instantiation
 template class VertexBasedCellPopulation<1>;

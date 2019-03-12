@@ -65,7 +65,7 @@
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
  * cells through the {{{CellData}}} class.
  */
-#include "DeltaNotchSrnModel.hpp"
+#include "DeltaNotchEdgeSrnModel.hpp"
 
 #include "CellEdgeSrnModel.hpp"
 
@@ -124,7 +124,7 @@ public:
                 std::vector<double> initial_conditions;
                 initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
                 initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
-                boost::shared_ptr<AbstractOdeSrnModel> p_srn_model(new DeltaNotchSrnModel());
+                boost::shared_ptr<AbstractOdeSrnModel> p_srn_model(new DeltaNotchEdgeSrnModel());
                 p_srn_model->SetInitialConditions(initial_conditions);
                 cellEdgeSrnModel->AddEdgeSrn(p_srn_model);
             }

@@ -104,6 +104,11 @@ protected:
     double mSimulatedToTime;
 
     /**
+     * The local edge index when used as part of a edge-based SRN
+     */
+    unsigned mEdgeLocalIndex;
+
+    /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
@@ -237,6 +242,19 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSrnModelParameters(out_stream& rParamsFile);
+
+    /**
+     * Sets the local edge index that this srn object belongs to
+     * @param index
+     */
+    void SetEdgeLocalIndex(unsigned index);
+
+
+    /**
+     * Gets the local edge index that this srn object belongs to
+     * @return
+     */
+    unsigned GetEdgeLocalIndex();
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

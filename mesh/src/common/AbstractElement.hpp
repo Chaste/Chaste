@@ -204,8 +204,6 @@ public:
      */
     Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
 
-
-
     /**
      *
      * @return Number of edges associated with this element
@@ -213,6 +211,18 @@ public:
     unsigned GetNumEdges() const;
 
 
+    /**
+     * Gets a set of element indices that neighours the element at the specified edge
+     * @param localIndex Local index of the edge in this element
+     * @return A set of element indices that neighbours this edge
+     */
+    std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
+
+
+    /**
+     * TODO: Proper description
+     * @return
+     */
     bool CheckEdgesAreValid();
 
 

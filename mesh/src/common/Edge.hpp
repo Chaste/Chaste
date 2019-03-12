@@ -134,6 +134,18 @@ public:
         return false;
     }
 
+    std::set<unsigned> GetOtherElements(unsigned elementIndex)
+    {
+        std::set<unsigned> otherElements;
+        std::set<unsigned> currentElem;
+        currentElem.insert(elementIndex);
+        std::set_difference(currentElem.begin(), currentElem.end(),
+                mElementIndices.begin(), mElementIndices.end(),
+                std::inserter(otherElements, otherElements.begin()));
+
+        return otherElements;
+    }
+
     void AddElement(unsigned elementIndex)
     {
         mElementIndices.insert(elementIndex);

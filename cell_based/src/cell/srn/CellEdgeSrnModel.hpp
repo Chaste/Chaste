@@ -79,7 +79,9 @@ public:
     }
 
     void AddEdgeSrn(boost::shared_ptr<AbstractSrnModel> edgeSrn){
+        edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
         mEdgeSrnModels.push_back(edgeSrn);
+
     }
 
     unsigned GetNumEdgeSrn()

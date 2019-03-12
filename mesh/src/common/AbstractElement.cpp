@@ -198,6 +198,14 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementAtEdgeIndex(unsigned localIndex)
+{
+    assert(localIndex < mEdges.size());
+
+    return mEdges[localIndex]->GetOtherElements(this->mIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::CheckEdgesAreValid() {
 
     if(SPACE_DIM != 2)

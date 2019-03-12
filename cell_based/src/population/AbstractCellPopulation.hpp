@@ -578,6 +578,14 @@ public:
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell)=0;
 
     /**
+     * Gets the local edge index of the neighbouring element
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * @return pair of element location and local edge index
+     */
+    virtual std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeIndex);
+
+    /**
      * @return the centroid of the cell population.
      */
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();

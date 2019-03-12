@@ -238,6 +238,10 @@ public:
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
+    std::set<std::pair<unsigned int, unsigned int>>
+    GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex) override;
+
+
     /**
      * Overridden AddNode() method.
      *

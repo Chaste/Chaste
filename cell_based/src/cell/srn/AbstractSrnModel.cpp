@@ -120,3 +120,15 @@ void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 void AbstractSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
 }
+
+void AbstractSrnModel::SetEdgeLocalIndex(unsigned index)
+{
+    this->mEdgeLocalIndex = index;
+}
+
+unsigned AbstractSrnModel::GetEdgeLocalIndex()
+{
+    return this->mEdgeLocalIndex;
+}
+
+
