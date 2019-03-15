@@ -31,11 +31,19 @@ public:
         unsigned exampleEdgeIndex = 1;
 
         // Empty edge should be invalid
-        Edge<2>* emptyEdge = new Edge<2>(exampleEdgeIndex);
-        TS_ASSERT(!emptyEdge->IsEdgeValid());
+        Edge<2>* testEdge = new Edge<2>(exampleEdgeIndex);
+        TS_ASSERT(!testEdge->IsEdgeValid());
 
-        TS_ASSERT_EQUALS(exampleEdgeIndex, emptyEdge->GetIndex());
+        TS_ASSERT_EQUALS(exampleEdgeIndex, testEdge->GetIndex());
 
+        // Add nodes to the edge, check validity and centre position
+        Node<SPACE_DIM> node0(0, ChastePoint<SPACE_DIM>(0,0,0));
+        Node<SPACE_DIM> node1(1, ChastePoint<SPACE_DIM>(1,1,1));
+
+        testEdge->SetNodes(&node0, &node1);
+        auto edgeCentreLocation = testEdge->rGetCentreLocation();
+        TS_ASSERT(testEdge->IsEdgeValid());
+        TS_ASSERT(edgeCentreLocation[0] == 0.5 && edgeCentreLocation[1] == 0.5);
 
         // Generate two hex vertex elements
         std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
@@ -77,8 +85,6 @@ public:
             auto element = honeycombMesh->GetElement(i);
             TS_ASSERT(element->CheckEdgesAreValid());
         }
-
-
 
     }
 

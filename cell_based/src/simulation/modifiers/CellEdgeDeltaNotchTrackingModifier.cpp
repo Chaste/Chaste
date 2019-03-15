@@ -121,6 +121,26 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::OutputSimulationModifierParameters
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
+template<unsigned int DIM>
+void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
+                                                        unsigned locationIndex, unsigned edgeLocalIndex) {
+
+}
+
+template<unsigned int DIM>
+void
+CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
+                                                     unsigned locationIndex, unsigned edgeLocalIndex) {
+
+}
+
+template<unsigned int DIM>
+void CellEdgeDeltaNotchTrackingModifier<DIM>::CellDivisionEdgeUpdate(
+        AbstractCellPopulation<DIM,DIM> &rCellPopulation, unsigned locationIndex) {
+
+}
+
+
 // Explicit instantiation
 template class CellEdgeDeltaNotchTrackingModifier<1>;
 template class CellEdgeDeltaNotchTrackingModifier<2>;

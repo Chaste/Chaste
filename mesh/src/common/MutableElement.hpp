@@ -153,6 +153,8 @@ public:
 
     void RegisterWithEdges();
 
+    void RebuildEdges();
+
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
      *
@@ -254,6 +256,8 @@ public:
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
     void RegisterWithEdges();
+
+    void RebuildEdges();
 
 
     /**

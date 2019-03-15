@@ -134,6 +134,15 @@ public:
         return false;
     }
 
+    c_vector<double, SPACE_DIM> rGetCentreLocation()
+    {
+        assert(mNodes.size() == 2);
+
+        return (mNodes[0]->rGetLocation() + mNodes[1]->rGetLocation()) /2.0;
+    }
+
+
+
     std::set<unsigned> GetOtherElements(unsigned elementIndex)
     {
         std::set<unsigned> otherElements;

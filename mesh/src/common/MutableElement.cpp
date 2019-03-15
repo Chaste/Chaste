@@ -136,6 +136,11 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
     // Update surrounding edges
     if(SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
     {
+        // Take the 3 node element as shown below (N# are nodes and E# are edges)
+        // N0 ==E0== N1 ==E1== N2 ==E2== N0
+        // If rIndex = 1, The edge E0 & E1 and Node N1 is removed [ ==E0== N1 ==E1== ]
+        // the section is replaced with edge --EN-- obtained from the EdgeHelper, this may be an existing edge
+        // N0 --EN-- N2 ==E2== N0
 
         unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
         unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
@@ -245,6 +250,13 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithEdges() {
     {
         edge->AddElement(this->mIndex);
     }
+
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableElement<ELEMENT_DIM, SPACE_DIM>::RebuildEdges(){
+    this->BuildEdges();
+    //TODO: handler
 
 }
 
@@ -440,6 +452,12 @@ void MutableElement<1, SPACE_DIM>::RegisterWithEdges(){
     {
         edge->AddElement(this->mIndex);
     }
+
+}
+
+template<unsigned SPACE_DIM>
+void MutableElement<1, SPACE_DIM>::RebuildEdges(){
+    this->BuildEdges();
 
 }
 
