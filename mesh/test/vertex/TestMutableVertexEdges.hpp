@@ -131,7 +131,49 @@ public:
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
 
-        honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
+        auto element0 = honeycombMesh->GetElement(0);
+        printf("Node ids: ");
+        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
+        {
+            printf(" %i ", element0->GetNode(i)->GetIndex());
+        }
+        printf("\n");
+        printf("Edge ids: ");
+        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
+        {
+            printf(" %i ", element0->GetEdge(i)->GetIndex());
+        }
+        printf("\n");
+
+
+        auto newElemIndex = honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
+        auto newElem = honeycombMesh->GetElement(newElemIndex);
+
+        printf("Redivide node ids: ");
+        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
+        {
+            printf(" %i ", element0->GetNode(i)->GetIndex());
+        }
+        printf("\n");
+        printf("Redivide edge ids: ");
+        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
+        {
+            printf(" %i ", element0->GetEdge(i)->GetIndex());
+        }
+        printf("\n");
+
+        printf("New Element Node ids: ");
+        for(unsigned i = 0; i < newElem->GetNumNodes(); i++)
+        {
+            printf(" %i ", newElem->GetNode(i)->GetIndex());
+        }
+        printf("\n");
+        printf("New element edge ids: ");
+        for(unsigned i = 0; i < newElem->GetNumEdges(); i++)
+        {
+            printf(" %i ", newElem->GetEdge(i)->GetIndex());
+        }
+        printf("\n");
 
         // Check edges again
         for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
