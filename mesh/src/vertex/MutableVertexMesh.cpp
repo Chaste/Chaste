@@ -691,7 +691,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
     }
 
     // Re-build edges when division is performed
-//    pElement->RebuildEdges();
+    pElement->RebuildEdges();
     // and build edges for the new element
     this->mElements[new_element_index]->SetEdgeHelper(&this->mEdges);
     this->mElements[new_element_index]->BuildEdges();

@@ -125,12 +125,34 @@ template<unsigned int DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
                                                         unsigned locationIndex, unsigned edgeLocalIndex) {
 
+    //Gets the cell
+    auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
+
+    //Gets the edge srn model
+    auto p_cell_edge_model = static_cast<CellEdgeSrnModel*>(cell->GetSrnModel());
+
+    //Adds a blank delta notch edge srn model
+    boost::shared_ptr<AbstractOdeSrnModel> delta_notch_srn(new DeltaNotchEdgeSrnModel());
+    p_cell_edge_model->InsertEdgeSrn(edgeLocalIndex, delta_notch_srn);
+
+
+
+
 }
 
 template<unsigned int DIM>
 void
 CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
                                                      unsigned locationIndex, unsigned edgeLocalIndex) {
+
+    //Gets the cell
+    auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
+
+    //Gets the edge srn model
+    auto p_cell_edge_model = static_cast<CellEdgeSrnModel*>(cell->GetSrnModel());
+
+    //Removes the edge delta notch srn
+    p_cell_edge_model->RemoveEdgeSrn(edgeLocalIndex);
 
 }
 

@@ -62,7 +62,8 @@ public:
 
     ~CellEdgeSrnModel(){}
 
-    void SimulateToCurrentTime() override {
+    void SimulateToCurrentTime() override
+    {
 
         for(auto srnModel: mEdgeSrnModels){
             srnModel->SimulateToCurrentTime();
@@ -70,18 +71,33 @@ public:
 
     }
 
-    AbstractSrnModel* CreateSrnModel() override {
+    AbstractSrnModel* CreateSrnModel() override
+    {
         return new CellEdgeSrnModel(*this);
     }
 
-    void AddEdgeSrn(std::vector<boost::shared_ptr<AbstractSrnModel>> edgeSrn){
+    void AddEdgeSrn(std::vector<boost::shared_ptr<AbstractSrnModel>> edgeSrn)
+    {
         mEdgeSrnModels = edgeSrn;
     }
 
-    void AddEdgeSrn(boost::shared_ptr<AbstractSrnModel> edgeSrn){
+    void AddEdgeSrn(boost::shared_ptr<AbstractSrnModel> edgeSrn)
+    {
         edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
         mEdgeSrnModels.push_back(edgeSrn);
 
+    }
+
+    void InsertEdgeSrn(unsigned index, boost::shared_ptr<AbstractSrnModel> edgeSrn)
+    {
+        mEdgeSrnModels.insert(mEdgeSrnModels.begin() + index, edgeSrn);
+    }
+
+    boost::shared_ptr<AbstractSrnModel> RemoveEdgeSrn(unsigned index)
+    {
+        auto edgeSrn = mEdgeSrnModels[index];
+        mEdgeSrnModels.erase(mEdgeSrnModels.begin() + index);
+        return edgeSrn;
     }
 
     unsigned GetNumEdgeSrn()
