@@ -158,6 +158,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
         this->mEdges[rIndex]->RemoveElement(this->GetIndex());
         this->mEdges.erase(this->mEdges.begin() + rIndex);
 
+        this->mEdgeHelper->InsertDeleteEdgeOperation(this->mIndex, rIndex);
+
     }
 
     // Remove element from the node at this location
@@ -182,6 +184,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
         {
             auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, pNode, pNode);
             this->mEdges.push_back(edge);
+
+            this->mEdgeHelper->InsertAddEdgeOperation(this->mIndex, 0);
         }
         else
         {
@@ -202,6 +206,9 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
 
             auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);
             this->mEdges.insert(this->mEdges.begin() + rIndex+1, edge);
+
+
+            this->mEdgeHelper->InsertAddEdgeOperation(this->mIndex, rIndex+1);
         }
 
     }

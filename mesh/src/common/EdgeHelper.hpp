@@ -9,6 +9,7 @@
 #include <map>
 #include "Node.hpp"
 #include "Edge.hpp"
+#include "EdgeOperation.hpp"
 
 /**
  * Class for facilitating the creation and management of unique edges in a vertex mesh
@@ -20,6 +21,8 @@ private:
 
     std::vector<Edge<SPACE_DIM>*> mEdges;
     std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
+    std::vector<EdgeOperation<SPACE_DIM,SPACE_DIM>> mEdgeOperations;
+    bool holdEdgeOperations;
 
 public:
 
@@ -40,6 +43,7 @@ public:
     Edge<SPACE_DIM>* operator[](unsigned index);
     Edge<SPACE_DIM>* operator[](unsigned index) const;
 
+
     void RemoveDeletedEdges();
 
     /**
@@ -48,6 +52,9 @@ public:
     void UpdateEdgesMapKey();
 
     unsigned GetNumEdges() const;
+
+
+
 
     typename std::vector<Edge<SPACE_DIM>*>::iterator begin()
     {
@@ -58,6 +65,24 @@ public:
     {
         return mEdges.end();
     }
+
+    void HoldEdgeOperations()
+    {
+        holdEdgeOperations = true;
+    }
+    void ResumeEdgeOperations()
+    {
+        holdEdgeOperations = false;
+    }
+
+
+    void InsertAddEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
+    void InsertDeleteEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
+    void InsertCellDivideOperation(unsigned elementIndex,
+                                   unsigned elementIndex2,
+                                   std::vector<long int> newEdges,
+                                   std::vector<long int> newEdges2
+    );
 
 };
 

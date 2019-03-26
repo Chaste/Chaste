@@ -10,10 +10,10 @@
 
 
 #include "AbstractCellBasedSimulationModifier.hpp"
-#include "AbstractCellEdgeModifier.hpp"
+#include "AbstractCellEdgeBasedSimulationModifier.hpp"
 
 template<unsigned DIM>
-class CellEdgeDeltaNotchTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>, public AbstractCellEdgeModifier<DIM,DIM>
+class CellEdgeDeltaNotchTrackingModifier : public AbstractCellEdgeBasedSimulationModifier<DIM,DIM>
 {
 
     /** Needed for serialization. */
@@ -30,15 +30,6 @@ class CellEdgeDeltaNotchTrackingModifier : public AbstractCellBasedSimulationMod
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
     }
-
-    void EdgeAdded(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> &rCellPopulation, unsigned locationIndex,
-                   unsigned edgeLocalIndex) override;
-
-    void EdgeRemoved(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> &rCellPopulation, unsigned locationIndex,
-                     unsigned edgeLocalIndex) override;
-
-    void CellDivisionEdgeUpdate(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> &rCellPopulation,
-                                unsigned locationIndex) override;
 
 public:
 
@@ -97,8 +88,9 @@ public:
     virtual void EdgeRemoved(AbstractCellPopulation<DIM, DIM> &rCellPopulation, unsigned locationIndex,
                      unsigned edgeLocalIndex) override;
 
-    virtual void CellDivisionEdgeUpdate(AbstractCellPopulation<DIM, DIM> &rCellPopulation,
-                                unsigned locationIndex) override;
+    virtual void CellDivisionEdgeUpdate(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+                                        unsigned locationIndex, std::vector<long int> edgeChange,
+                                        unsigned locationIndex2, std::vector<long int> edgeChange2) override;
 
 
 };

@@ -376,6 +376,10 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
+    //Edge ADD & DELETE operations are held as it will be
+    // compressed into a single DIVIDE operation
+    this->mEdges.HoldEdgeOperations();
+
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
 
@@ -551,6 +555,16 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                pElement->GetNodeLocalIndex(division_node_global_indices[1]),
                                                placeOriginalElementBelow);
 
+
+    //TODO: proper accounting for the edge changes
+    this->mEdges.ResumeEdgeOperations();
+
+    // Re-build edges when division is performed
+    pElement->RebuildEdges();
+    // and build edges for the new element
+    this->mElements[new_element_index]->SetEdgeHelper(&this->mEdges);
+    this->mElements[new_element_index]->BuildEdges();
+
     return new_element_index;
 }
 
@@ -689,12 +703,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
             }
         }
     }
-
-    // Re-build edges when division is performed
-    pElement->RebuildEdges();
-    // and build edges for the new element
-    this->mElements[new_element_index]->SetEdgeHelper(&this->mEdges);
-    this->mElements[new_element_index]->BuildEdges();
 
     return new_element_index;
 }

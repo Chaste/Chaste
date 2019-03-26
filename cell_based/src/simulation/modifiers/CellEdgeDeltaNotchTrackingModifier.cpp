@@ -8,7 +8,7 @@
 
 template<unsigned DIM>
 CellEdgeDeltaNotchTrackingModifier<DIM>::CellEdgeDeltaNotchTrackingModifier()
-        : AbstractCellBasedSimulationModifier<DIM>()
+        : AbstractCellEdgeBasedSimulationModifier<DIM>()
 {
 }
 
@@ -158,7 +158,9 @@ CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,
 
 template<unsigned int DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::CellDivisionEdgeUpdate(
-        AbstractCellPopulation<DIM,DIM> &rCellPopulation, unsigned locationIndex) {
+        AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+        unsigned locationIndex, std::vector<long int> edgeChange,
+        unsigned locationIndex2, std::vector<long int> edgeChange2) {
 
 }
 
