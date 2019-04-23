@@ -50,12 +50,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 
-XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadXmlFile(
+xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadXmlFile(
     const std::string& rFileName,
     const ::xsd::cxx::tree::properties<char>& rProps,
     bool validate)
 {
-    XSD_DOM_AUTO_PTR<xercesc::DOMDocument> p_doc;
+    xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> p_doc;
     try
     {
         // Initialise Xerces
@@ -122,7 +122,7 @@ XmlTools::Finalizer::~Finalizer()
     XmlTools::Finalize();
 }
 
-XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
+xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
         const std::string& rFileName,
         ::xsd::cxx::xml::error_handler<char>& rErrorHandler,
         const ::xsd::cxx::tree::properties<char>& rProps,
@@ -137,7 +137,7 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
 
 #if _XERCES_VERSION >= 30000
     // Xerces-C++ 3.0.0 and later.
-    XSD_DOM_AUTO_PTR<DOMLSParser> p_parser(p_impl->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0));
+    xml::dom::auto_ptr<DOMLSParser> p_parser(p_impl->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS, 0));
     DOMConfiguration* p_conf(p_parser->getDomConfig());
 
     // Discard comment nodes in the document.
@@ -200,7 +200,7 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
 
 #else // _XERCES_VERSION >= 30000
     // Same as above but for Xerces-C++ 2 series.
-    XSD_DOM_AUTO_PTR<DOMBuilder> p_parser(p_impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0));
+    xml::dom::auto_ptr<DOMBuilder> p_parser(p_impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS, 0));
 
     p_parser->setFeature(XMLUni::fgDOMComments, false);
     p_parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true);
@@ -248,7 +248,7 @@ XSD_DOM_AUTO_PTR<xercesc::DOMDocument> XmlTools::ReadFileToDomDocument(
 #endif // _XERCES_VERSION >= 30000
 
     // Do the parse
-    XSD_DOM_AUTO_PTR<DOMDocument> p_doc(p_parser->parseURI(rFileName.c_str()));
+    xml::dom::auto_ptr<DOMDocument> p_doc(p_parser->parseURI(rFileName.c_str()));
 
     if (ehp.failed())
     {

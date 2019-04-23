@@ -734,7 +734,6 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
         command = [build.tools['xsd'], 'cxx-tree',
                    '--generate-serialization',
                    '--output-dir', output_dir,
-                   '--std', 'c++11',
                    '--hxx-suffix', '.hpp', '--cxx-suffix', '.cpp',
                    '--prologue-file', 'heart/src/io/XsdPrologue.txt',
                    '--epilogue-file', 'heart/src/io/XsdEpilogue.txt',
