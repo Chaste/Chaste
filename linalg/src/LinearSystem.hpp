@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PCLDUFactorisation.hpp"
 #include "PCTwoLevelsBlockDiagonal.hpp"
 #include "ArchiveLocationInfo.hpp"
-//#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 
 #include <petscvec.h>
 #include <petscmat.h>
