@@ -125,64 +125,88 @@ public:
 
     }
 
-    void TestMeshElementDivide()
+//    void TestMeshElementDivide()
+//    {
+//        // Test cell division with honeycomb mesh
+//        HoneycombVertexMeshGenerator generator(2, 2);
+//        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+//
+//        auto element0 = honeycombMesh->GetElement(0);
+//        printf("Node ids: ");
+//        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
+//        {
+//            printf(" %i ", element0->GetNode(i)->GetIndex());
+//        }
+//        printf("\n");
+//        printf("Edge ids: ");
+//        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
+//        {
+//            printf(" %i ", element0->GetEdge(i)->GetIndex());
+//        }
+//        printf("\n");
+//
+//
+//
+//        auto newElemIndex = honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
+//        auto newElem = honeycombMesh->GetElement(newElemIndex);
+//
+//        printf("Redivide node ids: ");
+//        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
+//        {
+//            printf(" %i ", element0->GetNode(i)->GetIndex());
+//        }
+//        printf("\n");
+//        printf("Redivide edge ids: ");
+//        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
+//        {
+//            printf(" %i ", element0->GetEdge(i)->GetIndex());
+//        }
+//        printf("\n");
+//
+//        printf("New Element Node ids: ");
+//        for(unsigned i = 0; i < newElem->GetNumNodes(); i++)
+//        {
+//            printf(" %i ", newElem->GetNode(i)->GetIndex());
+//        }
+//        printf("\n");
+//        printf("New element edge ids: ");
+//        for(unsigned i = 0; i < newElem->GetNumEdges(); i++)
+//        {
+//            printf(" %i ", newElem->GetEdge(i)->GetIndex());
+//        }
+//        printf("\n");
+//
+//        // Check edges again
+//        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
+//        {
+//            auto element = honeycombMesh->GetElement(i);
+//            TS_ASSERT(element->CheckEdgesAreValid());
+//
+//        }
+//
+//    }
+
+    void TestMeshElementDivideShort()
     {
-        // Test cell deivision with honeycomb mesh
-        HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
-
-        auto element0 = honeycombMesh->GetElement(0);
-        printf("Node ids: ");
-        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
-        {
-            printf(" %i ", element0->GetNode(i)->GetIndex());
-        }
-        printf("\n");
-        printf("Edge ids: ");
-        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
-        {
-            printf(" %i ", element0->GetEdge(i)->GetIndex());
-        }
-        printf("\n");
+        const unsigned ELEMENT_DIM = 2;
+        const unsigned SPACE_DIM = 2;
 
 
-        auto newElemIndex = honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
-        auto newElem = honeycombMesh->GetElement(newElemIndex);
+        // Generate two hex vertex elements
+        std::vector<Node<SPACE_DIM>*> nodes0;
+        nodes0.push_back(new Node<SPACE_DIM>(0, ChastePoint<2>(-0.5, 1)));
+        nodes0.push_back(new Node<SPACE_DIM>(1, ChastePoint<2>(-0.5, 0)));
+        nodes0.push_back(new Node<SPACE_DIM>(2, ChastePoint<2>(-0.5, -1)));
+        nodes0.push_back(new Node<SPACE_DIM>(3, ChastePoint<2>(0.5, -1)));
+        nodes0.push_back(new Node<SPACE_DIM>(4, ChastePoint<2>(0.5, 0)));
+        nodes0.push_back(new Node<SPACE_DIM>(5, ChastePoint<2>(0.5, 1)));
 
-        printf("Redivide node ids: ");
-        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
-        {
-            printf(" %i ", element0->GetNode(i)->GetIndex());
-        }
-        printf("\n");
-        printf("Redivide edge ids: ");
-        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
-        {
-            printf(" %i ", element0->GetEdge(i)->GetIndex());
-        }
-        printf("\n");
+        std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
+        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
 
-        printf("New Element Node ids: ");
-        for(unsigned i = 0; i < newElem->GetNumNodes(); i++)
-        {
-            printf(" %i ", newElem->GetNode(i)->GetIndex());
-        }
-        printf("\n");
-        printf("New element edge ids: ");
-        for(unsigned i = 0; i < newElem->GetNumEdges(); i++)
-        {
-            printf(" %i ", newElem->GetEdge(i)->GetIndex());
-        }
-        printf("\n");
+        MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>(nodes0, elements);
 
-        // Check edges again
-        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
-        {
-            auto element = honeycombMesh->GetElement(i);
-            TS_ASSERT(element->CheckEdgesAreValid());
-
-        }
-
+        mesh->DivideElementAlongShortAxis(mesh->GetElement(0));
     }
 
 };

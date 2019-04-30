@@ -10,18 +10,19 @@
 #include "Node.hpp"
 #include "Edge.hpp"
 #include "EdgeOperation.hpp"
+#include "EdgeRemapInfo.hpp"
 
 /**
  * Class for facilitating the creation and management of unique edges in a vertex mesh
  */
- template <unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 class EdgeHelper {
 
 private:
 
     std::vector<Edge<SPACE_DIM>*> mEdges;
     std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
-    std::vector<EdgeOperation<SPACE_DIM,SPACE_DIM>> mEdgeOperations;
+    std::vector<EdgeOperation> mEdgeOperations;
     bool holdEdgeOperations;
 
 public:
@@ -76,12 +77,14 @@ public:
     }
 
 
+
+
     void InsertAddEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
     void InsertDeleteEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
     void InsertCellDivideOperation(unsigned elementIndex,
                                    unsigned elementIndex2,
-                                   std::vector<long int> newEdges,
-                                   std::vector<long int> newEdges2
+                                   EdgeRemapInfo* newEdges,
+                                   EdgeRemapInfo* newEdges2
     );
 
 };

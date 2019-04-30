@@ -6,7 +6,7 @@
 #define EDGEOPERATION_HPP_
 
 #include <vector>
-#include "MutableElement.hpp"
+#include "EdgeRemapInfo.hpp"
 
 enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
@@ -26,14 +26,9 @@ class EdgeOperation {
 
     unsigned mLocalEdgeIndex;
 
-    /**
-     * The change maps the new local edge index to the previous one
-     * 0+ Edge is the same but may have different local index
-     * -1 Edge is divided
-     * -2 Edge is new
-     */
-    std::vector<long int> mNewEdges;
-    std::vector<long int> mNewEdges2;
+
+    EdgeRemapInfo* mNewEdges;
+    EdgeRemapInfo* mNewEdges2;
 
 public:
 
@@ -52,6 +47,8 @@ public:
         this->mElementIndex = elementIndex;
         this->mElementIndex2 = 0;
         this->mLocalEdgeIndex = localEdgeIndex;
+        this->mNewEdges = nullptr;
+        this->mNewEdges2 = nullptr;
     }
 
      /**
@@ -63,8 +60,8 @@ public:
       */
     EdgeOperation(unsigned elementIndex,
                   unsigned elementIndex2,
-                  std::vector<long int> newEdges,
-                  std::vector<long int> newEdges2)
+                  EdgeRemapInfo* newEdges,
+                  EdgeRemapInfo* newEdges2)
     {
         this->mOperation = EDGE_OPERATION_DIVIDE;
         this->mElementIndex = elementIndex;
@@ -93,12 +90,12 @@ public:
         return mLocalEdgeIndex;
     }
 
-    std::vector<long int> GetNewEdges()
+    EdgeRemapInfo* GetNewEdges()
     {
         return mNewEdges;
     }
 
-    std::vector<long int> GetNewEdges2()
+    EdgeRemapInfo* GetNewEdges2()
     {
         return mNewEdges;
     }

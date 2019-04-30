@@ -379,6 +379,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     //Edge ADD & DELETE operations are held as it will be
     // compressed into a single DIVIDE operation
     this->mEdges.HoldEdgeOperations();
+    std::vector<long> edgeIds;
+    for(unsigned i = 0; i < pElement->GetNumEdges(); i++)
+        edgeIds.push_back(pElement->GetEdge(i)->GetIndex());
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -556,8 +559,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                placeOriginalElementBelow);
 
 
-    //TODO: proper accounting for the edge changes
-    this->mEdges.ResumeEdgeOperations();
+
 
     // Re-build edges when division is performed
     pElement->RebuildEdges();
@@ -565,8 +567,84 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     this->mElements[new_element_index]->SetEdgeHelper(&this->mEdges);
     this->mElements[new_element_index]->BuildEdges();
 
+    this->mEdges.ResumeEdgeOperations();
+
+    this->RecordCellDivideOperation(edgeIds, pElement, this->mElements[new_element_index]);
+
+
     return new_element_index;
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperation(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2)
+{
+    auto edgeReMapping1 = BuildEdgeDivideIdDifferenceVector(oldIds, pElement1);
+    auto edgeReMapping2 = BuildEdgeDivideIdDifferenceVector(oldIds, pElement2);
+
+    this->mEdges.InsertCellDivideOperation(pElement1->GetIndex(), pElement2->GetIndex(), edgeReMapping1, edgeReMapping2);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDifferenceVector(std::vector<long> &oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement)
+{
+    // Build a reverse index map
+    std::map<long, unsigned > oldIdsMap;
+    for(unsigned i= 0; i < oldIds.size(); i++)
+    {
+        auto id = oldIds[i];
+        oldIdsMap[id] = i;
+    }
+
+    std::vector<long> newEdges(pElement->GetNumEdges());
+    std::vector<unsigned char> edgeStatus(pElement->GetNumEdges());
+
+    int newEdgesCount = 0;
+    // Element 1 edge division re-mapping
+    for(unsigned i = 0; i < pElement->GetNumEdges(); i++)
+    {
+        // Fills the id vector with either the index before cell division or
+        // -1 if index did not exist before
+        auto id = pElement->GetEdge(i)->GetIndex();
+        auto id_itt = oldIdsMap.find(id);
+        if(id_itt != oldIdsMap.end())
+        {
+            newEdges.push_back(id_itt->second);
+            edgeStatus.push_back(0);
+        }
+        else
+        {
+            newEdges.push_back(-1);
+            edgeStatus.push_back(2);
+            newEdgesCount++;
+        }
+    }
+
+    // Find the middle index of the new edges
+    for(unsigned i = 0; i < newEdges.size(); i++)
+    {
+        int prevIndex = ((int)i - 1) % newEdges.size();
+        int nextIndex = ((int)i + 1) % newEdges.size();
+        if(newEdges[i] == -1 && newEdges[prevIndex] == -1 && newEdges[nextIndex] == -1)
+        {
+            int prev2Index = ((int)i - 2) % newEdges.size();
+            int next2Index = ((int)i + 2) % newEdges.size();
+
+            assert(newEdges[prev2Index] != -1 && newEdges[next2Index] != -1);
+            newEdges[prevIndex] = newEdges[prev2Index] +1;
+            newEdges[nextIndex] = newEdges[next2Index] -1;
+            edgeStatus[prevIndex] = 1;
+            edgeStatus[nextIndex] = 1;
+
+            break;
+        }
+    }
+
+    //We should always have 3 new edges with 2 divide and 1 new
+    assert(newEdgesCount == 3);
+
+    return new EdgeRemapInfo(newEdges, edgeStatus);
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
@@ -576,6 +654,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
+
 
     unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
     return new_element_index;

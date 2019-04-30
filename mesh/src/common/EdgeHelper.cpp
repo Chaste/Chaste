@@ -143,7 +143,7 @@ void EdgeHelper<SPACE_DIM>::InsertDeleteEdgeOperation(unsigned elementIndex,
 template<unsigned int SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::InsertCellDivideOperation(unsigned elementIndex,
                                                       unsigned elementIndex2,
-                                                      std::vector<long int> newEdges, std::vector<long int> newEdges2) {
+                                                      EdgeRemapInfo* newEdges, EdgeRemapInfo* newEdges2) {
     if(!holdEdgeOperations)
         mEdgeOperations.push_back(EdgeOperation(elementIndex, elementIndex2, newEdges, newEdges2));
 }
