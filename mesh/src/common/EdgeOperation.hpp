@@ -14,7 +14,9 @@ enum EDGE_OPERATION {
     EDGE_OPERATION_DIVIDE
 };
 
-
+/**
+ * Class for storing edge change during remeshing
+ */
 class EdgeOperation {
 
     EDGE_OPERATION mOperation;
@@ -68,6 +70,12 @@ public:
         this->mElementIndex2 = elementIndex2;
         this->mNewEdges = newEdges;
         this->mNewEdges2 = newEdges2;
+    }
+
+    ~EdgeOperation()
+    {
+        delete this->mNewEdges;
+        delete this->mNewEdges2;
     }
 
     EDGE_OPERATION GetOperation()

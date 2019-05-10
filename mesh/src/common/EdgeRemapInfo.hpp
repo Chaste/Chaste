@@ -7,6 +7,10 @@
 
 #include <vector>
 
+/**
+ * Storage class contains a mapping to the old local edges index during cell division.
+ *
+ */
 class EdgeRemapInfo {
 
     /**

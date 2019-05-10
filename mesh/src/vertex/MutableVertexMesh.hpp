@@ -603,7 +603,7 @@ public:
     void RecordCellDivideOperation(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
 
 
-     EdgeRemapInfo* BuildEdgeDivideIdDifferenceVector(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement);
+     EdgeRemapInfo* BuildEdgeDivideIdDifferenceInfo(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement);
 
     /**
      * Add an element to the mesh.

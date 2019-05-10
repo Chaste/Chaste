@@ -578,14 +578,14 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperation(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2)
 {
-    auto edgeReMapping1 = BuildEdgeDivideIdDifferenceVector(oldIds, pElement1);
-    auto edgeReMapping2 = BuildEdgeDivideIdDifferenceVector(oldIds, pElement2);
+    auto edgeReMapping1 = BuildEdgeDivideIdDifferenceInfo(oldIds, pElement1);
+    auto edgeReMapping2 = BuildEdgeDivideIdDifferenceInfo(oldIds, pElement2);
 
     this->mEdges.InsertCellDivideOperation(pElement1->GetIndex(), pElement2->GetIndex(), edgeReMapping1, edgeReMapping2);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDifferenceVector(std::vector<long> &oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement)
+EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDifferenceInfo(std::vector<long> &oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement)
 {
     // Build a reverse index map
     std::map<long, unsigned > oldIdsMap;
@@ -967,7 +967,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 
     // Update the node-edge mapping
     this->mEdges.UpdateEdgesMapKey();
-
 
 }
 
