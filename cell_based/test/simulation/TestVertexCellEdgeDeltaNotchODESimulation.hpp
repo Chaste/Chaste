@@ -109,27 +109,46 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
+
+            /* Initalise cell cycle */
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
 
 
-            CellEdgeSrnModel* cellEdgeSrnModel = new CellEdgeSrnModel();
+            /* Initialise edge based SRN */
+            auto p_element = p_mesh->GetElement(elem_index);
 
-            /* Adding 6 edges for the honeycomb */
-            for(int i = 0 ; i < 6 ; i ++)
+            auto p_cell_edge_srn_model = new CellEdgeSrnModel();
+
+            /* We choose to initialise the concentrations to random levels */
+            auto delta_concentration = RandomNumberGenerator::Instance()->ranf();
+            auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
+
+            double total_edge_length = 0.0;
+            for(unsigned i = 0 ; i < p_element->GetNumEdges() ; i ++)
+                total_edge_length += p_element->GetEdge(i)->rGetLength();
+
+
+            /* Gets the edges of the element and create an srn for each edge */
+            for(unsigned i = 0 ; i < p_element->GetNumEdges() ; i ++)
             {
-                /* We choose to initialise the concentrations to random levels in each cell edge. */
+                auto p_elem_edge = p_element->GetEdge(i);
+
+                auto p_edge_length = p_elem_edge->rGetLength();
                 std::vector<double> initial_conditions;
-                initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
-                initial_conditions.push_back(RandomNumberGenerator::Instance()->ranf());
+
+                /* Initial concentration of delta and notch vary depending on the edge length */
+                initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
+                initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+
                 boost::shared_ptr<AbstractOdeSrnModel> p_srn_model(new DeltaNotchEdgeSrnModel());
                 p_srn_model->SetInitialConditions(initial_conditions);
-                cellEdgeSrnModel->AddEdgeSrn(p_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
             }
 
-            CellPtr p_cell(new Cell(p_state, p_cc_model, cellEdgeSrnModel));
+            CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
 
             double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
@@ -148,13 +167,15 @@ public:
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
-         * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
+         * and run the simulation. We can make the simulation run for longer to see more patterning by increasing
+         * the end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexCellEdgeDeltaNotchODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 
-        /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within the cells in {{{CellData}}} and passes it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within
+         * the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(CellEdgeDeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 

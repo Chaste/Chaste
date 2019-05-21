@@ -141,6 +141,14 @@ public:
         return (mNodes[0]->rGetLocation() + mNodes[1]->rGetLocation()) /2.0;
     }
 
+    double rGetLength()
+    {
+        assert(mNodes.size() == 2);
+
+        return norm_2(mNodes[0]->rGetLocation() - mNodes[1]->rGetLocation());
+
+    }
+
 
 
     std::set<unsigned> GetOtherElements(unsigned elementIndex)
@@ -184,6 +192,8 @@ public:
     {
         return mElementIndices.size();
     }
+
+
 
     bool IsEdgeValid()
     {
