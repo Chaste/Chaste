@@ -7,6 +7,7 @@
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <srn/CellEdgeSrnModel.hpp>
 
 
 #include "AbstractCellBasedSimulationModifier.hpp"
@@ -82,6 +83,9 @@ public:
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
 
 
+
+
+
     virtual void EdgeAdded(AbstractCellPopulation<DIM, DIM> &rCellPopulation, unsigned locationIndex,
                    unsigned edgeLocalIndex) override;
 
@@ -89,8 +93,10 @@ public:
                      unsigned edgeLocalIndex) override;
 
     virtual void CellDivisionEdgeUpdate(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-                                        unsigned locationIndex, std::vector<long int> edgeChange,
-                                        unsigned locationIndex2, std::vector<long int> edgeChange2) override;
+                                        unsigned locationIndex, EdgeRemapInfo* edgeChange,
+                                        unsigned locationIndex2, EdgeRemapInfo* edgeChange2) override;
+
+    void PerformEdgeRemap(CellEdgeSrnModel* oldModel, CellEdgeSrnModel* newModel, EdgeRemapInfo* edgeChange);
 
 
 };

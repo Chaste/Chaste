@@ -22,7 +22,7 @@ private:
 
     std::vector<Edge<SPACE_DIM>*> mEdges;
     std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
-    std::vector<EdgeOperation> mEdgeOperations;
+    std::vector<EdgeOperation*> mEdgeOperations;
     bool holdEdgeOperations;
 
 public:
@@ -76,6 +76,16 @@ public:
         holdEdgeOperations = false;
     }
 
+    /**
+     * Gets the record of edge changes in the mesh
+     * @return
+     */
+    const std::vector<EdgeOperation*> & GetEdgeOperations();
+
+    /**
+     * Clears the edge change records in the mesh
+     */
+    void ClearEdgeOperations();
 
 
 

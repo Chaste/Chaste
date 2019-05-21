@@ -103,6 +103,7 @@ public:
 
 
         // Perform a test T1 swap on a shared edge
+        int numSwapsPerformed = 0;
         for(unsigned i = 0 ;i < honeycombMesh->GetNumEdges(); i++)
         {
             auto edge = honeycombMesh->GetEdge(i);
@@ -110,6 +111,7 @@ public:
             {
                 honeycombMesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
                 honeycombMesh->RemoveDeletedNodes();
+                numSwapsPerformed++;
             }
 
         }
@@ -122,91 +124,175 @@ public:
 
         }
 
+        //Count edge operations
+        printf("Num swaps performd: %i with num edge operations: %lu \n",numSwapsPerformed, honeycombMesh->GetEdgeOperations().size());
+
+        TS_ASSERT(honeycombMesh->GetEdgeOperations().size() == 8);
+        for( auto edgeOperation: honeycombMesh->GetEdgeOperations())
+        {
+            TS_ASSERT(edgeOperation->GetOperation() != EDGE_OPERATION_DIVIDE);
+        }
+
 
     }
 
-//    void TestMeshElementDivide()
-//    {
-//        // Test cell division with honeycomb mesh
-//        HoneycombVertexMeshGenerator generator(2, 2);
-//        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
-//
-//        auto element0 = honeycombMesh->GetElement(0);
-//        printf("Node ids: ");
-//        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
-//        {
-//            printf(" %i ", element0->GetNode(i)->GetIndex());
-//        }
-//        printf("\n");
-//        printf("Edge ids: ");
-//        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
-//        {
-//            printf(" %i ", element0->GetEdge(i)->GetIndex());
-//        }
-//        printf("\n");
-//
-//
-//
-//        auto newElemIndex = honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
-//        auto newElem = honeycombMesh->GetElement(newElemIndex);
-//
-//        printf("Redivide node ids: ");
-//        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
-//        {
-//            printf(" %i ", element0->GetNode(i)->GetIndex());
-//        }
-//        printf("\n");
-//        printf("Redivide edge ids: ");
-//        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
-//        {
-//            printf(" %i ", element0->GetEdge(i)->GetIndex());
-//        }
-//        printf("\n");
-//
-//        printf("New Element Node ids: ");
-//        for(unsigned i = 0; i < newElem->GetNumNodes(); i++)
-//        {
-//            printf(" %i ", newElem->GetNode(i)->GetIndex());
-//        }
-//        printf("\n");
-//        printf("New element edge ids: ");
-//        for(unsigned i = 0; i < newElem->GetNumEdges(); i++)
-//        {
-//            printf(" %i ", newElem->GetEdge(i)->GetIndex());
-//        }
-//        printf("\n");
-//
-//        // Check edges again
-//        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
-//        {
-//            auto element = honeycombMesh->GetElement(i);
-//            TS_ASSERT(element->CheckEdgesAreValid());
-//
-//        }
-//
-//    }
-
-    void TestMeshElementDivideShort()
+    void TestMeshElementDivide()
     {
-        const unsigned ELEMENT_DIM = 2;
-        const unsigned SPACE_DIM = 2;
+        // Test cell division with honeycomb mesh
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+        std::vector<unsigned> edgeIdBeforeDivide;
+
+        auto element0 = honeycombMesh->GetElement(0);
+        printf("Node ids: ");
+        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
+        {
+            printf(" %i ", element0->GetNode(i)->GetIndex());
+        }
+        printf("\n");
+        printf("Edge ids: ");
+        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
+        {
+            printf(" %i ", element0->GetEdge(i)->GetIndex());
+            edgeIdBeforeDivide.push_back(element0->GetEdge(i)->GetIndex());
+        }
+        printf("\n");
 
 
-        // Generate two hex vertex elements
-        std::vector<Node<SPACE_DIM>*> nodes0;
-        nodes0.push_back(new Node<SPACE_DIM>(0, ChastePoint<2>(-0.5, 1)));
-        nodes0.push_back(new Node<SPACE_DIM>(1, ChastePoint<2>(-0.5, 0)));
-        nodes0.push_back(new Node<SPACE_DIM>(2, ChastePoint<2>(-0.5, -1)));
-        nodes0.push_back(new Node<SPACE_DIM>(3, ChastePoint<2>(0.5, -1)));
-        nodes0.push_back(new Node<SPACE_DIM>(4, ChastePoint<2>(0.5, 0)));
-        nodes0.push_back(new Node<SPACE_DIM>(5, ChastePoint<2>(0.5, 1)));
 
-        std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
+        auto newElemIndex = honeycombMesh->DivideElementAlongShortAxis(honeycombMesh->GetElement(0));
+        auto newElem = honeycombMesh->GetElement(newElemIndex);
 
-        MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>(nodes0, elements);
+        printf("Redivide node ids: ");
+        for(unsigned i = 0; i < element0->GetNumNodes(); i++)
+        {
+            printf(" %i ", element0->GetNode(i)->GetIndex());
+        }
+        printf("\n");
+        printf("Redivide edge ids: ");
+        for(unsigned i = 0; i < element0->GetNumEdges(); i++)
+        {
+            printf(" %i ", element0->GetEdge(i)->GetIndex());
+        }
+        printf("\n");
 
-        mesh->DivideElementAlongShortAxis(mesh->GetElement(0));
+        printf("New Element Node ids: ");
+        for(unsigned i = 0; i < newElem->GetNumNodes(); i++)
+        {
+            printf(" %i ", newElem->GetNode(i)->GetIndex());
+        }
+        printf("\n");
+        printf("New element edge ids: ");
+        for(unsigned i = 0; i < newElem->GetNumEdges(); i++)
+        {
+            printf(" %i ", newElem->GetEdge(i)->GetIndex());
+        }
+        printf("\n");
+
+        // Check edges again
+        for( unsigned i = 0; i < honeycombMesh->GetNumElements(); i++)
+        {
+            auto element = honeycombMesh->GetElement(i);
+            TS_ASSERT(element->CheckEdgesAreValid());
+
+        }
+
+        printf("Num edge operations: %lu \n", honeycombMesh->GetEdgeOperations().size());
+        auto edgeOperations = honeycombMesh->GetEdgeOperations();
+
+        //Only one divide operation
+        TS_ASSERT(edgeOperations.size() == 1);
+        TS_ASSERT(edgeOperations[0]->GetOperation() == EDGE_OPERATION_DIVIDE);
+
+        //Test edge remapping data for the old cell
+        {
+            auto edgeRemap = edgeOperations[0]->GetNewEdges();
+            auto elem = element0;
+
+            TS_ASSERT(edgeRemap->GetEdgesMapping().size() == elem->GetNumEdges());
+            TS_ASSERT(edgeRemap->GetEdgesStatus().size() == elem->GetNumEdges());
+
+            int numRemapEdges = 0;
+            int numSplitEdges = 0;
+            int numNewEdges = 0;
+            for(unsigned i = 0 ; i < edgeRemap->GetEdgesStatus().size(); i++)
+            {
+                switch(edgeRemap->GetEdgesStatus()[i])
+                {
+                    case 0:
+                        {
+                            auto remapIndex = edgeRemap->GetEdgesMapping()[i];
+                            auto oldEdgeId = edgeIdBeforeDivide[remapIndex];
+                            auto newEdgeId = elem->GetEdge(i)->GetIndex();
+                            TS_ASSERT(oldEdgeId == newEdgeId);
+                            numRemapEdges++;
+                        }
+                        break;
+                    case 1:
+                        TS_ASSERT(edgeRemap->GetEdgesMapping()[i] > -1);
+                        numSplitEdges++;
+                        break;
+                    case 2:
+                        TS_ASSERT(edgeRemap->GetEdgesMapping()[i] < 0);
+                        numNewEdges++;
+                        break;
+                    default:
+                        TS_FAIL("Edge status invalid");
+                        break;
+
+                }
+            }
+
+            TS_ASSERT(numRemapEdges == 2);
+            TS_ASSERT(numSplitEdges == 2);
+            TS_ASSERT(numNewEdges == 1);
+
+        }
+
+        //Test edge remapping data for the new cell
+        {
+            auto edgeRemap = edgeOperations[0]->GetNewEdges2();
+            auto elem = newElem;
+
+            TS_ASSERT(edgeRemap->GetEdgesMapping().size() == elem->GetNumEdges());
+            TS_ASSERT(edgeRemap->GetEdgesStatus().size() == elem->GetNumEdges());
+
+            int numRemapEdges = 0;
+            int numSplitEdges = 0;
+            int numNewEdges = 0;
+            for(unsigned i = 0 ; i < edgeRemap->GetEdgesStatus().size(); i++)
+            {
+                switch(edgeRemap->GetEdgesStatus()[i])
+                {
+                    case 0:
+                    {
+                        auto remapIndex = edgeRemap->GetEdgesMapping()[i];
+                        auto oldEdgeId = edgeIdBeforeDivide[remapIndex];
+                        auto newEdgeId = elem->GetEdge(i)->GetIndex();
+                        TS_ASSERT(oldEdgeId == newEdgeId);
+                        numRemapEdges++;
+                    }
+                        break;
+                    case 1:
+                    TS_ASSERT(edgeRemap->GetEdgesMapping()[i] > -1);
+                        numSplitEdges++;
+                        break;
+                    case 2:
+                    TS_ASSERT(edgeRemap->GetEdgesMapping()[i] < 0);
+                        numNewEdges++;
+                        break;
+                    default:
+                        TS_FAIL("Edge status invalid");
+                        break;
+
+                }
+            }
+
+            TS_ASSERT(numRemapEdges == 2);
+            TS_ASSERT(numSplitEdges == 2);
+            TS_ASSERT(numNewEdges == 1);
+
+        }
     }
 
 };

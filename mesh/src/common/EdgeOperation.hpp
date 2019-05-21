@@ -105,7 +105,7 @@ public:
 
     EdgeRemapInfo* GetNewEdges2()
     {
-        return mNewEdges;
+        return mNewEdges2;
     }
 
 

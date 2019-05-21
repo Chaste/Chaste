@@ -40,14 +40,7 @@ private:
 
 protected:
 
-    using AbstractSrnModel::Initialise;
 
-
-    void Initialise() override {
-
-    }
-
-    /*  */
     CellEdgeSrnModel(const CellEdgeSrnModel &rModel) : AbstractSrnModel(rModel) {
 
         //Makes a copy of all SRN models inside the system
@@ -58,13 +51,20 @@ protected:
 
 public:
 
-    CellEdgeSrnModel() {}
+    CellEdgeSrnModel(){}
 
     ~CellEdgeSrnModel(){}
 
+    void Initialise() override
+    {
+        for(auto edgeModel: mEdgeSrnModels)
+        {
+            edgeModel->Initialise();
+        }
+    }
+
     void SimulateToCurrentTime() override
     {
-
         for(auto srnModel: mEdgeSrnModels){
             srnModel->SimulateToCurrentTime();
         }
@@ -111,6 +111,13 @@ public:
         return mEdgeSrnModels[index];
     }
 
+    void SetCell(CellPtr pCell) override {
+        AbstractSrnModel::SetCell(pCell);
+        //Makes a copy of all SRN models inside the system
+        for(auto srnModel: mEdgeSrnModels){
+            srnModel->SetCell(pCell);
+        }
+    }
 
 };
 

@@ -20,7 +20,11 @@ CellEdgeDeltaNotchTrackingModifier<DIM>::~CellEdgeDeltaNotchTrackingModifier()
 template<unsigned DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    UpdateCellData(rCellPopulation);
+    AbstractCellEdgeBasedSimulationModifier<DIM,DIM>::UpdateCellEdges(rCellPopulation);
+//    this->UpdateCellEdges(rCellPopulation);
+
+    //Updates the cell
+    this->UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
@@ -38,6 +42,9 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
 {
     // Make sure the cell population is updated
     rCellPopulation.Update();
+
+    // Handles all edge changes
+    this->UpdateCellEdges(rCellPopulation);
 
     // First recover each cell's Notch and Delta concentrations from the ODEs and store in CellData
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
@@ -159,8 +166,80 @@ CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,
 template<unsigned int DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::CellDivisionEdgeUpdate(
         AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-        unsigned locationIndex, std::vector<long int> edgeChange,
-        unsigned locationIndex2, std::vector<long int> edgeChange2) {
+        unsigned locationIndex, EdgeRemapInfo* edgeChange,
+        unsigned locationIndex2, EdgeRemapInfo* edgeChange2) {
+
+    //Gets the cell
+    auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
+    auto cell2 = rCellPopulation.GetCellUsingLocationIndex(locationIndex2);
+
+
+
+    //Gets the edge srn model
+    auto old_model = static_cast<CellEdgeSrnModel*>(cell->GetSrnModel());
+    auto model1 = new CellEdgeSrnModel();
+    auto model2 = new CellEdgeSrnModel();
+
+    PerformEdgeRemap(old_model, model1, edgeChange);
+    PerformEdgeRemap(old_model, model2, edgeChange2);
+
+    cell->SetSrnModel(model1);
+    cell->SetSrnModel(model2);
+
+
+}
+
+template<unsigned int DIM>
+void CellEdgeDeltaNotchTrackingModifier<DIM>::PerformEdgeRemap(CellEdgeSrnModel *oldModel, CellEdgeSrnModel *newModel,
+                                                               EdgeRemapInfo *edgeChange) {
+
+    //Goes through the SRN model
+    for(unsigned i = 0 ; i < edgeChange->GetEdgesMapping().size(); i++)
+    {
+        //The remapIndex, if +ve refers to the srn index of the oldModel, if -ve then it's a new edge
+        auto remapIndex = edgeChange->GetEdgesMapping()[i];
+
+        //remapStatus can be the following:
+        //0 - Direct remapping, the edge srn of the oldModel can be transferred directly to the new model
+        //1 - The edge is a split point between the diving cells, in this example we divide all concentration in half
+        //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
+        auto remapStatus = edgeChange->GetEdgesStatus()[i];
+
+        if((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
+            EXCEPTION("Remap index cannot be negative when it's a direct remap or an edge split");
+
+        switch(remapStatus)
+        {
+            //Direct remap
+            case 0:
+            {
+                auto current_edge_srn = oldModel->GetEdgeSrn(remapIndex);
+                newModel->AddEdgeSrn(current_edge_srn);
+            }
+
+                break;
+
+            //Split - Divide the concentration in half
+            case 1:
+            {
+                auto current_edge_srn = boost::dynamic_pointer_cast<DeltaNotchEdgeSrnModel>(oldModel->GetEdgeSrn(remapIndex));
+                boost::shared_ptr<DeltaNotchEdgeSrnModel> p_srn_model(new DeltaNotchEdgeSrnModel());
+
+                p_srn_model->SetDelta(current_edge_srn->GetDelta()/2.0);
+                p_srn_model->SetNotch(current_edge_srn->GetNotch()/2.0);
+
+                newModel->AddEdgeSrn(p_srn_model);
+            }
+                break;
+
+            //New edge - Initialise new model
+            case 2:
+                boost::shared_ptr<DeltaNotchEdgeSrnModel> p_srn_model(new DeltaNotchEdgeSrnModel());
+                newModel->AddEdgeSrn(p_srn_model);
+                break;
+
+        }
+    }
 
 }
 

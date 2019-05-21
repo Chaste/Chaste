@@ -183,8 +183,8 @@ public:
 
 
     /**
-     *
-     * @return The number of edges that are actually in use
+     * Gets the number of edges in the mesh
+     * @return The number of edges in the mesh
      */
     unsigned GetNumEdges() const;
 
@@ -194,6 +194,19 @@ public:
      * @return Pointer to the edge at the index
      */
     Edge<SPACE_DIM> * GetEdge(unsigned index) const;
+
+
+    /**
+     * Gets the record of edge changes in the mesh
+     * @return
+     */
+    const std::vector<EdgeOperation*> & GetEdgeOperations();
+
+    /**
+     * Clears the edge change records in the mesh
+     */
+    void ClearEdgeOperations();
+
 
 
     /**

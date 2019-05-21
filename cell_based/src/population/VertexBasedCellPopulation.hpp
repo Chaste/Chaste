@@ -548,6 +548,9 @@ public:
      * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
+
+    const std::vector<EdgeOperation*> &  GetCellEdgeChangeOperations();
+    void ClearCellEdgeOperations();
 };
 
 #include "SerializationExportWrapper.hpp"

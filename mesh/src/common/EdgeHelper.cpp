@@ -128,16 +128,31 @@ unsigned EdgeHelper<SPACE_DIM>::GetNumEdges() const {
 }
 
 template<unsigned int SPACE_DIM>
+const std::vector<EdgeOperation*> & EdgeHelper<SPACE_DIM>::GetEdgeOperations() {
+    return mEdgeOperations;
+}
+
+template<unsigned int SPACE_DIM>
+void EdgeHelper<SPACE_DIM>::ClearEdgeOperations() {
+    for(auto operation: mEdgeOperations)
+    {
+        delete operation;
+    }
+
+    mEdgeOperations.clear();
+}
+
+template<unsigned int SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::InsertAddEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex) {
     if(!holdEdgeOperations)
-        mEdgeOperations.push_back(EdgeOperation(EDGE_OPERATION_ADD, elementIndex, localEdgeIndex));
+        mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_ADD, elementIndex, localEdgeIndex));
 }
 
 template<unsigned int SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::InsertDeleteEdgeOperation(unsigned elementIndex,
                                                       unsigned localEdgeIndex) {
     if(!holdEdgeOperations)
-        mEdgeOperations.push_back(EdgeOperation(EDGE_OPERATION_DELETE, elementIndex, localEdgeIndex));
+        mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_DELETE, elementIndex, localEdgeIndex));
 }
 
 template<unsigned int SPACE_DIM>
@@ -145,8 +160,10 @@ void EdgeHelper<SPACE_DIM>::InsertCellDivideOperation(unsigned elementIndex,
                                                       unsigned elementIndex2,
                                                       EdgeRemapInfo* newEdges, EdgeRemapInfo* newEdges2) {
     if(!holdEdgeOperations)
-        mEdgeOperations.push_back(EdgeOperation(elementIndex, elementIndex2, newEdges, newEdges2));
+        mEdgeOperations.push_back(new EdgeOperation(elementIndex, elementIndex2, newEdges, newEdges2));
 }
+
+
 
 template class EdgeHelper<1>;
 template class EdgeHelper<2>;

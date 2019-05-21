@@ -605,6 +605,8 @@ public:
 
      EdgeRemapInfo* BuildEdgeDivideIdDifferenceInfo(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement);
 
+     int WrapIndex(int index, int maxSize);
+
     /**
      * Add an element to the mesh.
      *

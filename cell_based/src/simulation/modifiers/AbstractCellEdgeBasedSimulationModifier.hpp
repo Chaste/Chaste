@@ -14,17 +14,21 @@ class AbstractCellEdgeBasedSimulationModifier: public AbstractCellBasedSimulatio
 
 
 public:
-    void UpdateAtEndOfTimeStep(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> &rCellPopulation) override;
 
-private:
+    /**
+     * Iterates though a list of cell edge changes
+     * @param rCellPopulation reference through cell population
+     */
+    virtual void UpdateCellEdges(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
 
-    virtual void EdgeAdded(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, unsigned locationIndex, unsigned edgeLocalIndex)=0;
 
-    virtual void EdgeRemoved(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, unsigned locationIndex, unsigned edgeLocalIndex)=0;
+    virtual void EdgeAdded(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, unsigned locationIndex, unsigned edgeLocalIndex){};
+
+    virtual void EdgeRemoved(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, unsigned locationIndex, unsigned edgeLocalIndex){};
 
     virtual void CellDivisionEdgeUpdate(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-            unsigned locationIndex, std::vector<long int> edgeChange,
-            unsigned locationIndex2, std::vector<long int> edgeChange2)=0;
+                                        unsigned locationIndex, EdgeRemapInfo* edgeChange,
+                                        unsigned locationIndex2, EdgeRemapInfo* edgeChange2){};
 
 };
 

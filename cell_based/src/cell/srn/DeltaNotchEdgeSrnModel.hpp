@@ -92,14 +92,26 @@ public:
     void UpdateDeltaNotch();
 
     /**
-     * @return the current Notch level in this cell.
+     * @return the current Notch level in this edge
      */
     double GetNotch();
 
     /**
-     * @return the current Delta level in this cell.
+     * Set the notch level in this edge
+     * @param value
+     */
+    void SetNotch(double value);
+
+    /**
+     * @return the current Delta level in this edge.
      */
     double GetDelta();
+
+    /**
+     * Set the delta level in this edge
+     * @param value
+     */
+    void SetDelta(double value);
 
     /**
      * @return the current level of mean Delta in the neighbouring cells.

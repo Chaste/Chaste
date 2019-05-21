@@ -595,8 +595,8 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
         oldIdsMap[id] = i;
     }
 
-    std::vector<long> newEdges(pElement->GetNumEdges());
-    std::vector<unsigned char> edgeStatus(pElement->GetNumEdges());
+    std::vector<long> newEdges;
+    std::vector<unsigned char> edgeStatus;
 
     int newEdgesCount = 0;
     // Element 1 edge division re-mapping
@@ -620,18 +620,22 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
     }
 
     // Find the middle index of the new edges
+    int numOldEdges = oldIds.size();
+    int numEdges = newEdges.size();
     for(unsigned i = 0; i < newEdges.size(); i++)
     {
-        int prevIndex = ((int)i - 1) % newEdges.size();
-        int nextIndex = ((int)i + 1) % newEdges.size();
+        int prevIndex = WrapIndex((int)i - 1, numEdges);
+        int nextIndex = WrapIndex((int)i +1, numEdges);
+
+
         if(newEdges[i] == -1 && newEdges[prevIndex] == -1 && newEdges[nextIndex] == -1)
         {
-            int prev2Index = ((int)i - 2) % newEdges.size();
-            int next2Index = ((int)i + 2) % newEdges.size();
+            int prev2Index = WrapIndex((int)i - 2, numEdges);
+            int next2Index = WrapIndex((int)i + 2, numEdges);
 
             assert(newEdges[prev2Index] != -1 && newEdges[next2Index] != -1);
-            newEdges[prevIndex] = newEdges[prev2Index] +1;
-            newEdges[nextIndex] = newEdges[next2Index] -1;
+            newEdges[prevIndex] = WrapIndex(newEdges[prev2Index] +1, numOldEdges);
+            newEdges[nextIndex] = WrapIndex(newEdges[next2Index] -1, numOldEdges);
             edgeStatus[prevIndex] = 1;
             edgeStatus[nextIndex] = 1;
 
@@ -644,6 +648,26 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
 
     return new EdgeRemapInfo(newEdges, edgeStatus);
 }
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+int MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WrapIndex(int index, int maxSize) {
+
+    int outIndex = index;
+
+    if(index < 0)
+    {
+        outIndex = maxSize + index;
+    }
+    else if(index >= maxSize)
+    {
+        outIndex = index - maxSize;
+    }
+
+    assert(outIndex > -1 && outIndex < maxSize);
+
+    return outIndex;
+}
+
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -3301,6 +3325,7 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     }
     return intersection;
 }
+
 
 // Explicit instantiation
 template class MutableVertexMesh<1,1>;

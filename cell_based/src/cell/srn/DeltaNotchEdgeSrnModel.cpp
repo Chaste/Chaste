@@ -75,11 +75,22 @@ double DeltaNotchEdgeSrnModel::GetNotch()
     return notch;
 }
 
+void DeltaNotchEdgeSrnModel::SetNotch(double value) {
+    assert(mpOdeSystem != nullptr);
+    mpOdeSystem->rGetStateVariables()[0] = value;
+}
+
 double DeltaNotchEdgeSrnModel::GetDelta()
 {
     assert(mpOdeSystem != nullptr);
     double delta = mpOdeSystem->rGetStateVariables()[1];
     return delta;
+}
+
+void DeltaNotchEdgeSrnModel::SetDelta(double value) {
+    assert(mpOdeSystem != nullptr);
+    mpOdeSystem->rGetStateVariables()[1] = value;
+
 }
 
 double DeltaNotchEdgeSrnModel::GetMeanNeighbouringDelta()
@@ -94,6 +105,10 @@ void DeltaNotchEdgeSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
     // No new parameters to output, so just call method on direct parent class
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
 }
+
+
+
+
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"

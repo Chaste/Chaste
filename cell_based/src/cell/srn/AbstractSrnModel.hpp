@@ -142,7 +142,7 @@ public:
      *
      * @param pCell pointer to the cell
      */
-    void SetCell(CellPtr pCell);
+    virtual void SetCell(CellPtr pCell);
 
     /**
      * Initialise the SRN model at the start of a simulation.

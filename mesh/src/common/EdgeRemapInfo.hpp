@@ -35,11 +35,21 @@ public:
         mEdgeStatus = edgesStatus;
     }
 
+    /**
+     * Contains a mapping to the old local edges index. Negative value means a new edge
+     *
+     */
     std::vector<long int>& GetEdgesMapping()
     {
         return mEdgesMapping;
     }
 
+    /**
+     * Status
+     * 0 Edge has not changed
+     * 1 Edge has been split between two elements
+     * 2 Completely new edge was created
+     */
     std::vector<unsigned char>& GetEdgesStatus()
     {
         return mEdgeStatus;

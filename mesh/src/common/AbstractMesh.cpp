@@ -75,6 +75,19 @@ Edge<SPACE_DIM> * AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) 
     return mEdges[index];
 }
 
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+const std::vector<EdgeOperation*> & AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeOperations()
+{
+    return this->mEdges.GetEdgeOperations();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::ClearEdgeOperations()
+{
+    this->mEdges.ClearEdgeOperations();
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {

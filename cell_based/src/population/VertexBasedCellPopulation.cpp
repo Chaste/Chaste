@@ -866,6 +866,17 @@ void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restr
     mRestrictVertexMovement = restrictMovement;
 }
 
+template<unsigned DIM>
+const std::vector<EdgeOperation*> &  VertexBasedCellPopulation<DIM>::GetCellEdgeChangeOperations()
+{
+    return this->rGetMesh().GetEdgeOperations();
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::ClearCellEdgeOperations()
+{
+    this->rGetMesh().ClearEdgeOperations();
+}
 
 
 // Explicit instantiation
