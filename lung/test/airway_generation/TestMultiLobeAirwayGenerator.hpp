@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkSTLReader.h"
 #include "vtkTriangleFilter.h"
+#include "vtkMassProperties.h"
 
 
 #endif //CHASTE_VTK
@@ -185,6 +186,56 @@ public:
         }
 
     #endif
+    }
+
+    void TestProblemWithPointMembershipClassificationInVtk82()
+    {
+#if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
+        EXIT_IF_PARALLEL;
+        std::cout << "For information, VTK is "<<VTK_MAJOR_VERSION<<"."<<VTK_MINOR_VERSION<<".\n";
+        // This code is for #3002
+
+        // Create the first Lobe (as used in TestGenerate below)
+        vtkSmartPointer<vtkPolyData> lobe_surface = CreateCube(-2.9, 0.0, 0.0);
+        // See AirwayGenerator::AirwayGenerator()
+        vtkSmartPointer<vtkSelectEnclosedPoints> point_selector = vtkSmartPointer<vtkSelectEnclosedPoints>::New();
+        point_selector->CheckSurfaceOn();
+        point_selector->Initialize(lobe_surface);
+        point_selector->SetTolerance(1e-6);
+
+        // See AirwayGenerator::CreatePointCloudUsingTargetPoints(const unsigned& rApproxPoints)
+        vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
+#if VTK_MAJOR_VERSION >= 6
+        mass_properties->SetInputData(lobe_surface);
+#else
+        mass_properties->SetInput(lobe_surface);
+#endif
+        double point_spacing = std::pow(mass_properties->GetVolume()/4, 1.0/3.0);
+	TS_ASSERT_DELTA(point_spacing, 1.25992 /*2^(1/3)*/, 1e-5);
+	TS_ASSERT_DELTA(mass_properties->GetVolume(), 8.0, 1e-5);        
+
+        // See AirwayGenerator::CreatePointCloud(const double& rPointSpacing)
+        double bounds[6];
+        lobe_surface->GetBounds(bounds);
+
+        unsigned xi_max = std::ceil((bounds[1] - bounds[0])/point_spacing);
+        unsigned yi_max = std::ceil((bounds[3] - bounds[2])/point_spacing);
+        unsigned zi_max = std::ceil((bounds[5] - bounds[4])/point_spacing);
+	TS_ASSERT_EQUALS(xi_max, 2u);
+	TS_ASSERT_EQUALS(yi_max, 2u);
+	TS_ASSERT_EQUALS(zi_max, 2u);
+	// This show why the loop in AirwayGenerator::CreatePointCloud() is doing different things when run with VTK 8.2
+        //if (VTK_MAJOR_VERSION == 8u) {  // Reinstate if this test fails in VTK 5, 6 or7.
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0],               bounds[2],               bounds[4]),               true);
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0],               bounds[2],               bounds[4]+point_spacing), false);//true in 8.2
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0],               bounds[2]+point_spacing, bounds[4]),               false);//true in 8.2
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0],               bounds[2]+point_spacing, bounds[4]+point_spacing), false);
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0]+point_spacing, bounds[2],               bounds[4]),               false);//true in 8.2
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0]+point_spacing, bounds[2],               bounds[4]+point_spacing), true);
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]),               false);//true in 8.2
+            TS_ASSERT_EQUALS(point_selector->IsInsideSurface(bounds[0]+point_spacing, bounds[2]+point_spacing, bounds[4]+point_spacing), true);
+        //}
+#endif
     }
 
     void TestGenerate()
