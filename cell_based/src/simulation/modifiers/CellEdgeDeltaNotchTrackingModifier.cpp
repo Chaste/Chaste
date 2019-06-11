@@ -21,10 +21,31 @@ template<unsigned DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     AbstractCellEdgeBasedSimulationModifier<DIM,DIM>::UpdateCellEdges(rCellPopulation);
-//    this->UpdateCellEdges(rCellPopulation);
 
     //Updates the cell
     this->UpdateCellData(rCellPopulation);
+
+    //Debug cell concentration
+    printf("Time: %f ", SimulationTime::Instance()->GetTime());
+    double totalConcentration = 0;
+    for(unsigned i = 0 ; i < rCellPopulation.GetNumAllCells(); i ++)
+    {
+        auto cell = rCellPopulation.GetCellUsingLocationIndex(i);
+        //auto edgesSrn = static_cast<CellEdgeSrnModel*>(cell->GetSrnModel());
+        auto notchConcentration = cell->GetCellEdgeData()->GetItem("notch");
+
+
+
+        printf("|| NC %i:", i);
+        for( auto notch: notchConcentration)
+        {
+            totalConcentration += notch;
+            printf(" %f ", notch);
+        }
+    }
+    printf(" || TC %f", totalConcentration);
+    printf("\n");
+
 }
 
 template<unsigned DIM>
@@ -104,7 +125,9 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
 
             // Edge neighbour inside of cell
             // In this case we're only looking at immediate neighbour to the current edge
-            auto prevNeighbour = ((int)i -1) % p_cell_edge_model->GetNumEdgeSrn();
+            auto prevNeighbour = ((int)i -1);
+            if(prevNeighbour < 0)
+                prevNeighbour = p_cell_edge_model->GetNumEdgeSrn() -1;
             auto nextNeighbour = (i +1) % p_cell_edge_model->GetNumEdgeSrn();
             delta_counter += 2;
             mean_delta += delta_vec[prevNeighbour];
@@ -132,6 +155,8 @@ template<unsigned int DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
                                                         unsigned locationIndex, unsigned edgeLocalIndex) {
 
+    printf("Edge added");
+
     //Gets the cell
     auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
 
@@ -152,6 +177,8 @@ void
 CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
                                                      unsigned locationIndex, unsigned edgeLocalIndex) {
 
+    printf("Edge deleted");
+
     //Gets the cell
     auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
 
@@ -168,6 +195,8 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::CellDivisionEdgeUpdate(
         AbstractCellPopulation<DIM,DIM>& rCellPopulation,
         unsigned locationIndex, EdgeRemapInfo* edgeChange,
         unsigned locationIndex2, EdgeRemapInfo* edgeChange2) {
+
+    printf("Edge added");
 
     //Gets the cell
     auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);

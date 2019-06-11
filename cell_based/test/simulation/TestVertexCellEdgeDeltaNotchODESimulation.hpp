@@ -58,6 +58,7 @@
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
+#include "UniformCellCycleModel.hpp"
 
 
 /*
@@ -79,6 +80,171 @@ class TestVertexCellEdgeDeltaNotchODESimulation : public AbstractCellBasedTestSu
 {
 public:
 
+    void TestDeltaNotchEdgeSrnCorrectBehaviour()
+    {
+        TS_ASSERT_THROWS_NOTHING(DeltaNotchEdgeSrnModel srn_model);
+
+        // Create cell edge srn with four edges
+        auto p_cell_edge_srn_model = new CellEdgeSrnModel();
+        for(int i = 0 ; i < 4; i++)
+        {
+            boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
+
+            // Create a vector of initial conditions
+            std::vector<double> starter_conditions;
+            starter_conditions.push_back(0.5);
+            starter_conditions.push_back(0.5);
+            p_delta_notch_edge_srn_model->SetInitialConditions(starter_conditions);
+            p_cell_edge_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
+
+        }
+
+        UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_cell_edge_srn_model, false, CellPropertyCollection()));
+        p_cell->SetCellProliferativeType(p_diff_type);
+        std::vector<double> p_mean_delta = {1.0, 1.0, 1.0, 1.0};
+        p_cell->GetCellEdgeData()->SetItem("mean delta", p_mean_delta);
+        p_cell->InitialiseCellCycleModel();
+        p_cell->InitialiseSrnModel();
+
+        // Now updated to initial conditions
+        for(unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
+        {
+            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+
+            TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.5, 1e-4);
+            TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.5, 1e-4);
+        }
+
+
+        // Now update the SRN
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        unsigned num_steps = 100;
+        double end_time = 10.0;
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
+
+        while (p_simulation_time->GetTime() < end_time)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            p_cell_edge_srn_model->SimulateToCurrentTime();
+        }
+
+
+        // Test converged to steady state
+        for(unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
+        {
+            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+
+            TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.9900, 1e-4);
+            TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.0101, 1e-4);
+        }
+
+    }
+
+    void TestDeltaNotchEdgeSrnCreateCopy()
+    {
+        int numEdges = 4;
+
+        auto p_cell_edge_srn_model = new CellEdgeSrnModel();
+        for(int i = 0 ; i < numEdges; i++)
+        {
+            boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
+
+
+            // Set ODE system
+            std::vector<double> state_variables;
+            state_variables.push_back(2.0);
+            state_variables.push_back(3.0);
+            p_delta_notch_edge_srn_model->SetOdeSystem(new DeltaNotchOdeSystem(state_variables));
+            p_delta_notch_edge_srn_model->SetInitialConditions(state_variables);
+            p_cell_edge_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
+
+        }
+
+
+
+        // Create a copy
+        CellEdgeSrnModel* p_cell_edge_srn_model2 = static_cast<CellEdgeSrnModel*> (p_cell_edge_srn_model->CreateSrnModel());
+
+        for(int i = 0 ; i < numEdges; i++)
+        {
+            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model2->GetEdgeSrn(i));
+            // Check correct initializations
+            TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetNotch(), 2.0);
+            TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetDelta(), 3.0);
+
+        }
+
+
+
+
+
+        // Destroy models
+        delete p_cell_edge_srn_model;
+        delete p_cell_edge_srn_model2;
+    }
+
+    void TestArchiveDeltaNotchSrnModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_edge_srn.arch";
+
+        // Create an output archive
+        {
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
+
+            UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractSrnModel* p_srn_model = new DeltaNotchSrnModel;
+
+            MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+            MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+
+            // We must create a cell to be able to initialise the cell srn model's ODE system
+            CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
+            p_cell->SetCellProliferativeType(p_transit_type);
+            p_cell->GetCellData()->SetItem("mean delta", 10.0);
+            p_cell->InitialiseCellCycleModel();
+            p_cell->InitialiseSrnModel();
+            p_cell->SetBirthTime(0.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Read mean Delta from CellData
+            static_cast<DeltaNotchSrnModel*>(p_srn_model)->UpdateDeltaNotch();
+            TS_ASSERT_DELTA(static_cast<DeltaNotchSrnModel*>(p_srn_model)->GetMeanNeighbouringDelta(), 10.0, 1e-12);
+
+            output_arch << p_srn_model;
+
+            // Note that here, deletion of the cell-cycle model and srn is handled by the cell destructor
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractSrnModel* p_srn_model;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_srn_model;
+
+            TS_ASSERT_DELTA(static_cast<DeltaNotchSrnModel*>(p_srn_model)->GetMeanNeighbouringDelta(), 10.0, 1e-12);
+
+            delete p_srn_model;
+        }
+    }
+
+
 
 
     /*
@@ -97,11 +263,11 @@ public:
         EXIT_IF_PARALLEL;
 
         /* First we create a regular vertex mesh. */
-        HoneycombVertexMeshGenerator generator(5, 5);
+        HoneycombVertexMeshGenerator generator(2, 1);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
-         * {{{DeltaNotchSrnModel}}}, which
+         * {{{DeltaNotchEdgeSrnModel}}}, which
          * incorporates a Delta/Notch ODE system, here we use the hard coded initial conditions of 1.0 and 1.0.
          * In this example we choose to make each cell differentiated,
          * so that no cell division occurs. */
@@ -172,7 +338,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexCellEdgeDeltaNotchODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(1.0);
+        simulator.SetEndTime(10.0);
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within
          * the cells in {{{CellData}}} and passes it to the simulation.*/
