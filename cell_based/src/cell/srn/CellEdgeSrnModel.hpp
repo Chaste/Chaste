@@ -37,6 +37,7 @@ private:
     }
 
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
+    using abstractsrnmodel_t = std::vector<boost::shared_ptr<AbstractSrnModel>>;
 
 protected:
 
@@ -50,6 +51,17 @@ protected:
     }
 
 public:
+
+    /* Makes the class iterable which returns the individual edge srn models */
+    using iterator = abstractsrnmodel_t::iterator;
+    using const_iterator = abstractsrnmodel_t::const_iterator;
+    iterator begin() { return mEdgeSrnModels.begin(); }
+    iterator end() { return mEdgeSrnModels.end(); }
+    const_iterator begin() const { return mEdgeSrnModels.begin(); }
+    const_iterator end() const { return mEdgeSrnModels.end(); }
+    const_iterator cbegin() const { return mEdgeSrnModels.cbegin(); }
+    const_iterator cend() const { return mEdgeSrnModels.cend(); }
+
 
     CellEdgeSrnModel(){}
 
