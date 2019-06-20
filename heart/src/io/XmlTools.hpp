@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef XMLTOOLS_HPP_
 #define XMLTOOLS_HPP_
 
+#define XSD_CXX11
+
 #include <string>
 #include <vector>
 
@@ -79,7 +81,7 @@ public:
      * @param validate  whether to perform schema validation
      * @return Xerces convenience object
      */
-    static xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> ReadXmlFile(
+    static XSD_DOM_AUTO_PTR<xercesc::DOMDocument> ReadXmlFile(
         const std::string& rFileName,
         const ::xsd::cxx::tree::properties<char>& rProps,
         bool validate=true);
@@ -128,7 +130,7 @@ public:
      * @param validate  whether to perform schema validation
      * @return Xerces convenience object
      */
-    static xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> ReadFileToDomDocument(
+    static XSD_DOM_AUTO_PTR<xercesc::DOMDocument> ReadFileToDomDocument(
         const std::string& rFileName,
         ::xsd::cxx::xml::error_handler<char>& rErrorHandler,
         const ::xsd::cxx::tree::properties<char>& rProps,
