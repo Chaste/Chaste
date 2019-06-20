@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <random>
 #include <string>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "FakePetscSetup.hpp"
@@ -66,7 +67,7 @@ public:
     void TestAutoKeyword()
     {
         auto i = 0;
-        ++i; // Stop the compiler complaining about unused variable
+        TS_ASSERT_EQUALS(i, 0);
     }
 
     void TestSmartPointers()
@@ -80,13 +81,14 @@ public:
 
     void TestStdArray()
     {
-        std::array<unsigned, 3> my_array = {1u, 2u, 3u};
-        ++my_array[0]; // Stop the compiler complaining about unused variable
+        std::array<unsigned, 3> my_array = {{1u, 2u, 3u}};
+        TS_ASSERT_EQUALS(my_array[2], 3u);
     }
 
     void TestStdInitializerList()
     {
         std::vector<unsigned> my_vec = {1u, 2u, 3u, 4u, 5u};
+        TS_ASSERT_EQUALS(my_vec[1], 2u);
     }
 
     void TestRangeFor()
@@ -160,13 +162,14 @@ public:
     void TestTuple()
     {
         auto my_tuple = std::make_tuple(1.23, 5u, "a_string");
-        ++std::get<1>(my_tuple); // Stop the compiler complaining about unused variable
+
+        TS_ASSERT_EQUALS(std::get<1>(my_tuple), 5u);
+        TS_ASSERT_DELTA(std::get<double>(my_tuple), 1.23, 1e-12);
     }
 
     void TestNullptrType()
     {
-        int* i = nullptr;
-        ++i;
+        TS_ASSERT(std::is_null_pointer<decltype(nullptr)>::value);
     }
 
     void TestDigitSeparator()
