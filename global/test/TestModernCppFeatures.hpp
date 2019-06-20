@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCPP11FEATURES_HPP_
-#define TESTCPP11FEATURES_HPP_
+#ifndef TESTMODERNCPPFEATURES_HPP_
+#define TESTMODERNCPPFEATURES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -52,12 +52,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /**
- * Verify that certain C++11 features will compile correctly.
+ * Verify that certain modern C++ features will compile correctly.
  *
  * There is no real 'testing' in this class; just verification that the compiler can cope with various new language
  * features.
+ *
+ * Chaste currently uses C++14.
  */
-class TestCpp11Features : public CxxTest::TestSuite
+class TestModernCppFeatures : public CxxTest::TestSuite
 {
 public:
 
@@ -73,24 +75,25 @@ public:
         std::unique_ptr<double> p_unique;
 
         auto p_made_shared = std::make_shared<double>();
+        auto p_made_unique = std::make_unique<double>();
     }
 
     void TestStdArray()
     {
-        std::array<unsigned, 3> my_array;
+        std::array<unsigned, 3> my_array = {1u, 2u, 3u};
         ++my_array[0]; // Stop the compiler complaining about unused variable
     }
 
     void TestStdInitializerList()
     {
-        std::vector<unsigned> my_vec = {1, 2, 3, 4, 5};
+        std::vector<unsigned> my_vec = {1u, 2u, 3u, 4u, 5u};
     }
 
     void TestRangeFor()
     {
         // Traversing a vector
         {
-            std::vector<unsigned> my_vec = {0, 1, 2, 3, 4, 5};
+            std::vector<unsigned> my_vec = {0u, 1u, 2u, 3u, 4u, 5u};
 
             // Access by const reference
             for (const unsigned &i : my_vec)
@@ -146,7 +149,7 @@ public:
         }
 
         // Use algorithm std::sort, with a lambda, to sort smallest-to-largest x-val
-        auto sort_x = [](std::array<double, DIM> a, std::array<double, DIM> b) -> bool
+        auto sort_x = [](auto a, std::array<double, DIM> b) -> bool
         {
             return a[0] < b[0];
         };
@@ -165,6 +168,11 @@ public:
         int* i = nullptr;
         ++i;
     }
+
+    void TestDigitSeparator()
+    {
+        TS_ASSERT_EQUALS(1'000'000, 1000000);
+    }
 };
 
-#endif /*TESTCPP11FEATURES_HPP_*/
+#endif /*TESTMODERNCPPFEATURES_HPP_*/
