@@ -50,6 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "S1S2Stimulus.hpp"
 #include "SteadyStateRestitutionStimulus.hpp"
 #include "OutputFileHandler.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestRestitutionStimuli : public CxxTest::TestSuite
 {
