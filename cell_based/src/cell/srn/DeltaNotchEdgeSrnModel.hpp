@@ -129,6 +129,8 @@ public:
     void OutputSrnModelParameters(out_stream& rParamsFile);
 };
 
+typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;
+
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(DeltaNotchEdgeSrnModel)

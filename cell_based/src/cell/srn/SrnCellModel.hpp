@@ -14,8 +14,12 @@
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
+typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
-class CellEdgeSrnModel : public AbstractSrnModel {
+/**
+ * Srn Model at the Cell level, has representation for edges internally
+ */
+class SrnCellModel : public AbstractSrnModel {
 
 private:
 
@@ -37,16 +41,16 @@ private:
     }
 
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
-    using abstractsrnmodel_t = std::vector<boost::shared_ptr<AbstractSrnModel>>;
+    using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
 protected:
 
 
-    CellEdgeSrnModel(const CellEdgeSrnModel &rModel) : AbstractSrnModel(rModel) {
+    SrnCellModel(const SrnCellModel &rModel) : AbstractSrnModel(rModel) {
 
         //Makes a copy of all SRN models inside the system
         for(auto srnModel: rModel.mEdgeSrnModels){
-            this->mEdgeSrnModels.push_back(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
+            this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
         }
     }
 
@@ -63,9 +67,9 @@ public:
     const_iterator cend() const { return mEdgeSrnModels.cend(); }
 
 
-    CellEdgeSrnModel(){}
+    SrnCellModel(){}
 
-    ~CellEdgeSrnModel(){}
+    ~SrnCellModel(){}
 
     void Initialise() override
     {
@@ -85,27 +89,27 @@ public:
 
     AbstractSrnModel* CreateSrnModel() override
     {
-        return new CellEdgeSrnModel(*this);
+        return new SrnCellModel(*this);
     }
 
-    void AddEdgeSrn(std::vector<boost::shared_ptr<AbstractSrnModel>> edgeSrn)
+    void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
     {
         mEdgeSrnModels = edgeSrn;
     }
 
-    void AddEdgeSrn(boost::shared_ptr<AbstractSrnModel> edgeSrn)
+    void AddEdgeSrn(AbstractSrnModelPtr edgeSrn)
     {
         edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
         mEdgeSrnModels.push_back(edgeSrn);
 
     }
 
-    void InsertEdgeSrn(unsigned index, boost::shared_ptr<AbstractSrnModel> edgeSrn)
+    void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn)
     {
         mEdgeSrnModels.insert(mEdgeSrnModels.begin() + index, edgeSrn);
     }
 
-    boost::shared_ptr<AbstractSrnModel> RemoveEdgeSrn(unsigned index)
+    AbstractSrnModelPtr RemoveEdgeSrn(unsigned index)
     {
         auto edgeSrn = mEdgeSrnModels[index];
         mEdgeSrnModels.erase(mEdgeSrnModels.begin() + index);
@@ -117,10 +121,15 @@ public:
         return mEdgeSrnModels.size();
     }
 
-    boost::shared_ptr<AbstractSrnModel> GetEdgeSrn(unsigned index)
+    AbstractSrnModelPtr GetEdgeSrn(unsigned index)
     {
         assert(index < mEdgeSrnModels.size());
         return mEdgeSrnModels[index];
+    }
+
+    const std::vector<AbstractSrnModelPtr>& GetEdges()
+    {
+        return mEdgeSrnModels;
     }
 
     void SetCell(CellPtr pCell) override {
