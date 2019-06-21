@@ -42,15 +42,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/util/XercesDefs.hpp> // XMLCh
 
-#include <xsd/cxx/version.hxx>
-#include <xsd/cxx/xml/string.hxx>
-#include <xsd/cxx/xml/dom/auto-ptr.hxx>
-#include <xsd/cxx/tree/error-handler.hxx>
 #include <xsd/cxx/tree/elements.hxx>
+#include <xsd/cxx/tree/error-handler.hxx>
+#include <xsd/cxx/version.hxx>
+#include <xsd/cxx/xml/dom/auto-ptr.hxx>
+#include <xsd/cxx/xml/string.hxx>
 
 #ifndef X //Also used in XSD code for XdmfMeshWriter
 /**
