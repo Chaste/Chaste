@@ -38,16 +38,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# This statement can be removed when cmake_minimum_required >= 3.0
-if (POLICY CMP0048)
-    cmake_policy (SET CMP0048 NEW)
-endif ()
-
-# This statement can be removed when cmake_minimum_required >= 3.3
-if (POLICY CMP0062)
-    cmake_policy (SET CMP0062 NEW)
-endif ()
-
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include (EnsureOutOfSourceBuild)
 ensure_out_of_source_build ()
