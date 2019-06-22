@@ -473,7 +473,7 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
     }
 
     // Get the parameters using the method 'ChasteParameters(rFileName)',
-    // which returns a std::auto_ptr. We convert to a shared_ptr for easier semantics.
+    // which returns a std::unique_ptr. We convert to a shared_ptr for easier semantics.
     try
     {
         // Make sure Xerces finalization happens
