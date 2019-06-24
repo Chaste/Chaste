@@ -152,129 +152,42 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::OutputSimulationModifierParameters
 }
 
 template<unsigned int DIM>
+AbstractSrnModel *CellEdgeDeltaNotchTrackingModifier<DIM>::CreateEmptySrnEdgeModel() {
+    return new DeltaNotchEdgeSrnModel();
+}
+
+template<unsigned int DIM>
 void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
-                                                        unsigned locationIndex, unsigned edgeLocalIndex) {
+                                                        unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr addedEdge) {
 
-    printf("Edge added");
+    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(addedEdge);
+    //New edges have a concentration of 0
+    deltaNotchNewSrnEdge->SetDelta(0);
+    deltaNotchNewSrnEdge->SetNotch(0);
 
-    //Gets the cell
-    auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
+}
 
-    //Gets the edge srn model
-    auto p_cell_edge_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
-
-    //Adds a blank delta notch edge srn model
-    boost::shared_ptr<AbstractOdeSrnModel> delta_notch_srn(new DeltaNotchEdgeSrnModel());
-    p_cell_edge_model->InsertEdgeSrn(edgeLocalIndex, delta_notch_srn);
-
+template<unsigned int DIM>
+void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
+                                                     unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr oldSrnEdge) {
 
 
 
 }
 
 template<unsigned int DIM>
-void
-CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
-                                                     unsigned locationIndex, unsigned edgeLocalIndex) {
+void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge) {
 
-    printf("Edge deleted");
+    //Convert to delta notch srn type
+    auto deltaNotchOldSrnEdge = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(oldSrnEdge);
+    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(newSrnEdge);
 
-    //Gets the cell
-    auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
-
-    //Gets the edge srn model
-    auto p_cell_edge_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
-
-    //Removes the edge delta notch srn
-    p_cell_edge_model->RemoveEdgeSrn(edgeLocalIndex);
-
+    //In this example we're just halving the concentrations
+    deltaNotchNewSrnEdge->SetDelta(deltaNotchOldSrnEdge->GetDelta()/2.0);
+    deltaNotchNewSrnEdge->SetNotch(deltaNotchOldSrnEdge->GetNotch()/2.0);
 }
 
-template<unsigned int DIM>
-void CellEdgeDeltaNotchTrackingModifier<DIM>::CellDivisionEdgeUpdate(
-        AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-        unsigned locationIndex, EdgeRemapInfo* edgeChages1,
-        unsigned locationIndex2, EdgeRemapInfo* edgeChanges2) {
 
-    printf("Edge added");
-
-    //Gets the cell
-    auto cell = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
-    auto cell2 = rCellPopulation.GetCellUsingLocationIndex(locationIndex2);
-
-    //Gets the edge srn model and a copy of the srn models in the edges
-    auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
-    std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
-
-    auto srn_cell_model1 = new SrnCellModel();
-    auto srn_cell_model2 = new SrnCellModel();
-
-    cell->SetSrnModel(srn_cell_model1);
-    cell2->SetSrnModel(srn_cell_model2);
-
-    PerformEdgeRemap(old_srn_edges, srn_cell_model1, edgeChages1);
-    PerformEdgeRemap(old_srn_edges, srn_cell_model2, edgeChanges2);
-
-
-}
-
-template<unsigned int DIM>
-void CellEdgeDeltaNotchTrackingModifier<DIM>::PerformEdgeRemap(std::vector<AbstractSrnModelPtr>& old_edges, SrnCellModel *newModel,
-                                                               EdgeRemapInfo *edgeChange) {
-
-    //Goes through the SRN model
-    for(unsigned i = 0 ; i < edgeChange->GetEdgesMapping().size(); i++)
-    {
-        //The remapIndex, if +ve refers to the srn index of the oldModel, if -ve then it's a new edge
-        auto remapIndex = edgeChange->GetEdgesMapping()[i];
-
-        //remapStatus can be the following:
-        //0 - Direct remapping, the edge srn of the oldModel can be transferred directly to the new model
-        //1 - The edge is a split point between the diving cells, in this example we divide all concentration in half
-        //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
-        auto remapStatus = edgeChange->GetEdgesStatus()[i];
-
-        if((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
-            EXCEPTION("Remap index cannot be negative when it's a direct remap or an edge split");
-
-        switch(remapStatus)
-        {
-            //Direct remap
-            case 0:
-            {
-                auto current_edge_srn = old_edges[remapIndex];
-                newModel->AddEdgeSrn(current_edge_srn);
-            }
-
-                break;
-
-            //Split - Divide the concentration in half
-            case 1:
-            {
-                auto current_edge_srn = boost::dynamic_pointer_cast<DeltaNotchEdgeSrnModel>(old_edges[remapIndex]);
-                DeltaNotchEdgeSrnModelPtr p_srn_model(new DeltaNotchEdgeSrnModel());
-                newModel->AddEdgeSrn(p_srn_model);
-                p_srn_model->Initialise();
-                p_srn_model->SetDelta(current_edge_srn->GetDelta()/2.0);
-                p_srn_model->SetNotch(current_edge_srn->GetNotch()/2.0);
-
-
-            }
-                break;
-
-            //New edge - Initialise new model
-            case 2:
-                DeltaNotchEdgeSrnModelPtr p_srn_model(new DeltaNotchEdgeSrnModel());
-                newModel->AddEdgeSrn(p_srn_model);
-                p_srn_model->Initialise();
-                p_srn_model->SetDelta(0);
-                p_srn_model->SetNotch(0);
-                break;
-
-        }
-    }
-
-}
 
 
 // Explicit instantiation
@@ -284,4 +197,6 @@ template class CellEdgeDeltaNotchTrackingModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
+#include "AbstractCellEdgeBasedSimulationModifier.hpp"
+
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellEdgeDeltaNotchTrackingModifier)

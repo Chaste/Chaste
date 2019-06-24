@@ -238,8 +238,16 @@ public:
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
-    std::set<std::pair<unsigned int, unsigned int>>
-    GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex) override;
+
+    /**
+     * Overridden GetNeighbouringEdgeIndices() method.
+     *
+     * Gets the local edge index of the neighbouring element
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * @return pair of element location and local edge index
+     */
+    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex) override;
 
 
     /**

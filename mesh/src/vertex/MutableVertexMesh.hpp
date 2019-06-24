@@ -68,6 +68,7 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexMeshReMesh;
     friend class TestMutableVertexMeshRosetteMethods;
     friend class TestMutableVertexEdges;
+    friend class TestCellEdgeSrn;
 
 protected:
 
