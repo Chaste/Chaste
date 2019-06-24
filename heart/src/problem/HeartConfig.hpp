@@ -255,7 +255,7 @@ public:
     boost::shared_ptr<cp::chaste_parameters_type> ReadFile(const std::string& rFileName);
 
     /**
-     * Throw away the current instance by resetting auto_ptr #mpInstance to NULL.
+     * Throw away the current instance by resetting unique_ptr #mpInstance to NULL.
      * "New" another #mpInstance
      */
     static void Reset();

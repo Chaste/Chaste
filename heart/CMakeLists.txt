@@ -32,16 +32,6 @@
 
 find_package(Chaste COMPONENTS ${Chaste_DEPENDS_heart})
 
-# XSD < 4.0.0 generates code with std::auto_ptr.  This is deprecated from C++11 (in favour of new standard smart
-# pointers). This code turns off the deprecation warnings so that Chaste compiles.
-# TODO: Once we drop Chaste support for XSD 3.3, this should be removed in favour of changing auto_ptr to unique_ptr
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-    set(DEPRECATION_FLAG "-wr1478")
-else()
-    set(DEPRECATION_FLAG "-Wno-deprecated-declarations")
-endif()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEPRECATION_FLAG}")
-
 set(Chaste_heart_SOURCES "")
 
 file(GLOB xsd_config_files src/io/*.xsd)
@@ -74,8 +64,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 foreach(dyn_source ${dyn_sources})
     get_filename_component(dyn_source_name ${dyn_source} NAME_WE)
     add_library(${dyn_source_name} SHARED ${dyn_source})
-    set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 11)
+    set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 14)
     set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${dyn_source_name} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,-undefined,dynamic_lookup")
         #set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
