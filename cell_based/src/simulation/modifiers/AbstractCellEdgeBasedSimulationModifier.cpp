@@ -1,5 +1,5 @@
-#include "DeltaNotchEdgeSrnModel.hpp"
-#include "CellEdgeDeltaNotchTrackingModifier.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
+#include "DeltaNotchCellEdgeTrackingModifier.hpp"
 #include <cell_based/src/population/VertexBasedCellPopulation.hpp>
 #include "AbstractCellEdgeBasedSimulationModifier.hpp"
 

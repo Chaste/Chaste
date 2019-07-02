@@ -69,9 +69,9 @@
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
  * cells through the {{{CellEdgeData}}} class.
  */
-#include "DeltaNotchEdgeSrnModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 #include "SrnCellModel.hpp"
-#include "CellEdgeDeltaNotchTrackingModifier.hpp"
+#include "DeltaNotchCellEdgeTrackingModifier.hpp"
 
 
 
@@ -103,7 +103,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
-         * {{{DeltaNotchEdgeSrnModel}}}, which
+         * {{{DeltaNotchSrnEdgeModel}}}, which
          * incorporates a Delta/Notch ODE system, here we use the hard coded initial conditions of 1.0 and 1.0.
          * In this example we choose to make each cell differentiated,
          * so that no cell division occurs. */
@@ -145,7 +145,7 @@ public:
                 initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
                 initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
 
-                MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
+                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                 p_srn_model->SetInitialConditions(initial_conditions);
                 p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
             }
@@ -178,7 +178,7 @@ public:
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within
          * the cells in {{{CellData}}} and passes it to the simulation.*/
-        MAKE_PTR(CellEdgeDeltaNotchTrackingModifier<2>, p_modifier);
+        MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
         MAKE_PTR(NagaiHondaForce<2>, p_force);

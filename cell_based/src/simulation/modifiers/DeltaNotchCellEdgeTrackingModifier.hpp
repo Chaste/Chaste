@@ -2,8 +2,8 @@
 // Created by twin on 08/02/19.
 //
 
-#ifndef CELLEDGEDELTANOTCHTRACKINGMODIFIER_HPP_
-#define CELLEDGEDELTANOTCHTRACKINGMODIFIER_HPP_
+#ifndef DELTANOTCHTCELLEDGERACKINGMODIFIER_HPP_
+#define DELTANOTCHTCELLEDGERACKINGMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -14,7 +14,7 @@
 #include "AbstractCellEdgeBasedSimulationModifier.hpp"
 
 template<unsigned DIM>
-class CellEdgeDeltaNotchTrackingModifier : public AbstractCellEdgeBasedSimulationModifier<DIM,DIM>
+class DeltaNotchCellEdgeTrackingModifier : public AbstractCellEdgeBasedSimulationModifier<DIM,DIM>
 {
 
     /** Needed for serialization. */
@@ -37,12 +37,12 @@ public:
     /**
      * Default constructor.
      */
-    CellEdgeDeltaNotchTrackingModifier();
+    DeltaNotchCellEdgeTrackingModifier();
 
     /**
      * Destructor.
      */
-    virtual ~CellEdgeDeltaNotchTrackingModifier();
+    virtual ~DeltaNotchCellEdgeTrackingModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -101,6 +101,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellEdgeDeltaNotchTrackingModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellEdgeTrackingModifier)
 
-#endif //CELLEDGEDELTANOTCHTRACKINGMODIFIER_HPP_
+#endif //DELTANOTCHTCELLEDGERACKINGMODIFIER_HPP_

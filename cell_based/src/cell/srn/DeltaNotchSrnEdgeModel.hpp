@@ -2,8 +2,8 @@
 // Created by twin on 12/03/19.
 //
 
-#ifndef DELTANOTCHEDGESRNMODEL_HPP_
-#define DELTANOTCHEDGESRNMODEL_HPP_
+#ifndef DELTANOTCHSRNEDGEMODEL_HPP_
+#define DELTANOTCHSRNEDGEMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -16,7 +16,7 @@
  *
  * \todo #2752 document this class more thoroughly here
  */
-class DeltaNotchEdgeSrnModel : public AbstractOdeSrnModel
+class DeltaNotchSrnEdgeModel : public AbstractOdeSrnModel
 {
 private:
 
@@ -47,7 +47,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchEdgeSrnModel(const DeltaNotchEdgeSrnModel& rModel);
+    DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rModel);
 
 public:
 
@@ -56,7 +56,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchSrnEdgeModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Overridden builder method to create new copies of
@@ -129,16 +129,16 @@ public:
     void OutputSrnModelParameters(out_stream& rParamsFile);
 };
 
-typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;
+typedef boost::shared_ptr<DeltaNotchSrnEdgeModel> DeltaNotchEdgeSrnModelPtr;
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchEdgeSrnModel)
+CHASTE_CLASS_EXPORT(DeltaNotchSrnEdgeModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchEdgeSrnModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnEdgeModel)
 
 
 
 
 
-#endif //DELTANOTCHEDGESRNMODEL_HPP_
+#endif //DELTANOTCHSRNEDGEMODEL_HPP_

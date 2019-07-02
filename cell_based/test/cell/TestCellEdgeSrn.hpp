@@ -38,9 +38,9 @@
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
  * cells through the {{{CellEdgeData}}} class.
  */
-#include "DeltaNotchEdgeSrnModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 #include "SrnCellModel.hpp"
-#include "CellEdgeDeltaNotchTrackingModifier.hpp"
+#include "DeltaNotchCellEdgeTrackingModifier.hpp"
 
 class TestCellEdgeSrn: public AbstractCellBasedTestSuite
 {
@@ -49,13 +49,13 @@ public:
     void TestDeltaNotchEdgeSrnCorrectBehaviour()
     {
 
-        TS_ASSERT_THROWS_NOTHING(DeltaNotchEdgeSrnModel srn_model);
+        TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);
 
         // Create cell edge srn with four edges
         auto p_cell_edge_srn_model = new SrnCellModel();
         for(int i = 0 ; i < 4; i++)
         {
-            boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
+            boost::shared_ptr<DeltaNotchSrnEdgeModel> p_delta_notch_edge_srn_model(new DeltaNotchSrnEdgeModel());
 
             // Create a vector of initial conditions
             std::vector<double> starter_conditions;
@@ -81,7 +81,7 @@ public:
         // Now updated to initial conditions
         for(unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
         {
-            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
 
             TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.5, 1e-4);
             TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.5, 1e-4);
@@ -104,7 +104,7 @@ public:
         // Test converged to steady state
         for(unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
         {
-            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
 
             TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.9900, 1e-4);
             TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.0101, 1e-4);
@@ -121,7 +121,7 @@ public:
         auto p_cell_edge_srn_model = new SrnCellModel();
         for(int i = 0 ; i < numEdges; i++)
         {
-            boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
+            boost::shared_ptr<DeltaNotchSrnEdgeModel> p_delta_notch_edge_srn_model(new DeltaNotchSrnEdgeModel());
 
 
             // Set ODE system
@@ -141,7 +141,7 @@ public:
 
         for(int i = 0 ; i < numEdges; i++)
         {
-            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model2->GetEdgeSrn(i));
+            auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model2->GetEdgeSrn(i));
             // Check correct initializations
             TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetNotch(), 2.0);
             TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetDelta(), 3.0);
@@ -172,7 +172,7 @@ public:
             AbstractSrnModel* p_srn_model = new SrnCellModel;
             for(int i = 0 ; i < numEdges; i++)
             {
-                MAKE_PTR(DeltaNotchEdgeSrnModel, p_delta_notch_edge_srn_model);
+                MAKE_PTR(DeltaNotchSrnEdgeModel, p_delta_notch_edge_srn_model);
                 auto p_cell_edge_srn_model = static_cast<SrnCellModel*>(p_srn_model);
                 p_cell_edge_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
 
@@ -197,7 +197,7 @@ public:
             for(int i = 0 ; i < numEdges; i++)
             {
                 auto p_cell_edge_srn_model = static_cast<SrnCellModel*>(p_srn_model);
-                auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+                auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
                 p_delta_notch_edge_model->UpdateDeltaNotch();
                 TS_ASSERT_DELTA(p_delta_notch_edge_model->GetMeanNeighbouringDelta(), 10.0, 1e-12);
 
@@ -224,7 +224,7 @@ public:
             for(int i = 0 ; i < numEdges; i++)
             {
                 auto p_cell_edge_srn_model = static_cast<SrnCellModel*>(p_srn_model);
-                auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+                auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
                 p_delta_notch_edge_model->UpdateDeltaNotch();
                 TS_ASSERT_DELTA(p_delta_notch_edge_model->GetMeanNeighbouringDelta(), 10.0, 1e-12);
 
@@ -268,7 +268,7 @@ public:
                 initial_conditions.push_back(i);
                 initial_conditions.push_back(i);
 
-                MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
+                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                 p_srn_model->SetInitialConditions(initial_conditions);
                 p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
             }
@@ -285,7 +285,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* Create an edge tracking modifier */
-        MAKE_PTR(CellEdgeDeltaNotchTrackingModifier<2>, p_modifier);
+        MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
 
 
         /* Force swaps on a shared edge */
@@ -350,7 +350,7 @@ public:
                 initial_conditions.push_back(i);
                 initial_conditions.push_back(i);
 
-                MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
+                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                 p_srn_model->SetInitialConditions(initial_conditions);
                 p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
             }
@@ -367,7 +367,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* Create an edge tracking modifier */
-        MAKE_PTR(CellEdgeDeltaNotchTrackingModifier<2>, p_modifier);
+        MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
 
 
         p_modifier->SetupSolve(cell_population,"testVertexMeshCellEdgeSrnDivision");
