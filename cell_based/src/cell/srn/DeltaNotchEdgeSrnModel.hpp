@@ -1,6 +1,6 @@
 //
 // Created by twin on 12/03/19.
-//
+
 
 #ifndef DELTANOTCHEDGESRNMODEL_HPP_
 #define DELTANOTCHEDGESRNMODEL_HPP_
