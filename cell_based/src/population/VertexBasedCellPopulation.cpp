@@ -176,8 +176,8 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
 
 template<unsigned int DIM>
 std::set<std::pair<unsigned int, unsigned int>>
-VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex) {
-
+VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex)
+{
     std::set<std::pair<unsigned, unsigned>> neighbours;
 
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
@@ -185,12 +185,12 @@ VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsign
     auto globalEdgeIndex = element->GetEdgeGlobalIndex(pEdgeLocalIndex);
     auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(pEdgeLocalIndex);
 
-    for(auto neighbourElementIndex: neighbourElementIndices)
+    for (auto neighbourElementIndex : neighbourElementIndices)
     {
         auto neighbourElement = this->GetElement(neighbourElementIndex);
-        for(unsigned eIndex = 0; eIndex < neighbourElement->GetNumEdges(); eIndex++)
+        for (unsigned eIndex = 0; eIndex < neighbourElement->GetNumEdges(); eIndex++)
         {
-            if(neighbourElement->GetEdge(eIndex)->GetIndex() == globalEdgeIndex)
+            if (neighbourElement->GetEdge(eIndex)->GetIndex() == globalEdgeIndex)
             {
                 neighbours.insert(std::pair<unsigned, unsigned>(neighbourElementIndex, eIndex));
             }
@@ -287,7 +287,7 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    if(mRestrictVertexMovement)
+    if (mRestrictVertexMovement)
     {
         if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
         {
@@ -300,7 +300,7 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
             double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
 
             // The first time we see this behaviour, throw a StepSizeException, but not more than once
-            if(mThrowStepSizeException)
+            if (mThrowStepSizeException)
             {
                 mThrowStepSizeException = false;
                 throw StepSizeException(suggested_step, message.str(), false);

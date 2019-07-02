@@ -261,14 +261,16 @@ void Node<SPACE_DIM>::SetRadius(double radius)
 }
 
 template<unsigned int SPACE_DIM>
-void Node<SPACE_DIM>::AddEdge(unsigned index) {
+void Node<SPACE_DIM>::AddEdge(unsigned index)
+{
     mEdgeIndices.insert(index);
 }
 
 template<unsigned int SPACE_DIM>
-void Node<SPACE_DIM>::RemoveEdge(unsigned index) {
+void Node<SPACE_DIM>::RemoveEdge(unsigned index)
+{
     unsigned count = mEdgeIndices.erase(index);
-    if(count == 0)
+    if (count == 0)
     {
         EXCEPTION("Tried to remove an index which was not in the set");
     }

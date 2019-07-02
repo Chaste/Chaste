@@ -101,7 +101,7 @@ void CellCycleTimesGenerator::GenerateCellCycleTimeSequence()
 
 void CellCycleTimesGenerator::SetRate(double rate)
 {
-    if( mVectorCreated)
+    if (mVectorCreated)
     {
         EXCEPTION("You cannot reset the rate after cell cycle times are created.");
     }
@@ -118,7 +118,7 @@ double CellCycleTimesGenerator::GetRate()
 
 double CellCycleTimesGenerator::GetNextCellCycleTime()
 {
-    if(!mVectorCreated)
+    if (!mVectorCreated)
     {
         EXCEPTION("When using FixedSequenceCellCycleModel one must call CellCycleTimesGenerator::Instance()->GenerateCellCycleTimeSequence()"
                 " before the start of the simulation.");
@@ -130,4 +130,3 @@ double CellCycleTimesGenerator::GetNextCellCycleTime()
         return new_cell_cycle_time;
     }
 }
-

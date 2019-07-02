@@ -380,8 +380,10 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     // compressed into a single DIVIDE operation
     this->mEdges.HoldEdgeOperations();
     std::vector<long> edgeIds;
-    for(unsigned i = 0; i < pElement->GetNumEdges(); i++)
+    for (unsigned i = 0; i < pElement->GetNumEdges(); i++)
+    {
         edgeIds.push_back(pElement->GetEdge(i)->GetIndex());
+    }
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -558,11 +560,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                pElement->GetNodeLocalIndex(division_node_global_indices[1]),
                                                placeOriginalElementBelow);
 
-
-
-
     // Re-build edges when division is performed
     pElement->RebuildEdges();
+
     // and build edges for the new element
     this->mElements[new_element_index]->SetEdgeHelper(&this->mEdges);
     this->mElements[new_element_index]->BuildEdges();
@@ -570,7 +570,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     this->mEdges.ResumeEdgeOperations();
 
     this->RecordCellDivideOperation(edgeIds, pElement, this->mElements[new_element_index]);
-
 
     return new_element_index;
 }
@@ -589,7 +588,7 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
 {
     // Build a reverse index map
     std::map<long, unsigned > oldIdsMap;
-    for(unsigned i= 0; i < oldIds.size(); i++)
+    for (unsigned i= 0; i < oldIds.size(); i++)
     {
         auto id = oldIds[i];
         oldIdsMap[id] = i;
@@ -600,13 +599,13 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
 
     int newEdgesCount = 0;
     // Element 1 edge division re-mapping
-    for(unsigned i = 0; i < pElement->GetNumEdges(); i++)
+    for (unsigned i = 0; i < pElement->GetNumEdges(); i++)
     {
         // Fills the id vector with either the index before cell division or
         // -1 if index did not exist before
         auto id = pElement->GetEdge(i)->GetIndex();
         auto id_itt = oldIdsMap.find(id);
-        if(id_itt != oldIdsMap.end())
+        if (id_itt != oldIdsMap.end())
         {
             newEdges.push_back(id_itt->second);
             edgeStatus.push_back(0);
@@ -622,13 +621,12 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
     // Find the middle index of the new edges
     int numOldEdges = oldIds.size();
     int numEdges = newEdges.size();
-    for(unsigned i = 0; i < newEdges.size(); i++)
+    for (unsigned i = 0; i < newEdges.size(); i++)
     {
         int prevIndex = WrapIndex((int)i - 1, numEdges);
         int nextIndex = WrapIndex((int)i +1, numEdges);
 
-
-        if(newEdges[i] == -1 && newEdges[prevIndex] == -1 && newEdges[nextIndex] == -1)
+        if (newEdges[i] == -1 && newEdges[prevIndex] == -1 && newEdges[nextIndex] == -1)
         {
             int prev2Index = WrapIndex((int)i - 2, numEdges);
             int next2Index = WrapIndex((int)i + 2, numEdges);
@@ -643,32 +641,30 @@ EdgeRemapInfo* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::BuildEdgeDivideIdDiffe
         }
     }
 
-    //We should always have 3 new edges with 2 divide and 1 new
+    // We should always have 3 new edges with 2 divide and 1 new
     assert(newEdgesCount == 3);
 
     return new EdgeRemapInfo(newEdges, edgeStatus);
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-int MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WrapIndex(int index, int maxSize) {
+int MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WrapIndex(int index, int maxSize)
+{
+    int out_index = index;
 
-    int outIndex = index;
-
-    if(index < 0)
+    if (index < 0)
     {
-        outIndex = maxSize + index;
+        out_index = maxSize + index;
     }
-    else if(index >= maxSize)
+    else if (index >= maxSize)
     {
-        outIndex = index - maxSize;
+        out_index = index - maxSize;
     }
 
-    assert(outIndex > -1 && outIndex < maxSize);
+    assert(out_index > -1 && out_index < maxSize);
 
-    return outIndex;
+    return out_index;
 }
-
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,

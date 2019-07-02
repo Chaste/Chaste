@@ -1,9 +1,40 @@
-//
-// Created by twin on 22/01/19.
-//
+/*
 
-#ifndef CHASTE_CELLEGESRNMODEL_H
-#define CHASTE_CELLEGESRNMODEL_H
+Copyright (c) 2005-2019, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+#ifndef SRNCELLMODEL_HPP_
+#define SRNCELLMODEL_HPP_
 
 #include <vector>
 #include "ChasteSerialization.hpp"
@@ -17,9 +48,10 @@
 typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
- * Srn Model at the Cell level, has representation for edges internally
+ * SRN model at the cell level, has representation for edges internally.
  */
-class SrnCellModel : public AbstractSrnModel {
+class SrnCellModel : public AbstractSrnModel
+{
 
 private:
 
@@ -45,18 +77,11 @@ private:
 
 protected:
 
-
-    SrnCellModel(const SrnCellModel &rModel) : AbstractSrnModel(rModel) {
-
-        //Makes a copy of all SRN models inside the system
-        for(auto srnModel: rModel.mEdgeSrnModels){
-            this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
-        }
-    }
+    SrnCellModel(const SrnCellModel &rModel);
 
 public:
 
-    /* Makes the class iterable which returns the individual edge srn models */
+    /* Makes the class iterable which returns the individual edge SRN models */
     using iterator = abstractsrnmodel_t::iterator;
     using const_iterator = abstractsrnmodel_t::const_iterator;
     iterator begin() { return mEdgeSrnModels.begin(); }
@@ -66,81 +91,39 @@ public:
     const_iterator cbegin() const { return mEdgeSrnModels.cbegin(); }
     const_iterator cend() const { return mEdgeSrnModels.cend(); }
 
+    /**
+     * Default constuctor.
+     */
+    SrnCellModel()
+    {}
 
-    SrnCellModel(){}
+    /**
+     * Destuctor.
+     */
+    ~SrnCellModel()
+    {}
 
-    ~SrnCellModel(){}
+    void Initialise() override;
 
-    void Initialise() override
-    {
-        for(auto edgeModel: mEdgeSrnModels)
-        {
-            edgeModel->Initialise();
-        }
-    }
+    void SimulateToCurrentTime() override;
 
-    void SimulateToCurrentTime() override
-    {
-        for(auto srnModel: mEdgeSrnModels){
-            srnModel->SimulateToCurrentTime();
-        }
+    AbstractSrnModel* CreateSrnModel() override;
 
-    }
+    void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
 
-    AbstractSrnModel* CreateSrnModel() override
-    {
-        return new SrnCellModel(*this);
-    }
+    void AddEdgeSrn(AbstractSrnModelPtr edgeSrn);
 
-    void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
-    {
-        mEdgeSrnModels = edgeSrn;
-    }
+    void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn);
 
-    void AddEdgeSrn(AbstractSrnModelPtr edgeSrn)
-    {
-        edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
-        mEdgeSrnModels.push_back(edgeSrn);
+    AbstractSrnModelPtr RemoveEdgeSrn(unsigned index);
 
-    }
+    unsigned GetNumEdgeSrn();
 
-    void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn)
-    {
-        mEdgeSrnModels.insert(mEdgeSrnModels.begin() + index, edgeSrn);
-    }
+    AbstractSrnModelPtr GetEdgeSrn(unsigned index);
 
-    AbstractSrnModelPtr RemoveEdgeSrn(unsigned index)
-    {
-        auto edgeSrn = mEdgeSrnModels[index];
-        mEdgeSrnModels.erase(mEdgeSrnModels.begin() + index);
-        return edgeSrn;
-    }
+    const std::vector<AbstractSrnModelPtr>& GetEdges();
 
-    unsigned GetNumEdgeSrn()
-    {
-        return mEdgeSrnModels.size();
-    }
-
-    AbstractSrnModelPtr GetEdgeSrn(unsigned index)
-    {
-        assert(index < mEdgeSrnModels.size());
-        return mEdgeSrnModels[index];
-    }
-
-    const std::vector<AbstractSrnModelPtr>& GetEdges()
-    {
-        return mEdgeSrnModels;
-    }
-
-    void SetCell(CellPtr pCell) override {
-        AbstractSrnModel::SetCell(pCell);
-        //Makes a copy of all SRN models inside the system
-        for(auto srnModel: mEdgeSrnModels){
-            srnModel->SetCell(pCell);
-        }
-    }
-
+    void SetCell(CellPtr pCell) override;
 };
 
-
-#endif //CHASTE_CELLEGESRNMODEL_H
+#endif /* SRNCELLMODEL_HPP_ */

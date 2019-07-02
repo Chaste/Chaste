@@ -130,5 +130,3 @@ unsigned AbstractSrnModel::GetEdgeLocalIndex()
 {
     return this->mEdgeLocalIndex;
 }
-
-

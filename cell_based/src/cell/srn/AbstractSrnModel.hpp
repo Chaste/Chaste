@@ -221,7 +221,7 @@ public:
      *
      * Copy constructors are used to set all the member variables in the appropriate classes.
      *
-     *  @return new srn model
+     *  @return new SRN model
      */
     virtual AbstractSrnModel* CreateSrnModel()=0;
 
@@ -244,14 +244,13 @@ public:
     virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
-     * Sets the local edge index that this srn object belongs to
+     * Sets the local edge index that this SRN object belongs to
      * @param index
      */
     void SetEdgeLocalIndex(unsigned index);
 
-
     /**
-     * Gets the local edge index that this srn object belongs to
+     * Gets the local edge index that this SRN object belongs to
      * @return
      */
     unsigned GetEdgeLocalIndex();

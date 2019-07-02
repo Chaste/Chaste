@@ -151,7 +151,7 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-            // We must create a cell to be able to initialise the cell srn model's ODE system
+            // We must create a cell to be able to initialise the cell SRN model's ODE system
             CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->GetCellData()->SetItem("mean delta", 10.0);
@@ -168,7 +168,7 @@ public:
 
             output_arch << p_srn_model;
 
-            // Note that here, deletion of the cell-cycle model and srn is handled by the cell destructor
+            // Note that here, deletion of the cell-cycle model and SRN is handled by the cell destructor
             SimulationTime::Destroy();
         }
 
@@ -281,7 +281,7 @@ public:
             MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
             MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-            // We must create a cell to be able to initialise the cell srn model's ODE system
+            // We must create a cell to be able to initialise the cell SRN model's ODE system
             CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
             p_cell->SetCellProliferativeType(p_transit_type);
             p_cell->InitialiseCellCycleModel();
@@ -304,7 +304,7 @@ public:
 
             output_arch << p_srn_model;
 
-            // Note that here, deletion of the cell-cycle model and srn is handled by the cell destructor
+            // Note that here, deletion of the cell-cycle model and SRN is handled by the cell destructor
             SimulationTime::Destroy();
         }
 

@@ -390,15 +390,14 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
-        std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *> &elements) {
-
-    //Build a list of unique edges from nodes within all the elements
-    for(auto elem: elements)
+        std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *> &elements)
+{
+    // Build a list of unique edges from nodes within all the elements
+    for (auto elem : elements)
     {
         elem->SetEdgeHelper(&this->mEdges);
         elem->BuildEdges();
     }
-
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

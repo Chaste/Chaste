@@ -71,7 +71,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
 
-    // Create a null srn model if none given
+    // Create a null SRN model if none given
     if (pSrnModel == nullptr)
     {
         pSrnModel = new NullSrnModel;
@@ -105,7 +105,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         mCellPropertyCollection.AddProperty(p_cell_data);
     }
 
-    if(!mCellPropertyCollection.HasPropertyType<CellEdgeData>())
+    if (!mCellPropertyCollection.HasPropertyType<CellEdgeData>())
     {
         // Add empty cell edge data
         MAKE_PTR(CellEdgeData, p_cell_edge_data);
