@@ -3495,6 +3495,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                      [{'units': 'second', 'prefix': 'milli'}])
         mV = cellml_units.create_new(model, 'millivolt',
                                      [{'units': 'volt', 'prefix': 'milli'}])
+        milliMolar = cellml_units.create_new(model, 'millimolar',
+                                     [{'units': 'molar', 'prefix': 'milli'}])                                     
         current_units, microamps = klass.get_current_units_options(model)[0:2]
         # The interface generator
         generator = processors.InterfaceGenerator(model, name=klass.INTERFACE_COMPONENT_NAME)
@@ -3547,6 +3549,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
         if config.V_variable:
             config.V_variable = generator.add_input(config.V_variable, mV)
+
+        #Unit conversion for cytosolic_calcium_variable
+        if config.cytosolic_calcium_variable:
+                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+        
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
             i_ionic = generator.add_output_function('i_ionic', 'plus', ionic_vars, current_units)
@@ -5951,6 +5958,7 @@ class ConfigurationStore(object):
         # Identify the variables in the model
         self.find_transmembrane_potential()
         self.find_membrane_capacitance()
+        self.find_cytosolic_calcium_concentration()
         if not self.options.protocol:
             self.find_current_vars()
 
@@ -6393,6 +6401,13 @@ class ConfigurationStore(object):
         Uses first metadata, if present, then the configuration file."""
         self.Cm_variable = self._find_var('membrane_capacitance', self.Cm_definitions)
         DEBUG('config', 'Found capacitance', self.Cm_variable)
+
+    def find_cytosolic_calcium_concentration(self):
+        """Find and store the variable object representing the cytosolic_calcium_concentration.
+        
+        Uses metadata only, if does not store."""
+        self.cytosolic_calcium_variable = self._find_var('cytosolic_calcium_concentration', list())
+        DEBUG('config', 'Found capacitance', self.cytosolic_calcium_variable)
 
     def find_lookup_variables(self):
         """Find the variable objects used as lookup table keys.

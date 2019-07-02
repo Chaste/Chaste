@@ -1235,6 +1235,10 @@ class cellml_model(element_base):
         litre = make('litre', [{'multiplier': '1000', 'prefix': 'centi',
                                 'units': 'metre', 'exponent': '3'}])
         # SI derived units
+        #added molar to be able to convert millimolar micromolar etc
+        molar= make('molar', [{'units': 'mole'},
+                                 {'units': 'litre', 'exponent': '-1'}])
+
         radian = make('radian', [{'units': 'metre'},
                                  {'units': 'metre', 'exponent': '-1'}])
         steradian = make('steradian', [{'units': 'metre', 'exponent': '2'},
@@ -1278,7 +1282,7 @@ class cellml_model(element_base):
         katal = make('katal', [{'units': 'second', 'exponent': '-1'},
                                {'units': 'mole'}])
         for units in [becquerel, celsius, coulomb, farad, gram, gray, henry,
-                      hertz, joule, katal, litre, lumen, lux, newton, ohm,
+                      hertz, joule, katal, litre, lumen, lux, molar, newton, ohm,
                       pascal, radian, siemens, sievert, steradian, tesla,
                       volt, watt, weber]:
             std_units[units.name] = units
