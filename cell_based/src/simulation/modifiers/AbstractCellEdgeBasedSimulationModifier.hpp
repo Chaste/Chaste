@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SrnCellModel.hpp"
 #include "EdgeRemapInfo.hpp"
 #include "EdgeOperation.hpp"
-#include "DeltaNotchEdgeSrnModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 
 /**
  * The modifier serves as a base class for handling a simulation that uses edge-based SRN models. Vertex mesh
