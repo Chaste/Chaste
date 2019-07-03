@@ -3497,6 +3497,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                      [{'units': 'volt', 'prefix': 'milli'}])
         milliMolar = cellml_units.create_new(model, 'millimolar',
                                      [{'units': 'molar', 'prefix': 'milli'}])                                     
+
         current_units, microamps = klass.get_current_units_options(model)[0:2]
         # The interface generator
         generator = processors.InterfaceGenerator(model, name=klass.INTERFACE_COMPONENT_NAME)

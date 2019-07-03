@@ -1235,10 +1235,6 @@ class cellml_model(element_base):
         litre = make('litre', [{'multiplier': '1000', 'prefix': 'centi',
                                 'units': 'metre', 'exponent': '3'}])
         # SI derived units
-        #added molar to be able to convert millimolar micromolar etc
-        molar= make('molar', [{'units': 'mole'},
-                                 {'units': 'litre', 'exponent': '-1'}])
-
         radian = make('radian', [{'units': 'metre'},
                                  {'units': 'metre', 'exponent': '-1'}])
         steradian = make('steradian', [{'units': 'metre', 'exponent': '2'},
@@ -1282,7 +1278,7 @@ class cellml_model(element_base):
         katal = make('katal', [{'units': 'second', 'exponent': '-1'},
                                {'units': 'mole'}])
         for units in [becquerel, celsius, coulomb, farad, gram, gray, henry,
-                      hertz, joule, katal, litre, lumen, lux, molar, newton, ohm,
+                      hertz, joule, katal, litre, lumen, lux, newton, ohm,
                       pascal, radian, siemens, sievert, steradian, tesla,
                       volt, watt, weber]:
             std_units[units.name] = units
@@ -1299,6 +1295,13 @@ class cellml_model(element_base):
                                           " and must not redefine the standard units (5.4.1.2)."
                                           " The units definition named '%s' in the model is a duplicate." % units.name)
                 model_units[units.name] = units
+
+        #added a hack to add molar if it isn't already there, so we can  convert millimolar micromolar etc
+        molar= make('molar', [{'units': 'mole'}, {'units': 'litre', 'exponent': '-1'}])
+        if not molar.name in model_units:
+            model_units[molar.name] = molar
+
+
         # Update units hashmap
         for u in model_units.itervalues():
             self._add_units_obj(u)
