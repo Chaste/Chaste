@@ -3551,9 +3551,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
         if config.V_variable:
             config.V_variable = generator.add_input(config.V_variable, mV)
 
+       
         #Unit conversion for cytosolic_calcium_variable
-        if config.cytosolic_calcium_variable:
+        ##Try to check if can we check if cytosolic_calcium_variable has a dimension of mular. If it fails its units may not be defined properly 
+        try:
+            if config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
                 config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+        except:
+            logging.getLogger('units-converter').warn("Conversion of cytosolic_calcium_concentration to millimolar failed.")
         
         ionic_vars = config.i_ionic_vars
         if ionic_vars:

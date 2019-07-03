@@ -1297,9 +1297,14 @@ class cellml_model(element_base):
                 model_units[units.name] = units
 
         #added a hack to add molar if it isn't already there, so we can  convert millimolar micromolar etc
-        molar= make('molar', [{'units': 'mole'}, {'units': 'litre', 'exponent': '-1'}])
-        if not molar.name in model_units:
-            model_units[molar.name] = molar
+#        molar= make('molar', [{'units': 'mole'}, {'units': 'litre', 'exponent': '-1'}])
+#        if not molar.name in model_units:
+#            model_units[molar.name] = molar
+#        else:
+#            #check definition is correct
+#            #check how to NOT write millimolar if not converting
+#            #if unit conversion fails remove metadata?
+#            pass
 
 
         # Update units hashmap
