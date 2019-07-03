@@ -3495,8 +3495,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                      [{'units': 'second', 'prefix': 'milli'}])
         mV = cellml_units.create_new(model, 'millivolt',
                                      [{'units': 'volt', 'prefix': 'milli'}])
-        milliMolar = cellml_units.create_new(model, 'millimolar',
-                                     [{'units': 'molar', 'prefix': 'milli'}])                                     
+
+        milliMolar = cellml_units.create_new(model,'molar', 
+                            [{'units': 'mole', 'prefix': 'milli'},
+                             {'units': 'litre', 'exponent': '-1'}])
+
+        #milliMolar = molar.create_new(model, 'millimolar',
+        #                             [{'units': 'molar', 'prefix': 'milli'}])
+
+        #milliMolar.xml_parent=molar                                  
 
         current_units, microamps = klass.get_current_units_options(model)[0:2]
         # The interface generator
@@ -3554,11 +3561,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
        
         #Unit conversion for cytosolic_calcium_variable
         ##Try to check if can we check if cytosolic_calcium_variable has a dimension of mular. If it fails its units may not be defined properly 
-        try:
-            if config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
-        except:
-            logging.getLogger('units-converter').warn("Conversion of cytosolic_calcium_concentration to millimolar failed.")
+        if config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+            config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
         
         ionic_vars = config.i_ionic_vars
         if ionic_vars:

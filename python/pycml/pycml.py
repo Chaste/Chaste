@@ -1,4 +1,3 @@
-
 # We want 1/2==0.5
 from __future__ import division
 
