@@ -1,3 +1,4 @@
+
 # We want 1/2==0.5
 from __future__ import division
 
@@ -1294,18 +1295,6 @@ class cellml_model(element_base):
                                           " and must not redefine the standard units (5.4.1.2)."
                                           " The units definition named '%s' in the model is a duplicate." % units.name)
                 model_units[units.name] = units
-
-        #added a hack to add molar if it isn't already there, so we can  convert millimolar micromolar etc
-#        molar= make('molar', [{'units': 'mole'}, {'units': 'litre', 'exponent': '-1'}])
-#        if not molar.name in model_units:
-#            model_units[molar.name] = molar
-#        else:
-#            #check definition is correct
-#            #check how to NOT write millimolar if not converting
-#            #if unit conversion fails remove metadata?
-#            pass
-
-
         # Update units hashmap
         for u in model_units.itervalues():
             self._add_units_obj(u)
