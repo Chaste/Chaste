@@ -5829,6 +5829,8 @@ class ConfigurationStore(object):
         # Membrane capacitance
         self.Cm_definitions = []
         self.Cm_variable = None
+        # Cytosolic calcium concentration
+        self.cytosolic_calcium_concentration = None
         # Lookup table configuration
         self.lut_config = {}
         # Ionic currents configuration
