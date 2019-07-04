@@ -3556,10 +3556,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
        
         #Unit conversion for cytosolic_calcium_variable
-        ##Try to check if can we check if cytosolic_calcium_variable has a dimension of mular. If it fails its units may not be defined properly 
-        #if not doc.model.get_option('backward_euler') and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-        if  config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-            config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
+        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
+        if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+            value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
+            config.cytosolic_calcium_variable.initial_value = unicode(value)
+            config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
         
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
