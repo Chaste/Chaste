@@ -3496,7 +3496,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         mV = cellml_units.create_new(model, 'millivolt',
                                      [{'units': 'volt', 'prefix': 'milli'}])
 
-        milliMolar = cellml_units.create_new(model,'molar', 
+        milliMolar = cellml_units.create_new(model,'millimolar', 
                             [{'units': 'mole', 'prefix': 'milli'},
                              {'units': 'litre', 'exponent': '-1'}])
 
@@ -3561,7 +3561,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
        
         #Unit conversion for cytosolic_calcium_variable
         ##Try to check if can we check if cytosolic_calcium_variable has a dimension of mular. If it fails its units may not be defined properly 
-        if config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+        if not doc.model.get_option('backward_euler') and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+        if  config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
             config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
         
         ionic_vars = config.i_ionic_vars
