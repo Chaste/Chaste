@@ -2360,7 +2360,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 if var is self.v_variable:
                     value = '(mSetVoltageDerivativeToZero ? this->mFixedVoltage : %s)' % value
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var),
-                             self.EQ_ASSIGN, value, self.STMT_END,";")
+                             self.EQ_ASSIGN, value, self.STMT_END)
                 self.writeln(self.COMMENT_START, 'Units: ', var.units,
                              '; Initial value: ',
                              getattr(var, u'initial_value', 'Unknown'))
@@ -2392,7 +2392,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
     def output_nonlinear_state_assignments(self, nodeset=None):
         """Output assignments for nonlinear state variables."""
         for i, var in enumerate(self.nonlinear_system_vars):
-            if not nodeset or var in nodeset:
+            if not nodeset or var in nodeset and self.code_name(var):
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var), self.EQ_ASSIGN,
                              self.vector_index('rCurrentGuess', i), self.STMT_END)
                 #621 TODO: maybe convert if state var dimensions include time
@@ -2706,9 +2706,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Output mathematics for computing du/dt for each nonlinear state var u
             nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
+ 
+            
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
+            self.writeln("//output_nonlinear_state_assignments")
             self.output_nonlinear_state_assignments(nodeset=nodeset)
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
+            self.writeln("//output_equations")
             self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Fill in residual
@@ -2731,6 +2735,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                      'void', access='public')
             self.open_block()
             # Mathematics that the Jacobian depends on
+            used_vars = set()
             for entry in self.model.solver_info.jacobian.entry:
                 used_vars.update(self._vars_in(entry.math))
             nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
@@ -3503,6 +3508,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         current_units, microamps = klass.get_current_units_options(model)[0:2]
         # The interface generator
         generator = processors.InterfaceGenerator(model, name=klass.INTERFACE_COMPONENT_NAME)
+
+
         iface_comp = generator.get_interface_component()
         # In case we need to convert initial values, we create the units converter here
         if config.options.convert_interfaces:
@@ -3518,6 +3525,21 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Oops!
             raise TranslationError('Time does not have dimensions of time')
         generator.add_input(t, ms)
+
+        #Unit conversion for cytosolic_calcium_variable
+        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
+        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
+        try:
+            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+#                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
+                config.cytosolic_calcium_variable.initial_value = unicode(value)
+                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
+
+
+        except AttributeError:
+            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")        
+
         if doc.model.get_option('backward_euler'):
             # Backward Euler code generation requires access to the time step
             model_dt = solver_info.create_dt(generator, t.component, t.get_units())
@@ -3557,11 +3579,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
         #Unit conversion for cytosolic_calcium_variable
         ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
         #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
-        if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-            config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
-##            value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
-##            config.cytosolic_calcium_variable.initial_value = unicode(value)
-##            config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
+#        try:
+#            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+#                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+#        except AttributeError:
+#            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
         
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
@@ -6417,8 +6439,12 @@ class ConfigurationStore(object):
         """Find and store the variable object representing the cytosolic_calcium_concentration.
         
         Uses metadata only, if does not store."""
-        self.cytosolic_calcium_variable = self._find_var('cytosolic_calcium_concentration', list())
-        DEBUG('config', 'Found capacitance', self.cytosolic_calcium_variable)
+        self.cytosolic_calcium_variable = None
+        self.cytosolic_calcium_variable = self.doc.model.get_variable_by_oxmeta_name('cytosolic_calcium_concentration', throw=False)
+        if(self.cytosolic_calcium_variable):
+            DEBUG('config', 'Found capaccytosolic_calcium_variable', self.cytosolic_calcium_variable)
+        else:
+            DEBUG('config', 'capaccytosolic_calcium_variable NOT found', self.cytosolic_calcium_variable)
 
     def find_lookup_variables(self):
         """Find the variable objects used as lookup table keys.
