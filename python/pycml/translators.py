@@ -2707,7 +2707,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
             if any(nodes.count(x) > 1 for x in nodes):
-                raise "duplicate nodes"
+                raise Exception("duplicate nodes")
 
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
