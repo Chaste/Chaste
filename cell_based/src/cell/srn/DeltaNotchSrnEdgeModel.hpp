@@ -161,7 +161,7 @@ public:
     void OutputSrnModelParameters(out_stream& rParamsFile);
 };
 
-typedef boost::shared_ptr<DeltaNotchSrnEdgeModel> DeltaNotchEdgeSrnModelPtr;
+typedef boost::shared_ptr<DeltaNotchSrnEdgeModel> DeltaNotchSrnEdgeModelPtr;
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
@@ -169,4 +169,4 @@ CHASTE_CLASS_EXPORT(DeltaNotchSrnEdgeModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnEdgeModel)
 
-#endif  /* DELTANOTCHEDGESRNMODEL_HPP_ */
+#endif  /* DELTANOTCHSRNEDGEMODEL_HPP_ */

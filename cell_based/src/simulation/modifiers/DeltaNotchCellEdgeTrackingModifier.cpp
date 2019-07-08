@@ -158,16 +158,16 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::OutputSimulationModifierParameters
 }
 
 template<unsigned int DIM>
-AbstractSrnModel *CellEdgeDeltaNotchTrackingModifier<DIM>::CreateEmptySrnEdgeModel()
+AbstractSrnModel *DeltaNotchCellEdgeTrackingModifier<DIM>::CreateEmptySrnEdgeModel()
 {
-    return new DeltaNotchEdgeSrnModel();
+    return new DeltaNotchSrnEdgeModel();
 }
 
 template<unsigned int DIM>
-void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
+void DeltaNotchCellEdgeTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
                                                         unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr addedEdge)
 {
-    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(addedEdge);
+    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(addedEdge);
 
     // New edges have a concentration of 0
     deltaNotchNewSrnEdge->SetDelta(0);
@@ -175,17 +175,17 @@ void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<D
 }
 
 template<unsigned int DIM>
-void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
+void DeltaNotchCellEdgeTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
                                                      unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr oldSrnEdge)
 {
 }
 
 template<unsigned int DIM>
-void CellEdgeDeltaNotchTrackingModifier<DIM>::EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge)
+void DeltaNotchCellEdgeTrackingModifier<DIM>::EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge)
 {
     // Convert to delta notch SRN type
-    auto deltaNotchOldSrnEdge = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(oldSrnEdge);
-    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(newSrnEdge);
+    auto deltaNotchOldSrnEdge = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(oldSrnEdge);
+    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(newSrnEdge);
 
     // In this example we're just halving the concentrations
     deltaNotchNewSrnEdge->SetDelta(0.5*deltaNotchOldSrnEdge->GetDelta());

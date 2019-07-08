@@ -80,7 +80,7 @@ public:
     void TestDeltaNotchEdgeSrnCorrectBehaviour()
     {
 <<<<<<< HEAD
-        TS_ASSERT_THROWS_NOTHING(DeltaNotchEdgeSrnModel srn_model);
+        TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);
 =======
 
         TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);

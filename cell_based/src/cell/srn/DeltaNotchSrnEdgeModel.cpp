@@ -33,9 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DeltaNotchEdgeSrnModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 
-DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(2, pOdeSolver)
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
@@ -53,7 +53,7 @@ DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCyc
     assert(mpOdeSolver->IsSetUp());
 }
 
-DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(const DeltaNotchEdgeSrnModel& rModel)
+DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rModel)
     : AbstractOdeSrnModel(rModel)
 {
     /*
@@ -110,7 +110,7 @@ double DeltaNotchSrnEdgeModel::GetNotch()
     return notch;
 }
 
-void DeltaNotchEdgeSrnModel::SetNotch(double value)
+void DeltaNotchSrnEdgeModel::SetNotch(double value)
 {
     assert(mpOdeSystem != nullptr);
     mpOdeSystem->rGetStateVariables()[0] = value;
@@ -123,7 +123,7 @@ double DeltaNotchSrnEdgeModel::GetDelta()
     return delta;
 }
 
-void DeltaNotchEdgeSrnModel::SetDelta(double value)
+void DeltaNotchSrnEdgeModel::SetDelta(double value)
 {
     assert(mpOdeSystem != nullptr);
     mpOdeSystem->rGetStateVariables()[1] = value;
@@ -146,4 +146,4 @@ void DeltaNotchSrnEdgeModel::OutputSrnModelParameters(out_stream& rParamsFile)
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(DeltaNotchSrnEdgeModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchEdgeSrnModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnEdgeModel)

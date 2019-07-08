@@ -45,7 +45,7 @@ SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     }
 }
 
-void SrnCellModel::Initialise() override
+void SrnCellModel::Initialise()
 {
     for (auto edgeModel : mEdgeSrnModels)
     {
@@ -53,7 +53,7 @@ void SrnCellModel::Initialise() override
     }
 }
 
-void SrnCellModel::SimulateToCurrentTime() override
+void SrnCellModel::SimulateToCurrentTime()
 {
     for (auto srnModel : mEdgeSrnModels)
     {
@@ -61,7 +61,7 @@ void SrnCellModel::SimulateToCurrentTime() override
     }
 }
 
-AbstractSrnModel* SrnCellModel::CreateSrnModel() override
+AbstractSrnModel* SrnCellModel::CreateSrnModel()
 {
     return new SrnCellModel(*this);
 }
@@ -105,7 +105,7 @@ const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges()
     return mEdgeSrnModels;
 }
 
-void SrnCellModel::SetCell(CellPtr pCell) override
+void SrnCellModel::SetCell(CellPtr pCell)
 {
     AbstractSrnModel::SetCell(pCell);
 
