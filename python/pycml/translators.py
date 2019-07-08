@@ -2706,6 +2706,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Output mathematics for computing du/dt for each nonlinear state var u
             nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
+            if any(nodes.count(x) > 1 for x in nodes):
+                raise "duplicate nodes"
+            if any(nodeset.count(x) > 1 for x in nodes):
+                raise "duplicate nodeset"
+
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
@@ -2731,7 +2736,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                      'void', access='public')
             self.open_block()
             # Mathematics that the Jacobian depends on
-            used_vars = set()
             for entry in self.model.solver_info.jacobian.entry:
                 used_vars.update(self._vars_in(entry.math))
             nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
@@ -3559,9 +3563,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
         ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
         #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
         if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-            value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
-            config.cytosolic_calcium_variable.initial_value = unicode(value)
-            config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
+            config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+##            value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
+##            config.cytosolic_calcium_variable.initial_value = unicode(value)
+##            config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
         
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
