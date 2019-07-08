@@ -2360,7 +2360,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 if var is self.v_variable:
                     value = '(mSetVoltageDerivativeToZero ? this->mFixedVoltage : %s)' % value
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var),
-                             self.EQ_ASSIGN, value, self.STMT_END)
+                             self.EQ_ASSIGN, value, self.STMT_END,";")
                 self.writeln(self.COMMENT_START, 'Units: ', var.units,
                              '; Initial value: ',
                              getattr(var, u'initial_value', 'Unknown'))
@@ -2706,9 +2706,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Output mathematics for computing du/dt for each nonlinear state var u
             nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
-            if any(nodes.count(x) > 1 for x in nodes):
-                raise Exception("duplicate nodes")
-
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
