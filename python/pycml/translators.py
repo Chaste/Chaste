@@ -2708,8 +2708,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
             if any(nodes.count(x) > 1 for x in nodes):
                 raise "duplicate nodes"
-            if any(nodeset.count(x) > 1 for x in nodes):
-                raise "duplicate nodeset"
 
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
