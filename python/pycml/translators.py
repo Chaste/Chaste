@@ -2391,10 +2391,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
     
     def output_nonlinear_state_assignments(self, nodeset=None):
         """Output assignments for nonlinear state variables."""
+        processed=[]
         for i, var in enumerate(self.nonlinear_system_vars):
-            if not nodeset or var in nodeset and self.code_name(var):
+            if not nodeset or var in nodeset and self.code_name(var) and not self.code_name(var) in processed:
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var), self.EQ_ASSIGN,
                              self.vector_index('rCurrentGuess', i), self.STMT_END)
+                processed.append(self.code_name(var))
                 #621 TODO: maybe convert if state var dimensions include time
         self.writeln()
         return
@@ -3526,19 +3528,19 @@ class CellMLToChasteTranslator(CellMLTranslator):
             raise TranslationError('Time does not have dimensions of time')
         generator.add_input(t, ms)
 
-        #Unit conversion for cytosolic_calcium_variable
-        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
-        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
-        try:
-            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-#                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
-                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
-                config.cytosolic_calcium_variable.initial_value = unicode(value)
-                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
-
-
-        except AttributeError:
-            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")        
+##        #Unit conversion for cytosolic_calcium_variable
+##        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
+##        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
+##        try:
+##            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+##                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+###                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
+###                config.cytosolic_calcium_variable.initial_value = unicode(value)
+###                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
+##
+##
+##        except AttributeError:
+##            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")        
 
         if doc.model.get_option('backward_euler'):
             # Backward Euler code generation requires access to the time step
@@ -3575,16 +3577,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         if config.V_variable:
             config.V_variable = generator.add_input(config.V_variable, mV)
 
-       
-        #Unit conversion for cytosolic_calcium_variable
-        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
-        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
-#        try:
-#            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-#                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
-#        except AttributeError:
-#            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
-        
+
+
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
             i_ionic = generator.add_output_function('i_ionic', 'plus', ionic_vars, current_units)
@@ -3631,6 +3625,21 @@ class CellMLToChasteTranslator(CellMLTranslator):
                         for child in getattr(elt, 'xml_children', []):
                             process_ci_elts(child)
                 process_ci_elts(dVdt)
+
+        #Unit conversion for cytosolic_calcium_variable
+        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
+        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
+        try:
+            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+#                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
+#                config.cytosolic_calcium_variable.initial_value = unicode(value)
+#                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
+
+
+        except AttributeError:
+            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
+
 
         # Finish up
         def errh(errors):
