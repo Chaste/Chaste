@@ -79,12 +79,9 @@ public:
 
     void TestDeltaNotchEdgeSrnCorrectBehaviour()
     {
-<<<<<<< HEAD
-        TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);
-=======
+
 
         TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);
->>>>>>> 6e6a06f2e67f6cfd8ad3b844678539cbb0d13142
 
         // Create cell edge SRN with four edges
         auto p_cell_edge_srn_model = new SrnCellModel();

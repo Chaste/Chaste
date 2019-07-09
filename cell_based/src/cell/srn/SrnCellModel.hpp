@@ -103,11 +103,11 @@ public:
     ~SrnCellModel()
     {}
 
-    void Initialise() override;
+    virtual void Initialise() override;
 
-    void SimulateToCurrentTime() override;
+    virtual void SimulateToCurrentTime() override;
 
-    AbstractSrnModel* CreateSrnModel() override;
+    virtual AbstractSrnModel* CreateSrnModel() override;
 
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
 
@@ -123,7 +123,11 @@ public:
 
     const std::vector<AbstractSrnModelPtr>& GetEdges();
 
-    void SetCell(CellPtr pCell) override;
+    virtual void SetCell(CellPtr pCell) override;
 };
+
+// Declare identifier for the serializer
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(SrnCellModel)
 
 #endif /* SRNCELLMODEL_HPP_ */

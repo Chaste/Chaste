@@ -116,14 +116,6 @@ void SrnCellModel::SetCell(CellPtr pCell)
     }
 }
 
-// void SrnCellModel::OutputSrnModelParameters(out_stream& rParamsFile)
-// {
-//     // No new parameters to output, so just call method on direct parent class
-//     AbstractSrnModel::OutputSrnModelParameters(rParamsFile);
-// }
-
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(SrnCellModel)
-#include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(SrnCellModel)
