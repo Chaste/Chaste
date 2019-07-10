@@ -52,6 +52,9 @@ import optimize
 import processors
 import validator
 
+global do_conversion
+do_conversion = True
+
 __version__ = "$Revision$"[11:-2]
 
 def version_comment(note_time=True):
@@ -3616,15 +3619,22 @@ class CellMLToChasteTranslator(CellMLTranslator):
         #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
         try:
             if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
-#                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
-#                config.cytosolic_calcium_variable.initial_value = unicode(value)
-#                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
+                l=2
+                microMolar = cellml_units.create_new(model,'micromolar', 
+                            [{'units': 'mole', 'prefix': 'micro'},
+                             {'units': 'litre', 'exponent': '-1'}])  
+                global do_conversion
+                if not do_conversion:
+                    milliMolar=microMolar              
+                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)               
+
+##                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
+##                config.cytosolic_calcium_variable.initial_value = unicode(value)
+##                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
 
 
         except AttributeError:
             DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
-
 
         # Finish up
         def errh(errors):
@@ -3645,7 +3655,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
                     raise TranslationError(msg)
                 else:
                     print >>sys.stderr, msg
-
 
 class CellMLToCvodeTranslator(CellMLToChasteTranslator):
     """Translate a CellML model to C++ code for use with Chaste+CVODE."""
@@ -6923,7 +6932,25 @@ def run():
         def gv(vname):
             return cellml_variable.get_variable_object(doc.model, vname).get_source_variable(recurse=True)
         for var_i, var_j in jacobian.keys():
-            if gv(var_i) not in nonlinear_vars or gv(var_j) not in nonlinear_vars:
+            #hack to not remove converted variables.
+            source_var_i = None
+            source_var_j = None
+            var_i_name = var_i
+            var_j_name = var_i
+
+            if gv(var_i).get_type()==VarTypes.Computed:
+                source_var_i = gv(var_i).get_dependencies()[0].get_dependencies()[0].get_source_variable()
+            else:
+                source_var_i = gv(var_i)
+            if gv(var_j).get_type()==VarTypes.Computed:
+                source_var_j = gv(var_j).get_dependencies()[0].get_dependencies()[0].get_source_variable()
+            else:
+                source_var_j = gv(var_j)
+
+
+            #jacobian[var_i_name, var_j_name] = jacobian[(var_i, var_j)]
+            #if (gv(var_i) not in nonlinear_vars or gv(var_j) not in nonlinear_vars) and (source_var_i not in nonlinear_vars or source_var_j not in nonlinear_vars):
+            if source_var_i not in nonlinear_vars or source_var_j not in nonlinear_vars:
                 del jacobian[(var_i, var_j)]
         if doc.model._cml_jacobian_full:
             # Transform the Jacobian into the form needed by the Backward Euler code
