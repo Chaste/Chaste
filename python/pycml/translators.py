@@ -52,9 +52,6 @@ import optimize
 import processors
 import validator
 
-global do_conversion
-do_conversion = True
-
 __version__ = "$Revision$"[11:-2]
 
 def version_comment(note_time=True):
@@ -3619,20 +3616,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
         try:
             if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-                l=2
-                microMolar = cellml_units.create_new(model,'micromolar', 
-                            [{'units': 'mole', 'prefix': 'micro'},
-                             {'units': 'litre', 'exponent': '-1'}])  
-                global do_conversion
-                if not do_conversion:
-                    milliMolar=microMolar              
                 config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)               
-
-##                value = converter.convert_constant(config.cytosolic_calcium_variable.initial_value, config.cytosolic_calcium_variable.get_units(), milliMolar, config.cytosolic_calcium_variable.component)
-##                config.cytosolic_calcium_variable.initial_value = unicode(value)
-##                config.cytosolic_calcium_variable.units=unicode(milliMolar.name)
-
-
         except AttributeError:
             DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
 
@@ -6947,9 +6931,6 @@ def run():
             else:
                 source_var_j = gv(var_j)
 
-
-            #jacobian[var_i_name, var_j_name] = jacobian[(var_i, var_j)]
-            #if (gv(var_i) not in nonlinear_vars or gv(var_j) not in nonlinear_vars) and (source_var_i not in nonlinear_vars or source_var_j not in nonlinear_vars):
             if source_var_i not in nonlinear_vars or source_var_j not in nonlinear_vars:
                 del jacobian[(var_i, var_j)]
         if doc.model._cml_jacobian_full:
@@ -6968,7 +6949,34 @@ def run():
                     args.append(maple_parser.MOperator([maple_parser.MVariable(['delta_t']), expr], 'prod', 'times'))
                     new_expr = maple_parser.MOperator(args, '', 'minus')
                 if new_expr:
-                    jacobian[key] = new_expr
+                    converted_var = None
+                    if gv(key[0]).get_type()==VarTypes.Computed:
+                        converted_var = gv(key[0])
+                    if gv(key[1]).get_type()==VarTypes.Computed:
+                        converted_var = gv(key[1])
+                    #if we have converted units correct the term.
+                    if converted_var:
+                        # Helper methods
+                        def set_var_values(elt, vars=None):
+                            """Fake all variables appearing in the given expression being set to 1.0, and return them."""
+                            if vars is None:
+                                vars = []
+                            if isinstance(elt, mathml_ci):
+                                elt.variable.set_value(1.0)
+                                vars.append(elt.variable)
+                            else:
+                                for child in getattr(elt, 'xml_children', []):
+                                    set_var_values(child, vars)
+                            return vars                        
+                        # Figure out the conversion factor in each case
+                        defn = converted_var.get_dependencies()[0]
+                        defn_vars = set_var_values(defn.eq.rhs)
+                        assert len(defn_vars) == 1, "Unexpected form of units conversion expression found"
+                        factor = defn.eq.rhs.evaluate()
+                        new_expr = maple_parser.MOperator([maple_parser.MNumber([str(factor)]), new_expr], '','minus')
+                        new_expr = maple_parser.MOperator([maple_parser.MNumber(["1"]), new_expr], '','plus')
+                    jacobian[key] = new_expr                        
+
         # Add info as XML
         solver_info.add_all_info()
         # Analyse the XML, adding cellml_variable references, etc.
