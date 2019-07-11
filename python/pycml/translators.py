@@ -6973,8 +6973,8 @@ def run():
                         defn_vars = set_var_values(defn.eq.rhs)
                         assert len(defn_vars) == 1, "Unexpected form of units conversion expression found"
                         factor = defn.eq.rhs.evaluate()
-                        new_expr = maple_parser.MOperator([maple_parser.MNumber([str(factor)]), new_expr], '','minus')
-                        new_expr = maple_parser.MOperator([maple_parser.MNumber(["1"]), new_expr], '','plus')
+#                        new_expr = maple_parser.MOperator([maple_parser.MNumber([str(factor)]), new_expr], '','minus')
+#                        new_expr = maple_parser.MOperator([maple_parser.MNumber(["1"]), new_expr], '','plus')
                     jacobian[key] = new_expr                        
 
         # Add info as XML
