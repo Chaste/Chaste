@@ -65,10 +65,21 @@ private:
 
 public:
 
-    ///\todo #2987 Document method
+    /**
+     * Create an Edge with only the local index within the mesh. Nodes must be set using SetNode() after the
+     * constructor to make this a valid edge.
+     *
+     * @param index Index of this edge within the mesh
+     */
     Edge(unsigned index);
 
-    ///\todo #2987 Document method
+    /**
+     * Create an Edge that has an index and associated nodes.
+     *
+     * @param index Index of this edge within the mesh
+     * @param pNode0
+     * @param pNode1
+     */
     Edge(unsigned index, Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1);
 
     /**
@@ -76,61 +87,127 @@ public:
      */
     ~Edge();
 
-    ///\todo #2987 Document method
+    /**
+     * Mark the Edge to be deleted
+     */
     void MarkDeleted();
 
-    ///\todo #2987 Document method
+    /**
+     *
+     * @return True if Edge has been marked as deleted
+     */
     bool IsDeleted();
 
-    ///\todo #2987 Document method
+    /**
+     * Sets the index of this edge within the mesh
+     * @param index The index of this edge within the mesh
+     */
     void SetIndex(unsigned index);
 
-    ///\todo #2987 Document method
+    /**
+     * Gets the index of this edge within the mesh
+     * @return
+     */
     unsigned GetIndex();
 
-    ///\todo #2987 Document method
+    /**
+     * Obtains a pair of associated nodes' indices
+     * @return Obtains a pair of associated nodes' indices
+     */
     UIndexPair GetMapIndex();
 
-    ///\todo #2987 Document method
+
+    /**
+     * Clear all associated nodes
+     */
     void RemoveNodes();
 
-    ///\todo #2987 Document method
+    /**
+     * Set the Edge's associated nodes
+     * @param pNode0 A Node that forms one point of the edge
+     * @param pNode1 A different Node that forms the other point of the edge
+     */
     void SetNodes(Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1);
 
-    ///\todo #2987 Document method
+    /**
+     * Replace a Node in this Edge with another
+     * @param pOldNode The old Node to be replaced
+     * @param pNewNode New Node to replace the old Node
+     */
     void ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode);
 
-    ///\todo #2987 Document method
+    /**
+     * Gets the Node at index
+     * @param index
+     * @return
+     */
     Node<SPACE_DIM>* GetNode(unsigned index);
 
-    ///\todo #2987 Document method
+    /**
+     * Gets the number of Nodes associated with this edge
+     * @return
+     */
     unsigned GetNumNodes();
 
-    ///\todo #2987 Document method
+    /**
+     * Checks that the Edge contains pNode
+     * @param pNode
+     * @return true if pNode is containd in Edge, otherwise false
+     */
     bool ContainsNode(Node<SPACE_DIM>* pNode);
 
-    ///\todo #2987 Document method
+    /**
+     *
+     * @return The centre location of this edge, which is middle of two Nodes associated with the Edge
+     */
     c_vector<double, SPACE_DIM> rGetCentreLocation();
 
-    ///\todo #2987 Document method
+    /**
+     *
+     * @return The length of the Edge, i.e. the distance between the Edge's two Nodes
+     */
     double rGetLength();
 
-    ///\todo #2987 Document method
+    /**
+     * Gets other Element indices that the edge is associated to.
+     * element.
+     * @param elementIndex The Element index to exclude
+     * @return A set of Element indices or an empty set if there's no association.
+     */
     std::set<unsigned> GetOtherElements(unsigned elementIndex);
 
-    ///\todo #2987 Document method
+    /**
+     * Add an Element index that the Edge is associated to
+     * @param elementIndex
+     */
     void AddElement(unsigned elementIndex);
 
-    ///\todo #2987 Document method
+    /**
+     * Remove an Element index association from the Edge
+     * @param elementIndex
+     */
     void RemoveElement(unsigned elementIndex);
 
-    ///\todo #2987 Document method
+    /**
+    * Gets all Element indices that the edge is associated to. Used for testing the accounting of Add and Remove
+    * element.
+    *
+    * @return A set of Element indices or an empty set if there's no association.
+    */
     std::set<unsigned> GetNeighbouringElementIndices();
 
-    ///\todo #2987 Document method
+    /**
+     *
+     * @return The number of Elements associated with this Edge
+     */
     unsigned GetNumElements();
 
-    ///\todo #2987 Document method
+    /**
+     * Checks whether this edge is valid i.e. must have 2 valid Nodes, can't have associated Elements if 1D
+     * and maximum of 2 associated Elements if 2D. A consistency check is also performed for Edge's associated elements
+     * and contain Nodes' associated elements.
+     * @return
+     */
     bool IsEdgeValid();
 };
 

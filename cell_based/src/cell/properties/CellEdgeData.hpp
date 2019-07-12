@@ -47,7 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/map.hpp>
 #include "Exception.hpp"
 
-///\todo #2987 document class
+/**
+ * Data associated with the cell's edges, for use when cells are physically represented as a VertexMesh.
+ * Each data item is an array that has the same size and in the same order as edges in cell's associated VertexElement.
+ */
 class CellEdgeData : public AbstractCellProperty
 {
 private:
@@ -81,7 +84,7 @@ public:
     virtual ~CellEdgeData();
 
     /**
-     * This assigns the cell data.
+     * This assigns the cell data array.
      *
      * @param rVariableName the name of the data to be set.
      * @param data the value to set it to.
@@ -89,17 +92,26 @@ public:
     void SetItem(const std::string& rVariableName, std::vector<double> data);
 
     /**
-     * @return data.
+     * Retrieves the cell data array.
      *
      * @param rVariableName the index of the data required.
      * throws if rVariableName has not been stored
+     *
+     * @return An array of cell edge data
      */
     std::vector<double> GetItem(const std::string& rVariableName) const;
 
-    ///\todo #2987 Document method
+    /**
+     * Retrieves the data of rVariableName at index
+     *
+     * @param rVariableName
+     * @param index
+     * @return A single value in the data array.
+     */
     double GetItemAtIndex(const std::string& rVariableName, const unsigned int index);
 
     /**
+     *
      * @return number of data items
      */
     unsigned GetNumItems() const;

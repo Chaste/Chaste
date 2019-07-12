@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
+#include "CellEdgeVertexMeshWriter.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -114,6 +115,12 @@ private:
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes an edges representation of cells to file
+     * @param rDirectory
+     */
+    virtual void WriteCellEdgeVtkResultsToFile(const std::string& rDirectory);
 
     friend class boost::serialization::access;
     /**

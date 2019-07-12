@@ -499,6 +499,170 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+
+    this->WriteCellEdgeVtkResultsToFile(rDirectory);
+#endif //CHASTE_VTK
+}
+
+template<unsigned int DIM>
+void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::string &rDirectory)
+{
+#ifdef CHASTE_VTK
+
+    // Create mesh writer for VTK output
+    CellEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "edges-results", false);
+
+
+//    unsigned num_cells = this->GetNumAllCells();
+    unsigned num_edges = 0;
+
+    // Gets the number of total local edges in the population
+    for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        // Get index of this element in the vertex mesh
+        unsigned elem_index = elem_iter->GetIndex();
+        // Get the cell corresponding to this element
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+        assert(p_cell);
+
+        auto element = this->GetElement(elem_index);
+        num_edges += element->GetNumEdges();
+
+    }
+
+    // Iterate over any cell writers that are present
+    for (auto cell_writer: this->mCellWriters)
+    {
+        // Create vector to store VTK cell data
+        std::vector<double> vtk_cell_data(num_edges);
+        unsigned edge_counter = 0;
+
+        // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
+        for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+             elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+             ++elem_iter)
+        {
+            // Get index of this element in the vertex mesh
+            unsigned elem_index = elem_iter->GetIndex();
+
+            // Get the cell corresponding to this element
+            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+            assert(p_cell);
+
+
+            // Write the same property in all the edges
+            auto element = this->GetElement(elem_index);
+            for (unsigned e = 0; e < element->GetNumEdges(); ++e)
+            {
+                // Populate the vector of VTK cell data
+                vtk_cell_data[edge_counter] = cell_writer->GetCellDataForVtkOutput(p_cell, this);
+                ++edge_counter;
+            }
+        }
+
+        mesh_writer.AddCellData(cell_writer->GetVtkCellDataName(), vtk_cell_data);
+    }
+
+    // When outputting any CellData, we assume that the first cell is representative of all cells
+    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
+    std::vector<std::vector<double> > cell_data;
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cell_data_var(num_edges);
+        cell_data.push_back(cell_data_var);
+    }
+
+
+    unsigned cell_data_edge_counter = 0;
+    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+    for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        // Get index of this element in the vertex mesh
+        unsigned elem_index = elem_iter->GetIndex();
+
+        // Get the cell corresponding to this element
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+        assert(p_cell);
+
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            // Write the same property in all the edges
+            auto element = this->GetElement(elem_index);
+            for (unsigned e = 0; e < element->GetNumEdges(); ++e)
+            {
+                // Populate the vector of VTK cell data
+                cell_data[var][cell_data_edge_counter] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                ++cell_data_edge_counter;
+            }
+        }
+    }
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+    }
+
+    // When outputting any CellEdgeData, we assume that the first cell is representative of all cells
+    unsigned num_cell_edge_data_items = this->Begin()->GetCellEdgeData()->GetNumItems();
+    std::vector<std::string> cell_edge_data_names = this->Begin()->GetCellEdgeData()->GetKeys();
+
+    std::vector<std::vector<double> > cell_edge_data;
+    for (unsigned var=0; var<num_cell_edge_data_items; var++)
+    {
+        std::vector<double> cell_edge_data_var(num_edges);
+        cell_edge_data.push_back(cell_edge_data_var);
+    }
+
+    unsigned cell_edge_data_edge_counter = 0;
+    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+    for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        // Get index of this element in the vertex mesh
+        unsigned elem_index = elem_iter->GetIndex();
+
+        // Get the cell corresponding to this element
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+        assert(p_cell);
+
+        for (unsigned var=0; var<num_cell_edge_data_items; var++)
+        {
+            // Write the same property in all the edges
+            auto element = this->GetElement(elem_index);
+            for (unsigned e = 0; e < element->GetNumEdges(); ++e)
+            {
+                for (auto edge_value: p_cell->GetCellEdgeData()->GetItem(cell_edge_data_names[var]))
+                {
+                    // Populate the vector of VTK cell data
+                    cell_edge_data[var][cell_edge_data_edge_counter] = edge_value;
+                    ++cell_edge_data_edge_counter;
+                }
+
+            }
+        }
+    }
+    for (unsigned var=0; var<num_cell_edge_data_items; var++)
+    {
+        mesh_writer.AddCellData(cell_edge_data_names[var], cell_edge_data[var]);
+    }
+
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    std::stringstream time;
+    time << num_timesteps;
+
+    mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
+
+    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }
 

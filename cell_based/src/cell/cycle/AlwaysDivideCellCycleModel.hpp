@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A 'dummy' cell-cycle model class that can be used in simulations featuring constant
  * cell proliferation.
  *
- * \todo #2987 make sure this class is tested
  */
 class AlwaysDivideCellCycleModel : public AbstractCellCycleModel
 {
