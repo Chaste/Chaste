@@ -146,13 +146,15 @@ void CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<EL
 
         for (unsigned edge_index = 0; edge_index < p_element->GetNumEdges(); ++edge_index)
         {
-            auto p_edge = p_element->GetEdge(edge_index);
+
 
             vtkCell* p_cell;
-            p_cell = vtkTriangle::New();
+            p_cell = vtkPolygon::New();
 
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             p_cell_id_list->SetNumberOfIds(3);
+
+            auto p_edge = p_element->GetEdge(edge_index);
 
             assert(p_edge->GetNumNodes() == 2);
             for (unsigned j=0; j<p_edge->GetNumNodes(); ++j)

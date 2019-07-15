@@ -577,7 +577,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     }
 
 
-    unsigned cell_data_edge_counter = 0;
+    unsigned edge_counter = 0;
     // Loop over vertex elements ///\todo #2512 - replace with loop over cells
     for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
          elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
@@ -597,8 +597,8 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
             for (unsigned e = 0; e < element->GetNumEdges(); ++e)
             {
                 // Populate the vector of VTK cell data
-                cell_data[var][cell_data_edge_counter] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
-                ++cell_data_edge_counter;
+                cell_data[var][edge_counter] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                ++edge_counter;
             }
         }
     }
@@ -606,6 +606,39 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     {
         mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
     }
+
+    // Out CellID as we now split edges into individual "cells" for rendering
+    edge_counter = 0;
+    unsigned  cell_counter = 0;
+    std::vector<double> cell_ids(num_edges);
+    for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        // Get index of this element in the vertex mesh
+        unsigned elem_index = elem_iter->GetIndex();
+
+        // Get the cell corresponding to this element
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+        assert(p_cell);
+
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            // Write the same property in all the edges
+            auto element = this->GetElement(elem_index);
+            for (unsigned e = 0; e < element->GetNumEdges(); ++e)
+            {
+                // Populate the vector of VTK cell data
+                cell_ids[edge_counter] = cell_counter;
+                ++edge_counter;
+            }
+        }
+
+        ++cell_counter;
+    }
+    mesh_writer.AddCellData("Cell ID", cell_ids);
+
+
 
     // When outputting any CellEdgeData, we assume that the first cell is representative of all cells
     unsigned num_cell_edge_data_items = this->Begin()->GetCellEdgeData()->GetNumItems();
@@ -618,7 +651,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         cell_edge_data.push_back(cell_edge_data_var);
     }
 
-    unsigned cell_edge_data_edge_counter = 0;
+
     // Loop over vertex elements ///\todo #2512 - replace with loop over cells
     for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
          elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
@@ -633,16 +666,12 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
 
         for (unsigned var=0; var<num_cell_edge_data_items; var++)
         {
-            // Write the same property in all the edges
-            auto element = this->GetElement(elem_index);
-            for (unsigned e = 0; e < element->GetNumEdges(); ++e)
+            edge_counter = 0;
+            for (auto edge_value: p_cell->GetCellEdgeData()->GetItem(cell_edge_data_names[var]))
             {
-                for (auto edge_value: p_cell->GetCellEdgeData()->GetItem(cell_edge_data_names[var]))
-                {
-                    // Populate the vector of VTK cell data
-                    cell_edge_data[var][cell_edge_data_edge_counter] = edge_value;
-                    ++cell_edge_data_edge_counter;
-                }
+                // Populate the vector of VTK cell data
+                cell_edge_data[var][edge_counter] = edge_value;
+                ++edge_counter;
 
             }
         }
