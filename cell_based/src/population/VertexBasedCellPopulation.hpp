@@ -109,6 +109,9 @@ private:
      */
      bool mThrowStepSizeException = true;
 
+    /** Meta results file for VTK. */
+    out_stream mpVtkEdgeMetaFile;
+
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
@@ -352,6 +355,15 @@ public:
      * @param rOutputFileHandler handler for the directory in which to open this file.
     */
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+
+    /**
+     * Close output files associated with any writers in the members
+     * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
+     *
+     * The method also closes the .pvd output file if VTK is available.
+     */
+    virtual void CloseWritersFiles();
+
 
     /**
      * A virtual method to accept a cell population writer so it can

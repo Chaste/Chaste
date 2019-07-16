@@ -510,7 +510,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
 #ifdef CHASTE_VTK
 
     // Create mesh writer for VTK output
-    CellEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "edges-results", false);
+    CellEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "edge_results", false);
 
 
 //    unsigned num_cells = this->GetNumAllCells();
@@ -687,11 +687,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
 
     mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
 
-    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << num_timesteps;
-    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << num_timesteps;
-    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    *(this->mpVtkEdgeMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkEdgeMetaFile) << num_timesteps;
+    *(this->mpVtkEdgeMetaFile) << "\" group=\"\" part=\"0\" file=\"edge_results_";
+    *(this->mpVtkEdgeMetaFile) << num_timesteps;
+    *(this->mpVtkEdgeMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }
 
@@ -722,7 +722,30 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutput
         }
     }
 
+#ifdef CHASTE_VTK
+    mpVtkEdgeMetaFile = rOutputFileHandler.OpenOutputFile("edge_results.pvd");
+    *mpVtkEdgeMetaFile << "<?xml version=\"1.0\"?>\n";
+    *mpVtkEdgeMetaFile << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n";
+    *mpVtkEdgeMetaFile << "    <Collection>\n";
+#endif //CHASTE_VTK
+
     AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
+}
+
+template<unsigned int DIM>
+void VertexBasedCellPopulation<DIM>::CloseWritersFiles()
+{
+
+
+#ifdef CHASTE_VTK
+    *mpVtkEdgeMetaFile << "    </Collection>\n";
+    *mpVtkEdgeMetaFile << "</VTKFile>\n";
+    mpVtkEdgeMetaFile->close();
+#endif //CHASTE_VTK
+
+
+
+    AbstractCellPopulation<DIM>::CloseWritersFiles();
 }
 
 template<unsigned DIM>
