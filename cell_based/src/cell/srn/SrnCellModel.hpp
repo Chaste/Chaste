@@ -112,7 +112,7 @@ public:
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
 
     void AddEdgeSrn(AbstractSrnModelPtr edgeSrn);
-
+    // \todo: AddCellSrn to add SRN in cell interior.!!!!
     void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn);
 
     AbstractSrnModelPtr RemoveEdgeSrn(unsigned index);
