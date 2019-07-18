@@ -60,7 +60,7 @@ class ModelModifier(object):
         self.model = model
         self._units_converter = None
         self.connections_made = set()
-        
+   
     def finalize(self, error_handler, pre_units_check_hook=None, check_units=True):
         """Re-do the model validation steps needed for further processing of the model.
         
@@ -580,10 +580,11 @@ class InterfaceGenerator(ModelModifier):
         elif t not in [VarTypes.Constant, VarTypes.Free, VarTypes.State]:
             raise ModelModificationError("Variable " + var.fullname() + " has unexpected type " + str(t))
         # Add a new variable with desired units to the interface component
-        comp = self.get_interface_component()
+        comp = self.get_interface_component()        
         newvar = self.add_variable(comp, var_name, units, id=var.cmeta_id,
                                    initial_value=self._convert_initial_value(var, units, convert_initial_value),
                                    interfaces={u'public': u'out'})
+
         newvar._set_type(t)
         # Remove initial value and id from the original, if they exist
         self.del_attr(var, u'initial_value')
