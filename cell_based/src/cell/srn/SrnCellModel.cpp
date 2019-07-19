@@ -43,6 +43,7 @@ SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     {
         this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
     }
+    this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
 }
 
 void SrnCellModel::Initialise()
@@ -51,6 +52,7 @@ void SrnCellModel::Initialise()
     {
         edgeModel->Initialise();
     }
+    mInteriorSrnModel->Initialise();
 }
 
 void SrnCellModel::SimulateToCurrentTime()
@@ -59,6 +61,7 @@ void SrnCellModel::SimulateToCurrentTime()
     {
         srnModel->SimulateToCurrentTime();
     }
+    mInteriorSrnModel->SimulateToCurrentTime();
 }
 
 AbstractSrnModel* SrnCellModel::CreateSrnModel()
@@ -105,6 +108,16 @@ const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges()
     return mEdgeSrnModels;
 }
 
+void SrnCellModel::SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn)
+{
+    mInteriorSrnModel = interiorSrn;
+}
+
+AbstractSrnModelPtr SrnCellModel::GetInteriorSrn()
+{
+    return mInteriorSrnModel;
+}
+
 void SrnCellModel::SetCell(CellPtr pCell)
 {
     AbstractSrnModel::SetCell(pCell);
@@ -114,6 +127,7 @@ void SrnCellModel::SetCell(CellPtr pCell)
     {
         srnModel->SetCell(pCell);
     }
+    mInteriorSrnModel->SetCell(pCell);
 }
 
 // Declare identifier for the serializer
