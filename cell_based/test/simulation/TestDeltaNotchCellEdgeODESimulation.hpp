@@ -225,8 +225,14 @@ public:
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
-
-        simulator.Solve();
+        try
+        {
+            simulator.Solve();
+        }
+        catch(const std::exception& exc)
+        {
+            std::cerr<<exc.what()<<std::endl;
+        }
     }
 
 

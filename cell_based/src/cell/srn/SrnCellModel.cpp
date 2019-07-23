@@ -71,17 +71,24 @@ AbstractSrnModel* SrnCellModel::CreateSrnModel()
 
 void SrnCellModel::AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    for (unsigned int i=0; i<edgeSrn.size(); ++i)
+        edgeSrn[i]->SetEdgeModelIndicator(true);
     mEdgeSrnModels = edgeSrn;
 }
 
 void SrnCellModel::AddEdgeSrn(AbstractSrnModelPtr edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    edgeSrn->SetEdgeModelIndicator(true);
     edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
     mEdgeSrnModels.push_back(edgeSrn);
 }
 
 void SrnCellModel::InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    edgeSrn->SetEdgeModelIndicator(true);
     mEdgeSrnModels.insert(mEdgeSrnModels.begin() + index, edgeSrn);
 }
 

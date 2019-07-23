@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
-
 /**
  * A modifier class in which the mean levels of Delta in neighbouring cells
  * are computed and stored in CellData. To be used in conjunction with Delta
@@ -113,6 +112,8 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
+
+
 };
 
 #include "SerializationExportWrapper.hpp"

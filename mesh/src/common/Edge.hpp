@@ -209,6 +209,12 @@ public:
      * @return
      */
     bool IsEdgeValid();
+
+    /**
+     * Checks whether the edge is on the boundary
+     * @return true if on boundary
+     */
+    bool IsBoundaryEdge() const;
 };
 
 #endif //EDGE_HPP_

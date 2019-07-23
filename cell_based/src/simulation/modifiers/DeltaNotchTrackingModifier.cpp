@@ -34,7 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DeltaNotchTrackingModifier.hpp"
+#include "SrnCellModel.hpp"
 #include "DeltaNotchSrnModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 
 template<unsigned DIM>
 DeltaNotchTrackingModifier<DIM>::DeltaNotchTrackingModifier()
@@ -66,6 +68,7 @@ void DeltaNotchTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>
 template<unsigned DIM>
 void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+
     // Make sure the cell population is updated
     rCellPopulation.Update();
 
@@ -74,43 +77,27 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        DeltaNotchSrnModel* p_model = static_cast<DeltaNotchSrnModel*>(cell_iter->GetSrnModel());
-        double this_delta = p_model->GetDelta();
-        double this_notch = p_model->GetNotch();
+        auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
+        boost::shared_ptr<DeltaNotchSrnModel> p_interior_model
+                    = boost::static_pointer_cast<DeltaNotchSrnModel>(p_cell_edge_model->GetInteriorSrn());
 
+        const double this_notch = p_interior_model->GetNotch();
+        const double this_delta = p_interior_model->GetDelta();
+        double total_edge_delta = 0;
+        const unsigned int n_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
+        std::vector<double> edge_delta(n_cell_edges);
+        for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
+        {
+            boost::shared_ptr<DeltaNotchSrnEdgeModel> p_model
+            = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_model->GetEdgeSrn(i));
+            total_edge_delta += p_model->GetDelta();
+        }
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
-        cell_iter->GetCellData()->SetItem("notch", this_notch);
-        cell_iter->GetCellData()->SetItem("delta", this_delta);
+        cell_iter->GetCellData()->SetItem("interior notch", this_notch);
+        cell_iter->GetCellData()->SetItem("interior delta", this_delta);
+        cell_iter->GetCellData()->SetItem("total edge delta", total_edge_delta);
     }
 
-    // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
-    {
-        // Get the set of neighbouring location indices
-        std::set<unsigned> neighbour_indices = rCellPopulation.GetNeighbouringLocationIndices(*cell_iter);
-
-        // Compute this cell's average neighbouring Delta concentration and store in CellData
-        if (!neighbour_indices.empty())
-        {
-            double mean_delta = 0.0;
-            for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
-                 iter != neighbour_indices.end();
-                 ++iter)
-            {
-                CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(*iter);
-                double this_delta = p_cell->GetCellData()->GetItem("delta");
-                mean_delta += this_delta/neighbour_indices.size();
-            }
-            cell_iter->GetCellData()->SetItem("mean delta", mean_delta);
-        }
-        else
-        {
-            // If this cell has no neighbours, such as an isolated cell in a CaBasedCellPopulation, store 0.0 for the cell data
-            cell_iter->GetCellData()->SetItem("mean delta", 0.0);
-        }
-    }
 }
 
 template<unsigned DIM>

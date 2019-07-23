@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DELTANOTCHODESYSTEM_HPP_
-#define DELTANOTCHODESYSTEM_HPP_
+#ifndef DELTANOTCHEDGEODESYSTEM_HPP_
+#define DELTANOTCHEDGEODESYSTEM_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -49,8 +49,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * "Pattern formation by lateral inhibition with feedback: a mathematical
  * model of delta-notch intercellular signalling" (Journal of Theoretical
  * Biology 183:429-446, 1996).
+ * Here, however, we include edge based model: instead of using mean neighbouring delta
+ * we simply use neighbours edge data
  */
-class DeltaNotchOdeSystem : public AbstractOdeSystem
+class DeltaNotchEdgeOdeSystem : public AbstractOdeSystem
 {
 private:
 
@@ -76,12 +78,12 @@ public:
      *
      * @param stateVariables optional initial conditions for state variables (only used in archiving)
      */
-    DeltaNotchOdeSystem(std::vector<double> stateVariables=std::vector<double>());
+    DeltaNotchEdgeOdeSystem(std::vector<double> stateVariables=std::vector<double>());
 
     /**
      * Destructor.
      */
-    ~DeltaNotchOdeSystem();
+    ~DeltaNotchEdgeOdeSystem();
 
     /**
      * Compute the RHS of the  Collier et al. system of ODEs.
@@ -98,37 +100,37 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchOdeSystem)
+CHASTE_CLASS_EXPORT(DeltaNotchEdgeOdeSystem)
 
 namespace boost
 {
 namespace serialization
 {
 /**
- * Serialize information required to construct a DeltaNotchOdeSystem.
+ * Serialize information required to construct a DeltaNotchEdgeOdeSystem.
  */
 template<class Archive>
 inline void save_construct_data(
-    Archive & ar, const DeltaNotchOdeSystem * t, const unsigned int file_version)
+    Archive & ar, const DeltaNotchEdgeOdeSystem * t, const unsigned int file_version)
 {
     const std::vector<double>& state_variables = t->rGetConstStateVariables();
     ar & state_variables;
 }
 
 /**
- * De-serialize constructor parameters and initialise a DeltaNotchOdeSystem.
+ * De-serialize constructor parameters and initialise a DeltaNotchEdgeOdeSystem.
  */
 template<class Archive>
 inline void load_construct_data(
-    Archive & ar, DeltaNotchOdeSystem * t, const unsigned int file_version)
+    Archive & ar, DeltaNotchEdgeOdeSystem * t, const unsigned int file_version)
 {
     std::vector<double> state_variables;
     ar & state_variables;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)DeltaNotchOdeSystem(state_variables);
+    ::new(t)DeltaNotchEdgeOdeSystem(state_variables);
 }
 }
 } // namespace ...
 
-#endif /*DELTANOTCHODESYSTEM_HPP_*/
+#endif /*DELTANOTCHEDGEODESYSTEM_HPP_*/

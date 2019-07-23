@@ -170,12 +170,9 @@ template<unsigned SPACE_DIM>
 std::set<unsigned> Edge<SPACE_DIM>::GetOtherElements(unsigned elementIndex)
 {
     std::set<unsigned> otherElements;
-    std::set<unsigned> currentElem;
-    currentElem.insert(elementIndex);
-    std::set_difference(currentElem.begin(), currentElem.end(),
-            mElementIndices.begin(), mElementIndices.end(),
-            std::inserter(otherElements, otherElements.begin()));
-
+    for (unsigned elem: mElementIndices)
+        if (elem != elementIndex)
+            otherElements.insert(elem);
     return otherElements;
 }
 
@@ -254,6 +251,12 @@ bool Edge<SPACE_DIM>::IsEdgeValid()
     }
 
     return true;
+}
+
+template<unsigned SPACE_DIM>
+bool Edge<SPACE_DIM>::IsBoundaryEdge() const
+{
+    return mElementIndices.size()<=1;
 }
 
 // Explicit instantiation
