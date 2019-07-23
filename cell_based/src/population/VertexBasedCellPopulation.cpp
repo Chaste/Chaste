@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "T2SwapCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "SrnCellModel.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
@@ -422,6 +423,35 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
+
+    auto cells = this->rGetCells();
+
+    try
+    {
+        if (cells.size() > 0)
+        {
+            auto srnCellModel = dynamic_cast<SrnCellModel*>(cells.front()->GetSrnModel());
+            if (srnCellModel != nullptr)
+            {
+                this->WriteCellEdgeVtkResultsToFile(rDirectory);
+                return;
+            }
+
+        }
+
+    }
+    catch (std::bad_cast e)
+    {
+        //If casting fails then just default to WriteCellVtkResultsToFile()
+    }
+
+    this->WriteCellVtkResultsToFile(rDirectory);
+
+}
+
+template<unsigned int DIM>
+void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string &rDirectory)
+{
 #ifdef CHASTE_VTK
 
     // Create mesh writer for VTK output
@@ -500,7 +530,6 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 
-    this->WriteCellEdgeVtkResultsToFile(rDirectory);
 #endif //CHASTE_VTK
 }
 
@@ -510,7 +539,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
 #ifdef CHASTE_VTK
 
     // Create mesh writer for VTK output
-    CellEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "edge_results", false);
+    CellEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
 
 //    unsigned num_cells = this->GetNumAllCells();
@@ -687,11 +716,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
 
     mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
 
-    *(this->mpVtkEdgeMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkEdgeMetaFile) << num_timesteps;
-    *(this->mpVtkEdgeMetaFile) << "\" group=\"\" part=\"0\" file=\"edge_results_";
-    *(this->mpVtkEdgeMetaFile) << num_timesteps;
-    *(this->mpVtkEdgeMetaFile) << ".vtu\"/>\n";
+    *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }
 
@@ -722,31 +751,10 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutput
         }
     }
 
-#ifdef CHASTE_VTK
-    mpVtkEdgeMetaFile = rOutputFileHandler.OpenOutputFile("edge_results.pvd");
-    *mpVtkEdgeMetaFile << "<?xml version=\"1.0\"?>\n";
-    *mpVtkEdgeMetaFile << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n";
-    *mpVtkEdgeMetaFile << "    <Collection>\n";
-#endif //CHASTE_VTK
 
     AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
-template<unsigned int DIM>
-void VertexBasedCellPopulation<DIM>::CloseWritersFiles()
-{
-
-
-#ifdef CHASTE_VTK
-    *mpVtkEdgeMetaFile << "    </Collection>\n";
-    *mpVtkEdgeMetaFile << "</VTKFile>\n";
-    mpVtkEdgeMetaFile->close();
-#endif //CHASTE_VTK
-
-
-
-    AbstractCellPopulation<DIM>::CloseWritersFiles();
-}
 
 template<unsigned DIM>
 bool VertexBasedCellPopulation<DIM>::GetOutputCellRearrangementLocations()

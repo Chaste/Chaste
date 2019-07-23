@@ -64,6 +64,7 @@ private:
      * This test uses the private constructor to simplify testing.
      */
     friend class TestVertexBasedDivisionRules;
+    friend class TestVertexBasedCellPopulation;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -109,18 +110,25 @@ private:
      */
      bool mThrowStepSizeException = true;
 
-    /** Meta results file for VTK. */
-    out_stream mpVtkEdgeMetaFile;
-
     /**
-     * Overridden WriteVtkResultsToFile() method.
-     *
+     * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
+     * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,
+     * otherwise WriteCellVtkResultsToFile() is used to represent entire cells.
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
     /**
-     * Writes an edges representation of cells to file
+     * Writes a representation of cells to file.
+     * @param rDirectory
+     */
+    virtual void WriteCellVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes an edge-based representation of the cells to file.
+     * Each cell is divided into a number of triangles equaling the number of edges.
+     *
+     * Cell ID property is added by default so individual cells can still be differentiated.
      * @param rDirectory
      */
     virtual void WriteCellEdgeVtkResultsToFile(const std::string& rDirectory);
@@ -356,13 +364,6 @@ public:
     */
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
-    /**
-     * Close output files associated with any writers in the members
-     * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
-     *
-     * The method also closes the .pvd output file if VTK is available.
-     */
-    virtual void CloseWritersFiles();
 
 
     /**
@@ -583,7 +584,15 @@ public:
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
 
+    /**
+     * Get a vector of edge operations in the vertex mesh
+     * @return
+     */
     const std::vector<EdgeOperation*> &  GetCellEdgeChangeOperations();
+
+    /**
+     * Clear all edge operations in the vertex mesh
+     */
     void ClearCellEdgeOperations();
 };
 

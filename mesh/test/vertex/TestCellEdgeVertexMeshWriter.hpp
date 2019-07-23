@@ -38,8 +38,11 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then write to file */
-        CellEdgeVertexMeshWriter<2, 2> mesh_writer("", "edges-results", false);
-        mesh_writer.WriteVtkUsingMesh(*p_mesh, "test");
+        CellEdgeVertexMeshWriter<2, 2> mesh_writer("", "results", false);
+        mesh_writer.WriteVtkUsingMesh(*p_mesh, "0");
+
+        FileFinder vtk_file("results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
 
     }
 

@@ -115,7 +115,8 @@ public:
     virtual void EdgeRemoved(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr oldSrnEdge)=0;
 
     /**
-     * Called when an edge is divided during cell division
+     * Called when an edge is divided during cell division. For each edge division, this function is called twice
+     * where the newSrnEdge belong to the two new edges.
      * @param oldSrnEdge
      * @param newSrnEdge
      */
