@@ -6937,44 +6937,43 @@ def run():
             # Transform the Jacobian into the form needed by the Backward Euler code
             import maple_parser
             for key, expr in jacobian.iteritems():
-                new_expr = None
-                if key[0] == key[1]:
-                    # 1 on the diagonal
-                    new_expr = maple_parser.MNumber(['1'])
                 if not (isinstance(expr, maple_parser.MNumber) and str(expr) == '0'):
+                    new_expr = None
+                    if key[0] == key[1]:
+                        # 1 on the diagonal
+                        new_expr = maple_parser.MNumber(['1'])
+#                        #is this really necessary?
+#                        converted_var = None
+#                        if gv(key[0]).get_type()==VarTypes.Computed:
+#                            converted_var = gv(key[0])
+#                        if gv(key[1]).get_type()==VarTypes.Computed:
+#                            converted_var = gv(key[1])
+#                        #if we have converted units correct the term.
+#                        if converted_var:
+#                            # Helper methods
+#                            def set_var_values(elt, vars=None):
+#                                """Fake all variables appearing in the given expression being set to 1.0, and return them."""
+#                                if vars is None:
+#                                    vars = []
+#                                if isinstance(elt, mathml_ci):
+#                                    elt.variable.set_value(1.0)
+#                                    vars.append(elt.variable)
+#                                else:
+#                                    for child in getattr(elt, 'xml_children', []):
+#                                        set_var_values(child, vars)
+#                                return vars                        
+#                            # Figure out the conversion factor in each case
+#                            defn = converted_var.get_dependencies()[0]
+#                            defn_vars = set_var_values(defn.eq.rhs)
+#                            assert len(defn_vars) == 1, "Unexpected form of units conversion expression found"
+#                            factor = defn.eq.rhs.evaluate()
+#                            new_expr = maple_parser.MOperator([maple_parser.MNumber(["1"]), maple_parser.MNumber([str(factor)])], '','divide')                                            
                     # subtract delta_t * expr
                     args = []
                     if new_expr:
                         args.append(new_expr)
                     args.append(maple_parser.MOperator([maple_parser.MVariable(['delta_t']), expr], 'prod', 'times'))
                     new_expr = maple_parser.MOperator(args, '', 'minus')
-                if new_expr:
-                    converted_var = None
-                    if gv(key[0]).get_type()==VarTypes.Computed:
-                        converted_var = gv(key[0])
-                    if gv(key[1]).get_type()==VarTypes.Computed:
-                        converted_var = gv(key[1])
-                    #if we have converted units correct the term.
-                    if converted_var:
-                        # Helper methods
-                        def set_var_values(elt, vars=None):
-                            """Fake all variables appearing in the given expression being set to 1.0, and return them."""
-                            if vars is None:
-                                vars = []
-                            if isinstance(elt, mathml_ci):
-                                elt.variable.set_value(1.0)
-                                vars.append(elt.variable)
-                            else:
-                                for child in getattr(elt, 'xml_children', []):
-                                    set_var_values(child, vars)
-                            return vars                        
-                        # Figure out the conversion factor in each case
-                        defn = converted_var.get_dependencies()[0]
-                        defn_vars = set_var_values(defn.eq.rhs)
-                        assert len(defn_vars) == 1, "Unexpected form of units conversion expression found"
-                        factor = defn.eq.rhs.evaluate()
-#                        new_expr = maple_parser.MOperator([maple_parser.MNumber([str(factor)]), new_expr], '','minus')
-#                        new_expr = maple_parser.MOperator([maple_parser.MNumber(["1"]), new_expr], '','plus')
                     jacobian[key] = new_expr                        
 
         # Add info as XML
