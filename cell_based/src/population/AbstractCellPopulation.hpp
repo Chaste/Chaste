@@ -616,7 +616,7 @@ public:
      *
      * The method also closes the .pvd output file if VTK is available.
      */
-    void CloseWritersFiles();
+    virtual void CloseWritersFiles();
 
     /**
      * Write results from the current cell population state to output files.

@@ -72,7 +72,7 @@ DeltaNotchSrnModel::DeltaNotchSrnModel(const DeltaNotchSrnModel& rModel)
      */
 
     assert(rModel.GetOdeSystem());
-    SetOdeSystem(new DeltaNotchInteriorOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
+    SetOdeSystem(new DeltaNotchOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
 }
 
 AbstractSrnModel* DeltaNotchSrnModel::CreateSrnModel()
@@ -91,7 +91,7 @@ void DeltaNotchSrnModel::SimulateToCurrentTime()
 
 void DeltaNotchSrnModel::Initialise()
 {
-    AbstractOdeSrnModel::Initialise(new DeltaNotchInteriorOdeSystem);
+    AbstractOdeSrnModel::Initialise(new DeltaNotchOdeSystem);
 }
 
 void DeltaNotchSrnModel::UpdateDeltaNotch()
@@ -99,8 +99,8 @@ void DeltaNotchSrnModel::UpdateDeltaNotch()
     assert(mpOdeSystem != nullptr);
     assert(mpCell != nullptr);
 
-    double total_edge_delta = mpCell->GetCellData()->GetItem("total edge delta");
-    mpOdeSystem->SetParameter("total edge delta", total_edge_delta);
+    double mean_delta = mpCell->GetCellData()->GetItem("mean delta");
+    mpOdeSystem->SetParameter("Mean Delta", mean_delta);
 }
 
 double DeltaNotchSrnModel::GetNotch()
@@ -117,11 +117,11 @@ double DeltaNotchSrnModel::GetDelta()
     return delta;
 }
 
-double DeltaNotchSrnModel::GetTotalEdgeDelta()
+double DeltaNotchSrnModel::GetMeanNeighbouringDelta()
 {
     assert(mpOdeSystem != nullptr);
-    double total_edge_delta = mpOdeSystem->GetParameter("total edge delta");
-    return total_edge_delta;
+    double mean_neighbouring_delta = mpOdeSystem->GetParameter("Mean Delta");
+    return mean_neighbouring_delta;
 }
 
 void DeltaNotchSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)

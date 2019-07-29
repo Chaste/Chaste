@@ -79,6 +79,10 @@ private:
     boost::shared_ptr<AbstractSrnModel> mInteriorSrnModel;
 protected:
 
+    /**
+     * Copy constructor
+     * @param rModel
+     */
     SrnCellModel(const SrnCellModel &rModel);
 
 public:
@@ -96,14 +100,13 @@ public:
     /**
      * Default constuctor.
      */
-    SrnCellModel()
-    {}
+    SrnCellModel();
 
     /**
-     * Destuctor.
+     * Destructor.
      */
-    ~SrnCellModel()
-    {}
+    ~SrnCellModel();
+
 
     virtual void Initialise() override;
 

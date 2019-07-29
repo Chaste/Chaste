@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef TRAPEDGEVERTEXMESHWRITER_HPP_
-#define TRAPEDGEVERTEXMESHWRITER_HPP_
+#ifndef CELLEDGEVERTEXMESHWRITER_HPP_
+#define CELLEDGEVERTEXMESHWRITER_HPP_
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -46,9 +46,7 @@ class VertexMesh;
 #include <vtkCellData.h>
 #include <vtkPointData.h>
 #include <vtkConvexPointSet.h>
-#include <vtkQuad.h>
 #include <vtkPolygon.h>
-#include <vtkHexahedron.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -67,20 +65,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct MeshWriterIterators;
 
 /**
- * A mesh writer class for vertex-based meshes with edge representation. Each edge is associated with
- * trapezoid such that the base is the edge and the sides are parallel to the line joining the
- * cell's centroid and the nodes.
- *     __             __
- *   /    \         /    \
- *  /      \       /      \
- * |        |     |\      /|
- * |        |     | |    | |
- * |        | ==> |/      \|
- *  \      /       \      /
- *   \ __ /         \ __ /
+ * A mesh writer class for vertex-based meshes with edge representation, each "cell" in the vtk file in this case
+ * is a triangle composed of its two node on the edges and a centre location.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class TrapEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
+class TriangleEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
 
 private:
 
@@ -106,9 +95,9 @@ public:
      * @param rBaseName reference to the base name for results files
      * @param clearOutputDir whether to clear the output directory prior to writing files
      */
-    TrapEdgeVertexMeshWriter(const std::string& rDirectory,
-                             const std::string& rBaseName,
-                             const bool clearOutputDir=true);
+    TriangleEdgeVertexMeshWriter(const std::string& rDirectory,
+                     const std::string& rBaseName,
+                     const bool clearOutputDir=true);
 
     /**
      * Write VTK file using a mesh.
@@ -137,7 +126,7 @@ public:
     /**
      * Destructor.
      */
-    ~TrapEdgeVertexMeshWriter();
+    ~TriangleEdgeVertexMeshWriter();
 
     void WriteFiles() override;
 
@@ -145,4 +134,4 @@ public:
 };
 
 
-#endif /*TRAPEDGEVERTEXMESHWRITER_HPP_*/
+#endif /*CELLEDGEVERTEXMESHWRITER_HPP_*/

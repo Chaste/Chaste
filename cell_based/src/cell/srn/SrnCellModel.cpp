@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SrnCellModel.hpp"
 
 SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
-    : AbstractSrnModel(rModel)
+    : AbstractSrnModel(rModel), mInteriorSrnModel(nullptr)
 {
     // Make a copy of all SRN models inside the system
     for (auto srnModel: rModel.mEdgeSrnModels)
@@ -46,13 +46,29 @@ SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
 }
 
+
+SrnCellModel::SrnCellModel()
+{
+    mInteriorSrnModel = nullptr;
+
+}
+
+SrnCellModel::~SrnCellModel()
+{
+
+}
+
 void SrnCellModel::Initialise()
 {
     for (auto edgeModel : mEdgeSrnModels)
     {
         edgeModel->Initialise();
     }
-    mInteriorSrnModel->Initialise();
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->Initialise();
+    }
 }
 
 void SrnCellModel::SimulateToCurrentTime()
@@ -61,7 +77,10 @@ void SrnCellModel::SimulateToCurrentTime()
     {
         srnModel->SimulateToCurrentTime();
     }
-    mInteriorSrnModel->SimulateToCurrentTime();
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->SimulateToCurrentTime();
+    }
 }
 
 AbstractSrnModel* SrnCellModel::CreateSrnModel()
@@ -134,8 +153,14 @@ void SrnCellModel::SetCell(CellPtr pCell)
     {
         srnModel->SetCell(pCell);
     }
-    mInteriorSrnModel->SetCell(pCell);
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->SetCell(pCell);
+    }
 }
+
+
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"
