@@ -33,11 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "TrapEdgeVertexMeshWriter.hpp"
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
 
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::TrapEdgeVertexMeshWriter(const std::string &rDirectory,
+TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::TrapezoidEdgeVertexMeshWriter(const std::string &rDirectory,
                                                                            const std::string &rBaseName,
                                                                            const bool clearOutputDir)
         : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
@@ -52,14 +52,14 @@ TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::TrapEdgeVertexMeshWriter(const
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~TrapEdgeVertexMeshWriter()
+TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~TrapezoidEdgeVertexMeshWriter()
 {
 
 }
 
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh,
+void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh,
                                                                          std::string stamp)
 {
 #ifdef CHASTE_VTK
@@ -97,7 +97,7 @@ void TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexM
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh)
+void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh)
 {
 #ifdef CHASTE_VTK
     // Make the Vtk mesh
@@ -232,7 +232,7 @@ void TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<EL
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void
-TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
+TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
 {
 #ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
@@ -250,16 +250,16 @@ TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataNa
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void TrapEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
+void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
     //Blank as we're only using the class for VTK at the moment
 }
 
 ///////// Explicit instantiation///////
 
-template class TrapEdgeVertexMeshWriter<1,1>;
-template class TrapEdgeVertexMeshWriter<1,2>;
-template class TrapEdgeVertexMeshWriter<1,3>;
-template class TrapEdgeVertexMeshWriter<2,2>;
-template class TrapEdgeVertexMeshWriter<2,3>;
-template class TrapEdgeVertexMeshWriter<3,3>;
+template class TrapezoidEdgeVertexMeshWriter<1,1>;
+template class TrapezoidEdgeVertexMeshWriter<1,2>;
+template class TrapezoidEdgeVertexMeshWriter<1,3>;
+template class TrapezoidEdgeVertexMeshWriter<2,2>;
+template class TrapezoidEdgeVertexMeshWriter<2,3>;
+template class TrapezoidEdgeVertexMeshWriter<3,3>;

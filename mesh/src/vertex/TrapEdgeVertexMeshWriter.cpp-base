@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "TrapEdgeVertexMeshWriter.hpp"
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
 
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>

@@ -532,7 +532,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
 #ifdef CHASTE_VTK
 
     // Create mesh writer for VTK output
-    TrapEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
+    TrapezoidEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
     unsigned num_edges = 0;
     //here elements are synonymous with cells
     const unsigned n_cells = this->GetNumElements();

@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef TRAPEDGEVERTEXMESHWRITER_HPP_
-#define TRAPEDGEVERTEXMESHWRITER_HPP_
+#ifndef TRAPEZOIDEDGEVERTEXMESHWRITER_HPP_
+#define TRAPEZOIDEDGEVERTEXMESHWRITER_HPP_
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -80,7 +80,7 @@ struct MeshWriterIterators;
  *   \ __ /         \ __ /
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class TrapEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
+class TrapezoidEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
 
 private:
 
@@ -106,7 +106,7 @@ public:
      * @param rBaseName reference to the base name for results files
      * @param clearOutputDir whether to clear the output directory prior to writing files
      */
-    TrapEdgeVertexMeshWriter(const std::string& rDirectory,
+    TrapezoidEdgeVertexMeshWriter(const std::string& rDirectory,
                              const std::string& rBaseName,
                              const bool clearOutputDir=true);
 
@@ -137,7 +137,7 @@ public:
     /**
      * Destructor.
      */
-    ~TrapEdgeVertexMeshWriter();
+    ~TrapezoidEdgeVertexMeshWriter();
 
     void WriteFiles() override;
 
@@ -145,4 +145,4 @@ public:
 };
 
 
-#endif /*TRAPEDGEVERTEXMESHWRITER_HPP_*/
+#endif /*TRAPEZOIDEDGEVERTEXMESHWRITER_HPP_*/
