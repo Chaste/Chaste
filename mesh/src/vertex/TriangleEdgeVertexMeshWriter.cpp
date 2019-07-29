@@ -33,11 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellEdgeVertexMeshWriter.hpp"
+#include "TriangleEdgeVertexMeshWriter.hpp"
 
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::CellEdgeVertexMeshWriter(const std::string &rDirectory,
+TriangleEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::TriangleEdgeVertexMeshWriter(const std::string &rDirectory,
                                                                            const std::string &rBaseName,
                                                                            const bool clearOutputDir)
         : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
@@ -52,14 +52,14 @@ CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::CellEdgeVertexMeshWriter(const
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~CellEdgeVertexMeshWriter()
+TriangleEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~TriangleEdgeVertexMeshWriter()
 {
 
 }
 
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh,
+void TriangleEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh,
                                                                          std::string stamp)
 {
 #ifdef CHASTE_VTK
@@ -97,7 +97,7 @@ void CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexM
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh)
+void TriangleEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh)
 {
 #ifdef CHASTE_VTK
     // Make the Vtk mesh
@@ -173,7 +173,7 @@ void CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<EL
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void
-CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
+TriangleEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
 {
 #ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
@@ -191,16 +191,16 @@ CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataNa
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void CellEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
+void TriangleEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
     //Blank as we're only using the class for VTK at the moment
 }
 
 ///////// Explicit instantiation///////
 
-template class CellEdgeVertexMeshWriter<1,1>;
-template class CellEdgeVertexMeshWriter<1,2>;
-template class CellEdgeVertexMeshWriter<1,3>;
-template class CellEdgeVertexMeshWriter<2,2>;
-template class CellEdgeVertexMeshWriter<2,3>;
-template class CellEdgeVertexMeshWriter<3,3>;
+template class TriangleEdgeVertexMeshWriter<1,1>;
+template class TriangleEdgeVertexMeshWriter<1,2>;
+template class TriangleEdgeVertexMeshWriter<1,3>;
+template class TriangleEdgeVertexMeshWriter<2,2>;
+template class TriangleEdgeVertexMeshWriter<2,3>;
+template class TriangleEdgeVertexMeshWriter<3,3>;

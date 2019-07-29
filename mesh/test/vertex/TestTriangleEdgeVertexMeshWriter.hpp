@@ -2,8 +2,8 @@
 // Created by twin on 15/07/19.
 //
 
-#ifndef TESTCELLEDGEVERTEXMESHWRITER_HPP_
-#define TESTCELLEDGEVERTEXMESHWRITER_HPP_
+#ifndef TESTTRIANGLEEDGEVERTEXMESHWRITER_HPP_
+#define TESTTRIANGLEEDGEVERTEXMESHWRITER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -12,7 +12,7 @@
 
 #include "MutableMesh.hpp"
 #include "MutableVertexMesh.hpp"
-#include "CellEdgeVertexMeshWriter.hpp"
+#include "TriangleEdgeVertexMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "VertexMeshReader.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
@@ -27,7 +27,7 @@
 #include <vtkVersion.h>
 #endif
 
-class TestCellEdgeVertexMeshWriter : public CxxTest::TestSuite
+class TestTriangleEdgeVertexMeshWriter : public CxxTest::TestSuite
 {
 public:
 
@@ -38,7 +38,7 @@ public:
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then write to file */
-        CellEdgeVertexMeshWriter<2, 2> mesh_writer("", "results", false);
+        TriangleEdgeVertexMeshWriter<2, 2> mesh_writer("", "results", false);
         mesh_writer.WriteVtkUsingMesh(*p_mesh, "0");
 
         FileFinder vtk_file("results_0.vtu", RelativeTo::ChasteTestOutput);
@@ -48,4 +48,4 @@ public:
 
 };
 
-#endif /* TESTCELLEDGEVERTEXMESHWRITER_HPP_ */
+#endif /* TESTTRIANGLEEDGEVERTEXMESHWRITER_HPP_ */

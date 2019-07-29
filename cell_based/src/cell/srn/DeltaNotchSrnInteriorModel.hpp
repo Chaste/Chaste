@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DELTANOTCHSRNMODEL_HPP_
-#define DELTANOTCHSRNMODEL_HPP_
+#ifndef DELTANOTCHSRNINTERIORMODEL_HPP_
+#define DELTANOTCHSRNINTERIORMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * \todo #2752 document this class more thoroughly here
  */
-class DeltaNotchSrnModel : public AbstractOdeSrnModel
+class DeltaNotchSrnInteriorModel : public AbstractOdeSrnModel
 {
 private:
 
@@ -78,7 +78,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchSrnModel(const DeltaNotchSrnModel& rModel);
+    DeltaNotchSrnInteriorModel(const DeltaNotchSrnInteriorModel& rModel);
 
 public:
 
@@ -87,7 +87,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    DeltaNotchSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchSrnInteriorModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Overridden builder method to create new copies of
@@ -133,12 +133,12 @@ public:
     double GetDelta();
 
     /**
-     * @return the current level of mean Delta in the neighbouring cells.
+     * @return the current total level of Delta in the edges.
      *
      * N.B. This doesn't calculate anything, it just returns the parameter
      * from the DeltaNotchOdeSystem.
      */
-    double GetMeanNeighbouringDelta();
+    double GetTotalEdgeDelta();
 
     /**
      * Output SRN model parameters to file.
@@ -150,8 +150,9 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchSrnModel)
+CHASTE_CLASS_EXPORT(DeltaNotchSrnInteriorModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnInteriorModel)
 
-#endif /* DELTANOTCHSRNMODEL_HPP_ */
+
+#endif /* DELTANOTCHSRNINTERIORMODEL_HPP_ */

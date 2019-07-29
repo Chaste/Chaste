@@ -111,7 +111,7 @@ protected:
     /**
      * Indicates if edge model has been introduced. False by default.
      */
-    bool mIsEdgeBasedModel = false;
+    bool mIsEdgeBasedModel;
     /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.

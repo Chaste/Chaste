@@ -33,21 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DELTANOTCHTRACKINGMODIFIER_HPP_
-#define DELTANOTCHTRACKINGMODIFIER_HPP_
+#ifndef DELTANOTCHEDGEINTERIORTRACKINGMODIFIER_HPP_
+#define DELTANOTCHEDGEINTERIORTRACKINGMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
-
 /**
  * A modifier class in which the mean levels of Delta in neighbouring cells
  * are computed and stored in CellData. To be used in conjunction with Delta
  * Notch cell cycle models.
  */
 template<unsigned DIM>
-class DeltaNotchTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class DeltaNotchEdgeInteriorTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -69,12 +68,12 @@ public:
     /**
      * Default constructor.
      */
-    DeltaNotchTrackingModifier();
+    DeltaNotchEdgeInteriorTrackingModifier();
 
     /**
      * Destructor.
      */
-    virtual ~DeltaNotchTrackingModifier();
+    virtual ~DeltaNotchEdgeInteriorTrackingModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -113,9 +112,11 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
+
+
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchTrackingModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchEdgeInteriorTrackingModifier)
 
-#endif /*DELTANOTCHTRACKINGMODIFIER_HPP_*/
+#endif /*DELTANOTCHEDGEINTERIORTRACKINGMODIFIER_HPP_*/

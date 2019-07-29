@@ -69,7 +69,7 @@ struct MeshWriterIterators;
  * is a triangle composed of its two node on the edges and a centre location.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
+class TriangleEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
 
 private:
 
@@ -95,7 +95,7 @@ public:
      * @param rBaseName reference to the base name for results files
      * @param clearOutputDir whether to clear the output directory prior to writing files
      */
-    CellEdgeVertexMeshWriter(const std::string& rDirectory,
+    TriangleEdgeVertexMeshWriter(const std::string& rDirectory,
                      const std::string& rBaseName,
                      const bool clearOutputDir=true);
 
@@ -126,7 +126,7 @@ public:
     /**
      * Destructor.
      */
-    ~CellEdgeVertexMeshWriter();
+    ~TriangleEdgeVertexMeshWriter();
 
     void WriteFiles() override;
 
