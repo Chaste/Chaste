@@ -1568,6 +1568,9 @@ public:
                 p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
             }
 
+            MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_interior_model);
+            p_cell_edge_srn_model->SetInteriorSrnModel(p_srn_interior_model);
+
             cells[elem_index]->SetSrnModel(p_cell_edge_srn_model);
             cells[elem_index]->InitialiseSrnModel();
         }
@@ -1596,14 +1599,14 @@ public:
         FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file.Exists());
 
-        // Check that we have 144 cells (6*4*6(edges) = 144)
+        // Check that we have 144 (6*4*6) edges and 68 cells
         ifstream vtk_file_stream;
         vtk_file_stream.open (vtk_file.GetAbsolutePath());
         std::stringstream vtk_file_string_buffer;
         vtk_file_string_buffer << vtk_file_stream.rdbuf();
         vtk_file_stream.close();
         auto fileChar = vtk_file_string_buffer.str();
-        TS_ASSERT(std::regex_search(fileChar, std::regex("NumberOfCells=\"144\"")));
+        TS_ASSERT(std::regex_search(fileChar, std::regex("NumberOfCells=\"168\"")));
 
 
         // Final file

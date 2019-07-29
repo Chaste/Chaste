@@ -109,6 +109,10 @@ protected:
     unsigned mEdgeLocalIndex;
 
     /**
+     * Indicates if edge model has been introduced. False by default.
+     */
+    bool mIsEdgeBasedModel = false;
+    /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
@@ -254,6 +258,17 @@ public:
      * @return
      */
     unsigned GetEdgeLocalIndex();
+
+    /**
+     * Indicates whether this SRN is part of the model with edge SRNs
+     * @return true if edge SRN has been introduced into the model
+     */
+    bool HasEdgeModel() const;
+
+    /*
+     * Sets this model to be part of an edge based SRN
+     */
+    void SetEdgeModelIndicator(const bool indicator);
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

@@ -49,6 +49,7 @@ typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
  * SRN model at the cell level, has representation for edges internally.
+ * Also contains cell interior (cytoplasmic) SRN
  */
 class SrnCellModel : public AbstractSrnModel
 {
@@ -75,8 +76,13 @@ private:
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
     using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
+    boost::shared_ptr<AbstractSrnModel> mInteriorSrnModel;
 protected:
 
+    /**
+     * Copy constructor
+     * @param rModel
+     */
     SrnCellModel(const SrnCellModel &rModel);
 
 public:
@@ -94,14 +100,13 @@ public:
     /**
      * Default constuctor.
      */
-    SrnCellModel()
-    {}
+    SrnCellModel();
 
     /**
-     * Destuctor.
+     * Destructor.
      */
-    ~SrnCellModel()
-    {}
+    ~SrnCellModel();
+
 
     virtual void Initialise() override;
 
@@ -122,6 +127,10 @@ public:
     AbstractSrnModelPtr GetEdgeSrn(unsigned index);
 
     const std::vector<AbstractSrnModelPtr>& GetEdges();
+
+    void SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn);
+
+    AbstractSrnModelPtr GetInteriorSrn();
 
     virtual void SetCell(CellPtr pCell) override;
 };

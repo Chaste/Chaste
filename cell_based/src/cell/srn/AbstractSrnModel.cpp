@@ -130,3 +130,13 @@ unsigned AbstractSrnModel::GetEdgeLocalIndex()
 {
     return this->mEdgeLocalIndex;
 }
+
+bool AbstractSrnModel::HasEdgeModel() const
+{
+    return this->mIsEdgeBasedModel;
+}
+
+void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
+{
+    this->mIsEdgeBasedModel = indicator;
+}

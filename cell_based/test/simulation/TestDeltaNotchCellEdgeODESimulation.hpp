@@ -104,7 +104,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SrnCellModel.hpp"
 #include "DeltaNotchCellEdgeTrackingModifier.hpp"
 
-
+#include "DeltaNotchSrnModel.hpp"
+#include "DeltaNotchTrackingModifier.hpp"
 
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
@@ -128,9 +129,8 @@ public:
 
         /* We include the next line because Vertex simulations cannot be run in parallel */
         EXIT_IF_PARALLEL;
-
         /* First we create a regular vertex mesh. */
-        HoneycombVertexMeshGenerator generator(2, 1);
+        HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
@@ -155,7 +155,7 @@ public:
 
             auto p_cell_edge_srn_model = new SrnCellModel();
 
-            /* We choose to initialise the concentrations to random levels */
+            /* We choose to initialise the total concentrations to random levels */
             auto delta_concentration = RandomNumberGenerator::Instance()->ranf();
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
@@ -180,6 +180,10 @@ public:
                 p_srn_model->SetInitialConditions(initial_conditions);
                 p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
             }
+            MAKE_PTR(DeltaNotchSrnModel, p_cell_srn_model);
+            std::vector<double> zero_conditions(2);
+            p_cell_srn_model->SetInitialConditions(zero_conditions);
+            p_cell_edge_srn_model->SetInteriorSrnModel(p_cell_srn_model);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -205,12 +209,14 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchCellEdgeODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10.0);
+        simulator.SetEndTime(1.0);
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within
          * the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_cell_modifier);
+        simulator.AddSimulationModifier(p_cell_modifier);
 
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -219,7 +225,14 @@ public:
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
-        simulator.Solve();
+        try
+        {
+            simulator.Solve();
+        }
+        catch(const std::exception& exc)
+        {
+            std::cerr<<exc.what()<<std::endl;
+        }
     }
 
 

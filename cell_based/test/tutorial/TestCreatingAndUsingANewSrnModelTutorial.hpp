@@ -352,7 +352,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3.0, 4);
 
-            /* Create a cell with associated SRN and cell-cycle model. */
+            /* Create a cell with associated srn and cell-cycle model. */
             UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();
             AbstractSrnModel* p_srn_model = new MySrnModel;
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model, p_srn_model));

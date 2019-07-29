@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "DeltaNotchOdeSystem.hpp"
+#include "DeltaNotchEdgeOdeSystem.hpp"
 #include "AbstractOdeSrnModel.hpp"
 
 /**
@@ -117,7 +117,7 @@ public:
      *
      * N.B. Despite the name, this doesn't update the levels of delta or notch, or compute mean levels.
      * It just copies the current mean delta from the CellData
-     * (set by DeltaNotchTrackingModifier) to the DeltaNotchOdeSystem.
+     * (set by DeltaNotchTrackingModifier) to the DeltaNotchEdgeOdeSystem.
      *
      * \todo #2752 Improve the name of this method!
      */
@@ -146,13 +146,17 @@ public:
     void SetDelta(double value);
 
     /**
-     * @return the current level of mean Delta in the neighbouring cells.
+     * @return the current level of Delta in the neighbouring cell's edge.
      *
      * N.B. This doesn't calculate anything, it just returns the parameter
-     * from the DeltaNotchOdeSystem.
+     * from the DeltaNotchEdgeOdeSystem.
      */
-    double GetMeanNeighbouringDelta();
+    double GetNeighbouringDelta() const;
 
+    /**
+     * @return the level of delta in cell interior
+     */
+    double GetInteriorDelta() const;
     /**
      * Output SRN model parameters to file.
      *

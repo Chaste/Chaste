@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DeltaNotchOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
+#include "DeltaNotchEdgeOdeSystem.hpp"
 
-DeltaNotchOdeSystem::DeltaNotchOdeSystem(std::vector<double> stateVariables)
+DeltaNotchEdgeOdeSystem::DeltaNotchEdgeOdeSystem(std::vector<double> stateVariables)
     : AbstractOdeSystem(2)
 {
-    mpSystemInfo.reset(new CellwiseOdeSystemInformation<DeltaNotchOdeSystem>);
+    mpSystemInfo.reset(new CellwiseOdeSystemInformation<DeltaNotchEdgeOdeSystem>);
 
     /**
      * The state variables are as follows:
@@ -55,30 +55,30 @@ DeltaNotchOdeSystem::DeltaNotchOdeSystem(std::vector<double> stateVariables)
     SetDefaultInitialCondition(1, 1.0); // soon overwritten
 
     this->mParameters.push_back(0.5);
-
+    this->mParameters.push_back(0.5);
     if (stateVariables != std::vector<double>())
     {
         SetStateVariables(stateVariables);
     }
 }
 
-DeltaNotchOdeSystem::~DeltaNotchOdeSystem()
+DeltaNotchEdgeOdeSystem::~DeltaNotchEdgeOdeSystem()
 {
 }
 
-void DeltaNotchOdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+void DeltaNotchEdgeOdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
 {
     double notch = rY[0];
     double delta = rY[1];
-    double mean_delta = this->mParameters[0]; // Shorthand for "this->mParameter("Mean Delta");"
+    double neigh_delta = this->mParameters[0]; // Shorthand for "this->mParameter("Mean Delta");"
 
     // The next two lines define the ODE system by Collier et al. (1996)
-    rDY[0] = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;  // d[Notch]/dt
+    rDY[0] = neigh_delta*neigh_delta/(0.01 + neigh_delta*neigh_delta) - notch;  // d[Notch]/dt
     rDY[1] = 1.0/(1.0 + 100.0*notch*notch) - delta;                   // d[Delta]/dt
 }
 
 template<>
-void CellwiseOdeSystemInformation<DeltaNotchOdeSystem>::Initialise()
+void CellwiseOdeSystemInformation<DeltaNotchEdgeOdeSystem>::Initialise()
 {
     this->mVariableNames.push_back("Notch");
     this->mVariableUnits.push_back("non-dim");
@@ -88,9 +88,9 @@ void CellwiseOdeSystemInformation<DeltaNotchOdeSystem>::Initialise()
     this->mVariableUnits.push_back("non-dim");
     this->mInitialConditions.push_back(0.0); // will be filled in later
 
-    // If this is ever not the first parameter change the line
-    // double mean_delta = this->mParameters[0]; in EvaluateYDerivatives().
-    this->mParameterNames.push_back("Mean Delta");
+    this->mParameterNames.push_back("neighbour delta");
+    this->mParameterUnits.push_back("non-dim");
+    this->mParameterNames.push_back("interior delta");
     this->mParameterUnits.push_back("non-dim");
 
     this->mInitialised = true;
@@ -98,4 +98,4 @@ void CellwiseOdeSystemInformation<DeltaNotchOdeSystem>::Initialise()
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchOdeSystem)
+CHASTE_CLASS_EXPORT(DeltaNotchEdgeOdeSystem)

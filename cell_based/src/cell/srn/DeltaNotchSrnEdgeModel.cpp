@@ -72,7 +72,7 @@ DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rMo
      */
 
     assert(rModel.GetOdeSystem());
-    SetOdeSystem(new DeltaNotchOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
+    SetOdeSystem(new DeltaNotchEdgeOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
 }
 
 AbstractSrnModel* DeltaNotchSrnEdgeModel::CreateSrnModel()
@@ -84,14 +84,13 @@ void DeltaNotchSrnEdgeModel::SimulateToCurrentTime()
 {
     // Custom behaviour
     UpdateDeltaNotch();
-
     // Run the ODE simulation as needed
     AbstractOdeSrnModel::SimulateToCurrentTime();
 }
 
 void DeltaNotchSrnEdgeModel::Initialise()
 {
-    AbstractOdeSrnModel::Initialise(new DeltaNotchOdeSystem);
+    AbstractOdeSrnModel::Initialise(new DeltaNotchEdgeOdeSystem);
 }
 
 void DeltaNotchSrnEdgeModel::UpdateDeltaNotch()
@@ -99,8 +98,12 @@ void DeltaNotchSrnEdgeModel::UpdateDeltaNotch()
     assert(mpOdeSystem != nullptr);
     assert(mpCell != nullptr);
 
-    double mean_delta = mpCell->GetCellEdgeData()->GetItem("mean delta")[this->GetEdgeLocalIndex()];
-    mpOdeSystem->SetParameter("Mean Delta", mean_delta);
+    double neigh_delta = mpCell->GetCellEdgeData()->GetItem("neighbour delta")[this->GetEdgeLocalIndex()];
+    mpOdeSystem->SetParameter("neighbour delta", neigh_delta);
+    double interior_delta = 0;
+    interior_delta = mpCell->GetCellData()->GetItem("interior delta");
+    mpOdeSystem->SetParameter("interior delta", interior_delta);
+
 }
 
 double DeltaNotchSrnEdgeModel::GetNotch()
@@ -129,11 +132,16 @@ void DeltaNotchSrnEdgeModel::SetDelta(double value)
     mpOdeSystem->rGetStateVariables()[1] = value;
 }
 
-double DeltaNotchSrnEdgeModel::GetMeanNeighbouringDelta()
+double DeltaNotchSrnEdgeModel::GetNeighbouringDelta() const
 {
     assert(mpOdeSystem != nullptr);
-    double mean_neighbouring_delta = mpOdeSystem->GetParameter("Mean Delta");
-    return mean_neighbouring_delta;
+    return mpOdeSystem->GetParameter("neighbour delta");
+}
+
+double DeltaNotchSrnEdgeModel::GetInteriorDelta() const
+{
+    assert(mpOdeSystem != nullptr);
+    return mpOdeSystem->GetParameter("interior delta");
 }
 
 void DeltaNotchSrnEdgeModel::OutputSrnModelParameters(out_stream& rParamsFile)

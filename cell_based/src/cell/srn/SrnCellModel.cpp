@@ -36,13 +36,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SrnCellModel.hpp"
 
 SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
-    : AbstractSrnModel(rModel)
+    : AbstractSrnModel(rModel), mInteriorSrnModel(nullptr)
 {
     // Make a copy of all SRN models inside the system
     for (auto srnModel: rModel.mEdgeSrnModels)
     {
         this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
     }
+    this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
+}
+
+
+SrnCellModel::SrnCellModel()
+{
+    mInteriorSrnModel = nullptr;
+
+}
+
+SrnCellModel::~SrnCellModel()
+{
+
 }
 
 void SrnCellModel::Initialise()
@@ -51,6 +64,11 @@ void SrnCellModel::Initialise()
     {
         edgeModel->Initialise();
     }
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->Initialise();
+    }
 }
 
 void SrnCellModel::SimulateToCurrentTime()
@@ -58,6 +76,10 @@ void SrnCellModel::SimulateToCurrentTime()
     for (auto srnModel : mEdgeSrnModels)
     {
         srnModel->SimulateToCurrentTime();
+    }
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->SimulateToCurrentTime();
     }
 }
 
@@ -68,17 +90,24 @@ AbstractSrnModel* SrnCellModel::CreateSrnModel()
 
 void SrnCellModel::AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    for (unsigned int i=0; i<edgeSrn.size(); ++i)
+        edgeSrn[i]->SetEdgeModelIndicator(true);
     mEdgeSrnModels = edgeSrn;
 }
 
 void SrnCellModel::AddEdgeSrn(AbstractSrnModelPtr edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    edgeSrn->SetEdgeModelIndicator(true);
     edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
     mEdgeSrnModels.push_back(edgeSrn);
 }
 
 void SrnCellModel::InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    edgeSrn->SetEdgeModelIndicator(true);
     mEdgeSrnModels.insert(mEdgeSrnModels.begin() + index, edgeSrn);
 }
 
@@ -105,6 +134,16 @@ const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges()
     return mEdgeSrnModels;
 }
 
+void SrnCellModel::SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn)
+{
+    mInteriorSrnModel = interiorSrn;
+}
+
+AbstractSrnModelPtr SrnCellModel::GetInteriorSrn()
+{
+    return mInteriorSrnModel;
+}
+
 void SrnCellModel::SetCell(CellPtr pCell)
 {
     AbstractSrnModel::SetCell(pCell);
@@ -114,7 +153,14 @@ void SrnCellModel::SetCell(CellPtr pCell)
     {
         srnModel->SetCell(pCell);
     }
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->SetCell(pCell);
+    }
 }
+
+
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"

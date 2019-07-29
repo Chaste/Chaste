@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
-#include "CellEdgeVertexMeshWriter.hpp"
+#include "TrapEdgeVertexMeshWriter.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>

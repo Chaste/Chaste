@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchCellEdgeTrackingModifier.hpp"
 #include "SrnCellModel.hpp"
-#include "DeltaNotchSrnEdgeModel.hpp"
+#include "DeltaNotchSrnModel.hpp"
 
 template<unsigned DIM>
 DeltaNotchCellEdgeTrackingModifier<DIM>::DeltaNotchCellEdgeTrackingModifier()
@@ -76,78 +76,58 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
     // Handles all edge changes
     this->UpdateCellEdges(rCellPopulation);
 
-    // First recover each cell's Notch and Delta concentrations from the ODEs and store in CellData
+    // Recovers each cell's edge levels of notch and delta, and those of its neighbor's
+    // Then saves them
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
         auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
 
+        //This cell's edge data
         std::vector<double> notch_vec;
         std::vector<double> delta_vec;
-
         for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
         {
-            boost::shared_ptr<DeltaNotchSrnEdgeModel> p_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_model->GetEdgeSrn(i));
+            boost::shared_ptr<DeltaNotchSrnEdgeModel> p_model
+            = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_model->GetEdgeSrn(i));
             double this_delta = p_model->GetDelta();
             double this_notch = p_model->GetNotch();
-
             delta_vec.push_back(this_delta);
             notch_vec.push_back(this_notch);
         }
-
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
-        cell_iter->GetCellEdgeData()->SetItem("notch", notch_vec);
-        cell_iter->GetCellEdgeData()->SetItem("delta", delta_vec);
+        cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
+        cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
     }
 
-    // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
+    //After the edge data is filled, fill the edge neighbour data
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+            cell_iter != rCellPopulation.End();
+            ++cell_iter)
     {
         auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
-        std::vector<double> delta_vec = cell_iter->GetCellEdgeData()->GetItem("delta");
-        std::vector<double> mean_delta_vec(p_cell_edge_model->GetNumEdgeSrn());
+        const unsigned int n_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
+        std::vector<double> neigh_mean_delta(n_cell_edges);
 
-        // Iterate through each Edge SRN
-        for (unsigned i = 0; i < p_cell_edge_model->GetNumEdgeSrn(); i++)
+        for (unsigned int i=0; i<n_cell_edges; ++i)
         {
-            double mean_delta = 0.0;
-            double delta_counter = 0;
-
-            // Edge neighbour outside of cell
+            //Get neighbouring cell's values of delta on this
             auto elemNeighbours = rCellPopulation.GetNeighbouringEdgeIndices(*cell_iter, i);
+            double mean_delta = 0;
             for (auto neighbourIndex: elemNeighbours)
             {
                 auto neighbourCell = rCellPopulation.GetCellUsingLocationIndex(neighbourIndex.first);
-
-                std::vector<double> neighbour_delta_vec = neighbourCell->GetCellEdgeData()->GetItem("delta");
-
+                std::vector<double> neighbour_delta_vec = neighbourCell->GetCellEdgeData()->GetItem("edge delta");
                 mean_delta += neighbour_delta_vec[neighbourIndex.second];
-                delta_counter++;
             }
-
-            // Edge neighbour inside of cell
-            // In this case we're only looking at immediate neighbour to the current edge
-            auto prevNeighbour = ((int)i -1);
-            if (prevNeighbour < 0)
-            {
-                prevNeighbour = p_cell_edge_model->GetNumEdgeSrn() - 1;
-            }
-            auto nextNeighbour = (i +1) % p_cell_edge_model->GetNumEdgeSrn();
-            delta_counter += 2;
-            mean_delta += delta_vec[prevNeighbour];
-            mean_delta += delta_vec[nextNeighbour];
-
-            mean_delta = mean_delta/delta_counter;
-
-            // Store the delta
-            mean_delta_vec[i] = mean_delta;
+            if (elemNeighbours.size()>0)
+                mean_delta = mean_delta/elemNeighbours.size();
+            neigh_mean_delta[i] = mean_delta;
         }
-
-        cell_iter->GetCellEdgeData()->SetItem("mean delta", mean_delta_vec);
+        cell_iter->GetCellEdgeData()->SetItem("neighbour delta", neigh_mean_delta);
     }
+
 }
 
 template<unsigned DIM>
