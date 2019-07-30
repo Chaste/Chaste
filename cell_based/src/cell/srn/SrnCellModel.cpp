@@ -43,7 +43,8 @@ SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     {
         this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
     }
-    this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
+    if (rModel.mInteriorSrnModel!=nullptr)
+        this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
 }
 
 
