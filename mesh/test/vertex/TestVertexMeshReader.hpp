@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,7 @@ public:
     /**
      * Check that input files are opened correctly.
      */
-    void TestFilesOpen() throw(Exception)
+    void TestFilesOpen()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
     }
@@ -64,7 +64,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing nodes) then an exception is thrown.
      */
-    void TestNodesDataRead() throw(Exception)
+    void TestNodesDataRead()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
@@ -84,7 +84,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing elements) then an exception is thrown.
      */
-    void TestElementsDataRead() throw(Exception)
+    void TestElementsDataRead()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
@@ -132,7 +132,7 @@ public:
      * number is only stored as the index of the vector in which the coordinates
      * are stored.)
      */
-    void TestPermutedNodesFail() throw(Exception)
+    void TestPermutedNodesFail()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/baddata/vertex_mesh_permuted_nodes");
         TS_ASSERT_THROWS_THIS(for(unsigned i=0;i<mesh_reader.GetNumNodes();i++){mesh_reader.GetNextNode();}, "Data for node 3 missing")
@@ -144,7 +144,7 @@ public:
      * values, checks that no errors are thrown for the remaining nodes and
      * that an error is thrown if we try to call the function too many times.
      */
-    void TestGetNextNode() throw(Exception)
+    void TestGetNextNode()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
@@ -174,7 +174,7 @@ public:
      * all of the elements and that an error is thrown if we try to call the
      * function too many times.
      */
-    void TestGetNextElementData() throw(Exception)
+    void TestGetNextElementData()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
@@ -193,7 +193,7 @@ public:
      * all of the elements and that an error is thrown if we try to call the
      * function too many times.
      */
-    void TestGetNextElementDataWithFaces() throw(Exception)
+    void TestGetNextElementDataWithFaces()
     {
         // First test the case where there aren't actually any faces
         VertexMeshReader<3,3> mesh_reader1("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d");
@@ -262,7 +262,7 @@ public:
         TS_ASSERT_THROWS_THIS(mesh_reader3.GetNextElementDataWithFaces(), "Data for element 0 missing");
     }
 
-    void TestReadingWithNoElementAttributes() throw(Exception)
+    void TestReadingWithNoElementAttributes()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_no_element_attributes");
 
@@ -273,7 +273,7 @@ public:
         TS_ASSERT_EQUALS(next_element_info.AttributeValue, 0u);
     }
 
-    void TestReadingElementAttributes() throw(Exception)
+    void TestReadingElementAttributes()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
 
@@ -309,7 +309,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 0u);
     }
 
-    void TestOtherExceptions() throw(Exception)
+    void TestOtherExceptions()
     {
         TS_ASSERT_THROWS_THIS(READER_2D mesh_reader("mesh/test/data/nonexistent_file"),
                 "Could not open data file: mesh/test/data/nonexistent_file.node");

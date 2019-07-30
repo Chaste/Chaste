@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -251,26 +251,8 @@ void VertexMeshWriter<2, 2>::WriteVtkUsingMesh(VertexMesh<2, 2>& rMesh, std::str
 {
 #ifdef CHASTE_VTK
     // Create VTK mesh
-    if (dynamic_cast<Toroidal2dVertexMesh*>(&rMesh))
-    {
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Toroidal2dVertexMesh*>(&rMesh)->GetMeshForVtk();
-        MakeVtkMesh(*p_mesh_for_vtk);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
-    }
-    else if (dynamic_cast<Cylindrical2dVertexMesh*>(&rMesh))
-    {
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = static_cast<Cylindrical2dVertexMesh*>(&rMesh)->GetMeshForVtk();
-        MakeVtkMesh(*p_mesh_for_vtk);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
-    }
-    else
-    {
-        MakeVtkMesh(rMesh);
-    }
+    VertexMesh<2, 2>* p_mesh_for_vtk = rMesh.GetMeshForVtk();
+    MakeVtkMesh(*p_mesh_for_vtk);
 
     // Now write VTK mesh to file
     assert(mpVtkUnstructedMesh->CheckAttributes() == 0);

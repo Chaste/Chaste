@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestXmlMeshWriters : public CxxTest::TestSuite
 {
 public:
-    void TestBasicVtkMeshWriter() throw(Exception)
+    void TestBasicVtkMeshWriter()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -94,7 +94,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestSequentialMeshCannotWriteParallelFiles() throw(Exception)
+    void TestSequentialMeshCannotWriteParallelFiles()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -112,7 +112,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestParallelVtkMeshWriter() throw(Exception)
+    void TestParallelVtkMeshWriter()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -242,7 +242,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestParallelVtkMeshWriter2d() throw(Exception)
+    void TestParallelVtkMeshWriter2d()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -307,7 +307,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriter2D() throw(Exception)
+    void TestVtkMeshWriter2D()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -359,7 +359,9 @@ public:
             mesh.GetElement(i)->CalculateJacobian(element_jacobian, element_jacobian_determinant);
             jacobian.push_back(element_jacobian);
 
-            c_matrix<double, 2, 2> squared_element_jacobian = prod(element_jacobian, element_jacobian);
+            c_matrix<double, 2, 2> squared_element_jacobian;
+            squared_element_jacobian = prod(element_jacobian, element_jacobian);
+
             c_vector<double, 3> tri_squared_element_jacobian;
             //We store [T00 T01 T02 T11 T12 T22]
             tri_squared_element_jacobian(0) = squared_element_jacobian(0, 0);
@@ -430,7 +432,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestParallelVtkMeshWriter1d() throw(Exception)
+    void TestParallelVtkMeshWriter1d()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -494,7 +496,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriter1D() throw(Exception)
+    void TestVtkMeshWriter1D()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -525,7 +527,7 @@ public:
     }
 
 
-    void TestVtkMeshWriterWithData() throw(Exception)
+    void TestVtkMeshWriterWithData()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -637,7 +639,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriterForCables() throw(Exception)
+    void TestVtkMeshWriterForCables()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -678,7 +680,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestVtkMeshWriterForQuadraticMesh2D() throw(Exception)
+    void TestVtkMeshWriterForQuadraticMesh2D()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -767,7 +769,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestBasicQuadraticVtkMeshWriter() throw(Exception)
+    void TestBasicQuadraticVtkMeshWriter()
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
@@ -798,7 +800,7 @@ public:
     }
 
     //Test that the vtk mesh writer can output a 1D mesh embedded in 3D space
-    void TestVtkMeshWriter1Din3D() throw(Exception)
+    void TestVtkMeshWriter1Din3D()
     {
 #ifdef CHASTE_VTK
         TrianglesMeshReader<1,3> reader("mesh/test/data/branched_1d_in_3d_mesh");
@@ -827,7 +829,7 @@ public:
     }
 
     //Test that the vtk mesh writer can output a 2D mesh embedded in 3D space
-    void TestVtkMeshWriterWithSurfaceMesh() throw(Exception)
+    void TestVtkMeshWriterWithSurfaceMesh()
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");

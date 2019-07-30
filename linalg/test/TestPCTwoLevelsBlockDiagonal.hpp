@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,7 @@ class TestPCTwoLevelsBlockDiagonal : public CxxTest::TestSuite
 {
 public:
 
-    void TestBasicFunctionality() throw (Exception)
+    void TestBasicFunctionality()
     {
         EXIT_IF_PARALLEL;
 

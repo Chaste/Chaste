@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -150,7 +150,7 @@ public:
      * It is then possible to determine the body force and surface tractions required for
      * this deformation, and they are defined in the above class.
      */
-    void TestSolve3d() throw(Exception)
+    void TestSolve3d()
     {
         unsigned num_runs = 4;
         double l2_errors[4];
@@ -292,7 +292,7 @@ public:
      *  has a smaller area than the undeformed surface.
      *
      */
-    void TestWithPressureOnDeformedSurfaceBoundaryCondition3d() throw (Exception)
+    void TestWithPressureOnDeformedSurfaceBoundaryCondition3d()
     {
         double lambda = 0.85;
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -208,7 +208,7 @@ public:
      *
      * We now test that our new force is implemented correctly.
      */
-    void TestMyForce() throw(Exception)
+    void TestMyForce()
     {
         /* We first create a {{{MeshBasedCellPopulation}}} using the helper
          * classes {{{HoneycombMeshGenerator}}} and {{{CellsGenerator}}},
@@ -279,7 +279,7 @@ public:
      * We now provide a test demonstrating how {{{MyForce}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithMyForce() throw(Exception)
+    void TestOffLatticeSimulationWithMyForce()
     {
         /* Once again we create a {{{MeshBasedCellPopulation}}}. */
         HoneycombMeshGenerator generator(5, 5);

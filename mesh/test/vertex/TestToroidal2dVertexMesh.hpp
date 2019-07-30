@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ public:
         }
     }
 
-    void TestMeshGetWidth()
+    void TestMeshGetAndSetWidthAndHeight()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -89,12 +89,21 @@ public:
         // Test GetWidth() method
         double width = p_mesh->GetWidth(0);
         double height = p_mesh->GetWidth(1);
-
         TS_ASSERT_DELTA(width, 4.0, 1e-4);
         TS_ASSERT_DELTA(height, 6.0/sqrt(3.0), 1e-4);
+
+        // Test SetWidth() method
+        p_mesh->SetWidth(61.47);
+        width = p_mesh->GetWidth(0);
+        TS_ASSERT_DELTA(width, 61.47, 1e-4);
+
+        // Test SetHeight() method
+        p_mesh->SetHeight(123.89);
+        height = p_mesh->GetWidth(1);
+        TS_ASSERT_DELTA(height, 123.89, 1e-4);
     }
 
-    void TestGetVectorFromAtoB() throw (Exception)
+    void TestGetVectorFromAtoB()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -152,7 +161,7 @@ public:
         TS_ASSERT_DELTA(vector[1], 1/sqrt(3.0), 1e-4);
     }
 
-    void TestSetNodeLocationForToroidalMesh() throw (Exception)
+    void TestSetNodeLocationForToroidalMesh()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
@@ -195,7 +204,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[1], 6.0/sqrt(3.0) - 0.1, 1e-4);
     }
 
-    void TestAddNodeAndReMesh() throw (Exception)
+    void TestAddNodeAndReMesh()
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(6, 6);
@@ -443,7 +452,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetElement(18)->GetNodeGlobalIndex(4), 37u);
     }
 
-    void TestArchiving() throw (Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "toroidal_vertex_mesh_base.arch";
@@ -537,7 +546,7 @@ public:
         }
     }
 
-    void TestToroidalReMesh() throw (Exception)
+    void TestToroidalReMesh()
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -556,7 +565,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
     }
 
-    void TestToroidalReMeshAfterDelete() throw (Exception)
+    void TestToroidalReMeshAfterDelete()
     {
         // Create mesh
         unsigned num_cells_across = 6;
@@ -652,7 +661,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
 
         // Test GetMeshForVtk() method
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
@@ -703,9 +712,6 @@ public:
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 47u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 42u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
     }
 
     void TestConstructFromMeshReader()

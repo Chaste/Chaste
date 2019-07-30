@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -330,7 +330,7 @@ public:
         TS_ASSERT_EQUALS(v3[2], 3);
     }
 
-    void TestEigenVectorValueCalculation() throw(Exception)
+    void TestEigenVectorValueCalculation()
     {
         c_matrix<double, 3, 3> A;
         A(0,0) = 22.4;

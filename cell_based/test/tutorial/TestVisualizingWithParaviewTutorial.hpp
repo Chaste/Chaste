@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -114,7 +114,7 @@ public:
      * in which we use
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model.
      */
-    void Test2DMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
+    void Test2DMeshBasedMonolayerSimulationForVisualizing()
     {
         /* In a similar way to previous cell-based Chaste tutorials,
          * we create a mesh-based cell population in which cells are defined by their centres,
@@ -205,7 +205,7 @@ public:
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model. However here we impose periodic boundaries.
      * The only difference in this test is the generation of the mesh
      */
-    void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
+    void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing()
     {
         /*
          * We setup the simulation in the same way as above but
@@ -262,7 +262,7 @@ public:
     * We next run a similar simulation to the first two examples, but now use a `NodeBasedCellPopulation`,
     * in which cells are represented as 'overlapping spheres'.
     */
-    void Test2DNodeBasedMonolayerSimulationForVisualizing() throw (Exception)
+    void Test2DNodeBasedMonolayerSimulationForVisualizing()
     {
         /* We set up the simulation in much the same way as above, except now using a `NodesOnlyMesh` and
          * `NodeBasedCellPopulation`. Further details on how to set up a node-based simulation can be found in
@@ -319,7 +319,7 @@ public:
     * Here, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells using a mutable vertex mesh. Each cell is assigned a fixed cell-cycle model.
     */
-    void Test2DVertexBasedMonolayerSimulationForVisualizing() throw(Exception)
+    void Test2DVertexBasedMonolayerSimulationForVisualizing()
     {
         /* In this test, we create a vertex-based cell population in which cells are defined
          * by their vertices, and cell proliferation is governed by a fixed generation-based

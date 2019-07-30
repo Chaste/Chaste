@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,7 @@ public:
 class TestMonodomain3dExampleTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
         /* HOW_TO_TAG Cardiac/Problem definition
          * Generate a slab (cuboid) mesh rather than read a mesh in, and pass it to solver
@@ -161,8 +161,7 @@ public:
 
         /* `SetWriteInfo` is a useful method that means that the min/max voltage is
          * printed as the simulation runs (useful for verifying that cells are stimulated
-         * and the wave propagating, for example) (although note scons does buffer output
-         * before printing to screen) */
+         * and the wave propagating, for example) */
         monodomain_problem.SetWriteInfo();
 
         /* Finally, call `Initialise` and `Solve` as before */

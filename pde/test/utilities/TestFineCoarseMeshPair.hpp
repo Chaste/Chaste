@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ class TestFineCoarseMeshPair : public CxxTest::TestSuite
 public:
 
     // Simple test where the whole of the coarse mesh is in one fine element
-    void TestComputeFineElemsAndWeightsForQuadPointsSimple() throw(Exception)
+    void TestComputeFineElemsAndWeightsForQuadPointsSimple()
     {
         TetrahedralMesh<2,2> fine_mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
@@ -98,7 +98,7 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[1], 0u);
     }
 
-    void TestWithCoarseContainedInFine() throw(Exception)
+    void TestWithCoarseContainedInFine()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
         TetrahedralMesh<3,3> fine_mesh;
@@ -173,7 +173,7 @@ public:
         TS_ASSERT(mesh_pair.mpFineMeshBoxCollection==NULL);
     }
 
-    void TestWithCoarseSlightlyOutsideFine() throw(Exception)
+    void TestWithCoarseSlightlyOutsideFine()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
         TetrahedralMesh<3,3> fine_mesh;
@@ -239,7 +239,7 @@ public:
     }
 
 ////Bring back this functionality if needed
-//    void dontTestWithIdenticalMeshes() throw(Exception)
+//    void dontTestWithIdenticalMeshes()
 //    {
 //        TrianglesMeshReader<1,1> reader1("mesh/test/data/1D_0_to_1_10_elements");
 //        TetrahedralMesh<1,1> fine_mesh;
@@ -260,7 +260,7 @@ public:
 //        TS_ASSERT_THROWS_NOTHING(mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true));
 //    }
 
-    void TestWithDefaultBoxWidth() throw(Exception)
+    void TestWithDefaultBoxWidth()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0);
@@ -306,7 +306,7 @@ public:
      * that are too small), so we just test we get the same results as in
      * safe mode.
      */
-    void TestNonSafeMode() throw(Exception)
+    void TestNonSafeMode()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
         TetrahedralMesh<3,3> fine_mesh;
@@ -361,7 +361,7 @@ public:
     }
 
     // Covers some bits that aren't covered in the tests above,
-    void TestOtherCoverage() throw(Exception)
+    void TestOtherCoverage()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0);
@@ -400,7 +400,7 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 0u);
     }
 
-    void TestComputeCoarseElementsForFineNodes() throw(Exception)
+    void TestComputeCoarseElementsForFineNodes()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.2, 1.0, 1.0);
@@ -476,7 +476,7 @@ public:
         mesh_pair.DeleteCoarseBoxCollection();
     }
 
-    void TestComputeCoarseElementsForFineElementCentroids() throw(Exception)
+    void TestComputeCoarseElementsForFineElementCentroids()
     {
         TetrahedralMesh<2,2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.2, 1.0, 1.0);
@@ -542,7 +542,7 @@ public:
         }
     }
 
-    void TestComputeFineElemsAndWeightsForCoarseNodes() throw(Exception)
+    void TestComputeFineElemsAndWeightsForCoarseNodes()
     {
         TetrahedralMesh<2,2> fine_mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");

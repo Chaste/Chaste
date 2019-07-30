@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ class TestBidomainWithBathTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestWithBathAndElectrodes() throw (Exception)
+    void TestWithBathAndElectrodes()
     {
         /* First, set the end time and output info. In this simulation
          * we'll explicitly read the mesh, alter it, then pass it

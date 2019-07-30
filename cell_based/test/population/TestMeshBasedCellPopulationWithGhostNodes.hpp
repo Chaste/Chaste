@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -131,7 +131,7 @@ public:
     }
 
     // Test with ghost nodes, checking that the Iterator doesn't loop over ghost nodes
-    void TestMeshBasedCellPopulationWithGhostNodesSetup() throw(Exception)
+    void TestMeshBasedCellPopulationWithGhostNodesSetup()
     {
         unsigned num_cells_depth = 11;
         unsigned num_cells_width = 6;
@@ -264,7 +264,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().empty(), true);
     }
 
-    void TestAreaBasedVisocityOnAPeriodicMesh() throw (Exception)
+    void TestAreaBasedVisocityOnAPeriodicMesh()
     {
         // Set up the simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
@@ -543,7 +543,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
     }
 
-    void TestSpringIterator2d() throw(Exception)
+    void TestSpringIterator2d()
     {
         // Set up expected results for the honeycomb mesh created below
         // the following are the edges which do not contain a ghost node
@@ -605,7 +605,7 @@ public:
     }
 
     // 3d test with some ghost nodes
-    void TestSpringIterator3d() throw(Exception)
+    void TestSpringIterator3d()
     {
         // Create a simple mesh
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
@@ -782,7 +782,7 @@ public:
         FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.parameters").CompareFiles();
     }
 
-    void TestVoronoiAreasAndPerimetersWithGhostNodes() throw (Exception)
+    void TestVoronoiAreasAndPerimetersWithGhostNodes()
     {
         // Create a small honeycomb mesh surrounded by a single layer of ghost nodes
         HoneycombMeshGenerator generator(2, 2, 1);
@@ -814,7 +814,7 @@ public:
         }
     }
 
-    void TestVoronoiGhostNodeLabelling2d() throw (Exception)
+    void TestVoronoiGhostNodeLabelling2d()
     {
         // Set up the simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
@@ -876,7 +876,7 @@ public:
         }
     }
 
-    void TestVoronoiGhostNodeLabelling3d() throw (Exception)
+    void TestVoronoiGhostNodeLabelling3d()
     {
         // Set up the simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
@@ -985,7 +985,7 @@ public:
         TS_ASSERT_EQUALS(keys[1], "variable");
     }
 
-    void TestGetTetrahedralMeshForPdeModifier() throw(Exception)
+    void TestGetTetrahedralMeshForPdeModifier()
     {
         HoneycombMeshGenerator generator(2, 2, 2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();

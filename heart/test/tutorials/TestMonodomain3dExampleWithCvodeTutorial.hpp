@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -161,7 +161,7 @@ public:
 class TestMonodomain3dExampleWithCvodeTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomain3d() throw(Exception)
+    void TestMonodomain3d()
     {
 #ifdef CHASTE_CVODE
         DistributedTetrahedralMesh<3,3> mesh;

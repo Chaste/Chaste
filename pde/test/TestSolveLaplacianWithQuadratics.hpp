@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -275,7 +275,7 @@ class TestSolveLaplacianWithQuadratics : public CxxTest::TestSuite
 {
 public:
     // solve u'' + 1 = 0
-    void TestSolveLaplacianWithQuadratics1d() throw (Exception)
+    void TestSolveLaplacianWithQuadratics1d()
     {
         QuadraticMesh<1> quad_mesh;
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
@@ -302,7 +302,7 @@ public:
         PetscTools::Destroy(solution);
     }
 
-    void TestSolveLaplacianWithQuadratics2d() throw (Exception)
+    void TestSolveLaplacianWithQuadratics2d()
     {
         // Solve using quadratics..
         QuadraticMesh<2> quad_mesh;
@@ -360,7 +360,7 @@ public:
         PetscTools::Destroy(solution_quads);
     }
 
-    void TestSolveLaplacianWithQuadratics2dReordered() throw (Exception)
+    void TestSolveLaplacianWithQuadratics2dReordered()
     {
         // Solve using quadratics..
         QuadraticMesh<2> quad_mesh;
@@ -426,7 +426,7 @@ public:
     }
 
 
-    void TestSolveLaplacianWithQuadratics3d() throw (Exception)
+    void TestSolveLaplacianWithQuadratics3d()
     {
         // Solve using quadratics
         QuadraticMesh<3> quad_mesh;

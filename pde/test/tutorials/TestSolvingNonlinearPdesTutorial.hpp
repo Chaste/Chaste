@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -146,11 +146,11 @@ double MyNeummanFunction(const ChastePoint<2>& rX)
 class TestSolvingNonlinearPdesTutorial : public CxxTest::TestSuite
 {
 public:
-    /* Define a particular test. Note the {{{throw(Exception)}}} at the end of the
+    /* Define a particular test. Note the {{{}}} at the end of the
      * declaration. This causes {{{Exception}}} messages to be printed out if an
      * {{{Exception}}} is thrown, rather than just getting the message "terminate
      * called after throwing an instance of 'Exception' " */
-    void TestSolvingNonlinearEllipticPde() throw(Exception)
+    void TestSolvingNonlinearEllipticPde()
     {
         /* As usual, first create a mesh. */
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");

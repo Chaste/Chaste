@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -114,7 +114,7 @@ public:
     /*
      * Define a particular test.
      */
-    void TestSchnackenbergSystemOnButterflyMesh() throw (Exception)
+    void TestSchnackenbergSystemOnButterflyMesh()
     {
         /* As usual, we first create a mesh. Here we are using a 2d mesh of a butterfly-shaped domain. */
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/butterfly");

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -164,7 +164,9 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 
                 double u_at_node = mSolutionReplicated[index_into_vec];
                 u(index_of_unknown) += phi(i)*u_at_node;
-                for (unsigned j=0; j<SPACE_DIM; j++)
+                // NB. grad_u is PROBLEM_DIM x SPACE_DIM but grad_phi is ELEMENT_DIM x (ELEMENT_DIM+1)
+                // Assume here that SPACE_DIM == ELEMENT_DIM and assert it in calling function
+                for (unsigned j=0; j<ELEMENT_DIM; j++)
                 {
                     grad_u(index_of_unknown,j) += grad_phi(j,i)*u_at_node;
                 }
@@ -181,6 +183,7 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calculate(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh, Vec solution)
 {
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
     assert(solution);
     mSolutionReplicated.ReplicatePetscVector(solution);
     if (mSolutionReplicated.GetSize() != rMesh.GetNumNodes() * PROBLEM_DIM)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -246,7 +246,7 @@ public:
     // the solution of an equivalent monodomain-only problem, that the purkinje voltage for
     // purkinje nodes doesn't change (no purkinje stimulus is given), and is 0 for non-purkinje nodes.
     // This version uses the problem classes.  It also checks things still work with a permuted mesh.
-    void TestMonodomainPurkinjeProblemRunning() throw(Exception)
+    void TestMonodomainPurkinjeProblemRunning()
     {
         // Settings common to both problems
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
@@ -334,7 +334,7 @@ public:
     }
 
     // Solve a Purkinje problem on a branched domain
-    void TestBranchedMonodomainPurkinjeProblem() throw(Exception)
+    void TestBranchedMonodomainPurkinjeProblem()
     {
         //Sets up two problems with fibres of the same length,
         // * one with a single fibre of radius 0.5
@@ -470,7 +470,7 @@ public:
         }
     }
 
-    void TestBranchedMonodomainPurkinjeProblemAntiSymmetric() throw(Exception)
+    void TestBranchedMonodomainPurkinjeProblemAntiSymmetric()
     {
         //Sets up two problems with branched fibres of different lengths,
         //The radii of the child branches are anti-symmetric and the results compared.
@@ -599,7 +599,7 @@ public:
     }
 
     //Sets up a PVJ stimulus between two independent (not in tissue) cell models
-    void TestPVJStimulusTwoCellModels() throw(Exception)
+    void TestPVJStimulusTwoCellModels()
     {
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
@@ -688,7 +688,7 @@ public:
     //Solve a retrograde activation problem. A square of myocardium is coupled through a PMJ to a
     //single Purkinje fibre. The myocardium is stimulated and the activation wave should propagate through
     //the PMJ to activate the Purkinje fibre.
-    void TestMonodomainPurkinjeRetrogradeActivation() throw(Exception)
+    void TestMonodomainPurkinjeRetrogradeActivation()
     {
         // This test slows dramatically with number of processes.  Not know to deadlock, just to run slowly.
         if (PetscTools::GetNumProcs() > 5u)
@@ -732,7 +732,7 @@ public:
     //Solve an activation problem. A square of myocardium is coupled through several PVJs to a
     //single Purkinje fibre with a manually drawn forward-star at the end. In this case the Purkinje system
     //isn't stimulated, to check that the PVJ isn't erroneously generating current.
-    void TestMonodomainPurkinjeNoActivation() throw(Exception)
+    void TestMonodomainPurkinjeNoActivation()
     {
         // This test slows dramatically with number of processes.  Not know to deadlock, just to run slowly.
         if (PetscTools::GetNumProcs() > 5u)
@@ -772,7 +772,7 @@ public:
     //Solve an activation problem. A square of myocardium is coupled through several PVJs to a
     //single Purkinje fibre with a manually drawn forward-star at the end. The Purkinje system is stimulated and the activation wave should
     //propagate through to the tissue.
-    void TestMonodomainPurkinjeActivationViaStar() throw(Exception)
+    void TestMonodomainPurkinjeActivationViaStar()
     {
         // This test slows dramatically with number of processes.  Not know to deadlock, just to run slowly.
         if (PetscTools::GetNumProcs() > 5u)
@@ -820,7 +820,7 @@ public:
     //Solve an activation problem. A square of myocardium is coupled through several PVJs to a
     //single Purkinje fibre with a manually drawn forward-star at the end. The Purkinje system is stimulated and the activation wave should
     //propagate through to the tissue. The PVJ nodes are defined in a file.
-    void TestMonodomainPurkinjeActivationFromFile() throw(Exception)
+    void TestMonodomainPurkinjeActivationFromFile()
     {
         // This test slows dramatically with number of processes.  Not know to deadlock, just to run slowly.
         if (PetscTools::GetNumProcs() > 5u)
@@ -867,7 +867,7 @@ public:
     }
 
     //Solve the same activation problem as  TestMonodomainPurkinjeActivationFromFile with a non-dumb partitioning
-    void TestMonodomainPurkinjeActivationFromFileWithPartitioning() throw(Exception)
+    void TestMonodomainPurkinjeActivationFromFileWithPartitioning()
     {
         // Set up Purkinje problem
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
@@ -911,7 +911,7 @@ public:
         TS_ASSERT_LESS_THAN(10.0, monodomain_corner_voltage);
     }
 
-    void TestPvjFileErrorHandling() throw(Exception)
+    void TestPvjFileErrorHandling()
     {
         // Set up Purkinje problem
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);

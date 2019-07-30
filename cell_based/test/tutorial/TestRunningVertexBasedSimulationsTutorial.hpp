@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,7 +115,7 @@ public:
     * In the first test, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells, using a mutable vertex mesh. Each cell is assigned a stochastic cell-cycle model.
     */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /* First, we generate a vertex mesh. To create a {{{MutableVertexMesh}}}, we can use
         * the {{{HoneycombVertexMeshGenerator}}}. This generates a honeycomb-shaped mesh,
@@ -207,7 +207,7 @@ public:
     * boundary which cells can't pass through and a cell killer which removes cells once they leave
     * a region. As before each cell is assigned a stochastic cell-cycle model.
     */
-    void TestPeriodicMonolayer() throw(Exception)
+    void TestPeriodicMonolayer()
     {
         /* First, we generate a periodic vertex mesh. To create a {{{Cylindrical2dVertexMesh}}}, we can use
          * the {{{CylindricalHoneycombVertexMeshGenerator}}}. This generates a honeycomb-shaped mesh,

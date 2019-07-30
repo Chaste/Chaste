@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -126,7 +126,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         for (unsigned i=0; i<numElemX; i++)
         {
             unsigned left_index = j*(numElemX+1) + i;
-            std::pair<unsigned,unsigned> edge(left_index, left_index+1 ) ;
+            std::pair<unsigned,unsigned> edge(left_index, left_index+1 );
             edge_to_internal_map[edge] = node_index;
             node_pos[0]=i+0.5;
             MakeNewInternalNode(node_index, node_pos, top);
@@ -138,20 +138,20 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         {
             node_pos[0] = i;
             unsigned left_index = j*(numElemX+1) + i;
-            std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
+            std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) );
             edge_to_internal_map[edge] = node_index;
             MakeNewInternalNode(node_index, node_pos, top);
             unsigned parity=(i+(numElemY-j))%2;
             if (stagger==false || parity==1) //Default when no stagger
             {
                 //backslash
-                std::pair<unsigned,unsigned> back_edge(left_index+1, left_index+(numElemX+1) ) ;
+                std::pair<unsigned,unsigned> back_edge(left_index+1, left_index+(numElemX+1) );
                 edge_to_internal_map[back_edge] = node_index;
             }
             else
             {
                 //foward slash
-                std::pair<unsigned,unsigned> forward_edge(left_index, left_index+(numElemX+1)+1 ) ;
+                std::pair<unsigned,unsigned> forward_edge(left_index, left_index+(numElemX+1)+1 );
                 edge_to_internal_map[forward_edge] = node_index;
             }
             node_pos[0] = i+0.5;

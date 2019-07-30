@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -260,7 +260,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestTriangles1DMeshIn2DSpaceWithDeletedNode() throw (Exception)
+    void TestTriangles1DMeshIn2DSpaceWithDeletedNode()
     {
         TrianglesMeshReader<1,2> mesh_reader("mesh/test/data/semicircle_outline");
         MutableMesh<1,2> mesh;
@@ -330,7 +330,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumFaces(), 100u);
     }
 
-    void TestQuadratic1D() throw (Exception)
+    void TestQuadratic1D()
     {
         QuadraticMesh<1> mesh;
         TrianglesMeshReader<1,1> mesh_reader1("mesh/test/data/1D_0_to_1_10_elements_quadratic", 2, 1, false);
@@ -354,7 +354,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetBoundaryElement(0)->GetNodeGlobalIndex(0), mesh.GetBoundaryElement(0)->GetNodeGlobalIndex(0));
     }
 
-    void TestQuadratic2D() throw (Exception)
+    void TestQuadratic2D()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader1("mesh/test/data/square_128_elements_fully_quadratic", 2, 2, false);
@@ -378,7 +378,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetBoundaryElement(0)->GetNodeGlobalIndex(2), mesh.GetBoundaryElement(0)->GetNodeGlobalIndex(2));
     }
 
-    void TestQuadratic3D() throw (Exception)
+    void TestQuadratic3D()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic", 2, 1, false);
@@ -402,7 +402,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetBoundaryElement(0)->GetNodeGlobalIndex(5), mesh.GetBoundaryElement(0)->GetNodeGlobalIndex(5));
     }
 
-    void TestCmguiMeshWriter3D() throw(Exception)
+    void TestCmguiMeshWriter3D()
     {
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
@@ -442,7 +442,7 @@ public:
         TS_ASSERT(comparer3.CompareFiles());
     }
 
-    void TestCmguiMeshWriter2D() throw(Exception)
+    void TestCmguiMeshWriter2D()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements");
         TetrahedralMesh<2,2> mesh;
@@ -482,7 +482,7 @@ public:
         TS_ASSERT(comparer3.CompareFiles());
     }
 
-    void TestCmguiMeshWriter1D() throw(Exception)
+    void TestCmguiMeshWriter1D()
     {
         TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
         TetrahedralMesh<1,1> mesh;
@@ -522,7 +522,7 @@ public:
         TS_ASSERT(comparer3.CompareFiles());
     }
 
-    void TestCmguiDeformedSolutionsWriter2dLinearViz() throw(Exception)
+    void TestCmguiDeformedSolutionsWriter2dLinearViz()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
         mesh.Scale(1.0, 2.0); // historical reasons
@@ -630,7 +630,7 @@ public:
         TS_ASSERT(comparer_reg.CompareFiles());
     }
 
-    void TestCmguiDeformedSolutionsWriter2dQuadraticViz() throw(Exception)
+    void TestCmguiDeformedSolutionsWriter2dQuadraticViz()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 2.0);
 
@@ -699,7 +699,7 @@ public:
         TS_ASSERT(comparer4.CompareFiles());
     }
 
-    void TestCmguiDeformedSolutionsWriter3dQuadraticViz() throw(Exception)
+    void TestCmguiDeformedSolutionsWriter3dQuadraticViz()
     {
         QuadraticMesh<3> mesh(0.5, 1.0, 2.0, 3.0);
 
@@ -753,7 +753,7 @@ public:
         TS_ASSERT(comparer3.CompareFiles());
     }
 
-    void TestCmguiDeformedSolutionsWriterConvertOutput() throw(Exception)
+    void TestCmguiDeformedSolutionsWriterConvertOutput()
     {
         QuadraticMesh<2> mesh(0.5, 1.0, 1.0);
         mesh.Scale(1.0, 2.0); // historical reasons
@@ -802,7 +802,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(writer.ConvertOutput("mesh/test/data/TestCmguiDeformedSolutionsWriter", "bad_myoldsolution", 1), "Error occurred when reading file");
     }
 
-    void TestCmguiDeformedSolutionsMeshType() throw (Exception)
+    void TestCmguiDeformedSolutionsMeshType()
     {
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0, 1.0);
@@ -820,7 +820,7 @@ public:
     /**
      * This test is based on TestTrianglesMeshReader.hpp TestReadingElementAttributes.
      */
-    void TestWritingElementAttributesInTrianglesFormat() throw (Exception)
+    void TestWritingElementAttributesInTrianglesFormat()
     {
         std::string source_mesh = "mesh/test/data/1D_0_to_1_10_elements_with_attributes";
         std::string output_dir = "element_attrs";
@@ -902,7 +902,7 @@ public:
     /**
      *
      */
-    void TestWritingAttributesInTrianglesFormat() throw (Exception)
+    void TestWritingAttributesInTrianglesFormat()
     {
         std::string source_mesh = "mesh/test/data/1D_0_to_1_10_elements_with_attributes";
         std::string output_dir = "TestWritingAttrs";

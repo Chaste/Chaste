@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -132,7 +132,7 @@ c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
 class TestElectroMechanicsExactSolution : public CxxTest::TestSuite
 {
 public:
-    void TestIncompressibleSolveWithExactSolution() throw(Exception)
+    void TestIncompressibleSolveWithExactSolution()
     {
         MechanicsEventHandler::Reset();
 

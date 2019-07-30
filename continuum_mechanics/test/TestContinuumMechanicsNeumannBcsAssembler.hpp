@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestContinuumMechanicsNeumannBcsAssembler : public CxxTest::TestSuite
 {
 public:
-    void TestAssembler2d() throw (Exception)
+    void TestAssembler2d()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);
@@ -129,7 +129,7 @@ public:
     }
 
 
-    void TestAssembler3d() throw (Exception)
+    void TestAssembler3d()
     {
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ public:
         delete pMeshReader;
     }
 
-    void TestGenericReader() throw (Exception)
+    void TestGenericReader()
     {
         std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/Memfem_slab");
 

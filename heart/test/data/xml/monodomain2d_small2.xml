@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ChasteParameters xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_3">
+
+	<Simulation>       
+		<!-- 
+			Problem definition 
+		-->    
+	    <SimulationDuration unit="ms">0.1</SimulationDuration>
+	    <Domain>Mono</Domain>
+	    <SpaceDimension>2</SpaceDimension>
+	    <IonicModels>
+	    	<Default><Hardcoded>LuoRudyIBackwardEuler</Hardcoded></Default>
+    	</IonicModels>
+	    
+		<!-- 
+			Mesh definition 
+		-->    
+		<Mesh unit="cm">
+			<Sheet x="0.1" y="0.1" inter_node_space="0.05"/>
+	  	</Mesh>
+		    
+	    <!-- 
+	    	Stimuli (as many <Stimulus> definitions as needed) 
+	   	-->
+   		<Stimuli>
+			<Stimulus> <!-- #1 -->
+				<Strength unit="uA/cm^3">-80000.0</Strength>
+				<Duration unit="ms">1.0</Duration>
+				<Delay unit="ms">2.0</Delay>
+				<Location unit="cm">
+					<Cuboid>
+						<LowerCoordinates x="-0.25" y="-0.25" z="-0.25"/>
+						<UpperCoordinates x="0.25" y="0.25" z="0.75"/>
+					</Cuboid>
+				</Location>
+			</Stimulus>	
+		</Stimuli>
+		
+		<OutputDirectory>SaveMono2D2</OutputDirectory>
+		<CheckpointSimulation timestep="0.1" unit="ms" max_checkpoints_on_disk="3"/>
+	</Simulation>
+	
+    <Physiological>
+	    <!-- Parameters for drug action model -->
+	    <ApplyDrug concentration="10">
+	        <!-- Current names should match those in the Oxford metadata -->
+	        <IC50 current="membrane_fast_sodium_current" hill="1.0">16000</IC50>
+	        <!-- Hill coefficient defaults to 1.0 -->
+	        <IC50 current="membrane_rapid_delayed_rectifier_potassium_current">5</IC50>
+	        <!-- Missing parameter causes a warning -->
+	        <IC50 current="not_a_current">404</IC50>
+	    </ApplyDrug>
+    </Physiological>
+
+	<Numerical>
+		<TimeSteps ode="0.1" pde="0.1" printing="0.1" unit="ms"/>
+	</Numerical>
+</ChasteParameters>

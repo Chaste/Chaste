@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,7 +105,7 @@ public:
      *
      * Let us now run a simulation with mechano-electric feedback (MEF), and with different boundary conditions.
      */
-    void TestWithMef() throw(Exception)
+    void TestWithMef()
     {
         /* If we want to use MEF, where the stretch (in the fibre-direction) couples back to the cell
          * model and is used in stretch-activated channels (SACs), we can't just let Chaste convert
@@ -278,7 +278,7 @@ public:
      *
      * Next, we run a simulation on a 2d annulus, with an internal pressure applied.
      */
-    void TestAnnulusWithInternalPressure() throw (Exception)
+    void TestAnnulusWithInternalPressure()
     {
         /* The following should require little explanation now */
         TetrahedralMesh<2,2> electrics_mesh;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ class TestMutableMesh : public CxxTest::TestSuite
 private:
 
     template<unsigned DIM>
-    void EdgeIteratorTest(std::string meshFilename) throw(Exception)
+    void EdgeIteratorTest(std::string meshFilename)
     {
         // Create a simple mesh
         TrianglesMeshReader<DIM,DIM> mesh_reader(meshFilename);
@@ -114,7 +114,7 @@ private:
 
 public:
 
-    void TestNodeIterator() throw(Exception)
+    void TestNodeIterator()
     {
         TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
         MutableMesh<2,3> mesh;
@@ -151,7 +151,7 @@ public:
         TS_ASSERT_EQUALS(another_counter, mesh.GetNumNodes());
     }
 
-    void TestElementIterator() throw(Exception)
+    void TestElementIterator()
     {
         TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
         MutableMesh<2,3> mesh;
@@ -611,7 +611,7 @@ public:
         // Check the deleted element/node vectors
     }
 
-    void TestDeleteNodePriorToReMesh() throw (Exception)
+    void TestDeleteNodePriorToReMesh()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/circular_fan");
         MutableMesh<2,2> mesh;
@@ -630,7 +630,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 98u);
     }
 
-    void TestAddingAndDeletingNodes() throw (Exception)
+    void TestAddingAndDeletingNodes()
     {
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;
@@ -755,7 +755,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumAllElements(), mesh.GetNumElements() + 2);
     }
 
-    void Test3DNodeMerger() throw (Exception)
+    void Test3DNodeMerger()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
         MutableMesh<3,3> mesh;
@@ -935,7 +935,7 @@ public:
         }
     }
 
-    void TestDeleteNodes() throw (Exception)
+    void TestDeleteNodes()
     {
         MutableMesh<2,2> mesh;
         mesh.ConstructRectangularMesh(2,3);
@@ -965,7 +965,7 @@ public:
         TS_ASSERT_THROWS_THIS(mesh.MoveMergeNode(2,1),"Trying to move a deleted node");
     }
 
-    void TestDeleteNodeFails() throw (Exception)
+    void TestDeleteNodeFails()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/HalfSquareWithExtraNode");
         MutableMesh<2,2> mesh;
@@ -1086,7 +1086,7 @@ public:
         }
     }
 
-    void TestConstructFromNodes() throw (Exception)
+    void TestConstructFromNodes()
     {
         // Create mutable tetrahedral mesh which is Delaunay
         std::vector<Node<3> *> nodes;
@@ -1104,7 +1104,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetVolume(), 0.3333, 1e-4);
     }
 
-    void TestEdgeIterator() throw(Exception)
+    void TestEdgeIterator()
     {
         EdgeIteratorTest<3>("mesh/test/data/cube_2mm_12_elements");
         EdgeIteratorTest<2>("mesh/test/data/square_4_elements");
@@ -1112,7 +1112,7 @@ public:
     }
 
 
-    void TestDeleteElement() throw(Exception)
+    void TestDeleteElement()
     {
         TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
         MutableMesh<2,3> mesh;
@@ -1152,7 +1152,7 @@ public:
         TS_ASSERT_EQUALS(map.IsDeleted(241), true);
     }
 
-    void TestDeleteElement1DIn3D() throw(Exception)
+    void TestDeleteElement1DIn3D()
     {
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
         MutableMesh<1,3> mesh;
@@ -1177,7 +1177,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetLocation()[2], 0.0, 1e-6);
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         FileFinder archive_dir("archive_mutable_mesh", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mutable_mesh.arch";

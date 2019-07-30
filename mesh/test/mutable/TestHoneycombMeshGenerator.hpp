@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ private:
 
 public:
 
-    void TestSimpleMesh() throw(Exception)
+    void TestSimpleMesh()
     {
         unsigned cells_across = 2;
         unsigned cells_up = 2;
@@ -85,7 +85,7 @@ public:
         TS_ASSERT_DELTA(generator.GetDomainWidth(), 0.5000, 1e-4);
     }
 
-    void TestMonolayerHoneycombMeshGeneratorRelaxed() throw(Exception)
+    void TestMonolayerHoneycombMeshGeneratorRelaxed()
     {
         int num_cells_width = 8;
         int num_cells_depth = 22;
@@ -162,7 +162,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 21.6506, 1e-4); // includes ghosts
     }
 
-    void TestMonolayerHoneycombMeshGeneratorCompressed() throw(Exception)
+    void TestMonolayerHoneycombMeshGeneratorCompressed()
     {
         int num_cells_width = 8;
         int num_cells_depth = 12;
@@ -240,7 +240,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 12.3408, 1e-4); // includes ghosts
     }
 
-    void TestBoundaryNodes() throw(Exception)
+    void TestBoundaryNodes()
     {
         unsigned cells_across = 4;
         unsigned cells_up = 4;
@@ -263,7 +263,7 @@ public:
         TS_ASSERT_EQUALS(num_non_boundary_nodes, 4u);
     }
 
-    void TestGetCircularMesh() throw(Exception)
+    void TestGetCircularMesh()
     {
         unsigned num_cells_depth = 10;
         unsigned num_cells_width = 10;
@@ -280,7 +280,7 @@ public:
         Output2DNodesToFile(p_mesh, "circular_mesh.dat");
     }
 
-    void TestGetCircularMeshWithGhostNodesThrowsException() throw(Exception)
+    void TestGetCircularMeshWithGhostNodesThrowsException()
     {
         unsigned num_cells_depth = 10;
         unsigned num_cells_width = 10;
@@ -291,7 +291,7 @@ public:
         TS_ASSERT_THROWS_THIS(generator.GetCircularMesh(radius), "Cannot call GetCircularMesh on a HoneycombMesh with ghost nodes");
     }
 
-    void TestCircularMeshIsJacobian() throw(Exception)
+    void TestCircularMeshIsJacobian()
     {
         HoneycombMeshGenerator generator(20, 20, 0);
         MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(10);
@@ -300,7 +300,7 @@ public:
         p_mesh->ReMesh(map);
     }
 
-    void TestLargeMesh() throw(Exception)
+    void TestLargeMesh()
     {
         unsigned cells_across = 100;
         unsigned cells_up = 100;

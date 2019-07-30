@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -180,7 +180,7 @@ public:
         TS_ASSERT_DELTA(daughter_location[1], expected_daughter_location[1], 1e-6);
     }
 
-    void TestArchiveRandomDirectionCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveRandomDirectionCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "RandomDirectionCentreBasedDivisionRule.arch";
@@ -207,7 +207,7 @@ public:
         }
     }
 
-    void TestArchiveFixedCentreBasedDivisionRule() throw(Exception)
+    void TestArchiveFixedCentreBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "FixedCentreBasedDivisionRule.arch";

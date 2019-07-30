@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,7 +71,7 @@ class TestCell: public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellConstructor() throw(Exception)
+    void TestCellConstructor()
     {
         // Coverage
         TS_ASSERT_THROWS_NOTHING(null_deleter());
@@ -108,7 +108,7 @@ public:
         TS_ASSERT(dynamic_cast<NullSrnModel*>(p_cell->GetSrnModel()));
     }
 
-    void TestCellConstructorWithSrn() throw(Exception)
+    void TestCellConstructorWithSrn()
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -145,7 +145,7 @@ public:
         TS_ASSERT(dynamic_cast<NullSrnModel*>(p_cell->GetSrnModel()));
     }
 
-    void TestWithCellPropertyCollection() throw(Exception)
+    void TestWithCellPropertyCollection()
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -269,7 +269,7 @@ public:
         TS_ASSERT_EQUALS(num_wild_type, 0u);
     }
 
-    void TestCellsAgeingCorrectly() throw(Exception)
+    void TestCellsAgeingCorrectly()
     {
         // These lines are added to cover the exception case that a cell is
         // created without simulation time being set up...
@@ -513,7 +513,7 @@ public:
         TS_ASSERT_EQUALS(differentiated_cells[59], 8u);
     }
 
-    void TestWithFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestWithFixedG1GenerationalCellCycleModel()
     {
         // Simulation time is 6000 because we want to test that differentiated cells never divide.
 
@@ -597,7 +597,7 @@ public:
         TS_ASSERT_EQUALS(p_stochastic_differentiated_cell->ReadyToDivide(), false);
     }
 
-    void TestStochasticCycleModel() throw(Exception)
+    void TestStochasticCycleModel()
     {
         // Go up in steps of 0.01 to test stochasticity in cell-cycle models
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -863,7 +863,7 @@ public:
      *
      * It checks that the cell division thing works nicely too.
      */
-    void TestWithTysonNovakCellCycleModel() throw(Exception)
+    void TestWithTysonNovakCellCycleModel()
     {
         double standard_tyson_duration = 1.242;
 
@@ -1154,7 +1154,7 @@ public:
         TS_ASSERT_EQUALS(p_daughter_cell->IsLogged(), false);
     }
 
-    void TestAncestors() throw (Exception)
+    void TestAncestors()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -1185,7 +1185,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_cell->SetAncestor(p_healthy_state), "Attempting to give cell a cell ancestor which is not a CellAncestor");
     }
 
-    void TestCellId() throw (Exception)
+    void TestCellId()
     {
         // Resetting the Maximum cell Id to zero (to account for previous tests)
         CellId::ResetMaxCellId();

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,7 +83,7 @@ class TestParabolicGrowingDomainPdeModifier : public AbstractCellBasedWithTiming
 {
 public:
 
-    void TestParabolicConstructor() throw(Exception)
+    void TestParabolicConstructor()
     {
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
@@ -97,7 +97,7 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
     }
 
-    void TestGrowingDomainPdeModifierExceptions() throw(Exception)
+    void TestGrowingDomainPdeModifierExceptions()
     {
         EXIT_IF_PARALLEL;
 
@@ -142,7 +142,7 @@ public:
             "ParabolicGrowingDomainPdeModifier cannot be used with an AveragedSourceParabolicPde. Use a ParabolicBoxDomainPdeModifier instead.");
     }
 
-    void TestArchiveParabolicGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveParabolicGrowingDomainPdeModifier()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
@@ -201,7 +201,7 @@ public:
         }
     }
 
-    void TestMeshBasedMonolayerWithParabolicPde() throw (Exception)
+    void TestMeshBasedMonolayerWithParabolicPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         MutableMesh<2,2> mesh;
@@ -261,7 +261,7 @@ public:
         }
     }
 
-    void TestMeshBasedHeterogeneousMonolayerWithParabolicPde() throw (Exception)
+    void TestMeshBasedHeterogeneousMonolayerWithParabolicPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -344,7 +344,7 @@ public:
         }
     }
 
-    void TestMeshBasedMonolayerWithParabolicPdeAndNeumannBcs() throw (Exception)
+    void TestMeshBasedMonolayerWithParabolicPdeAndNeumannBcs()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
         MutableMesh<2,2> mesh;
@@ -395,7 +395,7 @@ public:
     }
 
     // Now test on a square with half apoptotic cells to compare all the population types
-    void TestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(6,6,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -451,7 +451,7 @@ public:
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-4);
     }
 
-    void TestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(6,6,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -515,7 +515,7 @@ public:
         delete p_mesh;
     }
 
-    void TestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(6,6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -577,7 +577,7 @@ public:
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
     }
 
-    void TestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(24, 6, 4, 24, 6, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -640,7 +640,7 @@ public:
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
     }
 
-    void TestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(6, 0, 0, 6, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();

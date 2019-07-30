@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -169,7 +169,7 @@ public:
         TS_ASSERT_EQUALS(backward_euler_solver.StoppingEventOccurred(), true);
     }
 
-    void TestBackwardEulerAnotherNonlinearEquationAnalytic() throw(Exception)
+    void TestBackwardEulerAnotherNonlinearEquationAnalytic()
     {
         Ode5Jacobian ode_system;
 
@@ -225,7 +225,7 @@ public:
         TS_ASSERT_DELTA(solutions.rGetSolutions()[last][1], 0, 2);
     }
 
-    void TestArchivingSolver() throw(Exception)
+    void TestArchivingSolver()
     {
         OutputFileHandler handler("archive", false);
         ArchiveLocationInfo::SetArchiveDirectory(handler.FindFile(""));

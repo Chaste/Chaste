@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -132,7 +132,7 @@ public:
 
     // Solve on a cylinder (fibre running down the centre) - run with just a monodomain problem, then
     // run with
-    void TestIn3d() throw (Exception)
+    void TestIn3d()
     {
         // Settings common to both problems
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);

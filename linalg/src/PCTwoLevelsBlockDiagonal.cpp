@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -180,12 +180,12 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A11_columns=A11_all_rows;
         ISCreateStride(PETSC_COMM_WORLD, high-low, 2*low, 2, &A11_local_rows); /// \todo: #1082 OK in parallel. Use as an example for the other two blocks
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-        MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns,
-            MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 8) //PETSc 3.8 or later
+        MatCreateSubMatrix(system_matrix, A11_local_rows, A11_columns,
+                           MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #else
-        MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns, PETSC_DECIDE,
-            MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
+        MatGetSubMatrix(system_matrix, A11_local_rows, A11_columns,
+                        MAT_INITIAL_MATRIX, &mPCContext.A11_matrix_subblock);
 #endif
 
         ISDestroy(PETSC_DESTROY_PARAM(A11_local_rows));
@@ -203,12 +203,12 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A22_B1_local_rows = A22_tissue_rows; // wrong in parallel, need to give local rows
         IS& A22_B1_columns = A22_tissue_rows;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-        MatGetSubMatrix(system_matrix, A22_B1_local_rows, A22_B1_columns,
-            MAT_INITIAL_MATRIX, &mPCContext.A22_B1_matrix_subblock);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 8) //PETSc 3.8 or later
+        MatCreateSubMatrix(system_matrix, A22_B1_local_rows, A22_B1_columns,
+                           MAT_INITIAL_MATRIX, &mPCContext.A22_B1_matrix_subblock);
 #else
-        MatGetSubMatrix(system_matrix, A22_B1_local_rows, A22_B1_columns, PETSC_DECIDE,
-            MAT_INITIAL_MATRIX, &mPCContext.A22_B1_matrix_subblock);
+        MatGetSubMatrix(system_matrix, A22_B1_local_rows, A22_B1_columns,
+                        MAT_INITIAL_MATRIX, &mPCContext.A22_B1_matrix_subblock);
 #endif
 
     }
@@ -225,12 +225,12 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         IS& A22_B2_local_rows = A22_bath_rows; // wrong in parallel, need to give local rows
         IS& A22_B2_columns = A22_bath_rows;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-        MatGetSubMatrix(system_matrix, A22_B2_local_rows, A22_B2_columns,
-            MAT_INITIAL_MATRIX, &mPCContext.A22_B2_matrix_subblock);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 8) //PETSc 3.8 or later
+        MatCreateSubMatrix(system_matrix, A22_B2_local_rows, A22_B2_columns,
+                           MAT_INITIAL_MATRIX, &mPCContext.A22_B2_matrix_subblock);
 #else
-        MatGetSubMatrix(system_matrix, A22_B2_local_rows, A22_B2_columns, PETSC_DECIDE,
-            MAT_INITIAL_MATRIX, &mPCContext.A22_B2_matrix_subblock);
+        MatGetSubMatrix(system_matrix, A22_B2_local_rows, A22_B2_columns,
+                        MAT_INITIAL_MATRIX, &mPCContext.A22_B2_matrix_subblock);
 #endif
     }
 

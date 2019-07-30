@@ -2,7 +2,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,7 +76,7 @@ import types
 from cStringIO import StringIO
 
 from utilities import *
-from enum import Enum # Pythonic enums
+from _enum import Enum # Pythonic enums
 
 import cellml_metadata # Handle RDF metadata for CellML
 

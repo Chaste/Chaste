@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,7 +79,7 @@ private:
 
 public:
 
-    void TestDoCellBirth() throw (Exception)
+    void TestDoCellBirth()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
         MutableMesh<3,3> mesh;
@@ -106,7 +106,7 @@ public:
         TS_ASSERT_EQUALS(num_births, 1u);
     }
 
-    void TestBirthOccursDuringSolve() throw (Exception)
+    void TestBirthOccursDuringSolve()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
 
@@ -153,7 +153,7 @@ public:
         mesh_writer2.WriteFilesUsingMesh(mesh);
     }
 
-    void TestSolveMethodSpheroidSimulation3D() throw (Exception)
+    void TestSolveMethodSpheroidSimulation3D()
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
         MutableMesh<3,3> mesh;
@@ -197,7 +197,7 @@ public:
         mesh_writer2.WriteFilesUsingMesh(mesh);
     }
 
-    void TestGhostNodesSpheroidSimulation3DandSave() throw (Exception)
+    void TestGhostNodesSpheroidSimulation3DandSave()
     {
         unsigned width = 3;
         unsigned height = 3;
@@ -314,7 +314,7 @@ public:
         delete p_mesh;
     }
 
-    void TestLoadOf3DSimulation() throw (Exception)
+    void TestLoadOf3DSimulation()
     {
         {
             // With ghost nodes - 56 ghosts 8 real cells

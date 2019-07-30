@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMixedDimensionMesh : public CxxTest::TestSuite
 {
 public:
-    void TestReadingSquareMesh() throw (Exception)
+    void TestReadingSquareMesh()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -202,7 +202,7 @@ public:
     }
 
 
-    void TestReadingMeshWithNoCables() throw (Exception)
+    void TestReadingMeshWithNoCables()
     {
         std::string mesh_base("mesh/test/data/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -214,7 +214,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 0u);
     }
 
-    void TestExceptions() throw (Exception)
+    void TestExceptions()
     {
         // Only TrianglesMeshReader supports cables
         MemfemMeshReader<3,3> memfem_reader("mesh/test/data/Memfem_slab");
@@ -224,7 +224,7 @@ public:
     }
 
 
-    void TestWritingCableFiles() throw(Exception)
+    void TestWritingCableFiles()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -242,7 +242,7 @@ public:
     }
 
 
-    void TestWritingCableFilesUsingMeshReader() throw(Exception)
+    void TestWritingCableFilesUsingMeshReader()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -312,7 +312,7 @@ public:
     }
 
 
-    void TestGeometryWithMetisPermuation() throw(Exception)
+    void TestGeometryWithMetisPermuation()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         TrianglesMeshReader<2,2> reader(mesh_base);
@@ -409,7 +409,7 @@ public:
         }
     }
 
-    void TestArchiving() throw(Exception)
+    void TestArchiving()
     {
         OutputFileHandler archive_dir_("mixed_mesh_archive"); // Clear folder
         FileFinder main_archive_dir("mixed_mesh_archive", RelativeTo::ChasteTestOutput);

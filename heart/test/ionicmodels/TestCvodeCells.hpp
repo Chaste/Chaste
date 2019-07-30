@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -120,7 +120,7 @@ class TestCvodeCells : public CxxTest::TestSuite
 {
 public:
 
-    void TestLuoRudyCvodeCell() throw(Exception)
+    void TestLuoRudyCvodeCell()
     {
 #ifdef CHASTE_CVODE
         // Set stimulus
@@ -309,7 +309,7 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestShannon2004() throw(Exception)
+    void TestShannon2004()
     {
 #ifdef CHASTE_CVODE
         // Set stimulus
@@ -461,13 +461,13 @@ public:
 #endif // CHASTE_CVODE
     }
 
-    void TestArchivingCvodeCells() throw(Exception)
+    void TestArchivingCvodeCells()
     {
 #ifdef CHASTE_CVODE
         //Archive
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("lr91_cvode.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("lr91_cvode.arch");
 
         const double magnitude_stimulus = -3;  // uA/cm2
         const double duration_stimulus = 3;  // ms

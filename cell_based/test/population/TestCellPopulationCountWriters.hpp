@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ class TestCellPopulationCountWriters : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCellMutationStatesCountWriter() throw (Exception)
+    void TestCellMutationStatesCountWriter()
     {
         EXIT_IF_PARALLEL;
 
@@ -118,7 +118,7 @@ public:
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellmutationstates_twice.dat").CompareFiles();
     }
 
-    void TestCellMutationStatesCountWriterArchiving() throw (Exception)
+    void TestCellMutationStatesCountWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -141,7 +141,7 @@ public:
        }
     }
 
-    void TestCellProliferativePhasesCountWriters() throw (Exception)
+    void TestCellProliferativePhasesCountWriters()
     {
         EXIT_IF_PARALLEL;
 
@@ -185,7 +185,7 @@ public:
         FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellcyclephases_twice.dat").CompareFiles();
     }
 
-    void TestCellProliferativePhasesCountWriterArchiving() throw (Exception)
+    void TestCellProliferativePhasesCountWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -208,7 +208,7 @@ public:
        }
     }
 
-    void TestCellProliferativeTypesCountWriters() throw (Exception)
+    void TestCellProliferativeTypesCountWriters()
     {
         EXIT_IF_PARALLEL;
 
@@ -255,7 +255,7 @@ public:
         FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellPopulationCountWriters/celltypes_twice.dat").CompareFiles();
     }
 
-    void TestCellProliferativeTypesCountWriterArchiving() throw (Exception)
+    void TestCellProliferativeTypesCountWriterArchiving()
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);

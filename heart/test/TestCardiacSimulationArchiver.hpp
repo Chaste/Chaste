@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,7 +94,7 @@ public:
     /*
      *  Simple bidomain simulation to test against in TestArchivingWithHelperClass below
      */
-    void TestSimpleBidomain1D() throw(Exception)
+    void TestSimpleBidomain1D()
     {
         OutputFileHandler handler("BidomainSimple1d",true); // This test was accruing output - true to wipe directory.
 
@@ -585,7 +585,7 @@ cp /tmp/$USER/testoutput/TestLoadAsSequentialWithBathAndDistributedMesh/archive.
     }
 
 public:
-    void TestMigrationExceptions() throw (Exception)
+    void TestMigrationExceptions()
     {
         FileFinder archive_dir("heart/test/data/checkpoint_migration_exception/", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_CONTAINS(CardiacSimulationArchiver<BidomainProblem<3> >::Load(archive_dir),
@@ -608,7 +608,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
      * Generates a 3d cube mesh with 125 nodes, corners at (0,0,0) and (1,1,1)
      * with nodal spacing of 0.2cm.
      */
-    void TestCreateArchiveForLoadAsSequential() throw (Exception)
+    void TestCreateArchiveForLoadAsSequential()
     {
         std::string directory = "TestCreateArchiveForLoadAsSequential";
         HeartConfig::Instance()->Reset();
@@ -649,7 +649,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
      * we can do everything with a single Load method.  But the tests are still named after
      * the original methods.
      */
-    void TestLoadAsSequential() throw (Exception)
+    void TestLoadAsSequential()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration/", RelativeTo::ChasteSourceRoot);
         std::string new_directory = "TestLoadAsSequential";
@@ -699,7 +699,7 @@ scons build=GccOpt_hostconfig,boost=1-34_3 test_suite=heart/test/TestCardiacSimu
 cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBath/?* ./heart/test/data/checkpoint_migration_with_bath/
 cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistributedMesh/?* ./heart/test/data/checkpoint_migration_with_bath_and_distributed_mesh/
      */
-    void TestCreateArchiveForLoadAsSequentialWithBath() throw (Exception)
+    void TestCreateArchiveForLoadAsSequentialWithBath()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(0.2);
@@ -752,7 +752,7 @@ cp  /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequentialWithBathAndDistrib
         }
     }
 
-    void TestLoadAsSequentialWithBath() throw (Exception)
+    void TestLoadAsSequentialWithBath()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_with_bath/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestLoadAsSequentialWithBath";
@@ -953,7 +953,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/
      * Generates a 3d cube mesh with 125 nodes, corners at (0,0,0) and (1,1,1)
      * with nodal spacing of 0.2cm.
      */
-    void TestCreateArchiveForLoadFromSequential() throw (Exception)
+    void TestCreateArchiveForLoadFromSequential()
     {
         std::string directory = "TestCreateArchiveForLoadFromSequential";
         HeartConfig::Instance()->Reset();
@@ -974,7 +974,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequential/?* ./heart/test/
     /**
      * #1159 - the second part of migrating a checkpoint to a different number of processes.
      */
-    void TestLoadFromSequential() throw (Exception)
+    void TestLoadFromSequential()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_from_seq/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestLoadFromSequential";
@@ -1024,7 +1024,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
      *
      * Sets up a simulation and archives it, solving for one PDE step first to set up default BCs.
      */
-    void TestCreateArchiveForLoadFromSequentialWithBath() throw (Exception)
+    void TestCreateArchiveForLoadFromSequentialWithBath()
     {
         std::string directory = "TestCreateArchiveForLoadFromSequentialWithBath";
         HeartConfig::Instance()->Reset();
@@ -1060,7 +1060,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
         delete p_mesh;
     }
 
-    void TestLoadFromSequentialWithBath() throw (Exception)
+    void TestLoadFromSequentialWithBath()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_from_seq_with_bath/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestLoadFromSequentialWithBath";
@@ -1151,7 +1151,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
     /*
      * The following tests that there are no problems when running and resuming a simulation with postprocessing.
      */
-    void TestSolveAndResumeWithPostprocessing() throw (Exception)
+    void TestSolveAndResumeWithPostprocessing()
     {
         setUp();
         HeartConfig::Instance()->SetOutputDirectory("SolveAndResumeWithPostprocessing");
@@ -1210,7 +1210,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
 scons build=GccOpt_hostconfig,boost=1-34_2  test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/data/checkpoint_migration_bcs_on_non_master_only/
      */
-    void TestCreateArchiveForBcsOnNonMasterOnly() throw (Exception)
+    void TestCreateArchiveForBcsOnNonMasterOnly()
     {
         std::string directory = "TestCreateArchiveForBcsOnNonMasterOnly";
         HeartConfig::Instance()->Reset();
@@ -1258,7 +1258,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/
         CardiacSimulationArchiver<BidomainProblem<1> >::Save(bidomain_problem, directory);
     }
 
-    void TestBcsOnNonMasterOnly() throw (Exception)
+    void TestBcsOnNonMasterOnly()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_bcs_on_non_master_only/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestBcsOnNonMasterOnly";
@@ -1306,7 +1306,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForBcsOnNonMasterOnly/?* ./heart/test/
 scons build=GccOpt_hostconfig,boost=1-34_2 test_suite=heart/test/TestCardiacSimulationArchiver.hpp
 cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./heart/test/data/checkpoint_migration_after_solve/
      */
-    void TestCreateArchiveForMigrateAfterSolve() throw (Exception)
+    void TestCreateArchiveForMigrateAfterSolve()
     {
         std::string directory = "TestCreateArchiveForMigrateAfterSolve";
         HeartConfig::Instance()->Reset();
@@ -1342,7 +1342,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
         );
     }
 
-    void TestMigrateAfterSolve() throw (Exception)
+    void TestMigrateAfterSolve()
     {
         FileFinder source_directory("heart/test/data/checkpoint_migration_after_solve/", RelativeTo::ChasteSourceRoot);
         std::string new_archive_dir = "TestMigrateAfterSolve";
@@ -1389,7 +1389,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
     /*
      *  Check that we can read for a permuted mesh (or permuted archive) and then correctly record that it was permuted
      */
-    void TestPermutedBidomain1D() throw(Exception)
+    void TestPermutedBidomain1D()
     {
         std::string archive_dir("ArchiveBidomainPermuted");
 

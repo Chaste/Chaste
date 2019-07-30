@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,9 +69,14 @@ typedef std::pair<std::string, std::string> StringPair;
 #ifdef CHASTE_CVODE
 #include <sundials/sundials_config.h>
 #if CHASTE_SUNDIALS_VERSION >= 20600
-// SUNDIALS 2.6 defined SUNDIALS_PACKAGE_VERSION without quotes...
+#if CHASTE_SUNDIALS_VERSION >= 30000
+// SUNDIALS 3.0 upwards uses SUNDIALS_VERSION instead of SUNDIALS_PACKAGE_VERSION.
+#define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_VERSION
+#else
+// SUNDIALS 2.6 upwards defines SUNDIALS_PACKAGE_VERSION with quotes...
 #include <boost/preprocessor/stringize.hpp>
 #define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
+#endif // SUNDIALS >= 3.0.0
 #else
 #define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
 #endif // SUNDIALS >= 2.6.0
@@ -415,7 +420,11 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t\t<Optional>\n";
 #ifdef CHASTE_CVODE
-    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
+    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS>";
+#if CHASTE_SUNDIALS_VERSION < 30000
+    output << "<!-- includes Cvode of a different version number -->";
+#endif
+    output << std::endl;
 #else
     output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
 #endif

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -62,6 +62,12 @@ private:
     /** The height of the mesh, taking account of top-bottom periodicity. */
     double mHeight;
 
+    /**
+     * Auxiliary mesh pointer, created/updated when GetMeshForVtk() is called
+     * and stored so that it may be deleted by the destructor.
+     */
+    VertexMesh<2,2>* mpMeshForVtk;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -80,6 +86,7 @@ private:
         archive & boost::serialization::base_object<MutableVertexMesh<2,2> >(*this);
         archive & mWidth;
         archive & mHeight;
+        mpMeshForVtk = nullptr;
     }
 
 public:
@@ -147,6 +154,20 @@ public:
     double GetWidth(const unsigned& rDimension) const;
 
     /**
+     * Set mHeight.
+     *
+     * @param height the new value of mHeight
+     */
+    void SetHeight(double height);
+
+    /**
+     * Set mWidth.
+     *
+     * @param width the new value of mWidth
+     */
+    void SetWidth(double width);
+
+    /**
      * Overridden AddNode() method.
      *
      * @param pNewNode the node to be added to the mesh
@@ -156,13 +177,15 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
+     * Overridden GetMeshForVtk() method.
+     *
      * Return a pointer to an extended mesh that is a 'non-periodic'
      * version of our mesh. This can then be used when writing to
      * VTK.
      *
      * @return a non-periodic vertex mesh
      */
-     MutableVertexMesh<2, 2>* GetMeshForVtk();
+     VertexMesh<2,2>* GetMeshForVtk();
 
      /**
       * Construct the mesh using a MeshReader.

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,7 +119,7 @@ public:
      * Secondly, test that cells' hypoxic durations are correctly updated when a
      * nutrient distribution is prescribed.
      */
-    void TestUpdateAtEndOfTimeStep() throw(Exception)
+    void TestUpdateAtEndOfTimeStep()
     {
         EXIT_IF_PARALLEL;
 
@@ -213,7 +213,7 @@ public:
         }
     }
 
-    void TestWithOxygen() throw(Exception)
+    void TestWithOxygen()
     {
         EXIT_IF_PARALLEL;
 
@@ -286,7 +286,7 @@ public:
      * Note: if the previous test is changed we need to update the file
      * this test refers to.
      */
-    void TestVisualizerOutput() throw (Exception)
+    void TestVisualizerOutput()
     {
         EXIT_IF_PARALLEL;
 
@@ -309,7 +309,7 @@ public:
         FileComparison(results_dir + "/results.vizsetup", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizsetup").CompareFiles();
     }
 
-    void TestWithPointwiseSource() throw(Exception)
+    void TestWithPointwiseSource()
     {
         EXIT_IF_PARALLEL;
 
@@ -388,7 +388,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
     }
 
-    void TestWithPointwiseTwoSource() throw(Exception)
+    void TestWithPointwiseTwoSource()
     {
         EXIT_IF_PARALLEL;
 
@@ -468,7 +468,7 @@ public:
         TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
     }
 
-    void TestSpheroidStatistics() throw (Exception)
+    void TestSpheroidStatistics()
     {
         EXIT_IF_PARALLEL;
 
@@ -574,7 +574,7 @@ public:
         TS_ASSERT(comparison.CompareFiles(5e-3));
     }
 
-    void TestCoarseSourceMesh() throw(Exception)
+    void TestCoarseSourceMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -727,7 +727,7 @@ public:
         }
     }
 
-    void TestCoarseSourceMeshWithGhostNodes() throw(Exception)
+    void TestCoarseSourceMeshWithGhostNodes()
     {
         EXIT_IF_PARALLEL;
 
@@ -790,7 +790,7 @@ public:
         }
     }
 
-    void TestArchivingWithSimplePde() throw (Exception)
+    void TestArchivingWithSimplePde()
     {
         EXIT_IF_PARALLEL;
 
@@ -879,7 +879,7 @@ public:
      * This test demonstrates how to archive a OffLatticeSimulation
      * in the case where the PDE has the cell population as a member variable.
      */
-    void TestArchivingWithCellwisePde() throw (Exception)
+    void TestArchivingWithCellwisePde()
     {
         EXIT_IF_PARALLEL;
 
@@ -953,7 +953,7 @@ public:
         delete p_simulator;
     }
 
-    void Test3DOffLatticeSimulationWithPdes() throw(Exception)
+    void Test3DOffLatticeSimulationWithPdes()
     {
         EXIT_IF_PARALLEL;
 
@@ -1014,7 +1014,7 @@ public:
      * del squared C = 1 on the unit disc, with boundary condition C=t on r=1,
      * which has analytic solution C = t - 0.25*(1-r^2).
      */
-    void TestWithBoundaryConditionVaryingInTime() throw(Exception)
+    void TestWithBoundaryConditionVaryingInTime()
     {
         EXIT_IF_PARALLEL;
 
@@ -1079,7 +1079,7 @@ public:
         }
     }
 
-    void TestOffLatticeSimulationWithPdesParameterOutputMethods() throw (Exception)
+    void TestOffLatticeSimulationWithPdesParameterOutputMethods()
     {
         EXIT_IF_PARALLEL;
 
@@ -1127,7 +1127,7 @@ public:
         ///\todo check output of simulator.OutputSimulationSetup();
     }
 
-    void TestNodeBasedWithCoarseMesh() throw(Exception)
+    void TestNodeBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1222,7 +1222,7 @@ public:
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
     }
 
-    void TestVertexBasedWithCoarseMesh() throw(Exception)
+    void TestVertexBasedWithCoarseMesh()
     {
         EXIT_IF_PARALLEL;
 
@@ -1297,7 +1297,7 @@ public:
         }
     }
 
-    void TestVolumeDependentAveragedPde() throw(Exception)
+    void TestVolumeDependentAveragedPde()
     {
         EXIT_IF_PARALLEL;
 
@@ -1392,7 +1392,7 @@ public:
         }
     }
 
-    void TestCoarsePdeSolutionOnNodeBased1d() throw(Exception)
+    void TestCoarsePdeSolutionOnNodeBased1d()
     {
         EXIT_IF_PARALLEL;
 
@@ -1453,7 +1453,7 @@ public:
         }
     }
 
-    void TestCoarsePdeSolutionOnNodeBased2d() throw(Exception)
+    void TestCoarsePdeSolutionOnNodeBased2d()
     {
         EXIT_IF_PARALLEL;
 
@@ -1515,7 +1515,7 @@ public:
         TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem("nutrient"), 0.9589, 1e-4);
     }
 
-    void TestCoarsePdeSolutionOnNodeBased3d() throw(Exception)
+    void TestCoarsePdeSolutionOnNodeBased3d()
     {
         EXIT_IF_PARALLEL;
 

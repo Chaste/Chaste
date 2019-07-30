@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPropagationPropertiesCalculator : public CxxTest::TestSuite
 {
 public:
-    void TestConductionVelocity1D(void) throw (Exception)
+    void TestConductionVelocity1D(void)
     {
         Hdf5DataReader simulation_data("heart/test/data/Monodomain1d",
                                        "MonodomainLR91_1d", false);
@@ -80,7 +80,7 @@ public:
 
     }
 
-    void TestConductionVelocityWithRepeatedStimuli(void) throw (Exception)
+    void TestConductionVelocityWithRepeatedStimuli(void)
     {
         Hdf5DataReader simulation_data("heart/test/data/Monodomain1d",
                                        "RepeatedStimuli", false);
@@ -133,7 +133,7 @@ public:
 
     }
 
-    void TestConductionBidomain3D() throw (Exception)
+    void TestConductionBidomain3D()
     {
         //Note: these data files (from notforrelease/test/TestCardiacFastSlowProblem3D.hpp) are incomplete.
         unsigned middle_index = 14895U;
@@ -251,7 +251,7 @@ public:
 
     }
 
-    void TestEadCalculation() throw(Exception)
+    void TestEadCalculation()
     {
        Hdf5DataReader ead_file("heart/test/data/PostProcessingWriter", "Ead", false);
        PropagationPropertiesCalculator ead_calc(&ead_file);

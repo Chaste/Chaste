@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ class TestMonodomainStiffnessMatrixAssembler : public CxxTest::TestSuite
 {
 public:
 
-    void TestMonodomainStiffnessMatrixAssembler1d() throw(Exception)
+    void TestMonodomainStiffnessMatrixAssembler1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;

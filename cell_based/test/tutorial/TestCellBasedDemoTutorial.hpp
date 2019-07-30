@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -113,7 +113,7 @@ public:
      * In the first test, we run a simple vertex-based simulation of an epithelial monolayer.
      * Each cell in the simulation is assigned a simple stochastic cell-cycle model, the cells will divide randomly and never stop proliferating.
      */
-    void TestVertexBasedMonolayer() throw (Exception)
+    void TestVertexBasedMonolayer()
     {
         /* The first thing we define is a 2D (specified by the <2,2>) mesh which holds the spatial information of the simulation. To do this we use one of a
          * number of {{{MeshGenerators}}}.*/
@@ -198,7 +198,7 @@ public:
      * in which cells are represented by overlapping spheres (actually circles, since we're
      * in 2D).
      */
-    void TestNodeBasedMonolayer() throw (Exception)
+    void TestNodeBasedMonolayer()
     {
         /* We now need to create a {{{NodesOnlyMesh}}} we do this by first creating a {{{MutableMesh}}}
          * and passing this to a helper method {{{ConstructNodesWithoutMesh}}} along with a interaction cut off length
@@ -265,7 +265,7 @@ public:
      * in which cells are represented by their centres and a Voronoi tessellation is used to
      * find nearest neighbours.
      */
-    void TestMeshBasedMonolayer() throw (Exception)
+    void TestMeshBasedMonolayer()
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.*/
         HoneycombMeshGenerator generator(2, 2);
@@ -316,7 +316,7 @@ public:
      * correspond to cells but are sometimes needed when using a Voronoi tessellation. We
      * will discuss ghost nodes in more detail in subsequent cell-based tutorials.
      */
-    void TestMeshBasedMonolayerWithGhostNodes() throw (Exception)
+    void TestMeshBasedMonolayerWithGhostNodes()
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.
          * Here we pass an extra argument to the {{{HoneycombMeshGenerator}}} which adds another 2 rows of
@@ -369,7 +369,7 @@ public:
      * We next show how to modify the previous test to implement a periodic boundary to the
      * left and right of the domain.
      */
-    void TestMeshBasedMonolayerPeriodic() throw (Exception)
+    void TestMeshBasedMonolayerPeriodic()
     {
         /* We now want to impose periodic boundaries on the domain. To do this we create a {{{Cylindrical2dMesh}}}
          * using a {{{CylindricalHoneycombMeshGenerator}}}.*/
@@ -414,7 +414,7 @@ public:
      * We next show how to modify the previous test to include one
      * or more 'obstructions' within the domain.
      */
-    void TestMeshBasedMonolayerPeriodicSolidBottomBoundary() throw (Exception)
+    void TestMeshBasedMonolayerPeriodicSolidBottomBoundary()
     {
         /* We make the same {{{Mesh}}}, {{{Cells}}}, {{{CellPopulation}}},
          * {{{CellBasedSimulation}}} and forces as before, all we change is the output directory.*/
@@ -463,7 +463,7 @@ public:
      * In the final test we show how to modify the earlier tests (using off lattice models) to implement a 'Potts-based' simulation,
      * in which cells are represented by collections of sites on a fixed lattice.
      */
-    void TestPottsBasedMonolayer() throw (Exception)
+    void TestPottsBasedMonolayer()
     {
         /* In common with the off lattice simulations we begin by creating a mesh. Here we use the {{{PottsMeshGenerator}}}
          * class to generate a {{{PottsMesh}}} each element in the mesh is a collection of lattice sites (represented by nodes at their centres).

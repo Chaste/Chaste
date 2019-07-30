@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -100,7 +100,7 @@ public:
      * In the first test, we run a simple Potts-based simulation, in which we create a monolayer
      * of cells, using a Potts mesh. Each cell is assigned a stochastic cell-cycle model.
      */
-    void TestMonolayer() throw(Exception)
+    void TestMonolayer()
     {
         /** The next line is needed because we cannot currently run Potts simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -242,7 +242,7 @@ public:
      * cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2015–2016.
      *
      */
-    void TestPottsMonolayerCellSorting() throw (Exception)
+    void TestPottsMonolayerCellSorting()
     {
         /** The next line is needed because we cannot currently run Potts simulations in parallel. */
         EXIT_IF_PARALLEL;
@@ -336,7 +336,7 @@ public:
      * The next test extends the previous example to three dimensions.
      *
      */
-    void TestPottsSpheroidCellSorting() throw (Exception)
+    void TestPottsSpheroidCellSorting()
     {
         /** The next line is needed because we cannot currently run Potts simulations in parallel. */
         EXIT_IF_PARALLEL;

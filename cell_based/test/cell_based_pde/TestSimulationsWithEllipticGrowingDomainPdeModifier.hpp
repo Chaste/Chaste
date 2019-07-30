@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -100,7 +100,7 @@ private:
 
 public:
 
-    void TestEllipticGrowingDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
+    void TestEllipticGrowingDomainPdeModifierWithVertexBasedMonolayer()
     {
         // Create Mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -162,7 +162,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9832, 1e-4);
     }
 
-    void TestEllipticGrowingDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
+    void TestEllipticGrowingDomainPdeModifierWithNodeBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -209,7 +209,7 @@ public:
         delete p_mesh; // to stop memory leaks
     }
 
-    void TestEllipticGrowingDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
+    void TestEllipticGrowingDomainPdeModifierWithMeshBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -258,7 +258,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9717, 1e-4);
     }
 
-    void TestEllipticGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
+    void TestEllipticGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -302,7 +302,7 @@ public:
         TS_ASSERT_THROWS_THIS(simulator.Solve(),"Currently can't solve PDEs on meshes with ghost nodes");
     }
 
-    void TestEllipticGrowingDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
+    void TestEllipticGrowingDomainPdeModifierWithPottsBasedMonolayer()
     {
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -352,7 +352,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.6666, 1e-4); // Lower as mesh is larger
     }
 
-    void TestEllipticGrowingDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
+    void TestEllipticGrowingDomainPdeModifierWithCaBasedMonolayer()
     {
         // Create a simple 2D PottsMesh
         unsigned domain_wide = 5*M_NUM_CELLS_ACROSS;
@@ -418,7 +418,7 @@ public:
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 0.9753, 1e-4);
     }
 
-    void TestExceptionWithPdeAndCellKiller() throw(Exception)
+    void TestExceptionWithPdeAndCellKiller()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0u,  false,  0.5, 0.0, 0.0));

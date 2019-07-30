@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ public:
 class TestAbstractPurkinjeCellFactory : public CxxTest::TestSuite
 {
 public:
-    void TestPurkinjeCellFactory() throw (Exception)
+    void TestPurkinjeCellFactory()
     {
         TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         MixedDimensionMesh<2,2> mixed_mesh;

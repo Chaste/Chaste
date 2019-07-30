@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ class TestOdeBasedCellCycleModels : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestTysonNovakCellCycleModel() throw(Exception)
+    void TestTysonNovakCellCycleModel()
     {
         // Set up
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -235,7 +235,7 @@ public:
      * conditions, since the oscillatory solution computed using the Chaste
      * ODE solver is not stable.
      */
-    void TestTysonNovakCellCycleModelSolver() throw(Exception)
+    void TestTysonNovakCellCycleModelSolver()
     {
         // Set up simulation time
         unsigned num_timesteps = 100000;
@@ -289,7 +289,7 @@ public:
          */
     }
 
-    void TestAlarcon2004OxygenBasedCellCycleModel() throw(Exception)
+    void TestAlarcon2004OxygenBasedCellCycleModel()
     {
         // Set up SimulationTime
         SimulationTime* p_simulation_time = SimulationTime::Instance();

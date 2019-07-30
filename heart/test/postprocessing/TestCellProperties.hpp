@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,6 +103,7 @@ public:
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastPeakPotential(), "AP did not occur, never descended past threshold voltage.");
+            TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastPeakPotential(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetMaxUpstrokeVelocities(), "AP did not occur, never descended past threshold voltage.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimesAtMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");
         }
@@ -125,6 +126,7 @@ public:
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), "No MaxUpstrokeVelocity matching a full action potential was recorded.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), "No TimeAtMaxUpstrokeVelocity matching a full action potential was recorded.");
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastCompletePeakPotential(), "No peak potential matching a full action potential was recorded.");
+            TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastCompletePeakPotential(), "No peak potential matching a full action potential was recorded.");
         }
 
         // Stay up for a while...
@@ -144,6 +146,7 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), 100, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), 105, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompletePeakPotential(), 20, 1e-6);
+            TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompletePeakPotential(), 100, 1e-6);
         }
 
         // Stay down for a while
@@ -165,6 +168,7 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), 100, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), 105, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompletePeakPotential(), 20, 1e-6);
+            TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompletePeakPotential(), 100, 1e-6);
         }
 
         // Go down again...
@@ -181,6 +185,7 @@ public:
             TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompleteMaxUpstrokeVelocity(), 141, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompleteMaxUpstrokeVelocity(), 85, 1e-6);
             TS_ASSERT_DELTA(cell_properties.GetLastCompletePeakPotential(), 0, 1e-6);
+            TS_ASSERT_DELTA(cell_properties.GetTimeAtLastCompletePeakPotential(), 141, 1e-6);
         }
 
         times.push_back(999);
@@ -233,6 +238,7 @@ public:
         TS_ASSERT_DELTA(cell_props.GetActionPotentialAmplitudes()[size - 1], 127.606, 0.001);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialAmplitude(), 127.606, 0.001);
         TS_ASSERT_DELTA(cell_props.GetLastPeakPotential(), 43.1665, 0.0001);
+        TS_ASSERT_DELTA(cell_props.GetTimeAtLastPeakPotential(), 3101.15, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(20), 6.5202, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(50), 271.1389, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(90), 362.0155, timestep); // Should use penultimate AP
@@ -322,7 +328,7 @@ public:
         TS_ASSERT_DELTA(cycle_lengths[size - 1], 2500, 1);
     }
 
-    void TestEadDetection() throw(Exception)
+    void TestEadDetection()
     {
         //this file contains 4 Aps
         std::ifstream ead_file("heart/test/data/sample_APs/Ead.dat");
@@ -361,7 +367,7 @@ public:
         TS_ASSERT_EQUALS(number_of_changes_for_last_ap, above_threshold_depo[size - 1]);
     }
 
-    void TestVeryLongApDetection() throw(Exception)
+    void TestVeryLongApDetection()
     {
         // This test is added to deal with a problem where you get long action potentials (overlapping the next stimulus)
         // and then, depending on the threshold, these got reported as one or two action potentials.
@@ -407,7 +413,7 @@ public:
         }
     }
 
-    void TestActionPotentialCalculations() throw(Exception)
+    void TestActionPotentialCalculations()
     {
         /*
         * In this simulation the stimulus was introduced at t=1ms.
@@ -584,6 +590,13 @@ public:
                 TS_ASSERT_EQUALS(peak_Vs.size(), 2u);
                 TS_ASSERT_DELTA(peak_Vs[0], -52.03, tolerance);
                 TS_ASSERT_DELTA(peak_Vs[1], 20.742, tolerance);
+
+                std::vector<double> peak_V_times = cell_properties.GetTimesAtPeakPotentials();
+                TS_ASSERT_EQUALS(peak_V_times.size(), 2u);
+                TS_ASSERT_DELTA(peak_V_times[0], 8.5, tolerance);
+                TS_ASSERT_DELTA(peak_V_times[1], 2018.5, tolerance);
+
+                TS_ASSERT_DELTA(cell_properties.GetTimeAtLastPeakPotential(), 2018.5, tolerance);
 
                 std::vector<double> amplitudes = cell_properties.GetActionPotentialAmplitudes();
                 TS_ASSERT_EQUALS(amplitudes.size(), 2u);

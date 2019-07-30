@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ class TestRungeKuttaFehlbergIvpOdeSolver: public CxxTest::TestSuite
 {
 public:
 
-    void TestAdjustStepSize() throw(Exception)
+    void TestAdjustStepSize()
     {
          RungeKuttaFehlbergIvpOdeSolver rkf_solver;
 
@@ -111,7 +111,7 @@ public:
                  "RKF45 Solver: Ode needs a smaller timestep than the set minimum\n");
     }
 
-    void TestCalculateNextYValue() throw(Exception)
+    void TestCalculateNextYValue()
     {
         RungeKuttaFehlbergIvpOdeSolver rkf_solver;
 
@@ -139,7 +139,7 @@ public:
         TS_ASSERT_DELTA(rkf_solver.mError[0], 6.2e-6, 1e-7);
     }
 
-    void TestRKFehlbergWithExampleFromBook() throw(Exception)
+    void TestRKFehlbergWithExampleFromBook()
     {
         /*
          * Book is "Numerical Analysis 6th Edition by R.L. Burden and J. D. Faires
@@ -183,7 +183,7 @@ public:
         }
     }
 
-    void TestRKFehlbergSystemOf3Equations() throw(Exception)
+    void TestRKFehlbergSystemOf3Equations()
     {
         OdeThirdOrder ode_system;
 
@@ -213,7 +213,7 @@ public:
         TS_ASSERT_DELTA(numerical_solution[2],analytical_solution[2],global_error_rkf);
     }
 
-    void TestRKFehlbergNonlinearEquation() throw(Exception)
+    void TestRKFehlbergNonlinearEquation()
     {
         Ode4 ode_system;
 
@@ -237,7 +237,7 @@ public:
         TS_ASSERT_DELTA(numerical_solution,analytical_solution,1.0e-4);
     }
 
-    void TestRKFehlbergAnotherNonlinearEquation() throw(Exception)
+    void TestRKFehlbergAnotherNonlinearEquation()
     {
         Ode5 ode_system;
 
@@ -262,7 +262,7 @@ public:
         TS_ASSERT_DELTA(numerical_solution,analytical_solution,1.0e-3);
     }
 
-    void TestRKFehlbergSystemOf3EquationsWithEvents() throw(Exception)
+    void TestRKFehlbergSystemOf3EquationsWithEvents()
     {
         OdeThirdOrderWithEvents ode_system_with_events;
 
@@ -301,7 +301,7 @@ public:
                 "(Solve without sampling) Stopping event is true for initial condition");
     }
 
-    void TestRKFehlbergAnotherNonlinearEquationAnalytic() throw(Exception)
+    void TestRKFehlbergAnotherNonlinearEquationAnalytic()
     {
         Ode5Jacobian ode_system;
 
@@ -326,7 +326,7 @@ public:
         TS_ASSERT_DELTA(numerical_solution,analytical_solution,1.0e-3);
     }
 
-    void TestRKFehlbergVanDerPolOde() throw(Exception)
+    void TestRKFehlbergVanDerPolOde()
     {
         VanDerPolOde ode_system;
 
@@ -360,7 +360,7 @@ public:
         TS_ASSERT_DELTA(numerical_solution[1], 0, 2);
     }
 
-    void TestArchivingRkfSolver() throw(Exception)
+    void TestArchivingRkfSolver()
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;

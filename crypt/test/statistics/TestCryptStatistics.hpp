@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ private:
 
 public:
 
-    void TestGetSection() throw (Exception)
+    void TestGetSection()
     {
         double crypt_length = 22.0;
 
@@ -170,7 +170,7 @@ public:
         }
     }
 
-    void TestMakeMeinekeGraphs() throw (Exception)
+    void TestMakeMeinekeGraphs()
     {
         // Specify output directory
         std::string output_directory = "MakeMeinekeGraphs";
@@ -341,7 +341,7 @@ public:
      * This test runs multiple crypt simulations and records whether
      * or not labelled cells are in a randomly chosen crypt section.
      */
-    void TestMultipleCryptSimulations() throw (Exception)
+    void TestMultipleCryptSimulations()
     {
         std::string output_directory = "MakeMoreMeinekeGraphs";
 

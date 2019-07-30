@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -224,7 +224,7 @@ public:
      * We conclude with a brief test demonstrating how {{{CellHeightTrackingModifier}}} can be used
      * in a cell-based simulation.
      */
-    void TestOffLatticeSimulationWithCellHeightTrackingModifier() throw(Exception)
+    void TestOffLatticeSimulationWithCellHeightTrackingModifier()
     {
         /*
          * In this case, we choose to create a small {{{NodeBasedCellPopulation}}} comprising 25 cells.

@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -319,9 +319,8 @@ extra_flags = build.CcFlags() + ' ' + hostconfig.CcFlags()
 link_flags  = build.LinkFlags() + ' ' + hostconfig.LdFlags()
 include_flag = ' ' + build.IncludeFlag() + ' '
 
-# C++11 changes (#2811)
-extra_flags = extra_flags + ' -std=c++11'
-extra_flags = extra_flags + ' -Wno-deprecated-declarations'  # XSD 3.3 generates code with deprecated std::auto_ptr
+# C++14 changes (#2811, #3008)
+extra_flags = extra_flags + ' -std=c++14'
 
 env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
            + ' ' + extra_flags)

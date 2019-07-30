@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -97,7 +97,7 @@ private:
 
 public:
 
-    void TestEllipticBoxDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeModifierWithVertexBasedMonolayer()
     {
         // Create Mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -164,7 +164,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.6191, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeModifierWithNodeBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -216,7 +216,7 @@ public:
         delete p_mesh; // to stop memory leaks
     }
 
-    void TestEllipticBoxDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeModifierWithMeshBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -270,7 +270,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.6786, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -328,7 +328,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(24))->GetCellData()->GetItem("oxygen"), 0.6786, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeModifierWithPottsBasedMonolayer()
     {
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -385,7 +385,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.7123, 1e-4);
     }
 
-    void TestEllipticBoxDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
+    void TestEllipticBoxDomainPdeModifierWithCaBasedMonolayer()
     {
         // Create a simple 2D PottsMesh
         unsigned domain_width = 5*M_NUM_CELLS_ACROSS;

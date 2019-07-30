@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,7 +101,7 @@ private:
 
 public:
 
-    void TestParabolicBoxDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
+    void TestParabolicBoxDomainPdeModifierWithVertexBasedMonolayer()
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -168,7 +168,7 @@ public:
         TS_ASSERT_DELTA((simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9120, 1e-4);
     }
 
-    void TestParabolicBoxDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
+    void TestParabolicBoxDomainPdeModifierWithNodeBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -222,7 +222,7 @@ public:
         delete p_mesh; // to stop memory leaks
     }
 
-    void TestParabolicBoxDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
+    void TestParabolicBoxDomainPdeModifierWithMeshBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -278,7 +278,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.8783, 1e-4);
     }
 
-    void TestParabolicBoxDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
+    void TestParabolicBoxDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -338,7 +338,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(20+4))->GetCellData()->GetItem("oxygen"), 0.8783, 1e-4);
     }
 
-    void TestParabolicBoxDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
+    void TestParabolicBoxDomainPdeModifierWithPottsBasedMonolayer()
     {
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -397,7 +397,7 @@ public:
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.8887, 1e-4);
     }
 
-    void TestParabolicBoxDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
+    void TestParabolicBoxDomainPdeModifierWithCaBasedMonolayer()
     {
         // Create a simple 2D PottsMesh
         unsigned domain_width = 5*M_NUM_CELLS_ACROSS;

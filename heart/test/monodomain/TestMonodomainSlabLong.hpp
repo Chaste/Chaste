@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -82,7 +82,7 @@ public:
 class TestMonodomainSlabLong : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainSlabLongWithCornerNodesStimulated( void ) throw (Exception)
+    void TestMonodomainSlabLongWithCornerNodesStimulated( void )
     {
         HeartConfig::Instance()->SetSimulationDuration(200); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");

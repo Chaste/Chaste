@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -272,7 +272,7 @@ public:
 class TestWritingPdeSolversTwoTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestExplicitSolver() throw (Exception)
+    void TestExplicitSolver()
     {
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);

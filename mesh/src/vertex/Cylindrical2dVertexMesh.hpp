@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,6 +58,12 @@ private:
 
     /** The circumference of the cylinder. */
     double mWidth;
+
+    /**
+     * Auxiliary mesh pointer, created/updated when GetMeshForVtk() is called
+     * and stored so that it may be deleted by the destructor.
+     */
+    VertexMesh<2,2>* mpMeshForVtk;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -166,13 +172,15 @@ public:
     void Scale(const double xScale=1.0, const double yScale=1.0,const double zScale=1.0);
 
     /**
+     * Overridden GetMeshForVtk() method.
+     *
      * Return a pointer to an extended mesh that is a 'non-periodic'
      * version of our mesh. This can then be used when writing to
      * VTK.
      *
      * @return a non-periodic vertex mesh
      */
-     MutableVertexMesh<2, 2>* GetMeshForVtk();
+     VertexMesh<2, 2>* GetMeshForVtk();
 };
 
 #include "SerializationExportWrapper.hpp"

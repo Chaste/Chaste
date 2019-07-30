@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ class TestCryptCellsGenerator : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCryptCellsGeneratorWithFixedG1GenerationalCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithFixedG1GenerationalCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -114,7 +114,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithUniformG1GenerationalCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithUniformG1GenerationalCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -177,7 +177,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithTysonNovakCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithTysonNovakCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -207,7 +207,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithWntCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithWntCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -241,7 +241,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithSimpleWntCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithSimpleWntCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -264,7 +264,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithStochasticWntCellCycleModel() throw(Exception)
+    void TestCryptCellsGeneratorWithStochasticWntCellCycleModel()
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
@@ -298,7 +298,7 @@ public:
         }
     }
 
-    void TestCryptCellsGeneratorWithUniformG1GenerationalCellCycleModelAndVertexMesh() throw(Exception)
+    void TestCryptCellsGeneratorWithUniformG1GenerationalCellCycleModelAndVertexMesh()
       {
           // Create mesh
           unsigned crypt_width = 4;
@@ -357,7 +357,7 @@ public:
           }
       }
 
-      void TestCryptCellsGeneratorWithSimpleWntCellCycleModelAndVertexMesh() throw(Exception)
+      void TestCryptCellsGeneratorWithSimpleWntCellCycleModelAndVertexMesh()
       {
           // Create mesh
           unsigned crypt_width = 4;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,7 +119,7 @@ public:
      *
      * In the first test, we demonstrate how to introduce mutations into a simulation of a crypt.
      */
-    void TestMeshBasedCryptWithMutations() throw(Exception)
+    void TestMeshBasedCryptWithMutations()
     {
         /* Note that time is re-initialized to zero and the random number generator is re-seeded to zero in the {{{AbstractCellBasedTestSuite}}}.
          *

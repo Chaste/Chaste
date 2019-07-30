@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,7 +89,7 @@ class TestAirwayGenerationTutorial : public CxxTest::TestSuite
 {
 public: // Tests should be public!
 
-    void TestGenerateAirways() throw (Exception)
+    void TestGenerateAirways()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 

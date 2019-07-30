@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ class TestObsoleteBoxCollection : public CxxTest::TestSuite
 {
 public:
 
-    void TestBox() throw (Exception)
+    void TestBox()
     {
         Box<2> test_box;
 
@@ -70,7 +70,7 @@ public:
         TS_ASSERT(nodes_contained_after.empty());
     }
 
-    void TestIndexing() throw (Exception)
+    void TestIndexing()
     {
         // 1D
         {
@@ -123,7 +123,7 @@ public:
         }
     }
 
-    void TestBoxGeneration1d() throw (Exception)
+    void TestBoxGeneration1d()
     {
         // Create a mesh
         TetrahedralMesh<1,1> mesh;
@@ -194,7 +194,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "Location in dimension 0 is");
     }
 
-    void TestAddElement() throw(Exception)
+    void TestAddElement()
     {
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0);
@@ -213,7 +213,7 @@ public:
         TS_ASSERT_EQUALS(*(box_collection.rGetBox(0).rGetElementsContained().begin()), mesh.GetElement(0));
     }
 
-    void TestSetupAllLocalBoxes2d() throw(Exception)
+    void TestSetupAllLocalBoxes2d()
     {
         double width = 1.0;
 
@@ -249,7 +249,7 @@ public:
         TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
     }
 
-    void TestSetupAllLocalBoxes2dPeriodic() throw(Exception)
+    void TestSetupAllLocalBoxes2dPeriodic()
     {
         double width = 1.0;
 
@@ -290,7 +290,7 @@ public:
         TS_ASSERT_EQUALS(local_boxes_to_box_11, correct_answer_11);
     }
 
-    void TestConvertBetweenLinearAndGridIndices() throw(Exception)
+    void TestConvertBetweenLinearAndGridIndices()
     {
         // 1D
         {
@@ -359,7 +359,7 @@ public:
         }
     }
 
-    void TestIsBoxInDomain() throw(Exception)
+    void TestIsBoxInDomain()
     {
         c_vector<double, 2 * 3> domain_size;
         domain_size(0) = 0.0;
@@ -389,7 +389,7 @@ public:
         TS_ASSERT_EQUALS(box_collection.IsBoxInDomain(box_collection.GetGridIndices(19) + test_point_0), true);
     }
 
-    void TestSetupAllLocalBoxes3d() throw(Exception)
+    void TestSetupAllLocalBoxes3d()
     {
         double width = 1.0;
 
@@ -433,7 +433,7 @@ public:
         TS_ASSERT_EQUALS(local_boxes_to_box_22, correct_answer_22);
     }
 
-    void TestPairsReturned1d() throw (Exception)
+    void TestPairsReturned1d()
     {
         std::vector< ChastePoint<1>* > points(5);
         points[0] = new ChastePoint<1>(0.2);
@@ -511,7 +511,7 @@ public:
         }
     }
 
-    void TestBoxGeneration2d() throw (Exception)
+    void TestBoxGeneration2d()
     {
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
@@ -573,7 +573,7 @@ public:
      * calculations. Failure of this test on a given architecture implies
      * failure of node-based cell simulations.
      */
-    void TestLargeObsoleteBoxCollection2d() throw (Exception)
+    void TestLargeObsoleteBoxCollection2d()
     {
         double cut_off_length = 1e-3;
 
@@ -602,7 +602,7 @@ public:
         TS_ASSERT_EQUALS(box_collection.CalculateContainingBox(probe), 1002000u);
     }
 
-    void TestPairsReturned2d() throw (Exception)
+    void TestPairsReturned2d()
     {
         std::vector< ChastePoint<2>* > points(10);
         points[0] = new ChastePoint<2>(0.2, 3.7);
@@ -727,7 +727,7 @@ public:
         }
     }
 
-    void TestPairsReturned3d() throw (Exception)
+    void TestPairsReturned3d()
     {
         // 3D cube of nodes, set up so that there is one node in each of the 3x3x3 boxes.
         std::vector<Node<3>* > nodes;
@@ -854,7 +854,7 @@ public:
         }
     }
 
-    void TestLocalBoxesHalfOnly2D() throw (Exception)
+    void TestLocalBoxesHalfOnly2D()
     {
         // Define parameters for the box collection
         c_vector<double, 2 * 2> domain_size;
@@ -1099,7 +1099,7 @@ public:
         }
     }
 
-    void TestNodesPairs2DWithPeriodicity() throw (Exception)
+    void TestNodesPairs2DWithPeriodicity()
     {
         // Set up a box collection
         c_vector<double, 2 * 2> domain_size;
@@ -1170,7 +1170,7 @@ public:
         }
     }
 
-    void TestNodesPairs3DWithPeriodicity() throw (Exception)
+    void TestNodesPairs3DWithPeriodicity()
     {
         // Set up a box collection
         c_vector<double, 2 * 3> domain_size;

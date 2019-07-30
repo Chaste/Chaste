@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,7 +89,7 @@ class TestOperatorSplittingMonodomainSolverLong : public CxxTest::TestSuite
 public:
     // like TestOperatorSplittingMonodomainSolver but much finer mesh and smaller
     // dt so can check for proper convergence
-    void TestConvergenceOnFineMesh() throw(Exception)
+    void TestConvergenceOnFineMesh()
     {
         ReplicatableVector final_voltage_normal;
         ReplicatableVector final_voltage_operator_splitting;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -162,7 +162,7 @@ public:
      * This is purely for coverage of assembling a 3D system (and also uses
      * alternative, heterogeneous constructor, also for coverage).
      */
-    void TestAssembleSystem3D() throw (Exception)
+    void TestAssembleSystem3D()
     {
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
@@ -194,7 +194,7 @@ public:
 
     // compare computed Jacobian against a numerically computed
     // Jacobian
-    void TestAssembleSystem() throw (Exception)
+    void TestAssembleSystem()
     {
         QuadraticMesh<2> mesh(1.0/2.0, 1.0, 1.0);
         CompressibleExponentialLaw<2> law;
@@ -336,7 +336,7 @@ public:
 
 
     // It just tests that nothing happens if zero force and tractions are given
-    void TestWithZeroDisplacement() throw(Exception)
+    void TestWithZeroDisplacement()
     {
         QuadraticMesh<2> mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
@@ -393,7 +393,7 @@ public:
      *    -0.608190204001744 - 0.890314286611269i
      *     0.955749406631746
      */
-    void TestSolveForSimpleDeformationWithCompMooneyRivlin() throw(Exception)
+    void TestSolveForSimpleDeformationWithCompMooneyRivlin()
     {
         double c = 2.2;
         double d = 1.1;
@@ -578,7 +578,7 @@ public:
      *
      * The calculation is written out fully in the FiniteElementImplementations document.
      */
-    void TestAgainstExactNonlinearSolution() throw(Exception)
+    void TestAgainstExactNonlinearSolution()
     {
         for (unsigned run = 0; run < 2; run++)
         {
@@ -689,7 +689,7 @@ public:
     }
 
 
-    void TestCheckPositiveDefinitenessOfJacobianMatrix() throw(Exception)
+    void TestCheckPositiveDefinitenessOfJacobianMatrix()
     {
         unsigned num_elem = 10;
 
@@ -737,7 +737,7 @@ public:
 
     // Solve using an exponential material law. Doesn't test against an exact solution, just that check that the
     // solver converges. Doesn't seem very robust.
-    void TestSolveForSimpleDeformationWithExponentialLaw() throw(Exception)
+    void TestSolveForSimpleDeformationWithExponentialLaw()
     {
         unsigned num_elem = 5;
 
@@ -785,7 +785,7 @@ public:
      * except the y position of the fixed nodes is left free, i.e. sliding boundary conditions
      * are given
      */
-    void TestSolveUsingSlidingBoundaryConditions2d() throw(Exception)
+    void TestSolveUsingSlidingBoundaryConditions2d()
     {
         double c = 2.2;
         double d = 1.1;
@@ -881,7 +881,7 @@ public:
     }
 
     // 3d sliding boundary conditions test
-    void TestSolveUsingSlidingBoundaryConditions3d() throw(Exception)
+    void TestSolveUsingSlidingBoundaryConditions3d()
     {
         unsigned num_elem = 2;
 
@@ -944,7 +944,7 @@ public:
     /* HOW_TO_TAG Continuum mechanics
      * Write strain after solve
      */
-    void TestWritingStrain() throw(Exception)
+    void TestWritingStrain()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
 
@@ -1017,7 +1017,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    void TestWritingStrain3d() throw(Exception)
+    void TestWritingStrain3d()
     {
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
@@ -1076,7 +1076,7 @@ public:
     }
 
 
-    void TestWritingStress3dAndExceptions() throw(Exception)
+    void TestWritingStress3dAndExceptions()
     {
         QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
 
@@ -1178,7 +1178,7 @@ public:
     }
 
     // quick 2d test that complements above test
-    void TestWritingStress2d() throw(Exception)
+    void TestWritingStress2d()
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
@@ -1220,7 +1220,7 @@ public:
     }
 
     //Covers exceptions that are thrown in AbstractContinuumMechanicsSolver if used with a non-quadratic mesh
-    void TestAbstractContinuumMechanicsSolverMeshType() throw(Exception)
+    void TestAbstractContinuumMechanicsSolverMeshType()
     {
         TetrahedralMesh<2,2> mesh;
         SolidMechanicsProblemDefinition<2> problem_defn(mesh);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -594,7 +594,7 @@ public:
      * Test that the solver can read an ordering file and assign the correct
      * number of nodes to each processor.
      */
-    void TestOrdering() throw(Exception)
+    void TestOrdering()
     {
         // Create mesh from mesh reader
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");

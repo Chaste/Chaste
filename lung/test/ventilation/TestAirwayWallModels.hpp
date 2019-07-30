@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ class TestAirwayWallModels: public CxxTest::TestSuite
 {
 public:
 
-    void TestLambertAirwayWallAndFactory() throw (Exception)
+    void TestLambertAirwayWallAndFactory()
     {
         // Get a simple mesh here
         TetrahedralMesh<1,3> mesh;
@@ -181,7 +181,7 @@ public:
         }
     }
 
-    void TestLaPradAirwayWall() throw (Exception)
+    void TestLaPradAirwayWall()
     {
         LaPradAirwayWall airway_wall;
         airway_wall.SetTimestep(1.0); //Not used, for coverage only
@@ -221,7 +221,7 @@ public:
     }
 
 
-    void TestLaPradAirwayWallAndFactory() throw (Exception)
+    void TestLaPradAirwayWallAndFactory()
     {
 
          //Get a simple mesh here
@@ -321,7 +321,7 @@ public:
     }
 
 
-    void TestHiornsAirwayWall() throw (Exception)
+    void TestHiornsAirwayWall()
     {
 
         HiornsAirwayWall airway_wall;
@@ -361,7 +361,7 @@ public:
     }
 
 
-    void TestHiornsAirwayWallAndFactory() throw (Exception)
+    void TestHiornsAirwayWallAndFactory()
     {
         // Get a simple mesh here
         TetrahedralMesh<1,3> mesh;

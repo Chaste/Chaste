@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -176,7 +176,7 @@ private:
 
 public:
 
-    void TestCoverageOfWriteToFile() throw (Exception)
+    void TestCoverageOfWriteToFile()
     {
         Ode2 ode_system;
         OdeSolution solutions;
@@ -205,7 +205,7 @@ public:
         TS_ASSERT(file_comparer.CompareFiles());
     }
 
-    void TestEulerSolver() throw (Exception)
+    void TestEulerSolver()
     {
         EulerIvpOdeSolver euler_solver;
 
@@ -602,11 +602,11 @@ public:
         TS_ASSERT_DELTA(testvalue_rk4, exact_solution, global_error_rk4);
     }
 
-    void TestArchivingSolvers() throw(Exception)
+    void TestArchivingSolvers()
     {
         OutputFileHandler handler("archive",false);
         handler.SetArchiveDirectory();
-        std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("ode_solver.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("ode_solver.arch"); // PLEASE DO NOT COPY-PASTE THIS FILENAME
         // Archive
         {
             std::ofstream ofs(archive_filename.c_str());

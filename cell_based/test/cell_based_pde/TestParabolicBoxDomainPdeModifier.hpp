@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ class TestParabolicBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTes
 {
 public:
 
-    void TestParabolicConstructor() throw(Exception)
+    void TestParabolicConstructor()
     {
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
@@ -111,7 +111,7 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->GetOutputGradient(),true);
     }
 
-    void TestArchiveParabolicBoxDomainPdeModifier() throw(Exception)
+    void TestArchiveParabolicBoxDomainPdeModifier()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
@@ -176,7 +176,7 @@ public:
         }
     }
 
-    void TestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -250,7 +250,7 @@ public:
     }
 
     // Only difference from above test is the use of Neuman BCs here
-    void TestMeshBasedSquareMonolayerWithNeumanBcs() throw (Exception)
+    void TestMeshBasedSquareMonolayerWithNeumanBcs()
     {
         HoneycombMeshGenerator generator(10,10,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -317,7 +317,7 @@ public:
         TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable_grad_y"), -0.2981, 1e-4);
     }
 
-    void TestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -385,7 +385,7 @@ public:
         delete p_mesh;
     }
 
-    void TestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(10,10);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -451,7 +451,7 @@ public:
         TS_ASSERT_DELTA( p_cell_0->GetCellData()->GetItem("variable"), 0.8513, 1e-4);
     }
 
-    void TestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 10, 4, 100, 10, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -522,7 +522,7 @@ public:
         TS_ASSERT_DELTA(p_cell_0->GetCellData()->GetItem("variable"), 0.8343, 1e-4);
     }
 
-    void TestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();

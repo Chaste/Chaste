@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -129,7 +129,7 @@ public:
      * by linear interpolation).
      *
      */
-    void TestSimpleIncompressibleProblem() throw(Exception)
+    void TestSimpleIncompressibleProblem()
     {
         /* First, define the geometry. This should be specified using the `QuadraticMesh` class, which inherits from `TetrahedralMesh`
          * and has mostly the same interface. Here we define a 0.8 by 1 rectangle, with elements 0.1 wide.
@@ -263,7 +263,7 @@ public:
      * in the inward direction so that is counters (somewhat) the effect of gravity. We also show how stresses
      * and strains can be written to file.
      */
-    void TestIncompressibleProblemWithTractions() throw(Exception)
+    void TestIncompressibleProblemWithTractions()
     {
         /* All of this is exactly as above */
         QuadraticMesh<2> mesh;

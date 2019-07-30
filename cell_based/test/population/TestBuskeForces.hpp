@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ class TestBuskeForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestBuskeAdhesiveForceMethods() throw (Exception)
+    void TestBuskeAdhesiveForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -142,7 +142,7 @@ public:
         }
     }
 
-    void TestBuskeElasticForceMethods() throw (Exception)
+    void TestBuskeElasticForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -227,7 +227,7 @@ public:
         }
     }
 
-    void TestBuskeMixedForceMethods() throw (Exception)
+    void TestBuskeMixedForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -289,7 +289,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceMethods() throw (Exception)
+    void TestBuskeCompressionForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
@@ -355,7 +355,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceWithMultipleCells() throw (Exception)
+    void TestBuskeCompressionForceWithMultipleCells()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -466,7 +466,7 @@ public:
         }
     }
 
-    void TestBuskeAdhesiveForceArchiving() throw (Exception)
+    void TestBuskeAdhesiveForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
@@ -508,7 +508,7 @@ public:
         }
     }
 
-    void TestBuskeElasticForceArchiving() throw (Exception)
+    void TestBuskeElasticForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
@@ -550,7 +550,7 @@ public:
         }
     }
 
-    void TestBuskeCompressionForceArchiving() throw (Exception)
+    void TestBuskeCompressionForceArchiving()
     {
         EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -149,7 +149,7 @@ public:
      *
      * in this test, an heterogeneous pattern pf Ggap is set up to check for proper archiving
      */
-    void TestArchivingProblemIntraStim() throw(Exception)
+    void TestArchivingProblemIntraStim()
     {
         FileFinder archive_dir("extended_bidomain_problem_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "extended.arch";
@@ -175,7 +175,7 @@ public:
      * Test of archiving an extended bidomain problem with extracellular stimulus.
      * This is the same as above but we check that the extracellular stimulus is archived properly
      */
-    void TestArchivingProblemExtraStim() throw(Exception)
+    void TestArchivingProblemExtraStim()
     {
         FileFinder archive_dir("extended_bidomain_problem_archive_extrastim", RelativeTo::ChasteTestOutput);
         std::string archive_file = "extended.arch";
@@ -199,7 +199,7 @@ private:
 
     unsigned mProbeNode; //probe node in the original mesh numbering
 
-    void SetupParameters() throw (Exception)
+    void SetupParameters()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.5, 0.5));
@@ -220,7 +220,7 @@ private:
 //// Functions for archiving problems with intracellular stimulus
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-    void RunFull2DSimulationIntraStim() throw (Exception)
+    void RunFull2DSimulationIntraStim()
     {
         SetupParameters();
 
@@ -257,7 +257,7 @@ private:
         HeartEventHandler::Report();
     }
 
-    void Run2DSimulationSaveAfterThreemilliSecondsIntraStim(FileFinder archive_dir, std::string archive_file) throw (Exception)
+    void Run2DSimulationSaveAfterThreemilliSecondsIntraStim(FileFinder archive_dir, std::string archive_file)
     {
         SetupParameters();
 
@@ -297,7 +297,7 @@ private:
         (*p_arch) & p_extended_problem; //archive
     }
 
-    void LoadAndRunRemainingTwoMilliSecondsIntraStim(FileFinder archive_dir, std::string archive_file) throw (Exception)
+    void LoadAndRunRemainingTwoMilliSecondsIntraStim(FileFinder archive_dir, std::string archive_file)
     {
         ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
         boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
@@ -366,7 +366,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    void RunFull2DSimulationExtraStim() throw (Exception)
+    void RunFull2DSimulationExtraStim()
     {
         SetupParameters();
 
@@ -394,7 +394,7 @@ private:
         HeartEventHandler::Headings();
         HeartEventHandler::Report();
     }
-    void Run2DSimulationSaveAfterThreemilliSecondsExtraStim(FileFinder archive_dir, std::string archive_file) throw (Exception)
+    void Run2DSimulationSaveAfterThreemilliSecondsExtraStim(FileFinder archive_dir, std::string archive_file)
     {
         SetupParameters();
 
@@ -425,7 +425,7 @@ private:
         (*p_arch) & p_extended_problem; //archive
     }
 
-    void LoadAndRunRemainingTwoMilliSecondsExtraStim(FileFinder archive_dir, std::string archive_file) throw (Exception)
+    void LoadAndRunRemainingTwoMilliSecondsExtraStim(FileFinder archive_dir, std::string archive_file)
     {
         ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
         boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();

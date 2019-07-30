@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCardiacElectroMechanicsFurtherFunctionality : public CxxTest::TestSuite
 {
 public:
-    void TestDeterminingWatchedNodes() throw(Exception)
+    void TestDeterminingWatchedNodes()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -94,7 +94,7 @@ public:
     // Sets up a short simulation on a square with zero stimulus, but a model with stretch activated channels.
     // Hacks the mechanics initial condition to correspond to some stretch, which should create a bit of
     // SAC activity and increased voltage
-    void TestWithMechanoElectricFeedback() throw (Exception)
+    void TestWithMechanoElectricFeedback()
     {
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(0.0);
 
@@ -205,7 +205,7 @@ public:
 
     // Similar to first part of above test, except the deformation is not homogeneous, and
     // also here we say that the deformation DOES affect conductivity.
-    void TestWithMefAndAlteredConductivitesHeterogeneousStretch() throw (Exception)
+    void TestWithMefAndAlteredConductivitesHeterogeneousStretch()
     {
         // irrelevant, not going to call solve
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(0.0);
@@ -301,7 +301,7 @@ public:
     // boundary conditions on every node. Run with and without deformation affecting the
     // conductivity - in the latter as the conductivity will be increased in the X-direction, the
     // wave should travel a little bit faster.
-    void TestDeformationAffectingConductivity() throw(Exception)
+    void TestDeformationAffectingConductivity()
     {
         unsigned num_stimulated_nodes[2];
 
@@ -404,7 +404,7 @@ public:
     }
 
 
-    void TestCardiacElectroMechanicsHeterogeneousMaterialLaws() throw(Exception)
+    void TestCardiacElectroMechanicsHeterogeneousMaterialLaws()
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000);
 

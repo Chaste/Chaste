@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -72,7 +72,7 @@ public:
      * Create and simulate a simple 3D cell population with a cuboid
      * mesh, with ghost nodes around the outside
      */
-    void Test3DHoneycombMeshWithGhostNodes() throw (Exception)
+    void Test3DHoneycombMeshWithGhostNodes()
     {
         /*          _ _ _ _ _
          *        /        /|

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -225,7 +225,7 @@ private:
 public:
 
     // Test vector assembly
-    void TestBasicVectorAssemblers() throw(Exception)
+    void TestBasicVectorAssemblers()
     {
         DoTestBasicVectorAssemblers<1>();
         DoTestBasicVectorAssemblers<2>();
@@ -235,7 +235,7 @@ public:
     // Test matrix assembly
     // only test the 1d one as here as more difficult to write down correct matrix on paper
     // Tested better with 2d mass matrix below
-    void TestBasicMatrixAssemblers() throw(Exception)
+    void TestBasicMatrixAssemblers()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;
@@ -266,7 +266,7 @@ public:
     }
 
     // Test the ability to assemble both a vector and a matrix
-    void TestBasicVectorAndMatrixAssembler() throw(Exception)
+    void TestBasicVectorAndMatrixAssembler()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;
@@ -369,7 +369,7 @@ public:
 
     }
 
-    void TestMassMatrixAssembler1d() throw(Exception)
+    void TestMassMatrixAssembler1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;
@@ -450,7 +450,7 @@ public:
     }
 
 
-    void TestMassMatrixAssembler2dIncludingScaleFactor() throw(Exception)
+    void TestMassMatrixAssembler2dIncludingScaleFactor()
     {
         TetrahedralMesh<2,2> mesh;
         TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements"); // so we know the exact connectivity
@@ -507,7 +507,7 @@ public:
         PetscTools::Destroy(mat);
     }
 
-    void TestStiffnessMatrixAssembler1d() throw(Exception)
+    void TestStiffnessMatrixAssembler1d()
     {
         TetrahedralMesh<1,1> mesh;
         double h = 0.1;
@@ -587,7 +587,7 @@ public:
         PetscTools::Destroy(mat);
     }
 
-    void TestInterpolationOfPositionAndCurrentSolution() throw(Exception)
+    void TestInterpolationOfPositionAndCurrentSolution()
     {
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0);

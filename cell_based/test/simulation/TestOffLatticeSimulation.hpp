@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,7 +85,7 @@ class TestOffLatticeSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestOutputNodeAndCellVelocitiesAndDivisionLocations() throw(Exception)
+    void TestOutputNodeAndCellVelocitiesAndDivisionLocations()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -158,7 +158,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestOutputNodeVelocitiesWithGhostNodes() throw(Exception)
+    void TestOutputNodeVelocitiesWithGhostNodes()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -231,7 +231,7 @@ public:
      * check that the numbers of nodes and cells match at the end of the
      * simulation.
      */
-    void TestOffLatticeSimulationWithCellDeath() throw (Exception)
+    void TestOffLatticeSimulationWithCellDeath()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -284,7 +284,7 @@ public:
     /**
      * Test a cell-based simulation with multiple cell killers.
      */
-    void TestOffLatticeSimulationWithMultipleCellKillers() throw (Exception)
+    void TestOffLatticeSimulationWithMultipleCellKillers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -344,7 +344,7 @@ public:
     /**
      * Test a cell-based simulation with multiple forces.
      */
-    void TestOffLatticeSimulationWithMultipleForces() throw (Exception)
+    void TestOffLatticeSimulationWithMultipleForces()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -403,7 +403,7 @@ public:
     /**
      * Test a cell-based simulation with variabe rest lengths forces.
      */
-    void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
+    void TestOffLatticeSimulationWithVariableRestLengths()
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
@@ -498,7 +498,7 @@ public:
     /**
      * This tests running a simulation in 3d with a 2d mesh (see #2112)
      */
-    void TestOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
+    void TestOffLatticeSimulationWith2dMeshIn3d()
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
@@ -542,7 +542,7 @@ public:
     /**
      * This tests archiving a simulation in 3d with a 2d mesh (see #2112)
      */
-    void TestArchivingOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
+    void TestArchivingOffLatticeSimulationWith2dMeshIn3d()
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
@@ -597,7 +597,7 @@ public:
     /**
      * Test a cell-based simulation with a periodic mesh.
      */
-    void TestOffLatticeSimulationWithPeriodicMesh() throw (Exception)
+    void TestOffLatticeSimulationWithPeriodicMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -640,7 +640,7 @@ public:
     /**
      * Test a cell-based simulation with multiple boundary conditions. y<2 and y>0
      */
-    void TestOffLatticeSimulationWithMultipleCellBoundaryConditions() throw (Exception)
+    void TestOffLatticeSimulationWithMultipleCellBoundaryConditions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -696,7 +696,7 @@ public:
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
     }
 
-    void TestOffLatticeSimulationWithStoppingEvent() throw (Exception)
+    void TestOffLatticeSimulationWithStoppingEvent()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -809,7 +809,7 @@ public:
         TS_ASSERT_LESS_THAN(3.1415, time);
     }
 
-    void TestApoptosisSpringLengths() throw (Exception)
+    void TestApoptosisSpringLengths()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -901,7 +901,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
     }
 
-    void TestOffLatticeSimulationParameterOutputMethods() throw (Exception)
+    void TestOffLatticeSimulationParameterOutputMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -964,7 +964,7 @@ public:
      * The purpose of this test is to check that it is possible to construct and run
      * a short 1D cell-based simulation without throwing any exceptions.
      */
-    void Test1dOffLatticeSimulation() throw (Exception)
+    void Test1dOffLatticeSimulation()
     {
         // Create a 1D MeshBasedCellPopulation
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
@@ -1004,7 +1004,7 @@ public:
         TS_ASSERT_EQUALS((static_cast<MeshBasedCellPopulation<1>* >(&(simulator.rGetCellPopulation())))->rGetMesh().GetNumElements(), initial_num_elements + 1);
     }
 
-    void TestSettingEndTimeIssue() throw(Exception)
+    void TestSettingEndTimeIssue()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -1032,7 +1032,7 @@ public:
             "End time and number of timesteps already setup. You should not use SimulationTime::SetEndTimeAndNumberOfTimeSteps in cell-based tests.");
     }
 
-    void TestCellProliferativeTypeCounts() throw(Exception)
+    void TestCellProliferativeTypeCounts()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -1119,7 +1119,7 @@ public:
      *
      * Test to check we can add and remove them
      */
-    void TestOffLatticeSimulationWithModifiers() throw (Exception)
+    void TestOffLatticeSimulationWithModifiers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -1159,7 +1159,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
     }
 
-    void TestWriterIteratorsWithCellDeath() throw(Exception)
+    void TestWriterIteratorsWithCellDeath()
     {
         /*
          * This test was added because of the issue raised by #2422 and #2689,
@@ -1224,7 +1224,7 @@ public:
         TS_ASSERT(node_files.CompareFiles());
     }
 
-    void TestOffLatticeSimulationWithAdaptiveTimestep() throw(Exception)
+    void TestOffLatticeSimulationWithAdaptiveTimestep()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 

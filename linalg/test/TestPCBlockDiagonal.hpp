@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,7 @@ class TestPCBlockDiagonal : public CxxTest::TestSuite
 {
 public:
 
-    void TestBasicFunctionality() throw (Exception)
+    void TestBasicFunctionality()
     {
         /*
          * We need to make sure here that the matrix is loaded with the appropriate parallel layout. Petsc's

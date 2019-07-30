@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,7 +89,7 @@ public:
 class TestCardiacElectroMechanicsOnAnnulus : public CxxTest::TestSuite
 {
 public:
-    void TestDynamicExpansionNoElectroMechanics() throw (Exception)
+    void TestDynamicExpansionNoElectroMechanics()
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
@@ -189,7 +189,7 @@ public:
     }
 
 
-    void TestStaticExpansionAndElectroMechanics() throw (Exception)
+    void TestStaticExpansionAndElectroMechanics()
     {
         TetrahedralMesh<2,2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;

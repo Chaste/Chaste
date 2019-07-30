@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ private:
 
 public:
 
-    void TestCylindricalHoneycombMeshGeneratorRelaxed() throw(Exception)
+    void TestCylindricalHoneycombMeshGeneratorRelaxed()
     {
         unsigned num_cells_width = 8;
         unsigned num_cells_depth = 22;
@@ -138,7 +138,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 21.6506, 1e-4);
     }
 
-    void TestCylindricalHoneycombMeshGeneratorCompressed() throw(Exception)
+    void TestCylindricalHoneycombMeshGeneratorCompressed()
     {
         unsigned num_cells_width = 8;
         unsigned num_cells_depth = 22;

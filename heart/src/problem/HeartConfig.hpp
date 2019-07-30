@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 
-#include "ChasteParameters_3_4.hpp"
+#include "ChasteParameters_2017_1.hpp"
 
 #include "AbstractStimulusFunction.hpp"
 #include "AbstractChasteRegion.hpp"
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/set.hpp>
 
-namespace cp = chaste::parameters::v3_4;
+namespace cp = chaste::parameters::v2017_1;
 
 // Forward declaration to avoid circular includes
 class HeartFileFinder;
@@ -255,7 +255,7 @@ public:
     boost::shared_ptr<cp::chaste_parameters_type> ReadFile(const std::string& rFileName);
 
     /**
-     * Throw away the current instance by resetting auto_ptr #mpInstance to NULL.
+     * Throw away the current instance by resetting unique_ptr #mpInstance to NULL.
      * "New" another #mpInstance
      */
     static void Reset();

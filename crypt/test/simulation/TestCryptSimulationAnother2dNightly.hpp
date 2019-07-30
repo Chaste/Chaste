@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,7 +74,7 @@ public:
      * Sloughing with a sloughing cell killer and not turning
      * into ghost nodes on a non-periodic mesh.
      */
-    void TestSloughingCellKillerOnNonPeriodicCrypt() throw (Exception)
+    void TestSloughingCellKillerOnNonPeriodicCrypt()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -113,7 +113,7 @@ public:
         simulator.Solve();
     }
 
-    void TestSloughingDeathWithPeriodicMesh() throw (Exception)
+    void TestSloughingDeathWithPeriodicMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -171,7 +171,7 @@ public:
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 84u);
     }
 
-    void TestMonolayerWithCutoffPointAndNoGhosts() throw (Exception)
+    void TestMonolayerWithCutoffPointAndNoGhosts()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -209,7 +209,7 @@ public:
     /*
     * This tests that the results files are correct (added because of #1130).
     */
-    void TestResultsFileForLongerCryptSimulation() throw(Exception)
+    void TestResultsFileForLongerCryptSimulation()
     {
         EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,7 +93,7 @@ class TestStimulusFactory : public CxxTest::TestSuite
 {
 public:
 
-    void TestDefaultImplementation()  throw (Exception)
+    void TestDefaultImplementation()
     {
         HeartConfig::Instance()->Reset();
 
@@ -116,7 +116,7 @@ public:
         }
     }
 
-    void TestOneFactory() throw (Exception)
+    void TestOneFactory()
     {
         HeartConfig::Instance()->Reset();
 
@@ -147,7 +147,7 @@ public:
         TS_ASSERT_EQUALS(stimulus_zero->GetStimulus(2), 0);
     }
 
-    void TestComputeContributiontoRHS() throw (Exception)
+    void TestComputeContributiontoRHS()
     {
         HeartConfig::Instance()->Reset();
 
@@ -204,7 +204,7 @@ public:
     /**
      * Convenience heartconfig setups for the tests below
      */
-    void SetupParameters() throw (Exception)
+    void SetupParameters()
     {
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,1.0);
@@ -220,7 +220,7 @@ public:
     }
 
 
-    void TestRegularCubeChasteNodesList() throw (Exception)
+    void TestRegularCubeChasteNodesList()
     {
         SetupParameters();
 
@@ -309,7 +309,7 @@ public:
         delete p_node_list_2;
     }
 
-    void TestIrregularCubeChastecuboid() throw (Exception)
+    void TestIrregularCubeChastecuboid()
     {
         SetupParameters();
 
@@ -365,7 +365,7 @@ public:
         delete p_cuboid_2;
     }
 
-    void TestRegularCubeZeroNetChargeElectrodes() throw (Exception)
+    void TestRegularCubeZeroNetChargeElectrodes()
     {
         SetupParameters();
 
@@ -422,7 +422,7 @@ public:
         delete p_cuboid_2;
     }
 
-    void TestGroundingSecondElectrode() throw (Exception)
+    void TestGroundingSecondElectrode()
     {
         SetupParameters();
 
@@ -525,7 +525,7 @@ public:
         delete p_cuboid_2;
     }
 
-    void TestRegularCubeIntersecting() throw (Exception)
+    void TestRegularCubeIntersecting()
     {
         DistributedTetrahedralMesh<3,3> mesh;
         double width = 2.0;

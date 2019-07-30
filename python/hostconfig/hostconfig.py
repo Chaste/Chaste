@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2017, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -234,7 +234,7 @@ def DetermineCvodeVersion(includePath):
     CheckPathExists(includePath, 'CVODE')
     config_h = os.path.join(includePath, 'sundials', 'sundials_config.h')
     if os.path.exists(config_h):
-        version_re = re.compile(r'#define SUNDIALS_PACKAGE_VERSION "?(\d+).(\d+).(\d+)"?')
+        version_re = re.compile(r'#define SUNDIALS_(?:PACKAGE_)?VERSION "?(\d+).(\d+).(\d+)"?')
         for line in open(config_h):
             m = version_re.match(line)
             if m:
@@ -243,7 +243,7 @@ def DetermineCvodeVersion(includePath):
                 patch = int(m.group(3))
                 conf.cvode_version = str(major*10000 + minor*100 + patch)
                 break
-        else:
+        else: 
             ConfigError('Unable to find version string within sundials_config.h')
     else:
         ConfigError('Unable to find sundials_config.h to read CVODE version')

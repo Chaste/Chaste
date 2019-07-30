@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestExecutableSupport : public CxxTest::TestSuite
 {
 public:
-    void TestStaticMethods() throw(Exception)
+    void TestStaticMethods()
     {
         const std::string output_dir("TestExecutableSupport");
         CommandLineArguments* p_args = CommandLineArguments::Instance();

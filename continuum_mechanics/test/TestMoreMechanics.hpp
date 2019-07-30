@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -330,7 +330,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
 class TestMoreMechanics : public CxxTest::TestSuite
 {
 public:
-    void TestBarPressureOnUnderside() throw(Exception)
+    void TestBarPressureOnUnderside()
     {
         EXIT_IF_PARALLEL; // petsc's direct solve only runs one 1 proc - MUMPS may be the answer for direct solves in parallel
 
@@ -369,7 +369,7 @@ public:
         ///////////////////////////////////////
     }
 
-    void TestBarPressureOnUndersideCompressible() throw(Exception)
+    void TestBarPressureOnUndersideCompressible()
     {
         EXIT_IF_PARALLEL; // petsc's direct solve only runs one 1 proc - MUMPS may be the answer for direct solves in parallel
 

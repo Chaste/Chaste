@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -230,7 +230,7 @@ private:
 
 public:
 
-    void TestWithDifferentCellsAndSolvers() throw(Exception)
+    void TestWithDifferentCellsAndSolvers()
     {
         double duration = 25;
         HeartConfig::Instance()->SetSimulationDuration(duration); //ms

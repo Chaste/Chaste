@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -132,7 +132,7 @@ public:
 class TestMonodomainPurkinjeAssemblersAndSolvers : public CxxTest::TestSuite
 {
 public:
-    void TestMonodomainPurkinjeVolumeAssembler() throw (Exception)
+    void TestMonodomainPurkinjeVolumeAssembler()
     {
         if (PetscTools::GetNumProcs() > 3u)
         {
@@ -206,7 +206,7 @@ public:
 
     }
 
-    void TestMonodomainPurkinjeCableAssembler() throw(Exception)
+    void TestMonodomainPurkinjeCableAssembler()
     {
         /* The assembly requires 1/time-step,
          * here we are providing enough information without starting a whole simulation */
@@ -284,7 +284,7 @@ public:
     // Solve a Purkinje problem and check that the solution for the myocardium nodes is exactly the same as
     // the solution of an equivalent monodomain-only problem, that the purkinje voltage for
     // purkinje nodes doesn't change (no purkinje stimulus is given), and is 0 for non-purkinje nodes.
-    void TestMonodomainPurkinjeSolver() throw(Exception)
+    void TestMonodomainPurkinjeSolver()
     {
         /* The assembly requires 1/time-step,
          * here we are providing enough information without starting a whole simulation */

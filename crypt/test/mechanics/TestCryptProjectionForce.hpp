@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,7 +67,7 @@ class TestCryptProjectionForce : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestCryptProjectionForceMethods() throw (Exception)
+    void TestCryptProjectionForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -244,7 +244,7 @@ public:
      * \todo WntBasedChemotaxis should be possible in other force laws. If/when
      * this is implemented, this test should be moved to somewhere more appropriate.
      */
-    void TestCryptProjectionForceWithWntBasedChemotaxis() throw (Exception)
+    void TestCryptProjectionForceWithWntBasedChemotaxis()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -333,7 +333,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 
-    void TestCryptProjectionForceWithArchiving() throw (Exception)
+    void TestCryptProjectionForceWithArchiving()
     {
         EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
 
@@ -461,7 +461,7 @@ private:
 
 public:
 
-    void TestForceCollection() throw (Exception)
+    void TestForceCollection()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
 
@@ -550,7 +550,7 @@ public:
         FileComparison( projection_force_results_dir + "projection_results.parameters", "crypt/test/data/TestForcesForCrypt/projection_results.parameters").CompareFiles();
     }
 
-    void TestCryptProjectionForceWithNodeBasedCellPopulation() throw (Exception)
+    void TestCryptProjectionForceWithNodeBasedCellPopulation()
     {
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;

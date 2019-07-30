@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,8 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(double width,
                                            double t2Threshold)
     : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
       mWidth(width),
-      mHeight(height)
+      mHeight(height),
+      mpMeshForVtk(nullptr)
 {
     // Call ReMesh() to remove any deleted nodes and relabel
     ReMesh();
@@ -55,6 +56,10 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh()
 
 Toroidal2dVertexMesh::~Toroidal2dVertexMesh()
 {
+    if (mpMeshForVtk != NULL)
+    {
+         delete mpMeshForVtk;
+    }
 }
 
 c_vector<double, 2> Toroidal2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
@@ -132,6 +137,18 @@ double Toroidal2dVertexMesh::GetWidth(const unsigned& rDimension) const
     return width;
 }
 
+void Toroidal2dVertexMesh::SetHeight(double height)
+{
+    assert(height > 0);
+    mHeight = height;
+}
+
+void Toroidal2dVertexMesh::SetWidth(double width)
+{
+    assert(width > 0);
+    mWidth = width;
+}
+
 unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
     unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
@@ -143,7 +160,7 @@ unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
+VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
@@ -260,8 +277,13 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         }
     }
 
-    MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
-    return p_mesh;
+    if (mpMeshForVtk != nullptr)
+    {
+        delete mpMeshForVtk;
+    }
+
+    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
+    return mpMeshForVtk;
 }
 
 void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader, double width, double height)
@@ -340,6 +362,7 @@ void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMes
     this->mCellRearrangementThreshold = 0.01;
     this->mT2Threshold = 0.001;
     this->mMeshChangesDuringSimulation = true;
+    this->mpMeshForVtk = nullptr;
 }
 
 // Serialization for Boost >= 1.36

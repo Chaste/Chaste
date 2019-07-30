@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,7 +57,7 @@ private:
 #endif
 
 public:
-    void TestInterpolatorTimesAndGenerateReferenceTrace() throw(Exception)
+    void TestInterpolatorTimesAndGenerateReferenceTrace()
     {
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("CvodeCellsWithDataClamp");
@@ -200,100 +200,100 @@ public:
 #endif
     }
 
-    void TestArchivingCvodeCellsWithDataClamp() throw(Exception)
+    void TestArchivingCvodeCellsWithDataClamp()
     {
         // We also hijack this test to test the archiving and restoration of modifiers.
 #ifdef CHASTE_CVODE
-       //Archive
-       OutputFileHandler handler("archive", false);
-       handler.SetArchiveDirectory();
-       std::string archive_filename =  ArchiveLocationInfo::GetProcessUniqueFilePath("shannon_with_data_clamp.arch");
+        //Archive
+        OutputFileHandler handler("archive", false);
+        handler.SetArchiveDirectory();
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("shannon_with_data_clamp.arch");
 
-       bool data_clamp_state;
-       bool data_available;
-       double fixed_modifier_value = 56.0;
-       std::vector<double> times;
-       std::vector<double> voltages;
+        bool data_clamp_state;
+        bool data_available;
+        double fixed_modifier_value = 56.0;
+        std::vector<double> times;
+        std::vector<double> voltages;
 
-       // Save
-       {
-           std::ofstream ofs(archive_filename.c_str());
-           boost::archive::text_oarchive output_arch(ofs);
+        // Save
+        {
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
 
-           // Using friend status to directly look at member variables.
-           data_clamp_state = mpModel->mDataClampIsOn;
-           data_available = mpModel->mDataAvailable;
-           times = mpModel->mExperimentalTimes;
-           voltages = mpModel->mExperimentalVoltages;
+            // Using friend status to directly look at member variables.
+            data_clamp_state = mpModel->mDataClampIsOn;
+            data_available = mpModel->mDataAvailable;
+            times = mpModel->mExperimentalTimes;
+            voltages = mpModel->mExperimentalVoltages;
 
-           // Check we are actually checking something!
-           TS_ASSERT_EQUALS(data_clamp_state, true);
-           TS_ASSERT_EQUALS(data_available, true);
-           TS_ASSERT(times.size()>10u);
-           TS_ASSERT_EQUALS(times.size(), voltages.size());
-           TS_ASSERT_EQUALS(mpModel->HasModifier("membrane_slow_delayed_rectifier_potassium_current"), true);
-           TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), 0.0, 1e-12);
+            // Check we are actually checking something!
+            TS_ASSERT_EQUALS(data_clamp_state, true);
+            TS_ASSERT_EQUALS(data_available, true);
+            TS_ASSERT(times.size()>10u);
+            TS_ASSERT_EQUALS(times.size(), voltages.size());
+            TS_ASSERT_EQUALS(mpModel->HasModifier("membrane_slow_delayed_rectifier_potassium_current"), true);
+            TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), 0.0, 1e-12);
 
-           boost::shared_ptr<AbstractModifier> p_fixed(new FixedModifier(fixed_modifier_value));
-           mpModel->SetModifier("membrane_slow_delayed_rectifier_potassium_current", p_fixed);
+            boost::shared_ptr<AbstractModifier> p_fixed(new FixedModifier(fixed_modifier_value));
+            mpModel->SetModifier("membrane_slow_delayed_rectifier_potassium_current", p_fixed);
 
-           TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), fixed_modifier_value, 1e-12);
+            TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), fixed_modifier_value, 1e-12);
 
-           // Archive as an AbstractCvodeCell pointer (not via boost shared pointer)
-           AbstractCvodeCell* const p_cell = mpModel.get();
-           output_arch <<  p_cell;
-       }
+            // Archive as an AbstractCvodeCell pointer (not via boost shared pointer)
+            AbstractCvodeCell* const p_cell = mpModel.get();
+            output_arch <<  p_cell;
+        }
 
-       // This should free up the memory and delete cell model.
-       mpModel.reset();
+        // This should free up the memory and delete cell model.
+        mpModel.reset();
 
-       // Load
-       {
-           std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-           boost::archive::text_iarchive input_arch(ifs);
+        // Load
+        {
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
 
-           AbstractCvodeCell* p_cell;
-           input_arch >> p_cell;
+            AbstractCvodeCell* p_cell;
+            input_arch >> p_cell;
 
-           TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 39u);
+            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 39u);
 
-           // Check modifiers were archived correctly
-           if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == NULL)
-           {
-               // Pointer could not be cast as the right kind, so throw error.
-               TS_ASSERT(false);
-           }
+            // Check modifiers were archived correctly
+            if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == NULL)
+            {
+                // Pointer could not be cast as the right kind, so throw error.
+                TS_ASSERT(false);
+            }
 
-           AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* p_modifiers_cell = static_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>*>(p_cell);
-           TS_ASSERT_EQUALS(p_modifiers_cell->HasModifier("membrane_slow_delayed_rectifier_potassium_current"),true);
-           boost::shared_ptr<AbstractModifier> p_modifier = p_modifiers_cell->GetModifier("membrane_slow_delayed_rectifier_potassium_current");
-           TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), fixed_modifier_value, 1e-12); // Fixed modifier returns 56 from above..
+            AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* p_modifiers_cell = static_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>*>(p_cell);
+            TS_ASSERT_EQUALS(p_modifiers_cell->HasModifier("membrane_slow_delayed_rectifier_potassium_current"),true);
+            boost::shared_ptr<AbstractModifier> p_modifier = p_modifiers_cell->GetModifier("membrane_slow_delayed_rectifier_potassium_current");
+            TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), fixed_modifier_value, 1e-12); // Fixed modifier returns 56 from above..
 
-           // Check data clamp was archived correctly.
-           if (dynamic_cast<AbstractCvodeCellWithDataClamp*>(p_cell) == NULL)
-           {
-               // Pointer could not be cast as the right kind, so throw error.
-               TS_ASSERT(false);
-           }
+            // Check data clamp was archived correctly.
+            if (dynamic_cast<AbstractCvodeCellWithDataClamp*>(p_cell) == NULL)
+            {
+                // Pointer could not be cast as the right kind, so throw error.
+                TS_ASSERT(false);
+            }
 
-           AbstractCvodeCellWithDataClamp* p_data_clamp_cell = static_cast<AbstractCvodeCellWithDataClamp*>(p_cell);
+            AbstractCvodeCellWithDataClamp* p_data_clamp_cell = static_cast<AbstractCvodeCellWithDataClamp*>(p_cell);
 
-           TS_ASSERT_EQUALS(p_data_clamp_cell->mDataClampIsOn, data_clamp_state);
-           TS_ASSERT_EQUALS(p_data_clamp_cell->mDataAvailable, data_available);
-           TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalTimes.size(), times.size());
-           TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalVoltages.size(), voltages.size());
+            TS_ASSERT_EQUALS(p_data_clamp_cell->mDataClampIsOn, data_clamp_state);
+            TS_ASSERT_EQUALS(p_data_clamp_cell->mDataAvailable, data_available);
+            TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalTimes.size(), times.size());
+            TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalVoltages.size(), voltages.size());
 
-           for (unsigned i=0; i<times.size(); i++)
-           {
-               TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalTimes[i], times[i], 1e-12);
-               TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalVoltages[i], voltages[i], 1e-12);
-           }
+            for (unsigned i=0; i<times.size(); i++)
+            {
+                TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalTimes[i], times[i], 1e-12);
+                TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalVoltages[i], voltages[i], 1e-12);
+            }
 
-           // Check we have a functioning unarchived cell (this will check that all internal member variables that pointed to modifiers still work).
-           p_cell->Compute(0, 100, 1);
+            // Check we have a functioning unarchived cell (this will check that all internal member variables that pointed to modifiers still work).
+            p_cell->Compute(0, 100, 1);
 
-           delete p_cell;
-       }
+            delete p_cell;
+        }
 #else
        std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE

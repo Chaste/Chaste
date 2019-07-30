@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ class TestSimpleImpedanceProblem : public CxxTest::TestSuite
 private:
 
 public:
-    void TestAcinarImpedance() throw(Exception)
+    void TestAcinarImpedance()
     {
         TetrahedralMesh<1,3> mesh;
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
@@ -157,7 +157,7 @@ public:
         TS_ASSERT_DELTA(imag(problem.GetImpedance()), 0.0, 1e-6);
     }
 
-    void TestMultipleFrequencies() throw(Exception)
+    void TestMultipleFrequencies()
     {
         TetrahedralMesh<1,3> mesh;
         //TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");

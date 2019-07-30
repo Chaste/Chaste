@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ class TestEllipticGrowingDomainPdeModifier : public AbstractCellBasedWithTimings
 {
 public:
 
-    void TestEllipticConstructor() throw(Exception)
+    void TestEllipticConstructor()
     {
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
@@ -94,7 +94,7 @@ public:
         TS_ASSERT_EQUALS(p_pde_modifier->rGetDependentVariableName(), "averaged quantity");
     }
 
-    void TestMeshGeneration() throw(Exception)
+    void TestMeshGeneration()
     {
         // Create PDE and boundary condition objects to be used by all cell populations
         MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
@@ -241,7 +241,7 @@ public:
         }
     }
 
-    void TestGrowingDomainPdeModifierExceptions() throw(Exception)
+    void TestGrowingDomainPdeModifierExceptions()
     {
         EXIT_IF_PARALLEL;
 
@@ -286,7 +286,7 @@ public:
             "EllipticGrowingDomainPdeModifier cannot be used with an AveragedSourceEllipticPde. Use an EllipticBoxDomainPdeModifier instead.");
     }
 
-    void TestArchiveEllipticGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveEllipticGrowingDomainPdeModifier()
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
@@ -352,7 +352,7 @@ public:
      *
      * where J0 is the zeroth order Bessel function.
      */
-    void TestMeshBasedMonolayerWithEllipticPde() throw (Exception)
+    void TestMeshBasedMonolayerWithEllipticPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -408,7 +408,7 @@ public:
      *
      *  where J0 is the zeroth order bessel fn and C and A are constants.
      */
-    void TestMeshBasedHeterogeneousMonolayerWithEllipticPde() throw (Exception)
+    void TestMeshBasedHeterogeneousMonolayerWithEllipticPde()
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
@@ -474,7 +474,7 @@ public:
     }
 
     // Now test on a square with half apoptotic cells to compare all the population types
-    void TestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -520,7 +520,7 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
     }
 
-    void TestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -574,7 +574,7 @@ public:
         delete p_mesh;
     }
 
-    void TestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(20,20);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -625,7 +625,7 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4654, 1e-4);
     }
 
-    void TestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -678,7 +678,7 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-4);
     }
 
-    void TestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -737,7 +737,7 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-3); // Note lower as slightly different answer with intel compiler
     }
 
-    void TestEllipticGrowingDomainPdeModifierIn1d() throw(Exception)
+    void TestEllipticGrowingDomainPdeModifierIn1d()
     {
         // Create mesh
         std::vector<Node<1>*> nodes;
@@ -786,7 +786,7 @@ public:
         }
     }
 
-    void TestEllipticGrowingDomainPdeModifierIn3d() throw(Exception)
+    void TestEllipticGrowingDomainPdeModifierIn3d()
     {
         // Create a simple mesh
         TetrahedralMesh<3,3> temp_mesh;

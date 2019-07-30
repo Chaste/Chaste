@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ class TestCryptProjectionStatistics : public AbstractCellBasedTestSuite
 {
 
 public:
-    void TestGetSection() throw(Exception)
+    void TestGetSection()
     {
         double a = 0.2;
         double b = 2.0;

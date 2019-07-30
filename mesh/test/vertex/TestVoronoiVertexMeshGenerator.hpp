@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ class TestVoronoiVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleMesh() throw(Exception)
+    void TestSimpleMesh()
     {
 #if BOOST_VERSION >= 105200
 
@@ -77,7 +77,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestBoundaryNodes() throw(Exception)
+    void TestBoundaryNodes()
     {
 #if BOOST_VERSION >= 105200
 
@@ -108,7 +108,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestConstructorExceptions() throw(Exception)
+    void TestConstructorExceptions()
     {
 #if BOOST_VERSION >= 105200
 
@@ -127,7 +127,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestValidateSeedLocations() throw(Exception)
+    void TestValidateSeedLocations()
     {
 #if BOOST_VERSION >= 105200
 
@@ -207,7 +207,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestGetToroidalMesh() throw(Exception)
+    void TestGetToroidalMesh()
     {
 #if BOOST_VERSION >= 105200
 
@@ -221,7 +221,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestNodesAreRepositionedInToroidalMesh() throw(Exception)
+    void TestNodesAreRepositionedInToroidalMesh()
     {
 #if BOOST_VERSION >= 105200
 
@@ -251,7 +251,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestGetPolygonDistributionAndAreaVariation() throw(Exception)
+    void TestGetPolygonDistributionAndAreaVariation()
     {
 #if BOOST_VERSION >= 105200
 
@@ -283,7 +283,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestRefreshSeedsAndRegenerateMeshCoverage() throw(Exception)
+    void TestRefreshSeedsAndRegenerateMeshCoverage()
     {
 #if BOOST_VERSION >= 105200
 
@@ -299,7 +299,7 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestSetAndGetMethods() throw(Exception)
+    void TestSetAndGetMethods()
     {
 #if BOOST_VERSION >= 105200
 

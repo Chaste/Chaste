@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMajorAirwaysCentreLinesCleaner : public CxxTest::TestSuite
 {
 public:
-    void TestDeleteOrderSimpleMesh() throw(Exception)
+    void TestDeleteOrderSimpleMesh()
     {
         TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
         MutableMesh<1,3> mesh;
@@ -82,7 +82,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetLocation()[2], 0.0, 1e-6);
     }
 
-    void TestDeleteFirstOrder() throw(Exception)
+    void TestDeleteFirstOrder()
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
@@ -115,7 +115,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestHeuristicCleanSimpleMesh() throw(Exception)
+    void TestHeuristicCleanSimpleMesh()
     {
         {
             TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
@@ -187,7 +187,7 @@ public:
         }
     }
 
-    void TestRemoveIsolatedNodesSimpleMesh() throw(Exception)
+    void TestRemoveIsolatedNodesSimpleMesh()
     {
         TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_isolated_nodes_major_airways_mesh");
         MutableMesh<1,3> mesh;

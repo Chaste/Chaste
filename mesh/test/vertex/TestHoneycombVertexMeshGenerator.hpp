@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ class TestHoneycombVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    void TestSimpleMesh() throw(Exception)
+    void TestSimpleMesh()
     {
         HoneycombVertexMeshGenerator generator(2, 2, false, 0.1, 0.1);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -55,7 +55,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetT2Threshold(), 0.1, 1e-12);
     }
 
-    void TestBoundaryNodes() throw(Exception)
+    void TestBoundaryNodes()
     {
         HoneycombVertexMeshGenerator generator(4, 4);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -74,7 +74,7 @@ public:
         TS_ASSERT_EQUALS(num_non_boundary_nodes, 4u);
     }
 
-    void TestLargeMesh() throw(Exception)
+    void TestLargeMesh()
     {
         HoneycombVertexMeshGenerator generator(100, 100);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -83,7 +83,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 10000u);
     }
 
-    void TestElementArea() throw(Exception)
+    void TestElementArea()
     {
         HoneycombVertexMeshGenerator generator(6, 6, false, 0.01, 0.001, 2.456);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();

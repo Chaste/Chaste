@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2017, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -247,7 +247,7 @@ public:
         TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
     }
 
-    void TestArchiveFixedVertexBasedDivisionRule() throw(Exception)
+    void TestArchiveFixedVertexBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "FixedVertexBasedDivisionRule.arch";
@@ -285,7 +285,7 @@ public:
         }
     }
 
-    void TestArchiveRandomDirectionVertexBasedDivisionRule() throw(Exception)
+    void TestArchiveRandomDirectionVertexBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "RandomDirectionVertexBasedDivisionRule.arch";
@@ -316,7 +316,7 @@ public:
         }
     }
 
-    void TestArchiveShortAxisVertexBasedDivisionRule() throw(Exception)
+    void TestArchiveShortAxisVertexBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "ShortAxisVertexBasedDivisionRule.arch";
