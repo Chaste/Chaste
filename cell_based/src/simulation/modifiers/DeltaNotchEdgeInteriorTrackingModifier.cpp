@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchEdgeInteriorTrackingModifier.hpp"
 #include "SrnCellModel.hpp"
-#include "DeltaNotchSrnModel.hpp"
+#include "DeltaNotchSrnInteriorModel.hpp"
 #include "DeltaNotchSrnEdgeModel.hpp"
 
 template<unsigned DIM>
@@ -78,8 +78,8 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
          ++cell_iter)
     {
         auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
-        boost::shared_ptr<DeltaNotchSrnModel> p_interior_model
-                    = boost::static_pointer_cast<DeltaNotchSrnModel>(p_cell_edge_model->GetInteriorSrn());
+        boost::shared_ptr<DeltaNotchSrnInteriorModel> p_interior_model
+                    = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_edge_model->GetInteriorSrn());
 
         const double this_notch = p_interior_model->GetNotch();
         const double this_delta = p_interior_model->GetDelta();

@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchCellEdgeTrackingModifier.hpp"
 #include "SrnCellModel.hpp"
-#include "DeltaNotchSrnModel.hpp"
+#include "DeltaNotchSrnInteriorModel.hpp"
 
 template<unsigned DIM>
 DeltaNotchCellEdgeTrackingModifier<DIM>::DeltaNotchCellEdgeTrackingModifier()
@@ -99,6 +99,18 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
         cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
         cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
+        //Filling interior delta value, if interior model is specified
+        double interior_delta_value = 0;
+        std::vector<double> interior_delta_vector(delta_vec.size());
+        if (p_cell_edge_model->GetInteriorSrn()!=nullptr)
+        {
+            boost::shared_ptr<DeltaNotchSrnInteriorModel> p_model
+            = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_edge_model->GetInteriorSrn());
+            interior_delta_value = p_model->GetDelta();
+        }
+        std::fill(interior_delta_vector.begin(), interior_delta_vector.end(), interior_delta_value);
+        cell_iter->GetCellEdgeData()->SetItem("interior delta", interior_delta_vector);
+
     }
 
     //After the edge data is filled, fill the edge neighbour data

@@ -55,7 +55,8 @@ DeltaNotchEdgeOdeSystem::DeltaNotchEdgeOdeSystem(std::vector<double> stateVariab
     SetDefaultInitialCondition(1, 1.0); // soon overwritten
 
     this->mParameters.push_back(0.5);
-    this->mParameters.push_back(0.5);
+    //By default zero. If no interior SRN model is specified, interior delta is zero
+    this->mParameters.push_back(0);
     if (stateVariables != std::vector<double>())
     {
         SetStateVariables(stateVariables);
@@ -70,7 +71,7 @@ void DeltaNotchEdgeOdeSystem::EvaluateYDerivatives(double time, const std::vecto
 {
     double notch = rY[0];
     double delta = rY[1];
-    double neigh_delta = this->mParameters[0]; // Shorthand for "this->mParameter("Mean Delta");"
+    double neigh_delta = this->mParameters[0]; // Shorthand for "this->mParameter("neighbor delta");"
 
     // The next two lines define the ODE system by Collier et al. (1996)
     rDY[0] = neigh_delta*neigh_delta/(0.01 + neigh_delta*neigh_delta) - notch;  // d[Notch]/dt

@@ -97,15 +97,11 @@ void DeltaNotchSrnEdgeModel::UpdateDeltaNotch()
 {
     assert(mpOdeSystem != nullptr);
     assert(mpCell != nullptr);
-
     double neigh_delta = mpCell->GetCellEdgeData()->GetItem("neighbour delta")[this->GetEdgeLocalIndex()];
     mpOdeSystem->SetParameter("neighbour delta", neigh_delta);
 
-    /** #TODO Discuss with Aydar about this **/
-//    double interior_delta = 0;
-//    interior_delta = mpCell->GetCellData()->GetItem("interior delta");
-//    mpOdeSystem->SetParameter("interior delta", interior_delta);
-
+    double interior_delta = mpCell->GetCellEdgeData()->GetItem("interior delta")[this->GetEdgeLocalIndex()];
+    mpOdeSystem->SetParameter("interior delta", interior_delta);
 }
 
 double DeltaNotchSrnEdgeModel::GetNotch()
@@ -144,6 +140,12 @@ double DeltaNotchSrnEdgeModel::GetInteriorDelta() const
 {
     assert(mpOdeSystem != nullptr);
     return mpOdeSystem->GetParameter("interior delta");
+}
+
+void DeltaNotchSrnEdgeModel::SetInteriorDelta(double value)
+{
+    assert(mpOdeSystem != nullptr);
+    mpOdeSystem->SetParameter("interior delta", value);
 }
 
 void DeltaNotchSrnEdgeModel::OutputSrnModelParameters(out_stream& rParamsFile)

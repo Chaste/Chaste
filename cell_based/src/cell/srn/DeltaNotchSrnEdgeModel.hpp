@@ -158,6 +158,11 @@ public:
      */
     double GetInteriorDelta() const;
     /**
+     * Sets the level of interior delta
+     * @param rParamsFile
+     */
+    void SetInteriorDelta(double value);
+    /**
      * Output SRN model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output

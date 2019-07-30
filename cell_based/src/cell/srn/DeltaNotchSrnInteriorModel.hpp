@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "DeltaNotchOdeSystem.hpp"
+#include "DeltaNotchInteriorOdeSystem.hpp"
 #include "AbstractOdeSrnModel.hpp"
 
 /**

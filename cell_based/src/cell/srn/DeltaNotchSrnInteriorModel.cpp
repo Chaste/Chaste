@@ -72,7 +72,7 @@ DeltaNotchSrnInteriorModel::DeltaNotchSrnInteriorModel(const DeltaNotchSrnInteri
      */
 
     assert(rModel.GetOdeSystem());
-    SetOdeSystem(new DeltaNotchOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
+    SetOdeSystem(new DeltaNotchInteriorOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
 }
 
 AbstractSrnModel* DeltaNotchSrnInteriorModel::CreateSrnModel()
@@ -91,7 +91,7 @@ void DeltaNotchSrnInteriorModel::SimulateToCurrentTime()
 
 void DeltaNotchSrnInteriorModel::Initialise()
 {
-    AbstractOdeSrnModel::Initialise(new DeltaNotchOdeSystem);
+    AbstractOdeSrnModel::Initialise(new DeltaNotchInteriorOdeSystem);
 }
 
 void DeltaNotchSrnInteriorModel::UpdateDeltaNotch()
