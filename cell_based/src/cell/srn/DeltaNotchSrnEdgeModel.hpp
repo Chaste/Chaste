@@ -158,10 +158,9 @@ public:
      */
     double GetInteriorDelta() const;
     /**
-     * Sets the level of interior delta
-     * @param rParamsFile
+     * @return the level of notch in cell interior
      */
-    void SetInteriorDelta(double value);
+    double GetInteriorNotch() const;
     /**
      * Output SRN model parameters to file.
      *

@@ -99,8 +99,11 @@ void DeltaNotchSrnInteriorModel::UpdateDeltaNotch()
     assert(mpOdeSystem != nullptr);
     assert(mpCell != nullptr);
 
-    double total_edge_delta = mpCell->GetCellData()->GetItem("total edge delta");
-    mpOdeSystem->SetParameter("total edge delta", total_edge_delta);
+    const double total_edge_delta = mpCell->GetCellData()->GetItem("total neighbour edge delta");
+    mpOdeSystem->SetParameter("total neighbour edge delta", total_edge_delta);
+
+    const double total_edge_notch = mpCell->GetCellData()->GetItem("total edge notch");
+    mpOdeSystem->SetParameter("total edge notch", total_edge_notch);
 }
 
 double DeltaNotchSrnInteriorModel::GetNotch()
@@ -120,8 +123,15 @@ double DeltaNotchSrnInteriorModel::GetDelta()
 double DeltaNotchSrnInteriorModel::GetTotalEdgeDelta()
 {
     assert(mpOdeSystem != nullptr);
-    double total_edge_delta = mpOdeSystem->GetParameter("total edge delta");
+    double total_edge_delta = mpOdeSystem->GetParameter("total neighbour edge delta");
     return total_edge_delta;
+}
+
+double DeltaNotchSrnInteriorModel::GetTotalEdgeNotch()
+{
+    assert(mpOdeSystem != nullptr);
+    double total_edge_notch = mpOdeSystem->GetParameter("total edge notch");
+    return total_edge_notch;
 }
 
 void DeltaNotchSrnInteriorModel::OutputSrnModelParameters(out_stream& rParamsFile)

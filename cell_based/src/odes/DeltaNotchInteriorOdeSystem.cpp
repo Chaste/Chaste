@@ -55,6 +55,7 @@ DeltaNotchInteriorOdeSystem::DeltaNotchInteriorOdeSystem(std::vector<double> sta
     SetDefaultInitialCondition(1, 1.0); // soon overwritten
 
     this->mParameters.push_back(0.5);
+    this->mParameters.push_back(0.5);
 
     if (stateVariables != std::vector<double>())
     {
@@ -68,15 +69,14 @@ DeltaNotchInteriorOdeSystem::~DeltaNotchInteriorOdeSystem()
 
 void DeltaNotchInteriorOdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
 {
-    double notch = rY[0];
-    double delta = rY[1];
-    double edge_delta = this->mParameters[0];
-
-    // The next two lines define the ODE system by Collier et al. (1996)
-    rDY[0] = edge_delta*edge_delta/(0.01 + edge_delta*edge_delta) - notch;  // d[Notch]/dt
-    rDY[1] = 1.0/(1.0 + 100.0*notch*notch) - delta;                   // d[Delta]/dt
-    rDY[0] = 0*rDY[0];
-    rDY[1] = 0*rDY[1];
+    const double notch = rY[0];
+    const double delta = rY[1];
+    const double edge_delta = this->mParameters[0];
+    const double edge_notch = this->mParameters[1];
+    // The next two lines define the DeltaNotch ODE system
+    // The decay rate is modified to reflect recruitment into membrane
+    rDY[0] = edge_delta*edge_delta/(0.01 + edge_delta*edge_delta) - notch*(1.0+0.1);  // d[Notch]/dt
+    rDY[1] = 1.0/(1.0 + 100.0*edge_notch*edge_notch) - delta*(1.0+0.1);                   // d[Delta]/dt
 }
 
 template<>
@@ -90,9 +90,13 @@ void CellwiseOdeSystemInformation<DeltaNotchInteriorOdeSystem>::Initialise()
     this->mVariableUnits.push_back("non-dim");
     this->mInitialConditions.push_back(0.0); // will be filled in later
 
-    this->mParameterNames.push_back("total edge delta");
+    this->mParameterNames.push_back("total neighbour edge delta");
+    this->mParameterUnits.push_back("non-dim");
+    this->mParameterNames.push_back("total edge notch");
     this->mParameterUnits.push_back("non-dim");
     this->mInitialised = true;
+
+
 }
 
 // Serialization for Boost >= 1.36

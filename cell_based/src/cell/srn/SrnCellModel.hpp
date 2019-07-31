@@ -69,6 +69,7 @@ private:
     {
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
         archive & mEdgeSrnModels;
+        archive & mInteriorSrnModel;
 //        archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
 //        archive & mInitialConditions;
 //        archive & mStateSize;

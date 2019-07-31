@@ -99,18 +99,22 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
         cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
         cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
-        //Filling interior delta value, if interior model is specified
+        //Filling interior delta/notch value, if interior model is specified
         double interior_delta_value = 0;
+        double interior_notch_value = 0;
         std::vector<double> interior_delta_vector(delta_vec.size());
+        std::vector<double> interior_notch_vector(delta_vec.size());
         if (p_cell_edge_model->GetInteriorSrn()!=nullptr)
         {
             boost::shared_ptr<DeltaNotchSrnInteriorModel> p_model
             = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_edge_model->GetInteriorSrn());
             interior_delta_value = p_model->GetDelta();
+            interior_notch_value = p_model->GetNotch();
         }
         std::fill(interior_delta_vector.begin(), interior_delta_vector.end(), interior_delta_value);
+        std::fill(interior_notch_vector.begin(), interior_notch_vector.end(), interior_notch_value);
         cell_iter->GetCellEdgeData()->SetItem("interior delta", interior_delta_vector);
-
+        cell_iter->GetCellEdgeData()->SetItem("interior notch", interior_notch_vector);
     }
 
     //After the edge data is filled, fill the edge neighbour data
