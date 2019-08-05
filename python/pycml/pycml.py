@@ -1661,7 +1661,7 @@ class cellml_variable(Colourable, element_base):
         super(cellml_variable, self).__init__()
         self.clear_dependency_info()
         return
-   
+    
     def clear_dependency_info(self):
         """Clear the type, dependency, etc. information for this variable.
         
