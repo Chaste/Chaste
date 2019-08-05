@@ -425,7 +425,7 @@ private:
         TS_ASSERT_EQUALS(&(p_problem->rGetMesh()), p_problem->GetTissue()->pGetMesh());
         // Check the mesh is/isn't the parallel variety
         const DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM,DIM>*>(p_problem->GetTissue()->pGetMesh());
-	if (isDistributedMesh)
+        if (isDistributedMesh)
         {
             TS_ASSERT(p_dist_mesh != NULL);
         }
@@ -869,9 +869,7 @@ private:
         TS_ASSERT_EQUALS(&(p_problem->rGetMesh()), p_problem->GetTissue()->pGetMesh());
         // Check the mesh is/isn't the parallel variety
         const DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM,DIM>*>(p_problem->GetTissue()->pGetMesh());
-TS_WARN(rRefArchiveDir);
-
-	if (isDistributedMesh)
+        if (isDistributedMesh)
         {
             TS_ASSERT(p_dist_mesh != NULL);
         }
