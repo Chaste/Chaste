@@ -207,14 +207,18 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     """
     if revision:
         revision = str(revision.strip())
-        assert len(revision) == 40  # expecting full commit hash
-        abbreviated_revision = revision[0:12]
-        revision = ' at revision [changeset:{}/git_repo]'.format(abbreviated_revision)
+
+        if test_file_path.strip().startswith('projects/'):
+            assert revision.isdigit(), 'Expected svn-style integer revision'
+            revision = 'at revision r{}'.format(revision)
+        else:
+            assert len(revision) == 40,  'Expected 40-digit git commit hash'
+            revision = 'at revision [changeset:{}/git_repo]'.format(revision[0:12])  # abbreviate to consistent length
 
     output = []
 
     # Header
-    output.append('This tutorial is automatically generated from the file ' + test_file_path + revision + '.\n')
+    output.append('This tutorial is automatically generated from the file {} {}.\n'.format(test_file_path, revision))
     output.append('Note that the code is given in full at the bottom of the page.\n\n\n')
 
     # Convert each file in turn
