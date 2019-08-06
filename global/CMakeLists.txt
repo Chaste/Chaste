@@ -62,6 +62,12 @@ add_executable(timekeeper "${generate_dir}/timekeeper.cpp")
 #  Setup command to generate Version and BuildInfo at build-time  #
 ###################################################################
 
+# Combine the CMAKE_CXX_FLAGS and CMAKE_CXX_FLAGS_<build_type> into one string with all the flags
+string(TOUPPER ${CMAKE_BUILD_TYPE} UPPERCASE_BUILD_TYPE)
+string(STRIP ${CMAKE_CXX_FLAGS} STRIPPED_CXX_FLAGS)
+string(STRIP ${CMAKE_CXX_FLAGS_${UPPERCASE_BUILD_TYPE}} STRIPPED_BUILD_TYPE_FLAGS)
+set(ALL_CXX_FLAGS "${STRIPPED_CXX_FLAGS} ${STRIPPED_BUILD_TYPE_FLAGS}")
+
 add_custom_command(OUTPUT 
     ${generate_dir}/Version.cpp
     ${generate_dir}/ChasteBuildInfo.cpp
@@ -81,7 +87,7 @@ add_custom_command(OUTPUT
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
         "-DCMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}"
-        "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
+        "-DALL_CXX_FLAGS=${ALL_CXX_FLAGS}"
         "-DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}"
         "-DMSVC=${MSVC}"
         "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateVersionAndBuildInfo.cmake"
