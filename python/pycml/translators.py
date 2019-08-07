@@ -3615,8 +3615,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
         ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
         #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
         try:
-            if  config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
-                config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)               
+            if config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+                if config.cytosolic_calcium_variable.get_type()==VarTypes.Computed:
+                    config.cytosolic_calcium_variable = generator.add_output(config.cytosolic_calcium_variable, milliMolar)
+                else:
+                    config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
         except AttributeError:
             DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
 
