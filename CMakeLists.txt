@@ -50,7 +50,7 @@ message ("# Setting compilers and build type")
 message ("####################################\n")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste)
+project (Chaste VERSION 2018.1)
 set (Chaste_VERSION_MAJOR 2018 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
