@@ -187,7 +187,7 @@ public:
 
     #endif
     }
-    
+
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
     const static unsigned sNumTrials=3u;
     // IsInsideSurface contains randomisation: a direction is which to look for surface crossing.  This means that,
@@ -202,7 +202,7 @@ public:
         return count;
     }
 #endif
-  
+
 //     void doNotTestProblemWithPointMembershipClassificationCube()
 //     {
 // #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
@@ -252,7 +252,7 @@ public:
 //         //}
 // #endif
 //     }
-    
+
     void TestProblemWithPointMembershipClassificationSphere()
     {
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
@@ -352,7 +352,7 @@ public:
         TS_ASSERT_DELTA(composite_mesh.GetNode(3)->rGetNodeAttributes()[1], 1.0, 1e-6);
         TS_ASSERT_DELTA(composite_mesh.GetNode(4)->rGetNodeAttributes()[1], 1.0, 1e-6);
         TS_ASSERT_DELTA(composite_mesh.GetNode(5)->rGetNodeAttributes()[1], 1.0, 1e-6);
-        
+
         // Note the VTK 8.2 has more nodes marked transitional.  Possibly due to differences in node merger
         //TS_ASSERT_DELTA(composite_mesh.GetNode(6)->rGetNodeAttributes()[1], 0.0, 1e-6);
         //TS_ASSERT_DELTA(composite_mesh.GetNode(7)->rGetNodeAttributes()[1], 0.0, 1e-6);
@@ -393,7 +393,7 @@ private:
 // #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 //     vtkSmartPointer<vtkPolyData> CreateCube(double XCentre, double YCentre, double ZCentre)
 //     {
-        
+
 //         vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
 //         double size = 1.0;
 //         cube->SetBounds(XCentre - size, XCentre + size,
