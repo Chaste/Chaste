@@ -9,5 +9,5 @@ https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML
 
 Static versions of the guide accompanying Chaste releases are also available.
 See:
-https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2018.1/ChasteGuides/CodeGenerationFromCellML.html
-for release 2018.1.
+https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1/ChasteGuides/CodeGenerationFromCellML.html
+for release 2019.1.
