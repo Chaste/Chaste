@@ -3622,6 +3622,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
                     config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
         except AttributeError:
             DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
+        except:
+             DEBUG('generate_interface', "Unit conversion for cytosolic_calcium_variable failed.")
 
         # Finish up
         def errh(errors):
@@ -6920,11 +6922,6 @@ def run():
             return cellml_variable.get_variable_object(doc.model, vname).get_source_variable(recurse=True)
         for var_i, var_j in jacobian.keys():
             #hack to not remove converted variables.
-            source_var_i = None
-            source_var_j = None
-            var_i_name = var_i
-            var_j_name = var_i
-
             if gv(var_i).get_type()==VarTypes.Computed:
                 source_var_i = gv(var_i).get_dependencies()[0].get_dependencies()[0].get_source_variable()
             else:
@@ -6940,44 +6937,20 @@ def run():
             # Transform the Jacobian into the form needed by the Backward Euler code
             import maple_parser
             for key, expr in jacobian.iteritems():
-                if not (isinstance(expr, maple_parser.MNumber) and str(expr) == '0'):
-                    new_expr = None
-                    if key[0] == key[1]:
-                        # 1 on the diagonal
-                        new_expr = maple_parser.MNumber(['1'])
-#                        #is this really necessary?
-#                        converted_var = None
-#                        if gv(key[0]).get_type()==VarTypes.Computed:
-#                            converted_var = gv(key[0])
-#                        if gv(key[1]).get_type()==VarTypes.Computed:
-#                            converted_var = gv(key[1])
-#                        #if we have converted units correct the term.
-#                        if converted_var:
-#                            # Helper methods
-#                            def set_var_values(elt, vars=None):
-#                                """Fake all variables appearing in the given expression being set to 1.0, and return them."""
-#                                if vars is None:
-#                                    vars = []
-#                                if isinstance(elt, mathml_ci):
-#                                    elt.variable.set_value(1.0)
-#                                    vars.append(elt.variable)
-#                                else:
-#                                    for child in getattr(elt, 'xml_children', []):
-#                                        set_var_values(child, vars)
-#                                return vars                        
-#                            # Figure out the conversion factor in each case
-#                            defn = converted_var.get_dependencies()[0]
-#                            defn_vars = set_var_values(defn.eq.rhs)
-#                            assert len(defn_vars) == 1, "Unexpected form of units conversion expression found"
-#                            factor = defn.eq.rhs.evaluate()
-#                            new_expr = maple_parser.MOperator([maple_parser.MNumber(["1"]), maple_parser.MNumber([str(factor)])], '','divide')                                            
+                new_expr = None
+                if key[0] == key[1]:
+                    # 1 on the diagonal
+                    new_expr = maple_parser.MNumber(['1'])
+                if not (isinstance(expr, maple_parser.MNumber) and str(expr) == '0'):                
                     # subtract delta_t * expr
                     args = []
                     if new_expr:
                         args.append(new_expr)
                     args.append(maple_parser.MOperator([maple_parser.MVariable(['delta_t']), expr], 'prod', 'times'))
                     new_expr = maple_parser.MOperator(args, '', 'minus')
-                    jacobian[key] = new_expr                        
+#                    jacobian[key] = new_expr
+                if new_expr:
+                    jacobian[key] = new_expr                    
 
         # Add info as XML
         solver_info.add_all_info()
