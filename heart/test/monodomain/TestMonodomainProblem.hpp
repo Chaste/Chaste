@@ -1337,7 +1337,7 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
         HeartConfig::Instance()->SetOutputDirectory("MonoProblem2dSpecificNode");
         HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_2d_specific_node");
-        //HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);     <- Todo #
+        // HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true); // <- Todo #2980
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
         HeartConfig::Instance()->SetCapacitance(1.0);
 
@@ -1346,7 +1346,8 @@ public:
 
         // Check output at specific nodes in parallel
         std::vector<unsigned> output_node;
-        output_node.push_back(123);
+        unsigned my_favourite_node = 123u;
+        output_node.push_back(my_favourite_node);
         monodomain_problem.SetOutputNodes(output_node);
 
         monodomain_problem.Initialise();
@@ -1361,7 +1362,7 @@ public:
         std::vector<unsigned> permuted_nodes = reader.GetIncompleteNodeMap();
         TS_ASSERT_EQUALS(permuted_nodes.size(), 1u);
 
-        std::vector<double> our_answer = reader.GetVariableOverTime("V", permuted_nodes[0]);
+        std::vector<double> our_answer = reader.GetVariableOverTime("V", permuted_nodes[0]); // Todo #2980 this should be simply 'my_favourite_node'.
 
         for (unsigned i = 0; i < right_answer.size(); i++)
         {
