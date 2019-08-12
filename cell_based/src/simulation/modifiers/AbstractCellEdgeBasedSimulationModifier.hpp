@@ -91,10 +91,19 @@ public:
                           EdgeRemapInfo* pEdgeChange);
 
     /**
-     * Called when an edge is to be added to a cell. This is so that the correct type of SRN edge mdoel object is used.
-     * @return An object based on AbstractSrnModel of the correct subclass
+     * Called when an edge is to be added to a cell. This is so that the correct type of SRN edge model object is used.
+     * @return An object based on AbstractSrnModel of the correct subclass.
      */
     virtual AbstractSrnModel* CreateEmptySrnEdgeModel()=0;
+
+    /**
+     * Called during a cell division. This is so that the correct type of SRN model object. Used only in the case
+     * where cells have set an interior srn.
+     * @return An object based on AbstractSrnModel of the correct subclass.
+     */
+    virtual AbstractSrnModel* CreateInteriorSrnEdgeModel(){ return nullptr; };
+
+
 
     /**
      * Called when an edge has been added to the cell, this happens during swap and cell division
@@ -121,6 +130,14 @@ public:
      * @param newSrnEdge
      */
     virtual void EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge)=0;
+
+    /**
+     * Called during cell divide only when cells have interior srn models. Provides the interior srn of both cells
+     * to allow customisation of how concentrations are split during cell divide.
+     * @param oldSrnInterior The interior srn model of the original cell
+     * @param newSrnInterior  The interior srn model of the divided cell
+     */
+    virtual void InteriorDivide(AbstractSrnModelPtr oldSrnInterior, AbstractSrnModelPtr newSrnInterior){};
 };
 
 #endif //ABSTRACTCELLEDGEMODIFIER_HPP_

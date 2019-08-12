@@ -62,7 +62,8 @@ population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestNumericalMethods.hpp
-simulation/TestDeltaNotchCellEdgeODESimulation.hpp
+simulation/TestDeltaNotchCellEdgeOnlyODESimulation.hpp
+simulation/TestDeltaNotchCellEdgeInteriorODESimulation.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithBuskeForces.hpp
