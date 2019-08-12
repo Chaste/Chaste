@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "DeltaNotchOdeSystem.hpp"
+#include "DeltaNotchInteriorOdeSystem.hpp"
 #include "AbstractOdeSrnModel.hpp"
 
 /**
@@ -136,9 +136,13 @@ public:
      * @return the current total level of Delta in the edges.
      *
      * N.B. This doesn't calculate anything, it just returns the parameter
-     * from the DeltaNotchOdeSystem.
+     * from the DeltaNotchInteriorOdeSystem.
      */
     double GetTotalEdgeDelta();
+    /**
+     * @return total edge notch
+     */
+    double GetTotalEdgeNotch();
 
     /**
      * Output SRN model parameters to file.

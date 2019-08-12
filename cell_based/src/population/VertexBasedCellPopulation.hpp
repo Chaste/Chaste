@@ -583,16 +583,13 @@ public:
      * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
-
     /**
      * Get a vector of edge operations in the vertex mesh
      * @return
      */
     const std::vector<EdgeOperation*> &  GetCellEdgeChangeOperations();
 
-    /**
-     * Clear all edge operations in the vertex mesh
-     */
+
     void ClearCellEdgeOperations();
 };
 

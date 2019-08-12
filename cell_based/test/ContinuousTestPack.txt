@@ -13,7 +13,7 @@ cell/TestOdeBasedCellCycleModels.hpp
 cell/TestOdeBasedSrnModels.hpp
 cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
-cell/TestCellEdgeSrn.hpp
+cell/TestCellEdgeInteriorSrn.hpp
 cell_based_pde/TestCellBasedEllipticPdes.hpp
 cell_based_pde/TestCellBasedEllipticPdeSolver.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp

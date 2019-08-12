@@ -307,7 +307,6 @@ public:
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
-
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -330,6 +329,8 @@ public:
          * the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_cell_modifier);
         simulator.AddSimulationModifier(p_cell_modifier);
+        MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_edge_modifier);
+        simulator.AddSimulationModifier(p_edge_modifier);
 
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
