@@ -44,23 +44,26 @@ authors:
    affiliation: 3
  - name: Benjamin D Evans
    orcid: 0000-0002-1734-6070
-   affiliation: "13, 14"
+   affiliation: "6, 7"
  - name: Alexander G Fletcher
    orcid: 0000-0003-0525-4336
-   affiliation: "6, 7"
+   affiliation: "8, 9"
  - name: James A Grogan
    affiliation: 1
  - name: Wenxian Guo
-   affiliation: 8
+   affiliation: 10
    orcid: 0000-0001-8130-3326
  - name: Daniel G Harvey
    affiliation: 3
+ - name: Maurice Hendrix
+   orcid: 0000-0002-6621-7996
+   affiliation: "11,12"
  - name: David Kay
    orcid: 0000-0003-4984-3669
    affiliation: 3
  - name: Jochen Kursawe
    orcid: 0000-0002-0314-9623
-   affiliation: 9
+   affiliation: 13
  - name: Philip K Maini
    orcid: 0000-0002-0146-9164
    affiliation: 1
@@ -69,13 +72,13 @@ authors:
    affiliation: 3
  - name: Gary R Mirams
    orcid: 0000-0002-4569-4312
-   affiliation: 10
+   affiliation: 11
  - name: James M Osborne
    orcid: 0000-0002-5622-0104
-   affiliation: 11
+   affiliation: 14
  - name: Pras Pathmanathan
    orcid: 0000-0003-2111-6689
-   affiliation: 12
+   affiliation: 15
  - name: Joe M Pitt-Francis
    orcid: 0000-0002-5094-5403
    affiliation: 3
@@ -101,25 +104,28 @@ affiliations:
    index: 4
  - name: Research IT Services, University College London, London, UK
    index: 5
- - name: School of Mathematics & Statistics, University of Sheffield, Sheffield, UK
-   index: 6
- - name: Bateson Centre, University of Sheffield, Sheffield, UK
-   index: 7
- - name: Department of Computer Science, University of Saskatchewan, Canada
-   index: 8
- - name: Faculty of Biology, Medicine and Health, University of Manchester, Manchester, UK
-   index: 9
- - name: Centre for Mathematical Medicine & Biology, School of Mathematical Sciences, University of Nottingham, Nottingham, UK
-   index: 10
- - name: School of Mathematics and Statistics, University of Melbourne, Victoria, Australia
-   index: 11
- - name: Office of Science and Engineering Laboratories (OSEL), Center for Devices and Radiological Health (CDRH), U.S. Food and Drug Administration (FDA), Silver Spring, MD 20993, USA
-   index: 12
  - name: Centre for Biomedical Modelling and Analysis, Living Systems Institute, University of Exeter, Exeter, UK
-   index: 13
+   index: 6
  - name: School of Psychological Science, University of Bristol, Bristol, UK
+   index: 7
+ - name: School of Mathematics & Statistics, University of Sheffield, Sheffield, UK
+   index: 8
+ - name: Bateson Centre, University of Sheffield, Sheffield, UK
+   index: 9
+ - name: Department of Computer Science, University of Saskatchewan, Canada
+   index: 10
+ - name: Centre for Mathematical Medicine & Biology, School of Mathematical Sciences, University of Nottingham, Nottingham, UK
+   index: 11
+ - name: Digital Research Service, University of Nottingham, Nottingham, UK
+   index: 12
+ - name: Faculty of Biology, Medicine and Health, University of Manchester, Manchester, UK
+   index: 13
+ - name: School of Mathematics and Statistics, University of Melbourne, Victoria, Australia
    index: 14
-date: 6th August 2019
+ - name: Office of Science and Engineering Laboratories (OSEL), Center for Devices and Radiological Health (CDRH), U.S. Food and Drug Administration (FDA), Silver Spring, MD 20993, USA
+   index: 15
+
+date: 12th August 2019
 bibliography: paper.bib
 ---
 
@@ -178,7 +184,7 @@ In the following sections we showcase a specific tutorial for each of cardiac, c
 
 Here we demonstrate how to run and visualise a three-dimensional monodomain cardiac simulation.
 This follows the tutorial `TestMonodomain3dRabbitHeartTutorial` which simulates the result of an electrical stimulus being applied to a realistic rabbit heart geometry.
-Assuming Chaste has been installed on Ubuntu Linux, and the Chaste source exists at `$CHASTE_SRC`, a minimal set of commands to build and run the tutorial is as follows:
+Assuming Chaste has been installed on Ubuntu Linux (or is running within a Docker container), and the Chaste source exists at `$CHASTE_SRC`, a minimal set of commands to build and run the tutorial is as follows:
 
 ```
 mkdir build && cd build
