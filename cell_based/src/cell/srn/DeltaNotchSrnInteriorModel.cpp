@@ -113,11 +113,25 @@ double DeltaNotchSrnInteriorModel::GetNotch()
     return notch;
 }
 
+void DeltaNotchSrnInteriorModel::SetNotch(double value)
+{
+    assert(mpOdeSystem != nullptr);
+    mpOdeSystem->rGetStateVariables()[0] = value;
+}
+
+
+
 double DeltaNotchSrnInteriorModel::GetDelta()
 {
     assert(mpOdeSystem != nullptr);
     double delta = mpOdeSystem->rGetStateVariables()[1];
     return delta;
+}
+
+void DeltaNotchSrnInteriorModel::SetDelta(double value)
+{
+    assert(mpOdeSystem != nullptr);
+    mpOdeSystem->rGetStateVariables()[1] = value;
 }
 
 double DeltaNotchSrnInteriorModel::GetTotalEdgeDelta()

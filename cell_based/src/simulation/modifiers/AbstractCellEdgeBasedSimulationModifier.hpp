@@ -59,10 +59,11 @@ class AbstractCellEdgeBasedSimulationModifier: public AbstractCellBasedSimulatio
 public:
 
     /**
-     * Iterates though a list of cell edge changes stored in the rCellPopulation
+     * Iterates though a list of cell edge changes stored in the rCellPopulation and perform changes in the cells's
+     * srn layout to reflect this change
      * @param rCellPopulation reference through cell population
      */
-    virtual void UpdateCellEdges(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
+    virtual void UpdateCellSrnLayout(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
 
     /**
      * Helper function for UpdateCellEdges for handling the case where a cell division occurs.
@@ -101,7 +102,7 @@ public:
      * where cells have set an interior srn.
      * @return An object based on AbstractSrnModel of the correct subclass.
      */
-    virtual AbstractSrnModel* CreateInteriorSrnEdgeModel(){ return nullptr; };
+    virtual AbstractSrnModel* CreateEmptySrnInteriorModel(){ return nullptr; };
 
 
 
@@ -132,8 +133,8 @@ public:
     virtual void EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge)=0;
 
     /**
-     * Called during cell divide only when cells have interior srn models. Provides the interior srn of both cells
-     * to allow customisation of how concentrations are split during cell divide.
+     * Called during cell divide only when cells have interior srn models. This function is called twice, once with newSrnInterior
+     * of the old cell and another with newSrnInterior of the new cell.
      * @param oldSrnInterior The interior srn model of the original cell
      * @param newSrnInterior  The interior srn model of the divided cell
      */

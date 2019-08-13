@@ -51,7 +51,7 @@ DeltaNotchCellEdgeTrackingModifier<DIM>::~DeltaNotchCellEdgeTrackingModifier()
 template<unsigned DIM>
 void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    AbstractCellEdgeBasedSimulationModifier<DIM,DIM>::UpdateCellEdges(rCellPopulation);
+    AbstractCellEdgeBasedSimulationModifier<DIM,DIM>::UpdateCellSrnLayout(rCellPopulation);
 
     // Update the cell
     this->UpdateCellData(rCellPopulation);
@@ -70,11 +70,10 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<
 template<unsigned DIM>
 void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Make sure the cell population is updated
-    rCellPopulation.Update();
 
-    // Handles all edge changes
-    this->UpdateCellEdges(rCellPopulation);
+    // Update srn topology in order to align with changes
+    // in the mesh
+    this->UpdateCellSrnLayout(rCellPopulation);
 
     // Recovers each cell's edge levels of notch and delta, and those of its neighbor's
     // Then saves them
@@ -84,7 +83,7 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
     {
         auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
 
-        //This cell's edge data
+        /* Cells edge data */
         std::vector<double> notch_vec;
         std::vector<double> delta_vec;
         for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
@@ -99,22 +98,11 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
         cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
         cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
-        //Filling interior delta/notch value, if interior model is specified
-        double interior_delta_value = 0;
-        double interior_notch_value = 0;
-        std::vector<double> interior_delta_vector(delta_vec.size());
-        std::vector<double> interior_notch_vector(delta_vec.size());
-        if (p_cell_edge_model->GetInteriorSrn()!=nullptr)
-        {
-            boost::shared_ptr<DeltaNotchSrnInteriorModel> p_model
-            = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_edge_model->GetInteriorSrn());
-            interior_delta_value = p_model->GetDelta();
-            interior_notch_value = p_model->GetNotch();
-        }
-        std::fill(interior_delta_vector.begin(), interior_delta_vector.end(), interior_delta_value);
-        std::fill(interior_notch_vector.begin(), interior_notch_vector.end(), interior_notch_value);
-        cell_iter->GetCellEdgeData()->SetItem("interior delta", interior_delta_vector);
-        cell_iter->GetCellEdgeData()->SetItem("interior notch", interior_notch_vector);
+
+        /* Cell interior data */
+        //We're not using interior model so interiors are set to 0
+        cell_iter->GetCellData()->SetItem("interior delta", 0);
+        cell_iter->GetCellData()->SetItem("interior notch", 0);
     }
 
     //After the edge data is filled, fill the edge neighbour data

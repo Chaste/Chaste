@@ -182,7 +182,7 @@ public:
 
                 MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                 p_srn_model->SetInitialConditions(initial_conditions);
-                p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
             }
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));

@@ -101,11 +101,9 @@ void DeltaNotchSrnEdgeModel::UpdateDeltaNotch()
     = mpCell->GetCellEdgeData()->GetItem("neighbour delta")[this->GetEdgeLocalIndex()];
     mpOdeSystem->SetParameter("neighbour delta", neigh_delta);
 
-    double interior_delta
-    = mpCell->GetCellEdgeData()->GetItem("interior delta")[this->GetEdgeLocalIndex()];
+    double interior_delta = mpCell->GetCellData()->GetItem("interior delta");
     mpOdeSystem->SetParameter("interior delta", interior_delta);
-    double interior_notch
-    = mpCell->GetCellEdgeData()->GetItem("interior notch")[this->GetEdgeLocalIndex()];
+    double interior_notch = mpCell->GetCellData()->GetItem("interior notch");
     mpOdeSystem->SetParameter("interior notch", interior_notch);
 }
 

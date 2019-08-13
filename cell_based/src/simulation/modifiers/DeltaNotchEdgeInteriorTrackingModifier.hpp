@@ -115,7 +115,7 @@ public:
 
     AbstractSrnModel *CreateEmptySrnEdgeModel() override;
 
-    AbstractSrnModel *CreateInteriorSrnEdgeModel() override;
+    AbstractSrnModel *CreateEmptySrnInteriorModel() override;
 
     void EdgeAdded(AbstractCellPopulation<DIM, DIM> &rCellPopulation, unsigned locationIndex,
                    unsigned edgeLocalIndex, AbstractSrnModelPtr addedEdge) override;

@@ -41,7 +41,7 @@ SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     // Make a copy of all SRN models inside the system
     for (auto srnModel: rModel.mEdgeSrnModels)
     {
-        this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
+        this->AddEdgeSrnModel(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
     }
     if (rModel.mInteriorSrnModel!=nullptr)
         this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
@@ -97,7 +97,7 @@ void SrnCellModel::AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
     mEdgeSrnModels = edgeSrn;
 }
 
-void SrnCellModel::AddEdgeSrn(AbstractSrnModelPtr edgeSrn)
+void SrnCellModel::AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn)
 {
     mIsEdgeBasedModel = true;
     edgeSrn->SetEdgeModelIndicator(true);

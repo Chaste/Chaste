@@ -1565,7 +1565,7 @@ public:
             {
 
                 MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
-                p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
             }
 
             cells[elem_index]->SetSrnModel(p_cell_edge_srn_model);
@@ -1655,7 +1655,7 @@ public:
             {
 
                 MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
-                p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
             }
 
             MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_interior_model);
