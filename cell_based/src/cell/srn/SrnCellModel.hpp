@@ -118,7 +118,7 @@ public:
 
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
 
-    void AddEdgeSrn(AbstractSrnModelPtr edgeSrn);
+    void AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn);
 
     void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn);
 

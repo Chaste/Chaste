@@ -44,8 +44,8 @@ DeltaNotchEdgeOdeSystem::DeltaNotchEdgeOdeSystem(std::vector<double> stateVariab
     /**
      * The state variables are as follows:
      *
-     * 0 - Notch concentration for this cell
-     * 1 - Delta concentration for this cell
+     * 0 - Notch concentration for this cell edge
+     * 1 - Delta concentration for this cell edge
      *
      * We store the last state variable so that it can be written
      * to file at each time step alongside the others, and visualized.

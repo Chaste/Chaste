@@ -59,10 +59,11 @@ class AbstractCellEdgeBasedSimulationModifier: public AbstractCellBasedSimulatio
 public:
 
     /**
-     * Iterates though a list of cell edge changes stored in the rCellPopulation
+     * Iterates though a list of cell edge changes stored in the rCellPopulation and perform changes in the cells's
+     * srn layout to reflect this change
      * @param rCellPopulation reference through cell population
      */
-    virtual void UpdateCellEdges(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
+    virtual void UpdateCellSrnLayout(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
 
     /**
      * Helper function for UpdateCellEdges for handling the case where a cell division occurs.
@@ -91,10 +92,19 @@ public:
                           EdgeRemapInfo* pEdgeChange);
 
     /**
-     * Called when an edge is to be added to a cell. This is so that the correct type of SRN edge mdoel object is used.
-     * @return An object based on AbstractSrnModel of the correct subclass
+     * Called when an edge is to be added to a cell. This is so that the correct type of SRN edge model object is used.
+     * @return An object based on AbstractSrnModel of the correct subclass.
      */
     virtual AbstractSrnModel* CreateEmptySrnEdgeModel()=0;
+
+    /**
+     * Called during a cell division. This is so that the correct type of SRN model object. Used only in the case
+     * where cells have set an interior srn.
+     * @return An object based on AbstractSrnModel of the correct subclass.
+     */
+    virtual AbstractSrnModel* CreateEmptySrnInteriorModel(){ return nullptr; };
+
+
 
     /**
      * Called when an edge has been added to the cell, this happens during swap and cell division
@@ -121,6 +131,14 @@ public:
      * @param newSrnEdge
      */
     virtual void EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge)=0;
+
+    /**
+     * Called during cell divide only when cells have interior srn models. This function is called twice, once with newSrnInterior
+     * of the old cell and another with newSrnInterior of the new cell.
+     * @param oldSrnInterior The interior srn model of the original cell
+     * @param newSrnInterior  The interior srn model of the divided cell
+     */
+    virtual void InteriorDivide(AbstractSrnModelPtr oldSrnInterior, AbstractSrnModelPtr newSrnInterior){};
 };
 
 #endif //ABSTRACTCELLEDGEMODIFIER_HPP_

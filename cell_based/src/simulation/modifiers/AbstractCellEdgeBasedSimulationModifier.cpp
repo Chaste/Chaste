@@ -5,7 +5,7 @@
 
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void AbstractCellEdgeBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::UpdateCellEdges(
+void AbstractCellEdgeBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::UpdateCellSrnLayout(
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> &rCellPopulation)
 {
 
@@ -67,8 +67,9 @@ void AbstractCellEdgeBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::CellDivisi
     auto cell1 = rCellPopulation.GetCellUsingLocationIndex(locationIndex);
     auto cell2 = rCellPopulation.GetCellUsingLocationIndex(locationIndex2);
 
-    // Ges the edge SRN model and a copy of the SRN models in the edges
+    // Ges the edge SRN model and a copy of the SRN models in the edges and interior
     auto old_model = static_cast<SrnCellModel*>(cell1->GetSrnModel());
+    auto old_srn_interior = old_model->GetInteriorSrn();
     std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
 
     auto srn_model1 = new SrnCellModel();
@@ -79,6 +80,22 @@ void AbstractCellEdgeBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::CellDivisi
 
     PerformEdgeRemap(rCellPopulation, locationIndex, old_srn_edges, srn_model1, pEdgeChange);
     PerformEdgeRemap(rCellPopulation, locationIndex2, old_srn_edges, srn_model2, pEdgeChange2);
+
+    //If there's interior srn then also allow custom srn split
+    if (old_srn_interior != nullptr)
+    {
+        srn_model1->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(this->CreateEmptySrnInteriorModel()));
+        srn_model1->GetInteriorSrn()->SetCell(cell1);
+        srn_model1->GetInteriorSrn()->Initialise();
+        srn_model2->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(this->CreateEmptySrnInteriorModel()));
+        srn_model2->GetInteriorSrn()->SetCell(cell2);
+        srn_model2->GetInteriorSrn()->Initialise();
+        this->InteriorDivide(old_srn_interior, srn_model1->GetInteriorSrn());
+        this->InteriorDivide(old_srn_interior, srn_model2->GetInteriorSrn());
+    }
+
+
+
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
@@ -111,14 +128,14 @@ void AbstractCellEdgeBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::PerformEdg
             /* Direct remap - move the edge to the new SRN cell model */
             auto current_edge_srn = old_edges[remapIndex];
             current_edge_srn->SetCell(pNewModel->GetCell()); //Move the edge to the current cell
-            pNewModel->AddEdgeSrn(current_edge_srn);
+            pNewModel->AddEdgeSrnModel(current_edge_srn);
         }
         else
         {
             /* Split or new edge, either way a new SRN edge is created */
             auto new_edge_srn = boost::shared_ptr<AbstractSrnModel>(this->CreateEmptySrnEdgeModel());
             new_edge_srn->SetCell(pNewModel->GetCell()); //New model does not have an existing cell so we must set this
-            pNewModel->AddEdgeSrn(new_edge_srn);
+            pNewModel->AddEdgeSrnModel(new_edge_srn);
             new_edge_srn->Initialise();
         }
     }
@@ -149,7 +166,7 @@ void AbstractCellEdgeBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::PerformEdg
             }
             case 1:
             {
-                /* Split - Divide the concentration in half */
+                /* Split - e.g. Divide the concentration in half */
                 this->EdgeDivide(old_edges[remapIndex], pNewModel->GetEdgeSrn(i));
                 break;
             }

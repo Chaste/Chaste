@@ -128,9 +128,21 @@ public:
     double GetNotch();
 
     /**
+     * Set the notch level in this edge
+     * @param value
+     */
+    void SetNotch(double value);
+
+    /**
      * @return the current Delta level in this cell.
      */
     double GetDelta();
+
+    /**
+     * Set the delta level in this edge
+     * @param value
+     */
+    void SetDelta(double value);
 
     /**
      * @return the current total level of Delta in the edges.

@@ -101,7 +101,7 @@ public:
                 starter_conditions.push_back(0.5);
                 starter_conditions.push_back(0.5);
                 p_delta_notch_edge_srn_model->SetInitialConditions(starter_conditions);
-                p_cell_edge_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
 
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -166,7 +166,7 @@ public:
                 state_variables.push_back(3.0);
                 p_delta_notch_edge_srn_model->SetOdeSystem(new DeltaNotchEdgeOdeSystem(state_variables));
                 p_delta_notch_edge_srn_model->SetInitialConditions(state_variables);
-                p_cell_edge_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
 
             // Create a copy
@@ -204,7 +204,7 @@ public:
                 for (int i = 0; i < numEdges; i++)
                 {
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_delta_notch_edge_srn_model);
-                    static_cast<SrnCellModel*>(p_srn_model)->AddEdgeSrn(p_delta_notch_edge_srn_model);
+                    static_cast<SrnCellModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
                 }
 
                 MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -295,7 +295,7 @@ public:
 
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
-                    p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
                 }
 
                 CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
@@ -326,7 +326,7 @@ public:
             }
 
             /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellEdges(cell_population);
+            p_modifier->UpdateCellSrnLayout(cell_population);
 
             /* Check that we now have the same number of edges in the vertex mesh and cells */
             for (unsigned i = 0; i < cell_population.GetNumAllCells(); i++)
@@ -371,7 +371,7 @@ public:
 
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
-                    p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
                 }
 
                 CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
@@ -399,7 +399,7 @@ public:
             }
 
             /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellEdges(cell_population);
+            p_modifier->UpdateCellSrnLayout(cell_population);
 
             /* We should now have 5 cells after the divide*/
             TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5);
@@ -438,7 +438,7 @@ public:
                 starter_conditions.push_back(0.5);
                 starter_conditions.push_back(0.5);
                 p_delta_notch_edge_srn_model->SetInitialConditions(starter_conditions);
-                p_cell_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
+                p_cell_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
             boost::shared_ptr<DeltaNotchSrnInteriorModel> p_delta_notch_interior_srn_model(new DeltaNotchSrnInteriorModel());
 
@@ -521,7 +521,7 @@ public:
                 state_variables.push_back(3.0);
                 p_delta_notch_edge_srn_model->SetOdeSystem(new DeltaNotchEdgeOdeSystem(state_variables));
                 p_delta_notch_edge_srn_model->SetInitialConditions(state_variables);
-                p_cell_srn_model->AddEdgeSrn(p_delta_notch_edge_srn_model);
+                p_cell_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
             boost::shared_ptr<DeltaNotchSrnInteriorModel> p_delta_notch_interior_srn_model(new DeltaNotchSrnInteriorModel());
             std::vector<double> state_variables;
@@ -567,7 +567,7 @@ public:
                 for (int i = 0; i < numEdges; i++)
                 {
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_delta_notch_edge_srn_model);
-                    static_cast<SrnCellModel*>(p_srn_model)->AddEdgeSrn(p_delta_notch_edge_srn_model);
+                    static_cast<SrnCellModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
                 }
                 MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_srn_model);
                 static_cast<SrnCellModel*>(p_srn_model)->SetInteriorSrnModel(p_interior_srn_model);
@@ -669,8 +669,9 @@ public:
 
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
-                    p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
                 }
+
                 MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_srn);
                 p_interior_srn->SetInitialConditions(std::vector<double>(2, 3.0));
                 p_cell_edge_srn_model->SetInteriorSrnModel(p_interior_srn);
@@ -703,7 +704,7 @@ public:
             }
 
             /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellEdges(cell_population);
+            p_modifier->UpdateCellSrnLayout(cell_population);
 
             /* Check that we now have the same number of edges in the vertex mesh and cells */
             for (unsigned i = 0; i < cell_population.GetNumAllCells(); i++)
@@ -749,11 +750,11 @@ public:
 
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
-                    p_cell_edge_srn_model->AddEdgeSrn(p_srn_model);
+                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
                 }
-                //MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_srn);
-                //p_interior_srn->SetInitialConditions(std::vector<double>(2, 4.0));
-                //p_cell_edge_srn_model->SetInteriorSrnModel(p_interior_srn);
+                MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_srn);
+                p_interior_srn->SetInitialConditions(std::vector<double>(2, 4.0));
+                p_cell_edge_srn_model->SetInteriorSrnModel(p_interior_srn);
 
                 CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
                 p_cell->SetCellProliferativeType(p_diff_type);
@@ -767,10 +768,9 @@ public:
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
             /* Create an edge tracking modifier */
-            MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
-            //MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_interior_modifier);
-            p_modifier->SetupSolve(cell_population,"testVertexMeshCellEdgeSrnDivision");
-            //p_interior_modifier->SetupSolve(cell_population, "testVertexMeshCellEdgeInteriorSrnDivision");
+            MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_modifier);
+            p_modifier->SetupSolve(cell_population,"testVertexMeshCellEdgeInteriorSrnDivision");
+
             /* Divide the 0th cell*/
             {
                 auto p_cell = cell_population.GetCellUsingLocationIndex(0);
@@ -780,8 +780,7 @@ public:
             }
 
             /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellEdges(cell_population);
-            //p_interior_modifier->UpdateCellData(cell_population);
+            p_modifier->UpdateCellSrnLayout(cell_population);
 
             /* We should now have 5 cells after the divide*/
             TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5);
@@ -792,6 +791,7 @@ public:
             {
                 auto p_cell = cell_population.GetCellUsingLocationIndex(0);
                 auto p_cell_edge_srn = static_cast<SrnCellModel*>(p_cell->GetSrnModel());
+                TS_ASSERT(p_cell_edge_srn->GetInteriorSrn() != nullptr);
                 TS_ASSERT_EQUALS(p_cell_edge_srn->GetNumEdgeSrn(), 5);
 
                 //auto p_interior_new_srn
@@ -803,9 +803,12 @@ public:
             {
                 auto p_cell = cell_population.GetCellUsingLocationIndex(4);
                 auto p_cell_edge_srn = static_cast<SrnCellModel*>(p_cell->GetSrnModel());
+                TS_ASSERT(p_cell_edge_srn->GetInteriorSrn() != nullptr);
                 TS_ASSERT_EQUALS(p_cell_edge_srn->GetNumEdgeSrn(), 5);
             }
         }
+
+
 };
 
 #endif //TESTCELLEDGEINTERIORSRN_HPP_
