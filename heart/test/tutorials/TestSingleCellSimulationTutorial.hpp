@@ -271,7 +271,7 @@ public:
         TS_ASSERT_DELTA(apd, 212.411, 1e-2);
         TS_ASSERT_DELTA(upstroke_velocity, 338.704, 1.25);
 
-        /* CVODE is still an optional dependency for Chaste.
+        /* CVODE is still an optional dependency for Chaste, but is required for this tutorial.
          * If CVODE is not installed this tutorial will
          * not do anything, but we can at least alert the user to this.*/
 #else
