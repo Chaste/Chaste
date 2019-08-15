@@ -115,8 +115,8 @@ public:
             std::vector<double> interior_delta(4);
             std::vector<double> interior_notch(4);
             p_cell->GetCellEdgeData()->SetItem("neighbour delta", neigbour_delta);
-            p_cell->GetCellEdgeData()->SetItem("interior delta", interior_delta);
-            p_cell->GetCellEdgeData()->SetItem("interior notch", interior_notch);
+            p_cell->GetCellData()->SetItem("interior delta", 0);
+            p_cell->GetCellData()->SetItem("interior notch", 0);
             p_cell->InitialiseCellCycleModel();
             p_cell->InitialiseSrnModel();
 
@@ -214,8 +214,8 @@ public:
                 CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
                 p_cell->SetCellProliferativeType(p_transit_type);
                 p_cell->GetCellEdgeData()->SetItem("neighbour delta", std::vector<double>{10.0, 10.0, 10.0, 10.0});
-                p_cell->GetCellEdgeData()->SetItem("interior delta", std::vector<double>{5.0, 5.0, 5.0, 5.0});
-                p_cell->GetCellEdgeData()->SetItem("interior notch", std::vector<double>{1.0, 1.0, 1.0, 1.0});
+                p_cell->GetCellData()->SetItem("interior delta", 5.0);
+                p_cell->GetCellData()->SetItem("interior notch", 1.0);
                 p_cell->InitialiseCellCycleModel();
                 p_cell->InitialiseSrnModel();
                 p_cell->SetBirthTime(0.0);
@@ -460,8 +460,8 @@ public:
             std::vector<double> interior_notch = {1.0, 1.0, 1.0, 1.0};
 
             p_cell->GetCellEdgeData()->SetItem("neighbour delta", neigbour_delta);
-            p_cell->GetCellEdgeData()->SetItem("interior delta", interior_delta);
-            p_cell->GetCellEdgeData()->SetItem("interior notch", interior_notch);
+            p_cell->GetCellData()->SetItem("interior delta", 1.0);
+            p_cell->GetCellData()->SetItem("interior notch", 1.0);
             p_cell->GetCellData()->SetItem("total neighbour edge delta", 4.0);
             p_cell->GetCellData()->SetItem("total edge notch", 2.0);
             p_cell->InitialiseCellCycleModel();
@@ -578,8 +578,8 @@ public:
                 CellPtr p_cell(new Cell(p_healthy_state, p_cc_model, p_srn_model));
                 p_cell->SetCellProliferativeType(p_transit_type);
                 p_cell->GetCellEdgeData()->SetItem("neighbour delta", std::vector<double>{10.0, 10.0, 10.0, 10.0});
-                p_cell->GetCellEdgeData()->SetItem("interior delta", std::vector<double>{5.0, 5.0, 5.0, 5.0});
-                p_cell->GetCellEdgeData()->SetItem("interior notch", std::vector<double>{1.0, 1.0, 1.0, 1.0});
+                p_cell->GetCellData()->SetItem("interior delta", 5.0);
+                p_cell->GetCellData()->SetItem("interior notch", 1.0);
                 p_cell->GetCellData()->SetItem("total neighbour edge delta", 40.0);
                 p_cell->GetCellData()->SetItem("total edge notch", 4.0);
                 p_cell->InitialiseCellCycleModel();
