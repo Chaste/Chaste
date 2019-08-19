@@ -275,8 +275,9 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
         /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
         CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#else // CVODE < v3.0.0 \
-    // Attach a linear solver for Newton iteration
+#else
+        // CVODE < v3.0.0
+        // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
 #endif
     }

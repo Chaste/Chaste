@@ -442,8 +442,9 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 
         /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
         CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#else // CVODE < v3.0.0 \
-    // Attach a linear solver for Newton iteration
+#else
+        // CVODE < v3.0.0
+        // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, NV_LENGTH_S(initialConditions));
 #endif
 
