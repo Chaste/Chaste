@@ -218,8 +218,14 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     if (!mpCvodeMem) // First run of this solver, set up CVODE memory
     {
         // Set up CVODE's memory.
+#if CHASTE_SUNDIALS_VERSION >= 40000
+        mpCvodeMem = CVodeCreate(CV_BDF);
+#else
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
+#endif
+
+        if (mpCvodeMem == nullptr)
+            EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
         // Set the user data
@@ -259,6 +265,15 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
         /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
         CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#elif
+        /* Create dense SUNMatrix for use in linear solves */
+        mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size());
+
+        /* Create dense SUNLinearSolver object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
+
+        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
 #else
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
