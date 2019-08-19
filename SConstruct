@@ -319,9 +319,6 @@ extra_flags = build.CcFlags() + ' ' + hostconfig.CcFlags()
 link_flags  = build.LinkFlags() + ' ' + hostconfig.LdFlags()
 include_flag = ' ' + build.IncludeFlag() + ' '
 
-# C++14 changes (#2811, #3008)
-extra_flags = extra_flags + ' -std=c++14'
-
 env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
            + ' ' + extra_flags)
 env.Append(LINKFLAGS = link_flags)
