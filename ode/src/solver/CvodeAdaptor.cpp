@@ -267,7 +267,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
         /* Create dense SUNLinearSolver object for use by CVode */
         mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
 
-        /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
         CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
 #elif CHASTE_SUNDIALS_VERSION >= 30000
         /* Create dense SUNLinearSolver object for use by CVode */
@@ -275,8 +275,8 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 
         /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
         CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
-#else
-        // Attach a linear solver for Newton iteration
+#else // CVODE < v3.0.0 \
+    // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
 #endif
     }
@@ -311,14 +311,22 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
             SUNMatDestroy(mpSundialsDenseMatrix);
         }
 
-        /* Create dense SUNMatrix for use in linear solves */
+        /* Create dense matrix of type SUNDenseMatrix for use in linear solves */
         mpSundialsDenseMatrix = SUNDenseMatrix(rInitialY.size(), rInitialY.size());
 
+#if CHASTE_SUNDIALS_VERSION >= 40000
+        /* Create dense SUNLinSol_Dense object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initial_values, mpSundialsDenseMatrix);
+
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#else
         /* Create dense SUNLinearSolver object for use by CVode */
         mpSundialsLinearSolver = SUNDenseLinearSolver(initial_values, mpSundialsDenseMatrix);
 
         /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
         CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#endif
 #else
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, rInitialY.size());
