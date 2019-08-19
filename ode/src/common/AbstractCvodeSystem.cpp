@@ -406,7 +406,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
 #endif
         if (mpCvodeMem == nullptr)
-            EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
+            EXCEPTION("Failed to SetupCvode CVODE"); // LCOV_EXCL_LINE
 
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);

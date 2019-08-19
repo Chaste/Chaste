@@ -227,7 +227,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 #endif
 
         if (mpCvodeMem == nullptr)
-            EXCEPTION("Failed to SetupCvode CVODE"); // In one line to avoid coverage problem!
+            EXCEPTION("Failed to SetupCvode CVODE"); // LCOV_EXCL_LINE
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
         // Set the user data
