@@ -38,20 +38,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     : AbstractSrnModel(rModel), mInteriorSrnModel(nullptr)
 {
-    // Make a copy of all SRN models inside the system
+    // Make a copy of all SRN models inside the system to be passed to daughter cell
+    // Note that CreateSrnModel() methods should have custom behavior for edge/interior SRNs
     for (auto srnModel: rModel.mEdgeSrnModels)
     {
         this->AddEdgeSrnModel(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
     }
     if (rModel.mInteriorSrnModel!=nullptr)
-        this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.mInteriorSrnModel->CreateSrnModel()));
+        this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
+    mIsEdgeBasedModel = rModel.HasEdgeModel();
 }
 
 
 SrnCellModel::SrnCellModel()
 {
     mInteriorSrnModel = nullptr;
-
 }
 
 SrnCellModel::~SrnCellModel()
@@ -72,6 +73,24 @@ void SrnCellModel::Initialise()
     }
 }
 
+void SrnCellModel::ResetForDivision()
+{
+    //Making sure that we are at the current time.
+    //SimulateToCurrentTime() MUST have been called before in Cell::ReadyToDivide() method
+    //so that Srn models should already be simulated up to the current time
+    assert(mSimulatedToTime == SimulationTime::Instance()->GetTime());
+    for (auto edgeModel : mEdgeSrnModels)
+    {
+        edgeModel->ResetForDivision();
+    }
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->ResetForDivision();
+    }
+
+}
+
 void SrnCellModel::SimulateToCurrentTime()
 {
     for (auto srnModel : mEdgeSrnModels)
@@ -79,9 +98,9 @@ void SrnCellModel::SimulateToCurrentTime()
         srnModel->SimulateToCurrentTime();
     }
     if (mInteriorSrnModel != nullptr)
-    {
         mInteriorSrnModel->SimulateToCurrentTime();
-    }
+
+    mSimulatedToTime = mEdgeSrnModels[0]->GetSimulatedToTime();
 }
 
 AbstractSrnModel* SrnCellModel::CreateSrnModel()
@@ -119,18 +138,18 @@ AbstractSrnModelPtr SrnCellModel::RemoveEdgeSrn(unsigned index)
     return edgeSrn;
 }
 
-unsigned SrnCellModel::GetNumEdgeSrn()
+unsigned SrnCellModel::GetNumEdgeSrn() const
 {
     return mEdgeSrnModels.size();
 }
 
-AbstractSrnModelPtr SrnCellModel::GetEdgeSrn(unsigned index)
+AbstractSrnModelPtr SrnCellModel::GetEdgeSrn(unsigned index) const
 {
     assert(index < mEdgeSrnModels.size());
     return mEdgeSrnModels[index];
 }
 
-const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges()
+const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges() const
 {
     return mEdgeSrnModels;
 }
@@ -140,7 +159,7 @@ void SrnCellModel::SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn)
     mInteriorSrnModel = interiorSrn;
 }
 
-AbstractSrnModelPtr SrnCellModel::GetInteriorSrn()
+AbstractSrnModelPtr SrnCellModel::GetInteriorSrn() const
 {
     return mInteriorSrnModel;
 }

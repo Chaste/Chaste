@@ -82,7 +82,7 @@ private:
 protected:
 
     /**
-     * Copy constructor
+     * Copy constructor. Called ONLY when a cell division occurs. See parent class comment for details
      * @param rModel
      */
     SrnCellModel(const SrnCellModel &rModel);
@@ -111,9 +111,17 @@ public:
 
 
     virtual void Initialise() override;
+    /**
+     * Halves the appropriate quantities in the constituent SRN models
+     */
+    virtual void ResetForDivision() override;
 
     virtual void SimulateToCurrentTime() override;
 
+    /**
+     * Called in Cell::Divide()
+     * @return
+     */
     virtual AbstractSrnModel* CreateSrnModel() override;
 
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
@@ -124,15 +132,15 @@ public:
 
     AbstractSrnModelPtr RemoveEdgeSrn(unsigned index);
 
-    unsigned GetNumEdgeSrn();
+    unsigned GetNumEdgeSrn() const;
 
-    AbstractSrnModelPtr GetEdgeSrn(unsigned index);
+    AbstractSrnModelPtr GetEdgeSrn(unsigned index) const;
 
-    const std::vector<AbstractSrnModelPtr>& GetEdges();
+    const std::vector<AbstractSrnModelPtr>& GetEdges() const;
 
     void SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn);
 
-    AbstractSrnModelPtr GetInteriorSrn();
+    AbstractSrnModelPtr GetInteriorSrn() const;
 
     virtual void SetCell(CellPtr pCell) override;
 };
