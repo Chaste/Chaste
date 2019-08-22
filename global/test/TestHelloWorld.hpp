@@ -40,11 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-// This doesn't test anything, it is just a first test for new users to run immediately after installation
-
+/* This doesn't test anything, it is just a first test for new users to run immediately after installation */ 
 class TestHelloWorld : public CxxTest::TestSuite
 {
 public:
+    // Note that tests have to be void() and start with the word `Test` (with a capital T).
     void TestPrintHelloWorld()
     {
         std::cout << "\nHello, world!\nChaste and dependencies are (at least partially) installed and running!\n\n";
