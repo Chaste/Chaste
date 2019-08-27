@@ -33,78 +33,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef EDGEREMAPINFO_HPP_
-#define EDGEREMAPINFO_HPP_
+#ifndef VERTEXBASEDPOPULATIONSRN_HPP_
+#define VERTEXBASEDPOPULATIONSRN_HPP_
 
-#include <vector>
+#include <VertexBasedCellPopulation.hpp>
+#include "ChasteSerialization.hpp"
+#include "SrnCellModel.hpp"
+#include "EdgeRemapInfo.hpp"
+#include "EdgeOperation.hpp"
+template <unsigned DIM>
+class VertexBasedCellPopulation;
 
-/**
- * Storage class contains a mapping to the old local edges index during cell division.
- *
- */
-class EdgeRemapInfo {
-
-    /**
-     * Contains a mapping to the old local edges index. Negative value means a new edge
-     *
-     */
-    std::vector<long int> mEdgesMapping;
-
-    /**
-     * Status
-     * 0 Edge has not changed
-     * 1 Edge has been split between two elements
-     * 2 Completely new edge was created
-     */
-    std::vector<unsigned char> mEdgeStatus;
-
-    //Determines how close the new node on the split edge is to the previous node
-    //Halve is by default
-    double mTheta = 0.5;
+template <unsigned DIM>
+class VertexBasedPopulationSrn
+{
+private:
+    VertexBasedCellPopulation<DIM>* mpCellPopulation;
 public:
+    VertexBasedPopulationSrn();
+    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* p_vertex_population);
 
-    EdgeRemapInfo(const std::vector<long int> edgesMapping, const std::vector<unsigned char> edgesStatus)
-    {
-        mEdgesMapping = edgesMapping;
-        mEdgeStatus = edgesStatus;
-    }
+    void UpdateSrnAfterBirthOrDeath();
 
-    EdgeRemapInfo(const std::vector<long int> edgesMapping, const std::vector<unsigned char> edgesStatus,
-                  double theta)
-    {
-        mEdgesMapping = edgesMapping;
-        mEdgeStatus = edgesStatus;
-        mTheta = theta;
-    }
-
-    /**
-     * Contains a mapping to the old local edges index. Negative value means a new edge
-     *
-     */
-    std::vector<long int>& GetEdgesMapping()
-    {
-        return mEdgesMapping;
-    }
-
-    /**
-     * Status
-     * 0 Edge has not changed
-     * 1 Edge has been split between two elements
-     * 2 Completely new edge was created
-     */
-    std::vector<unsigned char>& GetEdgesStatus()
-    {
-        return mEdgeStatus;
-    }
-
-    /**
-     *
-     */
-    double GetTheta() const
-    {
-        return mTheta;
-    }
+    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
+                             SrnCellModel* pSrnCell_1,
+                             EdgeRemapInfo* pEdgeChange_1);
 };
 
-
-#endif //EDGEREMAPINFO_HPP_
+#endif /* VERTEXBASEDPOPULATIONSRN_HPP_ */

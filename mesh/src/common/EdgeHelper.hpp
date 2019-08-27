@@ -96,7 +96,8 @@ public:
                                    EdgeRemapInfo* newEdges,
                                    EdgeRemapInfo* newEdges2
     );
-
+    void InsertEdgeSplitOperation(const unsigned elementIndex, const unsigned localEdgeIndex,
+                                  const double theta);
 };
 
 #endif //CHASTE_EDGEHELPER_HPP

@@ -212,6 +212,31 @@ void EdgeHelper<SPACE_DIM>::InsertCellDivideOperation(unsigned elementIndex,
     }
 }
 
+template <unsigned int SPACE_DIM>
+void EdgeHelper<SPACE_DIM>::InsertEdgeSplitOperation(const unsigned elementIndex,
+                                                     const unsigned localEdgeIndex,
+                                                     const double theta)
+{
+    if (!holdEdgeOperations)
+    {
+        std::vector<long int> edge_mapping(mEdges.size());
+        std::vector<unsigned char> edge_status(mEdges.size(),0);
+        const unsigned int split_1 = localEdgeIndex;
+        const unsigned int split_2 = localEdgeIndex+1;
+        edge_status[split_1] = 1;
+        edge_status[split_2] = 1;
+        unsigned int count = 0;
+        for (unsigned int i=0; i < mEdges.size(); ++i)
+        {
+            edge_mapping[i] = i - count;
+            if (edge_status[i]==1)
+                count = 1;
+        }
+        EdgeRemapInfo* newEdges = new EdgeRemapInfo(edge_mapping, edge_status, theta);
+        mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_SPLIT, elementIndex, newEdges));
+    }
+}
+
 template class EdgeHelper<1>;
 template class EdgeHelper<2>;
 template class EdgeHelper<3>;

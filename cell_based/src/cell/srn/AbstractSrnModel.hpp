@@ -265,10 +265,23 @@ public:
      */
     bool HasEdgeModel() const;
 
-    /*
+    /**
      * Sets this model to be part of an edge based SRN
      */
     void SetEdgeModelIndicator(const bool indicator);
+
+    /**
+     * Splits the SRN model into n sub-srns. E.g. when an edge is split.
+     * @param n_splits
+     * @return
+     */
+    virtual std::vector<AbstractSrnModel*> SplitSrnModel(const unsigned int n_splits) const;
+
+    /**
+     * Scales all ODE variables by factor theta.
+     * @param theta
+     */
+    virtual void ScaleSrnVariables(const double theta);
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

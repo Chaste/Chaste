@@ -65,31 +65,7 @@ public:
      */
     virtual void UpdateCellSrnLayout(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
 
-    /**
-     * Helper function for UpdateCellEdges for handling the case where a cell division occurs.
-     * @param rCellPopulation
-     * @param locationIndex
-     * @param pEdgeChange
-     * @param locationIndex2
-     * @param pEdgeChange2
-     */
-    virtual void CellDivisionEdgeUpdate(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                        unsigned locationIndex, EdgeRemapInfo* pEdgeChange,
-                                        unsigned locationIndex2, EdgeRemapInfo* pEdgeChange2);
 
-    /**
-     * Helper function for CellDivisionEdgeUpdate function. Handles the SRN edge remapping for a particular SRN cell
-     * @param rCellPopulation
-     * @param locationIndex
-     * @param old_edges
-     * @param pNewModel
-     * @param pEdgeChange
-     */
-    void PerformEdgeRemap(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM> &rCellPopulation,
-                          unsigned locationIndex,
-                          std::vector<AbstractSrnModelPtr>& old_edges,
-                          SrnCellModel* pNewModel,
-                          EdgeRemapInfo* pEdgeChange);
 
     /**
      * Called when an edge is to be added to a cell. This is so that the correct type of SRN edge model object is used.

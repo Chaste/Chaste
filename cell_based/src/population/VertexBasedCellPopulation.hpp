@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
 #include "TrapezoidEdgeVertexMeshWriter.hpp"
-
+#include "VertexBasedPopulationSrn.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
@@ -47,7 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
-
+template<unsigned DIM>
+class VertexBasedPopulationSrn;
 /**
  * A facade class encapsulating a vertex-based cell population.
  *
@@ -110,6 +111,10 @@ private:
      */
      bool mThrowStepSizeException = true;
 
+     /**
+      * SRN remapping helper class
+      */
+     VertexBasedPopulationSrn<DIM> mPopulationSrn;
     /**
      * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
      * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,

@@ -76,7 +76,7 @@ void Edge<SPACE_DIM>::SetIndex(unsigned index)
 }
 
 template<unsigned SPACE_DIM>
-unsigned Edge<SPACE_DIM>::GetIndex()
+unsigned Edge<SPACE_DIM>::GetIndex() const
 {
     return mIndex;
 }

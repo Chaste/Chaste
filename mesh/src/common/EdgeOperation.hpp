@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
     EDGE_OPERATION_DELETE,
-    EDGE_OPERATION_DIVIDE
+    EDGE_OPERATION_DIVIDE,
+    EDGE_OPERATION_SPLIT
 };
 
 /**
@@ -52,13 +53,10 @@ class EdgeOperation {
 
     EDGE_OPERATION mOperation;
 
-
     unsigned mElementIndex;
     unsigned mElementIndex2;
 
-
     unsigned mLocalEdgeIndex;
-
 
     EdgeRemapInfo* mNewEdges;
     EdgeRemapInfo* mNewEdges2;
@@ -103,44 +101,57 @@ public:
         this->mNewEdges2 = newEdges2;
     }
 
+    /**
+     * Constructor for split operation ()
+     * @param operation
+     * @param elementIndex
+     * @param newEdges
+     */
+    EdgeOperation(EDGE_OPERATION operation,
+                  const unsigned elementIndex,
+                  EdgeRemapInfo* newEdges)
+    {
+        assert(operation == EDGE_OPERATION_SPLIT);
+        this->mOperation = operation;
+        this->mElementIndex = elementIndex;
+        this->mNewEdges = newEdges;
+    }
+
     ~EdgeOperation()
     {
         delete this->mNewEdges;
         delete this->mNewEdges2;
     }
 
-    EDGE_OPERATION GetOperation()
+    EDGE_OPERATION GetOperation() const
     {
         return mOperation;
     }
 
-    unsigned GetElementIndex()
+    unsigned GetElementIndex() const
     {
         return this->mElementIndex;
     }
 
-    unsigned GetElementIndex2()
+    unsigned GetElementIndex2() const
     {
         return this->mElementIndex2;
     }
 
-    unsigned GetLocalEdgeIndex()
+    unsigned GetLocalEdgeIndex() const
     {
         return mLocalEdgeIndex;
     }
 
-    EdgeRemapInfo* GetNewEdges()
+    EdgeRemapInfo* GetNewEdges() const
     {
         return mNewEdges;
     }
 
-    EdgeRemapInfo* GetNewEdges2()
+    EdgeRemapInfo* GetNewEdges2() const
     {
         return mNewEdges2;
     }
-
-
-
 };
 
 #endif //EDGEOPERATION_HPP_

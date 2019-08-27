@@ -189,6 +189,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
             // Edge ==E1== is marked for delete
             // N0 ==E0== N1 --NE-- NN --NE-- N2 ==E2== N0
 
+            // Carefull here when T1 transitions occur.
             unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
 
             auto prevNode = this->mNodes[rIndex];
@@ -200,8 +201,6 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
 
             auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);
             this->mEdges.insert(this->mEdges.begin() + rIndex+1, edge);
-
-            this->mEdgeHelper->InsertAddEdgeOperation(this->mIndex, rIndex+1);
         }
     }
 

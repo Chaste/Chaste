@@ -420,6 +420,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     std::vector<unsigned> division_node_global_indices;
     unsigned nodes_added = 0;
 
+    //Keeps track of elements (first) whose edge (second) had been split
+    std::vector<std::pair<unsigned int, unsigned int> > edge_split_pairs;
+    std::vector<double> relative_new_node;
     // Find the intersections between the axis of division and the element edges
     for (unsigned i=0; i<intersecting_nodes.size(); i++)
     {
@@ -517,11 +520,13 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         // Iterate over common elements
         unsigned node_A_index = p_node_A->GetIndex();
         unsigned node_B_index = p_node_B->GetIndex();
+        bool original_element = false;
         for (std::set<unsigned>::iterator iter = shared_elements.begin();
              iter != shared_elements.end();
              ++iter)
         {
             VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*iter);
+            original_element = p_element->GetIndex()==pElement->GetIndex();
 
             // Find which node has the lower local index in this element
             unsigned local_indexA = p_element->GetNodeLocalIndex(node_A_index);
@@ -547,7 +552,26 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             }
 
             // Add new node to this element
-            this->GetElement(*iter)->AddNode(this->GetNode(new_node_global_index), index);
+            p_element->AddNode(this->GetNode(new_node_global_index), index);
+            if (!original_element)
+            {
+                const unsigned int n_edges = p_element->GetNumEdges();
+                const unsigned int nextIndex = (index+1)%n_edges;
+                auto prev_node = p_element->GetNode(index)->rGetLocation();
+                auto next_node = p_element->GetNode(nextIndex)->rGetLocation();
+                auto curr_node = this->GetNode(new_node_global_index)->rGetLocation();
+                c_vector<double, SPACE_DIM> last_to_next = this->GetVectorFromAtoB(prev_node, next_node);
+                c_vector<double, SPACE_DIM> last_to_curr = this->GetVectorFromAtoB(prev_node, curr_node);
+                double old_distance = norm_2(last_to_next);
+                double prev_curr_distance = norm_2(last_to_curr);
+                if (old_distance<prev_curr_distance)
+                {
+                    EXCEPTION("New node in split edge is not between a pair old nodes");
+                }
+                double theta = prev_curr_distance/old_distance;
+                relative_new_node.push_back(theta);
+                edge_split_pairs.push_back(std::pair<unsigned int, unsigned int>(p_element->GetIndex(),index));
+            }
         }
 
         // Store index of new node
@@ -570,7 +594,11 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     this->mEdges.ResumeEdgeOperations();
 
     this->RecordCellDivideOperation(edgeIds, pElement, this->mElements[new_element_index]);
-
+    for (unsigned int i=0; i<edge_split_pairs.size(); ++i)
+    {
+        this->mEdges.InsertEdgeSplitOperation(edge_split_pairs[i].first, edge_split_pairs[i].second,
+                                              relative_new_node[i]);
+    }
     return new_element_index;
 }
 

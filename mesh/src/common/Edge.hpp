@@ -108,7 +108,7 @@ public:
      * Gets the index of this edge within the mesh
      * @return
      */
-    unsigned GetIndex();
+    unsigned GetIndex() const;
 
     /**
      * Obtains a pair of associated nodes' indices

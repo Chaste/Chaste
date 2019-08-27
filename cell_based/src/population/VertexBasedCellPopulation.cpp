@@ -76,6 +76,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     {
         Validate();
     }
+    mPopulationSrn.SetVertexCellPopulation(this);
 }
 
 template<unsigned DIM>
@@ -236,7 +237,6 @@ CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParen
 
     // Divide the element
     unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
-
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -346,7 +346,8 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
         Validate();
     }
-
+    if (hasHadBirthsOrDeaths)
+        mPopulationSrn.UpdateSrnAfterBirthOrDeath();
     element_map.ResetToIdentity();
 }
 

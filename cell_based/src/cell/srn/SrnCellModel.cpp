@@ -38,12 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     : AbstractSrnModel(rModel), mInteriorSrnModel(nullptr)
 {
-    // Make a copy of all SRN models inside the system to be passed to daughter cell
-    // Note that CreateSrnModel() methods should have custom behavior for edge/interior SRNs
-    for (auto srnModel: rModel.mEdgeSrnModels)
-    {
-        this->AddEdgeSrnModel(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
-    }
+    //edge SRN vector should be empty in the newly created cell. They are added in
+    //VertexBasedPopulation::UpdateSrnAfterBirthOrDeath()
+
+    //Copy interior SRN to the new cell. Interior Srn should have custom implementation of a new interior SRN
+    //creation after cell division
     if (rModel.mInteriorSrnModel!=nullptr)
         this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
     mIsEdgeBasedModel = rModel.HasEdgeModel();
