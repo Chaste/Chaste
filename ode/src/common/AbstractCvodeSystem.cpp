@@ -398,8 +398,15 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     if (!mpCvodeMem)
     {
         //std::cout << "New CVODE solver\n";
+#if CHASTE_SUNDIALS_VERSION >= 40000
+        //  v4.0.0 release notes: instead of specifying the nonlinear iteration type when creating the CVODE(S) memory structure,
+        //  CVODE(S) uses the SUNNONLINSOL_NEWTON module implementation of a Newton iteration by default.
+        mpCvodeMem = CVodeCreate(CV_BDF);
+#else
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
-        if (mpCvodeMem == nullptr) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
+#endif
+        if (mpCvodeMem == nullptr)
+            EXCEPTION("Failed to SetupCvode CVODE"); // LCOV_EXCL_LINE
 
         // Set error handler
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
@@ -419,22 +426,33 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 #endif
 
 #if CHASTE_SUNDIALS_VERSION >= 30000
-        /* Create dense SUNMatrix for use in linear solves */
+        /* Create dense matrix SUNDenseMatrix for use in linear solves */
         mpSundialsDenseMatrix = SUNDenseMatrix(NV_LENGTH_S(initialConditions), NV_LENGTH_S(initialConditions));
+#endif
 
-        /* Create dense SUNLinearSolver object for use by CVode */
+#if CHASTE_SUNDIALS_VERSION >= 40000
+        /* Create dense SUNLinSol_Dense object for use by CVode */
+        mpSundialsLinearSolver = SUNLinSol_Dense(initialConditions, mpSundialsDenseMatrix);
+
+        /* Call CVodeSetLinearSolver to attach the matrix and linear solver to CVode */
+        CVodeSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
+#elif CHASTE_SUNDIALS_VERSION >= 30000
+        /* Create dense SUNDenseLinearSolver object for use by CVode */
         mpSundialsLinearSolver = SUNDenseLinearSolver(initialConditions, mpSundialsDenseMatrix);
 
         /* Call CVDlsSetLinearSolver to attach the matrix and linear solver to CVode */
         CVDlsSetLinearSolver(mpCvodeMem, mpSundialsLinearSolver, mpSundialsDenseMatrix);
 #else
+        // CVODE < v3.0.0
         // Attach a linear solver for Newton iteration
         CVDense(mpCvodeMem, NV_LENGTH_S(initialConditions));
 #endif
 
         if (mUseAnalyticJacobian)
         {
-#if CHASTE_SUNDIALS_VERSION >= 30000
+#if CHASTE_SUNDIALS_VERSION >= 40000
+            CVodeSetJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
+#elif CHASTE_SUNDIALS_VERSION >= 30000
             CVDlsSetJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
 #elif CHASTE_SUNDIALS_VERSION >= 20400
             CVDlsSetDenseJacFn(mpCvodeMem, AbstractCvodeSystemJacAdaptor);
@@ -525,7 +543,11 @@ void AbstractCvodeSystem::CvodeError(int flag, const char* msg,
         int ls_flag;
 #endif
         char* p_ls_flag_name;
-#if CHASTE_SUNDIALS_VERSION >= 20400
+
+#if CHASTE_SUNDIALS_VERSION >= 40000
+        CVodeGetLastLinFlag(mpCvodeMem, &ls_flag);
+        p_ls_flag_name = CVodeGetLinReturnFlagName(ls_flag);
+#elif CHASTE_SUNDIALS_VERSION >= 20400
         CVDlsGetLastFlag(mpCvodeMem, &ls_flag);
         p_ls_flag_name = CVDlsGetReturnFlagName(ls_flag);
 #else

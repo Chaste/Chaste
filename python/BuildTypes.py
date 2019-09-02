@@ -134,7 +134,8 @@ class BuildType(object):
         Return the CC flags to use, as a string.
         Note that this does not cover include paths or library search paths.
         """
-        return ' '.join(self._cc_flags)
+        # C++14 changes (#2811, #3008)
+        return (' '.join(self._cc_flags) + ' -std=c++14')
 
     def LinkFlags(self):
         """
