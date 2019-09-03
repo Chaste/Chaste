@@ -98,6 +98,11 @@ public:
     AbstractSrnModel* CreateSrnModel();
 
     /**
+     * Overriden ResetForDivision() method for custom cell division mitosis
+     */
+    virtual void ResetForDivision() override;
+
+    /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.

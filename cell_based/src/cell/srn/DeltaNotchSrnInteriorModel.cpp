@@ -72,12 +72,22 @@ DeltaNotchSrnInteriorModel::DeltaNotchSrnInteriorModel(const DeltaNotchSrnInteri
      */
 
     assert(rModel.GetOdeSystem());
-    SetOdeSystem(new DeltaNotchInteriorOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
+    AbstractOdeSystem* p_parent_system(rModel.GetOdeSystem());
+    SetOdeSystem(new DeltaNotchInteriorOdeSystem(p_parent_system->rGetStateVariables()));
+    for (unsigned int i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
+        mpOdeSystem->SetParameter(i, p_parent_system->GetParameter(i));
 }
 
 AbstractSrnModel* DeltaNotchSrnInteriorModel::CreateSrnModel()
 {
     return new DeltaNotchSrnInteriorModel(*this);
+}
+
+void DeltaNotchSrnInteriorModel::ResetForDivision()
+{
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
+    ScaleSrnVariables(0.5);
 }
 
 void DeltaNotchSrnInteriorModel::SimulateToCurrentTime()

@@ -599,15 +599,9 @@ public:
                                          c_vector<double, SPACE_DIM> axisOfDivision,
                                          bool placeOriginalElementBelow=false);
 
-
-
-    void RecordCellDivideOperation(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
-
-
-     EdgeRemapInfo* BuildEdgeDivideIdDifferenceInfo(std::vector<long>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement);
-
-     int WrapIndex(int index, int maxSize);
-
+    void RecordCellDivideOperation(std::vector<unsigned int>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
+    void RecordEdgeSplitOperation(const std::vector<std::pair<unsigned int, unsigned int> > edge_split_pairs,
+                                  const std::vector<double> relative_new_node);
     /**
      * Add an element to the mesh.
      *

@@ -505,6 +505,14 @@ CellPtr Cell::Divide()
     MAKE_PTR_ARGS(CellData, p_daughter_cell_data, (*p_cell_data));
     daughter_property_collection.AddProperty(p_daughter_cell_data);
 
+    // Get the existing copy of the cell edge data and remove it from the daughter cell
+    boost::shared_ptr<CellEdgeData> p_cell_edge_data = GetCellEdgeData();
+    daughter_property_collection.RemoveProperty(p_cell_edge_data);
+
+    // Create a new cell edge data object using the copy constructor and add this to the daughter cell
+    MAKE_PTR_ARGS(CellEdgeData, p_daughter_cell_edge_data, (*p_cell_edge_data));
+    daughter_property_collection.AddProperty(p_daughter_cell_edge_data);
+
     // Copy all cell Vec data (note we create a new object not just copying the pointer)
     if (daughter_property_collection.HasPropertyType<CellVecData>())
     {

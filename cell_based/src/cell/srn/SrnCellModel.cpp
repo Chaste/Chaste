@@ -46,6 +46,10 @@ SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
     if (rModel.mInteriorSrnModel!=nullptr)
         this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
     mIsEdgeBasedModel = rModel.HasEdgeModel();
+    for (auto edgeModel : rModel.mEdgeSrnModels)
+    {
+        mEdgeSrnModels.push_back(boost::shared_ptr<AbstractSrnModel>(edgeModel->CreateSrnModel()));
+    }
 }
 
 
@@ -78,6 +82,10 @@ void SrnCellModel::ResetForDivision()
     //SimulateToCurrentTime() MUST have been called before in Cell::ReadyToDivide() method
     //so that Srn models should already be simulated up to the current time
     assert(mSimulatedToTime == SimulationTime::Instance()->GetTime());
+
+    //Note that edge models follow different rules since the number and the state of edge SRNs
+    //after cell divisions depends on local topology. That is custom behavior of edge srn models is important
+    //to implement correctly
     for (auto edgeModel : mEdgeSrnModels)
     {
         edgeModel->ResetForDivision();

@@ -128,7 +128,7 @@ void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pN
 }
 
 template<unsigned SPACE_DIM>
-Node<SPACE_DIM>* Edge<SPACE_DIM>::GetNode(unsigned index)
+Node<SPACE_DIM>* Edge<SPACE_DIM>::GetNode(unsigned index) const
 {
     return mNodes[index];
 }
@@ -140,7 +140,7 @@ unsigned Edge<SPACE_DIM>::GetNumNodes()
 }
 
 template<unsigned SPACE_DIM>
-bool Edge<SPACE_DIM>::ContainsNode(Node<SPACE_DIM>* pNode)
+bool Edge<SPACE_DIM>::ContainsNode(Node<SPACE_DIM>* pNode) const
 {
     for (auto node : mNodes)
     {
@@ -257,6 +257,12 @@ template<unsigned SPACE_DIM>
 bool Edge<SPACE_DIM>::IsBoundaryEdge() const
 {
     return mElementIndices.size()<=1;
+}
+
+template <unsigned SPACE_DIM>
+bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& edge) const
+{
+    return this->ContainsNode(edge.GetNode(0))&&this->ContainsNode(edge.GetNode(1));
 }
 
 // Explicit instantiation

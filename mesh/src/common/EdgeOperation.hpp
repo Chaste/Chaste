@@ -114,7 +114,9 @@ public:
         assert(operation == EDGE_OPERATION_SPLIT);
         this->mOperation = operation;
         this->mElementIndex = elementIndex;
+        this->mElementIndex2 = 0;
         this->mNewEdges = newEdges;
+        this->mNewEdges2 = nullptr;
     }
 
     ~EdgeOperation()

@@ -34,3 +34,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EdgeRemapInfo.hpp"
+
+EdgeRemapInfo::EdgeRemapInfo(const std::vector<long int> &edgesMapping, const std::vector<unsigned int> &edgesStatus)
+:
+mEdgesMapping(edgesMapping),
+mEdgeStatus(edgesStatus)
+{}
+
+
+std::vector<long int> EdgeRemapInfo::GetEdgesMapping() const
+{
+    return mEdgesMapping;
+}
+
+std::vector<unsigned int> EdgeRemapInfo::GetEdgesStatus() const
+{
+    return mEdgeStatus;
+}
+
+std::vector<double> EdgeRemapInfo::GetSplitProportions() const
+{
+    return mSplitProportions;
+}
+
+void EdgeRemapInfo::SetSplitProportions(const std::vector<double> thetas)
+{
+    mSplitProportions = thetas;
+}

@@ -355,7 +355,30 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes()
     return mpElementAttributes == nullptr ? 0 : mpElementAttributes->rGetAttributes().size();
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
+{
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+            return true;
+    }
+    return false;
+}
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+long AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
+{
+    long result = -1;
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+        {
+            result = i;
+        }
+    }
+    return result;
+}
 
 
 // Explicit instantiation

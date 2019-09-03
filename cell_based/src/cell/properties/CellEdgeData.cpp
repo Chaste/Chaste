@@ -39,7 +39,7 @@ CellEdgeData::~CellEdgeData()
 {
 }
 
-void CellEdgeData::SetItem(const std::string &rVariableName, std::vector<double> data)
+void CellEdgeData::SetItem(const std::string &rVariableName, const std::vector<double> &data)
 {
     this->mCellEdgeData[rVariableName] = data;
 }
@@ -52,7 +52,7 @@ std::vector<double> CellEdgeData::GetItem(const std::string &rVariableName) cons
      * and increase the size by one.  Using a const_iterator ensures that the
      * map remains const.
      */
-    auto it = mCellEdgeData.find(rVariableName);
+    std::map<std::string, std::vector<double> >::const_iterator it = mCellEdgeData.find(rVariableName);
     if (it == mCellEdgeData.end())
     {
         EXCEPTION("The item " << rVariableName << " is not stored");
@@ -68,7 +68,7 @@ double CellEdgeData::GetItemAtIndex(const std::string &rVariableName, const unsi
      * and increase the size by one.  Using a const_iterator ensures that the
      * map remains const.
      */
-    auto it = mCellEdgeData.find(rVariableName);
+    std::map<std::string, std::vector<double> >::const_iterator it = mCellEdgeData.find(rVariableName);
     if (it == mCellEdgeData.end())
     {
         EXCEPTION("The item " << rVariableName << " is not stored");

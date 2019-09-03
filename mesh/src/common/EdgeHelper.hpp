@@ -54,9 +54,6 @@ public:
 
     unsigned GetNumEdges() const;
 
-
-
-
     typename std::vector<Edge<SPACE_DIM>*>::iterator begin()
     {
         return mEdges.begin();
@@ -96,8 +93,7 @@ public:
                                    EdgeRemapInfo* newEdges,
                                    EdgeRemapInfo* newEdges2
     );
-    void InsertEdgeSplitOperation(const unsigned elementIndex, const unsigned localEdgeIndex,
-                                  const double theta);
+    void InsertEdgeSplitOperation(const unsigned elementIndex, EdgeRemapInfo* newEdges);
 };
 
 #endif //CHASTE_EDGEHELPER_HPP

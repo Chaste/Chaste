@@ -271,15 +271,7 @@ public:
     void SetEdgeModelIndicator(const bool indicator);
 
     /**
-     * Splits the SRN model into n sub-srns. E.g. when an edge is split.
-     * @param n_splits
-     * @return
-     */
-    virtual std::vector<AbstractSrnModel*> SplitSrnModel(const unsigned int n_splits) const;
-
-    /**
-     * Scales all ODE variables by factor theta.
-     * @param theta
+     * Scales srn variables by factor theta
      */
     virtual void ScaleSrnVariables(const double theta);
 };

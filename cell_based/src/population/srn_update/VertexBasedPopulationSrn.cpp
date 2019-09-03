@@ -61,7 +61,6 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
             const unsigned int location_index_2 = operation->GetElementIndex2();
             EdgeRemapInfo *pEdgeChange_1 = operation->GetNewEdges();
             EdgeRemapInfo *pEdgeChange_2 = operation->GetNewEdges2();
-
             CellPtr cell_1 = mpCellPopulation->GetCellUsingLocationIndex(location_index_1);
             CellPtr cell_2 = mpCellPopulation->GetCellUsingLocationIndex(location_index_2);
             //
@@ -90,24 +89,6 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
             //checking if the new cell has empty edge srns
             auto old_model_2 = static_cast<SrnCellModel*>(cell_2->GetSrnModel());
             assert(old_model_2->GetEdges().empty());
-
-            for (unsigned int i=0; i<pEdgeChange_1->GetEdgesMapping().size(); ++i)
-            {
-                auto remapIndex = pEdgeChange_1->GetEdgesMapping()[i];
-                auto remapStatus = pEdgeChange_1->GetEdgesStatus()[i];
-                if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
-                {
-                    EXCEPTION("Remap index cannot be negative when it's a direct remap or an edge split");
-                }
-                if (remapStatus==1)
-                {
-                    //Note that we reset this edge SRN only once. Note that we assume here
-                    //that the division rule occured along the shortest axis, and that
-                    //the edge was split into two equal length subedges.
-                    parent_srn_edges[remapIndex]->ResetForDivision();
-                }
-            }
-
             RemapCellSrn(parent_srn_edges, old_model_1, pEdgeChange_1);
             RemapCellSrn(parent_srn_edges, old_model_2, pEdgeChange_2);
             parent_srn_edges.clear();
@@ -120,7 +101,6 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
             CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
             auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
             std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
-
             for (unsigned int i=0; i<pEdgeChange->GetEdgesMapping().size(); ++i)
             {
                 auto remapIndex = pEdgeChange->GetEdgesMapping()[i];
@@ -134,8 +114,8 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
                     EXCEPTION("A blank new edge has been created. SPLIT operation recorded wrongly");
                 }
             }
-
             RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
+
             old_srn_edges.clear();
             break;
         }
@@ -152,33 +132,35 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 {
     auto edge_mapping = pEdgeChange->GetEdgesMapping();
     std::vector<AbstractSrnModelPtr> new_edge_srn(edge_mapping.size());
-    unsigned int split_count = 0;
+    const std::vector<double> split_proportions = pEdgeChange->GetSplitProportions();
     // Goes through the SRN model
     for (unsigned i = 0; i < edge_mapping.size(); i++)
     {
         //The remapIndex, if +ve refers to the SRN index of the oldModel, if -ve then it's a new edge
-        auto remapIndex = edge_mapping[i];
+        const long int remapIndex = edge_mapping[i];
 
         //remapStatus can be the following:
         //0 - Direct remapping, the edge SRN of the oldModel can be transferred directly to the new model
         //1 - The edge is a split point between the diving cells, in this example we divide all concentration in half
         //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
-        auto remapStatus = pEdgeChange->GetEdgesStatus()[i];
+        const unsigned int remapStatus = pEdgeChange->GetEdgesStatus()[i];
+        if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
+        {
+            EXCEPTION("Remap index cannot be negative when it's a direct remap or an edge split");
+        }
 
         if (remapStatus ==0)
         {
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
         }
-        else if (remapStatus == 1)
+        if (remapStatus == 1)
         {
+            //Edge split depends on the relative splitting node position because
+            //currently we assume that edge concentrations are uniform on the edge
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
-            if (split_count==0)
-                new_edge_srn[i]->ScaleSrnVariables(pEdgeChange->GetTheta());
-            else if (split_count == 1)
-                new_edge_srn[i]->ScaleSrnVariables(1.0-pEdgeChange->GetTheta());
-            split_count++;
+            new_edge_srn[i]->ScaleSrnVariables(split_proportions[i]);
         }
-        else
+        if (remapStatus == 2)
         {
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[0]->CreateSrnModel());
         }

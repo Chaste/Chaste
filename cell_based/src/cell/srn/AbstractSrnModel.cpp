@@ -140,3 +140,7 @@ void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
 {
     this->mIsEdgeBasedModel = indicator;
 }
+
+void AbstractSrnModel::ScaleSrnVariables(const double theta)
+{
+}

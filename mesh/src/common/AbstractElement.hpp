@@ -293,6 +293,21 @@ public:
      * @return the number of node attributes associated with this node.
      */
     unsigned GetNumElementAttributes();
+
+    /**
+     * Checks if the element contains edge
+     * @param edge
+     * @return
+     */
+    bool ContainsEdge(const Edge<SPACE_DIM> *edge) const;
+
+    /**
+     * returns the local index of edge
+     * @param edge
+     * @return
+     */
+    long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
+
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/

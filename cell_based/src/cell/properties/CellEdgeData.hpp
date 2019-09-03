@@ -89,7 +89,7 @@ public:
      * @param rVariableName the name of the data to be set.
      * @param data the value to set it to.
      */
-    void SetItem(const std::string& rVariableName, std::vector<double> data);
+    void SetItem(const std::string& rVariableName, const std::vector<double> &data);
 
     /**
      * Retrieves the cell data array.

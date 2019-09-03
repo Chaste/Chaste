@@ -70,9 +70,11 @@ DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rMo
      * Note 3: Only set the variables defined in this class. Variables defined
      * in parent classes will be defined there.
      */
-
     assert(rModel.GetOdeSystem());
-    SetOdeSystem(new DeltaNotchEdgeOdeSystem(rModel.GetOdeSystem()->rGetStateVariables()));
+    AbstractOdeSystem* p_parent_system(rModel.GetOdeSystem());
+    SetOdeSystem(new DeltaNotchEdgeOdeSystem(p_parent_system->rGetStateVariables()));
+    for (unsigned int i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
+        mpOdeSystem->SetParameter(i, p_parent_system->GetParameter(i));
 }
 
 AbstractSrnModel* DeltaNotchSrnEdgeModel::CreateSrnModel()

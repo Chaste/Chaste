@@ -142,7 +142,7 @@ public:
          * so that no cell division occurs. */
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        MAKE_PTR(TransitCellProliferativeType, p_diff_type);
 
         for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
@@ -210,7 +210,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchCellEdgeInteriorODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(1.0);
+        simulator.SetEndTime(10.0);
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within
          * the cells in {{{CellData}}} and passes it to the simulation.*/
