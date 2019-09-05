@@ -207,8 +207,6 @@ public:
      */
     void ClearEdgeOperations();
 
-
-
     /**
      * @return the number of nodes that are actually in use.
      *

@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 #include "EdgeRemapInfo.hpp"
+
 /**
  * An element class for use in the VertexMesh class. The main
  * difference between this and the Element class is that a

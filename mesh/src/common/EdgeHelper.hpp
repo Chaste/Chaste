@@ -11,7 +11,6 @@
 #include "Edge.hpp"
 #include "EdgeOperation.hpp"
 #include "EdgeRemapInfo.hpp"
-
 /**
  * Class for facilitating the creation and management of unique edges in a vertex mesh
  */
@@ -84,16 +83,11 @@ public:
      */
     void ClearEdgeOperations();
 
-
-
-    void InsertAddEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
-    void InsertDeleteEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
-    void InsertCellDivideOperation(unsigned elementIndex,
-                                   unsigned elementIndex2,
-                                   EdgeRemapInfo* newEdges,
-                                   EdgeRemapInfo* newEdges2
-    );
-    void InsertEdgeSplitOperation(const unsigned elementIndex, EdgeRemapInfo* newEdges);
+    void InsertAddEdgeOperation(unsigned elementIndex, EdgeRemapInfo* remap_info);
+    void InsertNodeMergeOperation(const unsigned int elementIndex, EdgeRemapInfo* remap_info);
+    void InsertEdgeSplitOperation(const unsigned int elementIndex, EdgeRemapInfo* remap_info);
+    void InsertCellDivideOperation(const unsigned int elementIndex_1, const unsigned int elementIndex_2,
+                                   EdgeRemapInfo* remap_info_1, EdgeRemapInfo* remap_info_2);
 };
 
 #endif //CHASTE_EDGEHELPER_HPP

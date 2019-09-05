@@ -111,6 +111,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, 
     {
         auto pOldNode = this->mNodes[rIndex];
         unsigned rPrevIndex = (rIndex-1) % this->mEdges.size();
+        if (rIndex==0)
+            rPrevIndex = this->mEdges.size()-1;
         this->mEdges[rPrevIndex]->ReplaceNode(pOldNode, pNode);
         this->mEdges[rIndex]->ReplaceNode(pOldNode, pNode);
     }
@@ -141,7 +143,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 
         unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
         unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
-
+        if (rIndex==0)
+            rPrevIndex = this->mEdges.size()-1;
         auto prevNode = this->mNodes[rPrevIndex];
         auto nextNode = this->mNodes[rNextIndex];
 
@@ -152,8 +155,6 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
         // Delete the edge
         this->mEdges[rIndex]->RemoveElement(this->GetIndex());
         this->mEdges.erase(this->mEdges.begin() + rIndex);
-
-        this->mEdgeHelper->InsertDeleteEdgeOperation(this->mIndex, rIndex);
     }
 
     // Remove element from the node at this location

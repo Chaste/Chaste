@@ -43,7 +43,8 @@ enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
     EDGE_OPERATION_DELETE,
     EDGE_OPERATION_DIVIDE,
-    EDGE_OPERATION_SPLIT
+    EDGE_OPERATION_SPLIT,
+    EDGE_OPERATION_NODE_MERGE
 };
 
 /**
@@ -56,8 +57,6 @@ class EdgeOperation {
     unsigned mElementIndex;
     unsigned mElementIndex2;
 
-    unsigned mLocalEdgeIndex;
-
     EdgeRemapInfo* mNewEdges;
     EdgeRemapInfo* mNewEdges2;
 
@@ -65,20 +64,19 @@ public:
 
 
     /**
-     * Constructor for either ADD or DELETE operation
+     * Constructor for either Add, split, and node merg operations
      * @param operation
      * @param elementIndex
      * @param localEdgeIndex
      */
-    EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex, unsigned localEdgeIndex)
+    EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex, EdgeRemapInfo* newEdges)
     {
         assert(operation == EDGE_OPERATION_ADD || operation == EDGE_OPERATION_DELETE);
 
         this->mOperation = operation;
         this->mElementIndex = elementIndex;
         this->mElementIndex2 = 0;
-        this->mLocalEdgeIndex = localEdgeIndex;
-        this->mNewEdges = nullptr;
+        this->mNewEdges = newEdges;
         this->mNewEdges2 = nullptr;
     }
 
@@ -101,24 +99,6 @@ public:
         this->mNewEdges2 = newEdges2;
     }
 
-    /**
-     * Constructor for split operation ()
-     * @param operation
-     * @param elementIndex
-     * @param newEdges
-     */
-    EdgeOperation(EDGE_OPERATION operation,
-                  const unsigned elementIndex,
-                  EdgeRemapInfo* newEdges)
-    {
-        assert(operation == EDGE_OPERATION_SPLIT);
-        this->mOperation = operation;
-        this->mElementIndex = elementIndex;
-        this->mElementIndex2 = 0;
-        this->mNewEdges = newEdges;
-        this->mNewEdges2 = nullptr;
-    }
-
     ~EdgeOperation()
     {
         delete this->mNewEdges;
@@ -138,11 +118,6 @@ public:
     unsigned GetElementIndex2() const
     {
         return this->mElementIndex2;
-    }
-
-    unsigned GetLocalEdgeIndex() const
-    {
-        return mLocalEdgeIndex;
     }
 
     EdgeRemapInfo* GetNewEdges() const

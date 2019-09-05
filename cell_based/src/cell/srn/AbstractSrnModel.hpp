@@ -274,6 +274,8 @@ public:
      * Scales srn variables by factor theta
      */
     virtual void ScaleSrnVariables(const double theta);
+
+    virtual void AddSrnQuantities(AbstractSrnModel* p_other_srn);
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

@@ -322,6 +322,43 @@ protected:
      */
     c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
 
+    /**
+     * Records node merging (or edge shrinkage) event
+     * @param oldIds
+     * @param pElement
+     * @param merged_nodes_pair - the index of the deleted node is stored in the second position
+     */
+    void RecordNodeMergeOperation(const std::vector<unsigned int> oldIds,
+                                  VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                  const std::pair<unsigned int, unsigned int> merged_nodes_pair);
+
+    /**
+     * Records edge splits (node insertions into an edge) for VertexBasedPopulationSrn class to remap SRNs
+     * @param edge_split_pairs
+     * @param relative_new_node
+     */
+    void RecordEdgeSplitOperation(const std::vector<std::pair<VertexElement<ELEMENT_DIM,SPACE_DIM>*, unsigned int> > edge_split_pairs,
+                                  const std::vector<double> relative_new_node);
+
+    /**
+     * Records cell divisions for VertexBasedPopulationSrn class to remap SRNs
+     * @param oldIds Global Edge IDs of parent cell prior cell division
+     * @param pElement1 Daughter element
+     * @param pElement2 Daughter element
+     */
+    void RecordCellDivideOperation(const std::vector<unsigned int>& oldIds,
+                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1,
+                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
+
+    /**
+     * Records edge formation during neighbour swap
+     * @param oldIds
+     * @param pElement
+     * @param edge_index - new edge index
+     */
+    void RecordNewEdgeOperation(const std::vector<unsigned int>& oldIds,
+                                VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                const unsigned int edge_index);
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
@@ -353,7 +390,6 @@ protected:
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
-
 public:
 
     /**
@@ -599,9 +635,6 @@ public:
                                          c_vector<double, SPACE_DIM> axisOfDivision,
                                          bool placeOriginalElementBelow=false);
 
-    void RecordCellDivideOperation(std::vector<unsigned int>& oldIds, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1, VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
-    void RecordEdgeSplitOperation(const std::vector<std::pair<unsigned int, unsigned int> > edge_split_pairs,
-                                  const std::vector<double> relative_new_node);
     /**
      * Add an element to the mesh.
      *
@@ -674,6 +707,8 @@ public:
      * \todo This method seems to be redundant; remove it? (#2401)
      */
     void ReMesh();
+
+
 };
 
 #include "SerializationExportWrapper.hpp"
