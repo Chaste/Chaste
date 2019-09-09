@@ -358,6 +358,16 @@ void AbstractCvodeSystem::SetForceReset(bool autoReset)
     }
 }
 
+bool AbstractCvodeSystem::GetMinimalReset()
+{
+    return mForceMinimalReset;
+}
+
+bool AbstractCvodeSystem::GetForceReset()
+{
+    return mForceReset;
+}
+
 void AbstractCvodeSystem::SetMinimalReset(bool minimalReset)
 {
     mForceMinimalReset = minimalReset;
@@ -466,7 +476,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 //std::cout << "Resetting CVODE solver\n";
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeReInit(mpCvodeMem, tStart, initialConditions);
-        CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
+        //CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol); - "all solver inputs remain in effect" so we don't need this.
 #else
         CVodeReInit(mpCvodeMem, AbstractCvodeSystemRhsAdaptor, tStart, initialConditions,
                     CV_SS, mRelTol, &mAbsTol);
@@ -474,7 +484,11 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     }
 
     // Set max dt and change max steps if wanted
-    CVodeSetMaxStep(mpCvodeMem, maxDt);
+    if (maxDt > 0)
+    {
+        CVodeSetMaxStep(mpCvodeMem, maxDt);
+    }
+
     if (mMaxSteps > 0)
     {
         CVodeSetMaxNumSteps(mpCvodeMem, mMaxSteps);
