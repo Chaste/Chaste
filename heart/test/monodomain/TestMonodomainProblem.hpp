@@ -1342,14 +1342,40 @@ public:
         HeartConfig::Instance()->SetCapacitance(1.0);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
+
+        // Check an exception for coverage
+        {
+            MonodomainProblem<2> monodomain_problem_fail(&cell_factory);
+
+            // Check output at specific nodes in parallel
+            std::vector<unsigned> output_node;
+            output_node.push_back(10);
+            monodomain_problem_fail.SetOutputNodes(output_node);
+            monodomain_problem_fail.Initialise();
+
+            if (monodomain_problem_fail.rGetMesh().rGetNodePermutation().size() > 0)
+            {
+                HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true); //
+                TS_ASSERT_THROWS_THIS(monodomain_problem_fail.Solve(),
+                                      "HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is incompatible with outputting particular nodes in parallel (at present!).");
+                HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(false); //
+            }
+        }
+
         MonodomainProblem<2> monodomain_problem(&cell_factory);
 
         // Check output at specific nodes in parallel
         std::vector<unsigned> output_node;
         unsigned my_favourite_node = 123u;
+        unsigned my_other_node = 205u;
+        output_node.push_back(10);
+        output_node.push_back(50);
+        output_node.push_back(100);
         output_node.push_back(my_favourite_node);
-        monodomain_problem.SetOutputNodes(output_node);
+        output_node.push_back(my_other_node);
+        output_node.push_back(219);
 
+        monodomain_problem.SetOutputNodes(output_node);
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
 
@@ -1360,9 +1386,15 @@ public:
 
         Hdf5DataReader reader("MonoProblem2dSpecificNode", "MonodomainLR91_2d_specific_node", true);
         std::vector<unsigned> permuted_nodes = reader.GetIncompleteNodeMap();
-        TS_ASSERT_EQUALS(permuted_nodes.size(), 1u);
+        TS_ASSERT_EQUALS(permuted_nodes.size(), 6u);
 
-        std::vector<double> our_answer = reader.GetVariableOverTime("V", permuted_nodes[0]); // Todo #2980 this should be simply 'my_favourite_node'.
+        std::cout << "Permuted node index = " << permuted_nodes[0] << " and " << permuted_nodes[1] << std::endl;
+        for (unsigned i = 0; i < permuted_nodes.size(); i++)
+        {
+            std::cout << "Node index = " << output_node[i] << ",\tpermuted = " << permuted_nodes[i] << std::endl;
+        }
+
+        std::vector<double> our_answer = reader.GetVariableOverTime("V", permuted_nodes[3]); // Todo #2980 this should be simply 'my_favourite_node'.
 
         for (unsigned i = 0; i < right_answer.size(); i++)
         {

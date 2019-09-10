@@ -696,6 +696,10 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineWriterCo
             // Added for #2980
             if (mpMesh->rGetNodePermutation().size() > 0)
             {
+                if (HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
+                {
+                    EXCEPTION("HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is incompatible with outputting particular nodes in parallel (at present!).");
+                }
                 std::vector<unsigned> nodes_to_output_permuted(mNodesToOutput.size());
                 for (unsigned i = 0; i < mNodesToOutput.size(); i++)
                 {
