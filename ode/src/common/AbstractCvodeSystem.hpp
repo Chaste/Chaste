@@ -384,6 +384,22 @@ public:
     void SetMinimalReset(bool minimalReset);
 
     /**
+     * @brief Get whether we want to run with minimal reset or not (no reinitialisation of the solver if variables change)
+     * 
+     * @return true We are not resetting the solver if time or variables change between solve calls.
+     * @return false We will reset the solver if time or variables change between solve calls.
+     */
+    bool GetMinimalReset();
+
+    /**
+     * @brief Get whether we will force a solver reset on every call to Solve()
+     * 
+     * @return true We will reinitialise the solver at the start of every Solve() call.
+     * @return false We will not reinitialise the solver at the start of every Solve() call.
+     */
+    bool GetForceReset();
+
+    /**
      * Successive calls to Solve will attempt to intelligently determine whether
      * to re-initialise the internal CVODE solver, or whether we are simply
      * extending the previous solution forward in time.  This mechanism compares
