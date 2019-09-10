@@ -1388,7 +1388,6 @@ public:
         std::vector<unsigned> permuted_nodes = reader.GetIncompleteNodeMap();
         TS_ASSERT_EQUALS(permuted_nodes.size(), 6u);
 
-        std::cout << "Permuted node index = " << permuted_nodes[0] << " and " << permuted_nodes[1] << std::endl;
         for (unsigned i = 0; i < permuted_nodes.size(); i++)
         {
             std::cout << "Node index = " << output_node[i] << ",\tpermuted = " << permuted_nodes[i] << std::endl;
