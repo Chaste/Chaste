@@ -1393,13 +1393,13 @@ public:
 
         for (unsigned i = 0; i < right_answer1.size(); i++)
         {
-            TS_ASSERT_DELTA(right_answer1[i], our_answer1[i], 1e-4);
+            TS_ASSERT_DELTA(our_answer1[i], right_answer1[i], 2e-4);
         }
 
         std::vector<double> our_answer2 = reader.GetVariableOverTime("V", my_favourite_node2);
         for (unsigned i = 0; i < our_answer2.size(); i++)
         {
-            TS_ASSERT_DELTA(-83.85, our_answer2[i], 1e-2);
+            TS_ASSERT_DELTA(our_answer2[i], -83.85, 1e-2);
         }
     }
 
