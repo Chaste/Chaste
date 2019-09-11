@@ -231,6 +231,9 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                 mIncompleteNodeIndices.clear();
                 mIncompleteNodeIndices.resize(num_node_indices);
                 H5Aread(attribute_id, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
+                // Assume there is no permutation when extending.  We're going throw an exception at the 
+                // end of the block (so setting mIncompletePermIndices is only for safety.
+                mIncompletePermIndices = mIncompleteNodeIndices; 
 
                 // Release ids
                 H5Tclose(attribute_type);
@@ -428,13 +431,30 @@ void Hdf5DataWriter::ComputeIncompleteOffset()
 {
     mOffset = 0;
     mNumberOwned = 0;
-    for (unsigned i = 0; i < mIncompleteNodeIndices.size(); i++)
+
+    if (mIncompleteNodeIndices != mIncompletePermIndices) //i.e. not the identity
     {
-        if (mIncompleteNodeIndices[i] < mLo)
+        //Need to reorder to columns so that mIncompletePermIndices is increasing
+        std::vector<std::pair <unsigned, unsigned> > indices;
+        for (unsigned i = 0; i < mIncompletePermIndices.size(); i++)
+        {
+            indices.push_back(std::make_pair(mIncompletePermIndices[i], mIncompleteNodeIndices[i]));
+        }
+        std::sort(indices.begin(),indices.end());
+        for (unsigned i = 0; i < mIncompletePermIndices.size(); i++)
+        {
+            mIncompletePermIndices[i]=indices[i].first;
+            mIncompleteNodeIndices[i]=indices[i].second;
+        }
+    }
+
+    for (unsigned i = 0; i < mIncompletePermIndices.size(); i++)
+    {
+        if (mIncompletePermIndices[i] < mLo)
         {
             mOffset++;
         }
-        else if (mIncompleteNodeIndices[i] < mHi)
+        else if (mIncompletePermIndices[i] < mHi)
         {
             mNumberOwned++;
         }
@@ -608,7 +628,7 @@ void Hdf5DataWriter::EndDefineMode()
         attr = H5Acreate(mVariablesDatasetId, "NodeMap", H5T_NATIVE_UINT, colspace,
                          H5P_DEFAULT, H5P_DEFAULT);
 
-        // Write to the attribute
+        // Write to the attribute (the original node index labels)
         H5Awrite(attr, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
 
         H5Sclose(colspace);
@@ -793,7 +813,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         boost::scoped_array<double> local_data(new double[mNumberOwned]);
         for (unsigned i = 0; i < mNumberOwned; i++)
         {
-            local_data[i] = p_petsc_vector[mIncompleteNodeIndices[mOffset + i] - mLo];
+            local_data[i] = p_petsc_vector[mIncompletePermIndices[mOffset + i] - mLo];
         }
         if (mUseCache)
         {
@@ -934,7 +954,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
             boost::scoped_array<double> local_data(new double[mNumberOwned * NUM_STRIPES]);
             for (unsigned i = 0; i < mNumberOwned; i++)
             {
-                unsigned local_node_number = mIncompleteNodeIndices[mOffset + i] - mLo;
+                unsigned local_node_number = mIncompletePermIndices[mOffset + i] - mLo;
                 local_data[NUM_STRIPES * i] = p_petsc_vector[local_node_number * NUM_STRIPES];
                 local_data[NUM_STRIPES * i + 1] = p_petsc_vector[local_node_number * NUM_STRIPES + 1];
             }

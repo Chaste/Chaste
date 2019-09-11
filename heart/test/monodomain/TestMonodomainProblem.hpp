@@ -1337,7 +1337,6 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
         HeartConfig::Instance()->SetOutputDirectory("MonoProblem2dSpecificNode");
         HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_2d_specific_node");
-        // HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true); // <- Todo #2980
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
         HeartConfig::Instance()->SetCapacitance(1.0);
 
@@ -1390,14 +1389,14 @@ public:
                                           -80.1727, -79.8668, -79.5543, -79.2354, -78.9103, -78.5791, -78.2418, -77.8984, -77.5484, -77.1917, -76.8276, -76.4555, -76.0744, -75.6833, -75.2809,
                                           -74.8655, -74.4354, -73.9883, -73.5218, -73.0331, -72.5191, -71.9766, -71.402, -70.7915, -70.1413 };
 
-        std::vector<double> our_answer1 = reader.GetVariableOverTime("V", permuted_nodes[0]); // Todo #2980 this should be simply 'my_favourite_node1'.
+        std::vector<double> our_answer1 = reader.GetVariableOverTime("V", my_favourite_node1);
 
         for (unsigned i = 0; i < right_answer1.size(); i++)
         {
             TS_ASSERT_DELTA(right_answer1[i], our_answer1[i], 1e-4);
         }
 
-        std::vector<double> our_answer2 = reader.GetVariableOverTime("V", permuted_nodes[2]); // Todo #2980 this should be simply 'my_favourite_node2'.
+        std::vector<double> our_answer2 = reader.GetVariableOverTime("V", my_favourite_node2);
         for (unsigned i = 0; i < our_answer2.size(); i++)
         {
             TS_ASSERT_DELTA(-83.85, our_answer2[i], 1e-2);

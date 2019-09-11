@@ -704,10 +704,8 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineWriterCo
                 {
                     nodes_to_output_permuted[i] = mpMesh->rGetNodePermutation()[mNodesToOutput[i]];
                 }
-                /*mpWriter->DefineFixedDimension(mNodesToOutput, nodes_to_output_permuted, mpMesh->GetNumNodes());*/
-                mpWriter->DefineFixedDimension(nodes_to_output_permuted, nodes_to_output_permuted, mpMesh->GetNumNodes());
+                mpWriter->DefineFixedDimension(mNodesToOutput, nodes_to_output_permuted, mpMesh->GetNumNodes());
             } else {
-            
                 // Output only the nodes indicated
                 mpWriter->DefineFixedDimension(mNodesToOutput, mNodesToOutput, mpMesh->GetNumNodes());
             }
