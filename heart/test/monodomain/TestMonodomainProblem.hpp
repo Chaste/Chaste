@@ -1357,7 +1357,7 @@ public:
             {
                 HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true); //
                 TS_ASSERT_THROWS_THIS(monodomain_problem_fail.Solve(),
-                                      "HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is incompatible with outputting particular nodes in parallel (at present!).");
+                                      "HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is meaningless when outputting particular nodes in parallel. (Nodes are written with their original indices by default).");
                 HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(false); //
             }
         }
@@ -1365,39 +1365,42 @@ public:
         MonodomainProblem<2> monodomain_problem(&cell_factory);
 
         // Check output at specific nodes in parallel
-        std::vector<unsigned> output_node;
-        unsigned my_favourite_node = 123u;
+        std::vector<unsigned> output_nodes;
+        unsigned my_favourite_node1 = 123u;
         unsigned my_other_node = 205u;
-        output_node.push_back(10);
-        output_node.push_back(50);
-        output_node.push_back(100);
-        output_node.push_back(my_favourite_node);
-        output_node.push_back(my_other_node);
-        output_node.push_back(219);
+        unsigned my_favourite_node2 = 219u; 
+        
+        output_nodes.push_back(my_favourite_node1);
+        output_nodes.push_back(my_other_node);
+        output_nodes.push_back(my_favourite_node2);
+        // sequential {123,205,219} 
+        // 2 procs:   {174,211,106} (not increasing)
+        // 3 procs:   {47,211,150}  (not increasing)
 
-        monodomain_problem.SetOutputNodes(output_node);
+        monodomain_problem.SetOutputNodes(output_nodes);
         monodomain_problem.Initialise();
         monodomain_problem.Solve();
 
-        std::vector<double> right_answer{ -83.853, -83.8535, -83.8572, -83.8647, -83.8722, -83.8739, -83.8642, -83.8389, -83.7954, -83.7321, -83.6485,
+        Hdf5DataReader reader("MonoProblem2dSpecificNode", "MonodomainLR91_2d_specific_node", true);
+        std::vector<unsigned> permuted_nodes = reader.GetIncompleteNodeMap();
+        TS_ASSERT_EQUALS(permuted_nodes.size(), 3u);
+
+        std::vector<double> right_answer1{ -83.853, -83.8535, -83.8572, -83.8647, -83.8722, -83.8739, -83.8642, -83.8389, -83.7954, -83.7321, -83.6485,
                                           -83.5446, -83.4211, -83.2788, -83.1186, -82.9416, -82.749, -82.5418, -82.321, -82.0877, -81.8427, -81.587, -81.3213, -81.0464, -80.763, -80.4716,
                                           -80.1727, -79.8668, -79.5543, -79.2354, -78.9103, -78.5791, -78.2418, -77.8984, -77.5484, -77.1917, -76.8276, -76.4555, -76.0744, -75.6833, -75.2809,
                                           -74.8655, -74.4354, -73.9883, -73.5218, -73.0331, -72.5191, -71.9766, -71.402, -70.7915, -70.1413 };
 
-        Hdf5DataReader reader("MonoProblem2dSpecificNode", "MonodomainLR91_2d_specific_node", true);
-        std::vector<unsigned> permuted_nodes = reader.GetIncompleteNodeMap();
-        TS_ASSERT_EQUALS(permuted_nodes.size(), 6u);
+        std::vector<double> our_answer1 = reader.GetVariableOverTime("V", permuted_nodes[0]); // Todo #2980 this should be simply 'my_favourite_node1'.
 
-        for (unsigned i = 0; i < permuted_nodes.size(); i++)
+        for (unsigned i = 0; i < right_answer1.size(); i++)
         {
-            std::cout << "Node index = " << output_node[i] << ",\tpermuted = " << permuted_nodes[i] << std::endl;
+            TS_ASSERT_DELTA(right_answer1[i], our_answer1[i], 1e-4);
         }
 
-        std::vector<double> our_answer = reader.GetVariableOverTime("V", permuted_nodes[3]); // Todo #2980 this should be simply 'my_favourite_node'.
-
-        for (unsigned i = 0; i < right_answer.size(); i++)
+        std::vector<double> our_answer2 = reader.GetVariableOverTime("V", permuted_nodes[2]); // Todo #2980 this should be simply 'my_favourite_node2'.
+        for (unsigned i = 0; i < our_answer2.size(); i++)
         {
-            TS_ASSERT_DELTA(right_answer[i], our_answer[i], 1e-4);
+            TS_ASSERT_DELTA(-83.85, our_answer2[i], 1e-2);
         }
     }
 

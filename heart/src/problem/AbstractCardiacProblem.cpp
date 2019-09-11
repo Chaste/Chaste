@@ -32,7 +32,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
 #include "AbstractCardiacProblem.hpp"
 
 #include "DistributedVector.hpp"
@@ -698,17 +697,20 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineWriterCo
             {
                 if (HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
                 {
-                    EXCEPTION("HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is incompatible with outputting particular nodes in parallel (at present!).");
+                    EXCEPTION("HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is meaningless when outputting particular nodes in parallel. (Nodes are written with their original indices by default).");
                 }
                 std::vector<unsigned> nodes_to_output_permuted(mNodesToOutput.size());
                 for (unsigned i = 0; i < mNodesToOutput.size(); i++)
                 {
                     nodes_to_output_permuted[i] = mpMesh->rGetNodePermutation()[mNodesToOutput[i]];
                 }
-                mNodesToOutput = nodes_to_output_permuted;
+                /*mpWriter->DefineFixedDimension(mNodesToOutput, nodes_to_output_permuted, mpMesh->GetNumNodes());*/
+                mpWriter->DefineFixedDimension(nodes_to_output_permuted, nodes_to_output_permuted, mpMesh->GetNumNodes());
+            } else {
+            
+                // Output only the nodes indicated
+                mpWriter->DefineFixedDimension(mNodesToOutput, mNodesToOutput, mpMesh->GetNumNodes());
             }
-            // Output only the nodes indicted
-            mpWriter->DefineFixedDimension(mNodesToOutput, mpMesh->GetNumNodes());
         }
         // mNodeColumnId = mpWriter->DefineVariable("Node", "dimensionless");
         mVoltageColumnId = mpWriter->DefineVariable("V", "mV");

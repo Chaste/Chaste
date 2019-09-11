@@ -65,7 +65,7 @@ private:
     unsigned mHi;                                   /**< Local ownership of a PETSc vector of size #mFileFixedDimensionSize*/
     unsigned mNumberOwned;                          /**< mNumberOwned=#mHi-#mLo; except with incomplete data*/
     unsigned mOffset;                               /**< mOffset=#mLo; except with incomplete data*/
-
+    std::vector<unsigned> mIncompletePermIndices;   /**< The actual runtime indices of the incomplete data nodes (used when running in parallel and a permutation has been applied)*/ 
     bool mNeedExtend;                               /**< Used so that the data set is only extended when data is written*/
     bool mUseMatrixForIncompleteData;               /**< Whether to use a matrix format for incomplete data */
 
@@ -183,10 +183,11 @@ public:
     /**
      * Define the fixed dimension, assuming incomplete data output (subset of the nodes).
      *
-     * @param rNodesToOuput Node indexes to be output (precondition: to be monotonic increasing)
+     * @param rNodesToOuputOriginalIndices Node indices to be output as in the original mesh (precondition: to be monotonic increasing)
      * @param vecSize
+     * @param rNodesToOuputPermutedIndices Node indices to be output as they are in the runtime parallel partitioned mesh
      */
-    void DefineFixedDimension(const std::vector<unsigned>& rNodesToOuput, long vecSize);
+    void DefineFixedDimension(const std::vector<unsigned>& rNodesToOuputOriginalIndices, const std::vector<unsigned>& rNodesToOuputPermutedIndices, long vecSize);
 
     /**
      * Define a variable.

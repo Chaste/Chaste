@@ -409,19 +409,19 @@ void Hdf5DataWriter::DefineFixedDimension(long dimensionSize)
     mIsFixedDimensionSet = true;
 }
 
-void Hdf5DataWriter::DefineFixedDimension(const std::vector<unsigned>& rNodesToOuput, long vecSize)
+void Hdf5DataWriter::DefineFixedDimension(const std::vector<unsigned>& rNodesToOuputOriginalIndices, const std::vector<unsigned>& rNodesToOuputPermutedIndices, long vecSize)
 {
-    unsigned vector_size = rNodesToOuput.size();
+    unsigned vector_size = rNodesToOuputOriginalIndices.size();
 
     for (unsigned index = 0; index < vector_size - 1; index++)
     {
-        if (rNodesToOuput[index] >= rNodesToOuput[index + 1])
+        if (rNodesToOuputOriginalIndices[index] >= rNodesToOuputOriginalIndices[index + 1])
         {
             EXCEPTION("Input should be monotonic increasing");
         }
     }
 
-    if ((int)rNodesToOuput.back() >= vecSize)
+    if ((int)rNodesToOuputOriginalIndices.back() >= vecSize  || (int)rNodesToOuputPermutedIndices.back() >= vecSize)
     {
         EXCEPTION("Vector size doesn't match nodes to output");
     }
@@ -430,7 +430,8 @@ void Hdf5DataWriter::DefineFixedDimension(const std::vector<unsigned>& rNodesToO
 
     mFileFixedDimensionSize = vector_size;
     mIsDataComplete = false;
-    mIncompleteNodeIndices = rNodesToOuput;
+    mIncompleteNodeIndices = rNodesToOuputOriginalIndices;
+    mIncompletePermIndices = rNodesToOuputPermutedIndices;
     ComputeIncompleteOffset();
 }
 

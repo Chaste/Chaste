@@ -554,7 +554,7 @@ public:
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(60);
-        writer.DefineFixedDimension(node_numbers, number_nodes);
+        writer.DefineFixedDimension(node_numbers, node_numbers, number_nodes);
 
         writer.EndDefineMode();
 
@@ -626,7 +626,7 @@ public:
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(48);
-        writer.DefineFixedDimension(node_numbers, number_nodes);
+        writer.DefineFixedDimension(node_numbers, node_numbers, number_nodes);
 
         writer.EndDefineMode();
 
@@ -984,7 +984,7 @@ public:
         node_numbers.push_back(16);
         node_numbers.push_back(23);
         node_numbers.push_back(42);
-        writer.DefineFixedDimension(node_numbers, number_nodes);
+        writer.DefineFixedDimension(node_numbers, node_numbers, number_nodes);
 
         int vm_id = writer.DefineVariable("V_m", "millivolts");
         int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
@@ -1154,17 +1154,17 @@ public:
         node_numbers.push_back(6);
 
         // Data not increasing
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100), "Input should be monotonic increasing");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100), "Input should be monotonic increasing");
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimensionUsingMatrix(node_numbers, 100), "Input should be monotonic increasing");
         node_numbers[2] = 100;
         // Data is increasing but the last number is too large
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100), "Vector size doesn\'t match nodes to output");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100), "Vector size doesn\'t match nodes to output");
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimensionUsingMatrix(node_numbers, 100), "Vector size doesn\'t match nodes to output");
 
         mpTestWriter->DefineFixedDimension(5000);
         // Can't set fixed dimension more than once
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(5000), "Fixed dimension already set");
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100), "Vector size doesn\'t match nodes to output");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100), "Vector size doesn\'t match nodes to output");
 
         int ina_var_id = INT_UNSET;
         int ik_var_id = INT_UNSET;
@@ -1225,7 +1225,7 @@ public:
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(60);
-        TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineFixedDimension(node_numbers, 100));
+        TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->EndDefineMode());
 
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineVariable("I_Ca", "milli amperes"),
@@ -1236,7 +1236,7 @@ public:
                               "Cannot define variables when not in Define mode");
 
         // Can't call define fixed dimension again
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100),
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100),
                               "Cannot define variables when not in Define mode");
 
         // Test that we can't write incomplete data from a vector that doesn't have the right entries (0 to 59)
