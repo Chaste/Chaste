@@ -459,7 +459,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
     }
     BOOST_FOREACH (boost::shared_ptr<AbstractOutputModifier> p_output_modifier, mOutputModifiers)
     {
-        p_output_modifier->InitialiseAtStart(this->mpMesh->GetDistributedVectorFactory());
+        p_output_modifier->InitialiseAtStart(this->mpMesh->GetDistributedVectorFactory(), this->mpMesh->rGetNodePermutation());
         p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), initial_condition, PROBLEM_DIM);
     }
 

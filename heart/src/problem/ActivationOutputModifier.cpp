@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "HeartConfig.hpp"
 
-void ActivationOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory)
+void ActivationOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation)
 {
     mLocalSize = pVectorFactory->GetLocalOwnership();
     mFirstActivitationTimes.resize(mLocalSize, -1.0);
