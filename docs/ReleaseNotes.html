@@ -8,6 +8,39 @@
 <h1>Chaste Release Notes</h1>
 
 
+<h2>Release 2019.1 (changes since Release 2018.1)</h2>
+
+
+<h3>Headline features</h3>
+<ul><li>Chaste is now compiled with <a  href="https://en.wikipedia.org/wiki/C%2B%2B14">C++14</a>.
+</li><li>Chaste now supports up to and including Ubuntu 19.04 (Disco).
+</li><li>The minimum required CMake version for building Chaste is now 3.5.1.
+</li><li>Installing Chaste is now even easier using the new <a  href="https://github.com/Chaste/chaste-docker">docker image for Chaste</a>.
+</li></ul>
+
+<h3>New dependency support</h3>
+<ul><li>Chaste now supports PETSc up to 3.11, Boost up to 1.70, HDF5 up to 1.10.5, Xerces up to 3.2.2, SUNDIALS up to 3.1.0 and VTK up to 8.1.
+</li><li>Chaste no longer supports PETSc &lt; 3.6, Boost &lt; 1.58, HDF5 &lt; 1.8.16, XSD &lt; 4.0.0, Xerces &lt; 3.1.3, SUNDIALS &lt; 2.5.0 and VTK &lt; 6.2.
+</li></ul>
+
+<h3>Core</h3>
+<ul><li>Two new CMake build types have been added: <tt>AggressiveOpt</tt> which sets <tt>-Ofast -march=native -DNDEBUG</tt> and is good for release builds with more aggressive optimisation, and <tt>DebugOpt</tt> which sets <tt>-Og -g</tt> and is a good default for an edit-compile-debug workflow.
+  <ul><li><tt>TestChasteBuildInfo.hpp</tt> is now displaying correct information for C++ compiler flags for both cmake and the old scons build system.
+  </li></ul></li><li>Dropping support for XSD 3.x should prevent Chaste builds from emitting warnings about deprecated <tt>std::auto_ptr</tt>.
+</li><li>The <tt>docs</tt> directory has been refactored to contain more relevant information, and now includes a <a  href="https://joss.theoj.org/">JOSS</a> paper about Chaste and recent publications it has enabled.
+</li><li>The unused interface <tt> Hdf5DataWriter::DefineFixedDimensionUsingMatrix()</tt> was <strong>deleted</strong>.
+</li></ul>
+
+<h3>Heart</h3>
+<ul><li>Intracellular calcium is now converted consistently into milliMolar within the action potential models and so the method <tt>AbstractCardiacCellInterface::GetIntracellularCalciumConcentration()</tt> (used by mechanics models) always returns calcium in milliMolar. Note that this has changed the state variable ordering in the PyCML-generated C++ models, so any archives of these variables will need to be updated.
+</li><li>Tweaks to <tt>SteadyStateRunner</tt> class which might provide a speed-up for getting certain action potential models to steady state, by removing maximum time step from CVODE and solving separately during stimulus and non-stimulus regions.
+</li><li>The behaviour of <tt>AbstractCardiacProblem&lt;&gt;::SetOutputNodes()</tt> and <tt>SingleTraceOutputModifier</tt> has been altered. When running in parallel node indices into the original mesh are now automatically converted to indices into then permuted runtime mesh.
+</li></ul>
+
+<h3>Future Plans</h3>
+<ul><li>This is the last release of Chaste to support Xerces &lt; 3.1.2.
+</li></ul></div>
+
 
 <h2>Release 2018.1 (changes since Release 2017.1)</h2>
 
