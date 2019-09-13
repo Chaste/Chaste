@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -163,7 +163,8 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::CreatePointCloud(const double& rPo
                 double x = bounds[0] + xi*rPointSpacing;
                 double y = bounds[2] + yi*rPointSpacing;
                 double z = bounds[4] + zi*rPointSpacing;
-                if (mPointSelector->IsInsideSurface(x, y, z))
+                // Repeat test for "isinside" because, prior to VTK 8.2, it may fail when the point is on surface (#3002)
+                if (mPointSelector->IsInsideSurface(x, y, z) || mPointSelector->IsInsideSurface(x, y, z) || mPointSelector->IsInsideSurface(x, y, z))
                 {
                     points->InsertPoint(node_index, x, y, z);
                     node_index += 1;
@@ -397,7 +398,8 @@ vtkIdType AirwayGenerator::InsertBranch(vtkSmartPointer<vtkPolyData> pPointCloud
     CheckBranchAngleLengthAndAdjust(startId, originalDirection, endLocation);
 
     // If the branch point isn't inside the surface then terminate
-    if (!mPointSelector->IsInsideSurface(endLocation))
+    // Repeat test for "isinside" because, prior to VTK 8.2, it may fail when the point is on surface (#3002)
+    if (!mPointSelector->IsInsideSurface(endLocation) && !mPointSelector->IsInsideSurface(endLocation) && !mPointSelector->IsInsideSurface(endLocation))
     {
         return -1;
     }
@@ -642,7 +644,8 @@ void AirwayGenerator::RadiiProcessPoint(unsigned pointId, unsigned startId, std:
 
 bool AirwayGenerator::IsInsideLobeSurface(double point[3])
 {
-    return mPointSelector->IsInsideSurface(point);
+    // Repeat test for "isinside" because, prior to VTK 8.2, it may fail when the point is on surface (#3002)
+    return (mPointSelector->IsInsideSurface(point) || mPointSelector->IsInsideSurface(point) || mPointSelector->IsInsideSurface(point));
 }
 
 double AirwayGenerator::DistanceFromLobeSurface(double point[3])

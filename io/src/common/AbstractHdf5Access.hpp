@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "FileFinder.hpp"
 
-
 const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
 
 /**
@@ -52,21 +51,21 @@ class AbstractHdf5Access
 {
 
 protected:
-    std::string mBaseName;                          /**< The base name for the data files. */
-    std::string mDatasetName;                       /**< The base name for the dataset we are reading/writing. */
-    FileFinder mDirectory;                          /**< Directory HDF5 file will be, or is, stored in. */
-    static const unsigned DATASET_DIMS=3;           /**< The dimensions of each dataset (variable, node, time). */
+    std::string mBaseName;                        /**< The base name for the data files. */
+    std::string mDatasetName;                     /**< The base name for the dataset we are reading/writing. */
+    FileFinder mDirectory;                        /**< Directory HDF5 file will be, or is, stored in. */
+    static const unsigned DATASET_DIMS = 3;       /**< The dimensions of each dataset (variable, node, time). */
 
-    bool mIsDataComplete;                           /**< Whether the data file is complete. */
-    std::string mUnlimitedDimensionName;            /**< The name of the unlimited dimension. */
-    std::string mUnlimitedDimensionUnit;            /**< The physical units of the unlimited dimension. */
-    bool mIsUnlimitedDimensionSet;                  /**< Is the unlimited dimension set up at the moment?*/
-    std::vector<unsigned> mIncompleteNodeIndices;   /**< Vector of node indices for which the data file does not contain data. */
+    bool mIsDataComplete;                         /**< Whether the data file contains entries for all nodes. */
+    std::string mUnlimitedDimensionName;          /**< The name of the unlimited dimension. */
+    std::string mUnlimitedDimensionUnit;          /**< The physical units of the unlimited dimension. */
+    bool mIsUnlimitedDimensionSet;                /**< Is the unlimited dimension set up at the moment?*/
+    std::vector<unsigned> mIncompleteNodeIndices; /**< Vector of node indices for which the data file does not contain data. */
 
-    hid_t mFileId;                                  /**< The data file ID. */
-    hid_t mUnlimitedDatasetId;                      /**< The dataset ID for the unlimited (independent) variable - usually time. */
-    hid_t mVariablesDatasetId;                      /**< The dataset ID for the dependent variables. */
-    hsize_t mDatasetDims[DATASET_DIMS];             /**< The sizes of each dimension of the dataset (variable, node, time). */
+    hid_t mFileId;                                /**< The data file ID. */
+    hid_t mUnlimitedDatasetId;                    /**< The dataset ID for the unlimited (independent) variable - usually time. */
+    hid_t mVariablesDatasetId;                    /**< The dataset ID for the dependent variables. */
+    hsize_t mDatasetDims[DATASET_DIMS];           /**< The sizes of each dimension of the dataset (variable, node, time). */
 
     /**
      * Check for the existence of a dataset in an HDF5 file.
@@ -98,7 +97,6 @@ protected:
      * this cache by reducing max_bytes_in_cache.
      */
     void SetMainDatasetRawChunkCache();
-
 
 public:
     /**
@@ -132,6 +130,8 @@ public:
 
     /**
      * Get method for mIsDataComplete.
+     * If this is true the data file contains entries for all nodes.
+     * If this is false the data file only contains entries for some nodes.
      *
      * @return #mIsDataComplete.
      */
@@ -139,6 +139,7 @@ public:
 
     /**
      * @return #mIncompleteNodeIndices.
+     * Vector of node indices for which the data file does not contain data.
      */
     std::vector<unsigned> GetIncompleteNodeMap();
 

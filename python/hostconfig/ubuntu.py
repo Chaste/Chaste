@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -243,7 +243,7 @@ def Configure(prefs, build):
 
     # Is CVODE installed?
     use_cvode = int(prefs.get('use-cvode', True))
-    use_cvode = use_cvode and os.path.exists('/usr/lib/libsundials_cvode.so')
+    use_cvode = use_cvode and (os.path.exists('/usr/lib/libsundials_cvode.so') or os.path.exists('/usr/lib/x86_64-linux-gnu/libsundials_cvode.so'))
     if ubuntu_ver <= [9,04]:
         # We don't support CVODE 2.4
         use_cvode = False

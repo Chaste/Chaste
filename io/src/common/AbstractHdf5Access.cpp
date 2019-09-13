@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,14 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "Exception.hpp"
 #include "AbstractHdf5Access.hpp"
+#include "Exception.hpp"
 
 bool AbstractHdf5Access::DoesDatasetExist(const std::string& rDatasetName)
 {
     // This is a nice method for testing existence, introduced in HDF5 1.8.0
     htri_t dataset_status = H5Lexists(mFileId, rDatasetName.c_str(), H5P_DEFAULT);
-    return (dataset_status>0);
+    return (dataset_status > 0);
 }
 
 void AbstractHdf5Access::SetUnlimitedDatasetId()
@@ -63,15 +63,15 @@ void AbstractHdf5Access::SetUnlimitedDatasetId()
         hid_t name_attribute_id = H5Aopen_name(mUnlimitedDatasetId, "Name");
         hid_t unit_attribute_id = H5Aopen_name(mUnlimitedDatasetId, "Unit");
 
-        hid_t attribute_type  = H5Aget_type(name_attribute_id);
+        hid_t attribute_type = H5Aget_type(name_attribute_id);
 
         // Read into it.
-        char* string_array = (char *)malloc(sizeof(char)*MAX_STRING_SIZE);
-        H5Aread( name_attribute_id, attribute_type, string_array);
+        char* string_array = (char*)malloc(sizeof(char) * MAX_STRING_SIZE);
+        H5Aread(name_attribute_id, attribute_type, string_array);
         std::string name_string(&string_array[0]);
         mUnlimitedDimensionName = name_string;
 
-        H5Aread( unit_attribute_id, attribute_type, string_array);
+        H5Aread(unit_attribute_id, attribute_type, string_array);
         std::string unit_string(&string_array[0]);
         mUnlimitedDimensionUnit = unit_string;
 
@@ -94,13 +94,13 @@ void AbstractHdf5Access::SetUnlimitedDatasetId()
 }
 
 AbstractHdf5Access::AbstractHdf5Access(const std::string& rDirectory,
-                   const std::string& rBaseName,
-                   const std::string& rDatasetName,
-                   bool makeAbsolute)
- : mBaseName(rBaseName),
-   mDatasetName(rDatasetName),
-   mIsDataComplete(true),
-   mIsUnlimitedDimensionSet(false)
+                                       const std::string& rBaseName,
+                                       const std::string& rDatasetName,
+                                       bool makeAbsolute)
+        : mBaseName(rBaseName),
+          mDatasetName(rDatasetName),
+          mIsDataComplete(true),
+          mIsUnlimitedDimensionSet(false)
 {
     RelativeTo::Value relative_to;
     if (makeAbsolute)
@@ -117,11 +117,11 @@ AbstractHdf5Access::AbstractHdf5Access(const std::string& rDirectory,
 AbstractHdf5Access::AbstractHdf5Access(const FileFinder& rDirectory,
                                        const std::string& rBaseName,
                                        const std::string& rDatasetName)
- : mBaseName(rBaseName),
-   mDatasetName(rDatasetName),
-   mDirectory(rDirectory),
-   mIsDataComplete(true),
-   mIsUnlimitedDimensionSet(false)
+        : mBaseName(rBaseName),
+          mDatasetName(rDatasetName),
+          mDirectory(rDirectory),
+          mIsDataComplete(true),
+          mIsUnlimitedDimensionSet(false)
 {
 }
 
@@ -129,12 +129,10 @@ AbstractHdf5Access::~AbstractHdf5Access()
 {
 }
 
-
 bool AbstractHdf5Access::IsDataComplete()
 {
     return mIsDataComplete;
 }
-
 
 std::vector<unsigned> AbstractHdf5Access::GetIncompleteNodeMap()
 {
@@ -159,23 +157,21 @@ void AbstractHdf5Access::SetMainDatasetRawChunkCache()
     // See: http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetChunkCache
 
     hsize_t max_objects_in_chunk_cache = 12799u;
-    hsize_t max_bytes_in_cache = 128u*1024u*1024u;
-#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 && H5_VERS_RELEASE>=3 // HDF5 1.8.3+
+    hsize_t max_bytes_in_cache = 128u * 1024u * 1024u;
+#if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >= 8 && H5_VERS_RELEASE >= 3 // HDF5 1.8.3+
     // These methods set the cache on a dataset basis
-    hid_t dapl_id = H5Dget_access_plist( mVariablesDatasetId );
-    H5Pset_chunk_cache( dapl_id,
-                        max_objects_in_chunk_cache ,
-                        max_bytes_in_cache ,
-                        H5D_CHUNK_CACHE_W0_DEFAULT);
+    hid_t dapl_id = H5Dget_access_plist(mVariablesDatasetId);
+    H5Pset_chunk_cache(dapl_id,
+                       max_objects_in_chunk_cache,
+                       max_bytes_in_cache,
+                       H5D_CHUNK_CACHE_W0_DEFAULT);
 #else
     // These older methods set the cache on a file basis
-    hid_t fapl_id = H5Fget_access_plist( mFileId );
-    H5Pset_cache( fapl_id,
-                  0, // unused
-                  max_objects_in_chunk_cache,
-                  max_bytes_in_cache,
-                  0.75); // default value
+    hid_t fapl_id = H5Fget_access_plist(mFileId);
+    H5Pset_cache(fapl_id,
+                 0, // unused
+                 max_objects_in_chunk_cache,
+                 max_bytes_in_cache,
+                 0.75); // default value
 #endif
 }
-
-

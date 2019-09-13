@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 
 #include <string>
-#include "Hdf5DataWriter.hpp"
-//#include "AbstractCardiacProblem.hpp"
+#include "AbstractTetrahedralMesh.hpp"
+
 /**
  * A plug-in class for on-the-fly output.  This is designed so that a user can insert something in
  * order to monitor the progress of a simulation or to produce "post processed" output during the simulation.
@@ -109,10 +109,11 @@ public:
      * Initialise the modifier (open a file or make some memory) when the solve loop is starting
      *
      * Note the problem passes parameters in a non-templated fashion in order to keep the interface as lightweight as
-     * possible.
+     * possible.  That is, it might have been slicker to pass in the mesh but that would require multiple templates.
      * @param pVectorFactory  The vector factory which is associated with the calling problem's mesh
+     * @param rNodePermutation The permutation associated with the calling problem's mesh (when running with parallel partitioning)
      */
-    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory)=0;
+    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation)=0;
 
     /**
      * Finalise the modifier (close a file or dump the calculation to disk)

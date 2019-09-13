@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -273,7 +273,12 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 
             double suggested_step = 0.95*dt*((0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())/length);
 
-            throw StepSizeException(suggested_step, message.str(), false);
+            // The first time we see this behaviour, throw a StepSizeException, but not more than once
+            if(mThrowStepSizeException)
+            {
+                mThrowStepSizeException = false;
+                throw StepSizeException(suggested_step, message.str(), false);
+            }
         }
     }
 }

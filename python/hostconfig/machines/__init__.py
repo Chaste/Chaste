@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -107,8 +107,6 @@ def config_module():
         import comlab as conf
     elif machine_fqdn.endswith(".dtc.ox.ac.uk"):
         import dtc as conf
-    elif machine_fqdn.endswith(".maths.nottingham.ac.uk"):
-        import nottingham as conf
     elif machine_fqdn.endswith(".iceberg.shef.ac.uk"):
         import iceberg as conf
     elif machine_fqdn == "beaky-buzzard.maths.ox.ac.uk":

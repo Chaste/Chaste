@@ -29,10 +29,10 @@ Information on changes in this release can be found in the file
 [ReleaseNotes.html](docs/ReleaseNotes.html).
 
 Tutorial examples for this release are available at:
-https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2018.1
+https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1
 
 API documentation generated from the code by Doxygen is available at:
-https://chaste.cs.ox.ac.uk/chaste/docs/release_2018.1
+https://chaste.cs.ox.ac.uk/chaste/docs/release_2019.1
 
 Chaste welcomes contributions from the community.
 For information on how to contribute to Chaste, and for support and bug reports, please see the file [CONTRIBUTING.md](docs/CONTRIBUTING.md).

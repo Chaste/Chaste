@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -410,6 +410,9 @@ public:
      *  types of cells). This method by default throws an exception, so should be
      *  implemented in the concrete class if intracellular (cytosolic) calcium concentration is
      *  one of the state variables.
+     *
+     *  Returns the intracellular calcium concentraion *in milliMolar*.
+     *
      *  @return intracellular calcium concentration
      */
     virtual double GetIntracellularCalciumConcentration();

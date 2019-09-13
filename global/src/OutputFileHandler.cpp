@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -166,7 +166,15 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
     {
         // Mimic the old SCons behaviour of setting CHASTE_TEST_OUTPUT: /tmp/'+os.environ['USER']+'/testoutput/
         std::stringstream  tmp_directory;
-        tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/";
+        if (getenv("USER")!=NULL)
+        {
+            tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/";
+        }
+        else
+        {
+            // No $USER in environment (which may be the case in Docker)
+            tmp_directory << "/tmp/chaste/testoutput/"; // LCOV_EXCL_LINE
+        }
         directory_root.SetPath(tmp_directory.str(), RelativeTo::AbsoluteOrCwd);
         /* // Former behaviour: default to 'testoutput' folder within the current directory
          * directory_root.SetPath("testoutput", RelativeTo::CWD); */

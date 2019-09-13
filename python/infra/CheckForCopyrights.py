@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,64 +37,40 @@ import re
 import sys
 
 
-deprecated_notice = re.compile(r"""Copyright \(c\) 2005-\d{4}, University of Oxford.
-All rights reserved.
-
-University of Oxford means the Chancellor, Masters and Scholars of the
-University of Oxford, having an administrative office at Wellington
-Square, Oxford OX1 2JD, UK.
-((
-This file is part of Chaste.
-)?)
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
- \* Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
- \* Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
- \* Neither the name of the University of Oxford nor the names of its
-   contributors may be used to endorse or promote products derived from this
-   software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES \(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION\)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT \(INCLUDING NEGLIGENCE OR OTHERWISE\) ARISING IN ANY WAY OUT
-OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+deprecated_notice = re.compile(r"""(# ){0,1}Copyright \(c\) 2005-\d{4}, University of Oxford.
+(# ){0,1}All rights reserved.
+(# ){0,1}
+(# ){0,1}University of Oxford means the Chancellor, Masters and Scholars of the
+(# ){0,1}University of Oxford, having an administrative office at Wellington
+(# ){0,1}Square, Oxford OX1 2JD, UK.
+(# ){0,1}
+(# ){0,1}This file is part of Chaste.
+(# ){0,1}
+(# ){0,1}Redistribution and use in source and binary forms, with or without
+(# ){0,1}modification, are permitted provided that the following conditions are met:
+(# ){0,1} \* Redistributions of source code must retain the above copyright notice,
+(# ){0,1}   this list of conditions and the following disclaimer.
+(# ){0,1} \* Redistributions in binary form must reproduce the above copyright notice,
+(# ){0,1}   this list of conditions and the following disclaimer in the documentation
+(# ){0,1}   and/or other materials provided with the distribution.
+(# ){0,1} \* Neither the name of the University of Oxford nor the names of its
+(# ){0,1}   contributors may be used to endorse or promote products derived from this
+(# ){0,1}   software without specific prior written permission.
+(# ){0,1}
+(# ){0,1}THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"
+(# ){0,1}AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+(# ){0,1}IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+(# ){0,1}ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+(# ){0,1}LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+(# ){0,1}CONSEQUENTIAL DAMAGES \(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+(# ){0,1}GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION\)
+(# ){0,1}HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+(# ){0,1}LIABILITY, OR TORT \(INCLUDING NEGLIGENCE OR OTHERWISE\) ARISING IN ANY WAY OUT
+(# ){0,1}OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """, re.MULTILINE)
 
-deprecated_notice_GPL = re.compile(r"""Copyright \(C\) University of Oxford, 2005-\d{4}
 
-University of Oxford means the Chancellor, Masters and Scholars of the
-University of Oxford, having an administrative office at Wellington
-Square, Oxford OX1 2JD, UK.
-((
-This file is part of Chaste.
-)?)
-Chaste is free software: you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as published
-by the Free Software Foundation, either version 2.1 of the License, or
-\(at your option\) any later version.
-
-Chaste is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-License for more details. The offer of Chaste under the terms of the
-License is subject to the License being interpreted in accordance with
-English Law and subject to any action against the University of Oxford
-being under the jurisdiction of the English Courts.
-
-You should have received a copy of the GNU Lesser General Public License
-along with Chaste. If not, see <http://www.gnu.org/licenses/>.
-""", re.MULTILINE)
-
-current_notice="""Copyright (c) 2005-2018, University of Oxford.
+current_notice="""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -126,13 +102,15 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+license_current_notice = 'BSD 3-Clause License.\n\n'+current_notice
 py_current_notice='"""'+current_notice+'"""\n'
 cpp_current_notice='/*\n\n'+current_notice+'\n*/'
-cpp_notice_to_add = cpp_current_notice + "\n\n"
 
-# This is used when replacing a deprecated notice with the latest version,
-# to account for the optional text.
-replacement_notice = current_notice.replace("\nThis file is part of Chaste.\n", r"\1")
+def AddHashesToBeginningOfLines(message):
+    message = '# ' + message.replace("\n", "\n# ")
+    return message[:-2]
+
+cmake_current_notice = AddHashesToBeginningOfLines(current_notice)
 
 output_notice=current_notice.replace("\nThis file is part of Chaste.\n", "")
 boost_random_distribution_notice = """
@@ -193,8 +171,6 @@ py_lgpl_notice = """# This library is free software; you can redistribute it and
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details."""
 
-
-
 def CheckForCopyrightNotice(findStrOrRe, fileIn):
     """Test if the (possibly multi-line) string/regexp findStr is contained anywhere in fileIn."""
     fileIn.seek(0)
@@ -249,6 +225,8 @@ def InspectFile(fileName):
     valid_notice = False
     if (CheckForCopyrightNotice(cpp_current_notice, file_in) or
         CheckForCopyrightNotice(py_current_notice, file_in) or
+        CheckForCopyrightNotice(cmake_current_notice, file_in) or
+        CheckForCopyrightNotice(license_current_notice, file_in) or
         CheckForCopyrightNotice(output_notice, file_in)):
         #print 'Found current notice in '+file_name
         valid_notice=True
@@ -270,19 +248,15 @@ def InspectFile(fileName):
     if valid_notice:
         return True
 
+    if fileName[-14:]=='CMakeLists.txt':
+        replacement = AddHashesToBeginningOfLines(current_notice)
+    else:
+        replacement = current_notice
+
     if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
-            ReplaceStringInFile(deprecated_notice, replacement_notice, fileName)
-            return True
-        else:
-            print 'Fix this by doing:',sys.argv[0],'-update'
-            return False
-
-    if CheckForCopyrightNotice(deprecated_notice_GPL, file_in):
-        print 'Found deprecated GPL copyright notice for', fileName
-        if apply_update:
-            ReplaceStringInFile(deprecated_notice_GPL, replacement_notice, fileName)
+            ReplaceStringInFile(deprecated_notice, replacement, fileName)
             return True
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
@@ -293,8 +267,12 @@ def InspectFile(fileName):
         if fileName[-3:] == '.py':
             print 'Not implemented for .py files'
             return False
+        elif fileName[-14:]=='CMakeLists.txt':
+            HeadAppendStringInFile(cmake_current_notice + "\n\n", fileName)
+        elif fileName[-7:]=='LICENSE':
+            HeadAppendStringInFile(license_current_notice , fileName)
         else:
-            HeadAppendStringInFile(cpp_notice_to_add, fileName)
+            HeadAppendStringInFile(cpp_current_notice + "\n\n", fileName)
         return True
     else:
         print 'Fix this by doing:',sys.argv[0],'-new'
@@ -309,7 +287,7 @@ if __name__ == '__main__':
     # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
-    named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
+    named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE', 'output.chaste', 'Version.cpp.in']
 
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
     startchar_ignores = ['_', '.']

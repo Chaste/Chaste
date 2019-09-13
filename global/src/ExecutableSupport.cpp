@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,12 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <hdf5.h>
 #include <parmetis.h>
 
-#include <boost/foreach.hpp>
-typedef std::pair<std::string, std::string> StringPair;
 
 #include "ChasteSerialization.hpp"
 #include "CommandLineArguments.hpp"
-#include "Exception.hpp"
 #include "PetscException.hpp"
 #include "PetscSetupUtils.hpp"
 #include "PetscTools.hpp"
@@ -379,21 +376,25 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<BuildTime>" << ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
     output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
     output << "\t\t<BuilderUnameInfo>" << ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
+
     output << "\t\t<Projects>\n";
-    // A bit ugly!  \todo Can neaten up with tuples in C++11
-    std::map<std::string, std::string> projects_modified = ChasteBuildInfo::rGetIfProjectsModified();
-    BOOST_FOREACH (const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())
     {
-        // LCOV_EXCL_START
-        // No projects are checked out for continuous builds normally!
-        output << "\t\t\t<Project>" << std::endl;
-        output << "\t\t\t\t<Name>" << r_project_version.first << "</Name>" << std::endl;
-        output << "\t\t\t\t<Version>" << r_project_version.second << "</Version>" << std::endl;
-        output << "\t\t\t\t<Modified>" << projects_modified[r_project_version.first] << "</Modified>" << std::endl;
-        output << "\t\t\t</Project>" << std::endl;
-        // LCOV_EXCL_STOP
+        const std::map<std::string, std::string>& r_projects_modified = ChasteBuildInfo::rGetIfProjectsModified();
+        const std::map<std::string, std::string>& r_projects_versions = ChasteBuildInfo::rGetProjectVersions();
+        for (const auto& r_project_version : r_projects_versions)
+        {
+            // LCOV_EXCL_START
+            // No projects are checked out for continuous builds normally!
+            output << "\t\t\t<Project>" << std::endl;
+            output << "\t\t\t\t<Name>" << r_project_version.first << "</Name>" << std::endl;
+            output << "\t\t\t\t<Version>" << r_project_version.second << "</Version>" << std::endl;
+            output << "\t\t\t\t<Modified>" << r_projects_modified.at(r_project_version.first) << "</Modified>" << std::endl;
+            output << "\t\t\t</Project>" << std::endl;
+            // LCOV_EXCL_STOP
+        }
     }
     output << "\t\t</Projects>\n";
+
     output << "\t</ProvenanceInfo>\n";
 
     output << "\t<Compiler>\n";

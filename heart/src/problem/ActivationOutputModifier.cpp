@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "HeartConfig.hpp"
 
-void ActivationOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory)
+void ActivationOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation)
 {
     mLocalSize = pVectorFactory->GetLocalOwnership();
     mFirstActivitationTimes.resize(mLocalSize, -1.0);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,15 +63,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The first thing to do is to include the headers.
  */
 #include <cxxtest/TestSuite.h>
-#include "CellProperties.hpp"
-#include "SteadyStateRunner.hpp"
 #include "AbstractCvodeCell.hpp"
-#include "RegularStimulus.hpp"
+#include "CellProperties.hpp"
 #include "EulerIvpOdeSolver.hpp"
+#include "RegularStimulus.hpp"
 #include "Shannon2004Cvode.hpp"
+#include "SteadyStateRunner.hpp"
 /* This test is always run sequentially (never in parallel)*/
 #include "FakePetscSetup.hpp"
-
 
 /* Now we define the test class, which must inherit from {{{CxxTest::TestSuite}}}
  * as usual, and the (public) test method
@@ -83,7 +82,7 @@ public:
     {
 /* CVODE is still an optional Chaste dependency, but it is highly recommended for
  * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled
- * (see InstallCvode and ChasteGuides/HostconfigSystem). */
+ * (see InstallCvode and ChasteGuides/CmakeBuildGuide). */
 #ifdef CHASTE_CVODE
         /*
          * == Defining a CVODE model ==
@@ -117,7 +116,6 @@ public:
          * Now you can modify certain parameters of the stimulus function, such as the period
          */
         p_regular_stim->SetPeriod(1000.0);
-
 
         /*
          * == Numerical Considerations ==
@@ -162,10 +160,15 @@ public:
          *
          * In this case, one other thing you can try is to change the absolute and relative
          * tolerances of the CVODE solver, the default being (1e-5,1e-7), although it isn't clear whether
-         * refining sometimes makes things worse, as CVODE goes to look for trouble in areas with steep gradients.
+         * refining sometimes makes things worse for models with singularities,
+         * as CVODE goes to look for trouble in areas with steep gradients.
          *
-         * {{{p_model->SetTolerances(1e-6,1e-8);}}}
-         *
+         * For this particular test, we are going to specify quite strict tolerances, so that the test gets the same results
+         * on different versions of CVODE and different compilers.
+         */
+        p_model->SetTolerances(1e-8, 1e-8);
+
+        /*
          * By default we use an analytic Jacobian for CVODE cells (where available - see [wiki:ChasteGuides/CodeGenerationFromCellML]
          * for instructions on how to provide one using Maple). In some cases (the Hund-Rudy model particularly being one) the
          * analytic Jacobian contains effectively divide-by-zero entries, even at resting potential. If you observe
@@ -209,7 +212,7 @@ public:
          * (this model needs more than 100 paces to reach steady state).
          *
          */
-        TS_ASSERT_EQUALS(result,false);
+        TS_ASSERT_EQUALS(result, false);
 
         /*
          * == Getting detail for paces of interest ==
@@ -242,7 +245,7 @@ public:
          *
          * Write the data out to a file.
          */
-        solution.WriteToFile("TestCvodeCells","Shannon2004Cvode","ms");
+        solution.WriteToFile("TestCvodeCells", "Shannon2004Cvode", "ms");
 
         /*
          * == Calculating APD and Upstroke Velocity ==
@@ -255,14 +258,20 @@ public:
 
         double apd = cell_props.GetLastActionPotentialDuration(90);
         double upstroke_velocity = cell_props.GetLastMaxUpstrokeVelocity();
+
+        std::cout << "APD = " << apd << "ms" << std::endl;
+        std::cout << "Upstroke velocity = " << upstroke_velocity << "mV/ms" << std::endl;
+
         /*
          * Here we just check that the values are equal to the ones we expect,
          * with appropriate precision to pass on different versions of CVODE.
+         *
+         * (These reference values were generated with tolerances of Abs=1e-12, Rel=1e-12.)
          */
-        TS_ASSERT_DELTA(apd, 212.41, 1e-2);
-        TS_ASSERT_DELTA(upstroke_velocity, 338, 1.25);
+        TS_ASSERT_DELTA(apd, 212.411, 1e-2);
+        TS_ASSERT_DELTA(upstroke_velocity, 338.704, 1.25);
 
-        /* CVODE is still an optional dependency for Chaste.
+        /* CVODE is still an optional dependency for Chaste, but is required for this tutorial.
          * If CVODE is not installed this tutorial will
          * not do anything, but we can at least alert the user to this.*/
 #else

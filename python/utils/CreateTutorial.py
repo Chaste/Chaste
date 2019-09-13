@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -206,11 +206,21 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     the contents as for test_file.
     """
     if revision:
-        revision = ' at revision [changeset:%s/git_repo]' % str(revision.strip())
+        revision = str(revision.strip())
+
+        if test_file_path.strip().startswith('projects/'):
+            assert revision.isdigit(), 'Expected svn-style integer revision'
+            revision = 'at revision r{}'.format(revision)
+        else:
+            assert len(revision) == 40,  'Expected 40-digit git commit hash'
+            revision = 'at revision [changeset:{}/git_repo]'.format(revision[0:12])  # abbreviate to consistent length
+
     output = []
+
     # Header
-    output.append('This tutorial is automatically generated from the file ' + test_file_path + revision + '.\n')
+    output.append('This tutorial is automatically generated from the file {} {}.\n'.format(test_file_path, revision))
     output.append('Note that the code is given in full at the bottom of the page.\n\n\n')
+
     # Convert each file in turn
     test_output, test_code = ConvertFileToWikiText(test_file, test_file_path)
     output.append(test_output)

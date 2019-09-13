@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,6 +46,9 @@ ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 if os.path.isdir('/home/bob/petsc-3.6.4'):
     petsc_ver = [3,6]
     petsc_path = '/home/bob/petsc-3.6.4'
+elif os.path.isdir('/home/bob/petsc-3.7.7'):
+    petsc_ver = [3,7]
+    petsc_path = '/home/bob/petsc-3.7.7'
 else:
     petsc_ver = [3,1]
     petsc_path = '/home/bob/petsc-3.1-p8/'
@@ -288,6 +291,10 @@ def Configure(prefs, build):
                 cvode_path = BASE+'cvode_2_8'
         elif prefs['cvode'] == '2.9':
             cvode_path = BASE+'cvode_2_9'
+        elif prefs['cvode'] == '3.1':
+            cvode_path = BASE+'cvode_3_1'
+        elif prefs['cvode'] == '4.1':
+            cvode_path = BASE+'cvode_4_1'
         else:
             raise ValueError('Unsupported CVODE version "%s" requested' % prefs['cvode'])
         cvode_inc = os.path.join(cvode_path, 'include')
@@ -304,11 +311,14 @@ def Configure(prefs, build):
         # Pick version 1) if the user has asked for a version, 2) if there is a system 6.2 version on the machine, 3) fall back to system version 5
         default_vtk_version = '5'                             # (3) Fall back to version 5.x (Ubuntu 14.04)
         vtk_62_include_path = '/usr/include/vtk-6.2'
+        vtk_63_include_path = '/usr/include/vtk-6.3'
         if (os.path.isdir(vtk_62_include_path)):
             default_vtk_version = '6.2'                       # (2) System-wide 6.2 (Ubuntu 16.04) 
         vtk_71_include_path = '/usr/include/vtk-7.1'
         if (os.path.isdir(vtk_71_include_path)):
             default_vtk_version = '7.1'                       # Ubuntu 18,04
+        if (os.path.isdir(vtk_63_include_path)):              # (2) System-wide 6.3 (Ubuntu 18.04 - optional dependency)
+            default_vtk_version = '6.3'
         prefs['vtk'] = prefs.get('vtk', default_vtk_version)  # (1) User's choice
         # Assume that the system wide version of VTK is 6.2 (on 16.04) and use this in preference
         if prefs['vtk'] == '7.1':

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ public:
     /**
      * Static method for getting the test output directory (the directory where
      * chaste stores test output).  This is set from the environment variable
-     * CHASTE_TEST_OUTPUT, and defaults to "./testoutput" if it is not set.
+     * CHASTE_TEST_OUTPUT, and defaults to "/tmp/$USER/testoutput" if it is not set.
      *
      * Attempts to return an absolute path, but may get confused by odd setups.
      *

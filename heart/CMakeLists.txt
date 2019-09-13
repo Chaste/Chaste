@@ -1,14 +1,36 @@
-find_package(Chaste COMPONENTS ${Chaste_DEPENDS_heart})
+# Copyright (c) 2005-2019, University of Oxford.
+# All rights reserved.
+# 
+# University of Oxford means the Chancellor, Masters and Scholars of the
+# University of Oxford, having an administrative office at Wellington
+# Square, Oxford OX1 2JD, UK.
+# 
+# This file is part of Chaste.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#  * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * Neither the name of the University of Oxford nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+# OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# XSD < 4.0.0 generates code with std::auto_ptr.  This is deprecated from C++11 (in favour of new standard smart
-# pointers). This code turns off the deprecation warnings so that Chaste compiles.
-# TODO: Once we drop Chaste support for XSD 3.3, this should be removed in favour of changing auto_ptr to unique_ptr
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-    set(DEPRECATION_FLAG "-wr1478")
-else()
-    set(DEPRECATION_FLAG "-Wno-deprecated-declarations")
-endif()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEPRECATION_FLAG}")
+
+find_package(Chaste COMPONENTS ${Chaste_DEPENDS_heart})
 
 set(Chaste_heart_SOURCES "")
 
@@ -42,8 +64,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 foreach(dyn_source ${dyn_sources})
     get_filename_component(dyn_source_name ${dyn_source} NAME_WE)
     add_library(${dyn_source_name} SHARED ${dyn_source})
-    set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 11)
+    set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 14)
     set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${dyn_source_name} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,-undefined,dynamic_lookup")
         #set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,-undefined,dynamic_lookup")

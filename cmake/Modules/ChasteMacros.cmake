@@ -413,19 +413,6 @@ endmacro(Chaste_DO_COMPONENT)
 macro(Chaste_DO_PROJECT projectName)
     if (Chaste_ENABLE_project_${projectName})
         message("Configuring project ${projectName}")
-
-        # If project depends on heart, turn off XSD-related warnings about std::auto_ptr
-        # TODO: remove this once we no longer support the oldest XSD version. #2811 #2934
-        list (FIND chaste_project_${projectName}_LIB_DEPENDS "chaste_heart" _index)
-        if (${_index} GREATER -1)
-            if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-                set(DEPRECATION_FLAG "-wr1478")
-            else()
-                set(DEPRECATION_FLAG "-Wno-deprecated-declarations")
-            endif()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEPRECATION_FLAG}")
-        endif()
-
         Chaste_DO_COMMON(project_${projectName})
     endif()
 endmacro(Chaste_DO_PROJECT)
@@ -617,7 +604,7 @@ macro(Chaste_DO_TEST_COMMON component)
                     if(filename MATCHES "Test(.*)Tutorial.(hpp|py)")
                         # Get the git revision of last time this file was changed
                         if(DEFINED GIT_EXECUTABLE AND EXISTS "${Chaste_SOURCE_DIR}/.git")
-                            execute_process(COMMAND git log -1 --format=%h --follow ${filename}
+                            execute_process(COMMAND git log -1 --format=%H --follow ${filename}
                                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                                     OUTPUT_VARIABLE Chaste_revision
                                     OUTPUT_STRIP_TRAILING_WHITESPACE)

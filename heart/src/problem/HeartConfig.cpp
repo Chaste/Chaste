@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -473,13 +473,13 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
     }
 
     // Get the parameters using the method 'ChasteParameters(rFileName)',
-    // which returns a std::auto_ptr. We convert to a shared_ptr for easier semantics.
+    // which returns a std::unique_ptr. We convert to a shared_ptr for easier semantics.
     try
     {
         // Make sure Xerces finalization happens
         XmlTools::Finalizer finalizer(false);
         // Parse XML to DOM
-        xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> p_doc = XmlTools::ReadXmlFile(rFileName, props);
+        auto p_doc = XmlTools::ReadXmlFile(rFileName, props);
         // Test the namespace on the root element
         xercesc::DOMElement* p_root_elt = p_doc->getDocumentElement();
         std::string namespace_uri(X2C(p_root_elt->getNamespaceURI()));

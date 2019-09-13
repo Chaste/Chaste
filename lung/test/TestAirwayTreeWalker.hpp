@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,17 +39,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <queue>
 
+#include "AirwayTreeWalker.hpp"
 #include "TetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "AirwayTreeWalker.hpp"
 
 class TestAirwayTreeWalker : public CxxTest::TestSuite
 {
 public:
     void TestGetMethods()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayTreeWalker walker(mesh, 0u);
@@ -65,7 +65,7 @@ public:
         TS_ASSERT(walker.GetParentElement(mesh.GetElement(0u)) == NULL);
         TS_ASSERT(walker.GetParentElement(0u) == NULL);
 
-        std::vector<Element<1,3>* > child_eles = walker.GetChildElements(mesh.GetElement(1u));
+        std::vector<Element<1, 3>*> child_eles = walker.GetChildElements(mesh.GetElement(1u));
         TS_ASSERT_EQUALS(child_eles.size(), 2u);
         TS_ASSERT_EQUALS(child_eles[0], mesh.GetElement(2u));
         TS_ASSERT_EQUALS(child_eles[1], mesh.GetElement(6u));
@@ -85,8 +85,8 @@ public:
 
     void TestGenerations()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayTreeWalker walker(mesh, 0u);
@@ -106,13 +106,13 @@ public:
 
     void TestOrders()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayTreeWalker walker(mesh, 0u);
 
-        //mesh is symmetric, so Horsfield and Strahler orders are equivalent
+        // mesh is symmetric, so Horsfield and Strahler orders are equivalent
         TS_ASSERT_EQUALS(walker.GetElementHorsfieldOrder(0u), 3u);
         TS_ASSERT_EQUALS(walker.GetElementHorsfieldOrder(1u), 3u);
         TS_ASSERT_EQUALS(walker.GetElementHorsfieldOrder(6u), 2u);

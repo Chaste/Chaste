@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -100,6 +100,8 @@ def get_mac_name_from_darwin_version(version_str):
         return 'macOS Sierra'
     elif version_str.startswith('10.13.'):
         return 'macOS High Sierra'
+    elif version_str.startswith('10.14.'):
+        return 'macOS Mojave'
     else:
         return 'Unknown Mac Version'
 

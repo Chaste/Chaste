@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,26 +40,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring> // For strcpy
 
-#include "Hdf5DataWriter.hpp"
+#include "ChasteSyscalls.hpp"
+#include "DistributedVectorFactory.hpp"
 #include "Hdf5DataReader.hpp"
-#include "PetscSetupAndFinalize.hpp"
+#include "Hdf5DataWriter.hpp"
+#include "MathsCustomFunctions.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
-#include "DistributedVectorFactory.hpp"
-#include "ChasteSyscalls.hpp"
-#include "MathsCustomFunctions.hpp"
 #include "Warnings.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 #include "CompareHdf5ResultsFiles.hpp"
 
 class TestHdf5DataWriter : public CxxTest::TestSuite
 {
 private:
-
     Hdf5DataWriter* mpTestWriter;
 
 public:
-
     void TestSimpleParallelWriteDirectlyWithHdf5()
     {
         // File to write
@@ -80,11 +78,11 @@ public:
         const unsigned X = 2;
         const unsigned Y = 5;
         int data[X][Y];
-        for (unsigned i=0; i<X; i++)
+        for (unsigned i = 0; i < X; i++)
         {
-            for (unsigned j=0; j<Y; j++)
+            for (unsigned j = 0; j < Y; j++)
             {
-                data[i][j] = 100*PetscTools::GetMyRank() + 10*i + j;
+                data[i][j] = 100 * PetscTools::GetMyRank() + 10 * i + j;
             }
         }
 
@@ -102,11 +100,11 @@ public:
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
-        hsize_t count[DIMS] = {X, Y};
+        hsize_t count[DIMS] = { X, Y };
         hid_t memspace = H5Screate_simple(DIMS, count, NULL);
 
         // Select hyperslab in the file.
-        hsize_t offset[DIMS] = {PetscTools::GetMyRank()*X, 0};
+        hsize_t offset[DIMS] = { PetscTools::GetMyRank() * X, 0 };
         filespace = H5Dget_space(dset_id);
         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
 
@@ -118,7 +116,7 @@ public:
         TS_ASSERT_EQUALS(status, 0);
 
         // Create dataspace for the name, unit attribute
-        hsize_t columns[2] = {Y, 21};
+        hsize_t columns[2] = { Y, 21 };
         hid_t colspace = H5Screate_simple(1, columns, NULL);
 
         // Create attribute
@@ -132,7 +130,7 @@ public:
         // Create the type 'char'
         hid_t char_type = H5Tcopy(H5T_C_S1);
         // H5Tset_strpad(char_type, H5T_STR_NULLPAD);
-        H5Tset_size(char_type, 21 );
+        H5Tset_size(char_type, 21);
         hid_t attr = H5Acreate(dset_id, "Name", char_type, colspace,
                                H5P_DEFAULT, H5P_DEFAULT);
 
@@ -151,7 +149,7 @@ public:
         H5Fclose(file_id);
     }
 
-    static const unsigned data_size=17;
+    static const unsigned data_size = 17;
     void TestPetscWriteDirectlyWithHdf5()
     {
         // Initialise a PETSc vector
@@ -160,10 +158,10 @@ public:
         VecGetArray(a_vec, &p_a_vec);
         int lo, hi;
         VecGetOwnershipRange(a_vec, &lo, &hi);
-        for (int global_index=lo; global_index<hi; global_index++)
+        for (int global_index = lo; global_index < hi; global_index++)
         {
             unsigned local_index = global_index - lo;
-            p_a_vec[local_index] = global_index + 100*PetscTools::GetMyRank();
+            p_a_vec[local_index] = global_index + 100 * PetscTools::GetMyRank();
         }
         VecRestoreArray(a_vec, &p_a_vec);
         VecAssemblyBegin(a_vec);
@@ -188,7 +186,7 @@ public:
 
         // Create the dataspace for the dataset.
         //TS_ASSERT_EQUALS(data_size, hi-lo);
-        hsize_t dimsf[DIMS]={data_size}; // dataset dimensions
+        hsize_t dimsf[DIMS] = { data_size }; // dataset dimensions
 
         hid_t filespace = H5Screate_simple(DIMS, dimsf, NULL);
 
@@ -198,11 +196,11 @@ public:
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
-        hsize_t count[DIMS] = {(unsigned)(hi-lo)};
+        hsize_t count[DIMS] = { (unsigned)(hi - lo) };
         hid_t memspace = H5Screate_simple(DIMS, count, NULL);
 
         // Select hyperslab in the file.
-        hsize_t offset[DIMS] = {(unsigned)(lo)};
+        hsize_t offset[DIMS] = { (unsigned)(lo) };
         filespace = H5Dget_space(dset_id);
         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
 
@@ -239,16 +237,16 @@ public:
         hsize_t dataset_id = H5Dopen(file_id, "TheVector", H5P_DEFAULT);
         hsize_t dxpl = H5Pcreate(H5P_DATASET_XFER);
         hsize_t edc = H5Pget_edc_check(dxpl);
-        TS_ASSERT_EQUALS(edc, (hsize_t) 1) //Checksum is enabled
+        TS_ASSERT_EQUALS(edc, (hsize_t)1) //Checksum is enabled
 
         herr_t status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxpl, data);
 
         TS_ASSERT_EQUALS(status, 0);
 
         // Check the index
-        for (unsigned i=0; i<data_size; i++)
+        for (unsigned i = 0; i < data_size; i++)
         {
-            TS_ASSERT_EQUALS(((unsigned)data[i]%100), i);
+            TS_ASSERT_EQUALS(((unsigned)data[i] % 100), i);
         }
 
         // Check the final component
@@ -256,7 +254,7 @@ public:
         MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
 
         // The last component was owned by processor "num_procs-1"
-        TS_ASSERT_EQUALS(((int)data[data_size-1]/100), num_procs-1);
+        TS_ASSERT_EQUALS(((int)data[data_size - 1] / 100), num_procs - 1);
 
         H5Pclose(dxpl);
         H5Dclose(dataset_id);
@@ -276,9 +274,9 @@ public:
 
         writer.DefineFixedDimension(number_nodes);
 
-        int node_id = writer.DefineVariable("Node","dimensionless");
-        int ik_id = writer.DefineVariable("I_K","milliamperes");
-        int ina_id = writer.DefineVariable("I_Na","milliamperes");
+        int node_id = writer.DefineVariable("Node", "dimensionless");
+        int ik_id = writer.DefineVariable("I_K", "milliamperes");
+        int ina_id = writer.DefineVariable("I_Na", "milliamperes");
 
         writer.EndDefineMode();
 
@@ -290,11 +288,11 @@ public:
 
         // Write some values
         for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-             index!= distributed_vector_1.End();
+             index != distributed_vector_1.End();
              ++index)
         {
-            distributed_vector_1[index] =  index.Global;
-            distributed_vector_2[index] =  1000 + index.Global;
+            distributed_vector_1[index] = index.Global;
+            distributed_vector_2[index] = 1000 + index.Global;
         }
         distributed_vector_1.Restore();
         distributed_vector_2.Restore();
@@ -307,16 +305,16 @@ public:
         writer.Close();
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_multi_column", true,
-            "io/test/data", "hdf5_test_multi_column", false));
+                                                "io/test/data", "hdf5_test_multi_column", false));
 
         // We make sure that the comparison returns the same result with the weaker method
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("TestHdf5DataWriter", "hdf5_test_multi_column", true,
-            "io/test/data", "hdf5_test_multi_column", false));
+                                                          "io/test/data", "hdf5_test_multi_column", false));
 
         std::cout << "The next comparison should fail...\n";
         // We make that the comparison fails as the files are different
         TS_ASSERT(!CompareFilesViaHdf5DataReaderGlobalNorm("TestHdf5DataWriter", "hdf5_test_multi_column", true,
-            "io/test/data", "hdf5_test_full_format_extended", false));
+                                                           "io/test/data", "hdf5_test_full_format_extended", false));
 
         PetscTools::Destroy(petsc_data_1);
         PetscTools::Destroy(petsc_data_2);
@@ -337,7 +335,7 @@ public:
                               true); // cache
         writer.DefineFixedDimension(number_nodes);
 
-        int node_id = writer.DefineVariable("Node","dimensionless");
+        int node_id = writer.DefineVariable("Node", "dimensionless");
 
         writer.EndDefineMode();
 
@@ -345,10 +343,10 @@ public:
         DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
         for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-             index!= distributed_vector_1.End();
+             index != distributed_vector_1.End();
              ++index)
         {
-            distributed_vector_1[index] =  index.Global;
+            distributed_vector_1[index] = index.Global;
         }
         distributed_vector_1.Restore();
 
@@ -374,8 +372,8 @@ public:
         writer.DefineFixedDimension(number_nodes);
 
         // Define TWO variables
-        int node_id = writer.DefineVariable("Node","dimensionless");
-        writer.DefineVariable("I_K","milliamperes");
+        int node_id = writer.DefineVariable("Node", "dimensionless");
+        writer.DefineVariable("I_K", "milliamperes");
 
         writer.EndDefineMode();
 
@@ -383,10 +381,10 @@ public:
         DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
         for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-             index!= distributed_vector_1.End();
+             index != distributed_vector_1.End();
              ++index)
         {
-            distributed_vector_1[index] =  index.Global;
+            distributed_vector_1[index] = index.Global;
         }
         distributed_vector_1.Restore();
 
@@ -415,7 +413,7 @@ public:
                                   true); // cache
             writer.DefineFixedDimension(number_nodes);
 
-            int node_id = writer.DefineVariable("Node","dimensionless");
+            int node_id = writer.DefineVariable("Node", "dimensionless");
             writer.DefineUnlimitedDimension("Time", "msec");
             writer.EndDefineMode();
 
@@ -423,10 +421,10 @@ public:
             DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
             for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
+                 index != distributed_vector_1.End();
                  ++index)
             {
-                distributed_vector_1[index] =  index.Global;
+                distributed_vector_1[index] = index.Global;
             }
             distributed_vector_1.Restore();
             writer.PutVector(node_id, petsc_data_1);
@@ -450,8 +448,8 @@ public:
                                   true); // cache
 
             // Check chunk info was read correctly
-            hsize_t expected_chunk_size[3] = {1, 100, 1};
-            for ( int i=0; i<3; ++i )
+            hsize_t expected_chunk_size[3] = { 1, 100, 1 };
+            for (int i = 0; i < 3; ++i)
             {
                 TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
             }
@@ -465,10 +463,10 @@ public:
             DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
             for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
+                 index != distributed_vector_1.End();
                  ++index)
             {
-                distributed_vector_1[index] =  number_nodes*2 + index.Global;
+                distributed_vector_1[index] = number_nodes * 2 + index.Global;
             }
             distributed_vector_1.Restore();
             writer.PutVector(node_id, petsc_data_1);
@@ -502,21 +500,21 @@ public:
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_non_even_row_dist", false);
         writer.DefineFixedDimension(number_nodes);
 
-        int node_id = writer.DefineVariable("Node","dimensionless");
-        int ik_id = writer.DefineVariable("I_K","milliamperes");
-        int ina_id = writer.DefineVariable("I_Na","milliamperes");
+        int node_id = writer.DefineVariable("Node", "dimensionless");
+        int ik_id = writer.DefineVariable("I_K", "milliamperes");
+        int ina_id = writer.DefineVariable("I_Na", "milliamperes");
 
         writer.EndDefineMode();
 
-        Vec petsc_data_1=factory.CreateVec();
+        Vec petsc_data_1 = factory.CreateVec();
         DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-        Vec petsc_data_2=factory.CreateVec();
+        Vec petsc_data_2 = factory.CreateVec();
         DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
 
         // Write some values
         for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-             index!= distributed_vector_1.End();
+             index != distributed_vector_1.End();
              ++index)
         {
             distributed_vector_1[index] = index.Global;
@@ -547,16 +545,16 @@ public:
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_full_format_incomplete", false);
 
-        int node_id = writer.DefineVariable("Node","dimensionless");
-        int ik_id = writer.DefineVariable("I_K","milliamperes");
-        int ina_id = writer.DefineVariable("I_Na","milliamperes");
+        int node_id = writer.DefineVariable("Node", "dimensionless");
+        int ik_id = writer.DefineVariable("I_K", "milliamperes");
+        int ina_id = writer.DefineVariable("I_Na", "milliamperes");
         writer.DefineUnlimitedDimension("Time", "msec");
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(60);
-        writer.DefineFixedDimension(node_numbers, number_nodes);
+        writer.DefineFixedDimension(node_numbers, node_numbers, number_nodes);
 
         writer.EndDefineMode();
 
@@ -569,16 +567,16 @@ public:
         Vec petsc_data_3 = factory.CreateVec();
         DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_3);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Write some values
             for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
+                 index != distributed_vector_1.End();
                  ++index)
             {
-                distributed_vector_1[index] =  index.Global;
-                distributed_vector_2[index] =  time_step*1000 + 100 + index.Global;
-                distributed_vector_3[index] =  time_step*1000 + 200 + index.Global;
+                distributed_vector_1[index] = index.Global;
+                distributed_vector_2[index] = time_step * 1000 + 100 + index.Global;
+                distributed_vector_3[index] = time_step * 1000 + 200 + index.Global;
             }
             distributed_vector_1.Restore();
             distributed_vector_2.Restore();
@@ -621,28 +619,28 @@ public:
                               "Data",
                               true); // cache
 
-        int node_id = writer.DefineVariable("Node","dimensionless");
+        int node_id = writer.DefineVariable("Node", "dimensionless");
         writer.DefineUnlimitedDimension("Time", "msec");
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(48);
-        writer.DefineFixedDimension(node_numbers, number_nodes);
+        writer.DefineFixedDimension(node_numbers, node_numbers, number_nodes);
 
         writer.EndDefineMode();
 
         Vec petsc_data_1 = factory.CreateVec();
         DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Write some values
             for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
+                 index != distributed_vector_1.End();
                  ++index)
             {
-                distributed_vector_1[index] =  index.Global;
+                distributed_vector_1[index] = index.Global;
             }
             distributed_vector_1.Restore();
 
@@ -686,16 +684,16 @@ public:
         Vec petsc_data_3 = factory.CreateVec();
         DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_3);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Write some values
             for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
+                 index != distributed_vector_1.End();
                  ++index)
             {
                 distributed_vector_1[index] = index.Global;
-                distributed_vector_2[index] = time_step*1000 + 100 + index.Global;
-                distributed_vector_3[index] = time_step*1000 + 200 + index.Global;
+                distributed_vector_2[index] = time_step * 1000 + 100 + index.Global;
+                distributed_vector_3[index] = time_step * 1000 + 200 + index.Global;
             }
             distributed_vector_1.Restore();
             distributed_vector_2.Restore();
@@ -712,7 +710,7 @@ public:
         writer.Close();
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
-                                                 "io/test/data", "hdf5_test_full_format", false));
+                                                "io/test/data", "hdf5_test_full_format", false));
 
         PetscTools::Destroy(petsc_data_1);
         PetscTools::Destroy(petsc_data_2);
@@ -749,7 +747,7 @@ public:
         DistributedVector distributed_node_number = vec_factory.CreateDistributedVector(node_number);
 
         for (DistributedVector::Iterator index = distributed_vector_short.Begin();
-             index!= distributed_vector_short.End();
+             index != distributed_vector_short.End();
              ++index)
         {
             distributed_node_number[index] = index.Global;
@@ -761,16 +759,16 @@ public:
         Vec petsc_data_long = factory.CreateVec(2);
         DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
-        DistributedVector::Stripe phi_e_stripe(distributed_vector_long,1 );
+        DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-                 index!= distributed_vector_long.End();
+                 index != distributed_vector_long.End();
                  ++index)
             {
-                vm_stripe[index] =  time_step*1000 + index.Global*2;
-                phi_e_stripe[index] =  time_step*1000 + index.Global*2+1;
+                vm_stripe[index] = time_step * 1000 + index.Global * 2;
+                phi_e_stripe[index] = time_step * 1000 + index.Global * 2 + 1;
             }
             distributed_vector_long.Restore();
 
@@ -823,8 +821,8 @@ public:
         writer.EndDefineMode();
 
         // Check chunk info was read correctly
-        hsize_t expected_chunk_size[3] = {3, 10, 2};
-        for ( int i=0; i<3; ++i )
+        hsize_t expected_chunk_size[3] = { 3, 10, 2 };
+        for (int i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
         }
@@ -839,14 +837,14 @@ public:
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
         DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-                 index!= distributed_vector_long.End();
+                 index != distributed_vector_long.End();
                  ++index)
             {
-                vm_stripe[index] =  time_step*1000 + index.Global*2;
-                phi_e_stripe[index] =  time_step*1000 + index.Global*2+1;
+                vm_stripe[index] = time_step * 1000 + index.Global * 2;
+                phi_e_stripe[index] = time_step * 1000 + index.Global * 2 + 1;
             }
             distributed_vector_long.Restore();
 
@@ -856,7 +854,7 @@ public:
 
             // Check that the cache is emptied on whole chunks. Size of cache
             // should go 0, 200, 400, 0, ... when run with one process.
-            unsigned expected_cache_size = ((time_step+1) % 3) * writer.mNumberOwned * 2;
+            unsigned expected_cache_size = ((time_step + 1) % 3) * writer.mNumberOwned * 2;
             TS_ASSERT_EQUALS(writer.mDataCache.size(), expected_cache_size);
         }
 
@@ -900,11 +898,11 @@ public:
         DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
 
         for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-             index!= distributed_vector_long.End();
+             index != distributed_vector_long.End();
              ++index)
         {
-            vm_stripe[index] =  1000 + index.Global*2;
-            phi_e_stripe[index] =  1000 + index.Global*2+1;
+            vm_stripe[index] = 1000 + index.Global * 2;
+            phi_e_stripe[index] = 1000 + index.Global * 2 + 1;
         }
         distributed_vector_long.Restore();
 
@@ -940,17 +938,17 @@ public:
         Vec petsc_data = factory.CreateVec(3);
         DistributedVector distributed_vector = factory.CreateDistributedVector(petsc_data);
         DistributedVector::Stripe vm_stripe(distributed_vector, 0);
-        DistributedVector::Stripe phi_e_stripe(distributed_vector,1);
-        DistributedVector::Stripe ina_stripe(distributed_vector,2);
+        DistributedVector::Stripe phi_e_stripe(distributed_vector, 1);
+        DistributedVector::Stripe ina_stripe(distributed_vector, 2);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             for (DistributedVector::Iterator index = distributed_vector.Begin();
-                 index!= distributed_vector.End();
+                 index != distributed_vector.End();
                  ++index)
             {
-                vm_stripe[index] =  time_step*1000 + index.Global*2;
-                phi_e_stripe[index] =  time_step*1000 + index.Global*2+1;
+                vm_stripe[index] = time_step * 1000 + index.Global * 2;
+                phi_e_stripe[index] = time_step * 1000 + index.Global * 2 + 1;
                 ina_stripe[index] = -56.0;
             }
             distributed_vector.Restore();
@@ -986,10 +984,10 @@ public:
         node_numbers.push_back(16);
         node_numbers.push_back(23);
         node_numbers.push_back(42);
-        writer.DefineFixedDimension(node_numbers, number_nodes);
+        writer.DefineFixedDimension(node_numbers, node_numbers, number_nodes);
 
-        int vm_id = writer.DefineVariable("V_m","millivolts");
-        int phi_e_id = writer.DefineVariable("Phi_e","millivolts");
+        int vm_id = writer.DefineVariable("V_m", "millivolts");
+        int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
 
         std::vector<int> variable_IDs;
         variable_IDs.push_back(vm_id);
@@ -1005,14 +1003,14 @@ public:
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
         DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
 
-        for (unsigned time_step=0; time_step<2; time_step++)
+        for (unsigned time_step = 0; time_step < 2; time_step++)
         {
             for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-                 index!= distributed_vector_long.End();
+                 index != distributed_vector_long.End();
                  ++index)
             {
-                vm_stripe[index] = (time_step+1)*1000 + index.Global;
-                phi_e_stripe[index] =  index.Global;
+                vm_stripe[index] = (time_step + 1) * 1000 + index.Global;
+                phi_e_stripe[index] = index.Global;
             }
             distributed_vector_long.Restore();
 
@@ -1028,9 +1026,9 @@ public:
         PetscTools::Destroy(petsc_data_long);
 
         // Now cover two exceptions: one is the unsupported PutStripedVector for incomplete data and 3 vars...
-        int first = writer.DefineVariable("first","millivolts");
-        int second = writer.DefineVariable("second","millivolts");
-        int third = writer.DefineVariable("third","milliAmps");
+        int first = writer.DefineVariable("first", "millivolts");
+        int second = writer.DefineVariable("second", "millivolts");
+        int third = writer.DefineVariable("third", "milliAmps");
 
         std::vector<int> three_variable_IDs;
         three_variable_IDs.push_back(first);
@@ -1045,13 +1043,13 @@ public:
         writer.Close();
 
         // ...and one is the case when we pass in a short vector to the PutStripedVector method
-        int single_var = writer.DefineVariable("only","one");
+        int single_var = writer.DefineVariable("only", "one");
         std::vector<int> one_ID;
         one_ID.push_back(single_var);
         writer.EndDefineMode();
         Vec petsc_data_1var = factory.CreateVec(1);
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(one_ID, petsc_data_1var),
-                                "The PutStripedVector method requires at least two variables ID. If only one is needed, use PutVector method instead");
+                              "The PutStripedVector method requires at least two variables ID. If only one is needed, use PutVector method instead");
         PetscTools::Destroy(petsc_data_1var);
     }
 
@@ -1077,9 +1075,9 @@ public:
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_non_implemented", false);
         writer.DefineFixedDimension(number_nodes);
 
-        int vm_id = writer.DefineVariable("V_m","millivolts");
-        int ina_id = writer.DefineVariable("I_Na","milliamperes");
-        int phi_e_id = writer.DefineVariable("Phi_e","millivolts");
+        int vm_id = writer.DefineVariable("V_m", "millivolts");
+        int ina_id = writer.DefineVariable("I_Na", "milliamperes");
+        int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
 
         std::vector<int> unoredred_variable_IDs;
         unoredred_variable_IDs.push_back(vm_id);
@@ -1095,19 +1093,19 @@ public:
         DistributedVector distributed_vector_short = factory.CreateDistributedVector(petsc_data_short);
 
         for (DistributedVector::Iterator index = distributed_vector_short.Begin();
-             index!= distributed_vector_short.End();
+             index != distributed_vector_short.End();
              ++index)
         {
             distributed_vector_short[index] = -0.5;
         }
         distributed_vector_short.Restore();
 
-        DistributedVectorFactory factory2(2*number_nodes);
+        DistributedVectorFactory factory2(2 * number_nodes);
         Vec petsc_data_long = factory2.CreateVec();
         DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
         for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-             index!= distributed_vector_long.End();
+             index != distributed_vector_long.End();
              ++index)
         {
             vm_stripe[index] = index.Global;
@@ -1117,12 +1115,12 @@ public:
         writer.PutVector(ina_id, petsc_data_short);
         //Try to write striped data in the wrong columns
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(unoredred_variable_IDs, petsc_data_long),
-                "Columns should be consecutive. Try reordering them.");
+                              "Columns should be consecutive. Try reordering them.");
         //Try to write data of wrong size
         TS_ASSERT_THROWS_THIS(writer.PutVector(ina_id, petsc_data_long),
-                "Vector size doesn\'t match fixed dimension");
+                              "Vector size doesn\'t match fixed dimension");
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(ordered_variable_IDs, petsc_data_short),
-                "Vector size doesn\'t match fixed dimension");
+                              "Vector size doesn\'t match fixed dimension");
 
         writer.Close();
 
@@ -1141,14 +1139,14 @@ public:
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new Hdf5DataWriter(vec_factory, "", "test"));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineUnlimitedDimension("Time", "msecs"));
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineUnlimitedDimension("Time", "msecs"),
-                "Unlimited dimension already set. Cannot be defined twice");
+                              "Unlimited dimension already set. Cannot be defined twice");
 
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineUnlimitedDimension("Time", "m secs"),
-                "Unlimited dimension already set. Cannot be defined twice");
+                              "Unlimited dimension already set. Cannot be defined twice");
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineUnlimitedDimension("T,i,m,e", "msecs"),
-                "Unlimited dimension already set. Cannot be defined twice");
+                              "Unlimited dimension already set. Cannot be defined twice");
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineUnlimitedDimension("", "msecs"),
-                "Unlimited dimension already set. Cannot be defined twice");
+                              "Unlimited dimension already set. Cannot be defined twice");
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
@@ -1156,17 +1154,15 @@ public:
         node_numbers.push_back(6);
 
         // Data not increasing
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100),"Input should be monotonic increasing");
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimensionUsingMatrix(node_numbers, 100),"Input should be monotonic increasing");
-        node_numbers[2]=100;
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100), "Input should be monotonic increasing");
+        node_numbers[2] = 100;
         // Data is increasing but the last number is too large
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100),"Vector size doesn\'t match nodes to output");
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimensionUsingMatrix(node_numbers, 100),"Vector size doesn\'t match nodes to output");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100), "Vector size doesn\'t match nodes to output");
 
         mpTestWriter->DefineFixedDimension(5000);
         // Can't set fixed dimension more than once
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(5000),"Fixed dimension already set");
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100),"Vector size doesn\'t match nodes to output");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(5000), "Fixed dimension already set");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100), "Vector size doesn\'t match nodes to output");
 
         int ina_var_id = INT_UNSET;
         int ik_var_id = INT_UNSET;
@@ -1174,22 +1170,22 @@ public:
 
         TS_ASSERT_THROWS_NOTHING(ina_var_id = mpTestWriter->DefineVariable("I_Na", "milliamperes"));
         TS_ASSERT_THROWS_NOTHING(ik_var_id = mpTestWriter->DefineVariable("I_K", "milliamperes"));
-        TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineVariable("Dummy",""));
+        TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineVariable("Dummy", ""));
 
         // Defined twice
         TS_ASSERT_THROWS_THIS(ik2_var_id = mpTestWriter->DefineVariable("I_K", "milliamperes"),
-                "Variable name already exists");
+                              "Variable name already exists");
         TS_ASSERT_EQUALS(ik2_var_id, INT_UNSET);
 
         // Bad variable names/units
         TS_ASSERT_THROWS_THIS(ik_var_id = mpTestWriter->DefineVariable("I_K", "milli amperes"),
-                "Variable name/units \'milli amperes\' not allowed: may only contain alphanumeric characters or \'_\'.");
+                              "Variable name/units \'milli amperes\' not allowed: may only contain alphanumeric characters or \'_\'.");
         TS_ASSERT_THROWS_THIS(ik_var_id = mpTestWriter->DefineVariable("I   K", "milliamperes"),
-                "Variable name/units \'I   K\' not allowed: may only contain alphanumeric characters or \'_\'.");
+                              "Variable name/units \'I   K\' not allowed: may only contain alphanumeric characters or \'_\'.");
         TS_ASSERT_THROWS_THIS(ik_var_id = mpTestWriter->DefineVariable("I.K", "milliamperes"),
-                "Variable name/units \'I.K\' not allowed: may only contain alphanumeric characters or \'_\'.");
+                              "Variable name/units \'I.K\' not allowed: may only contain alphanumeric characters or \'_\'.");
         TS_ASSERT_THROWS_THIS(ik_var_id = mpTestWriter->DefineVariable("", "milliamperes"),
-                "Variable name not allowed: may not be blank.");
+                              "Variable name not allowed: may not be blank.");
 
         TS_ASSERT_EQUALS(ina_var_id, 0);
         TS_ASSERT_EQUALS(ik_var_id, 1);
@@ -1205,14 +1201,14 @@ public:
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new Hdf5DataWriter(vec_factory, "", "testdefine"));
 
         // Ending define mode without having defined at least a variable and a fixed dimension should raise an exception
-        TS_ASSERT_THROWS_THIS(mpTestWriter->EndDefineMode(),"Cannot end define mode. No variables have been defined.");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->EndDefineMode(), "Cannot end define mode. No variables have been defined.");
 
         int ina_var_id = 0;
         int ik_var_id = 0;
 
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineUnlimitedDimension("Time", "msecs"));
         TS_ASSERT_THROWS_THIS(mpTestWriter->EndDefineMode(),
-                "Cannot end define mode. No variables have been defined.");
+                              "Cannot end define mode. No variables have been defined.");
 
         TS_ASSERT_THROWS_NOTHING(ina_var_id = mpTestWriter->DefineVariable("I_Na", "milliamperes"));
         TS_ASSERT_THROWS_NOTHING(ik_var_id = mpTestWriter->DefineVariable("I_K", "milliamperes"));
@@ -1221,31 +1217,31 @@ public:
 
         // In Hdf5 a fixed dimension should be defined always
         TS_ASSERT_THROWS_THIS(mpTestWriter->EndDefineMode(),
-                "Cannot end define mode. One fixed dimension should be defined.");
+                              "Cannot end define mode. One fixed dimension should be defined.");
 
         std::vector<unsigned> node_numbers;
         node_numbers.push_back(21);
         node_numbers.push_back(47);
         node_numbers.push_back(60);
-        TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineFixedDimension(node_numbers, 100));
+        TS_ASSERT_THROWS_NOTHING(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->EndDefineMode());
 
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineVariable("I_Ca", "milli amperes"),
-                "Cannot define variables when not in Define mode");
+                              "Cannot define variables when not in Define mode");
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineUnlimitedDimension("Time", "msecs"),
-                "Unlimited dimension already set. Cannot be defined twice");
+                              "Unlimited dimension already set. Cannot be defined twice");
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(5000),
-                "Cannot define variables when not in Define mode");
+                              "Cannot define variables when not in Define mode");
 
         // Can't call define fixed dimension again
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, 100),
-                "Cannot define variables when not in Define mode");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(node_numbers, node_numbers, 100),
+                              "Cannot define variables when not in Define mode");
 
         // Test that we can't write incomplete data from a vector that doesn't have the right entries (0 to 59)
         DistributedVectorFactory factory(60);
-        Vec petsc_data_short=factory.CreateVec();
+        Vec petsc_data_short = factory.CreateVec();
         TS_ASSERT_THROWS_THIS(mpTestWriter->PutVector(0, petsc_data_short),
-                "Vector size doesn\'t match fixed dimension");
+                              "Vector size doesn\'t match fixed dimension");
         PetscTools::Destroy(petsc_data_short);
 
         mpTestWriter->Close();
@@ -1261,7 +1257,7 @@ public:
         int ina_var_id = 0;
         int ik_var_id = 0;
 
-        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(0),"Fixed dimension must be at least 1 long");
+        TS_ASSERT_THROWS_THIS(mpTestWriter->DefineFixedDimension(0), "Fixed dimension must be at least 1 long");
         mpTestWriter->DefineFixedDimension(5000);
 
         TS_ASSERT_THROWS_NOTHING(ina_var_id = mpTestWriter->DefineVariable("I_Na", "milliamperes"));
@@ -1271,7 +1267,7 @@ public:
         TS_ASSERT_EQUALS(ik_var_id, 1);
 
         TS_ASSERT_THROWS_THIS(mpTestWriter->DefineUnlimitedDimension("Time", "msecs"),
-                "Cannot define variables when not in Define mode");
+                              "Cannot define variables when not in Define mode");
         mpTestWriter->Close();
         delete mpTestWriter;
     }
@@ -1291,9 +1287,9 @@ public:
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->EndDefineMode());
 
         TS_ASSERT_THROWS_THIS(mpTestWriter->PutUnlimitedVariable(0.0),
-                "PutUnlimitedVariable() called but no unlimited dimension has been set");
+                              "PutUnlimitedVariable() called but no unlimited dimension has been set");
         TS_ASSERT_THROWS_THIS(mpTestWriter->AdvanceAlongUnlimitedDimension(),
-                "Trying to advance along an unlimited dimension without having defined any");
+                              "Trying to advance along an unlimited dimension without having defined any");
 
         mpTestWriter->Close();
         delete mpTestWriter;
@@ -1305,16 +1301,16 @@ public:
         DistributedVectorFactory vec_factory(number_nodes);
 
         Hdf5DataWriter writer(vec_factory, "", "testdefine", false);
-//        writer.DefineFixedDimension(number_nodes);
-//
-//        int node_id = writer.DefineVariable("Node","dimensionless");
-//        int vm_id = writer.DefineVariable("V_m","millivolts");
-//        int phi_e_id = writer.DefineVariable("Phi_e","millivolts");
-//        int ina_id = writer.DefineVariable("I_Na","milliamperes");
-//
-//        writer.DefineUnlimitedDimension("Time", "msec");
+        //        writer.DefineFixedDimension(number_nodes);
+        //
+        //        int node_id = writer.DefineVariable("Node","dimensionless");
+        //        int vm_id = writer.DefineVariable("V_m","millivolts");
+        //        int phi_e_id = writer.DefineVariable("Phi_e","millivolts");
+        //        int ina_id = writer.DefineVariable("I_Na","milliamperes");
+        //
+        //        writer.DefineUnlimitedDimension("Time", "msec");
 
-//        writer.EndDefineMode();
+        //        writer.EndDefineMode();
 
         int node_id = 1;
         int vm_id = 2;
@@ -1334,7 +1330,7 @@ public:
         DistributedVector distributed_node_number = vec_factory.CreateDistributedVector(node_number);
 
         for (DistributedVector::Iterator index = distributed_node_number.Begin();
-             index!= distributed_node_number.End();
+             index != distributed_node_number.End();
              ++index)
         {
             distributed_node_number[index] = index.Global;
@@ -1343,28 +1339,28 @@ public:
         distributed_node_number.Restore();
         distributed_vector_short.Restore();
 
-        DistributedVectorFactory factory2(2*number_nodes);
+        DistributedVectorFactory factory2(2 * number_nodes);
         Vec petsc_data_long = factory2.CreateVec();
         DistributedVector distributed_vector_long = factory2.CreateDistributedVector(petsc_data_long);
 
         for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-             index!= distributed_vector_long.End();
+             index != distributed_vector_long.End();
              ++index)
         {
-            distributed_vector_long[index] =  1000 + index.Global;
+            distributed_vector_long[index] = 1000 + index.Global;
         }
         distributed_vector_long.Restore();
 
         TS_ASSERT_THROWS_THIS(writer.PutVector(node_id, node_number),
-                "Cannot write data while in define mode.");
+                              "Cannot write data while in define mode.");
         TS_ASSERT_THROWS_THIS(writer.PutVector(ina_id, petsc_data_short),
-                "Cannot write data while in define mode.");
+                              "Cannot write data while in define mode.");
         TS_ASSERT_THROWS_THIS(writer.PutStripedVector(variable_IDs, petsc_data_long),
-                "Cannot write data while in define mode.");
+                              "Cannot write data while in define mode.");
         TS_ASSERT_THROWS_THIS(writer.PutUnlimitedVariable(0.0),
-                "Cannot write data while in define mode.");
+                              "Cannot write data while in define mode.");
         TS_ASSERT_THROWS_THIS(writer.AdvanceAlongUnlimitedDimension(),
-                "Trying to advance along an unlimited dimension without having defined any");
+                              "Trying to advance along an unlimited dimension without having defined any");
 
         writer.Close();
         PetscTools::Destroy(petsc_data_short);
@@ -1391,7 +1387,7 @@ public:
         chmod(empty.GetAbsolutePath().c_str(), CHASTE_READONLY);
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "empty", false);
-        writer.DefineVariable("Node","dimensionless");
+        writer.DefineVariable("Node", "dimensionless");
         writer.DefineFixedDimension(number_nodes);
         H5E_BEGIN_TRY //Suppress HDF5 error in this test
         {
@@ -1440,7 +1436,7 @@ public:
         Vec phase_petsc = factory.CreateVec();
         DistributedVector phase_data = factory.CreateDistributedVector(phase_petsc);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Fill in data
             for (DistributedVector::Iterator index = phase_data.Begin();
@@ -1470,10 +1466,10 @@ public:
         hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
         hid_t dset = H5Dopen(h5_file, "Postprocessing", H5P_DEFAULT); // open dataset
         hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
-        hsize_t expected_dims[3] = {10, 25, 1};
+        hsize_t expected_dims[3] = { 10, 25, 1 };
         hsize_t chunk_dims[3];
-        H5Pget_chunk(dcpl, 3, chunk_dims );
-        for (int i=0; i<3; ++i)
+        H5Pget_chunk(dcpl, 3, chunk_dims);
+        for (int i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
         }
@@ -1511,16 +1507,15 @@ public:
             Vec petsc_data_2 = factory.CreateVec();
             DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
 
-
-            for (unsigned time_step=0; time_step<10; time_step++)
+            for (unsigned time_step = 0; time_step < 10; time_step++)
             {
                 // Write some values
                 for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                     index!= distributed_vector_1.End();
+                     index != distributed_vector_1.End();
                      ++index)
                 {
                     distributed_vector_1[index] = index.Global;
-                    distributed_vector_2[index] = time_step*1000 + 100 + index.Global;
+                    distributed_vector_2[index] = time_step * 1000 + 100 + index.Global;
                 }
                 distributed_vector_1.Restore();
                 distributed_vector_2.Restore();
@@ -1540,13 +1535,12 @@ public:
         /* Re-open the file and add the new data */
 
         TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false,
-                              false /*(do not extend)*/, "Extra stuff"),
+                                                    false /*(do not extend)*/, "Extra stuff"),
                               "Adding new data only makes sense when extending an existing file");
         Hdf5DataWriter annotating_writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false, true, "Extra stuff");
 
-
-        int phase_id = annotating_writer.DefineVariable("Phase","radians");
-        int plasma_id = annotating_writer.DefineVariable("Plasma","gloops");
+        int phase_id = annotating_writer.DefineVariable("Phase", "radians");
+        int plasma_id = annotating_writer.DefineVariable("Plasma", "gloops");
         int node_id_again = annotating_writer.DefineVariable("Node", "dimensionless");
         annotating_writer.DefineFixedDimension(number_nodes);
         annotating_writer.DefineUnlimitedDimension("Distance", "LightYears", 2);
@@ -1561,16 +1555,16 @@ public:
             Vec petsc_data_3 = factory.CreateVec();
             DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_2);
 
-            for (unsigned time_step=0; time_step<2; time_step++)
+            for (unsigned time_step = 0; time_step < 2; time_step++)
             {
                 // Write some values
                 for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                     index!= distributed_vector_1.End();
+                     index != distributed_vector_1.End();
                      ++index)
                 {
                     distributed_vector_3[index] = index.Global;
                     distributed_vector_1[index] = index.Global;
-                    distributed_vector_2[index] = time_step*1000 + 100 + index.Global;
+                    distributed_vector_2[index] = time_step * 1000 + 100 + index.Global;
                 }
                 distributed_vector_1.Restore();
                 distributed_vector_2.Restore();
@@ -1592,7 +1586,8 @@ public:
 
         // This one has the wrong name on the unlimited variable of the Extra Stuff dataset.
         TS_ASSERT_EQUALS(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
-                                                       "io/test/data", "hdf5_test_adding_variables_bad", false, 1e-10, "Extra stuff"), false);
+                                                       "io/test/data", "hdf5_test_adding_variables_bad", false, 1e-10, "Extra stuff"),
+                         false);
 
         // The 'bad' file isn't actually bad for the original Data (voltage etc. just the units of the new 'Extra Stuff').
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
@@ -1600,11 +1595,10 @@ public:
 
         // This one is correct for both original and extra stuff datasets.
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
-                                                 "io/test/data", "hdf5_test_adding_variables", false));
+                                                "io/test/data", "hdf5_test_adding_variables", false));
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
                                                 "io/test/data", "hdf5_test_adding_variables", false, 1e-10, "Extra stuff"));
-
     }
 
     /**
@@ -1624,7 +1618,7 @@ public:
                                   "You are asking to delete a file and then extend it, change arguments to constructor.");
 
             // Check for a wrong file format exception
-            OutputFileHandler file_handler("TestHdf5DataWriter",false);
+            OutputFileHandler file_handler("TestHdf5DataWriter", false);
             out_stream p_wrong_format = file_handler.OpenOutputFile("hdf5_wrong_format.h5");
             *p_wrong_format << "gobbledegook" << std::endl;
             p_wrong_format->close();
@@ -1667,7 +1661,7 @@ public:
         DistributedVector ik_data = factory.CreateDistributedVector(ik_petsc);
         DistributedVector ina_data = factory.CreateDistributedVector(ina_petsc);
 
-        for (unsigned time_step=10; time_step<15; time_step++)
+        for (unsigned time_step = 10; time_step < 15; time_step++)
         {
             // Fill in data
             for (DistributedVector::Iterator index = node_data.Begin();
@@ -1675,8 +1669,8 @@ public:
                  ++index)
             {
                 node_data[index] = index.Global;
-                ik_data[index] = time_step*1000 + 100 + index.Global;
-                ina_data[index] = time_step*1000 + 200 + index.Global;
+                ik_data[index] = time_step * 1000 + 100 + index.Global;
+                ina_data[index] = time_step * 1000 + 200 + index.Global;
             }
             node_data.Restore();
             ik_data.Restore();
@@ -1720,8 +1714,8 @@ public:
                               true); // cache
 
         // Check chunk info was read correctly
-        hsize_t expected_chunk_size[3] = {10, 100, 3};
-        for ( int i=0; i<3; ++i )
+        hsize_t expected_chunk_size[3] = { 10, 100, 3 };
+        for (int i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(writer.mChunkSize[i], expected_chunk_size[i]);
         }
@@ -1745,7 +1739,7 @@ public:
         DistributedVector::Stripe ik_stripe(distributed_vector_long, 1);
         DistributedVector::Stripe ina_stripe(distributed_vector_long, 2);
 
-        for (unsigned time_step=15; time_step<20; time_step++)
+        for (unsigned time_step = 15; time_step < 20; time_step++)
         {
             // Fill in data
             for (DistributedVector::Iterator index = distributed_vector_long.Begin();
@@ -1753,8 +1747,8 @@ public:
                  ++index)
             {
                 node_stripe[index] = index.Global;
-                ik_stripe[index] = time_step*1000 + 100 + index.Global;
-                ina_stripe[index] = time_step*1000 + 200 + index.Global;
+                ik_stripe[index] = time_step * 1000 + 100 + index.Global;
+                ina_stripe[index] = time_step * 1000 + 200 + index.Global;
             }
             distributed_vector_long.Restore();
 
@@ -1764,7 +1758,7 @@ public:
 
             // Check that the cache is growing at the expected rate.
             // Should go 300, 600, 900, ... when run with one process.
-            unsigned expected_cache_size = ((time_step-15+1) % 10) * writer.mNumberOwned * 3;
+            unsigned expected_cache_size = ((time_step - 15 + 1) % 10) * writer.mNumberOwned * 3;
             TS_ASSERT_EQUALS(writer.mDataCache.size(), expected_cache_size);
 
             writer.AdvanceAlongUnlimitedDimension();
@@ -1786,7 +1780,6 @@ public:
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format", true,
                                                 "io/test/data", "hdf5_test_full_format_extended_twice", false));
-
     }
 
     void TestPermutation()
@@ -1803,7 +1796,7 @@ public:
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_permuted", false);
         writer.DefineFixedDimension(number_nodes);
 
-        int index_id = writer.DefineVariable("index","dimensionless");
+        int index_id = writer.DefineVariable("index", "dimensionless");
         int vm_id = writer.DefineVariable("V_m", "millivolts");
         int phi_e_id = writer.DefineVariable("Phi_e", "millivolts");
 
@@ -1819,22 +1812,22 @@ public:
         TS_ASSERT_EQUALS(writer.ApplyPermutation(rotation_perm), false);
         //Can't apply a permutation of the wrong length
         short_perm.push_back(0u);
-        TS_ASSERT_THROWS_THIS(writer.ApplyPermutation(short_perm), "Permutation doesn't match the expected problem size");
+        TS_ASSERT_THROWS_THIS(writer.ApplyPermutation(short_perm), "Permutation doesn't match the expected problem size of 10");
 
-        for (unsigned index=0; index<(unsigned)number_nodes; index++)
+        for (unsigned index = 0; index < (unsigned)number_nodes; index++)
         {
-            rotation_perm.push_back( (index + 3) % number_nodes); // 3, 4, ... 0, 1, 2
+            rotation_perm.push_back((index + 3) % number_nodes); // 3, 4, ... 0, 1, 2
             identity_perm.push_back(index);
         }
 
         // Make the permutation incorrect
         TS_ASSERT_EQUALS(rotation_perm[0], 3u);
-        rotation_perm[0]=0;
+        rotation_perm[0] = 0;
 
         TS_ASSERT_THROWS_THIS(writer.ApplyPermutation(rotation_perm), "Permutation vector doesn't contain a valid permutation");
 
         // Correct the mistake imposed above
-        rotation_perm[0]=3;
+        rotation_perm[0] = 3;
 
         TS_ASSERT_EQUALS(writer.ApplyPermutation(identity_perm), false); //Does nothing
 
@@ -1846,21 +1839,19 @@ public:
         // Can't apply permutation after define mode
         TS_ASSERT_THROWS_THIS(writer.ApplyPermutation(rotation_perm), "Cannot define permutation when not in Define mode");
 
-
         // However, we can force the permutation to be applied by using the unsafe/extending flag.
         Hdf5DataWriter writer_unsafe_perm(factory, "TestHdf5DataWriter", "hdf5_permuted_unsafe", false);
         writer_unsafe_perm.DefineFixedDimension(number_nodes);
-        writer_unsafe_perm.DefineVariable("index","dimensionless");
+        writer_unsafe_perm.DefineVariable("index", "dimensionless");
         writer_unsafe_perm.DefineVariable("V_m", "millivolts");
         writer_unsafe_perm.DefineVariable("Phi_e", "millivolts");
         writer_unsafe_perm.EndDefineMode();
         writer_unsafe_perm.ApplyPermutation(rotation_perm, /*unsafe*/ true);
 
-
         Vec petsc_data_short = factory.CreateVec();
         DistributedVector distributed_vector_short = factory.CreateDistributedVector(petsc_data_short);
         for (DistributedVector::Iterator index = distributed_vector_short.Begin();
-             index!= distributed_vector_short.End();
+             index != distributed_vector_short.End();
              ++index)
         {
             distributed_vector_short[index] = index.Global;
@@ -1874,10 +1865,10 @@ public:
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
         DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
         for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-             index!= distributed_vector_long.End();
+             index != distributed_vector_long.End();
              ++index)
         {
-            vm_stripe[index] =  100 + index.Global;
+            vm_stripe[index] = 100 + index.Global;
             phi_e_stripe[index] = 1000 + index.Global;
         }
         distributed_vector_long.Restore();
@@ -1890,204 +1881,11 @@ public:
         PetscTools::Destroy(petsc_data_short);
         PetscTools::Destroy(petsc_data_long);
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("TestHdf5DataWriter", "hdf5_permuted", true,
-                                                "io/test/data", "hdf5_unpermuted", false));
+                                                          "io/test/data", "hdf5_unpermuted", false));
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_permuted", true,
                                                 "io/test/data", "hdf5_permuted", false));
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_permuted_unsafe", true,
                                                 "io/test/data", "hdf5_permuted", false));
-    }
-
-    void TestHdf5DataWriterFullFormatIncompleteUsingMatrix()
-    {
-        int number_nodes = 100;
-
-        DistributedVectorFactory factory(number_nodes);
-
-        Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_full_format_incomplete_using_matrix", false);
-
-        int node_id = writer.DefineVariable("Node","dimensionless");
-        int ik_id = writer.DefineVariable("I_K","milliamperes");
-        int ina_id = writer.DefineVariable("I_Na","milliamperes");
-        writer.DefineUnlimitedDimension("Time", "msec");
-
-        std::vector<unsigned> node_numbers;
-        node_numbers.push_back(21);
-        node_numbers.push_back(47);
-        node_numbers.push_back(60);
-        writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
-
-        writer.EndDefineMode();
-
-        Vec petsc_data_1 = factory.CreateVec();
-        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
-
-        Vec petsc_data_2 = factory.CreateVec();
-        DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
-
-        Vec petsc_data_3 = factory.CreateVec();
-        DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_3);
-
-        for (unsigned time_step=0; time_step<10; time_step++)
-        {
-            // Write some values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
-                 ++index)
-            {
-                distributed_vector_1[index] =  index.Global;
-                distributed_vector_2[index] =  time_step*1000 + 100 + index.Global;
-                distributed_vector_3[index] =  time_step*1000 + 200 + index.Global;
-            }
-            distributed_vector_1.Restore();
-            distributed_vector_2.Restore();
-            distributed_vector_3.Restore();
-
-            // Write the vector
-
-            writer.PutVector(node_id, petsc_data_1);
-            writer.PutVector(ik_id, petsc_data_2);
-            writer.PutVector(ina_id, petsc_data_3);
-            writer.PutUnlimitedVariable(time_step);
-            writer.AdvanceAlongUnlimitedDimension();
-        }
-
-        writer.Close();
-
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete_using_matrix", true,
-                                                "io/test/data", "hdf5_test_full_format_incomplete", false));
-
-        PetscTools::Destroy(petsc_data_1);
-        PetscTools::Destroy(petsc_data_2);
-        PetscTools::Destroy(petsc_data_3);
-    }
-
-    void TestHdf5DataWriterSingleIncompleteUsingMatrixCached()
-    {
-        int number_nodes = 100;
-
-        DistributedVectorFactory factory(number_nodes);
-
-        Hdf5DataWriter writer(factory,
-                              "TestHdf5DataWriter",
-                              "hdf5_test_single_incomplete_using_matrix_cached",
-                              false,
-                              false,
-                              "Data",
-                              true); // cache
-
-        int node_id = writer.DefineVariable("Node","dimensionless");
-        writer.DefineUnlimitedDimension("Time", "msec");
-
-        std::vector<unsigned> node_numbers;
-        node_numbers.push_back(21);
-        node_numbers.push_back(47);
-        node_numbers.push_back(60);
-        writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
-
-        writer.EndDefineMode();
-
-        Vec petsc_data_1 = factory.CreateVec();
-        DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
-
-        for (unsigned time_step=0; time_step<10; time_step++)
-        {
-            // Write some values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                 index!= distributed_vector_1.End();
-                 ++index)
-            {
-                distributed_vector_1[index] =  index.Global;
-            }
-            distributed_vector_1.Restore();
-
-            writer.PutVector(node_id, petsc_data_1);
-            writer.PutUnlimitedVariable(time_step);
-            writer.AdvanceAlongUnlimitedDimension();
-        }
-
-        writer.Close();
-
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_single_incomplete_using_matrix_cached", true,
-                                                "io/test/data", "hdf5_test_single_incomplete_using_matrix_cached", false));
-
-        PetscTools::Destroy(petsc_data_1);
-    }
-
-    void Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(bool useCache, std::string outputFile)
-    {
-        /* This test doesn't get run directly, see following two blocks */
-        int number_nodes = 100;
-        DistributedVectorFactory vec_factory(number_nodes);
-
-        Hdf5DataWriter writer(vec_factory,
-                              "TestHdf5DataWriter",
-                              outputFile,
-                              false,
-                              false,
-                              "Data",
-                              useCache);
-
-        std::vector<unsigned> node_numbers;
-        node_numbers.push_back(4);
-        node_numbers.push_back(8);
-        node_numbers.push_back(15);
-        node_numbers.push_back(16);
-        node_numbers.push_back(23);
-        node_numbers.push_back(42);
-        writer.DefineFixedDimensionUsingMatrix(node_numbers, number_nodes);
-
-        int vm_id = writer.DefineVariable("V_m","millivolts");
-        int phi_e_id = writer.DefineVariable("Phi_e","millivolts");
-
-        std::vector<int> striped_variable_IDs;
-        striped_variable_IDs.push_back(vm_id);
-        striped_variable_IDs.push_back(phi_e_id);
-
-        writer.DefineUnlimitedDimension("Time", "msec");
-
-        writer.EndDefineMode();
-
-        DistributedVectorFactory factory(number_nodes);
-        Vec petsc_data_long = factory.CreateVec(2);
-        DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
-        DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
-        DistributedVector::Stripe phi_e_stripe(distributed_vector_long,1 );
-
-        for (unsigned time_step=0; time_step<2; time_step++)
-        {
-            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
-                 index!= distributed_vector_long.End();
-                 ++index)
-            {
-                vm_stripe[index] = (time_step+1)*1000 + index.Global;
-                phi_e_stripe[index] =  index.Global;
-            }
-            distributed_vector_long.Restore();
-
-            writer.PutStripedVector(striped_variable_IDs, petsc_data_long);
-            writer.PutUnlimitedVariable(time_step);
-            writer.AdvanceAlongUnlimitedDimension();
-        }
-
-        writer.Close();
-
-
-        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", outputFile, true,
-                                                "io/test/data", "hdf5_test_full_format_striped_incomplete", false));
-
-        PetscTools::Destroy(petsc_data_long);
-    }
-
-    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrix()
-    {
-        // Without caching
-        Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(false, "hdf5_test_full_format_striped_incomplete_using_matrix");
-    }
-
-    void TestHdf5DataWriterFullFormatStripedIncompleteUsingMatrixCached()
-    {
-        // With caching
-        Hdf5DataWriterFullFormatStripedIncompleteUsingMatrix(true, "hdf5_test_full_format_striped_incomplete_using_matrix_cached");
     }
 
     void TestHdf5DataWriterManualChunkSizeAndAlignment()
@@ -2104,9 +1902,9 @@ public:
             writer.DefineUnlimitedDimension("Time", "msec", 101);
             writer.DefineFixedDimension(number_nodes);
             // Odd number of variables for
-            writer.DefineVariable("Node","dimensionless");
-            writer.DefineVariable("I_K","milliamperes");
-            writer.DefineVariable("I_Na","milliamperes");
+            writer.DefineVariable("Node", "dimensionless");
+            writer.DefineVariable("I_K", "milliamperes");
+            writer.DefineVariable("I_Na", "milliamperes");
 
             /* Set the target chunk size to 8 K (smaller than normal) and the
              * alignment to 16 K.
@@ -2130,17 +1928,17 @@ public:
 
         // Open file
         OutputFileHandler file_handler(folder, false);
-        FileFinder file = file_handler.FindFile(filename+".h5");
+        FileFinder file = file_handler.FindFile(filename + ".h5");
         hid_t h5_file = H5Fopen(file.GetAbsolutePath().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
         hid_t dset = H5Dopen(h5_file, "Data", H5P_DEFAULT); // open dataset
 
         /* Check chunk dimensions are as expected for 8 K chunks with these
          * dataset dimensions. */
         hid_t dcpl = H5Dget_create_plist(dset); // get dataset creation property list
-        hsize_t expected_dims[3] = {17, 20, 3};
+        hsize_t expected_dims[3] = { 17, 20, 3 };
         hsize_t chunk_dims[3];
         H5Pget_chunk(dcpl, 3, chunk_dims);
-        for (int i=0; i<3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(chunk_dims[i], expected_dims[i]);
         }
@@ -2157,12 +1955,12 @@ public:
          * (These numbers might be machine-dependent!)
          */
         H5O_info_t data_info;
-        H5Oget_info( dset, &data_info );
+        H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x10000u); // 64 KB
         H5Dclose(dset);
 
         dset = H5Dopen(h5_file, "Data_Unlimited", H5P_DEFAULT);
-        H5Oget_info( dset, &data_info );
+        H5Oget_info(dset, &data_info);
         TS_ASSERT_EQUALS(data_info.addr, 0x9A8000u); // About 9.7 MB
 
         // Tidy up

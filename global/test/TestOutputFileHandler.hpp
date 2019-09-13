@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -131,7 +131,15 @@ public:
             setenv("CHASTE_TEST_OUTPUT", "", 1/*Overwrite*/);
             // Predict where Chaste puts output when CHASTE_TEST_OUTPUT is not set
             std::stringstream  tmp_directory;
-            tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/NoEnvironmentForTestoutput";
+            if (getenv("USER")!=NULL)
+             {
+                 tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/NoEnvironmentForTestoutput";
+             }
+             else
+             {
+                 // No $USER in environment (which may be the case in Docker)
+                 tmp_directory << "/tmp/chaste/testoutput/NoEnvironmentForTestoutput";
+             }
             // Check this folder is not present
             FileFinder test_folder(tmp_directory.str(), RelativeTo::Absolute);
             TS_ASSERT(!test_folder.Exists());
