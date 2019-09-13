@@ -51,8 +51,8 @@ message ("####################################\n")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
 project (Chaste VERSION 2019.1)
-set (Chaste_VERSION_MAJOR ${CMAKE_PROJECT_VERSION_MAJOR} CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR ${CMAKE_PROJECT_VERSION_MINOR} CACHE STRING "Chaste minor version number")
+set (Chaste_VERSION_MAJOR 2019 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 include (ChasteHostOperatingSystem)
 include (ChasteBuildTypes)
