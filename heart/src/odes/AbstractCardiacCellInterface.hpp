@@ -410,9 +410,9 @@ public:
      *  types of cells). This method by default throws an exception, so should be
      *  implemented in the concrete class if intracellular (cytosolic) calcium concentration is
      *  one of the state variables.
-     * 
+     *
      *  Returns the intracellular calcium concentraion *in milliMolar*.
-     * 
+     *
      *  @return intracellular calcium concentration
      */
     virtual double GetIntracellularCalciumConcentration();

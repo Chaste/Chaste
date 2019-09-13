@@ -1367,12 +1367,12 @@ public:
         std::vector<unsigned> output_nodes;
         unsigned my_favourite_node1 = 123u;
         unsigned my_other_node = 205u;
-        unsigned my_favourite_node2 = 219u; 
-        
+        unsigned my_favourite_node2 = 219u;
+
         output_nodes.push_back(my_favourite_node1);
         output_nodes.push_back(my_other_node);
         output_nodes.push_back(my_favourite_node2);
-        // sequential {123,205,219} 
+        // sequential {123,205,219}
         // 2 procs:   {174,211,106} (not increasing)
         // 3 procs:   {47,211,150}  (not increasing)
 

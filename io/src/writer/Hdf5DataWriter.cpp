@@ -231,9 +231,9 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                 mIncompleteNodeIndices.clear();
                 mIncompleteNodeIndices.resize(num_node_indices);
                 H5Aread(attribute_id, H5T_NATIVE_UINT, &mIncompleteNodeIndices[0]);
-                // Assume there is no permutation when extending.  We're going throw an exception at the 
+                // Assume there is no permutation when extending.  We're going throw an exception at the
                 // end of the block (so setting mIncompletePermIndices is only for safety.
-                mIncompletePermIndices = mIncompleteNodeIndices; 
+                mIncompletePermIndices = mIncompleteNodeIndices;
 
                 // Release ids
                 H5Tclose(attribute_type);

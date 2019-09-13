@@ -160,9 +160,9 @@ public:
          *
          * In this case, one other thing you can try is to change the absolute and relative
          * tolerances of the CVODE solver, the default being (1e-5,1e-7), although it isn't clear whether
-         * refining sometimes makes things worse for models with singularities, 
+         * refining sometimes makes things worse for models with singularities,
          * as CVODE goes to look for trouble in areas with steep gradients.
-         * 
+         *
          * For this particular test, we are going to specify quite strict tolerances, so that the test gets the same results
          * on different versions of CVODE and different compilers.
          */
@@ -265,7 +265,7 @@ public:
         /*
          * Here we just check that the values are equal to the ones we expect,
          * with appropriate precision to pass on different versions of CVODE.
-         * 
+         *
          * (These reference values were generated with tolerances of Abs=1e-12, Rel=1e-12.)
          */
         TS_ASSERT_DELTA(apd, 212.411, 1e-2);

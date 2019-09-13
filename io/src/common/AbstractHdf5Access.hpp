@@ -130,7 +130,7 @@ public:
 
     /**
      * Get method for mIsDataComplete.
-     * If this is true the data file contains entries for all nodes. 
+     * If this is true the data file contains entries for all nodes.
      * If this is false the data file only contains entries for some nodes.
      *
      * @return #mIsDataComplete.

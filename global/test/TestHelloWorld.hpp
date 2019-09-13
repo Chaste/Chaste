@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-/* This doesn't test anything, it is just a first test for new users to run immediately after installation */ 
+/* This doesn't test anything, it is just a first test for new users to run immediately after installation */
 class TestHelloWorld : public CxxTest::TestSuite
 {
 public:

@@ -65,7 +65,7 @@ private:
     unsigned mHi;                                   /**< Local ownership of a PETSc vector of size #mFileFixedDimensionSize*/
     unsigned mNumberOwned;                          /**< mNumberOwned=#mHi-#mLo; except with incomplete data*/
     unsigned mOffset;                               /**< mOffset=#mLo; except with incomplete data*/
-    std::vector<unsigned> mIncompletePermIndices;   /**< The actual runtime indices of the incomplete data nodes (used when running in parallel and a permutation has been applied)*/ 
+    std::vector<unsigned> mIncompletePermIndices;   /**< The actual runtime indices of the incomplete data nodes (used when running in parallel and a permutation has been applied)*/
     bool mNeedExtend;                               /**< Used so that the data set is only extended when data is written*/
 
     std::vector<DataWriterVariable> mVariables;     /**< The data variables */
