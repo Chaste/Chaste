@@ -52,7 +52,19 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
         switch (operation->GetOperation())
         {
         case EDGE_OPERATION_ADD:
+        case EDGE_OPERATION_NODE_MERGE:
+        case EDGE_OPERATION_SPLIT:
+        case EDGE_OPERATION_MERGE:
+        {
+            const unsigned int location_index = operation->GetElementIndex();
+            EdgeRemapInfo *pEdgeChange = operation->GetNewEdges();
+            CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
+            auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
+            std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
+            RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
+            old_srn_edges.clear();
             break;
+        }
         case EDGE_OPERATION_DELETE:
             break;
         case EDGE_OPERATION_DIVIDE:
@@ -73,43 +85,6 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
             parent_srn_edges.clear();
             break;
         }
-        case EDGE_OPERATION_SPLIT:
-        {
-            const unsigned int location_index = operation->GetElementIndex();
-            EdgeRemapInfo *pEdgeChange = operation->GetNewEdges();
-            CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
-            auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
-            std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
-            for (unsigned int i=0; i<pEdgeChange->GetEdgesMapping().size(); ++i)
-            {
-                auto remapIndex = pEdgeChange->GetEdgesMapping()[i];
-                auto remapStatus = pEdgeChange->GetEdgesStatus()[i];
-                if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
-                {
-                    EXCEPTION("Remap index cannot be negative when it's a direct remap or an edge split");
-                }
-                if (remapStatus == 2)
-                {
-                    EXCEPTION("A blank new edge has been created. SPLIT operation recorded wrongly");
-                }
-            }
-            RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
-
-            old_srn_edges.clear();
-            break;
-        }
-        case EDGE_OPERATION_NODE_MERGE:
-        {
-            const unsigned int location_index = operation->GetElementIndex();
-            EdgeRemapInfo *pEdgeChange = operation->GetNewEdges();
-            CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
-            auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
-            std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
-            RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
-            old_srn_edges.clear();
-            break;
-        }
-
         }
     }
     mpCellPopulation->ClearCellEdgeOperations();
@@ -136,6 +111,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         //1 - The edge is a split point between the diving cells, in this example we divide all concentration in half
         //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
         //3 - Edge below or above an edge that was deleted due to node merging
+        //4 - Edge above was merged into this edge
         const unsigned int remapStatus = pEdgeChange->GetEdgesStatus()[i];
         if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
         {
@@ -150,12 +126,14 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             //Edge split depends on the relative splitting node position because
             //currently we assume that edge concentrations are uniform on the edge
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
-            new_edge_srn[i]->ScaleSrnVariables(split_proportions[i]);
+            assert(split_proportions[i]>=0);
+            new_edge_srn[i]->SplitEdgeSrn(split_proportions[i]);
             break;
         case 2:
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[0]->CreateSrnModel());
             break;
         case 3:
+        {
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
             const bool isPrevEdge = pEdgeChange->GetEdgesStatus()[(i+1)%n_edges]==3;
             //Find the shrunk edge
@@ -173,8 +151,16 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
                     shrunkEdge = n_edges;
                 }
             }
-            new_edge_srn[i]->AddSrnQuantities(parent_srn_edges[shrunkEdge].get());
+            new_edge_srn[i]->AddShrunkEdgeSrn(parent_srn_edges[shrunkEdge].get());
             break;
+        }
+        case 4:
+        {
+            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
+            const unsigned int next_edge_index = (remapIndex+1)%(n_edges+1);
+            new_edge_srn[i] -> AddMergedEdgeSrn(parent_srn_edges[next_edge_index].get());
+            break;
+        }
         }
 
         //Setting the new local edge index and the cell
@@ -183,16 +169,18 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         if (remapStatus == 2)
             new_edge_srn[i]->InitialiseDaughterCell();
     }
+
     //For the case when edge quantities are returned into interior when edge shrinks due to node merging
     boost::shared_ptr<AbstractSrnModel> interior_srn
     =boost::shared_ptr<AbstractSrnModel>(pSrnCell->GetInteriorSrn());
     if (interior_srn != nullptr)
     {
-        for (unsigned int shrunkEdge:shrunk_edges)
+        for (unsigned int shrunkEdgeIndex:shrunk_edges)
         {
-            interior_srn->AddSrnQuantities(parent_srn_edges[shrunkEdge].get());
+            interior_srn->AddShrunkEdgeToInterior(parent_srn_edges[shrunkEdgeIndex].get());
         }
     }
+
     pSrnCell->AddEdgeSrn(new_edge_srn);
 }
 

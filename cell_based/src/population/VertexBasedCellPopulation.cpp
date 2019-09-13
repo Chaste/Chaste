@@ -346,9 +346,12 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
         Validate();
     }
+    //First cell is representative of other clels
     bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
-    if (hasHadBirthsOrDeaths&&EdgeModelOrNot)
+    if (EdgeModelOrNot)
+    {
         mPopulationSrn.UpdateSrnAfterBirthOrDeath();
+    }
 
     element_map.ResetToIdentity();
 }

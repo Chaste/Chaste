@@ -36,10 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DeltaNotchCellEdgeTrackingModifier.hpp"
 #include "SrnCellModel.hpp"
 #include "DeltaNotchSrnInteriorModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 
 template<unsigned DIM>
 DeltaNotchCellEdgeTrackingModifier<DIM>::DeltaNotchCellEdgeTrackingModifier()
-        : AbstractCellEdgeBasedSimulationModifier<DIM>()
+        : AbstractCellBasedSimulationModifier<DIM>()
 {
 }
 
@@ -51,8 +52,6 @@ DeltaNotchCellEdgeTrackingModifier<DIM>::~DeltaNotchCellEdgeTrackingModifier()
 template<unsigned DIM>
 void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    AbstractCellEdgeBasedSimulationModifier<DIM,DIM>::UpdateCellSrnLayout(rCellPopulation);
-
     // Update the cell
     this->UpdateCellData(rCellPopulation);
 }
@@ -70,11 +69,6 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<
 template<unsigned DIM>
 void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-
-    // Update srn topology in order to align with changes
-    // in the mesh
-    this->UpdateCellSrnLayout(rCellPopulation);
-
     // Recovers each cell's edge levels of notch and delta, and those of its neighbor's
     // Then saves them
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
@@ -141,41 +135,6 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::OutputSimulationModifierParameters
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
-template<unsigned int DIM>
-AbstractSrnModel *DeltaNotchCellEdgeTrackingModifier<DIM>::CreateEmptySrnEdgeModel()
-{
-    return new DeltaNotchSrnEdgeModel();
-}
-
-template<unsigned int DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::EdgeAdded(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
-                                                        unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr addedEdge)
-{
-    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(addedEdge);
-
-    // New edges have a concentration of 0
-    deltaNotchNewSrnEdge->SetDelta(0);
-    deltaNotchNewSrnEdge->SetNotch(0);
-}
-
-template<unsigned int DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::EdgeRemoved(AbstractCellPopulation<DIM,DIM> &rCellPopulation,
-                                                     unsigned locationIndex, unsigned edgeLocalIndex, AbstractSrnModelPtr oldSrnEdge)
-{
-}
-
-template<unsigned int DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge)
-{
-    // Convert to delta notch SRN type
-    auto deltaNotchOldSrnEdge = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(oldSrnEdge);
-    auto deltaNotchNewSrnEdge = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(newSrnEdge);
-
-    // In this example we're just halving the concentrations
-    deltaNotchNewSrnEdge->SetDelta(0.5*deltaNotchOldSrnEdge->GetDelta());
-    deltaNotchNewSrnEdge->SetNotch(0.5*deltaNotchOldSrnEdge->GetNotch());
-}
-
 // Explicit instantiation
 template class DeltaNotchCellEdgeTrackingModifier<1>;
 template class DeltaNotchCellEdgeTrackingModifier<2>;
@@ -183,6 +142,5 @@ template class DeltaNotchCellEdgeTrackingModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-#include "AbstractCellEdgeBasedSimulationModifier.hpp"
 
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellEdgeTrackingModifier)

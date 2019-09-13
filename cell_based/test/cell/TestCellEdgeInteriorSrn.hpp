@@ -264,82 +264,6 @@ public:
             }
         }
 
-        void TestVertexMeshCellEdgeSrnSwap()
-        {
-            /* First we create a regular vertex mesh. */
-            HoneycombVertexMeshGenerator generator(2, 2);
-            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
-
-            std::vector<CellPtr> cells;
-            MAKE_PTR(WildTypeCellMutationState, p_state);
-            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-
-            for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
-            {
-                /* Initalise cell cycle */
-                auto p_cc_model = new NoCellCycleModel();
-                p_cc_model->SetDimension(2);
-
-                /* Initialise edge based SRN */
-                auto p_element = p_mesh->GetElement(elem_index);
-                auto p_cell_edge_srn_model = new SrnCellModel();
-
-                /* Gets the edges of the element and create an SRN for each edge */
-                for (unsigned i = 0; i < p_element->GetNumEdges() ; i ++)
-                {
-                    std::vector<double> initial_conditions;
-
-                    /* Initial concentration of delta and notch is the same */
-                    initial_conditions.push_back(i);
-                    initial_conditions.push_back(i);
-
-                    MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
-                    p_srn_model->SetInitialConditions(initial_conditions);
-                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
-                }
-
-                CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
-                p_cell->SetCellProliferativeType(p_diff_type);
-                p_cell->SetBirthTime(0.0);
-                p_cell->InitialiseCellCycleModel();
-                p_cell->InitialiseSrnModel();
-                cells.push_back(p_cell);
-            }
-
-            /* Create the cell population */
-            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-            /* Create an edge tracking modifier */
-            MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
-
-            /* Force swaps on a shared edge */
-            int numSwapsPerformed = 0;
-            for (unsigned i = 0; i < p_mesh->GetNumEdges(); i++)
-            {
-                auto edge = p_mesh->GetEdge(i);
-                if (edge->GetNumElements() > 1)
-                {
-                    p_mesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
-                    p_mesh->RemoveDeletedNodes();
-                    numSwapsPerformed++;
-                }
-            }
-
-            /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellSrnLayout(cell_population);
-
-            /* Check that we now have the same number of edges in the vertex mesh and cells */
-            for (unsigned i = 0; i < cell_population.GetNumAllCells(); i++)
-            {
-                auto element = cell_population.GetElement(i);
-                auto cell = cell_population.GetCellUsingLocationIndex(i);
-                auto srn_cell = static_cast<SrnCellModel*>(cell->GetSrnModel());
-                TS_ASSERT_EQUALS(element->GetNumEdges(), srn_cell->GetNumEdgeSrn());
-            }
-        }
-        /**
-         * The cell division code has to be implemented for this test to make sense and pass it
-         */
         void TestVertexMeshCellEdgeSrnDivision()
         {
             /* First we create a regular vertex mesh. */
@@ -402,8 +326,6 @@ public:
             /* We should now have 5 cells after the divide*/
             TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5);
 
-            /* The 0th and 4th index cells should not have only 5 edges and concentration split */
-
             /* Check the 0th cell */
             {
                 auto p_cell = cell_population.GetCellUsingLocationIndex(0);
@@ -418,6 +340,7 @@ public:
                 TS_ASSERT_EQUALS(p_cell_edge_srn->GetNumEdgeSrn(), 5);
             }
         }
+
         /**
          * Tests with both interior and edge SRNs
          */
@@ -654,7 +577,7 @@ public:
 
                 /* Initialise edge based SRN */
                 auto p_element = p_mesh->GetElement(elem_index);
-                auto p_cell_edge_srn_model = new SrnCellModel();
+                auto p_cell_srn_model = new SrnCellModel();
 
                 /* Gets the edges of the element and create an SRN for each edge */
                 for (unsigned i = 0; i < p_element->GetNumEdges() ; i ++)
@@ -662,19 +585,18 @@ public:
                     std::vector<double> initial_conditions;
 
                     /* Initial concentration of delta and notch is the same */
-                    initial_conditions.push_back(i);
-                    initial_conditions.push_back(i);
+                    initial_conditions.push_back(1.0);
+                    initial_conditions.push_back(1.0);
 
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
-                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
+                    p_cell_srn_model->AddEdgeSrnModel(p_srn_model);
                 }
+                MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_model);
+                p_interior_model->SetInitialConditions(std::vector<double>(2,1.0));
+                p_cell_srn_model->SetInteriorSrnModel(p_interior_model);
 
-                MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_srn);
-                p_interior_srn->SetInitialConditions(std::vector<double>(2, 3.0));
-                p_cell_edge_srn_model->SetInteriorSrnModel(p_interior_srn);
-
-                CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
+                CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_srn_model));
                 p_cell->SetCellProliferativeType(p_diff_type);
                 p_cell->SetBirthTime(0.0);
                 p_cell->InitialiseCellCycleModel();
@@ -687,36 +609,135 @@ public:
 
             /* Create an edge tracking modifier */
             MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
+            p_modifier->UpdateCellData(cell_population);
+            /* Force T1 swap on the first shared edge of the first element
+             * This means that edge 0 and 1 of the element after the swap
+             * correspond to the edges 0 and 2 of the old element
+             */
+            auto elem = p_mesh->GetElement(0);
+            const unsigned int old_n_edges = elem->GetNumEdges();
 
-            /* Force swaps on a shared edge */
-            int numSwapsPerformed = 0;
-            for (unsigned i = 0; i < p_mesh->GetNumEdges(); i++)
+            const unsigned int edge_index_swapped = 1;
+            auto edge = elem->GetEdge(edge_index_swapped);
+            p_mesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
+
+            p_mesh->RemoveDeletedNodes();
+            const unsigned int new_n_edges = elem->GetNumEdges();
+            TS_ASSERT_EQUALS(old_n_edges, new_n_edges+1);
+
+            auto edge_operations = cell_population.GetCellEdgeChangeOperations();
+            std::vector<std::vector<unsigned int> > pop_edge_status(4);
+            std::vector<std::vector<long int> > pop_edge_mapping(4);
+            for (auto operation:edge_operations)
             {
-                auto edge = p_mesh->GetEdge(i);
-                if (edge->GetNumElements() > 1)
+                const unsigned int element = operation->GetElementIndex();
+                pop_edge_mapping[element] = operation->GetNewEdges()->GetEdgesMapping();
+                pop_edge_status[element] = operation->GetNewEdges()->GetEdgesStatus();
+            }
+            cell_population.Update(false);
+            //p_modifier->UpdateCellData(cell_population);
+
+            //Check if the srn quantities are correct in cell 1. First check edges and then interior
+            auto cell_0_srn
+            = static_cast<SrnCellModel*>(cell_population.GetCellUsingLocationIndex(0)->GetSrnModel());
+            const unsigned int n_edge_srns = cell_0_srn->GetEdges().size();
+            TS_ASSERT_EQUALS(n_edge_srns,5);
+            TS_ASSERT_EQUALS(n_edge_srns, p_mesh->GetElement(0)->GetNumEdges());
+            for (unsigned int i=0; i<pop_edge_mapping[0].size(); ++i)
+            {
+                auto p_delta_notch_edge_srn_model
+                = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(cell_0_srn->GetEdgeSrn(i));
+                if (pop_edge_status[0][i]!=0)
                 {
-                    p_mesh->IdentifySwapType(edge->GetNode(0), edge->GetNode(1));
-                    p_mesh->RemoveDeletedNodes();
-                    numSwapsPerformed++;
+                    TS_ASSERT_EQUALS(pop_edge_status[0][i],3);
+                    //Quarters go for each adjacent edge...
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(),1.25,1e-10);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(),1.25,1e-10);
+                    assert(i==0||i==1);
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(),1.0,1e-10);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(),1.0,1e-10);
                 }
             }
 
-            /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellSrnLayout(cell_population);
+            //.. and a half to the interior
+            auto p_interior_cell_0 = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(cell_0_srn->GetInteriorSrn());
+            TS_ASSERT_DELTA(p_interior_cell_0->GetDelta(), 1.5, 1e-10);
+            TS_ASSERT_DELTA(p_interior_cell_0->GetNotch(), 1.5, 1e-10);
 
-            /* Check that we now have the same number of edges in the vertex mesh and cells */
-            for (unsigned i = 0; i < cell_population.GetNumAllCells(); i++)
+            //Check if the srn quantities are correct in cell 2
+            auto cell_1_srn
+            = static_cast<SrnCellModel*>(cell_population.GetCellUsingLocationIndex(1)->GetSrnModel());
+            const unsigned int n_edge_srns_1 = cell_1_srn->GetEdges().size();
+            TS_ASSERT_EQUALS(n_edge_srns_1,5);
+            TS_ASSERT_EQUALS(n_edge_srns_1, p_mesh->GetElement(1)->GetNumEdges());
+            for (unsigned int i=0; i<pop_edge_mapping[1].size(); ++i)
             {
-                auto element = cell_population.GetElement(i);
-                auto cell = cell_population.GetCellUsingLocationIndex(i);
-                auto srn_cell = static_cast<SrnCellModel*>(cell->GetSrnModel());
-                TS_ASSERT_EQUALS(element->GetNumEdges(), srn_cell->GetNumEdgeSrn());
+                auto p_delta_notch_edge_srn_model
+                = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(cell_1_srn->GetEdgeSrn(i));
+                if (pop_edge_status[1][i]!=0)
+                {
+                    TS_ASSERT_EQUALS(pop_edge_status[1][i],3);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(),1.25,1e-10);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(),1.25,1e-10);
+                    assert(i==3||i==4);//edges
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(),1.0,1e-10);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(),1.0,1e-10);
+                }
             }
+            //Check if the interior srn quantities have been updated properly
+            auto p_interior_cell_1 = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(cell_1_srn->GetInteriorSrn());
+            TS_ASSERT_DELTA(p_interior_cell_1->GetDelta(), 1.5, 1e-10);
+            TS_ASSERT_DELTA(p_interior_cell_1->GetNotch(), 1.5, 1e-10);
+
+            //Check if the srn quantities are correct in cell 3
+            auto cell_2_srn
+            = static_cast<SrnCellModel*>(cell_population.GetCellUsingLocationIndex(2)->GetSrnModel());
+            const unsigned int n_edge_srns_2 = cell_2_srn->GetEdges().size();
+            TS_ASSERT_EQUALS(n_edge_srns_2,7);
+            TS_ASSERT_EQUALS(n_edge_srns_2, p_mesh->GetElement(2)->GetNumEdges());
+            for (unsigned int i=0; i<pop_edge_mapping[2].size(); ++i)
+            {
+                auto p_delta_notch_edge_srn_model
+                = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(cell_2_srn->GetEdgeSrn(i));
+                if (pop_edge_status[2][i]!=0)
+                {
+                    TS_ASSERT_EQUALS(pop_edge_status[2][i],2);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(),0.0,1e-10);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(),0.0,1e-10);
+                    assert(i==0);
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(),1.0,1e-10);
+                    TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(),1.0,1e-10);
+                }
+            }
+
+            auto p_interior_cell_2 = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(cell_2_srn->GetInteriorSrn());
+            TS_ASSERT_DELTA(p_interior_cell_2->GetDelta(), 1.0, 1e-10);
+            TS_ASSERT_DELTA(p_interior_cell_2->GetNotch(), 1.0, 1e-10);
+
+            //Check if the srn quantities are correct in cell 4
+            auto cell_3_srn
+            = static_cast<SrnCellModel*>(cell_population.GetCellUsingLocationIndex(3)->GetSrnModel());
+            const unsigned int n_edge_srns_3 = cell_3_srn->GetEdges().size();
+            TS_ASSERT_EQUALS(n_edge_srns_3,6);
+            TS_ASSERT_EQUALS(n_edge_srns_3, p_mesh->GetElement(3)->GetNumEdges());
+            //The fourth cell srns are unaffected
+            TS_ASSERT(pop_edge_mapping[3].empty());
+            TS_ASSERT(pop_edge_status[3].empty());
+
+            auto p_interior_cell_3 = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(cell_3_srn->GetInteriorSrn());
+            TS_ASSERT_DELTA(p_interior_cell_3->GetDelta(), 1.0, 1e-10);
+            TS_ASSERT_DELTA(p_interior_cell_3->GetNotch(), 1.0, 1e-10);
         }
 
-        /**
-         * The cell division code has to be implemented for this test to make sense and pass it
-         */
         void TestVertexMeshCellEdgeInteriorSrnDivision()
         {
             /* First we create a regular vertex mesh. */
@@ -743,8 +764,8 @@ public:
                     std::vector<double> initial_conditions;
 
                     /* Initial concentration of delta and notch is the same */
-                    initial_conditions.push_back(i);
-                    initial_conditions.push_back(i);
+                    initial_conditions.push_back(2.0);
+                    initial_conditions.push_back(2.0);
 
                     MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
@@ -777,9 +798,6 @@ public:
                 cell_population.AddCell(p_new_cell, p_cell);
                 cell_population.Update(true);
             }
-
-            /* Apply the edge changes to the cell's SRN models */
-            p_modifier->UpdateCellSrnLayout(cell_population);
 
             /* We should now have 5 cells after the divide*/
             TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5);

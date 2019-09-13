@@ -106,6 +106,12 @@ public:
     void Initialise(); // override
 
     /**
+     * Overriden method. This simply resets the model variables/parameters
+     * of the newly created edge between two cells to the desired value
+     */
+    virtual void InitialiseDaughterCell() override;
+
+    /**
      * Overridden SimulateToTime() method for custom behaviour.
      *
      * \todo #2752 say what it does in this class
@@ -167,6 +173,14 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSrnModelParameters(out_stream& rParamsFile);
+
+    virtual void AddSrnQuantities(AbstractSrnModel *p_other_srn,
+                                  const double scale = 1.0) override;
+
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn) override;
+
+    virtual void SplitEdgeSrn(const double relative_position) override;
 };
 
 typedef boost::shared_ptr<DeltaNotchSrnEdgeModel> DeltaNotchSrnEdgeModelPtr;

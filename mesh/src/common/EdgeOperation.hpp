@@ -44,7 +44,8 @@ enum EDGE_OPERATION {
     EDGE_OPERATION_DELETE,
     EDGE_OPERATION_DIVIDE,
     EDGE_OPERATION_SPLIT,
-    EDGE_OPERATION_NODE_MERGE
+    EDGE_OPERATION_NODE_MERGE,
+    EDGE_OPERATION_MERGE
 };
 
 /**
@@ -71,8 +72,6 @@ public:
      */
     EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex, EdgeRemapInfo* newEdges)
     {
-        assert(operation == EDGE_OPERATION_ADD || operation == EDGE_OPERATION_DELETE);
-
         this->mOperation = operation;
         this->mElementIndex = elementIndex;
         this->mElementIndex2 = 0;

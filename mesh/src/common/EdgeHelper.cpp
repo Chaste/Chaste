@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeHelper.hpp"
 
 template<unsigned int SPACE_DIM>
-EdgeHelper<SPACE_DIM>::EdgeHelper(): holdEdgeOperations(false)
+EdgeHelper<SPACE_DIM>::EdgeHelper()
 {
 }
 
@@ -183,46 +183,20 @@ void EdgeHelper<SPACE_DIM>::ClearEdgeOperations()
 }
 
 template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertAddEdgeOperation(unsigned elementIndex, EdgeRemapInfo* remap_info)
-{
-    if (!holdEdgeOperations)
-    {
-        mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_ADD, elementIndex, remap_info));
-    }
-}
-
-template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertNodeMergeOperation(const unsigned int elementIndex,
-                                                     EdgeRemapInfo* remap_info)
-{
-    if (!holdEdgeOperations)
-    {
-        mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_NODE_MERGE, elementIndex, remap_info));
-    }
-}
-
-template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertEdgeSplitOperation(const unsigned int elementIndex,
-                                                     EdgeRemapInfo* remap_info)
-{
-    if (!holdEdgeOperations)
-    {
-        mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_SPLIT, elementIndex, remap_info));
-    }
-}
-
-template<unsigned int SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::InsertCellDivideOperation(const unsigned int elementIndex_1, const unsigned int elementIndex_2,
                                                       EdgeRemapInfo* remap_info_1, EdgeRemapInfo* remap_info_2)
 {
-    if (!holdEdgeOperations)
-    {
         mEdgeOperations.push_back(new EdgeOperation(elementIndex_1, elementIndex_2,
                                                     remap_info_1, remap_info_2));
-    }
 }
 
 
+template <unsigned int SPACE_DIM>
+void EdgeHelper<SPACE_DIM>::InsertEdgeOperation(EDGE_OPERATION operation, const unsigned int elementIndex,
+                                                EdgeRemapInfo* remap_info)
+{
+    mEdgeOperations.push_back(new EdgeOperation(operation, elementIndex, remap_info));
+}
 
 template class EdgeHelper<1>;
 template class EdgeHelper<2>;

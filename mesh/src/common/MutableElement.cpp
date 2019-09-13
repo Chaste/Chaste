@@ -179,8 +179,6 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
         {
             auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, pNode, pNode);
             this->mEdges.push_back(edge);
-
-            this->mEdgeHelper->InsertAddEdgeOperation(this->mIndex, 0);
         }
         else
         {

@@ -167,6 +167,8 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSrnModelParameters(out_stream& rParamsFile);
+
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn) override;
 };
 
 // Declare identifier for the serializer

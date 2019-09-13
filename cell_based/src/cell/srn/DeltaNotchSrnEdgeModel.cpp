@@ -95,6 +95,18 @@ void DeltaNotchSrnEdgeModel::Initialise()
     AbstractOdeSrnModel::Initialise(new DeltaNotchEdgeOdeSystem);
 }
 
+void DeltaNotchSrnEdgeModel::InitialiseDaughterCell()
+{
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
+    mpOdeSystem->SetStateVariable("Notch",0.0);
+    mpOdeSystem->SetStateVariable("Delta",0.0);
+
+    mpOdeSystem->SetParameter("neighbour delta",0.0);
+    mpOdeSystem->SetParameter("interior delta",0.0);
+    mpOdeSystem->SetParameter("interior notch",0.0);
+}
+
 void DeltaNotchSrnEdgeModel::UpdateDeltaNotch()
 {
     assert(mpOdeSystem != nullptr);
@@ -158,6 +170,34 @@ void DeltaNotchSrnEdgeModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
+}
+
+void DeltaNotchSrnEdgeModel::AddSrnQuantities(AbstractSrnModel *p_other_srn,
+                                              const double scale)
+{
+    auto other_srn
+    = static_cast<DeltaNotchSrnEdgeModel*>(p_other_srn);
+    const double other_delta = other_srn->GetDelta();
+    const double other_notch = other_srn->GetNotch();
+    const double this_delta = GetDelta();
+    const double this_notch = GetNotch();
+    SetDelta(this_delta+scale*other_delta);
+    SetNotch(this_notch+scale*other_notch);
+}
+
+void DeltaNotchSrnEdgeModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
+{
+    AddSrnQuantities(p_shrunk_edge_srn, 0.25);
+}
+
+void DeltaNotchSrnEdgeModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
+{
+    AddSrnQuantities(p_merged_edge_srn);
+}
+
+void DeltaNotchSrnEdgeModel::SplitEdgeSrn(const double relative_position)
+{
+    ScaleSrnVariables(relative_position);
 }
 
 // Declare identifier for the serializer

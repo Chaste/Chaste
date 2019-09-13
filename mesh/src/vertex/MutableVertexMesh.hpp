@@ -333,12 +333,14 @@ protected:
                                   const std::pair<unsigned int, unsigned int> merged_nodes_pair);
 
     /**
-     * Records edge splits (node insertions into an edge) for VertexBasedPopulationSrn class to remap SRNs
-     * @param edge_split_pairs
-     * @param relative_new_node
+     * Records edge split operation in element pElement.
+     * @param pElement
+     * @param edge_index - index of the edge being split
+     * @param inserted_node_rel_position - position of the inserted node relative to the lower index node of the edge
      */
-    void RecordEdgeSplitOperation(const std::vector<std::pair<VertexElement<ELEMENT_DIM,SPACE_DIM>*, unsigned int> > edge_split_pairs,
-                                  const std::vector<double> relative_new_node);
+    void RecordEdgeSplitOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                  const unsigned int edge_index,
+                                  const double inserted_node_rel_position);
 
     /**
      * Records cell divisions for VertexBasedPopulationSrn class to remap SRNs
@@ -351,14 +353,20 @@ protected:
                                    VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
 
     /**
-     * Records edge formation during neighbour swap
-     * @param oldIds
+     * Records edge formation
      * @param pElement
      * @param edge_index - new edge index
      */
-    void RecordNewEdgeOperation(const std::vector<unsigned int>& oldIds,
-                                VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    void RecordNewEdgeOperation(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                 const unsigned int edge_index);
+    /**
+     * Records merging of adjacent edges due to deletion of the shared node node_index in element pElement
+     * @param pElement
+     * @param edge
+     */
+    void RecordEdgeMergeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                  const unsigned int node_index);
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DeltaNotchSrnInteriorModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 
 DeltaNotchSrnInteriorModel::DeltaNotchSrnInteriorModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
         : AbstractOdeSrnModel(2, pOdeSolver)
@@ -163,6 +164,22 @@ void DeltaNotchSrnInteriorModel::OutputSrnModelParameters(out_stream& rParamsFil
     // No new parameters to output, so just call method on direct parent class
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
 }
+
+void DeltaNotchSrnInteriorModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
+{
+    auto shrunk_srn
+        = static_cast<DeltaNotchSrnEdgeModel*>(p_shrunk_edge_srn);
+    const double edge_notch = shrunk_srn->GetNotch();
+    const double edge_delta = shrunk_srn->GetDelta();
+    const double this_notch = GetNotch();
+    const double this_delta = GetDelta();
+
+    const double fraction = 0.5;
+    SetDelta(this_delta+fraction*edge_delta);
+    SetNotch(this_notch+fraction*edge_notch);
+}
+
+
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"

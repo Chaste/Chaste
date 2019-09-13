@@ -48,7 +48,7 @@ class EdgeRemapInfo {
      * Contains a mapping to the old local edges index. Negative value means a new edge
      *
      */
-    std::vector<long int> mEdgesMapping;
+    const std::vector<long int> mEdgesMapping;
 
     /**
      * Status
@@ -56,7 +56,7 @@ class EdgeRemapInfo {
      * 1 Edge has been split between two elements
      * 2 Completely new edge was created
      */
-    std::vector<unsigned int> mEdgeStatus;
+    const std::vector<unsigned int> mEdgeStatus;
 
     /**
      * Determines how close the new node on the split edges is to the previous (lower) node

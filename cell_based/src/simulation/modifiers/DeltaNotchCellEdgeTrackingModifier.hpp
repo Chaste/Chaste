@@ -41,10 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SrnCellModel.hpp"
 
 #include "AbstractCellBasedSimulationModifier.hpp"
-#include "AbstractCellEdgeBasedSimulationModifier.hpp"
 
 template<unsigned DIM>
-class DeltaNotchCellEdgeTrackingModifier : public AbstractCellEdgeBasedSimulationModifier<DIM,DIM>
+class DeltaNotchCellEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
 
     /** Needed for serialization. */
@@ -111,23 +110,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationModifierParameters(out_stream& rParamsFile);
-
-
-    AbstractSrnModel *CreateEmptySrnEdgeModel() override;
-
-
-    virtual void EdgeAdded(AbstractCellPopulation<DIM, DIM> &rCellPopulation, unsigned locationIndex,
-                   unsigned edgeLocalIndex, AbstractSrnModelPtr addedEdge) override;
-
-    virtual void EdgeRemoved(AbstractCellPopulation<DIM, DIM> &rCellPopulation, unsigned locationIndex,
-                     unsigned edgeLocalIndex, AbstractSrnModelPtr oldSrnEdge) override;
-
-
-    void EdgeDivide(AbstractSrnModelPtr oldSrnEdge, AbstractSrnModelPtr newSrnEdge) override;
-
-
-
-
 };
 
 #include "SerializationExportWrapper.hpp"

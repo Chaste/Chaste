@@ -275,7 +275,39 @@ public:
      */
     virtual void ScaleSrnVariables(const double theta);
 
-    virtual void AddSrnQuantities(AbstractSrnModel* p_other_srn);
+    /**
+     * Adds Srn quantities (variables or parameters) to this.
+     * The quantities can be scaled by factor scale.
+     * @param p_other_srn
+     * @param scale
+     */
+    virtual void AddSrnQuantities(AbstractSrnModel* p_other_srn,
+                                  const double scale = 1.0);
+
+    /**
+     * Adds the shrunk edge srn quantities to this edge
+     * @param p_shrunk_edge_srn
+     */
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn);
+
+    /**
+     * Adds the merged edge srn quantities to this edge
+     * @param p_merged_edge_srn
+     */
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn);
+
+    /**
+     * Adds the shrunk edge srn quantities to the interior srn
+     * @param p_shrunk_edge_srn
+     */
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn);
+
+    /**
+     * Scales SRN quantities due to edge split. Amount of scaling may depend on the resulting proportions,
+     * deetermined by relative position of the node that splits the edge
+     * @param relative_position - how close the added node is to the previous node
+     */
+    virtual void SplitEdgeSrn(const double relative_position);
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)
