@@ -367,6 +367,14 @@ protected:
     void RecordEdgeMergeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                   const unsigned int node_index);
 
+    /**
+     * Records loss of neighbour by an edge, e.g. in T2 swap.
+     * @param pElement
+     * @param edge_index
+     */
+    void RecordEdgeNewNeighbourOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                         const unsigned int edge_index);
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 

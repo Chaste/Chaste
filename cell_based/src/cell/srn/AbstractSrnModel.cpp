@@ -163,4 +163,7 @@ void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_s
 void AbstractSrnModel::SplitEdgeSrn(const double relative_position)
 {}
 
+void AbstractSrnModel::UpdateSrnAfterNewNeighbour()
+{}
+
 

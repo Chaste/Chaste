@@ -3740,6 +3740,23 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperation(VertexE
     this->mEdges.InsertEdgeOperation(EDGE_OPERATION_MERGE, element_index, remap_info);
 }
 
+template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RecordEdgeNewNeighbourOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
+                                                                                const unsigned int edge_index)
+{
+    const unsigned int element_index = pElement->GetIndex();
+    const unsigned int n_edges = pElement->GetNumEdges();
+    std::vector<unsigned int > edge_status(n_edges, 0);
+    std::vector<long int> edge_mapping(n_edges);
+    for (unsigned int i=0; i<n_edges; ++i)
+    {
+        edge_mapping[i] = i;
+    }
+    edge_status[edge_index] = 5;
+    EdgeRemapInfo* remap_info = new EdgeRemapInfo(edge_mapping, edge_status);
+    this->mEdges.InsertEdgeOperation(EDGE_OPERATION_NEW_NEIGHBOUR, element_index, remap_info);
+}
+
 // Explicit instantiation
 template class MutableVertexMesh<1,1>;
 template class MutableVertexMesh<1,2>;

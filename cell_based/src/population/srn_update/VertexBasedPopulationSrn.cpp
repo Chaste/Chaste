@@ -55,6 +55,7 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
         case EDGE_OPERATION_NODE_MERGE:
         case EDGE_OPERATION_SPLIT:
         case EDGE_OPERATION_MERGE:
+        case EDGE_OPERATION_NEW_NEIGHBOUR:
         {
             const unsigned int location_index = operation->GetElementIndex();
             EdgeRemapInfo *pEdgeChange = operation->GetNewEdges();
@@ -112,6 +113,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
         //3 - Edge below or above an edge that was deleted due to node merging
         //4 - Edge above was merged into this edge
+        //5 - Edge acquired a new neighbour. For example after a T2 swap
         const unsigned int remapStatus = pEdgeChange->GetEdgesStatus()[i];
         if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
         {
@@ -161,6 +163,12 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             new_edge_srn[i] -> AddMergedEdgeSrn(parent_srn_edges[next_edge_index].get());
             break;
         }
+        case 5:
+        {
+            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
+            new_edge_srn[i]->UpdateSrnAfterNewNeighbour();
+            break;
+        }
         }
 
         //Setting the new local edge index and the cell
@@ -179,6 +187,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         {
             interior_srn->AddShrunkEdgeToInterior(parent_srn_edges[shrunkEdgeIndex].get());
         }
+        interior_srn->UpdateSrnAfterNewNeighbour();
     }
 
     pSrnCell->AddEdgeSrn(new_edge_srn);
