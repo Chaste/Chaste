@@ -38,13 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <iomanip>
 #include <fstream>
+#include <memory>
 #include <numeric>
 
 // Spectra includes (for the eigenvalue and eigenvector calculations)
 #include <MatOp/SparseGenMatProd.h>
 #include <SymEigsSolver.h>
 
-#include "ChasteMakeUnique.hpp"
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
@@ -83,7 +83,7 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::a
     bool periodic_y = SPACE_DIM > 1 ? periodicity[1] : false;
     bool periodic_z = SPACE_DIM > 2 ? periodicity[2] : false;
 
-    mpBoxCollection = our::make_unique<ObsoleteBoxCollection<SPACE_DIM>>(
+    mpBoxCollection = std::make_unique<ObsoleteBoxCollection<SPACE_DIM>>(
             boxWidth,
             domain_size,
             periodic_x,

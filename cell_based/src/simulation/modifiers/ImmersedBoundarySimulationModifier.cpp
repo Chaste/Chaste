@@ -35,7 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundarySimulationModifier.hpp"
 
-#include "ChasteMakeUnique.hpp"
+#include <memory>
+
 #include "FluidSource.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
@@ -144,7 +145,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     domain_size(2) = 0.0;
     domain_size(3) = 1.0;
 
-    mpBoxCollection = our::make_unique<ObsoleteBoxCollection<DIM>>(
+    mpBoxCollection = std::make_unique<ObsoleteBoxCollection<DIM>>(
             mpCellPopulation->GetInteractionDistance(),
             domain_size,
             true,
@@ -158,14 +159,14 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     {
         case 2:
         {
-            mpArrays = our::make_unique<ImmersedBoundary2dArrays<DIM>>(
+            mpArrays = std::make_unique<ImmersedBoundary2dArrays<DIM>>(
                     mpMesh,
                     SimulationTime::Instance()->GetTimeStep(),
                     mReynoldsNumber,
                     mpCellPopulation->DoesPopulationHaveActiveSources()
             );
 
-            mpFftInterface = our::make_unique<ImmersedBoundaryFftInterface<DIM>>(
+            mpFftInterface = std::make_unique<ImmersedBoundaryFftInterface<DIM>>(
                     mpMesh,
                     &(mpArrays->rGetModifiableRightHandSideGrids()[0][0][0]),
                     &(mpArrays->rGetModifiableFourierGrids()[0][0][0]),
@@ -210,7 +211,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
         }
 
         // Set up the random field generator and save it to cache
-        mpRandomField = our::make_unique<UniformGridRandomFieldGenerator<DIM>>(
+        mpRandomField = std::make_unique<UniformGridRandomFieldGenerator<DIM>>(
                 lower_corner,
                 upper_corner,
                 num_grid_pts,

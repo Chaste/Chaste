@@ -39,8 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed for test framework
 #include "AbstractCellBasedTestSuite.hpp"
 
+#include <memory>
+
 #include "CellsGenerator.hpp"
-#include "ChasteMakeUnique.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
@@ -538,7 +539,7 @@ public:
     {
         // Test member variables
         {
-            auto p_force = our::make_unique<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>();
+            auto p_force = std::make_unique<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>();
 
             // Set member variables
             p_force->SetLabelledCellToLabelledCellSpringConst(1.23);
