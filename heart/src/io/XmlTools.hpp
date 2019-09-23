@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,19 +36,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef XMLTOOLS_HPP_
 #define XMLTOOLS_HPP_
 
+#define XSD_CXX11
+
 #include <string>
 #include <vector>
 
 #include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNode.hpp>
 #include <xercesc/util/XercesDefs.hpp> // XMLCh
 
-#include <xsd/cxx/version.hxx>
-#include <xsd/cxx/xml/string.hxx>
-#include <xsd/cxx/xml/dom/auto-ptr.hxx>
-#include <xsd/cxx/tree/error-handler.hxx>
 #include <xsd/cxx/tree/elements.hxx>
+#include <xsd/cxx/tree/error-handler.hxx>
+#include <xsd/cxx/version.hxx>
+#include <xsd/cxx/xml/dom/auto-ptr.hxx>
+#include <xsd/cxx/xml/string.hxx>
 
 #ifndef X //Also used in XSD code for XdmfMeshWriter
 /**
@@ -79,7 +81,7 @@ public:
      * @param validate  whether to perform schema validation
      * @return Xerces convenience object
      */
-    static xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> ReadXmlFile(
+    static XSD_DOM_AUTO_PTR<xercesc::DOMDocument> ReadXmlFile(
         const std::string& rFileName,
         const ::xsd::cxx::tree::properties<char>& rProps,
         bool validate=true);
@@ -128,7 +130,7 @@ public:
      * @param validate  whether to perform schema validation
      * @return Xerces convenience object
      */
-    static xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> ReadFileToDomDocument(
+    static XSD_DOM_AUTO_PTR<xercesc::DOMDocument> ReadFileToDomDocument(
         const std::string& rFileName,
         ::xsd::cxx::xml::error_handler<char>& rErrorHandler,
         const ::xsd::cxx::tree::properties<char>& rProps,

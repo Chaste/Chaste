@@ -2,7 +2,7 @@
 # We want 1/2==0.5
 from __future__ import division
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -2657,8 +2657,8 @@ class cellml_units(Colourable, element_base):
                                    other.expand().get_multiplicative_factor(),
                                    1e-6)
         if equal and self.is_simple():
-            equal = self._rel_error_ok(self.unit.get_offset(),
-                                       other.unit.get_offset(),
+            equal = self._rel_error_ok(self.get_offset(),
+                                       other.get_offset(),
                                        1e-6)
         return equal
 

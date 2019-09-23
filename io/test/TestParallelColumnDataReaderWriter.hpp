@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -279,8 +279,8 @@ public:
         TS_ASSERT_EQUALS(var2_node4[0], -4 * 1e100); // First time step
         TS_ASSERT_DELTA(var2_node4[1], sqrt(4 * 1e100), 1e-4); // Second time step
 
-        TS_ASSERT_THROWS_THIS(mpReader->GetValues("LifeSigns",4),"Unknown variable");
-        TS_ASSERT_THROWS(mpReader->GetValues("Var1",10),std::out_of_range);
+        TS_ASSERT_THROWS_THIS(mpReader->GetValues("LifeSigns",4), "Unknown variable");
+        TS_ASSERT_THROWS(mpReader->GetValues("Var1",10), const std::out_of_range &);
 
         // Delete the reader: makes sure that files are closed
         delete mpReader;

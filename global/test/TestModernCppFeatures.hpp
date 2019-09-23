@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCPP11FEATURES_HPP_
-#define TESTCPP11FEATURES_HPP_
+#ifndef TESTMODERNCPPFEATURES_HPP_
+#define TESTMODERNCPPFEATURES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -47,24 +47,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <random>
 #include <string>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "FakePetscSetup.hpp"
 
 /**
- * Verify that certain C++11 features will compile correctly.
+ * Verify that certain modern C++ features will compile correctly.
  *
  * There is no real 'testing' in this class; just verification that the compiler can cope with various new language
  * features.
+ *
+ * Chaste currently uses C++14.
  */
-class TestCpp11Features : public CxxTest::TestSuite
+class TestModernCppFeatures : public CxxTest::TestSuite
 {
 public:
 
     void TestAutoKeyword()
     {
         auto i = 0;
-        ++i; // Stop the compiler complaining about unused variable
+        TS_ASSERT_EQUALS(i, 0);
     }
 
     void TestSmartPointers()
@@ -73,24 +76,26 @@ public:
         std::unique_ptr<double> p_unique;
 
         auto p_made_shared = std::make_shared<double>();
+        auto p_made_unique = std::make_unique<double>();
     }
 
     void TestStdArray()
     {
-        std::array<unsigned, 3> my_array;
-        ++my_array[0]; // Stop the compiler complaining about unused variable
+        std::array<unsigned, 3> my_array = {{1u, 2u, 3u}};
+        TS_ASSERT_EQUALS(my_array[2], 3u);
     }
 
     void TestStdInitializerList()
     {
-        std::vector<unsigned> my_vec = {1, 2, 3, 4, 5};
+        std::vector<unsigned> my_vec = {1u, 2u, 3u, 4u, 5u};
+        TS_ASSERT_EQUALS(my_vec[1], 2u);
     }
 
     void TestRangeFor()
     {
         // Traversing a vector
         {
-            std::vector<unsigned> my_vec = {0, 1, 2, 3, 4, 5};
+            std::vector<unsigned> my_vec = {0u, 1u, 2u, 3u, 4u, 5u};
 
             // Access by const reference
             for (const unsigned &i : my_vec)
@@ -146,7 +151,7 @@ public:
         }
 
         // Use algorithm std::sort, with a lambda, to sort smallest-to-largest x-val
-        auto sort_x = [](std::array<double, DIM> a, std::array<double, DIM> b) -> bool
+        auto sort_x = [](auto a, std::array<double, DIM> b) -> bool
         {
             return a[0] < b[0];
         };
@@ -157,14 +162,20 @@ public:
     void TestTuple()
     {
         auto my_tuple = std::make_tuple(1.23, 5u, "a_string");
-        ++std::get<1>(my_tuple); // Stop the compiler complaining about unused variable
+
+        TS_ASSERT_EQUALS(std::get<1>(my_tuple), 5u);
+        TS_ASSERT_DELTA(std::get<double>(my_tuple), 1.23, 1e-12);
     }
 
     void TestNullptrType()
     {
-        int* i = nullptr;
-        ++i;
+        TS_ASSERT(std::is_null_pointer<decltype(nullptr)>::value);
+    }
+
+    void TestDigitSeparator()
+    {
+        TS_ASSERT_EQUALS(1'000'000, 1000000);
     }
 };
 
-#endif /*TESTCPP11FEATURES_HPP_*/
+#endif /*TESTMODERNCPPFEATURES_HPP_*/

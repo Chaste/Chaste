@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,19 +93,14 @@ public:
     /**
      * Constructor
      *
-     * @param globalIndex The global index of the node which is to be output (assumes no permutation).
-     *  This is the index *in memory at solve time*.  If you are running in parallel and you want a
-     *  specific location or index in your mesh then you will need to look in the mesh for node or permutation.
-     *  \code
-     *     ChastePoint<1> point(0.05);
-     *     unsigned new_index_for_5 = mesh.GetNearestNodeIndex(point);
-     *     SingleTraceOutputModifier("trace_5.txt", new_index_for_5));
-     *  \endcode
-     *  or
+     * @param globalIndex The global index of the node which is to be output.
+     *  This is the index *in the original mesh*.  If you are running in parallel your index in the original
+     *  mesh will be automatically converted to the runtime index using the node permutation in the mesh.
+     *  That is, is you ask for node 5 in the original mesh then you will automatically get
      *  \code
      *     unsigned new_index_for_5 = mesh.rGetNodePermutation()[5];
-     *     SingleTraceOutputModifier("trace_5.txt", new_index_for_5));
      *  \endcode
+     *  which is the runtime index of the same node in space.
      *
      * @param rFilename  The file which is eventually produced by this modifier
      * @param flushTime The simulation time between manual file flushes (if required)
@@ -120,13 +115,14 @@ public:
     }
 
     /**
-     * Initialise the modifier (open the file) when the solve loop is starting.
+     * Initialise the modifier (open a file or make some memory) when the solve loop is starting
      *
      * Note the problem passes parameters in a non-templated fashion in order to keep the interface as lightweight as
-     * possible.
+     * possible.  That is, it might have been slicker to pass in the mesh but that would require multiple templates.
      * @param pVectorFactory  The vector factory which is associated with the calling problem's mesh
+     * @param rNodePermutation The permutation associated with the calling problem's mesh (when running with parallel partitioning)
      */
-    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory);
+    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation);
 
     /**
      * Finalise the modifier (close the file)

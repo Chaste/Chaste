@@ -1,7 +1,7 @@
 # Configuration for beat.cs.ox.ac.uk, see
 # https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/Beat
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the

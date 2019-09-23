@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -623,7 +623,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
         // Test GetMeshForVtk() method
-        MutableVertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
+        VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
@@ -674,9 +674,6 @@ public:
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(3), 47u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(4), 35u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
-
-        // Avoid memory leak
-        delete p_mesh_for_vtk;
     }
 };
 

@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,20 +42,32 @@ import subprocess
 # do_inf_tests = 1
 
 # Check which version of Ubuntu this is
-fp = open('/etc/issue')
-ubuntu_ver = fp.read().split()[1]
+# fp = open('/etc/issue')
+# ubuntu_ver = fp.read().split()[1]
+# fp.close()
+
+## A more robust way of finding the Ubuntu version (works with Betas too)
+fp = open('/etc/lsb-release')
+whole_file = fp.read()
 fp.close()
 
-# First deal with special cases for beta releases etc.
-if ubuntu_ver == 'Trusty':
-    ubuntu_ver = [14,04]
-else:
-    ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
+for item in whole_file.split("\n"):
+    if "DISTRIB_RELEASE=" in item:
+        version_line = item.strip()
 
-if ubuntu_ver >= [18,04]:
+ubuntu_ver = version_line.replace('DISTRIB_RELEASE=','')
+ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
+
+if ubuntu_ver >= [18,10]:
+    petsc_ver = 3.9
+    petsc_path = '/usr/lib/petscdir/'
+    petsc_build_name = '3.9'
+elif ubuntu_ver >= [18,04]:
     petsc_ver = 3.7
-    petsc_path = '/usr/lib/petscdir/3.7/'
-if ubuntu_ver >= [17,10]:
+    petsc_path = '/usr/lib/petscdir/'
+    petsc_build_name = '3.7'
+    petsc_build_name_optimized = '3.7-real'
+elif ubuntu_ver >= [17,10]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.6/'
 elif ubuntu_ver >= [17,04]:
@@ -84,16 +96,18 @@ else:
     petsc_2_3_path = '/usr/lib/petscdir/2.3.3/'
 
 petsc_2_2_path = ''
-if ubuntu_ver >= [16,04]:
-    petsc_build_name_optimized = os.path.basename(glob.glob(os.path.join(petsc_path, '*-real'))[0])
-    _dbg = glob.glob(os.path.join(petsc_path, '*-real-debug'))
-    if _dbg:
-        petsc_build_name = os.path.basename(_dbg[0])
+if ubuntu_ver < [18,04]:
+    if ubuntu_ver >= [16,04]:
+        petsc_build_name_optimized = os.path.basename(glob.glob(os.path.join(petsc_path, '*-real'))[0])
+        _dbg = glob.glob(os.path.join(petsc_path, '*-real-debug'))
+        if _dbg:
+            petsc_build_name = os.path.basename(_dbg[0])
+        else:
+            petsc_build_name = petsc_build_name_optimized
     else:
-        petsc_build_name = petsc_build_name_optimized
-else:
-    petsc_build_name = 'linux-gnu-c-debug'
-    petsc_build_name_optimized = 'linux-gnu-c-opt'
+        petsc_build_name = 'linux-gnu-c-debug'
+        petsc_build_name_optimized = 'linux-gnu-c-opt'
+
 petsc_build_name_profile = petsc_build_name
 
 dealii_path = None
@@ -229,7 +243,7 @@ def Configure(prefs, build):
 
     # Is CVODE installed?
     use_cvode = int(prefs.get('use-cvode', True))
-    use_cvode = use_cvode and os.path.exists('/usr/lib/libsundials_cvode.so')
+    use_cvode = use_cvode and (os.path.exists('/usr/lib/libsundials_cvode.so') or os.path.exists('/usr/lib/x86_64-linux-gnu/libsundials_cvode.so'))
     if ubuntu_ver <= [9,04]:
         # We don't support CVODE 2.4
         use_cvode = False

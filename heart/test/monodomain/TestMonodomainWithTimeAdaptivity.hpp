@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -207,7 +207,8 @@ public:
                 // compare
                 //This test assumes no exception.  Requires PETSc > 2.3.2
                 TS_ASSERT_DELTA(min_adaptive, 19.9009, 1e-3);
-                TS_ASSERT_DELTA(max_adaptive, 25.6082, 1e-3);
+                TS_ASSERT_DELTA(max_adaptive, 25.6082, 1.25e-3);
+                // Note that the threshold was increased to 1.25e-3 due to a minor change in PETSc. See #2997.
             }
         }
         catch (Exception& e)

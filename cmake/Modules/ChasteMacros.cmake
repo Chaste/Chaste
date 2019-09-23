@@ -604,7 +604,7 @@ macro(Chaste_DO_TEST_COMMON component)
                     if(filename MATCHES "Test(.*)Tutorial.(hpp|py)")
                         # Get the git revision of last time this file was changed
                         if(DEFINED GIT_EXECUTABLE AND EXISTS "${Chaste_SOURCE_DIR}/.git")
-                            execute_process(COMMAND git log -1 --format=%h --follow ${filename}
+                            execute_process(COMMAND git log -1 --format=%H --follow ${filename}
                                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                                     OUTPUT_VARIABLE Chaste_revision
                                     OUTPUT_STRIP_TRAILING_WHITESPACE)

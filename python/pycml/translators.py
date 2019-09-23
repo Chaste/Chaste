@@ -1,7 +1,6 @@
 # We want 1/2==0.5
 from __future__ import division
-
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -2391,10 +2390,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
     
     def output_nonlinear_state_assignments(self, nodeset=None):
         """Output assignments for nonlinear state variables."""
+#        processed=[]
         for i, var in enumerate(self.nonlinear_system_vars):
-            if not nodeset or var in nodeset:
+            if not nodeset or var in nodeset and self.code_name(var):# and not self.code_name(var) in processed:
                 self.writeln(self.TYPE_DOUBLE, self.code_name(var), self.EQ_ASSIGN,
                              self.vector_index('rCurrentGuess', i), self.STMT_END)
+#                processed.append(self.code_name(var))
                 #621 TODO: maybe convert if state var dimensions include time
         self.writeln()
         return
@@ -2706,9 +2707,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Output mathematics for computing du/dt for each nonlinear state var u
             nodes = map(lambda u: (u, self.free_vars[0]), self.nonlinear_system_vars)
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
+ 
+            
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
+            self.writeln("//output_nonlinear_state_assignments")
             self.output_nonlinear_state_assignments(nodeset=nodeset)
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
+            self.writeln("//output_equations")
             self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Fill in residual
@@ -3495,9 +3500,17 @@ class CellMLToChasteTranslator(CellMLTranslator):
                                      [{'units': 'second', 'prefix': 'milli'}])
         mV = cellml_units.create_new(model, 'millivolt',
                                      [{'units': 'volt', 'prefix': 'milli'}])
+
+        milliMolar = cellml_units.create_new(model,'millimolar', 
+                            [{'units': 'mole', 'prefix': 'milli'},
+                             {'units': 'litre', 'exponent': '-1'}])
+
+
         current_units, microamps = klass.get_current_units_options(model)[0:2]
         # The interface generator
         generator = processors.InterfaceGenerator(model, name=klass.INTERFACE_COMPONENT_NAME)
+
+
         iface_comp = generator.get_interface_component()
         # In case we need to convert initial values, we create the units converter here
         if config.options.convert_interfaces:
@@ -3513,6 +3526,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Oops!
             raise TranslationError('Time does not have dimensions of time')
         generator.add_input(t, ms)
+
         if doc.model.get_option('backward_euler'):
             # Backward Euler code generation requires access to the time step
             model_dt = solver_info.create_dt(generator, t.component, t.get_units())
@@ -3547,6 +3561,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
         if config.V_variable:
             config.V_variable = generator.add_input(config.V_variable, mV)
+
+
+
         ionic_vars = config.i_ionic_vars
         if ionic_vars:
             i_ionic = generator.add_output_function('i_ionic', 'plus', ionic_vars, current_units)
@@ -3594,6 +3611,20 @@ class CellMLToChasteTranslator(CellMLTranslator):
                             process_ci_elts(child)
                 process_ci_elts(dVdt)
 
+        #Unit conversion for cytosolic_calcium_variable
+        ##Try to check  if cytosolic_calcium_variable has a dimension of molar. If it fails its units may not be defined properly
+        #Cannot just use generator.add_input as thsi may cause duplicates in BackwardsEuler odes
+        try:
+            if config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
+                if config.cytosolic_calcium_variable.get_type()==VarTypes.Computed:
+                    config.cytosolic_calcium_variable = generator.add_output(config.cytosolic_calcium_variable, milliMolar)
+                else:
+                    config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
+        except AttributeError:
+            DEBUG('generate_interface', "Model has no cytosolic_calcium_variable")
+        except:
+             DEBUG('generate_interface', "Unit conversion for cytosolic_calcium_variable failed.")
+
         # Finish up
         def errh(errors):
             raise TranslationError("Creation of Chaste interface component failed:\n  " + str(errors))
@@ -3613,7 +3644,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
                     raise TranslationError(msg)
                 else:
                     print >>sys.stderr, msg
-
 
 class CellMLToCvodeTranslator(CellMLToChasteTranslator):
     """Translate a CellML model to C++ code for use with Chaste+CVODE."""
@@ -5812,6 +5842,8 @@ class ConfigurationStore(object):
         # Membrane capacitance
         self.Cm_definitions = []
         self.Cm_variable = None
+        # Cytosolic calcium concentration
+        self.cytosolic_calcium_concentration = None
         # Lookup table configuration
         self.lut_config = {}
         # Ionic currents configuration
@@ -5951,6 +5983,7 @@ class ConfigurationStore(object):
         # Identify the variables in the model
         self.find_transmembrane_potential()
         self.find_membrane_capacitance()
+        self.find_cytosolic_calcium_concentration()
         if not self.options.protocol:
             self.find_current_vars()
 
@@ -6394,6 +6427,17 @@ class ConfigurationStore(object):
         self.Cm_variable = self._find_var('membrane_capacitance', self.Cm_definitions)
         DEBUG('config', 'Found capacitance', self.Cm_variable)
 
+    def find_cytosolic_calcium_concentration(self):
+        """Find and store the variable object representing the cytosolic_calcium_concentration.
+        
+        Uses metadata only, if does not store."""
+        self.cytosolic_calcium_variable = None
+        self.cytosolic_calcium_variable = self.doc.model.get_variable_by_oxmeta_name('cytosolic_calcium_concentration', throw=False)
+        if(self.cytosolic_calcium_variable):
+            DEBUG('config', 'Found capaccytosolic_calcium_variable', self.cytosolic_calcium_variable)
+        else:
+            DEBUG('config', 'capaccytosolic_calcium_variable NOT found', self.cytosolic_calcium_variable)
+
     def find_lookup_variables(self):
         """Find the variable objects used as lookup table keys.
 
@@ -6732,8 +6776,7 @@ def get_options(args, default_options=None):
         try:
             import numba
         except:
-            options.numba = False
-
+            options.numba = False 
     return options, args[0]
 
 
@@ -6878,7 +6921,17 @@ def run():
         def gv(vname):
             return cellml_variable.get_variable_object(doc.model, vname).get_source_variable(recurse=True)
         for var_i, var_j in jacobian.keys():
-            if gv(var_i) not in nonlinear_vars or gv(var_j) not in nonlinear_vars:
+            #hack to not remove converted variables.
+            if gv(var_i).get_type()==VarTypes.Computed:
+                source_var_i = gv(var_i).get_dependencies()[0].get_dependencies()[0].get_source_variable()
+            else:
+                source_var_i = gv(var_i)
+            if gv(var_j).get_type()==VarTypes.Computed:
+                source_var_j = gv(var_j).get_dependencies()[0].get_dependencies()[0].get_source_variable()
+            else:
+                source_var_j = gv(var_j)
+
+            if source_var_i not in nonlinear_vars or source_var_j not in nonlinear_vars:
                 del jacobian[(var_i, var_j)]
         if doc.model._cml_jacobian_full:
             # Transform the Jacobian into the form needed by the Backward Euler code
@@ -6888,15 +6941,17 @@ def run():
                 if key[0] == key[1]:
                     # 1 on the diagonal
                     new_expr = maple_parser.MNumber(['1'])
-                if not (isinstance(expr, maple_parser.MNumber) and str(expr) == '0'):
+                if not (isinstance(expr, maple_parser.MNumber) and str(expr) == '0'):                
                     # subtract delta_t * expr
                     args = []
                     if new_expr:
                         args.append(new_expr)
                     args.append(maple_parser.MOperator([maple_parser.MVariable(['delta_t']), expr], 'prod', 'times'))
                     new_expr = maple_parser.MOperator(args, '', 'minus')
+#                    jacobian[key] = new_expr
                 if new_expr:
-                    jacobian[key] = new_expr
+                    jacobian[key] = new_expr                    
+
         # Add info as XML
         solver_info.add_all_info()
         # Analyse the XML, adding cellml_variable references, etc.

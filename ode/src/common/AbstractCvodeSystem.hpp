@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -382,6 +382,22 @@ public:
      * @param minimalReset  whether to avoid checking for changes in state variables
      */
     void SetMinimalReset(bool minimalReset);
+
+    /**
+     * @brief Get whether we want to run with minimal reset or not (no reinitialisation of the solver if variables change)
+     *
+     * @return true We are not resetting the solver if time or variables change between solve calls.
+     * @return false We will reset the solver if time or variables change between solve calls.
+     */
+    bool GetMinimalReset();
+
+    /**
+     * @brief Get whether we will force a solver reset on every call to Solve()
+     *
+     * @return true We will reinitialise the solver at the start of every Solve() call.
+     * @return false We will not reinitialise the solver at the start of every Solve() call.
+     */
+    bool GetForceReset();
 
     /**
      * Successive calls to Solve will attempt to intelligently determine whether

@@ -47,7 +47,7 @@ foreach(project ${Chaste_PROJECTS})
     if (IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${project}/.git")
         # Determine the git hash as a string
         execute_process(
-                COMMAND git -C ${Chaste_SOURCE_DIR}/projects/${project} rev-parse --short HEAD
+                COMMAND git -C ${Chaste_SOURCE_DIR}/projects/${project} rev-parse HEAD
                 OUTPUT_VARIABLE this_project_version
         )
         # Determine whether there are uncommitted revisions

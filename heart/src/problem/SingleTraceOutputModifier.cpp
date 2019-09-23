@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,10 +38,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MathsCustomFunctions.hpp"
 
 void
-SingleTraceOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory)
+SingleTraceOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation)
 {
     // Collectively open the output directory - this might already be in place from creating the HDF5 file
     OutputFileHandler output_handler(HeartConfig::Instance()->GetOutputDirectory(), false);
+
+    if (!rNodePermutation.empty()){
+        //Convert to runtime permuted index
+        mGlobalIndex = rNodePermutation[mGlobalIndex];
+    }
+    // Note that the runtime index is the one which will get archived
 
     // Only the node owner needs to proceed here
     if (pVectorFactory->IsGlobalIndexLocal(mGlobalIndex))

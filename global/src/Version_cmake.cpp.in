@@ -124,7 +124,7 @@ const char* ChasteBuildInfo::GetCompilerVersion()
 
 const char* ChasteBuildInfo::GetCompilerFlags()
 {
-    return "${CMAKE_CXX_FLAGS}";
+    return "${ALL_CXX_FLAGS}";
 }
 
 const std::map<std::string, std::string>& ChasteBuildInfo::rGetProjectVersions()

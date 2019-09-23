@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -108,13 +108,14 @@ public:
     }
 
     /**
-     * Initialise the modifier (make space for local activation times) when the solve loop is starting.
+     * Initialise the modifier (open a file or make some memory) when the solve loop is starting
      *
      * Note the problem passes parameters in a non-templated fashion in order to keep the interface as lightweight as
-     * possible.
+     * possible.  That is, it might have been slicker to pass in the mesh but that would require multiple templates.
      * @param pVectorFactory  The vector factory which is associated with the calling problem's mesh
+     * @param rNodePermutation The permutation associated with the calling problem's mesh (when running with parallel partitioning)
      */
-    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory);
+    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation);
 
     /**
      * Finalise the modifier (write all results to the file)

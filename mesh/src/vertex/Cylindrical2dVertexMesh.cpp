@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,14 +42,16 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  double cellRearrangementThreshold,
                                                  double t2Threshold)
     : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
-      mWidth(width)
+      mWidth(width),
+      mpMeshForVtk(nullptr)
 {
-    // ReMesh to remove any deleted nodes and relabel
+    // Call ReMesh() to remove any deleted nodes and relabel
     ReMesh();
 }
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
-    : mWidth(rMesh.GetWidth(0))
+    : mWidth(rMesh.GetWidth(0)),
+      mpMeshForVtk(nullptr)
 {
     mpDelaunayMesh = &rMesh;
 
@@ -78,11 +80,11 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
     for (unsigned i=0; i<num_nodes; i++)
     {
         double x_location = mNodes[i]->rGetLocation()[0];
-        if (x_location < 0 )
+        if (x_location < 0)
         {
             mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
         }
-        else if (x_location > mWidth )
+        else if (x_location > mWidth)
         {
             mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
         }
@@ -145,11 +147,16 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
 }
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()
+    : mpMeshForVtk(nullptr)
 {
 }
 
 Cylindrical2dVertexMesh::~Cylindrical2dVertexMesh()
 {
+    if (mpMeshForVtk != nullptr)
+    {
+         delete mpMeshForVtk;
+    }
 }
 
 c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
@@ -227,7 +234,7 @@ void Cylindrical2dVertexMesh::Scale(const double xScale, const double yScale, co
     mWidth *= xScale;
 }
 
-MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
+VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
@@ -319,8 +326,13 @@ MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         }
     }
 
-    MutableVertexMesh<2, 2>* p_mesh = new MutableVertexMesh<2,2>(nodes, elements, mCellRearrangementThreshold, mT2Threshold);
-    return p_mesh;
+    if (mpMeshForVtk != nullptr)
+    {
+        delete mpMeshForVtk;
+    }
+
+    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
+    return mpMeshForVtk;
 }
 
 // Serialization for Boost >= 1.36

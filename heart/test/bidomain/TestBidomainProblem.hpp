@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1083,13 +1083,7 @@ public:
         BidomainProblem<1> bidomain_problem( &cell_factory );
 
         // Single trace at node 5
-        unsigned new_index_for_5 = mesh.rGetNodePermutation()[5];
-        TS_ASSERT_EQUALS(new_index_for_5, 8u);
-        ChastePoint<1> point(0.05);
-        unsigned index_for_location = mesh.GetNearestNodeIndex(point);
-        TS_ASSERT_EQUALS(index_for_location, 8u);
-
-        boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", new_index_for_5, 0.1));
+        boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5u, 0.1));
         bidomain_problem.AddOutputModifier(trace_5);
 
         bidomain_problem.SetMesh(&mesh);

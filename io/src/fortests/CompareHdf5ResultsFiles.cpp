@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2019, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <vector>
-#include "petscvec.h"
-#include "Hdf5DataReader.hpp"
 #include "DistributedVectorFactory.hpp"
+#include "Hdf5DataReader.hpp"
+#include "petscvec.h"
 
 bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1, bool makeAbsolute1,
                                    std::string pathname2, std::string filename2, bool makeAbsolute2,
@@ -83,7 +83,7 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
                   << unlimited_variable_unit2 << " don't match\n";
         return false;
     }
-    for (unsigned var=0; var<num_vars; var++)
+    for (unsigned var = 0; var < num_vars; var++)
     {
         std::string var_name = variable_names1[var];
         if (var_name != variable_names2[var])
@@ -111,13 +111,13 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
         return false;
     }
 
-    for (unsigned timestep=0; timestep<times1.size(); timestep++)
+    for (unsigned timestep = 0; timestep < times1.size(); timestep++)
     {
         ///\todo remove magic number? (#1884)
-        if (fabs(times1[timestep]-times2[timestep]) > 1e-8)
+        if (fabs(times1[timestep] - times2[timestep]) > 1e-8)
         {
-            std::cout << "Time steps " << times1[timestep]
-                      << " and " << times2[timestep] << " don't match\n";
+            std::cout << "Time step " << timestep << " doesn't match. First file says " << times1[timestep]
+                      << " and second says " << times2[timestep] << std::endl;
             return false;
         }
     }
@@ -127,7 +127,7 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
 
     if (is_complete1 != is_complete2)
     {
-        std::cout<<"One of the readers has incomplete data and the other doesn't\n";
+        std::cout << "One of the readers has incomplete data and the other doesn't\n";
         return false;
     }
 
@@ -138,9 +138,9 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
         Vec data1 = factory.CreateVec();
         Vec data2 = factory.CreateVec();
 
-        for (unsigned timestep=0; timestep<times1.size(); timestep++)
+        for (unsigned timestep = 0; timestep < times1.size(); timestep++)
         {
-            for (unsigned var=0; var<num_vars; var++)
+            for (unsigned var = 0; var < num_vars; var++)
             {
                 reader1.GetVariableOverNodes(data1, variable_names1[var], timestep);
                 reader2.GetVariableOverNodes(data2, variable_names2[var], timestep);
@@ -180,29 +180,29 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
             return false;
         }
 
-        for (unsigned index=0; index<indices1.size(); index++)
+        for (unsigned index = 0; index < indices1.size(); index++)
         {
-            if (indices1[index]!=indices2[index])
+            if (indices1[index] != indices2[index])
             {
-               std::cout << "Time steps " << indices1[index] << " and " << indices2[index] << " don't match\n";
-               return false;
+                std::cout << "Node indices " << indices1[index] << " and " << indices2[index] << " don't match\n";
+                return false;
             }
         }
 
         // Check all the data
-        for (unsigned index=0; index<indices1.size(); index++)
+        for (unsigned index = 0; index < indices1.size(); index++)
         {
             unsigned node_index = indices1[index];
-            for (unsigned var=0; var<num_vars; var++)
+            for (unsigned var = 0; var < num_vars; var++)
             {
                 std::vector<double> var_over_time1 = reader1.GetVariableOverTime(variable_names1[var], node_index);
                 std::vector<double> var_over_time2 = reader2.GetVariableOverTime(variable_names1[var], node_index);
-                for (unsigned time_step=0;time_step< var_over_time1.size(); time_step++)
+                for (unsigned time_step = 0; time_step < var_over_time1.size(); time_step++)
                 {
                     if (fabs(var_over_time1[time_step] - var_over_time2[time_step]) > tol)
                     {
-                        std::cout<<"Node "<<node_index<<" at time step "<<time_step<<" variable "<<variable_names1[var]<<
-                            " differs ("<<var_over_time1[time_step]<<" != "<<var_over_time2[time_step]<<")\n";
+                        std::cout << "Node " << node_index << " at time step " << time_step << " variable " << variable_names1[var]
+                                  << " differs (" << var_over_time1[time_step] << " != " << var_over_time2[time_step] << ")" << std::endl;
                         return false;
                     }
                 }
@@ -230,9 +230,9 @@ bool CompareFilesViaHdf5DataReaderGlobalNorm(std::string pathname1, std::string 
     Vec data1 = factory.CreateVec();
     Vec data2 = factory.CreateVec();
 
-    for (unsigned timestep=0; timestep<times1.size(); timestep++)
+    for (unsigned timestep = 0; timestep < times1.size(); timestep++)
     {
-        for (unsigned var=0; var<num_vars; var++)
+        for (unsigned var = 0; var < num_vars; var++)
         {
             reader1.GetVariableOverNodes(data1, variable_names1[var], timestep);
             reader2.GetVariableOverNodes(data2, variable_names2[var], timestep);
@@ -241,7 +241,7 @@ bool CompareFilesViaHdf5DataReaderGlobalNorm(std::string pathname1, std::string 
             PetscReal data2_norm;
             VecNorm(data1, NORM_2, &data1_norm);
             VecNorm(data2, NORM_2, &data2_norm);
-            PetscReal norm = fabs(data1_norm-data2_norm);
+            PetscReal norm = fabs(data1_norm - data2_norm);
             if (norm > tol)
             {
                 is_the_same = false;
