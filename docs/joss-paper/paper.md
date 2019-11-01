@@ -184,11 +184,16 @@ In the following sections we showcase a specific tutorial for each of cardiac, c
 
 Here we demonstrate how to run and visualise a three-dimensional monodomain cardiac simulation.
 This follows the tutorial `TestMonodomain3dRabbitHeartTutorial` which simulates the result of an electrical stimulus being applied to a realistic rabbit heart geometry.
-Assuming Chaste has been installed on Ubuntu Linux (or is running within a Docker container), and the Chaste source exists at `$CHASTE_SRC`, a minimal set of commands to build and run the tutorial is as follows:
+Assuming that
+ 1. Chaste has been installed on Ubuntu Linux (or is running within a Docker container),
+ 1. the Chaste source code exists at `$CHASTE_SOURCE_DIR`,
+ 1. the environment variable `$CHASTE_TEST_OUTPUT` is set to a valid directory,
+
+a minimal set of commands to build and run the tutorial is as follows:
 
 ```
 mkdir build && cd build
-cmake $CHASTE_SRC
+cmake $CHASTE_SOURCE_DIR
 make TestMonodomain3dRabbitHeartTutorial
 ctest -R TestMonodomain3dRabbitHeartTutorial
 ```
@@ -196,14 +201,14 @@ ctest -R TestMonodomain3dRabbitHeartTutorial
 This will produce output in the following directory:
 
 ```
-$CHASTE_SRC/testoutput/Monodomain3dRabbitHeart
+$CHASTE_TEST_OUTPUT/Monodomain3dRabbitHeart
 ```
 
 To view the results evolving over time as an animation in ParaView it is necessary to post-process the results with the following command:
 
 ```
-cd $CHASTE_SRC/testoutput/Monodomain3dRabbitHeart/vtk_output
-python $CHASTE_SRC/python/utils/AddVtuTimeAnnotations.py results.vtu annotated_results.vtu
+cd $CHASTE_TEST_OUTPUT/Monodomain3dRabbitHeart/vtk_output
+python $CHASTE_SOURCE_DIR/python/utils/AddVtuTimeAnnotations.py results.vtu annotated_results.vtu
 ```
 
 To visualise the output, open the file `annotated_results.vtu` in ParaView, and select to colour by `V` (voltage).
@@ -217,11 +222,16 @@ Trans-membrane voltage on the rabbit heart mesh at the end of the simulation. As
 
 Here we demonstrate how to run and visualise a cell sorting simulation using Chaste's vertex model implementation.
 This follows the tutorial `TestRunningDifferentialAdhesionSimulationsTutorial`.
-Assuming Chaste has been installed on Ubuntu Linux (or is running within a Docker container), and the Chaste source exists at `$CHASTE_SRC`, a minimal set of commands to build and run the tutorial is as follows:
+Assuming that
+ 1. Chaste has been installed on Ubuntu Linux (or is running within a Docker container),
+ 1. the Chaste source code exists at `$CHASTE_SOURCE_DIR`,
+ 1. the environment variable `$CHASTE_TEST_OUTPUT` is set to a valid directory,
+
+a minimal set of commands to build and run the tutorial is as follows:
 
 ```
 mkdir build && cd build
-cmake $CHASTE_SRC
+cmake $CHASTE_SOURCE_DIR
 make TestRunningDifferentialAdhesionSimulationsTutorial
 ctest -R TestRunningDifferentialAdhesionSimulationsTutorial
 ```
@@ -229,7 +239,7 @@ ctest -R TestRunningDifferentialAdhesionSimulationsTutorial
 This will produce output in the following directory:
 
 ```
-$CHASTE_SRC/testoutput/TestVertexBasedDifferentialAdhesionSimulation
+$CHASTE_TEST_OUTPUT/TestVertexBasedDifferentialAdhesionSimulation
 ```
 
 To visualise the simulation, open the file `results.pvd` in ParaView, choose to colour by 'Cell types', and display 'Surface With Edges'.
@@ -243,11 +253,16 @@ The initial configuration of cells (left), and the final configuration of cells 
 
 Here we demonstrate how to run and visualise the lung airway generation tutorial.
 This follows the tutorial `TestAirwayGenerationTutorial` which statistically generates lung airways given initial geometry segmented from a CT scan.
-Assuming Chaste has been installed on Ubuntu Linux (or is running within a Docker container), and the Chaste source exists at `$CHASTE_SRC`, a minimal set of commands to build and run the tutorial is as follows:
+Assuming that
+ 1. Chaste has been installed on Ubuntu Linux (or is running within a Docker container),
+ 1. the Chaste source code exists at `$CHASTE_SOURCE_DIR`,
+ 1. the environment variable `$CHASTE_TEST_OUTPUT` is set to a valid directory,
+
+a minimal set of commands to build and run the tutorial is as follows:
 
 ```
 mkdir build && cd build
-cmake $CHASTE_SRC
+cmake $CHASTE_SOURCE_DIR
 make TestAirwayGenerationTutorial
 ctest -R TestAirwayGenerationTutorial
 ```
@@ -255,7 +270,7 @@ ctest -R TestAirwayGenerationTutorial
 This will produce output in the following directory:
 
 ```
-$CHASTE_SRC/testoutput/TestAirwayGenerationTutorial
+$CHASTE_TEST_OUTPUT/TestAirwayGenerationTutorial
 ```
 
 To visualise the generated airway geometry, open the file `example_complete_conducting_airway.vtu` in ParaView.
