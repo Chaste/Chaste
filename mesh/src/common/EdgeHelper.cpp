@@ -84,6 +84,7 @@ Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM> *node0,
     else
     {
         edge = edgeItt->second;
+        edge->SetNodes(node0, node1);
     }
 
     return edge;
@@ -139,10 +140,9 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
         }
     }
 
-    // Repopulate the nodes vector and reset the list of deleted node indices
+    // Repopulate the edges vector
     this->mEdges = live_edges;
 
-    // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mEdges.size(); i++)
     {
         this->mEdges[i]->SetIndex(i);
