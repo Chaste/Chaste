@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel()
     : AbstractSimplePhaseBasedCellCycleModel(),
       mGeneration(0),
-      mMaxTransitGenerations(3) // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
+      mMaxTransitGenerations(3) // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x).
 {
 }
 

@@ -593,8 +593,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     for (unsigned int i=0; i<edge_split_pairs.size(); ++i)
     {
         RecordEdgeSplitOperation(edge_split_pairs[i].first,
-                                       edge_split_pairs[i].second,
-                                       relative_new_node[i]);
+                                 edge_split_pairs[i].second,
+                                 relative_new_node[i]);
     }
     return new_element_index;
 }
@@ -891,6 +891,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     // Remove deleted edges and update the node-edge mapping
     this->mEdges.RemoveDeletedEdges();
 
+    std::vector<std::pair<unsigned int, unsigned int> > edge_nodes(this->mEdges.GetNumEdges());
+    for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
+    {
+        const unsigned int index_0 = this->mEdges[i]->GetNode(0)->GetIndex();
+        const unsigned int index_1 = this->mEdges[i]->GetNode(1)->GetIndex();
+        edge_nodes[i] = std::pair<unsigned int, unsigned int>(index_0, index_1);
+    }
+
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     std::vector<Node<SPACE_DIM>*> live_nodes;
     for (unsigned i=0; i<this->mNodes.size(); i++)
@@ -907,20 +915,32 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 
     // Sanity check
     assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_nodes.size());
-
     // Repopulate the nodes vector and reset the list of deleted node indices
     this->mNodes = live_nodes;
     mDeletedNodeIndices.clear();
 
+    //The map for updating nodes and edge pointers
+    std::map<unsigned int, unsigned int> old_to_new_map;
     // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
+        old_to_new_map[this->mNodes[i]->GetIndex()] = i;
         this->mNodes[i]->SetIndex(i);
+    }
+
+    //Updating nodes and edge pointers
+    for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
+    {
+        const unsigned int old_index_0 = edge_nodes[i].first;
+        const unsigned int old_index_1 = edge_nodes[i].second;
+
+        const unsigned int new_index_0 = old_to_new_map[old_index_0];
+        const unsigned int new_index_1 = old_to_new_map[old_index_1];
+        this->mEdges[i]->SetNodes(this->mNodes[new_index_0],this->mNodes[new_index_1]);
     }
 
     // Update the node-edge mapping
     this->mEdges.UpdateEdgesMapKey();
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
