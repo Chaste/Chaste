@@ -431,13 +431,14 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 {
 
     auto cells = this->rGetCells();
-
+    boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
     //If edge SRNs are specified, then write vtk results into a mesh where quantities
     //associated with each edge are taken into account. We assume that the first cell is
     //representative of all cells
     if (cells.size() > 0)
     {
-        if(this->Begin()->GetSrnModel()->HasEdgeModel())
+        //If cells contain edge data
+        if (p_cell_edge_data != nullptr)
         {
             this->WriteCellEdgeVtkResultsToFile(rDirectory);
             return;

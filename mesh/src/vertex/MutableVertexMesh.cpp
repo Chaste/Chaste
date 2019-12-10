@@ -120,6 +120,11 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
     this->GenerateEdgesFromElements(vertexElements);
 
     this->mMeshChangesDuringSimulation = true;
+
+    /*EdgeHelper<SPACE_DIM> *pEdgeHelper;
+    pEdgeHelper = &(this->mEdges);*/
+    EdgeHelper<SPACE_DIM> *pEdgeHelper(&(this->mEdges));
+    mOperationRecorder.SetEdgeHelper(pEdgeHelper);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -326,6 +331,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
     mLocationsOfT3Swaps.clear();
 }
 
+template<unsigned int ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDivisionAxis() const
+{
+    return mDivisionAxis;
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearDivisionAxis()
+{
+    mDivisionAxis.clear();
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
@@ -382,6 +399,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     {
         edgeIds.push_back(pElement->GetEdge(i)->GetIndex());
     }
+    //Store division axis
+    mDivisionAxis.push_back(axisOfDivision);
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -3476,7 +3495,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperation(const s
     std::vector<long int> edge_mapping(elementNumEdges,-1);
     std::vector<unsigned int> edge_status(elementNumEdges,0);
 
-    //Marking unaffacted edges
+    //Marking unaffected edges
     for (unsigned int i=0; i<oldIds.size(); ++i)
     {
         long index = pElement->GetLocalEdgeIndex(this->mEdges[oldIds[i]]);

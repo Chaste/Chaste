@@ -51,6 +51,7 @@ class VertexMeshWriter;
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 
+#include "VertexMeshOperationRecorder.hpp"
 /**
  * A mutable vertex-based mesh class, which inherits from VertexMesh and allows for local
  * remeshing. This is implemented through simple operations including node merging, neighbour
@@ -71,6 +72,8 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestCellEdgeInteriorSrn;
 
 protected:
+
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM> mOperationRecorder;
 
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
@@ -126,6 +129,11 @@ protected:
      * The locations are stored until they are cleared by ClearLocationsOfT3Swaps().
      */
     std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
+
+    /**
+     * Short axis of cells during cell division
+     */
+    std::vector< c_vector<double, SPACE_DIM> > mDivisionAxis;
 
     /**
      * Divide an element along the axis passing through two of its nodes.
@@ -592,6 +600,16 @@ public:
      * Helper method to clear the stored T3 swaps
      */
     void ClearLocationsOfT3Swaps();
+
+    /**
+     * @return short axis before division
+     */
+    std::vector<c_vector<double, SPACE_DIM> > GetDivisionAxis() const;
+
+    /**
+     * Helper method to clear the division short axis
+     */
+    void ClearDivisionAxis();
 
     /**
      * Add a node to the mesh.
