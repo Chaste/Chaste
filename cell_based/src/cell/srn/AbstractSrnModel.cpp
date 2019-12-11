@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSrnModel.hpp"
 
 AbstractSrnModel::AbstractSrnModel()
-    : mSimulatedToTime(SimulationTime::Instance()->GetTime())
+    : mSimulatedToTime(SimulationTime::Instance()->GetTime()), mIsEdgeBasedModel(false)
 {
 }
 
@@ -53,7 +53,7 @@ void AbstractSrnModel::InitialiseDaughterCell()
 }
 
 AbstractSrnModel::AbstractSrnModel(const AbstractSrnModel& rModel)
-    : mSimulatedToTime(rModel.GetSimulatedToTime())
+    : mSimulatedToTime(rModel.GetSimulatedToTime()), mIsEdgeBasedModel(rModel.mIsEdgeBasedModel)
 {
     /*
      * Set each member variable of the new SRN model that inherits
@@ -130,3 +130,40 @@ unsigned AbstractSrnModel::GetEdgeLocalIndex()
 {
     return this->mEdgeLocalIndex;
 }
+
+bool AbstractSrnModel::HasEdgeModel() const
+{
+    return this->mIsEdgeBasedModel;
+}
+
+void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
+{
+    this->mIsEdgeBasedModel = indicator;
+}
+
+void AbstractSrnModel::ScaleSrnVariables(const double theta)
+{
+}
+
+void AbstractSrnModel::AddSrnQuantities(AbstractSrnModel* p_other_srn,
+                                        const double scale)
+{
+}
+
+void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
+{
+}
+
+void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
+{}
+
+void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
+{}
+
+void AbstractSrnModel::SplitEdgeSrn(const double relative_position)
+{}
+
+void AbstractSrnModel::UpdateSrnAfterNewNeighbour()
+{}
+
+

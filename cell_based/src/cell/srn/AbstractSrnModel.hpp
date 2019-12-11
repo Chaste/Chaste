@@ -109,6 +109,10 @@ protected:
     unsigned mEdgeLocalIndex;
 
     /**
+     * Indicates if edge model has been introduced. False by default.
+     */
+    bool mIsEdgeBasedModel;
+    /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
      * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
@@ -254,6 +258,62 @@ public:
      * @return
      */
     unsigned GetEdgeLocalIndex();
+
+    /**
+     * Indicates whether this SRN is part of the model with edge SRNs
+     * @return true if edge SRN has been introduced into the model
+     */
+    bool HasEdgeModel() const;
+
+    /**
+     * Sets this model to be part of an edge based SRN
+     */
+    void SetEdgeModelIndicator(const bool indicator);
+
+    /**
+     * Scales srn variables by factor theta
+     */
+    virtual void ScaleSrnVariables(const double theta);
+
+    /**
+     * Adds Srn quantities (variables or parameters) to this.
+     * The quantities can be scaled by factor scale.
+     * @param p_other_srn
+     * @param scale
+     */
+    virtual void AddSrnQuantities(AbstractSrnModel* p_other_srn,
+                                  const double scale = 1.0);
+
+    /**
+     * Adds the shrunk edge srn quantities to this edge
+     * @param p_shrunk_edge_srn
+     */
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn);
+
+    /**
+     * Adds the merged edge srn quantities to this edge
+     * @param p_merged_edge_srn
+     */
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn);
+
+    /**
+     * Adds the shrunk edge srn quantities to the interior srn
+     * @param p_shrunk_edge_srn
+     */
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn);
+
+    /**
+     * Scales SRN quantities due to edge split. Amount of scaling may depend on the resulting proportions,
+     * deetermined by relative position of the node that splits the edge
+     * @param relative_position - how close the added node is to the previous node
+     */
+    virtual void SplitEdgeSrn(const double relative_position);
+
+    /**
+     * Updates Srn quantities after neighbour loss. This might be necessary to do
+     * in case there are cell-cell bonds in the model
+     */
+    virtual void UpdateSrnAfterNewNeighbour();
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

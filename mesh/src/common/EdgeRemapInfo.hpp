@@ -48,7 +48,7 @@ class EdgeRemapInfo {
      * Contains a mapping to the old local edges index. Negative value means a new edge
      *
      */
-    std::vector<long int> mEdgesMapping;
+    const std::vector<long int> mEdgesMapping;
 
     /**
      * Status
@@ -56,24 +56,23 @@ class EdgeRemapInfo {
      * 1 Edge has been split between two elements
      * 2 Completely new edge was created
      */
-    std::vector<unsigned char> mEdgeStatus;
+    const std::vector<unsigned int> mEdgeStatus;
 
+    /**
+     * Determines how close the new node on the split edges is to the previous (lower) node
+     * Value of 0 means the new node is at the same position as the lower node,
+     * and value of 1 means that its at the upper node of the edge to be split.
+     */
+    std::vector<double> mSplitProportions;
 public:
 
-    EdgeRemapInfo(std::vector<long int> edgesMapping, std::vector<unsigned char> edgesStatus)
-    {
-        mEdgesMapping = edgesMapping;
-        mEdgeStatus = edgesStatus;
-    }
+    EdgeRemapInfo(const std::vector<long int> &edgesMapping, const std::vector<unsigned int> &edgesStatus);
 
     /**
      * Contains a mapping to the old local edges index. Negative value means a new edge
      *
      */
-    std::vector<long int>& GetEdgesMapping()
-    {
-        return mEdgesMapping;
-    }
+    std::vector<long int> GetEdgesMapping() const;
 
     /**
      * Status
@@ -81,12 +80,13 @@ public:
      * 1 Edge has been split between two elements
      * 2 Completely new edge was created
      */
-    std::vector<unsigned char>& GetEdgesStatus()
-    {
-        return mEdgeStatus;
-    }
+    std::vector<unsigned int> GetEdgesStatus() const;
 
-
+    /**
+     *
+     */
+    std::vector<double> GetSplitProportions() const;
+    void SetSplitProportions(const std::vector<double> thetas);
 };
 
 

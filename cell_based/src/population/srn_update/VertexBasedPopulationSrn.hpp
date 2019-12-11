@@ -33,31 +33,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifndef VERTEXBASEDPOPULATIONSRN_HPP_
+#define VERTEXBASEDPOPULATIONSRN_HPP_
+
+#include <VertexBasedCellPopulation.hpp>
+#include "ChasteSerialization.hpp"
+#include "SrnCellModel.hpp"
 #include "EdgeRemapInfo.hpp"
+#include "EdgeOperation.hpp"
+template <unsigned DIM>
+class VertexBasedCellPopulation;
 
-EdgeRemapInfo::EdgeRemapInfo(const std::vector<long int> &edgesMapping, const std::vector<unsigned int> &edgesStatus)
-:
-mEdgesMapping(edgesMapping),
-mEdgeStatus(edgesStatus)
-{}
-
-
-std::vector<long int> EdgeRemapInfo::GetEdgesMapping() const
+template <unsigned DIM>
+class VertexBasedPopulationSrn
 {
-    return mEdgesMapping;
-}
+private:
+    VertexBasedCellPopulation<DIM>* mpCellPopulation;
+public:
+    VertexBasedPopulationSrn();
+    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* p_vertex_population);
 
-std::vector<unsigned int> EdgeRemapInfo::GetEdgesStatus() const
-{
-    return mEdgeStatus;
-}
+    void UpdateSrnAfterBirthOrDeath();
 
-std::vector<double> EdgeRemapInfo::GetSplitProportions() const
-{
-    return mSplitProportions;
-}
+    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
+                             SrnCellModel* pSrnCell_1,
+                             EdgeRemapInfo* pEdgeChange_1);
+};
 
-void EdgeRemapInfo::SetSplitProportions(const std::vector<double> thetas)
-{
-    mSplitProportions = thetas;
-}
+#endif /* VERTEXBASEDPOPULATIONSRN_HPP_ */

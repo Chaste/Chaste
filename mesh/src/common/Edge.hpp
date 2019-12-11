@@ -108,7 +108,7 @@ public:
      * Gets the index of this edge within the mesh
      * @return
      */
-    unsigned GetIndex();
+    unsigned GetIndex() const;
 
     /**
      * Obtains a pair of associated nodes' indices
@@ -141,7 +141,7 @@ public:
      * @param index
      * @return
      */
-    Node<SPACE_DIM>* GetNode(unsigned index);
+    Node<SPACE_DIM>* GetNode(unsigned index) const;
 
     /**
      * Gets the number of Nodes associated with this edge
@@ -154,7 +154,7 @@ public:
      * @param pNode
      * @return true if pNode is containd in Edge, otherwise false
      */
-    bool ContainsNode(Node<SPACE_DIM>* pNode);
+    bool ContainsNode(Node<SPACE_DIM>* pNode) const;
 
     /**
      *
@@ -209,6 +209,20 @@ public:
      * @return
      */
     bool IsEdgeValid();
+
+    /**
+     * Checks whether the edge is on the boundary
+     * @return true if on boundary
+     */
+    bool IsBoundaryEdge() const;
+
+    /**
+     * Comparison operator.
+     * @param edge_1
+     * @param edge_2
+     * @return
+     */
+    bool operator==(const Edge<SPACE_DIM>& edge) const;
 };
 
 #endif //EDGE_HPP_

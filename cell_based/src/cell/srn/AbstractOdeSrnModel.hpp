@@ -150,6 +150,12 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSrnModelParameters(out_stream& rParamsFile) = 0;
+
+    /**
+     * Scales all ODE variables by factor theta.
+     * @param theta
+     */
+    virtual void ScaleSrnVariables(const double theta) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)

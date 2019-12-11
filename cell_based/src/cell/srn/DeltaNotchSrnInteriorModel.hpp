@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DELTANOTCHSRNEDGEMODEL_HPP_
-#define DELTANOTCHSRNEDGEMODEL_HPP_
+#ifndef DELTANOTCHSRNINTERIORMODEL_HPP_
+#define DELTANOTCHSRNINTERIORMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "DeltaNotchEdgeOdeSystem.hpp"
+#include "DeltaNotchInteriorOdeSystem.hpp"
 #include "AbstractOdeSrnModel.hpp"
 
 /**
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * \todo #2752 document this class more thoroughly here
  */
-class DeltaNotchSrnEdgeModel : public AbstractOdeSrnModel
+class DeltaNotchSrnInteriorModel : public AbstractOdeSrnModel
 {
 private:
 
@@ -66,7 +66,6 @@ private:
     }
 
 protected:
-
     /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
@@ -79,7 +78,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rModel);
+    DeltaNotchSrnInteriorModel(const DeltaNotchSrnInteriorModel& rModel);
 
 public:
 
@@ -88,7 +87,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    DeltaNotchSrnEdgeModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchSrnInteriorModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Overridden builder method to create new copies of
@@ -99,17 +98,16 @@ public:
     AbstractSrnModel* CreateSrnModel();
 
     /**
+     * Overriden ResetForDivision() method for custom cell division mitosis
+     */
+    virtual void ResetForDivision() override;
+
+    /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
     void Initialise(); // override
-
-    /**
-     * Overriden method. This simply resets the model variables/parameters
-     * of the newly created edge between two cells to the desired value
-     */
-    virtual void InitialiseDaughterCell() override;
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
@@ -123,14 +121,14 @@ public:
      *
      * N.B. Despite the name, this doesn't update the levels of delta or notch, or compute mean levels.
      * It just copies the current mean delta from the CellData
-     * (set by DeltaNotchTrackingModifier) to the DeltaNotchEdgeOdeSystem.
+     * (set by DeltaNotchTrackingModifier) to the DeltaNotchOdeSystem.
      *
      * \todo #2752 Improve the name of this method!
      */
     void UpdateDeltaNotch();
 
     /**
-     * @return the current Notch level in this edge
+     * @return the current Notch level in this cell.
      */
     double GetNotch();
 
@@ -141,7 +139,7 @@ public:
     void SetNotch(double value);
 
     /**
-     * @return the current Delta level in this edge.
+     * @return the current Delta level in this cell.
      */
     double GetDelta();
 
@@ -152,21 +150,17 @@ public:
     void SetDelta(double value);
 
     /**
-     * @return the current level of Delta in the neighbouring cell's edge.
+     * @return the current total level of Delta in the edges.
      *
      * N.B. This doesn't calculate anything, it just returns the parameter
-     * from the DeltaNotchEdgeOdeSystem.
+     * from the DeltaNotchInteriorOdeSystem.
      */
-    double GetNeighbouringDelta() const;
+    double GetTotalEdgeDelta();
+    /**
+     * @return total edge notch
+     */
+    double GetTotalEdgeNotch();
 
-    /**
-     * @return the level of delta in cell interior
-     */
-    double GetInteriorDelta() const;
-    /**
-     * @return the level of notch in cell interior
-     */
-    double GetInteriorNotch() const;
     /**
      * Output SRN model parameters to file.
      *
@@ -174,21 +168,14 @@ public:
      */
     void OutputSrnModelParameters(out_stream& rParamsFile);
 
-    virtual void AddSrnQuantities(AbstractSrnModel *p_other_srn,
-                                  const double scale = 1.0) override;
-
-    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
-    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn) override;
-
-    virtual void SplitEdgeSrn(const double relative_position) override;
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn) override;
 };
-
-typedef boost::shared_ptr<DeltaNotchSrnEdgeModel> DeltaNotchSrnEdgeModelPtr;
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchSrnEdgeModel)
+CHASTE_CLASS_EXPORT(DeltaNotchSrnInteriorModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnEdgeModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnInteriorModel)
 
-#endif  /* DELTANOTCHSRNEDGEMODEL_HPP_ */
+
+#endif /* DELTANOTCHSRNINTERIORMODEL_HPP_ */

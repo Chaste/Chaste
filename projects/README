@@ -1,6 +1,0 @@
-
-You can put user projects in this directory, to make use of the Chaste build system.
-
-We recommend that user projects be standalone Git repositories, hosted by the user, based on our template project.
-
-See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/UserProjects for more information.

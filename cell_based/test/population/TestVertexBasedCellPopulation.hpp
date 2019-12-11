@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTVERTEXBASEDCELLPOPULATION_HPP_
 #define TESTVERTEXBASEDCELLPOPULATION_HPP_
 
+#include <iostream>
+#include <fstream>
+#include <regex>
+
 #include <cxxtest/TestSuite.h>
 
 #include <boost/archive/text_oarchive.hpp>
@@ -60,6 +64,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "SrnCellModel.hpp"
+#include "DeltaNotchSrnEdgeModel.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -1523,6 +1529,189 @@ public:
         // PDE mesh node 11 interpolates the value of "foo" from cells 1, 2 and 5
         double expected_value_11 = (1.0 + 2.0 + 5.0)/3.0;
         TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(11,var_name), expected_value_11, 1e-6);
+    }
+
+    void TestOutputVtkCellEdges()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+
+            /* Initialise edge based SRN */
+            auto p_element = p_mesh->GetElement(elem_index);
+
+            auto p_cell_edge_srn_model = new SrnCellModel();
+
+            double total_edge_length = 0.0;
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            {
+                total_edge_length += p_element->GetEdge(i)->rGetLength();
+            }
+
+            /* Gets the edges of the element and create an SRN for each edge */
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            {
+
+                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
+            }
+
+            cells[elem_index]->SetSrnModel(p_cell_edge_srn_model);
+            cells[elem_index]->InitialiseSrnModel();
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkCellEdges";
+
+
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        cell_population.CloseWritersFiles();
+
+
+        // Test that VTK writer has produced some files
+
+        // Initial condition file
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Check that we have 144 (6*4*6) edges and 68 cells
+        ifstream vtk_file_stream;
+        vtk_file_stream.open (vtk_file.GetAbsolutePath());
+        std::stringstream vtk_file_string_buffer;
+        vtk_file_string_buffer << vtk_file_stream.rdbuf();
+        vtk_file_stream.close();
+        auto fileChar = vtk_file_string_buffer.str();
+        TS_ASSERT(std::regex_search(fileChar, std::regex("NumberOfCells=\"168\"")));
+
+
+        // Final file
+        FileFinder vtk_file2(output_directory + "/results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file3.Exists());
+
+
+
+#endif //CHASTE_VTK
+
+
+    }
+
+    void TestOutputVtkCellEdgesWithInterior()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+
+            /* Initialise edge based SRN */
+            auto p_element = p_mesh->GetElement(elem_index);
+
+            auto p_cell_edge_srn_model = new SrnCellModel();
+
+            double total_edge_length = 0.0;
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            {
+                total_edge_length += p_element->GetEdge(i)->rGetLength();
+            }
+
+            /* Gets the edges of the element and create an SRN for each edge */
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            {
+
+                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
+                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
+            }
+
+            MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_interior_model);
+            p_cell_edge_srn_model->SetInteriorSrnModel(p_srn_interior_model);
+
+            cells[elem_index]->SetSrnModel(p_cell_edge_srn_model);
+            cells[elem_index]->InitialiseSrnModel();
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkCellEdgesWithInterior";
+
+
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        cell_population.CloseWritersFiles();
+
+
+        // Test that VTK writer has produced some files
+
+        // Initial condition file
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Check that we have 144 (6*4*6) edges and 68 cells
+        ifstream vtk_file_stream;
+        vtk_file_stream.open (vtk_file.GetAbsolutePath());
+        std::stringstream vtk_file_string_buffer;
+        vtk_file_string_buffer << vtk_file_stream.rdbuf();
+        vtk_file_stream.close();
+        auto fileChar = vtk_file_string_buffer.str();
+        TS_ASSERT(std::regex_search(fileChar, std::regex("NumberOfCells=\"168\"")));
+
+
+        // Final file
+        FileFinder vtk_file2(output_directory + "/results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file3.Exists());
+
+
+
+#endif //CHASTE_VTK
+
+
     }
 };
 

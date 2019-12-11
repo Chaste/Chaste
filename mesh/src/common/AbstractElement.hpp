@@ -44,6 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeHelper.hpp"
 #include "ElementAttributes.hpp"
 
+template<unsigned int SPACE_DIM>
+class EdgeHelper;
 /*
  * When creating an element within a mesh one needs to specify its global index.
  * If the element is not used within a mesh the following constant is used instead.
@@ -293,6 +295,21 @@ public:
      * @return the number of node attributes associated with this node.
      */
     unsigned GetNumElementAttributes();
+
+    /**
+     * Checks if the element contains edge
+     * @param edge
+     * @return
+     */
+    bool ContainsEdge(const Edge<SPACE_DIM> *edge) const;
+
+    /**
+     * returns the local index of edge
+     * @param edge
+     * @return
+     */
+    long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
+
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/

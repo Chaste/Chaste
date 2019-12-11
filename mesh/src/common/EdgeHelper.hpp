@@ -11,7 +11,6 @@
 #include "Edge.hpp"
 #include "EdgeOperation.hpp"
 #include "EdgeRemapInfo.hpp"
-
 /**
  * Class for facilitating the creation and management of unique edges in a vertex mesh
  */
@@ -22,8 +21,7 @@ private:
 
     std::vector<Edge<SPACE_DIM>*> mEdges;
     std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
-    std::vector<EdgeOperation*> mEdgeOperations;
-    bool holdEdgeOperations;
+    //std::vector<EdgeOperation*> mEdgeOperations;
 
 public:
 
@@ -54,9 +52,6 @@ public:
 
     unsigned GetNumEdges() const;
 
-
-
-
     typename std::vector<Edge<SPACE_DIM>*>::iterator begin()
     {
         return mEdges.begin();
@@ -67,36 +62,20 @@ public:
         return mEdges.end();
     }
 
-    void HoldEdgeOperations()
-    {
-        holdEdgeOperations = true;
-    }
-    void ResumeEdgeOperations()
-    {
-        holdEdgeOperations = false;
-    }
-
     /**
      * Gets the record of edge changes in the mesh
      * @return
-     */
+
     const std::vector<EdgeOperation*> & GetEdgeOperations();
 
-    /**
+    *
      * Clears the edge change records in the mesh
-     */
+
     void ClearEdgeOperations();
 
-
-
-    void InsertAddEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
-    void InsertDeleteEdgeOperation(unsigned elementIndex, unsigned localEdgeIndex);
-    void InsertCellDivideOperation(unsigned elementIndex,
-                                   unsigned elementIndex2,
-                                   EdgeRemapInfo* newEdges,
-                                   EdgeRemapInfo* newEdges2
-    );
-
+    void InsertCellDivideOperation(const unsigned int elementIndex_1, const unsigned int elementIndex_2,
+                                   EdgeRemapInfo* remap_info_1, EdgeRemapInfo* remap_info_2);
+    void InsertEdgeOperation(EDGE_OPERATION operation, const unsigned int elementIndex, EdgeRemapInfo* remap_info);*/
 };
 
 #endif //CHASTE_EDGEHELPER_HPP

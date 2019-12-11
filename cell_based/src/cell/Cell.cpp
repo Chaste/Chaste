@@ -57,7 +57,8 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
       mApoptosisTime(0.25), // cell takes 15 min to fully undergo apoptosis
       mUndergoingApoptosis(false),
       mIsDead(false),
-      mIsLogged(false)
+      mIsLogged(false),
+      mHasSrnModel(false)
 {
     if (SimulationTime::Instance()->IsStartTimeSetUp()==false)
     {
@@ -76,6 +77,10 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     {
         pSrnModel = new NullSrnModel;
         mpSrnModel = pSrnModel;
+    }
+    else
+    {
+        mHasSrnModel = true;
     }
 
     mpSrnModel->SetCell(CellPtr(this, null_deleter()));
@@ -205,6 +210,7 @@ void Cell::SetSrnModel(AbstractSrnModel* pSrnModel)
     }
     mpSrnModel = pSrnModel;
     mpSrnModel->SetCell(CellPtr(this, null_deleter()));
+    mHasSrnModel = true;
 }
 
 AbstractSrnModel* Cell::GetSrnModel() const
@@ -470,6 +476,7 @@ bool Cell::ReadyToDivide()
 
     // NOTE - we run the SRN model here first before the CCM
     mpSrnModel->SimulateToCurrentTime();
+
     // This in turn runs any simulations within the CCM through ReadyToDivide();
     mCanDivide = mpCellCycleModel->ReadyToDivide();
 
@@ -504,6 +511,14 @@ CellPtr Cell::Divide()
     MAKE_PTR_ARGS(CellData, p_daughter_cell_data, (*p_cell_data));
     daughter_property_collection.AddProperty(p_daughter_cell_data);
 
+    // Get the existing copy of the cell edge data and remove it from the daughter cell
+    boost::shared_ptr<CellEdgeData> p_cell_edge_data = GetCellEdgeData();
+    daughter_property_collection.RemoveProperty(p_cell_edge_data);
+
+    // Create a new cell edge data object using the copy constructor and add this to the daughter cell
+    MAKE_PTR_ARGS(CellEdgeData, p_daughter_cell_edge_data, (*p_cell_edge_data));
+    daughter_property_collection.AddProperty(p_daughter_cell_edge_data);
+
     // Copy all cell Vec data (note we create a new object not just copying the pointer)
     if (daughter_property_collection.HasPropertyType<CellVecData>())
     {
@@ -527,4 +542,9 @@ CellPtr Cell::Divide()
     p_new_cell->SetApoptosisTime(mApoptosisTime);
 
     return p_new_cell;
+}
+
+bool Cell::HasSrnModel() const
+{
+    return mHasSrnModel;
 }

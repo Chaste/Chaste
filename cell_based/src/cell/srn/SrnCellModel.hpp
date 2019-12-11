@@ -49,6 +49,7 @@ typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
  * SRN model at the cell level, has representation for edges internally.
+ * Also contains cell interior (cytoplasmic) SRN
  */
 class SrnCellModel : public AbstractSrnModel
 {
@@ -67,6 +68,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
+        archive & mEdgeSrnModels;
+        archive & mInteriorSrnModel;
 //        archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
 //        archive & mInitialConditions;
 //        archive & mStateSize;
@@ -75,8 +78,13 @@ private:
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
     using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
+    boost::shared_ptr<AbstractSrnModel> mInteriorSrnModel;
 protected:
 
+    /**
+     * Copy constructor. Called ONLY when a cell division occurs. See parent class comment for details
+     * @param rModel
+     */
     SrnCellModel(const SrnCellModel &rModel);
 
 public:
@@ -94,34 +102,45 @@ public:
     /**
      * Default constuctor.
      */
-    SrnCellModel()
-    {}
+    SrnCellModel();
 
     /**
-     * Destuctor.
+     * Destructor.
      */
-    ~SrnCellModel()
-    {}
+    ~SrnCellModel();
+
 
     virtual void Initialise() override;
+    /**
+     * Halves the appropriate quantities in the constituent SRN models
+     */
+    virtual void ResetForDivision() override;
 
     virtual void SimulateToCurrentTime() override;
 
+    /**
+     * Called in Cell::Divide()
+     * @return
+     */
     virtual AbstractSrnModel* CreateSrnModel() override;
 
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
 
-    void AddEdgeSrn(AbstractSrnModelPtr edgeSrn);
+    void AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn);
 
     void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn);
 
     AbstractSrnModelPtr RemoveEdgeSrn(unsigned index);
 
-    unsigned GetNumEdgeSrn();
+    unsigned GetNumEdgeSrn() const;
 
-    AbstractSrnModelPtr GetEdgeSrn(unsigned index);
+    AbstractSrnModelPtr GetEdgeSrn(unsigned index) const;
 
-    const std::vector<AbstractSrnModelPtr>& GetEdges();
+    const std::vector<AbstractSrnModelPtr>& GetEdges() const;
+
+    void SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn);
+
+    AbstractSrnModelPtr GetInteriorSrn() const;
 
     virtual void SetCell(CellPtr pCell) override;
 };

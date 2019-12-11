@@ -42,7 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
     EDGE_OPERATION_DELETE,
-    EDGE_OPERATION_DIVIDE
+    EDGE_OPERATION_DIVIDE,
+    EDGE_OPERATION_SPLIT,
+    EDGE_OPERATION_NODE_MERGE,
+    EDGE_OPERATION_MERGE,
+    EDGE_OPERATION_NEW_NEIGHBOUR
 };
 
 /**
@@ -52,13 +56,8 @@ class EdgeOperation {
 
     EDGE_OPERATION mOperation;
 
-
     unsigned mElementIndex;
     unsigned mElementIndex2;
-
-
-    unsigned mLocalEdgeIndex;
-
 
     EdgeRemapInfo* mNewEdges;
     EdgeRemapInfo* mNewEdges2;
@@ -67,20 +66,17 @@ public:
 
 
     /**
-     * Constructor for either ADD or DELETE operation
+     * Constructor for either Add, split, and node merg operations
      * @param operation
      * @param elementIndex
      * @param localEdgeIndex
      */
-    EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex, unsigned localEdgeIndex)
+    EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex, EdgeRemapInfo* newEdges)
     {
-        assert(operation == EDGE_OPERATION_ADD || operation == EDGE_OPERATION_DELETE);
-
         this->mOperation = operation;
         this->mElementIndex = elementIndex;
         this->mElementIndex2 = 0;
-        this->mLocalEdgeIndex = localEdgeIndex;
-        this->mNewEdges = nullptr;
+        this->mNewEdges = newEdges;
         this->mNewEdges2 = nullptr;
     }
 
@@ -109,38 +105,30 @@ public:
         delete this->mNewEdges2;
     }
 
-    EDGE_OPERATION GetOperation()
+    EDGE_OPERATION GetOperation() const
     {
         return mOperation;
     }
 
-    unsigned GetElementIndex()
+    unsigned GetElementIndex() const
     {
         return this->mElementIndex;
     }
 
-    unsigned GetElementIndex2()
+    unsigned GetElementIndex2() const
     {
         return this->mElementIndex2;
     }
 
-    unsigned GetLocalEdgeIndex()
-    {
-        return mLocalEdgeIndex;
-    }
-
-    EdgeRemapInfo* GetNewEdges()
+    EdgeRemapInfo* GetNewEdges() const
     {
         return mNewEdges;
     }
 
-    EdgeRemapInfo* GetNewEdges2()
+    EdgeRemapInfo* GetNewEdges2() const
     {
         return mNewEdges2;
     }
-
-
-
 };
 
 #endif //EDGEOPERATION_HPP_

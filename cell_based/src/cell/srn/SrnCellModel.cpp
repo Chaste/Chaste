@@ -36,13 +36,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SrnCellModel.hpp"
 
 SrnCellModel::SrnCellModel(const SrnCellModel &rModel)
-    : AbstractSrnModel(rModel)
+    : AbstractSrnModel(rModel), mInteriorSrnModel(nullptr)
 {
-    // Make a copy of all SRN models inside the system
-    for (auto srnModel: rModel.mEdgeSrnModels)
+    //edge SRN vector should be empty in the newly created cell. They are added in
+    //VertexBasedPopulation::UpdateSrnAfterBirthOrDeath()
+
+    //Copy interior SRN to the new cell. Interior Srn should have custom implementation of a new interior SRN
+    //creation after cell division
+    if (rModel.mInteriorSrnModel!=nullptr)
+        this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
+    mIsEdgeBasedModel = rModel.HasEdgeModel();
+    for (auto edgeModel : rModel.mEdgeSrnModels)
     {
-        this->AddEdgeSrn(boost::shared_ptr<AbstractSrnModel>(srnModel->CreateSrnModel()));
+        mEdgeSrnModels.push_back(boost::shared_ptr<AbstractSrnModel>(edgeModel->CreateSrnModel()));
     }
+}
+
+
+SrnCellModel::SrnCellModel()
+{
+    mInteriorSrnModel = nullptr;
+}
+
+SrnCellModel::~SrnCellModel()
+{
+
 }
 
 void SrnCellModel::Initialise()
@@ -51,6 +69,33 @@ void SrnCellModel::Initialise()
     {
         edgeModel->Initialise();
     }
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->Initialise();
+    }
+}
+
+void SrnCellModel::ResetForDivision()
+{
+    //Making sure that we are at the current time.
+    //SimulateToCurrentTime() MUST have been called before in Cell::ReadyToDivide() method
+    //so that Srn models should already be simulated up to the current time
+    assert(mSimulatedToTime == SimulationTime::Instance()->GetTime());
+
+    //Note that edge models follow different rules since the number and the state of edge SRNs
+    //after cell divisions depends on local topology. That is custom behavior of edge srn models is important
+    //to implement correctly
+    for (auto edgeModel : mEdgeSrnModels)
+    {
+        edgeModel->ResetForDivision();
+    }
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->ResetForDivision();
+    }
+
 }
 
 void SrnCellModel::SimulateToCurrentTime()
@@ -59,6 +104,10 @@ void SrnCellModel::SimulateToCurrentTime()
     {
         srnModel->SimulateToCurrentTime();
     }
+    if (mInteriorSrnModel != nullptr)
+        mInteriorSrnModel->SimulateToCurrentTime();
+
+    mSimulatedToTime = mEdgeSrnModels[0]->GetSimulatedToTime();
 }
 
 AbstractSrnModel* SrnCellModel::CreateSrnModel()
@@ -68,17 +117,24 @@ AbstractSrnModel* SrnCellModel::CreateSrnModel()
 
 void SrnCellModel::AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    for (unsigned int i=0; i<edgeSrn.size(); ++i)
+        edgeSrn[i]->SetEdgeModelIndicator(true);
     mEdgeSrnModels = edgeSrn;
 }
 
-void SrnCellModel::AddEdgeSrn(AbstractSrnModelPtr edgeSrn)
+void SrnCellModel::AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    edgeSrn->SetEdgeModelIndicator(true);
     edgeSrn->SetEdgeLocalIndex(mEdgeSrnModels.size());
     mEdgeSrnModels.push_back(edgeSrn);
 }
 
 void SrnCellModel::InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn)
 {
+    mIsEdgeBasedModel = true;
+    edgeSrn->SetEdgeModelIndicator(true);
     mEdgeSrnModels.insert(mEdgeSrnModels.begin() + index, edgeSrn);
 }
 
@@ -89,20 +145,30 @@ AbstractSrnModelPtr SrnCellModel::RemoveEdgeSrn(unsigned index)
     return edgeSrn;
 }
 
-unsigned SrnCellModel::GetNumEdgeSrn()
+unsigned SrnCellModel::GetNumEdgeSrn() const
 {
     return mEdgeSrnModels.size();
 }
 
-AbstractSrnModelPtr SrnCellModel::GetEdgeSrn(unsigned index)
+AbstractSrnModelPtr SrnCellModel::GetEdgeSrn(unsigned index) const
 {
     assert(index < mEdgeSrnModels.size());
     return mEdgeSrnModels[index];
 }
 
-const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges()
+const std::vector<AbstractSrnModelPtr>& SrnCellModel::GetEdges() const
 {
     return mEdgeSrnModels;
+}
+
+void SrnCellModel::SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn)
+{
+    mInteriorSrnModel = interiorSrn;
+}
+
+AbstractSrnModelPtr SrnCellModel::GetInteriorSrn() const
+{
+    return mInteriorSrnModel;
 }
 
 void SrnCellModel::SetCell(CellPtr pCell)
@@ -114,7 +180,14 @@ void SrnCellModel::SetCell(CellPtr pCell)
     {
         srnModel->SetCell(pCell);
     }
+
+    if (mInteriorSrnModel != nullptr)
+    {
+        mInteriorSrnModel->SetCell(pCell);
+    }
 }
+
+
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"

@@ -13,7 +13,7 @@ cell/TestOdeBasedCellCycleModels.hpp
 cell/TestOdeBasedSrnModels.hpp
 cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
-cell/TestCellEdgeSrn.hpp
+cell/TestCellEdgeInteriorSrn.hpp
 cell_based_pde/TestCellBasedEllipticPdes.hpp
 cell_based_pde/TestCellBasedEllipticPdeSolver.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp
@@ -62,7 +62,8 @@ population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestNumericalMethods.hpp
-simulation/TestDeltaNotchCellEdgeODESimulation.hpp
+simulation/TestDeltaNotchCellEdgeOnlyODESimulation.hpp
+simulation/TestDeltaNotchCellEdgeInteriorODESimulation.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithBuskeForces.hpp

@@ -33,31 +33,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DeltaNotchCellEdgeTrackingModifier.hpp"
+#include "DeltaNotchEdgeInteriorTrackingModifier.hpp"
 #include "SrnCellModel.hpp"
 #include "DeltaNotchSrnInteriorModel.hpp"
 #include "DeltaNotchSrnEdgeModel.hpp"
 
 template<unsigned DIM>
-DeltaNotchCellEdgeTrackingModifier<DIM>::DeltaNotchCellEdgeTrackingModifier()
-        : AbstractCellBasedSimulationModifier<DIM>()
+DeltaNotchEdgeInteriorTrackingModifier<DIM>::DeltaNotchEdgeInteriorTrackingModifier()
+    : AbstractCellBasedSimulationModifier<DIM>()
 {
 }
 
 template<unsigned DIM>
-DeltaNotchCellEdgeTrackingModifier<DIM>::~DeltaNotchCellEdgeTrackingModifier()
+DeltaNotchEdgeInteriorTrackingModifier<DIM>::~DeltaNotchEdgeInteriorTrackingModifier()
 {
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Update the cell
-    this->UpdateCellData(rCellPopulation);
+    UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void DeltaNotchEdgeInteriorTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -67,47 +66,76 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Recovers each cell's edge levels of notch and delta, and those of its neighbor's
-    // Then saves them
+    // First recover each cell's Notch and Delta concentrations from the ODEs and store
+    // in CellData and CellEdgeData
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
         auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
 
-        /* Cells edge data */
+        /* Cell Edges delta notch collection */
         std::vector<double> notch_vec;
         std::vector<double> delta_vec;
+
+
         for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
         {
             boost::shared_ptr<DeltaNotchSrnEdgeModel> p_model
-            = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_model->GetEdgeSrn(i));
-            double this_delta = p_model->GetDelta();
-            double this_notch = p_model->GetNotch();
-            delta_vec.push_back(this_delta);
-            notch_vec.push_back(this_notch);
+                    = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_model->GetEdgeSrn(i));
+            double edge_delta = p_model->GetDelta();
+            double edge_notch = p_model->GetNotch();
+
+            delta_vec.push_back(edge_delta);
+            notch_vec.push_back(edge_notch);
         }
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
-        cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
         cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
+        cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
 
-        /* Cell interior data */
-        //We're not using interior model so interiors are set to 0
-        cell_iter->GetCellData()->SetItem("interior delta", 0);
-        cell_iter->GetCellData()->SetItem("interior notch", 0);
+
+
+        /* Interior delta notch collection */
+        //Filling interior delta/notch value, interior model must be specified for this edge-interior example
+        assert(p_cell_edge_model->GetInteriorSrn() != nullptr);
+        boost::shared_ptr<DeltaNotchSrnInteriorModel> p_interior_model
+                = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_edge_model->GetInteriorSrn());
+
+        // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
+        cell_iter->GetCellData()->SetItem("interior delta", p_interior_model->GetDelta());
+        cell_iter->GetCellData()->SetItem("interior notch", p_interior_model->GetNotch());
+
+
     }
 
     //After the edge data is filled, fill the edge neighbour data
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-            cell_iter != rCellPopulation.End();
-            ++cell_iter)
+         cell_iter != rCellPopulation.End();
+         ++cell_iter)
     {
         auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
         const unsigned int n_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
         std::vector<double> neigh_mean_delta(n_cell_edges);
 
+        /* Cell interior */
+        double total_edge_delta = 0;
+        double total_edge_notch = 0;
+
+        auto edges_delta = cell_iter->GetCellEdgeData()->GetItem("edge delta");
+        auto edges_notch = cell_iter->GetCellEdgeData()->GetItem("edge notch");
+
+        for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
+        {
+            total_edge_delta += edges_delta[i];
+            total_edge_notch += edges_notch[i];
+        }
+
+        cell_iter->GetCellData()->SetItem("total neighbour edge delta", total_edge_delta);
+        cell_iter->GetCellData()->SetItem("total edge notch", total_edge_notch);
+
+        /* Cell edge */
         for (unsigned int i=0; i<n_cell_edges; ++i)
         {
             //Get neighbouring cell's values of delta on this
@@ -123,24 +151,27 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
                 mean_delta = mean_delta/elemNeighbours.size();
             neigh_mean_delta[i] = mean_delta;
         }
+
         cell_iter->GetCellEdgeData()->SetItem("neighbour delta", neigh_mean_delta);
     }
+
+
 
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void DeltaNotchEdgeInteriorTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
+
 // Explicit instantiation
-template class DeltaNotchCellEdgeTrackingModifier<1>;
-template class DeltaNotchCellEdgeTrackingModifier<2>;
-template class DeltaNotchCellEdgeTrackingModifier<3>;
+template class DeltaNotchEdgeInteriorTrackingModifier<1>;
+template class DeltaNotchEdgeInteriorTrackingModifier<2>;
+template class DeltaNotchEdgeInteriorTrackingModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellEdgeTrackingModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchEdgeInteriorTrackingModifier)
