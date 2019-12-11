@@ -70,8 +70,8 @@ void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    std::vector< c_vector<double, SPACE_DIM> > t1_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT1Swaps();
-
+    std::vector< c_vector<double, SPACE_DIM> > t1_swap_locations
+    = pCellPopulation->rGetMesh().GetOperationRecorder()->GetLocationsOfT1Swaps();
     *this->mpOutStream << t1_swap_locations.size() << "\t";
     for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
     {
@@ -81,7 +81,7 @@ void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
         }
     }
 
-    pCellPopulation->rGetMesh().ClearLocationsOfT1Swaps();
+    pCellPopulation->rGetMesh().GetOperationRecorder()->ClearLocationsOfT1Swaps();
 }
 
 // Explicit instantiation

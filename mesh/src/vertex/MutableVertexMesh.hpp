@@ -51,6 +51,7 @@ class VertexMeshWriter;
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 
+#include "VertexMeshOperationRecorder.hpp"
 /**
  * A mutable vertex-based mesh class, which inherits from VertexMesh and allows for local
  * remeshing. This is implemented through simple operations including node merging, neighbour
@@ -69,9 +70,12 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexMeshRosetteMethods;
     friend class TestMutableVertexEdges;
     friend class TestCellEdgeInteriorSrn;
-
+private:
+    /** Whether we need to record mesh operations, e.g. when SRN models are used */
+    bool mTrackMeshOperations = false;
+    /** Helper class to record rearrangements and mesh operations */
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM> mOperationRecorder = VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>();
 protected:
-
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
 
@@ -111,21 +115,14 @@ protected:
     double mDistanceForT3SwapChecking;
 
     /**
-     * Locations of T1 swaps (the mid point of the moving nodes), stored so they can be accessed and output by the cell population.
-     * The locations are stored until they are cleared by ClearLocationsOfT1Swaps().
-     */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps;
-
-    /**
      * The location of the last T2 swap (the centre of the removed triangle), stored so it can be accessed by the T2SwapCellKiller.
      */
     c_vector<double, SPACE_DIM> mLastT2SwapLocation;
 
     /**
-     * Locations of T3 swaps (the location of the intersection with the edge), stored so they can be accessed and output by the cell population.
-     * The locations are stored until they are cleared by ClearLocationsOfT3Swaps().
+     * Short axis of cells during cell division
      */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
+    std::vector< c_vector<double, SPACE_DIM> > mDivisionAxis;
 
     /**
      * Divide an element along the axis passing through two of its nodes.
@@ -322,59 +319,6 @@ protected:
      */
     c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
 
-    /**
-     * Records node merging (or edge shrinkage) event
-     * @param oldIds
-     * @param pElement
-     * @param merged_nodes_pair - the index of the deleted node is stored in the second position
-     */
-    void RecordNodeMergeOperation(const std::vector<unsigned int> oldIds,
-                                  VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                  const std::pair<unsigned int, unsigned int> merged_nodes_pair);
-
-    /**
-     * Records edge split operation in element pElement.
-     * @param pElement
-     * @param edge_index - index of the edge being split
-     * @param inserted_node_rel_position - position of the inserted node relative to the lower index node of the edge
-     */
-    void RecordEdgeSplitOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
-                                  const unsigned int edge_index,
-                                  const double inserted_node_rel_position);
-
-    /**
-     * Records cell divisions for VertexBasedPopulationSrn class to remap SRNs
-     * @param oldIds Global Edge IDs of parent cell prior cell division
-     * @param pElement1 Daughter element
-     * @param pElement2 Daughter element
-     */
-    void RecordCellDivideOperation(const std::vector<unsigned int>& oldIds,
-                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1,
-                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
-
-    /**
-     * Records edge formation
-     * @param pElement
-     * @param edge_index - new edge index
-     */
-    void RecordNewEdgeOperation(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                const unsigned int edge_index);
-    /**
-     * Records merging of adjacent edges due to deletion of the shared node node_index in element pElement
-     * @param pElement
-     * @param edge
-     */
-    void RecordEdgeMergeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
-                                  const unsigned int node_index);
-
-    /**
-     * Records loss of neighbour by an edge, e.g. in T2 swap.
-     * @param pElement
-     * @param edge_index
-     */
-    void RecordEdgeNewNeighbourOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
-                                         const unsigned int edge_index);
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
@@ -569,29 +513,19 @@ public:
     bool GetCheckForInternalIntersections() const;
 
     /**
-     * @return the locations of the T1 swaps
-     */
-    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
-
-    /**
      * @return the location of the last T2 swap
      */
     c_vector<double, SPACE_DIM> GetLastT2SwapLocation();
 
     /**
-     * @return the locations of the T3 swaps
+     * @return short axis before division
      */
-    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
+    std::vector<c_vector<double, SPACE_DIM> > GetDivisionAxis() const;
 
     /**
-     * Helper method to clear the stored T1 swaps
+     * Helper method to clear the division short axis
      */
-    void ClearLocationsOfT1Swaps();
-
-    /**
-     * Helper method to clear the stored T3 swaps
-     */
-    void ClearLocationsOfT3Swaps();
+    void ClearDivisionAxis();
 
     /**
      * Add a node to the mesh.
@@ -724,7 +658,11 @@ public:
      */
     void ReMesh();
 
-
+    /**
+     * @param track whether we need to track mesh operations during ReMesh
+     */
+    void SetMeshOperationTracking(const bool track);
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* GetOperationRecorder();
 };
 
 #include "SerializationExportWrapper.hpp"

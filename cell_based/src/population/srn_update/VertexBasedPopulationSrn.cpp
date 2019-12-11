@@ -47,7 +47,10 @@ void VertexBasedPopulationSrn<DIM>::SetVertexCellPopulation(VertexBasedCellPopul
 template <unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
 {
-    for (auto operation:mpCellPopulation->GetCellEdgeChangeOperations())
+    std::vector<EdgeOperation*> edge_operations
+    = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
+
+    for (auto operation:edge_operations)
     {
         switch (operation->GetOperation())
         {
@@ -88,7 +91,7 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
         }
         }
     }
-    mpCellPopulation->ClearCellEdgeOperations();
+    mpCellPopulation->rGetMesh().GetOperationRecorder()->ClearEdgeOperations();
 }
 
 template <unsigned DIM>

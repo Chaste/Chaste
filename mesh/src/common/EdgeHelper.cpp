@@ -165,7 +165,7 @@ unsigned EdgeHelper<SPACE_DIM>::GetNumEdges() const {
     return mEdges.size();
 }
 
-template<unsigned int SPACE_DIM>
+/*template<unsigned int SPACE_DIM>
 const std::vector<EdgeOperation*> & EdgeHelper<SPACE_DIM>::GetEdgeOperations()
 {
     return mEdgeOperations;
@@ -196,7 +196,7 @@ void EdgeHelper<SPACE_DIM>::InsertEdgeOperation(EDGE_OPERATION operation, const 
                                                 EdgeRemapInfo* remap_info)
 {
     mEdgeOperations.push_back(new EdgeOperation(operation, elementIndex, remap_info));
-}
+}*/
 
 template class EdgeHelper<1>;
 template class EdgeHelper<2>;

@@ -76,7 +76,14 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     {
         Validate();
     }
-    mPopulationSrn.SetVertexCellPopulation(this);
+
+    const bool HasSrn = (*this->mCells.begin())->HasSrnModel();
+
+    if (HasSrn)
+    {
+        mPopulationSrn.SetVertexCellPopulation(this);
+        mpMutableVertexMesh->SetMeshOperationTracking(true);
+    }
 }
 
 template<unsigned DIM>
@@ -431,13 +438,14 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 {
 
     auto cells = this->rGetCells();
-
+    boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
     //If edge SRNs are specified, then write vtk results into a mesh where quantities
     //associated with each edge are taken into account. We assume that the first cell is
     //representative of all cells
     if (cells.size() > 0)
     {
-        if(this->Begin()->GetSrnModel()->HasEdgeModel())
+        //If cells contain edge data
+        if (p_cell_edge_data != nullptr)
         {
             this->WriteCellEdgeVtkResultsToFile(rDirectory);
             return;
@@ -1130,18 +1138,6 @@ template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restrictMovement)
 {
     mRestrictVertexMovement = restrictMovement;
-}
-
-template<unsigned DIM>
-const std::vector<EdgeOperation*> &  VertexBasedCellPopulation<DIM>::GetCellEdgeChangeOperations()
-{
-    return this->rGetMesh().GetEdgeOperations();
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::ClearCellEdgeOperations()
-{
-    this->rGetMesh().ClearEdgeOperations();
 }
 
 
