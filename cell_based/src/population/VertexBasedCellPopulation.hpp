@@ -115,6 +115,7 @@ private:
       * SRN remapping helper class
       */
      VertexBasedPopulationSrn<DIM> mPopulationSrn;
+
     /**
      * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
      * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,
@@ -588,14 +589,6 @@ public:
      * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
-    /**
-     * Get a vector of edge operations in the vertex mesh
-     * @return
-     */
-    const std::vector<EdgeOperation*> &  GetCellEdgeChangeOperations();
-
-
-    void ClearCellEdgeOperations();
 };
 
 #include "SerializationExportWrapper.hpp"

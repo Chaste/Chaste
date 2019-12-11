@@ -76,7 +76,14 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
     {
         Validate();
     }
-    mPopulationSrn.SetVertexCellPopulation(this);
+
+    const bool HasSrn = (*this->mCells.begin())->HasSrnModel();
+
+    if (HasSrn)
+    {
+        mPopulationSrn.SetVertexCellPopulation(this);
+        mpMutableVertexMesh->SetMeshOperationTracking(true);
+    }
 }
 
 template<unsigned DIM>
@@ -1131,18 +1138,6 @@ template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restrictMovement)
 {
     mRestrictVertexMovement = restrictMovement;
-}
-
-template<unsigned DIM>
-const std::vector<EdgeOperation*> &  VertexBasedCellPopulation<DIM>::GetCellEdgeChangeOperations()
-{
-    return this->rGetMesh().GetEdgeOperations();
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::ClearCellEdgeOperations()
-{
-    this->rGetMesh().ClearEdgeOperations();
 }
 
 

@@ -57,7 +57,8 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
       mApoptosisTime(0.25), // cell takes 15 min to fully undergo apoptosis
       mUndergoingApoptosis(false),
       mIsDead(false),
-      mIsLogged(false)
+      mIsLogged(false),
+      mHasSrnModel(false)
 {
     if (SimulationTime::Instance()->IsStartTimeSetUp()==false)
     {
@@ -76,6 +77,10 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     {
         pSrnModel = new NullSrnModel;
         mpSrnModel = pSrnModel;
+    }
+    else
+    {
+        mHasSrnModel = true;
     }
 
     mpSrnModel->SetCell(CellPtr(this, null_deleter()));
@@ -205,6 +210,7 @@ void Cell::SetSrnModel(AbstractSrnModel* pSrnModel)
     }
     mpSrnModel = pSrnModel;
     mpSrnModel->SetCell(CellPtr(this, null_deleter()));
+    mHasSrnModel = true;
 }
 
 AbstractSrnModel* Cell::GetSrnModel() const
@@ -536,4 +542,9 @@ CellPtr Cell::Divide()
     p_new_cell->SetApoptosisTime(mApoptosisTime);
 
     return p_new_cell;
+}
+
+bool Cell::HasSrnModel() const
+{
+    return mHasSrnModel;
 }
