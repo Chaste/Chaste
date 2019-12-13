@@ -3617,7 +3617,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         try:
             if config.options.convert_interfaces and config.cytosolic_calcium_variable and milliMolar.dimensionally_equivalent(config.cytosolic_calcium_variable.get_units()):
                 if config.cytosolic_calcium_variable.get_type()==VarTypes.Computed:
-                    config.cytosolic_calcium_variable = generator.add_output(config.cytosolic_calcium_variable, milliMolar)
+                    config.cytosolic_calcium_variable = generator.add_output(config.cytosolic_calcium_variable, milliMolar, annotate=False)
                 else:
                     config.cytosolic_calcium_variable = generator.add_input(config.cytosolic_calcium_variable, milliMolar)
         except AttributeError:
