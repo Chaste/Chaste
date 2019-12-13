@@ -287,7 +287,8 @@ if __name__ == '__main__':
     # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
-    named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE', 'output.chaste', 'Version.cpp.in']
+    named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE',
+                   'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
 
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'testoutput', 'doc', 'projects', 'hierwikiplugin']
     startchar_ignores = ['_', '.']
