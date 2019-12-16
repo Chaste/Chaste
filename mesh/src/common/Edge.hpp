@@ -90,7 +90,7 @@ public:
     /**
      * Mark the Edge to be deleted
      */
-    void MarkDeleted();
+    void MarkAsDeleted();
 
     /**
      *

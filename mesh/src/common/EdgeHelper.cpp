@@ -130,6 +130,9 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
     std::vector<Edge<SPACE_DIM>*> live_edges;
     for (unsigned i=0; i<this->mEdges.size(); i++)
     {
+        // An edge can be deleted if it is not contained in any elements
+        // or if it is marked to be deleted. The second case can occur if one of the edge nodes
+        // had been marked as deleted.
         if (this->mEdges[i]->GetNumElements() == 0)
         {
             delete this->mEdges[i];
@@ -164,39 +167,6 @@ template<unsigned int SPACE_DIM>
 unsigned EdgeHelper<SPACE_DIM>::GetNumEdges() const {
     return mEdges.size();
 }
-
-/*template<unsigned int SPACE_DIM>
-const std::vector<EdgeOperation*> & EdgeHelper<SPACE_DIM>::GetEdgeOperations()
-{
-    return mEdgeOperations;
-}
-
-template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::ClearEdgeOperations()
-{
-    for (auto operation : mEdgeOperations)
-    {
-        delete operation;
-    }
-
-    mEdgeOperations.clear();
-}
-
-template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertCellDivideOperation(const unsigned int elementIndex_1, const unsigned int elementIndex_2,
-                                                      EdgeRemapInfo* remap_info_1, EdgeRemapInfo* remap_info_2)
-{
-        mEdgeOperations.push_back(new EdgeOperation(elementIndex_1, elementIndex_2,
-                                                    remap_info_1, remap_info_2));
-}
-
-
-template <unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertEdgeOperation(EDGE_OPERATION operation, const unsigned int elementIndex,
-                                                EdgeRemapInfo* remap_info)
-{
-    mEdgeOperations.push_back(new EdgeOperation(operation, elementIndex, remap_info));
-}*/
 
 template class EdgeHelper<1>;
 template class EdgeHelper<2>;

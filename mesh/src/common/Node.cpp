@@ -272,8 +272,19 @@ void Node<SPACE_DIM>::RemoveEdge(unsigned index)
     unsigned count = mEdgeIndices.erase(index);
     if (count == 0)
     {
-        EXCEPTION("Tried to remove an index which was not in the set");
+        EXCEPTION("Tried to remove an edge index which was not in the set");
     }
+}
+
+template<unsigned int SPACE_DIM>
+void Node<SPACE_DIM>::SetEdgeIndices(std::set<unsigned int> edge_indices)
+{
+    mEdgeIndices = edge_indices;
+}
+template<unsigned int SPACE_DIM>
+std::set<unsigned int> Node<SPACE_DIM>::GetEdgeIndices() const
+{
+    return mEdgeIndices;
 }
 
 //////////////////////////////////////////////////////////////////////////

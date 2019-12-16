@@ -192,8 +192,6 @@ double MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDistanceForT3SwapChecking()
     return mDistanceForT3SwapChecking;
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCheckForInternalIntersections() const
 {
@@ -347,6 +345,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(VertexElement<ELE
         this->mElements[new_element_index] = pNewElement;
     }
     pNewElement->RegisterWithNodes();
+    pNewElement->SetEdgeHelper(&this->mEdges);
+    pNewElement->BuildEdges();
     return pNewElement->GetIndex();
 }
 
@@ -364,7 +364,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
     assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
-    //Storing element edge map prior to division
+    //Storing element edge map prior to division. This is needed for division recording.
     std::vector<unsigned int> edgeIds;
     for (unsigned i = 0; i < pElement->GetNumEdges(); i++)
     {
@@ -575,10 +575,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     // Re-build edges when division is performed
     pElement->RebuildEdges();
 
-    // and build edges for the new element
-    this->mElements[new_element_index]->SetEdgeHelper(&this->mEdges);
-    this->mElements[new_element_index]->BuildEdges();
-
     if (mTrackMeshOperations)
     {
         mOperationRecorder.RecordCellDivideOperation(edgeIds, pElement, this->mElements[new_element_index]);
@@ -728,7 +724,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
             }
         }
     }
-
+    pElement->BuildEdges();
     return new_element_index;
 }
 
@@ -844,7 +840,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 {
     // Make sure the map is big enough.  Each entry will be set in the loop below.
     rElementMap.Resize(this->GetNumAllElements());
-
     // Remove any elements that have been marked for deletion and store all other elements in a temporary structure
     std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> live_elements;
     for (unsigned i=0; i<this->mElements.size(); i++)
@@ -881,18 +876,16 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
-    // Remove deleted edges and update the node-edge mapping
-    this->mEdges.RemoveDeletedEdges();
-
-    std::vector<std::pair<unsigned int, unsigned int> > edge_nodes(this->mEdges.GetNumEdges());
+    /*std::vector<std::pair<unsigned int, unsigned int> > edge_nodes(this->mEdges.GetNumEdges());
     for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
     {
         const unsigned int index_0 = this->mEdges[i]->GetNode(0)->GetIndex();
         const unsigned int index_1 = this->mEdges[i]->GetNode(1)->GetIndex();
         edge_nodes[i] = std::pair<unsigned int, unsigned int>(index_0, index_1);
-    }
+    }*/
 
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
+    // Also mark edges associated with the deleted nodes
     std::vector<Node<SPACE_DIM>*> live_nodes;
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
@@ -913,16 +906,16 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     mDeletedNodeIndices.clear();
 
     //The map for updating nodes and edge pointers
-    std::map<unsigned int, unsigned int> old_to_new_map;
+    //std::map<unsigned int, unsigned int> old_to_new_map;
     // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
-        old_to_new_map[this->mNodes[i]->GetIndex()] = i;
+        //old_to_new_map[this->mNodes[i]->GetIndex()] = i;
         this->mNodes[i]->SetIndex(i);
     }
 
     //Updating nodes and edge pointers
-    for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
+    /*for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
     {
         const unsigned int old_index_0 = edge_nodes[i].first;
         const unsigned int old_index_1 = edge_nodes[i].second;
@@ -930,8 +923,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
         const unsigned int new_index_0 = old_to_new_map[old_index_0];
         const unsigned int new_index_1 = old_to_new_map[old_index_1];
         this->mEdges[i]->SetNodes(this->mNodes[new_index_0],this->mNodes[new_index_1]);
-    }
+    }*/
 
+    // Remove deleted edges and update the node-edge mapping
+    this->mEdges.RemoveDeletedEdges();
     // Update the node-edge mapping
     this->mEdges.UpdateEdgesMapKey();
 }

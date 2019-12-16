@@ -80,7 +80,6 @@ private:
      */
     bool mIsDeleted;
 
-
     /** Set of indices of edges that contains this node **/
     std::set<unsigned> mEdgeIndices;
 
@@ -254,8 +253,25 @@ public:
      */
     bool IsBoundaryNode() const;
 
+    /**
+     * Add an edge that contains this node
+     * @param index of the edge to add
+     */
     void AddEdge(unsigned index);
+    /**
+     * Remove an edge that contains this node
+     * @param index of the edge to add
+     */
     void RemoveEdge(unsigned index);
+
+    /**
+     * Set edge indices that contain this node
+     */
+    void SetEdgeIndices(std::set<unsigned int> edge_indices);
+    /**
+     * @return set of edge indices associated with the node.
+     */
+    std::set<unsigned int> GetEdgeIndices() const;
 
     /**
      * Add an element that contains this node.

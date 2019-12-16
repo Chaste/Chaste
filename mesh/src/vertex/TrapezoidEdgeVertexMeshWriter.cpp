@@ -143,7 +143,8 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
         const c_vector<double, SPACE_DIM> elem_centroid = rMesh.GetCentroidOfElement(elem->GetIndex());
         for (unsigned elem_node_num = 0; elem_node_num < n_elem_nodes; elem_node_num++)
         {
-            const c_vector<double, SPACE_DIM> node_position = elem->GetNode(elem_node_num)->rGetLocation();
+            c_vector<double, SPACE_DIM> node_position;
+            node_position = elem->GetNode(elem_node_num)->rGetLocation();
             const double new_x = (node_position[0]-elem_centroid[0])*alpha + elem_centroid[0];
             const double new_y = (node_position[1]-elem_centroid[1])*alpha + elem_centroid[1];
             if (SPACE_DIM == 2)
@@ -220,8 +221,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
              */
             vtkCell* p_cell;
             p_cell = vtkHexahedron::New();
-            const unsigned n_trap_nodes = p_cell->GetNumberOfFaces();
-            assert(n_trap_nodes == 6);
+            assert(p_cell->GetNumberOfFaces() == 6);
             p_cell->Delete();
         }
     }

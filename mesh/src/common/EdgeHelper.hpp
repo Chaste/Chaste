@@ -21,7 +21,6 @@ private:
 
     std::vector<Edge<SPACE_DIM>*> mEdges;
     std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
-    //std::vector<EdgeOperation*> mEdgeOperations;
 
 public:
 
@@ -61,21 +60,6 @@ public:
     {
         return mEdges.end();
     }
-
-    /**
-     * Gets the record of edge changes in the mesh
-     * @return
-
-    const std::vector<EdgeOperation*> & GetEdgeOperations();
-
-    *
-     * Clears the edge change records in the mesh
-
-    void ClearEdgeOperations();
-
-    void InsertCellDivideOperation(const unsigned int elementIndex_1, const unsigned int elementIndex_2,
-                                   EdgeRemapInfo* remap_info_1, EdgeRemapInfo* remap_info_2);
-    void InsertEdgeOperation(EDGE_OPERATION operation, const unsigned int elementIndex, EdgeRemapInfo* remap_info);*/
 };
 
 #endif //CHASTE_EDGEHELPER_HPP
