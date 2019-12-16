@@ -188,12 +188,10 @@ std::set<std::pair<unsigned int, unsigned int>>
 VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex)
 {
     std::set<std::pair<unsigned, unsigned>> neighbours;
-
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
     auto element = this->GetElement(cellLocationIndex);
     auto globalEdgeIndex = element->GetEdgeGlobalIndex(pEdgeLocalIndex);
     auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(pEdgeLocalIndex);
-
     for (auto neighbourElementIndex : neighbourElementIndices)
     {
         auto neighbourElement = this->GetElement(neighbourElementIndex);

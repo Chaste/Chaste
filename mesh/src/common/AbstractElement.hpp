@@ -186,41 +186,6 @@ public:
      */
     void AddNode(Node<SPACE_DIM>* pNode);
 
-    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* edgeHelper);
-
-    void ClearEdges();
-
-    void BuildEdges();
-
-    /**
-     * Gets the global index of the edge at localIndex
-     * @param localIndex local index of the edge in this element
-     * @return Global index of the edge
-     */
-    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
-
-    /**
-     * Gets the edge at localIndex
-     * @param localIndex local index of the edge in this element
-     * @return
-     */
-    Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
-
-    /**
-     *
-     * @return Number of edges associated with this element
-     */
-    unsigned GetNumEdges() const;
-
-
-    /**
-     * Gets a set of element indices that neighours the element at the specified edge
-     * @param localIndex Local index of the edge in this element
-     * @return A set of element indices that neighbours this edge
-     */
-    std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
-
-
     /**
      * TODO: Proper description
      * @return
@@ -295,6 +260,50 @@ public:
      * @return the number of node attributes associated with this node.
      */
     unsigned GetNumElementAttributes();
+
+    /**
+     * Sets edge helper
+     * @param edgeHelper
+     */
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* edgeHelper);
+
+    /**
+     * Clear edges from element
+     */
+    void ClearEdges();
+
+    /**
+     * Builds edges from element nodes
+     */
+    void BuildEdges();
+
+    /**
+     * Gets the global index of the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return Global index of the edge
+     */
+    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
+
+    /**
+     * Gets the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return
+     */
+    Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
+
+    /**
+     *
+     * @return Number of edges associated with this element
+     */
+    unsigned GetNumEdges() const;
+
+
+    /**
+     * Gets a set of element indices that neighours the element at the specified edge
+     * @param localIndex Local index of the edge in this element
+     * @return A set of element indices that neighbours this edge
+     */
+    std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
 
     /**
      * Checks if the element contains edge

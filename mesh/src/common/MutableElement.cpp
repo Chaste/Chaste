@@ -81,6 +81,11 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
     {
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
+    //Update edges in the element so they know they are not contained by it
+    for (unsigned i=0; i<this->GetNumEdges(); i++)
+    {
+        this->mEdges[i]->RemoveElement(this->mIndex);
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

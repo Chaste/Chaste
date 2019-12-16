@@ -165,39 +165,6 @@ unsigned EdgeHelper<SPACE_DIM>::GetNumEdges() const {
     return mEdges.size();
 }
 
-/*template<unsigned int SPACE_DIM>
-const std::vector<EdgeOperation*> & EdgeHelper<SPACE_DIM>::GetEdgeOperations()
-{
-    return mEdgeOperations;
-}
-
-template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::ClearEdgeOperations()
-{
-    for (auto operation : mEdgeOperations)
-    {
-        delete operation;
-    }
-
-    mEdgeOperations.clear();
-}
-
-template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertCellDivideOperation(const unsigned int elementIndex_1, const unsigned int elementIndex_2,
-                                                      EdgeRemapInfo* remap_info_1, EdgeRemapInfo* remap_info_2)
-{
-        mEdgeOperations.push_back(new EdgeOperation(elementIndex_1, elementIndex_2,
-                                                    remap_info_1, remap_info_2));
-}
-
-
-template <unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::InsertEdgeOperation(EDGE_OPERATION operation, const unsigned int elementIndex,
-                                                EdgeRemapInfo* remap_info)
-{
-    mEdgeOperations.push_back(new EdgeOperation(operation, elementIndex, remap_info));
-}*/
-
 template class EdgeHelper<1>;
 template class EdgeHelper<2>;
 template class EdgeHelper<3>;
