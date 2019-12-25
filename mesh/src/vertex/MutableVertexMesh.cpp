@@ -869,6 +869,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
         this->mElements[i]->ResetIndex(i);
     }
 
+    // Remove deleted edges and update the node-edge mapping
+    this->mEdges.RemoveDeletedEdges();
+
     // Remove deleted nodes
     RemoveDeletedNodes();
 }
