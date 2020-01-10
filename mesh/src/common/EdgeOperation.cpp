@@ -33,33 +33,76 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef VERTEXBASEDPOPULATIONSRN_HPP_
-#define VERTEXBASEDPOPULATIONSRN_HPP_
-
-#include <VertexBasedCellPopulation.hpp>
-#include "ChasteSerialization.hpp"
-#include "SrnCellModel.hpp"
-#include "EdgeRemapInfo.hpp"
 #include "EdgeOperation.hpp"
-#include "VertexElementMap.hpp"
 
-template <unsigned DIM>
-class VertexBasedCellPopulation;
-
-template <unsigned DIM>
-class VertexBasedPopulationSrn
+EdgeOperation::EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex,
+                             EdgeRemapInfo* pRemapInfo, const bool isIndexRemapped)
+:
+                             mElementIndex(elementIndex),
+                             mElementIndex2(0),
+                             mpRemapInfo(pRemapInfo),
+                             mIsElementIndexRemapped(isIndexRemapped)
 {
-private:
-    VertexBasedCellPopulation<DIM>* mpCellPopulation;
-public:
-    VertexBasedPopulationSrn();
-    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* p_vertex_population);
+    this->mOperation = operation;
+    this->mpRemapInfo2 = nullptr;
+}
 
-    void UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap);
+EdgeOperation::EdgeOperation(unsigned elementIndex,
+                             unsigned elementIndex2,
+                             EdgeRemapInfo* pRemapInfo,
+                             EdgeRemapInfo* pRemapInfo2)
+:
+        mElementIndex(elementIndex),
+        mElementIndex2(elementIndex2),
+        mpRemapInfo(pRemapInfo),
+        mpRemapInfo2(pRemapInfo2),
+        mIsElementIndexRemapped(false)
+{
+    this->mOperation = EDGE_OPERATION_DIVIDE;
+}
 
-    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
-                             SrnCellModel* pSrnCell_1,
-                             EdgeRemapInfo* pEdgeChange_1);
-};
+EdgeOperation::~EdgeOperation()
+{
+    delete this->mpRemapInfo;
+    delete this->mpRemapInfo2;
+}
 
-#endif /* VERTEXBASEDPOPULATIONSRN_HPP_ */
+EDGE_OPERATION EdgeOperation::GetOperation() const
+{
+    return mOperation;
+}
+
+unsigned EdgeOperation::GetElementIndex() const
+{
+    return this->mElementIndex;
+}
+
+void EdgeOperation::SetElementIndex(const unsigned int index)
+{
+    this->mElementIndex  = index;
+}
+
+unsigned EdgeOperation::GetElementIndex2() const
+{
+    return this->mElementIndex2;
+}
+
+void EdgeOperation::SetElementIndex2(const unsigned int index)
+{
+    this->mElementIndex2  = index;
+}
+
+EdgeRemapInfo* EdgeOperation::GetRemapInfo() const
+{
+    return mpRemapInfo;
+}
+
+EdgeRemapInfo* EdgeOperation::GetRemapInfo2() const
+{
+    return mpRemapInfo2;
+}
+
+bool EdgeOperation::IsElementIndexRemapped() const
+{
+    return mIsElementIndexRemapped;
+}

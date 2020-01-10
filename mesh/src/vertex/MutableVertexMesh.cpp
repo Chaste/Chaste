@@ -1222,7 +1222,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  */
                 assert(pNodeA->IsBoundaryNode());
                 assert(pNodeB->IsBoundaryNode());
-
                 PerformNodeMerge(pNodeA, pNodeB);
                 RemoveDeletedNodes();
                 break;
@@ -1405,7 +1404,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                              */
                              EXCEPTION("Triangular element next to triangular void, not implemented yet.");
                         }
-
                         PerformVoidRemoval(pNodeA, pNodeB, this->mNodes[nodeC_index]);
                     }
                     else
@@ -1531,9 +1529,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
             {
                 edgeIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
             }
+            const unsigned int node_A_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
             this->mElements[*it]->DeleteNode(node_B_local_index);
 
-            const unsigned int node_A_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
             if (mTrackMeshOperations)
             {
                 mOperationRecorder.RecordNodeMergeOperation(edgeIds, this->mElements[*it],
@@ -1730,7 +1728,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     assert(SPACE_DIM == 2);                    // LCOV_EXCL_LINE
     assert(ELEMENT_DIM == SPACE_DIM);        // LCOV_EXCL_LINE
 
-
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
@@ -1896,7 +1893,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 {
     // The given element must be triangular for us to be able to perform a T2 swap on it
     assert(rElement.GetNumNodes() == 3);
-
     // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
     c_vector<double, SPACE_DIM> new_node_location;
     new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
@@ -1914,7 +1910,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     }
     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
     Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
-
     // Loop over each of the three nodes contained in rElement
     for (unsigned i=0; i<3; i++)
     {
@@ -1922,12 +1917,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
         Node<SPACE_DIM>* p_node = rElement.GetNode(i);
         std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
         containing_elements.erase(rElement.GetIndex());
-
         // For each of these elements...
         for (std::set<unsigned>::iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
         {
             VertexElement<ELEMENT_DIM,SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
-
             // ...throw an exception if the element is triangular...
             if (p_this_elem->GetNumNodes() < 4)
             {
@@ -1941,7 +1934,20 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
             }
             else
             {
+                std::vector<unsigned int> oldIds;
+                std::pair<unsigned int, unsigned int> node_pair;
+                if (mTrackMeshOperations)
+                {
+                    for (unsigned int i=0; i<p_this_elem->GetNumEdges(); ++i)
+                    {
+                        oldIds.push_back(p_this_elem->GetEdge(i)->GetIndex());
+                    }
+                    node_pair.first= p_this_elem->GetNodeLocalIndex(new_node_global_index);
+                    node_pair.second = p_this_elem->GetNodeLocalIndex(p_node->GetIndex());
+                }
                 p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(p_node->GetIndex()));
+                if (mTrackMeshOperations)
+                    mOperationRecorder.RecordNodeMergeOperation(oldIds, p_this_elem, node_pair, true);
             }
         }
     }
@@ -2853,14 +2859,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
     c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation()
             + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation()) / 3.0
             + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeC->rGetLocation()) / 3.0;
-
     /*
      * In two steps, merge nodes A, B and C into a single node.  This is implemented in such a way that
      * the ordering of their indices does not matter.
      */
-
     PerformNodeMerge(pNodeA, pNodeB);
-
     Node<SPACE_DIM>* p_merged_node = pNodeB;
 
     if (pNodeB->IsDeleted())
@@ -2869,7 +2872,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
     }
 
     PerformNodeMerge(pNodeC, p_merged_node);
-
     if (p_merged_node->IsDeleted())
     {
         p_merged_node = pNodeC;

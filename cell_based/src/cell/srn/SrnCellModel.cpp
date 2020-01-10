@@ -118,6 +118,7 @@ AbstractSrnModel* SrnCellModel::CreateSrnModel()
 void SrnCellModel::AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn)
 {
     mIsEdgeBasedModel = true;
+    mEdgeSrnModels.clear();
     for (unsigned int i=0; i<edgeSrn.size(); ++i)
         edgeSrn[i]->SetEdgeModelIndicator(true);
     mEdgeSrnModels = edgeSrn;

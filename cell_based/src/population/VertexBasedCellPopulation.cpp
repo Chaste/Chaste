@@ -191,10 +191,7 @@ VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsign
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
     auto element = this->GetElement(cellLocationIndex);
     auto globalEdgeIndex = element->GetEdgeGlobalIndex(pEdgeLocalIndex);
-    //std::cout<<"H1 "<<element->GetNumEdges()<<" "<<pEdgeLocalIndex<<std::endl;
-    //std::cout<<GetLocationOfCellCentre(pCell)[0]<<GetLocationOfCellCentre(pCell)[1]<<std::endl;
     auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(pEdgeLocalIndex);
-    //std::cout<<"H2"<<std::endl;
     for (auto neighbourElementIndex : neighbourElementIndices)
     {
         auto neighbourElement = this->GetElement(neighbourElementIndex);
@@ -354,11 +351,11 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
         Validate();
     }
-    //First cell is representative of other clels
+    //First cell is representative of other cells
     bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
     if (EdgeModelOrNot)
     {
-        mPopulationSrn.UpdateSrnAfterBirthOrDeath();
+        mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
     }
 
     element_map.ResetToIdentity();

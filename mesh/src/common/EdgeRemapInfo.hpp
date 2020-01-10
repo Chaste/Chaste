@@ -39,14 +39,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 /**
- * Storage class contains a mapping to the old local edges index during cell division.
- *
+ * Storage class contains a mapping to the old local edge indices and status of the new edges.
  */
 class EdgeRemapInfo {
 
     /**
-     * Contains a mapping to the old local edges index. Negative value means a new edge
-     *
+     * Contains a mapping to the old local edge indices. Negative value means a new edge
      */
     const std::vector<long int> mEdgesMapping;
 
@@ -55,6 +53,8 @@ class EdgeRemapInfo {
      * 0 Edge has not changed
      * 1 Edge has been split between two elements
      * 2 Completely new edge was created
+     * 3 Edge above or below the current edge was deleted
+     * 4 Edge above has been merged into the current one
      */
     const std::vector<unsigned int> mEdgeStatus;
 
@@ -83,9 +83,14 @@ public:
     std::vector<unsigned int> GetEdgesStatus() const;
 
     /**
-     *
+     * Gets split proportions. Used in VerteBasedPopulationSrn class
      */
     std::vector<double> GetSplitProportions() const;
+
+    /**
+     * Sets split proportions. Used in VertexMeshOperationRecorder class
+     * @param thetas
+     */
     void SetSplitProportions(const std::vector<double> thetas);
 };
 

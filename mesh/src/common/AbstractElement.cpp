@@ -184,14 +184,16 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::BuildEdges()
 }
 
 template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
-unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const {
-    assert((unsigned)localIndex < mEdges.size());
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
     return mEdges[localIndex]->GetIndex();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Edge<SPACE_DIM> *AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned localIndex) const {
-    assert((unsigned)localIndex < mEdges.size());
+Edge<SPACE_DIM> *AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
     return mEdges[localIndex];
 }
 
@@ -204,7 +206,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::set<unsigned> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementAtEdgeIndex(unsigned localIndex)
 {
     assert(localIndex < mEdges.size());
-
     return mEdges[localIndex]->GetOtherElements(this->mIndex);
 }
 

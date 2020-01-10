@@ -308,12 +308,6 @@ public:
      * @param relative_position - how close the added node is to the previous node
      */
     virtual void SplitEdgeSrn(const double relative_position);
-
-    /**
-     * Updates Srn quantities after neighbour loss. This might be necessary to do
-     * in case there are cell-cell bonds in the model
-     */
-    virtual void UpdateSrnAfterNewNeighbour();
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

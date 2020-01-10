@@ -200,6 +200,7 @@ void DeltaNotchSrnEdgeModel::SplitEdgeSrn(const double relative_position)
     ScaleSrnVariables(relative_position);
 }
 
+
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(DeltaNotchSrnEdgeModel)

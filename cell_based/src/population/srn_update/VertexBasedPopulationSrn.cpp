@@ -45,50 +45,59 @@ void VertexBasedPopulationSrn<DIM>::SetVertexCellPopulation(VertexBasedCellPopul
 }
 
 template <unsigned DIM>
-void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath()
+void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap)
 {
     std::vector<EdgeOperation*> edge_operations
     = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
-
     for (auto operation:edge_operations)
     {
-        switch (operation->GetOperation())
+        // An operation with deleted element may be recorded,
+        // e.g. following a T2 swap, neighbouring element may become triangular due to node merging
+        // and may subsequently be marked for deletion, despite being marked to perform edge operations.
+        if (!rElementMap.IsDeleted(operation->GetElementIndex()))
         {
-        case EDGE_OPERATION_ADD:
-        case EDGE_OPERATION_NODE_MERGE:
-        case EDGE_OPERATION_SPLIT:
-        case EDGE_OPERATION_MERGE:
-        case EDGE_OPERATION_NEW_NEIGHBOUR:
-        {
-            const unsigned int location_index = operation->GetElementIndex();
-            EdgeRemapInfo *pEdgeChange = operation->GetNewEdges();
-            CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
-            auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
-            std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
-            RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
-            old_srn_edges.clear();
-            break;
-        }
-        case EDGE_OPERATION_DELETE:
-            break;
-        case EDGE_OPERATION_DIVIDE:
-        {
-            const unsigned int location_index_1 = operation->GetElementIndex();
-            const unsigned int location_index_2 = operation->GetElementIndex2();
-            EdgeRemapInfo *pEdgeChange_1 = operation->GetNewEdges();
-            EdgeRemapInfo *pEdgeChange_2 = operation->GetNewEdges2();
-            CellPtr cell_1 = mpCellPopulation->GetCellUsingLocationIndex(location_index_1);
-            CellPtr cell_2 = mpCellPopulation->GetCellUsingLocationIndex(location_index_2);
+            switch (operation->GetOperation())
+            {
+            case EDGE_OPERATION_ADD:
+            case EDGE_OPERATION_NODE_MERGE:
+            case EDGE_OPERATION_SPLIT:
+            case EDGE_OPERATION_MERGE:
+            {
+                unsigned int location_index = operation->GetElementIndex();
+                if (operation->IsElementIndexRemapped())
+                {
+                    location_index = rElementMap.GetNewIndex(operation->GetElementIndex());
+                }
+                EdgeRemapInfo *pEdgeChange = operation->GetRemapInfo();
+                CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
 
-            auto old_model_1 = static_cast<SrnCellModel*>(cell_1->GetSrnModel());
-            std::vector<AbstractSrnModelPtr> parent_srn_edges = old_model_1->GetEdges();
-            auto old_model_2 = static_cast<SrnCellModel*>(cell_2->GetSrnModel());
+                auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
+                std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
+                RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
+                old_srn_edges.clear();
+                break;
+            }
+            case EDGE_OPERATION_DELETE:
+                break;
+            case EDGE_OPERATION_DIVIDE:
+            {
+                const unsigned int location_index_1 = rElementMap.GetNewIndex(operation->GetElementIndex());
+                const unsigned int location_index_2 = rElementMap.GetNewIndex(operation->GetElementIndex2());
+                EdgeRemapInfo *pEdgeChange_1 = operation->GetRemapInfo();
+                EdgeRemapInfo *pEdgeChange_2 = operation->GetRemapInfo2();
+                CellPtr cell_1 = mpCellPopulation->GetCellUsingLocationIndex(location_index_1);
+                CellPtr cell_2 = mpCellPopulation->GetCellUsingLocationIndex(location_index_2);
 
-            RemapCellSrn(parent_srn_edges, old_model_1, pEdgeChange_1);
-            RemapCellSrn(parent_srn_edges, old_model_2, pEdgeChange_2);
-            parent_srn_edges.clear();
-            break;
-        }
+                auto old_model_1 = static_cast<SrnCellModel*>(cell_1->GetSrnModel());
+                std::vector<AbstractSrnModelPtr> parent_srn_edges = old_model_1->GetEdges();
+                auto old_model_2 = static_cast<SrnCellModel*>(cell_2->GetSrnModel());
+
+                RemapCellSrn(parent_srn_edges, old_model_1, pEdgeChange_1);
+                RemapCellSrn(parent_srn_edges, old_model_2, pEdgeChange_2);
+                parent_srn_edges.clear();
+                break;
+            }
+            }
         }
     }
     mpCellPopulation->rGetMesh().GetOperationRecorder()->ClearEdgeOperations();
@@ -112,11 +121,10 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 
         //remapStatus can be the following:
         //0 - Direct remapping, the edge SRN of the oldModel can be transferred directly to the new model
-        //1 - The edge is a split point between the diving cells, in this example we divide all concentration in half
+        //1 - The edge is a split point between the dividing cells
         //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
-        //3 - Edge below or above an edge that was deleted due to node merging
+        //3 - Edge below or above the edge that was deleted due to node merging
         //4 - Edge above was merged into this edge
-        //5 - Edge acquired a new neighbour. For example after a T2 swap
         const unsigned int remapStatus = pEdgeChange->GetEdgesStatus()[i];
         if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
         {
@@ -151,7 +159,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             else
             {
                 shrunkEdge = remapIndex-1;
-                if (shrunkEdge<0)
+                if (remapIndex==0)
                 {
                     shrunkEdge = n_edges;
                 }
@@ -166,21 +174,13 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             new_edge_srn[i] -> AddMergedEdgeSrn(parent_srn_edges[next_edge_index].get());
             break;
         }
-        case 5:
-        {
-            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
-            new_edge_srn[i]->UpdateSrnAfterNewNeighbour();
-            break;
         }
-        }
-
         //Setting the new local edge index and the cell
         new_edge_srn[i]->SetEdgeLocalIndex(i);
         new_edge_srn[i]->SetCell(pSrnCell->GetCell());
         if (remapStatus == 2)
             new_edge_srn[i]->InitialiseDaughterCell();
     }
-
     //For the case when edge quantities are returned into interior when edge shrinks due to node merging
     boost::shared_ptr<AbstractSrnModel> interior_srn
     =boost::shared_ptr<AbstractSrnModel>(pSrnCell->GetInteriorSrn());
@@ -190,7 +190,6 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         {
             interior_srn->AddShrunkEdgeToInterior(parent_srn_edges[shrunkEdgeIndex].get());
         }
-        interior_srn->UpdateSrnAfterNewNeighbour();
     }
 
     pSrnCell->AddEdgeSrn(new_edge_srn);

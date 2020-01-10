@@ -45,90 +45,91 @@ enum EDGE_OPERATION {
     EDGE_OPERATION_DIVIDE,
     EDGE_OPERATION_SPLIT,
     EDGE_OPERATION_NODE_MERGE,
-    EDGE_OPERATION_MERGE,
-    EDGE_OPERATION_NEW_NEIGHBOUR
+    EDGE_OPERATION_MERGE
 };
 
 /**
- * Class for storing edge change during remeshing
+ * Class for storing edge operation during remeshing
  */
 class EdgeOperation {
-
+private:
     EDGE_OPERATION mOperation;
 
     unsigned mElementIndex;
     unsigned mElementIndex2;
 
-    EdgeRemapInfo* mNewEdges;
-    EdgeRemapInfo* mNewEdges2;
+    EdgeRemapInfo* mpRemapInfo;
+    EdgeRemapInfo* mpRemapInfo2;
 
+    bool mIsElementIndexRemapped;
 public:
 
-
     /**
-     * Constructor for either Add, split, and node merg operations
-     * @param operation
-     * @param elementIndex
-     * @param localEdgeIndex
+     * Constructor for add, split, node and edge merge operations
+     * @param operation - which operation was performed
+     * @param elementIndex - index of the element
+     * @param pRemapInfo - remapping info
+     * @param isIndexRemapped - indicates whether the operation has been recorded before elements changed their indices
+     * e.g. when T2 swap occurs, node merging operation is recorded with element index that will be modified in
+     * RemoveDeletedNodesAndELements() function. See also Update() function in VertexBasedCellPopulation class
      */
-    EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex, EdgeRemapInfo* newEdges)
-    {
-        this->mOperation = operation;
-        this->mElementIndex = elementIndex;
-        this->mElementIndex2 = 0;
-        this->mNewEdges = newEdges;
-        this->mNewEdges2 = nullptr;
-    }
+    EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex,
+                  EdgeRemapInfo* pRemapInfo, const bool isIndexRemapped = false);
 
      /**
       * Constructor for the DIVIDE operation
       * @param elementIndex
       * @param elementIndex2
-      * @param newEdges
-      * @param newEdges2
+      * @param pRemapInfo
+      * @param pRemapInfo2
       */
     EdgeOperation(unsigned elementIndex,
                   unsigned elementIndex2,
-                  EdgeRemapInfo* newEdges,
-                  EdgeRemapInfo* newEdges2)
-    {
-        this->mOperation = EDGE_OPERATION_DIVIDE;
-        this->mElementIndex = elementIndex;
-        this->mElementIndex2 = elementIndex2;
-        this->mNewEdges = newEdges;
-        this->mNewEdges2 = newEdges2;
-    }
+                  EdgeRemapInfo* pRemapInfo,
+                  EdgeRemapInfo* pRemapInfo2);
 
-    ~EdgeOperation()
-    {
-        delete this->mNewEdges;
-        delete this->mNewEdges2;
-    }
+    ~EdgeOperation();
 
-    EDGE_OPERATION GetOperation() const
-    {
-        return mOperation;
-    }
+    /**
+     * @return edge operations
+     */
+    EDGE_OPERATION GetOperation() const;
 
-    unsigned GetElementIndex() const
-    {
-        return this->mElementIndex;
-    }
+    /**
+     * @return Element index on which edge operation has been performed.
+     * Also index (inherited from mother cell) of the first daughter cell.
+     */
+    unsigned GetElementIndex() const;
 
-    unsigned GetElementIndex2() const
-    {
-        return this->mElementIndex2;
-    }
+    /**
+     * Modify element index on which edge operation has been performed
+     */
+    void SetElementIndex(const unsigned int index);
 
-    EdgeRemapInfo* GetNewEdges() const
-    {
-        return mNewEdges;
-    }
+    /**
+     * @return Element index of the second daughter cell
+     */
+    unsigned GetElementIndex2() const;
 
-    EdgeRemapInfo* GetNewEdges2() const
-    {
-        return mNewEdges2;
-    }
+    /**
+     * Modify element index of the second daughter cell
+     */
+    void SetElementIndex2(const unsigned int index);
+
+    /**
+     * @return Edge remap info
+     */
+    EdgeRemapInfo* GetRemapInfo() const;
+
+    /**
+     * @return Edge remap info after cell division
+     */
+    EdgeRemapInfo* GetRemapInfo2() const;
+
+    /**
+     * @return mIsElementIndexRemapped
+     */
+    bool IsElementIndexRemapped() const;
 };
 
 #endif //EDGEOPERATION_HPP_

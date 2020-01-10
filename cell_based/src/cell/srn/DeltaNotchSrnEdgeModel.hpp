@@ -176,10 +176,8 @@ public:
 
     virtual void AddSrnQuantities(AbstractSrnModel *p_other_srn,
                                   const double scale = 1.0) override;
-
     virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
     virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn) override;
-
     virtual void SplitEdgeSrn(const double relative_position) override;
 };
 

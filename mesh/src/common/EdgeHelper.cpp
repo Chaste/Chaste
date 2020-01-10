@@ -131,8 +131,6 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
     for (unsigned i=0; i<this->mEdges.size(); i++)
     {
         // An edge can be deleted if it is not contained in any elements
-        // or if it is marked to be deleted. The second case can occur if one of the edge nodes
-        // had been marked as deleted.
         if (this->mEdges[i]->GetNumElements() == 0)
         {
             delete this->mEdges[i];

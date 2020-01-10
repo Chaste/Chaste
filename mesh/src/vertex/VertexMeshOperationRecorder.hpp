@@ -64,7 +64,8 @@ public:
      */
     void RecordNodeMergeOperation(const std::vector<unsigned int> oldIds,
                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                  const std::pair<unsigned int, unsigned int> merged_nodes_pair);
+                                  const std::pair<unsigned int, unsigned int> merged_nodes_pair,
+                                  const bool elementIndexIsRemapped = false);
 
     /**
      * Records edge split operation in element pElement.
@@ -100,14 +101,6 @@ public:
      */
     void RecordEdgeMergeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                   const unsigned int node_index);
-
-    /**
-     * Records loss of neighbour by an edge, e.g. in T2 swap.
-     * @param pElement
-     * @param edge_index
-     */
-    void RecordEdgeNewNeighbourOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
-                                         const unsigned int edge_index);
 };
 
 #endif /* VERTEXMESHOPERATIONRECORDER_HPP_ */

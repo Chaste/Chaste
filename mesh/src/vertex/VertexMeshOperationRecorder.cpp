@@ -1,6 +1,5 @@
 
 #include "VertexMeshOperationRecorder.hpp"
-
 #include "EdgeRemapInfo.hpp"
 template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
 VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::VertexMeshOperationRecorder()
@@ -90,7 +89,8 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearEdgeOperations()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperation(const std::vector<unsigned int> oldIds,
                                                                                    VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
-                                                                                   const std::pair<unsigned int, unsigned int> merged_nodes_pair)
+                                                                                   const std::pair<unsigned int, unsigned int> merged_nodes_pair,
+                                                                                   const bool elementIndexIsRemapped)
 {
     const unsigned int element_index = pElement->GetIndex();
     const unsigned int elementNumEdges = pElement->GetNumEdges();
@@ -107,11 +107,11 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
             edge_status[index] = 0;
         }
     }
-
     //Checking whether the deleted node is upper or lower node
     const unsigned int node_A_index = merged_nodes_pair.first;
     const unsigned int node_B_index = merged_nodes_pair.second;
-    const bool is_B_upper = node_B_index>node_A_index;
+    //Node B is also considered upper node if the last two nodes are merged
+    const bool is_B_upper = node_B_index>node_A_index||(node_B_index+node_A_index==oldIds.size()-1);
     unsigned int lower_node = node_A_index;
     unsigned int upper_node = node_B_index;
     if (!is_B_upper)
@@ -159,10 +159,12 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     }
     //Sanity check
     for (unsigned int i=0; i<edge_mapping.size(); ++i)
+    {
         assert(edge_mapping[i]>=0);
+    }
 
     EdgeRemapInfo* remap_info = new EdgeRemapInfo(edge_mapping, edge_status);
-    mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_NODE_MERGE, element_index, remap_info));
+    mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_NODE_MERGE, element_index, remap_info,elementIndexIsRemapped));
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
@@ -248,6 +250,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
     std::vector<double> thetas_2(n_edges_2);
     //Go through unmapped edges of daughter cell to find a mapping between parent split edge and
     //daughter edge
+    std::vector<unsigned int> old_split_edges_1(old_split_edges);
     for (unsigned int i=0; i<n_edges_1; ++i)
     {
         if (edge_mapping_1[i]==-2)
@@ -255,16 +258,18 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
             auto node_1 = pElement1->GetEdge(i)->GetNode(0);
             auto node_2 = pElement1->GetEdge(i)->GetNode(1);
             bool split_edge_found = false;
-            for (unsigned int j=0; j<old_split_edges.size(); ++j)
+            for (unsigned int j=0; j<old_split_edges_1.size(); ++j)
             {
-                auto old_edge = (*mpEdgeHelper)[oldIds[old_split_edges[j]]];
+                auto old_edge = (*mpEdgeHelper)[oldIds[old_split_edges_1[j]]];
                 if (old_edge->ContainsNode(node_1)||old_edge->ContainsNode(node_2))
                 {
-                    edge_mapping_1[i] = old_split_edges[j];
+                    edge_mapping_1[i] = old_split_edges_1[j];
                     edge_status_1[i] = 1;
                     counter_1++;
                     split_edge_found = true;
                     thetas_1[i] = pElement1->GetEdge(i)->rGetLength()/old_edge->rGetLength();
+                    old_split_edges_1.erase(old_split_edges_1.begin()+j);
+                    break;
                 }
             }
             if (!split_edge_found)
@@ -293,6 +298,8 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
                     counter_2++;
                     split_edge_found = true;
                     thetas_2[i] = pElement2->GetEdge(i)->rGetLength()/old_edge->rGetLength();
+                    old_split_edges.erase(old_split_edges.begin()+j);
+                    break;
                 }
             }
             if (!split_edge_found)
@@ -303,6 +310,8 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
             }
         }
     }
+    assert(old_split_edges_1.empty());
+    assert(old_split_edges.empty());
     //Checking if all edges of daughter cells have been mapped.
     assert(counter_1==n_edges_1);
     assert(counter_2==n_edges_2);
@@ -378,23 +387,6 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperati
 
     EdgeRemapInfo* remap_info = new EdgeRemapInfo(edge_mapping, edge_status);
     mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_MERGE, element_index, remap_info));
-}
-
-template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeNewNeighbourOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
-                                                                                          const unsigned int edge_index)
-{
-    const unsigned int element_index = pElement->GetIndex();
-    const unsigned int n_edges = pElement->GetNumEdges();
-    std::vector<unsigned int > edge_status(n_edges, 0);
-    std::vector<long int> edge_mapping(n_edges);
-    for (unsigned int i=0; i<n_edges; ++i)
-    {
-        edge_mapping[i] = i;
-    }
-    edge_status[edge_index] = 5;
-    EdgeRemapInfo* remap_info = new EdgeRemapInfo(edge_mapping, edge_status);
-    mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_NEW_NEIGHBOUR, element_index, remap_info));
 }
 
 template class VertexMeshOperationRecorder<1,1>;
