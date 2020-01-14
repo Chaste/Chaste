@@ -17,57 +17,75 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelp
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::InsertT1SwapLocation(const c_vector<double, SPACE_DIM> location)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT1Swap(T1SwapInfo<SPACE_DIM>& rSwap_info)
 {
-    mLocationsOfT1Swaps.push_back(location);
+    mT1Swaps.push_back(rSwap_info);
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT1Swaps() const
+std::vector<T1SwapInfo<SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetT1SwapsInfo() const
 {
-    return mLocationsOfT1Swaps;
+    return mT1Swaps;
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearT1SwapsInfo()
 {
-    mLocationsOfT1Swaps.clear();
+    mT1Swaps.clear();
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::InsertT2SwapLocation(const c_vector<double, SPACE_DIM> location)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT2Swap(T2SwapInfo<SPACE_DIM>& rSwap_info)
 {
-    mLocationsOfT2Swaps.push_back(location);
+    mT2Swaps.push_back(rSwap_info);
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT2Swaps() const
+std::vector<T2SwapInfo<SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetT2SwapsInfo() const
 {
-    return mLocationsOfT2Swaps;
+    return mT2Swaps;
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT2Swaps()
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearT2SwapsInfo()
 {
-    mLocationsOfT2Swaps.clear();
+    mT2Swaps.clear();
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::InsertT3SwapLocation(const c_vector<double, SPACE_DIM> location)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT3Swap(T3SwapInfo<SPACE_DIM>& rSwap_info)
 {
-    mLocationsOfT3Swaps.push_back(location);
+    mT3Swaps.push_back(rSwap_info);
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT3Swaps() const
+std::vector<T3SwapInfo<SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetT3SwapsInfo() const
 {
-    return mLocationsOfT3Swaps;
+    return mT3Swaps;
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearT3SwapsInfo()
 {
-    mLocationsOfT3Swaps.clear();
+    mT3Swaps.clear();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivisionInfo(CellDivisionInfo<SPACE_DIM>& rDivision_info)
+{
+    mCellDivisions.push_back(rDivision_info);
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+std::vector<CellDivisionInfo<SPACE_DIM> > VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::GetCellDivisionInfo() const
+{
+    return mCellDivisions;
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearCellDivisionInfo()
+{
+    mCellDivisions.clear();
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
@@ -397,6 +415,6 @@ template class VertexMeshOperationRecorder<2,3>;
 template class VertexMeshOperationRecorder<3,3>;
 
 // Serialization for Boost >= 1.36
-/*#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMeshOperationRecorder)*/
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMeshOperationRecorder)
 

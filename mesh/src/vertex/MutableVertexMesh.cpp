@@ -300,18 +300,6 @@ c_vector<double, SPACE_DIM> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLastT2
     return mLastT2SwapLocation;
 }
 
-template<unsigned int ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDivisionAxis() const
-{
-    return mDivisionAxis;
-}
-
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearDivisionAxis()
-{
-    mDivisionAxis.clear();
-}
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
@@ -370,8 +358,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     {
         edgeIds.push_back(pElement->GetEdge(i)->GetIndex());
     }
-    //Store division axis
-    mDivisionAxis.push_back(axisOfDivision);
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -571,6 +557,21 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                pElement->GetNodeLocalIndex(division_node_global_indices[0]),
                                                pElement->GetNodeLocalIndex(division_node_global_indices[1]),
                                                placeOriginalElementBelow);
+    //Record cell division info
+    CellDivisionInfo<SPACE_DIM> division_info;
+    division_info.mLocation = centroid;
+    division_info.mDaughterLocation1 = this->GetCentroidOfElement(pElement->GetIndex());
+    c_vector<double, SPACE_DIM> long_axis = this->GetShortAxisOfElement(pElement->GetIndex());
+    division_info.mDaughterLongAxis1(0) = -long_axis(1);
+    division_info.mDaughterLongAxis1(1) = long_axis(0);
+
+    division_info.mDaughterLocation2 = this->GetCentroidOfElement(new_element_index);
+    long_axis = this->GetShortAxisOfElement(new_element_index);
+    division_info.mDaughterLongAxis2(0) = -long_axis(1);
+    division_info.mDaughterLongAxis2(1) = long_axis(0);
+
+    division_info.mDivisionAxis = axisOfDivision;
+    mOperationRecorder.RecordCellDivisionInfo(division_info);
 
     // Re-build edges when division is performed
     pElement->RebuildEdges();
@@ -1561,7 +1562,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
     c_vector<double, SPACE_DIM> nodeB_location = pNodeB->rGetLocation();
     c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
-    mOperationRecorder.InsertT1SwapLocation(nodeA_location + 0.5*vector_AB);
+
 
     double distance_AB = norm_2(vector_AB);
     if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
@@ -1601,6 +1602,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> vector_CD;
     vector_CD(0) = -vector_AB(1) * distance_between_nodes_CD / distance_AB;
     vector_CD(1) =  vector_AB(0) * distance_between_nodes_CD / distance_AB;
+
+    //Record T1Swap
+    T1SwapInfo<SPACE_DIM> swap_info;
+    swap_info.mLocation = nodeA_location+0.5*vector_AB;
+    swap_info.mPreSwapEdge = vector_AB;
+    swap_info.mPostSwapEdge = vector_CD;
+    mOperationRecorder.RecordT1Swap(swap_info);
 
     c_vector<double, SPACE_DIM> nodeC_location = nodeA_location + 0.5*vector_AB - 0.5*vector_CD;
     c_vector<double, SPACE_DIM> nodeD_location = nodeC_location + vector_CD;
@@ -2010,8 +2018,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     // Store the location of the T3 swap, the location of the intersection with the edge
     ///\todo the intersection location is sometimes overwritten when WidenEdgeOrCorrectIntersectionLocationIfNecessary
     // is called (see #2401) - we should correct this in these cases!
-
-    mOperationRecorder.InsertT3SwapLocation(intersection);
+    T3SwapInfo<SPACE_DIM> swap_info;
+    swap_info.mLocation = intersection;
+    mOperationRecorder.RecordT3Swap(swap_info);
 
 
     if (pNode->GetNumContainingElements() == 1)

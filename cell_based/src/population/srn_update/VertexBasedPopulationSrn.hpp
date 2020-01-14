@@ -42,6 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeRemapInfo.hpp"
 #include "EdgeOperation.hpp"
 #include "VertexElementMap.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/set.hpp>
+#include <boost/serialization/vector.hpp>
 
 template <unsigned DIM>
 class VertexBasedCellPopulation;
@@ -50,6 +53,22 @@ template <unsigned DIM>
 class VertexBasedPopulationSrn
 {
 private:
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
+     *
+     * Note also that member data related to writers is not saved - output must
+     * be set up again by the caller after a restart.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+    }
     VertexBasedCellPopulation<DIM>* mpCellPopulation;
 public:
     VertexBasedPopulationSrn();
@@ -61,5 +80,6 @@ public:
                              SrnCellModel* pSrnCell_1,
                              EdgeRemapInfo* pEdgeChange_1);
 };
-
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedPopulationSrn)
 #endif /* VERTEXBASEDPOPULATIONSRN_HPP_ */

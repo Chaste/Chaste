@@ -198,3 +198,6 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 template class VertexBasedPopulationSrn<1>;
 template class VertexBasedPopulationSrn<2>;
 template class VertexBasedPopulationSrn<3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedPopulationSrn)

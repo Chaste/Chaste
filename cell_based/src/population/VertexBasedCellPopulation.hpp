@@ -416,39 +416,6 @@ public:
     double GetVolumeOfCell(CellPtr pCell);
 
     /**
-     * Return all locations of T2 swaps since the last sampling time step.
-     *
-     * @return mLocationsOfT2Swaps
-     */
-    std::vector< c_vector< double, DIM > > GetLocationsOfT2Swaps();
-
-     /**
-     * Return all IDs of cells undergoing T2 swaps since the last sampling time step.
-     *
-     * @return mLocationsOfT2Swaps
-     */
-    std::vector< unsigned > GetCellIdsOfT2Swaps();
-
-    /**
-     * Add location of T2 Swap.
-     *
-     * @param locationOfT2Swap  Location of the T2 swap
-     */
-    void AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap);
-
-    /**
-     * Add ID of T2 Swap.
-     *
-     * @param idOfT2Swap ID of the cell undergoing a T2 swap
-     */
-    void AddCellIdOfT2Swap(unsigned idOfT2Swap);
-
-    /**
-     * Clear the locations and IDs of cells undergoing T2 Swaps.
-     */
-    void ClearLocationsAndCellIdsOfT2Swaps();
-
-    /**
      * @return mOutputCellRearrangementLocations
      */
     bool GetOutputCellRearrangementLocations();

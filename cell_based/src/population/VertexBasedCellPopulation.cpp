@@ -856,37 +856,6 @@ void VertexBasedCellPopulation<DIM>::SetVertexBasedDivisionRule(boost::shared_pt
 }
 
 template<unsigned DIM>
-std::vector< c_vector< double, DIM > > VertexBasedCellPopulation<DIM>::GetLocationsOfT2Swaps()
-{
-    return mLocationsOfT2Swaps;
-}
-
-template<unsigned DIM>
-std::vector< unsigned > VertexBasedCellPopulation<DIM>::GetCellIdsOfT2Swaps()
-{
-    return mCellIdsOfT2Swaps;
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap)
-{
-    mLocationsOfT2Swaps.push_back(locationOfT2Swap);
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AddCellIdOfT2Swap(unsigned idOfT2Swap)
-{
-    mCellIdsOfT2Swaps.push_back(idOfT2Swap);
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
-{
-    mCellIdsOfT2Swaps.clear();
-    mLocationsOfT2Swaps.clear();
-}
-
-template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
     // This method only works in 2D sequential

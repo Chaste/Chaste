@@ -120,11 +120,6 @@ protected:
     c_vector<double, SPACE_DIM> mLastT2SwapLocation;
 
     /**
-     * Short axis of cells during cell division
-     */
-    std::vector< c_vector<double, SPACE_DIM> > mDivisionAxis;
-
-    /**
      * Divide an element along the axis passing through two of its nodes.
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
@@ -516,16 +511,6 @@ public:
      * @return the location of the last T2 swap
      */
     c_vector<double, SPACE_DIM> GetLastT2SwapLocation();
-
-    /**
-     * @return short axis before division
-     */
-    std::vector<c_vector<double, SPACE_DIM> > GetDivisionAxis() const;
-
-    /**
-     * Helper method to clear the division short axis
-     */
-    void ClearDivisionAxis();
 
     /**
      * Add a node to the mesh.

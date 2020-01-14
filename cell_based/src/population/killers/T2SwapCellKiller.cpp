@@ -58,7 +58,6 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
      * The static_cast will work since we already know it's a VertexBasedCellPopulation.
      */
     MutableVertexMesh<DIM,DIM>& mesh = static_cast<MutableVertexMesh<DIM,DIM>&>(this->mpCellPopulation->rGetMesh());
-    VertexBasedCellPopulation<DIM>* p_vertex_population = static_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation);
     VertexElementMap element_map(mesh.GetNumAllElements());
 
     bool recheck_mesh = true;
@@ -76,8 +75,10 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
             CellPtr p_cell = this->mpCellPopulation->GetCellUsingLocationIndex(elem_index);
             if (element_map.IsDeleted(elem_index) && !(p_cell->IsDead()))
             {
-                p_vertex_population->AddLocationOfT2Swap(mesh.GetLastT2SwapLocation());
-                p_vertex_population->AddCellIdOfT2Swap(p_cell->GetCellId());
+                T2SwapInfo<DIM> swap_info;
+                swap_info.mCellId = p_cell->GetCellId();
+                swap_info.mLocation = mesh.GetLastT2SwapLocation();
+                mesh.GetOperationRecorder()->RecordT2Swap(swap_info);
                 p_cell->Kill();
 
                 // There can't have been more than one new cell death, so leave the for loop here.
