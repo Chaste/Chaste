@@ -808,7 +808,6 @@ public:
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
             T2SwapCellKiller<2> cell_killer(&cell_population);
 
             // Create an output archive

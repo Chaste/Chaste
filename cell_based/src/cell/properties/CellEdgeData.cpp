@@ -93,3 +93,7 @@ std::vector<std::string> CellEdgeData::GetKeys() const {
     }
     return keys;
 }
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+CHASTE_CLASS_EXPORT(CellEdgeData)

@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
 #include "Exception.hpp"
 
 /**
@@ -56,7 +58,7 @@ class CellEdgeData : public AbstractCellProperty
 private:
 
     /**
-     * The cell data.
+     * The cell edge data.
      */
     std::map<std::string, std::vector<double>> mCellEdgeData;
 

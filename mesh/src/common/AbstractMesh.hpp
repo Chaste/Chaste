@@ -100,7 +100,7 @@ protected:  // Give access of these variables to subclasses
     /** Vector of pointers to boundary nodes in the mesh. */
     std::vector<Node<SPACE_DIM> *> mBoundaryNodes;
 
-    /** Vector of pointers to eges in the mesh **/
+    /** Vector of pointers to edges in the mesh **/
     EdgeHelper<SPACE_DIM> mEdges;
 
     /**

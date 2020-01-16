@@ -187,7 +187,6 @@ protected:
     void save(Archive& archive, const unsigned int version) const
     {
         archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
-
         // Create a mesh writer pointing to the correct file and directory
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
                                                              ArchiveLocationInfo::GetMeshFilename(),

@@ -452,13 +452,10 @@ inline void save_construct_data(
     // Save data required to construct instance
     const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
-
     const AbstractCellCycleModel* const p_cell_cycle_model = t->GetCellCycleModel();
     ar & p_cell_cycle_model;
-
     const AbstractSrnModel* const p_srn_model = t->GetSrnModel();
     ar & p_srn_model;
-
     const CellPropertyCollection& r_cell_property_collection = t->rGetCellPropertyCollection();
     ar & r_cell_property_collection;
 }
