@@ -99,7 +99,7 @@ class RdfProcessor(object):
     def _load_ontology(self):
         """Load the Oxford metadata ontology the first time it's needed."""
         pycml_path = os.path.dirname(os.path.realpath(__file__))
-        metadata_path = os.path.join(pycml_path, 'metadata_repo')
+        metadata_path = os.path.join(pycml_path, 'ontologies')
         oxmeta_ttl = os.path.join(metadata_path, 'oxford-metadata.ttl')
         oxmeta_rdf = os.path.join(metadata_path, 'oxford-metadata.rdf')
 
