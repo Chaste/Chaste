@@ -103,6 +103,10 @@ class RdfProcessor(object):
         oxmeta_ttl = os.path.join(metadata_path, 'oxford-metadata.ttl')
         oxmeta_rdf = os.path.join(metadata_path, 'oxford-metadata.rdf')
 
+        if not (os.path.isfile(oxmeta_ttl) and os.path.isfile(oxmeta_rdf)):
+            raise ValueError(
+                "Ontology files are missing, you probably need to run 'git submodule update --init' in the chaste source folder.")
+
         g = self._ontology = self.Graph()
         # We allow a difference in modification time of 10s, so we don't get confused when checking out!
         if os.stat(oxmeta_ttl).st_mtime > os.stat(oxmeta_rdf).st_mtime + 10.0:
