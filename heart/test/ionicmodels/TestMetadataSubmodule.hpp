@@ -58,12 +58,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the Chaste source via a git submodule instead of living here.
  * 
  * The second test should be updated whenever the submodule is manually 
- * updated to match the latest at the remote master at
+ * updated to match the latest at the remote master.
+ * 
+ * To do this manual update, make sure you are on the develop branch and, do
+ * 
+ * cd $CHASTE_SRC/python/pycml/ontologies
+ * git pull origin master
+ * cd $CHASTE_SRC
+ * git add python/pycml/ontologies
+ * git commit -m "Update CellML Metadata ontology to latest remote version."
+ * git push
+ * 
+ * Then type 
+ * git submodule
+ * and copy the commit hash into the member variable in the below test
  * 
  */
 class TestMetadataSubmodule : public CxxTest::TestSuite
 {
-
     std::string GetOutputOfCommand(const char* cmd)
     {
         std::array<char, 256> buffer;
@@ -106,6 +118,8 @@ public:
 
     void TestForPendingUpdatesToSubmodule()
     {
+        std::string latest_commit_hash = "aa9440d3a52efc01a6ea23f7901e436b38007cea";
+
         FileFinder chaste_source("", RelativeTo::ChasteSourceRoot);
         std::stringstream command;
         command << "git --git-dir=" << chaste_source.GetAbsolutePath() << ".git submodule";
@@ -123,10 +137,16 @@ public:
         std::string submodule_foldername = rest_of_output.substr(0, rest_of_output.find(" "));
 
         TS_ASSERT_EQUALS(submodule_foldername, "python/pycml/ontologies");
-        TS_ASSERT_EQUALS(current_commit_hash, "bc75575092aebd978093b46a3d7433f9cfd7d62f");
+        TS_ASSERT_EQUALS(current_commit_hash, latest_commit_hash);
 
-        //std::cout << current_commit_hash << std::endl;
-        //std::cout << submodule_foldername << std::endl;
+        if (current_commit_hash != latest_commit_hash)
+        {
+            std::cout << "This test has failed because the submodule containing CellML ontology"
+                         " is out of date.\n Please run the command:\n"
+                         "'git submodule update --init'\n"
+                         "in the terminal in the Chaste source directory."
+                      << std::endl;
+        }
     }
 };
 
