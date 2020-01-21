@@ -298,9 +298,12 @@ if __name__ == '__main__':
 
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest',
                    'testoutput', 'doc', 'projects', 'hierwikiplugin']
+
     startchar_ignores = ['_', '.']
     exclusions = ['python/pycml/_enum.py',
-                  'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
+                  'python/pycml/pyparsing.py',
+                  'python/pycml/schematron.py',
+                  'python/pycml/ontologies/ttl2rdf.py']
 
     apply_update = '-update' in sys.argv
     apply_new = '-new' in sys.argv
