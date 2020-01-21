@@ -57,10 +57,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * which is shared with other projects, and is now imported into
  * the Chaste source via a git submodule instead of living here.
  * 
- * The second test should be updated whenever the submodule is manually 
- * updated to match the latest at the remote master.
+ * This test suite makes sure that the submodule has been initialised and is up to date.
  * 
- * To do this manual update, make sure you are on the develop branch and, do
+ * The second test should be updated by the person who decides that the
+ * Chaste copy of the metadata should be updated to match the remote ontology
+ * at  https://github.com/ModellingWebLab/ontologies/
+ * 
+ * This update is done manually, make sure you are on the develop branch and do:
  * 
  * cd $CHASTE_SRC/python/pycml/ontologies
  * git pull origin master
@@ -71,7 +74,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * Then type 
  * git submodule
- * and copy the commit hash into the member variable in the below test
+ * and copy the commit hash into the member variable in the below test. If anyone runs the
+ * latest version of the code, it will fail to remind them to do a `git submodule update`.
  * 
  */
 class TestMetadataSubmodule : public CxxTest::TestSuite
@@ -141,9 +145,10 @@ public:
 
         if (current_commit_hash != latest_commit_hash)
         {
-            std::cout << "This test has failed because the submodule containing CellML ontology"
-                         " is out of date.\n Please run the command:\n"
-                         "'git submodule update --init'\n"
+            std::cout << "This test has failed because the submodule containing"
+                         " the CellML metadata ontology is out of date.\n"
+                         "Please run the command:\n"
+                         "'git submodule update'\n"
                          "in the terminal in the Chaste source directory."
                       << std::endl;
         }
