@@ -17,7 +17,7 @@ jobs:
       run: git submodule update --init
     - name: install boost
       run: |
-        brew install boost
+        brew install boost@1.60
       if: always()
     - name: install xerces
       run: |
