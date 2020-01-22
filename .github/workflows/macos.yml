@@ -18,13 +18,6 @@ jobs:
     - name: checkout submodule
       run: git submodule update --init
 
-    - name: install cmake
-      run: |
-        cmake --version
-        brew install cmake
-        cmake --version
-      if: always()
-
     - name: install boost
       run: |
         brew install boost
@@ -87,12 +80,12 @@ jobs:
       if: always()
 
     - name: cmake configure
-      run: cmake ..
+      run: cmake -DBoost_NO_BOOST_CMAKE=ON ..
       working-directory: chaste-build-dir
       env:
         XSD_ROOT: /usr/local/Cellar/
       if: always()
-      
+
     # - name: cmake build
     #   run: cmake --build . --parallel 2 --target Continuous
     #   working-directory: chaste-build-dir
