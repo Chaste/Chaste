@@ -3,7 +3,7 @@ name: Ubuntu continuous test suite
 on:
   push:
     branches:
-      - develop
+      - release
 
 jobs:
   
