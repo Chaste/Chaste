@@ -13,6 +13,11 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: checkout submodule
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
     - name: install dependencies
       run: |
         echo 'deb http://www.cs.ox.ac.uk/chaste/ubuntu bionic/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
