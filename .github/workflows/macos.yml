@@ -15,9 +15,16 @@ jobs:
     - uses: actions/checkout@v1
     - name: checkout submodule
       run: git submodule update --init
+    - name: install cmake
+      run: |
+        cmake --version
+        brew install cmake
+        cmake --version
+      if: always()
+      run: git submodule update --init
     - name: install boost
       run: |
-        brew install boost@1.60
+        brew install boost
       if: always()
     - name: install xerces
       run: |
