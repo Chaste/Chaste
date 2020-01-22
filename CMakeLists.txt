@@ -49,6 +49,8 @@ message ("\n####################################")
 message ("# Setting compilers and build type")
 message ("####################################\n")
 
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
 project (Chaste VERSION 2019.1)
 set (Chaste_VERSION_MAJOR 2019 CACHE STRING "Chaste major version number")
