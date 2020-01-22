@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: checkout submodule
-      run: git submodule --init
+      run: git submodule update --init
     - name: install dependencies
       run: |
         echo 'deb http://www.cs.ox.ac.uk/chaste/ubuntu bionic/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
