@@ -70,15 +70,12 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
                 }
                 EdgeRemapInfo *pEdgeChange = operation->GetRemapInfo();
                 CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
-
                 auto old_model = static_cast<SrnCellModel*>(cell->GetSrnModel());
                 std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
                 RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
                 old_srn_edges.clear();
                 break;
             }
-            case EDGE_OPERATION_DELETE:
-                break;
             case EDGE_OPERATION_DIVIDE:
             {
                 const unsigned int location_index_1 = rElementMap.GetNewIndex(operation->GetElementIndex());

@@ -266,15 +266,18 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.0+0.2*sqrt(41.0), 1e-6);
 
         // Test T1 swap location tracking
-        std::vector< c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
+        std::vector<T1SwapInfo<2> > swap_info
+                    = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
+        std::vector< c_vector<double, 2> > t1_locations;
+        t1_locations.push_back(swap_info[0].mLocation);
         TS_ASSERT_EQUALS(t1_locations.size(), 1u);
         TS_ASSERT_DELTA(t1_locations[0][0], 0.5, 1e-6);
         TS_ASSERT_DELTA(t1_locations[0][1], 0.5, 1e-6);
 
         // Test T1 swap location clearing
-        vertex_mesh.ClearLocationsOfT1Swaps();
-        t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
-        TS_ASSERT_EQUALS(t1_locations.size(), 0u);
+        vertex_mesh.GetOperationRecorder()->ClearT1SwapsInfo();
+        swap_info = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 0u);
     }
 
     void TestPerformT1SwapOnBoundary()

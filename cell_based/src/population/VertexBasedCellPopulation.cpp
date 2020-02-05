@@ -1107,6 +1107,11 @@ void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restr
     mRestrictVertexMovement = restrictMovement;
 }
 
+template<unsigned DIM>
+VertexBasedPopulationSrn<DIM>& VertexBasedCellPopulation<DIM>::rGetVertexBasedPopulationSrn()
+{
+    return mPopulationSrn;
+}
 
 // Explicit instantiation
 template class VertexBasedCellPopulation<1>;

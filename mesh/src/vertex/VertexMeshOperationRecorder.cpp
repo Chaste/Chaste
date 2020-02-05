@@ -129,7 +129,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     const unsigned int node_A_index = merged_nodes_pair.first;
     const unsigned int node_B_index = merged_nodes_pair.second;
     //Node B is also considered upper node if the last two nodes are merged
-    const bool is_B_upper = node_B_index>node_A_index||(node_B_index+node_A_index==oldIds.size()-1);
+    const bool is_B_upper = node_B_index>node_A_index||(node_B_index==0&&node_A_index==oldIds.size()-1);
     unsigned int lower_node = node_A_index;
     unsigned int upper_node = node_B_index;
     if (!is_B_upper)

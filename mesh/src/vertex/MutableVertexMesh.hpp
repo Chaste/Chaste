@@ -70,6 +70,7 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexMeshRosetteMethods;
     friend class TestMutableVertexEdges;
     friend class TestCellEdgeInteriorSrn;
+    friend class TestMutableVertexMeshOperationsWithPopulationSrn;
 private:
     /** Whether we need to record mesh operations, e.g. when SRN models are used */
     bool mTrackMeshOperations = false;

@@ -1624,6 +1624,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
          it != rElementsContainingNodes.end();
          ++it)
     {
+        std::vector<unsigned int> oldIds;
+        for (unsigned int i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+        {
+            oldIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
+        }
         // If, as in element 3 above, this element does not contain node A (now C)...
         if (nodeA_elem_indices.find(*it) == nodeA_elem_indices.end())
         {
@@ -1675,11 +1680,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             /*
              * T1 swap and subsequent A-B edge shrinkage is recorded as node merging
              */
-            std::vector<unsigned int> oldIds;
-            for (unsigned int i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
-            {
-                oldIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
-            }
             std::pair<unsigned int, unsigned int> deleted_node_indices;
             if (nodeA_local_index == nodeB_local_index_plus_one)
             {
@@ -1704,7 +1704,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             }
             if (mTrackMeshOperations)
                 mOperationRecorder.RecordNodeMergeOperation(oldIds, this->mElements[*it],
-                                           deleted_node_indices);
+                                                            deleted_node_indices);
         }
     }
 
@@ -2834,18 +2834,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     p_element_2->AddNode(this->mNodes[new_node_1_global_index], local_index_2);
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordNewEdgeOperation(p_element_2, local_index_2);
+
                 }
                 else
                 {
                     assert(next_node_2 == previous_node_1);
-
                     p_element_1->AddNode(this->mNodes[new_node_1_global_index], local_index_1);
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordNewEdgeOperation(p_element_1, local_index_1);
                     const unsigned int inserted_local_index_2 = (local_index_2 + p_element_2->GetNumNodes() - 1)%(p_element_2->GetNumNodes());
                     p_element_2->AddNode(this->mNodes[new_node_2_global_index], inserted_local_index_2);
                     if (mTrackMeshOperations)
-                        mOperationRecorder.RecordNewEdgeOperation(p_element_2, inserted_local_index_2);
+                        mOperationRecorder.RecordNewEdgeOperation(p_element_2, local_index_2);
                 }
 
                 // Check the nodes are updated correctly

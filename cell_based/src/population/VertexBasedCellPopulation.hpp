@@ -66,7 +66,7 @@ private:
      */
     friend class TestVertexBasedDivisionRules;
     friend class TestVertexBasedCellPopulation;
-
+    friend class TestMutableVertexMeshOperationsWithPopulationSrn;
     /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if this cell population has been de-serialized.
@@ -556,6 +556,11 @@ public:
      * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
+
+    /**
+     * Get VertexBasedPopulationSrn object. Used e.g. in TestMutableVertexMeshRemeshWithPopulationSrn.
+     */
+    VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn();
 };
 
 #include "SerializationExportWrapper.hpp"
