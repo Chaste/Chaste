@@ -180,17 +180,17 @@ This not only allows a user to select the most appropriate tool for their resear
 This is an explicit design goal of Chaste, which focusses on the flexibility of implementing multiple models rather than (for example) building a graphical user interface.
 See Table 1 for a comparison of alternatives to Chaste in specific domains, with all other software tools implementing a single modelling framework.
 
-| Software    | Open Source |  GUI  |  CA   |  CP   |  PM   |  VT   |  VM   |             Refs              |
-| ----------- | :---------: | :---: | :---: | :---: | :---: | :---: | :---: | :---------------------------: |
-| Chaste      |      x      |       |   x   |   x   |   x   |   x   |   x   |                               |
-| CompuCell3D |      x      |   x   |       |   x   |       |       |       |    [@Swat2012CompuCell3D]     |
-| Morpheus    |      x      |   x   |       |   x   |       |       |       |    [@Starruss2014Morpheus]    |
-| EPISIM      |             |   x   |       |       |   x   |       |       |    [@Sutterlin2013EPISIM]     |
-| CellSys     |             |   x   |       |       |   x   |       |       |     [@Hoehme2010CellSys]      |
-| PhysiCell   |      x      |       |       |       |   x   |       |       | [@Ghaffarizadeh2018PhysiCell] |
-| Biocellion  |             |       |       |       |   x   |       |       |     [@Kang2014Biocellion]     |
-| VirtualLeaf |      x      |   x   |       |       |       |       |   x   |    [@Merks2011VirtualLeaf]    |
-| EmbryoMaker |      x      |   x   |       |       |   x   |       |       | [@Marin-Riera2015EmbryoMaker] |
+| Software    | Open Source |  GUI  |  CA   |  CP   |  PM   |  VT   |  VM   |
+| ----------- | :---------: | :---: | :---: | :---: | :---: | :---: | :---: |
+| Chaste      |      x      |       |   x   |   x   |   x   |   x   |   x   |
+| CompuCell3D |      x      |   x   |       |   x   |       |       |       |
+| Morpheus    |      x      |   x   |       |   x   |       |       |       |
+| EPISIM      |             |   x   |       |       |   x   |       |       |
+| CellSys     |             |   x   |       |       |   x   |       |       |
+| PhysiCell   |      x      |       |       |       |   x   |       |       |
+| Biocellion  |             |       |       |       |   x   |       |       |
+| VirtualLeaf |      x      |   x   |       |       |       |       |   x   |
+| EmbryoMaker |      x      |   x   |       |       |   x   |       |       |
 
 **Table 1:**
 A comparison of software tools for cell-based modelling.
@@ -200,6 +200,7 @@ CP: cellular Potts.
 PM: particle model, a cell-centre model.
 VT: Voronoi tessellation, a cell-centre model.
 VM: vertex model.
+References: CompuCell3D [@Swat2012CompuCell3D], Morpheus [@Starruss2014Morpheus], EPISIM [@Sutterlin2013EPISIM], CellSys [@Hoehme2010CellSys], PhysiCell [@Ghaffarizadeh2018PhysiCell], Biocellion [@Kang2014Biocellion], VirtualLeaf [@Merks2011VirtualLeaf], EmbryoMaker [@Marin-Riera2015EmbryoMaker].
 
 ### Installation
 
@@ -326,35 +327,35 @@ The initial geometry of major airways segmented from a CT scan (left), and an ex
 Since our last publication on Chaste [@Mirams2013Chaste], over 70 peer-reviewed publications have been enabled, which we mention briefly below.
 
 Publications using Cardiac Chaste have included scientific studies relating to:
-basic mechanisms of cardiac electrophysiology in healthy and diseased settings [@Walmsley2013mRNA, @Passini2013Computational, @Sadrieh2014Multiscale, @Bartolucci2014Linking, @Samanta2015Ca, @Pathmanathan2015, @cardone2016human, @Zhou2016, @Mahoney2016Connexin43, @Corsi2017Noninvasive, @Dutta2016, @Reilly2016, @Dutta2017, @Lyon2018,  @Xin2019];
-the effects of realistic tissue structure on simulated cardiac electrical activity [@Walmsley2013Estimation, @Lekadir2014Effect, @Lekadir2016Statistically, @Zacur2017];
-the sources and consequences of inter-subject electrophysiological variability [@Dutta2013Ionic, @Britton2013Experimentally, @Elkins2013Variability, @Walmsley2015Application, @Britton2017, @Muszkiewicz2018];
-predicting the effects of drugs on cardiac activity, including safety assessment [@Beattie2013Evaluation, @Zemzemi2013Computational, @Wallman2014Computational, @Mirams2014Prediction, @Passini2014Late, @Cardone-Noott2014Computational, @Zemzemi2015Effects, @Moreno2015New, @Davies2016Recent, @Hill2016Computational, @Passini2016, @britton2017quantitative, @McMillan2017, @passini2017human, @Lim2018Role];
-and the development of associated web-based tools [@Williams2015Web, @Cooper2016Cardiac, @Daly2018].
+basic mechanisms of cardiac electrophysiology in healthy and diseased settings [@Walmsley2013mRNA; @Passini2013Computational; @Sadrieh2014Multiscale; @Bartolucci2014Linking; @Samanta2015Ca; @Pathmanathan2015; @cardone2016human; @Zhou2016; @Mahoney2016Connexin43; @Corsi2017Noninvasive; @Dutta2016; @Reilly2016; @Dutta2017; @Lyon2018;  @Xin2019];
+the effects of realistic tissue structure on simulated cardiac electrical activity [@Walmsley2013Estimation; @Lekadir2014Effect; @Lekadir2016Statistically; @Zacur2017];
+the sources and consequences of inter-subject electrophysiological variability [@Dutta2013Ionic; @Britton2013Experimentally; @Elkins2013Variability; @Walmsley2015Application; @Britton2017; @Muszkiewicz2018];
+predicting the effects of drugs on cardiac activity, including safety assessment [@Beattie2013Evaluation; @Zemzemi2013Computational; @Wallman2014Computational; @Mirams2014Prediction; @Passini2014Late; @Cardone-Noott2014Computational; @Zemzemi2015Effects; @Moreno2015New; @Davies2016Recent; @Hill2016Computational; @Passini2016; @britton2017quantitative; @McMillan2017; @passini2017human; @Lim2018Role];
+and the development of associated web-based tools [@Williams2015Web; @Cooper2016Cardiac; @Daly2018].
 Other studies enabled by Cardiac Chaste have advanced the
 methodologies for parameter identifiability and inference, model
 selection and uncertainty quantification for in cardiac
 electrophysiology models
-[@Daly2015Hodgkin, @Mirams2016White, @Johnstone2016Uncertainty, @Daly2017Comparing];
+[@Daly2015Hodgkin; @Mirams2016White; @Johnstone2016Uncertainty; @Daly2017Comparing];
 and for the verification and efficient numerical simulation of such
 models
-[@Marsh2012Secrets,@Agudelo-Toro2013Computationally, @Pathmanathan2014Verification, @Corrado2016Stability, @Campos2016Lattice, @Spiteri2016Godunov, @Cervi2018HighOrder, @Cardone2018, @Green2019LUT].
+[@Marsh2012Secrets;@Agudelo-Toro2013Computationally; @Pathmanathan2014Verification; @Corrado2016Stability; @Campos2016Lattice; @Spiteri2016Godunov; @Cervi2018HighOrder; @Cardone2018; @Green2019LUT].
 The continuum-mechanics solvers in Chaste have been used for studies of dielectric elastomers [@Langham2018Modeling]; and our electro-mechanics code as used in [@Carapella2014Quantitative], has also been used to verify new numerical methods [@gurev2015high].
 
-Work using Cardiac Chaste has also been published on mesh generation and model simulation in the area of gastric electrophysiology, in particular focusing on  interstitial cell of Cajal network structure and function [@Sathar2014Biophysically, @Gao2014Developmental, @Sathar2015Tissue, @Sathar2015Comparison, @Sathar2015Multiscale, @Gao2015Stochastic].
+Work using Cardiac Chaste has also been published on mesh generation and model simulation in the area of gastric electrophysiology, in particular focusing on  interstitial cell of Cajal network structure and function [@Sathar2014Biophysically; @Gao2014Developmental; @Sathar2015Tissue; @Sathar2015Comparison; @Sathar2015Multiscale; @Gao2015Stochastic].
 
-Publications enabled by Cell-based Chaste have focused on: the cellular mechanisms and dynamics of intestinal homeostasis and carcinogenesis [@Dunn2013Computational, @Hu2014Epidermal, @Baker2014Quantification, @Osborne2015Multiscale, @Dunn2016Combined, @Langlands2016Paneth, @Carroll2017Interkinetic, @Almet2018Multicellular, @Muraro2018TNF];
-the mechanisms underlying vascular tumour growth and response to therapy in the Microvessel Chaste project [@Grogan2017Microvessel, @Grogan2017Predicting, @Grogan2018Importance];
+Publications enabled by Cell-based Chaste have focused on: the cellular mechanisms and dynamics of intestinal homeostasis and carcinogenesis [@Dunn2013Computational; @Hu2014Epidermal; @Baker2014Quantification; @Osborne2015Multiscale; @Dunn2016Combined; @Langlands2016Paneth; @Carroll2017Interkinetic; @Almet2018Multicellular; @Muraro2018TNF];
+the mechanisms underlying vascular tumour growth and response to therapy in the Microvessel Chaste project [@Grogan2017Microvessel; @Grogan2017Predicting; @Grogan2018Importance];
 the biomechanical characterization of skin lesions [@Franzetti2015Combined];
-the organisation and proliferation of stem and pluripotent cells in development [@Atwell2015Mechano-logical, @Koke2014Computational, @Godwin2017Extended];
-the dynamics of developing epithelial tissues [@Kursawe2015Capabilities, @Tetley2016Unipolar, @Abdullah2017Universal, @Finegan2018Tissue, @Waites2018Information];
+the organisation and proliferation of stem and pluripotent cells in development [@Atwell2015Mechano-logical; @Koke2014Computational; @Godwin2017Extended];
+the dynamics of developing epithelial tissues [@Kursawe2015Capabilities; @Tetley2016Unipolar; @Abdullah2017Universal; @Finegan2018Tissue; @Waites2018Information];
 the spread of sexually-transmitted infections [@Nelson2014STI-GMaS];
 vascular remodelling [@Osborne2018Fully];
-the similarities and differences between competing cell-based modelling approaches [@Figueredo2013On-lattice, @Davit2013Validity, @Fletcher2013Implementing, @Osborne2017Comparing];
-the calibration and parameterisation of such models [@Cooper2013Connecting, @Kursawe2018Approximate];
-and their efficient numerical solution [@Harvey2015Parallel, @Rubinacci2015Cognac, @Kursawe2017Impact, @Cooper2017Numerical].
+the similarities and differences between competing cell-based modelling approaches [@Figueredo2013On-lattice; @Davit2013Validity; @Fletcher2013Implementing; @Osborne2017Comparing];
+the calibration and parameterisation of such models [@Cooper2013Connecting; @Kursawe2018Approximate];
+and their efficient numerical solution [@Harvey2015Parallel; @Rubinacci2015Cognac; @Kursawe2017Impact; @Cooper2017Numerical].
 
-Papers on Lung Chaste describe its use for patient-specific airway tree generation and flow modelling  [@bordas2015development, @soares2017evaluation, @burrowes2017combined].
+Papers on Lung Chaste describe its use for patient-specific airway tree generation and flow modelling  [@bordas2015development; @soares2017evaluation; @burrowes2017combined].
 
 # Acknowledgements
 
