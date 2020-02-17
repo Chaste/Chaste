@@ -145,12 +145,12 @@ It aims to couple biophysically-detailed models of airway mechanics with organ-s
 
 Chaste is designed to be modular and extensible, providing libraries for common scientific computing infrastructure such as linear algebra operations, finite element meshes, and ordinary and partial differential equation solvers.
 This infrastructure is used by libraries for specific applications, such as continuum mechanics, cardiac models, and cell-based models.
-The software engineering techniques used to develop Chaste are intended to ensure code quality, re-usablity and reliability.
+The software engineering techniques used to develop Chaste are intended to ensure code quality, re-usability and reliability.
 Primary applications of the software include cardiac and respiratory physiology, cancer and developmental biology.
 
 ## The software
 
-Chaste is available on GitHub (https://github.com/Chaste/Chaste), and the current stable release is version 2019.1.
+Chaste is available on GitHub [https://github.com/Chaste/Chaste](https://github.com/Chaste/Chaste), and the current stable release is version 2019.1.
 Please see the Readme.md file on the Github repository for links to the Chaste wiki and install guides.
 
 Previous publications about Chaste have detailed the rationale for, and design principles behind, Chaste [@Pitt-Francis2009Chaste], as well as the main application areas of Chaste up to 2013 [@Mirams2013Chaste].
@@ -159,39 +159,77 @@ Chaste places an emphasis on reproducibility and verification and, as such, exte
 A series of test suites must all pass before any commit is considered a release-candidate.
 Most testing is performed on Long Term Support (LTS) versions of Ubuntu Linux, with unit tests additionally being run on macOS.
 
-Testing includes compilation of all libraries with GCC, clang and Intel C++ compilers; extensive unit testing; performance profiling to identify any slowdowns over time; memory testing with valgrind; verification of code coverage; and running unit tests with different combinations of dependencies to ensure portability.
-The output of these tests is available at
-https://chaste.cs.ox.ac.uk/buildbot/
+Testing includes compilation of all libraries with GCC, Clang and Intel C++ compilers; extensive unit testing; performance profiling to identify any slowdowns over time; memory testing with valgrind; verification of code coverage; and running unit tests with different combinations of dependencies to ensure portability.
+The output of these tests is available at [https://chaste.cs.ox.ac.uk/buildbot/](https://chaste.cs.ox.ac.uk/buildbot/).
+
+Since 2013, Chaste has substantially changed to modernise its infrastructure and to enable new science.
+In terms of infrastructure, Chaste now uses a modern CMake build system, the C++14 language standard, and makes extensive use of BuildBot for continuous integration.
+In terms of science, Lung Chaste is entirely new and allows the use of Chaste in a new scientific domain.
+In Cardiac Chaste, we can now create algebraic Jacobians for CellML ODE systems, which can improve speed of simulation for cardiac action potential and tissue simulations [@Cooper2015Cellular], and metadata annotations of CellML files have replaced manual specification of variables in configuration files.
+Cell-based Chaste has been overhauled to improve flexibility.
+Changes include hierarchies of simulation modifiers, information writers, cell-cycle models, subcellular reaction network models, and numerical methods that allow new customisation points in almost every area of all cell-based simulations.
+In addition, simulation output has been standardised to use VTK, a standard and powerful visualisation framework, and some cell-centre simulations now run in parallel using MPI.
+
+### Comparison with other software
+
+Chaste provides substantial common infrastructure enabling a wide range of applications across multiple disciplines.
+Common elements include meshing, solving differential equations, input/output and continuum mechanics, and these form a platform for Cardiac, Cell-based and Lung Chaste.
+
+A key goal of Chaste is to enable the implementation of many different modelling frameworks.
+This not only allows a user to select the most appropriate tool for their research but, importantly, enables the comparison of different modelling frameworks to better understand the benefits and drawbacks of each [@Osborne2017Comparing].
+This is an explicit design goal of Chaste, which focusses on the flexibility of implementing multiple models rather than (for example) building a graphical user interface.
+See Table 1 for a comparison of alternatives to Chaste in specific domains, with all other software tools implementing a single modelling framework.
+
+| Software    | Open Source |  GUI  |  CA   |  CP   |  PM   |  VT   |  VM   |             Refs              |
+| ----------- | :---------: | :---: | :---: | :---: | :---: | :---: | :---: | :---------------------------: |
+| Chaste      |      x      |       |   x   |   x   |   x   |   x   |   x   |                               |
+| CompuCell3D |      x      |   x   |       |   x   |       |       |       |    [@Swat2012CompuCell3D]     |
+| Morpheus    |      x      |   x   |       |   x   |       |       |       |    [@Starruss2014Morpheus]    |
+| EPISIM      |             |   x   |       |       |   x   |       |       |    [@Sutterlin2013EPISIM]     |
+| CellSys     |             |   x   |       |       |   x   |       |       |     [@Hoehme2010CellSys]      |
+| PhysiCell   |      x      |       |       |       |   x   |       |       | [@Ghaffarizadeh2018PhysiCell] |
+| Biocellion  |             |       |       |       |   x   |       |       |     [@Kang2014Biocellion]     |
+| VirtualLeaf |      x      |   x   |       |       |       |       |   x   |    [@Merks2011VirtualLeaf]    |
+| EmbryoMaker |      x      |   x   |       |       |   x   |       |       | [@Marin-Riera2015EmbryoMaker] |
+
+**Table 1:**
+A comparison of software tools for cell-based modelling.
+GUI: graphical user interface.
+CA: cellular automata.
+CP: cellular Potts.
+PM: particle model, a cell-centre model.
+VT: Voronoi tessellation, a cell-centre model.
+VM: vertex model.
 
 ### Installation
 
-Installation of Chaste has been greatly simplified through the development of a Docker image (https://github.com/chaste/chaste-docker). Docker is a lightweight, open-source virtualisation technology for running encapsulated applications ('containers') on all major operating systems at near-native speed. This enables Chaste (including all dependencies, environment settings, convenience scripts and the latest precompiled release) to be downloaded and installed with just a single command. Isolating Chaste within a container also means that its dependencies and those installed on the user's host system can coexist without interference or version conflicts.
+Installation of Chaste has been greatly simplified through the development of a Docker image [https://github.com/chaste/chaste-docker](https://github.com/chaste/chaste-docker). Docker is a lightweight, open-source virtualisation technology for running encapsulated applications ('containers') on all major operating systems at near-native speed. This enables Chaste (including all dependencies, environment settings, convenience scripts and the latest precompiled release) to be downloaded and installed with just a single command. Isolating Chaste within a container also means that its dependencies and those installed on the user's host system can coexist without interference or version conflicts.
 
-In addition to simplifying the setup and execution of Chaste, importantly this also enhances its reproducibility by providing a homogeneous computational environment regardless of the underlying operating system and hardware. Not only is the Chaste source code version-controlled, but so too are the dependencies, configuration settings and environment variables used to build and run it. This means that collaborators and reviewers can easily and consistently reproduce results (to within machine precision) on any platform while developers can seamlessly migrate and scale-up their simulations from a laptop to a workstation or HPC cluster.
+In addition to simplifying the set-up and execution of Chaste, importantly this also enhances its reproducibility by providing a homogeneous computational environment regardless of the underlying operating system and hardware. Not only is the Chaste source code version-controlled, but so too are the dependencies, configuration settings and environment variables used to build and run it. This means that collaborators and reviewers can easily and consistently reproduce results (to within machine precision) on any platform while developers can seamlessly migrate and scale-up their simulations from a laptop to a workstation or HPC cluster.
 
 ## Example usage
 
 Chaste has tutorials to walk users through basic functionality for each application area.
-Tutorial examples are bundled for each specific release version, and examples for this release are available at https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1.
+Tutorial examples are bundled for each specific release version, and examples for this release are available at [https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1](https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1).
 
 Tutorials take the form of C++ header files that each define 'tests' in the Chaste testing infrastructure.
 These tests must be compiled and run to produce an output, which can be visualised using [ParaView](https://www.paraview.org/).
 
 In the following sections we showcase a specific tutorial for each of cardiac, cell-based, and lung Chaste, with minimal commands necessary to reproduce the output shown.
 
-
 ### Cardiac example
 
 Here we demonstrate how to run and visualise a three-dimensional monodomain cardiac simulation.
 This follows the tutorial `TestMonodomain3dRabbitHeartTutorial` which simulates the result of an electrical stimulus being applied to a realistic rabbit heart geometry.
 Assuming that
+
  1. Chaste has been installed on Ubuntu Linux (or is running within a Docker container),
  1. the Chaste source code exists at `$CHASTE_SOURCE_DIR`,
  1. the environment variable `$CHASTE_TEST_OUTPUT` is set to a valid directory,
 
 a minimal set of commands to build and run the tutorial is as follows:
 
-```
+```shell
 mkdir build && cd build
 cmake $CHASTE_SOURCE_DIR
 make TestMonodomain3dRabbitHeartTutorial
@@ -200,13 +238,13 @@ ctest -R TestMonodomain3dRabbitHeartTutorial
 
 This will produce output in the following directory:
 
-```
+```shell
 $CHASTE_TEST_OUTPUT/Monodomain3dRabbitHeart
 ```
 
 To view the results evolving over time as an animation in ParaView it is necessary to post-process the results with the following command:
 
-```
+```shell
 cd $CHASTE_TEST_OUTPUT/Monodomain3dRabbitHeart/vtk_output
 python $CHASTE_SOURCE_DIR/python/utils/AddVtuTimeAnnotations.py results.vtu annotated_results.vtu
 ```
@@ -223,13 +261,14 @@ Trans-membrane voltage on the rabbit heart mesh at the end of the simulation. As
 Here we demonstrate how to run and visualise a cell sorting simulation using Chaste's vertex model implementation.
 This follows the tutorial `TestRunningDifferentialAdhesionSimulationsTutorial`.
 Assuming that
+
  1. Chaste has been installed on Ubuntu Linux (or is running within a Docker container),
  1. the Chaste source code exists at `$CHASTE_SOURCE_DIR`,
  1. the environment variable `$CHASTE_TEST_OUTPUT` is set to a valid directory,
 
 a minimal set of commands to build and run the tutorial is as follows:
 
-```
+```shell
 mkdir build && cd build
 cmake $CHASTE_SOURCE_DIR
 make TestRunningDifferentialAdhesionSimulationsTutorial
@@ -238,7 +277,7 @@ ctest -R TestRunningDifferentialAdhesionSimulationsTutorial
 
 This will produce output in the following directory:
 
-```
+```shell
 $CHASTE_TEST_OUTPUT/TestVertexBasedDifferentialAdhesionSimulation
 ```
 
@@ -254,13 +293,14 @@ The initial configuration of cells (left), and the final configuration of cells 
 Here we demonstrate how to run and visualise the lung airway generation tutorial.
 This follows the tutorial `TestAirwayGenerationTutorial` which statistically generates lung airways given initial geometry segmented from a CT scan.
 Assuming that
+
  1. Chaste has been installed on Ubuntu Linux (or is running within a Docker container),
  1. the Chaste source code exists at `$CHASTE_SOURCE_DIR`,
  1. the environment variable `$CHASTE_TEST_OUTPUT` is set to a valid directory,
 
 a minimal set of commands to build and run the tutorial is as follows:
 
-```
+```shell
 mkdir build && cd build
 cmake $CHASTE_SOURCE_DIR
 make TestAirwayGenerationTutorial
@@ -269,7 +309,7 @@ ctest -R TestAirwayGenerationTutorial
 
 This will produce output in the following directory:
 
-```
+```shell
 $CHASTE_TEST_OUTPUT/TestAirwayGenerationTutorial
 ```
 
@@ -281,7 +321,6 @@ Application of an 'Extract Surface' filter followed by a 'Tube' filter allows th
 **Figure 3:**
 The initial geometry of major airways segmented from a CT scan (left), and an example of a complete generated airway tree (right).
 
-
 ## Recent publications enabled by Chaste
 
 Since our last publication on Chaste [@Mirams2013Chaste], over 70 peer-reviewed publications have been enabled, which we mention briefly below.
@@ -291,7 +330,7 @@ basic mechanisms of cardiac electrophysiology in healthy and diseased settings [
 the effects of realistic tissue structure on simulated cardiac electrical activity [@Walmsley2013Estimation, @Lekadir2014Effect, @Lekadir2016Statistically, @Zacur2017];
 the sources and consequences of inter-subject electrophysiological variability [@Dutta2013Ionic, @Britton2013Experimentally, @Elkins2013Variability, @Walmsley2015Application, @Britton2017, @Muszkiewicz2018];
 predicting the effects of drugs on cardiac activity, including safety assessment [@Beattie2013Evaluation, @Zemzemi2013Computational, @Wallman2014Computational, @Mirams2014Prediction, @Passini2014Late, @Cardone-Noott2014Computational, @Zemzemi2015Effects, @Moreno2015New, @Davies2016Recent, @Hill2016Computational, @Passini2016, @britton2017quantitative, @McMillan2017, @passini2017human, @Lim2018Role];
-and the development of associated web-based tools [@Williams2015Web, @Cooper2015Cellular, @Cooper2016Cardiac, @Daly2018].
+and the development of associated web-based tools [@Williams2015Web, @Cooper2016Cardiac, @Daly2018].
 Other studies enabled by Cardiac Chaste have advanced the
 methodologies for parameter identifiability and inference, model
 selection and uncertainty quantification for in cardiac
