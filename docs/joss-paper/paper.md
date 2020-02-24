@@ -247,7 +247,8 @@ To view the results evolving over time as an animation in ParaView it is necessa
 
 ```shell
 cd $CHASTE_TEST_OUTPUT/Monodomain3dRabbitHeart/vtk_output
-python $CHASTE_SOURCE_DIR/python/utils/AddVtuTimeAnnotations.py results.vtu annotated_results.vtu
+python $CHASTE_SOURCE_DIR/python/utils/AddVtuTimeAnnotations.py \
+       results.vtu annotated_results.vtu
 ```
 
 To visualise the output, open the file `annotated_results.vtu` in ParaView, and select to colour by `V` (voltage).
