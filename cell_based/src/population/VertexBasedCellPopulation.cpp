@@ -357,7 +357,6 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     {
         mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
     }
-
     element_map.ResetToIdentity();
 }
 

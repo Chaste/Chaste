@@ -647,6 +647,10 @@ public:
      * @param track whether we need to track mesh operations during ReMesh
      */
     void SetMeshOperationTracking(const bool track);
+
+    /**
+     * @return pointer to the VertexMeshOperationRecorder
+     */
     VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* GetOperationRecorder();
 };
 

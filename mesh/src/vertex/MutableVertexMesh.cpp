@@ -361,7 +361,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
-
+    std::cout<<"Dividing cell loc: "<<centroid(0)<<" "<<centroid(1)<<std::endl;
     // Create a vector perpendicular to the axis of division
     c_vector<double, SPACE_DIM> perp_axis;
     perp_axis(0) = -axisOfDivision(1);
@@ -525,7 +525,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                 index = local_indexA;
             }
 
-            if (!original_element)
+            if (!original_element&&mTrackMeshOperations)
             {
                 const unsigned int n_edges = p_element->GetNumEdges();
                 const unsigned int nextIndex = (index+1)%n_edges;
@@ -543,6 +543,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                 double theta = prev_curr_distance/old_distance;
                 relative_new_node.push_back(theta);
                 edge_split_pairs.push_back(std::pair<VertexElement<ELEMENT_DIM,SPACE_DIM>*, unsigned int>(p_element,index));
+                auto elem_loc = this->GetCentroidOfElement(p_element->GetIndex());
+                std::cout<<"Other split el location: "<<p_element->GetIndex()<<" "<<elem_loc(0)<<" "<<elem_loc(1)<<std::endl;
             }
             // Add new node to this element
             p_element->AddNode(this->GetNode(new_node_global_index), index);
@@ -583,7 +585,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         {
             mOperationRecorder.RecordEdgeSplitOperation(edge_split_pairs[i].first,
                                                         edge_split_pairs[i].second,
-                                                        relative_new_node[i]);
+                                                        relative_new_node[i], true);
         }
     }
     return new_element_index;
@@ -880,14 +882,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
-    /*std::vector<std::pair<unsigned int, unsigned int> > edge_nodes(this->mEdges.GetNumEdges());
-    for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
-    {
-        const unsigned int index_0 = this->mEdges[i]->GetNode(0)->GetIndex();
-        const unsigned int index_1 = this->mEdges[i]->GetNode(1)->GetIndex();
-        edge_nodes[i] = std::pair<unsigned int, unsigned int>(index_0, index_1);
-    }*/
-
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     // Also mark edges associated with the deleted nodes
     std::vector<Node<SPACE_DIM>*> live_nodes;
@@ -909,25 +903,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     this->mNodes = live_nodes;
     mDeletedNodeIndices.clear();
 
-    //The map for updating nodes and edge pointers
-    //std::map<unsigned int, unsigned int> old_to_new_map;
     // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
-        //old_to_new_map[this->mNodes[i]->GetIndex()] = i;
         this->mNodes[i]->SetIndex(i);
     }
-
-    //Updating nodes and edge pointers
-    /*for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
-    {
-        const unsigned int old_index_0 = edge_nodes[i].first;
-        const unsigned int old_index_1 = edge_nodes[i].second;
-
-        const unsigned int new_index_0 = old_to_new_map[old_index_0];
-        const unsigned int new_index_1 = old_to_new_map[old_index_1];
-        this->mEdges[i]->SetNodes(this->mNodes[new_index_0],this->mNodes[new_index_1]);
-    }*/
 
     // Remove deleted edges and update the node-edge mapping
     this->mEdges.RemoveDeletedEdges();
@@ -1899,6 +1879,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement)
 {
+    std::cout<<"T2 element index: "<<rElement.GetIndex()<<std::endl;
     // The given element must be triangular for us to be able to perform a T2 swap on it
     assert(rElement.GetNumNodes() == 3);
     // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
@@ -1918,17 +1899,32 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     }
     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
     Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
+
+    std::cout<<"New node index/loc: "<<new_node_global_index<<" "<<new_node_location(0)<<" "<<new_node_location(1)<<std::endl;
+    std::set<unsigned int> neigh_indices;
+
     // Loop over each of the three nodes contained in rElement
     for (unsigned i=0; i<3; i++)
     {
         // For each node, find the set of other elements containing it
         Node<SPACE_DIM>* p_node = rElement.GetNode(i);
+
+        std::cout<<"T2 node: "<<p_node->GetIndex()<<std::endl;
+
         std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
         containing_elements.erase(rElement.GetIndex());
         // For each of these elements...
         for (std::set<unsigned>::iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
         {
             VertexElement<ELEMENT_DIM,SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
+            std::cout<<"E index: "<<p_this_elem->GetIndex()<<std::endl;
+            neigh_indices.insert(p_this_elem->GetIndex());
+            for (unsigned int j=0; j<p_this_elem->GetNumEdges(); j++)
+            {
+                std::cout<<p_this_elem->GetEdge(j)->GetIndex()<<": "<<p_this_elem->GetEdge(j)->GetNode(0)->GetIndex()
+                        <<" "<<p_this_elem->GetEdge(j)->GetNode(1)->GetIndex()<<std::endl;;
+            }
+
             // ...throw an exception if the element is triangular...
             if (p_this_elem->GetNumNodes() < 4)
             {
@@ -1938,6 +1934,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
             // ...otherwise, replace p_node with p_new_node unless this has already happened (in which case, delete p_node from the element)
             if (p_this_elem->GetNodeLocalIndex(new_node_global_index) == UINT_MAX)
             {
+                std::cout<<"Replaced node global/local: "<<p_node->GetIndex()<<" / "<<p_this_elem->GetNodeLocalIndex(p_node->GetIndex())<<std::endl;
                 p_this_elem->ReplaceNode(p_node, p_new_node);
             }
             else
@@ -1946,13 +1943,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
                 std::pair<unsigned int, unsigned int> node_pair;
                 if (mTrackMeshOperations)
                 {
-                    for (unsigned int i=0; i<p_this_elem->GetNumEdges(); ++i)
+                    for (unsigned int k=0; k<p_this_elem->GetNumEdges(); ++k)
                     {
-                        oldIds.push_back(p_this_elem->GetEdge(i)->GetIndex());
+                        oldIds.push_back(p_this_elem->GetEdge(k)->GetIndex());
                     }
                     node_pair.first= p_this_elem->GetNodeLocalIndex(new_node_global_index);
                     node_pair.second = p_this_elem->GetNodeLocalIndex(p_node->GetIndex());
                 }
+                std::cout<<"Deleted node global/local: "<<p_node->GetIndex()<<" / "<<p_this_elem->GetNodeLocalIndex(p_node->GetIndex())<<std::endl;
                 p_this_elem->DeleteNode(p_this_elem->GetNodeLocalIndex(p_node->GetIndex()));
                 if (mTrackMeshOperations)
                     mOperationRecorder.RecordNodeMergeOperation(oldIds, p_this_elem, node_pair, true);
@@ -1971,6 +1969,19 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 
     mDeletedElementIndices.push_back(rElement.GetIndex());
     rElement.MarkAsDeleted();
+    std::cout<<"After T2 neigh:"<<std::endl;
+    for (unsigned i:neigh_indices)
+    {
+        std::cout<<"E index: "<<i<<std::endl;
+        VertexElement<ELEMENT_DIM,SPACE_DIM>* p_this_elem = this->GetElement(i);
+        const unsigned int n_edges = p_this_elem->GetNumEdges();
+        for (unsigned int j=0; j<n_edges; ++j)
+        {
+            std::cout<<p_this_elem->GetEdge(j)->GetIndex()<<": "<<p_this_elem->GetEdge(j)->GetNode(0)->GetIndex()
+                     <<" "<<p_this_elem->GetEdge(j)->GetNode(1)->GetIndex()<<std::endl;
+        }
+
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -2917,6 +2928,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleHighOrderJunctions(Node<SP
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIncrease(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
+    std::cout<<"Rosette increase"<<std::endl;
     /*
      * One of the nodes will have 3 containing element indices, the other
      * will have at least four. We first identify which node is which.
@@ -3015,6 +3027,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIncrease(Node<
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(Node<SPACE_DIM>* pProtorosetteNode)
 {
+    std::cout<<"Rosette resolution"<<std::endl;
     // Double check we are dealing with a protorosette
     assert(pProtorosetteNode->rGetContainingElementIndices().size() == 4);
 
@@ -3205,6 +3218,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(No
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankDecrease(Node<SPACE_DIM>* pRosetteNode)
 {
+    std::cout<<"Rosette decrease"<<std::endl;
     unsigned rosette_rank = pRosetteNode->rGetContainingElementIndices().size();
 
     // Double check we're dealing with a rosette

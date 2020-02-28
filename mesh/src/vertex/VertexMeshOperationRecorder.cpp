@@ -188,17 +188,17 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeSplitOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                                    const unsigned int edge_index,
-                                                                                   const double inserted_node_rel_position)
+                                                                                   const double inserted_node_rel_position,
+                                                                                   const bool elementIndexIsRemapped)
 {
     const unsigned int element_index = pElement->GetIndex();
     const unsigned int elementNumEdges = pElement->GetNumEdges();
-    const unsigned int localEdgeIndex = edge_index;
     std::vector<double> thetas(elementNumEdges);
     std::vector<long int> edge_mapping(elementNumEdges);
     std::vector<unsigned int> edge_status(elementNumEdges,0);
     //Daughter edge indices
-    const unsigned int split_1 = localEdgeIndex;
-    const unsigned int split_2 = localEdgeIndex+1;
+    const unsigned int split_1 = edge_index;
+    const unsigned int split_2 = edge_index+1;
     edge_status[split_1] = 1;
     edge_status[split_2] = 1;
     thetas[split_1] = inserted_node_rel_position;
@@ -212,7 +212,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeSplitOperati
     }
     EdgeRemapInfo* newEdges = new EdgeRemapInfo(edge_mapping, edge_status);
     newEdges->SetSplitProportions(thetas);
-    mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_SPLIT, element_index, newEdges));
+    mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_SPLIT, element_index, newEdges, elementIndexIsRemapped));
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -258,6 +258,8 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
             counter_2++;
         }
     }
+    if (old_split_edges.size()!=2)
+        EXCEPTION("edge split size is wrong");
     //Two parent edges are split
     assert(old_split_edges.size()==2);
     //Three edges in daughter cells are unmapped
