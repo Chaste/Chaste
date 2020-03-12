@@ -325,38 +325,30 @@ The initial geometry of major airways segmented from a CT scan (left), and an ex
 
 ## Recent publications enabled by Chaste
 
-Since our last publication on Chaste [@Mirams2013Chaste], over 70 peer-reviewed publications have been enabled, which we mention briefly below.
+Since our last publication on Chaste, over 70 peer-reviewed publications have been enabled in the areas described below.
 
 Publications using Cardiac Chaste have included scientific studies relating to:
-basic mechanisms of cardiac electrophysiology in healthy and diseased settings [@Walmsley2013mRNA; @Passini2013Computational; @Sadrieh2014Multiscale; @Bartolucci2014Linking; @Samanta2015Ca; @Pathmanathan2015; @cardone2016human; @Zhou2016; @Mahoney2016Connexin43; @Corsi2017Noninvasive; @Dutta2016; @Reilly2016; @Dutta2017; @Lyon2018;  @Xin2019];
-the effects of realistic tissue structure on simulated cardiac electrical activity [@Walmsley2013Estimation; @Lekadir2014Effect; @Lekadir2016Statistically; @Zacur2017];
-the sources and consequences of inter-subject electrophysiological variability [@Dutta2013Ionic; @Britton2013Experimentally; @Elkins2013Variability; @Walmsley2015Application; @Britton2017; @Muszkiewicz2018];
-predicting the effects of drugs on cardiac activity, including safety assessment [@Beattie2013Evaluation; @Zemzemi2013Computational; @Wallman2014Computational; @Mirams2014Prediction; @Passini2014Late; @Cardone-Noott2014Computational; @Zemzemi2015Effects; @Moreno2015New; @Davies2016Recent; @Hill2016Computational; @Passini2016; @britton2017quantitative; @McMillan2017; @passini2017human; @Lim2018Role];
-and the development of associated web-based tools [@Williams2015Web; @Cooper2016Cardiac; @Daly2018].
-Other studies enabled by Cardiac Chaste have advanced the
-methodologies for parameter identifiability and inference, model
-selection and uncertainty quantification for in cardiac
-electrophysiology models
-[@Daly2015Hodgkin; @Mirams2016White; @Johnstone2016Uncertainty; @Daly2017Comparing];
-and for the verification and efficient numerical simulation of such
-models
-[@Marsh2012Secrets;@Agudelo-Toro2013Computationally; @Pathmanathan2014Verification; @Corrado2016Stability; @Campos2016Lattice; @Spiteri2016Godunov; @Cervi2018HighOrder; @Cardone2018; @Green2019LUT].
-The continuum-mechanics solvers in Chaste have been used for studies of dielectric elastomers [@Langham2018Modeling]; and our electro-mechanics code as used in [@Carapella2014Quantitative], has also been used to verify new numerical methods [@gurev2015high].
+basic mechanisms of cardiac electrophysiology and tissue structure in healthy and diseased settings;
+the sources and consequences of inter-subject electrophysiological variability;
+predicting the effects of drugs on cardiac activity, including safety assessment
+and the development of associated web-based tools [@Cooper2016Cardiac].
+Other studies enabled by Cardiac Chaste have advanced technical methodologies for parameter identifiability and inference, model selection and uncertainty quantification in cardiac electrophysiology models [@Johnstone2016Uncertainty];
+and for the verification and efficient numerical simulation of cardiac
+models [@Green2019LUT].
+The continuum-mechanics solvers in Chaste have been used for studies of cardiac electromechanics [@Carapella2014Quantitative].
 
-Work using Cardiac Chaste has also been published on mesh generation and model simulation in the area of gastric electrophysiology, in particular focusing on  interstitial cell of Cajal network structure and function [@Sathar2014Biophysically; @Gao2014Developmental; @Sathar2015Tissue; @Sathar2015Comparison; @Sathar2015Multiscale; @Gao2015Stochastic].
+The Cardiac Chaste code has also been applied to gastric electrophysiology, in particular focusing on the interstitial cells of Cajal network [@Sathar2015Tissue].
 
-Publications enabled by Cell-based Chaste have focused on: the cellular mechanisms and dynamics of intestinal homeostasis and carcinogenesis [@Dunn2013Computational; @Hu2014Epidermal; @Baker2014Quantification; @Osborne2015Multiscale; @Dunn2016Combined; @Langlands2016Paneth; @Carroll2017Interkinetic; @Almet2018Multicellular; @Muraro2018TNF];
-the mechanisms underlying vascular tumour growth and response to therapy in the Microvessel Chaste project [@Grogan2017Microvessel; @Grogan2017Predicting; @Grogan2018Importance];
-the biomechanical characterization of skin lesions [@Franzetti2015Combined];
-the organisation and proliferation of stem and pluripotent cells in development [@Atwell2015Mechano-logical; @Koke2014Computational; @Godwin2017Extended];
-the dynamics of developing epithelial tissues [@Kursawe2015Capabilities; @Tetley2016Unipolar; @Abdullah2017Universal; @Finegan2018Tissue; @Waites2018Information];
-the spread of sexually-transmitted infections [@Nelson2014STI-GMaS];
+Publications enabled by Cell-based Chaste have focused on: the cellular mechanisms and dynamics of intestinal homeostasis and carcinogenesis;
+the mechanisms underlying vascular tumour growth and response to therapy in the Microvessel Chaste project [@Grogan2017Microvessel];
+the biomechanical characterization of epithelial tissue development and wound healing;
+the organisation and proliferation of stem and pluripotent cells in development;
+the spread of sexually-transmitted infections;
 vascular remodelling [@Osborne2018Fully];
-the similarities and differences between competing cell-based modelling approaches [@Figueredo2013On-lattice; @Davit2013Validity; @Fletcher2013Implementing; @Osborne2017Comparing];
-the calibration and parameterisation of such models [@Cooper2013Connecting; @Kursawe2018Approximate];
-and their efficient numerical solution [@Harvey2015Parallel; @Rubinacci2015Cognac; @Kursawe2017Impact; @Cooper2017Numerical].
+cell-based model calibration and parameterisation [@Kursawe2018Approximate];
+and their efficient numerical solution [@Cooper2017Numerical].
 
-Papers on Lung Chaste describe its use for patient-specific airway tree generation and flow modelling  [@bordas2015development; @soares2017evaluation; @burrowes2017combined].
+Papers on Lung Chaste describe its use for patient-specific airway tree generation and flow modelling [@bordas2015development].
 
 # Acknowledgements
 
