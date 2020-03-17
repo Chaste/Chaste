@@ -361,7 +361,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
-
     // Create a vector perpendicular to the axis of division
     c_vector<double, SPACE_DIM> perp_axis;
     perp_axis(0) = -axisOfDivision(1);
@@ -525,7 +524,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                 index = local_indexA;
             }
 
-            if (!original_element)
+            if (!original_element&&mTrackMeshOperations)
             {
                 const unsigned int n_edges = p_element->GetNumEdges();
                 const unsigned int nextIndex = (index+1)%n_edges;
@@ -583,7 +582,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         {
             mOperationRecorder.RecordEdgeSplitOperation(edge_split_pairs[i].first,
                                                         edge_split_pairs[i].second,
-                                                        relative_new_node[i]);
+                                                        relative_new_node[i], true);
         }
     }
     return new_element_index;
@@ -880,14 +879,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
-    /*std::vector<std::pair<unsigned int, unsigned int> > edge_nodes(this->mEdges.GetNumEdges());
-    for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
-    {
-        const unsigned int index_0 = this->mEdges[i]->GetNode(0)->GetIndex();
-        const unsigned int index_1 = this->mEdges[i]->GetNode(1)->GetIndex();
-        edge_nodes[i] = std::pair<unsigned int, unsigned int>(index_0, index_1);
-    }*/
-
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     // Also mark edges associated with the deleted nodes
     std::vector<Node<SPACE_DIM>*> live_nodes;
@@ -909,25 +900,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     this->mNodes = live_nodes;
     mDeletedNodeIndices.clear();
 
-    //The map for updating nodes and edge pointers
-    //std::map<unsigned int, unsigned int> old_to_new_map;
     // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
-        //old_to_new_map[this->mNodes[i]->GetIndex()] = i;
         this->mNodes[i]->SetIndex(i);
     }
-
-    //Updating nodes and edge pointers
-    /*for (unsigned int i=0; i<this->mEdges.GetNumEdges(); ++i)
-    {
-        const unsigned int old_index_0 = edge_nodes[i].first;
-        const unsigned int old_index_1 = edge_nodes[i].second;
-
-        const unsigned int new_index_0 = old_to_new_map[old_index_0];
-        const unsigned int new_index_1 = old_to_new_map[old_index_1];
-        this->mEdges[i]->SetNodes(this->mNodes[new_index_0],this->mNodes[new_index_1]);
-    }*/
 
     // Remove deleted edges and update the node-edge mapping
     this->mEdges.RemoveDeletedEdges();
@@ -1513,6 +1490,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
 
     // Update the elements previously containing node B to contain node A
     unsigned node_B_index = pNodeB->GetIndex();
+    // For rebuilding edges affected elements
+    std::set<unsigned> rebuilt_elements;
     for (std::set<unsigned>::const_iterator it = nodeB_elem_indices.begin(); it != nodeB_elem_indices.end(); ++it)
     {
         // Find the local index of node B in this element
@@ -1544,11 +1523,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
             // Replace node B with node A in this element
             this->mElements[*it]->UpdateNode(node_B_local_index, pNodeA);
         }
+        rebuilt_elements.insert(this->mElements[*it]->GetIndex());
     }
 
     assert(!(this->mNodes[node_B_index]->IsDeleted()));
     this->mNodes[node_B_index]->MarkAsDeleted();
     mDeletedNodeIndices.push_back(node_B_index);
+    for (unsigned i:rebuilt_elements)
+        this->GetElement(i)->RebuildEdges();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1620,6 +1602,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
+    //For rebuilding affected elements
+    std::set<unsigned> rebuilt_elements;
     for (std::set<unsigned>::const_iterator it = rElementsContainingNodes.begin();
          it != rElementsContainingNodes.end();
          ++it)
@@ -1645,6 +1629,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             this->mElements[*it]->AddNode(pNodeA, nodeB_local_index);
             if (mTrackMeshOperations)
                 mOperationRecorder.RecordNewEdgeOperation(this->mElements[*it], nodeB_local_index);
+
         }
         else if (nodeB_elem_indices.find(*it) == nodeB_elem_indices.end())
         {
@@ -1706,6 +1691,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                 mOperationRecorder.RecordNodeMergeOperation(oldIds, this->mElements[*it],
                                                             deleted_node_indices);
         }
+        rebuilt_elements.insert(this->mElements[*it]->GetIndex());
     }
 
     // Sort out boundary nodes
@@ -1728,6 +1714,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             pNodeB->SetAsBoundaryNode(true);
         }
     }
+
+    for (unsigned i:rebuilt_elements)
+        this->GetElement(i)->RebuildEdges();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1918,17 +1907,24 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     }
     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
     Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
+
+    std::set<unsigned int> neigh_indices;
+
     // Loop over each of the three nodes contained in rElement
     for (unsigned i=0; i<3; i++)
     {
         // For each node, find the set of other elements containing it
         Node<SPACE_DIM>* p_node = rElement.GetNode(i);
+
         std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
         containing_elements.erase(rElement.GetIndex());
         // For each of these elements...
         for (std::set<unsigned>::iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
         {
             VertexElement<ELEMENT_DIM,SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
+
+            neigh_indices.insert(p_this_elem->GetIndex());
+
             // ...throw an exception if the element is triangular...
             if (p_this_elem->GetNumNodes() < 4)
             {
@@ -1946,9 +1942,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
                 std::pair<unsigned int, unsigned int> node_pair;
                 if (mTrackMeshOperations)
                 {
-                    for (unsigned int i=0; i<p_this_elem->GetNumEdges(); ++i)
+                    for (unsigned int k=0; k<p_this_elem->GetNumEdges(); ++k)
                     {
-                        oldIds.push_back(p_this_elem->GetEdge(i)->GetIndex());
+                        oldIds.push_back(p_this_elem->GetEdge(k)->GetIndex());
                     }
                     node_pair.first= p_this_elem->GetNodeLocalIndex(new_node_global_index);
                     node_pair.second = p_this_elem->GetNodeLocalIndex(p_node->GetIndex());
@@ -1971,6 +1967,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 
     mDeletedElementIndices.push_back(rElement.GetIndex());
     rElement.MarkAsDeleted();
+
+    for (unsigned i:neigh_indices)
+    {
+        this->GetElement(i)->RebuildEdges();
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -2022,7 +2023,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     swap_info.mLocation = intersection;
     mOperationRecorder.RecordT3Swap(swap_info);
 
-
+    // For rebuilding edges
+    std::set<unsigned> rebuilt_elements;
     if (pNode->GetNumContainingElements() == 1)
     {
         // Get the index of the element containing the intersecting node
@@ -2111,7 +2113,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
                 if (mTrackMeshOperations)
                     mOperationRecorder.RecordEdgeSplitOperation(p_element, node_A_local_index, a_to_node_length/a_to_b_length);
-
+                rebuilt_elements.insert(p_element->GetIndex());
                 // Check the nodes are updated correctly
                 assert(pNode->GetNumContainingElements() == 2);
             }
@@ -2147,6 +2149,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     //We record node deletion as node merging.
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordNodeMergeOperation(oldIds, p_intersecting_element, std::pair<unsigned int, unsigned int>(downstream_index, local_index));
+                    rebuilt_elements.insert(p_intersecting_element->GetIndex());
 
                     // Mark all three nodes as deleted
                     pNode->MarkAsDeleted();
@@ -2187,6 +2190,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     //Record edge merging in the intersecting element
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeMergeOperation(p_intersecting_element, common_vertex_local_index);
+                    rebuilt_elements.insert(p_intersecting_element->GetIndex());
 
                     this->mNodes[common_vertex_index]->MarkAsDeleted();
                     mDeletedNodeIndices.push_back(common_vertex_index);
@@ -2241,6 +2245,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 if (mTrackMeshOperations)
                     mOperationRecorder.RecordEdgeMergeOperation(this->GetElement(intersecting_element_index), p_node_local_index);
 
+                rebuilt_elements.insert(elementIndex);
+                rebuilt_elements.insert(intersecting_element_index);
                 // Mark all three nodes as deleted
                 pNode->MarkAsDeleted();
                 mDeletedNodeIndices.push_back(pNode->GetIndex());
@@ -2311,6 +2317,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             // The nodes must have been updated correctly
             assert(pNode->GetNumContainingElements() == 2);
             assert(this->mNodes[new_node_global_index]->GetNumContainingElements() == 2);
+
+            rebuilt_elements.insert(elementIndex);
+            rebuilt_elements.insert(intersecting_element_index);
         }
     }
     else if (pNode->GetNumContainingElements() == 2)
@@ -2374,6 +2383,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             const double split_ratio = norm_2(vector_a_to_p)/a_to_b_length;
             if (mTrackMeshOperations)
                 mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), node_A_local_index, split_ratio);
+            rebuilt_elements.insert(elementIndex);
 
             // Remove vertex A from elements and record this as edge merge operation
             std::set<unsigned> elements_containing_vertex_A = this->mNodes[vertexA_index]->rGetContainingElementIndices();
@@ -2385,6 +2395,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 this->GetElement(*iter)->DeleteNode(this_vertexA_local_index);
                 if (mTrackMeshOperations)
                     mOperationRecorder.RecordEdgeMergeOperation(this->GetElement(*iter), this_vertexA_local_index);
+                rebuilt_elements.insert(this->GetElement(*iter)->GetIndex());
             }
 
             // Remove vertex A from the mesh
@@ -2402,6 +2413,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 this->GetElement(*iter)->DeleteNode(this_vertexB_local_index);
                 if (mTrackMeshOperations)
                     mOperationRecorder.RecordEdgeMergeOperation(this->GetElement(*iter), this_vertexB_local_index);
+                rebuilt_elements.insert(this->GetElement(*iter)->GetIndex());
             }
 
             // Remove vertex B from the mesh
@@ -2475,6 +2487,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     const double ratio_new_node = a_to_new_length/a_to_b_length;
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), node_A_local_index, ratio_new_node);
+                    rebuilt_elements.insert(elementIndex);
 
                     this->GetElement(elementIndex)->AddNode(pNode, node_A_local_index);
 
@@ -2491,6 +2504,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                         p_element_1->AddNode(this->mNodes[new_node_global_index], insertion_local_index);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_1, insertion_local_index);
+                        rebuilt_elements.insert(p_element_1->GetIndex());
                     }
                     else
                     {
@@ -2499,6 +2513,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                         p_element_2->AddNode(this->mNodes[new_node_global_index], insertion_local_index);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_2, insertion_local_index);
+                        rebuilt_elements.insert(p_element_2->GetIndex());
                     }
 
                     // Check the nodes are updated correctly
@@ -2554,6 +2569,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), node_A_local_index, ratio_p_node);
 
+                    rebuilt_elements.insert(elementIndex);
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
@@ -2561,6 +2577,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                         p_element_1->AddNode(this->mNodes[new_node_global_index], insertion_local_index);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_1, insertion_local_index);
+                        rebuilt_elements.insert(p_element_1->GetIndex());
                     }
                     else
                     {
@@ -2569,6 +2586,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                         p_element_2->AddNode(this->mNodes[new_node_global_index], insertion_local_index);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_2, insertion_local_index);
+                        rebuilt_elements.insert(p_element_2->GetIndex());
                     }
 
                     // Remove vertex A from the mesh
@@ -2581,6 +2599,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeMergeOperation(p_element_common_2, local_index_2);
                     assert(this->mNodes[vertexA_index]->GetNumContainingElements()==0);
+                    rebuilt_elements.insert(p_element_common_1->GetIndex());
+                    rebuilt_elements.insert(p_element_common_2->GetIndex());
 
                     this->mNodes[vertexA_index]->MarkAsDeleted();
                     mDeletedNodeIndices.push_back(vertexA_index);
@@ -2666,13 +2686,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     assert(ratio_new_node<=1);
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), node_A_local_index, ratio_new_node);
-
+                    rebuilt_elements.insert(elementIndex);
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
                         p_element_2->AddNode(this->mNodes[new_node_global_index], local_index_2);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_2, local_index_2);
+                        rebuilt_elements.insert(p_element_2->GetIndex());
                     }
                     else
                     {
@@ -2680,6 +2701,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                         p_element_1->AddNode(this->mNodes[new_node_global_index], local_index_1);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_1, local_index_1);
+                        rebuilt_elements.insert(p_element_1->GetIndex());
                     }
 
                     // Check the nodes are updated correctly
@@ -2733,13 +2755,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     assert(ratio_new_node<=1);
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), node_A_local_index, ratio_new_node);
-
+                    rebuilt_elements.insert(elementIndex);
                     // Add the new nodes to the original elements containing pNode (this also updates the node)
                     if (next_node_1 == previous_node_2)
                     {
                         p_element_2->AddNode(this->mNodes[new_node_global_index], local_index_2);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_2, local_index_2);
+                        rebuilt_elements.insert(p_element_2->GetIndex());
                     }
                     else
                     {
@@ -2747,6 +2770,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                         p_element_1->AddNode(this->mNodes[new_node_global_index], local_index_1);
                         if (mTrackMeshOperations)
                             mOperationRecorder.RecordNewEdgeOperation(p_element_1, local_index_1);
+                        rebuilt_elements.insert(p_element_1->GetIndex());
                     }
 
                     // Remove vertex B from the mesh
@@ -2758,6 +2782,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     p_element_common_2->DeleteNode(local_index_2);
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordEdgeMergeOperation(p_element_common_2, local_index_2);
+                    rebuilt_elements.insert(p_element_common_1->GetIndex());
+                    rebuilt_elements.insert(p_element_common_2->GetIndex());
 
                     assert(this->mNodes[vertexB_index]->GetNumContainingElements()==0);
 
@@ -2824,6 +2850,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 this->GetElement(elementIndex)->AddNode(this->mNodes[new_node_1_global_index], node_A_local_index);
                 if (mTrackMeshOperations)
                     mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex),node_A_local_index,a_to_node1_length/a_to_nodeP_length);
+                rebuilt_elements.insert(elementIndex);
                 // Add the new nodes to the original elements containing pNode (this also updates the node)
                 if (next_node_1 == previous_node_2)
                 {
@@ -2847,7 +2874,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     if (mTrackMeshOperations)
                         mOperationRecorder.RecordNewEdgeOperation(p_element_2, local_index_2);
                 }
-
+                rebuilt_elements.insert(p_element_1->GetIndex());
+                rebuilt_elements.insert(p_element_2->GetIndex());
                 // Check the nodes are updated correctly
                 assert(pNode->GetNumContainingElements() == 3);
                 assert(this->mNodes[new_node_1_global_index]->GetNumContainingElements() == 2);
@@ -2859,6 +2887,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     {
         EXCEPTION("Trying to merge a node, contained in more than 2 elements, into another element, this is not possible with the vertex mesh.");
     }
+    for (unsigned i:rebuilt_elements)
+        this->GetElement(i)->RebuildEdges();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

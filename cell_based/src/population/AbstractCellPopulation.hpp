@@ -65,7 +65,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
-
 /**
  * An abstract facade class encapsulating a cell population.
  *

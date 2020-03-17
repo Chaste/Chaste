@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Edge.hpp"
-
 template<unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index)
     : mIndex(index),
@@ -119,12 +118,12 @@ void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1)
 template<unsigned SPACE_DIM>
 void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
 {
-    for (unsigned i = 0; i < mNodes.size(); i++)
+    for (unsigned i = 0; i < 2; i++)
     {
         if (this->mNodes[i] == pOldNode)
         {
             this->mNodes[i] = pNewNode;
-            break;
+            return;
         }
     }
 }

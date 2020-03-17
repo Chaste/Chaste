@@ -193,10 +193,12 @@ public:
      * @param pElement
      * @param edge_index - index of the edge being split
      * @param inserted_node_rel_position - position of the inserted node relative to the lower index node of the edge
+     * @param
      */
     void RecordEdgeSplitOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                   const unsigned int edge_index,
-                                  const double inserted_node_rel_position);
+                                  const double inserted_node_rel_position,
+                                  const bool elementIndexIsRemapped = false);
 
     /**
      * Records cell divisions for VertexBasedPopulationSrn class to remap SRNs

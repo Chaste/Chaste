@@ -92,14 +92,6 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldN
     }
     EXCEPTION("You didn't have that node to start with.");
 
-    // Also replace nodes for edges
-    if (mEdges.size() > 0)
-    {
-        for (auto edge: mEdges)
-        {
-            edge->ReplaceNode(pOldNode, pNewNode);
-        }
-    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
