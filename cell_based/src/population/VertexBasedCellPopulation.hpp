@@ -272,13 +272,12 @@ public:
 
     /**
      * Overridden GetNeighbouringEdgeIndices() method.
-     *
-     * Gets the local edge index of the neighbouring element
+     * Gets the local edge index of the neighbouring element and the element index
      * @param pCell  Cell pointer
      * @param pEdgeIndex Local edge index
-     * @return pair of element location and local edge index
+     * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex) override;
+    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex) override;
 
 
     /**

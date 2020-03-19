@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in the sub-cellular reaction network.
- *
+ * This SRN model represents a single junction of a cell
  * \todo #2752 document this class more thoroughly here
  */
 class DeltaNotchSrnEdgeModel : public AbstractOdeSrnModel
@@ -122,7 +122,7 @@ public:
      * Update the current levels of Delta and Notch in the cell.
      *
      * N.B. Despite the name, this doesn't update the levels of delta or notch, or compute mean levels.
-     * It just copies the current mean delta from the CellData
+     * It just copies the current mean delta from the CellEdgeData
      * (set by DeltaNotchTrackingModifier) to the DeltaNotchEdgeOdeSystem.
      *
      * \todo #2752 Improve the name of this method!
@@ -163,10 +163,12 @@ public:
      * @return the level of delta in cell interior
      */
     double GetInteriorDelta() const;
+
     /**
      * @return the level of notch in cell interior
      */
     double GetInteriorNotch() const;
+
     /**
      * Output SRN model parameters to file.
      *
@@ -174,10 +176,30 @@ public:
      */
     void OutputSrnModelParameters(out_stream& rParamsFile);
 
+    /**
+     * Override the method declared in AbstractSrnModel class
+     * @param p_other_srn
+     * @param scale
+     */
     virtual void AddSrnQuantities(AbstractSrnModel *p_other_srn,
                                   const double scale = 1.0) override;
+
+    /**
+     * Override the method declared in AbstractSrnModel class
+     * @param p_shrunk_edge_srn
+     */
     virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
+
+    /**
+     * Override the method declared in AbstractSrnModel class
+     * @param p_merged_edge_srn
+     */
     virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn) override;
+
+    /**
+     * Override the method declared in AbstractSrnModel class
+     * @param relative_position
+     */
     virtual void SplitEdgeSrn(const double relative_position) override;
 };
 

@@ -112,6 +112,7 @@ protected:
      * Indicates if edge model has been introduced. False by default.
      */
     bool mIsEdgeBasedModel;
+
     /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
      * is by calling that method, to ensure that a model of the correct subclass is created.
@@ -272,12 +273,14 @@ public:
 
     /**
      * Scales srn variables by factor theta
+     * Method overriden in AbstractOdeSrnModel
      */
     virtual void ScaleSrnVariables(const double theta);
 
     /**
      * Adds Srn quantities (variables or parameters) to this.
      * The quantities can be scaled by factor scale.
+     * This method is virtual and needs to be overriden by user-defined SRN model
      * @param p_other_srn
      * @param scale
      */
@@ -285,26 +288,30 @@ public:
                                   const double scale = 1.0);
 
     /**
-     * Adds the shrunk edge srn quantities to this edge
+     * Adds the shrunk edge srn quantities to this edge.
+     * This method is virtual and needs to be overriden by user-defined SRN model.
      * @param p_shrunk_edge_srn
      */
     virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn);
 
     /**
      * Adds the merged edge srn quantities to this edge
+     * This method is virtual and needs to be overriden by user-defined SRN model.
      * @param p_merged_edge_srn
      */
     virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn);
 
     /**
-     * Adds the shrunk edge srn quantities to the interior srn
+     * Adds the shrunk edge srn quantities to (this) interior srn
+     * This method is virtual and needs to be overriden by user-defined SRN model.
      * @param p_shrunk_edge_srn
      */
     virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn);
 
     /**
      * Scales SRN quantities due to edge split. Amount of scaling may depend on the resulting proportions,
-     * deetermined by relative position of the node that splits the edge
+     * deetermined by relative position of the node that splits the edge.
+     * This method is virtual and needs to be overriden by user-defined SRN model.
      * @param relative_position - how close the added node is to the previous node
      */
     virtual void SplitEdgeSrn(const double relative_position);

@@ -71,6 +71,8 @@ void DeltaNotchInteriorOdeSystem::EvaluateYDerivatives(double time, const std::v
 {
     const double notch = rY[0];
     const double delta = rY[1];
+
+    // Total edge delta/notch used to regulate expression/decay of cytoplasmic delta/notch
     const double edge_delta = this->mParameters[0];
     const double edge_notch = this->mParameters[1];
     // The next two lines define the DeltaNotch ODE system

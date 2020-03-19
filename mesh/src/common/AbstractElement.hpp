@@ -66,8 +66,8 @@ protected:
     /** The edges forming this element **/
     std::vector<Edge<SPACE_DIM>*> mEdges;
 
+    /** EdgeHelper class to keep track of edges
     EdgeHelper<SPACE_DIM>* mEdgeHelper;
-
 
     /** The index of this element within the mesh */
     unsigned mIndex;
@@ -292,7 +292,6 @@ public:
     Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
 
     /**
-     *
      * @return Number of edges associated with this element
      */
     unsigned GetNumEdges() const;
@@ -315,7 +314,7 @@ public:
     /**
      * returns the local index of edge
      * @param edge
-     * @return
+     * @return -1 if an edge was not found
      */
     long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
 

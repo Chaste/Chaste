@@ -86,15 +86,15 @@ public:
     virtual ~CellEdgeData();
 
     /**
-     * This assigns the cell data array.
+     * This assigns the cell edge data vector.
      *
      * @param rVariableName the name of the data to be set.
-     * @param data the value to set it to.
+     * @param data the vector of values to set it to.
      */
     void SetItem(const std::string& rVariableName, const std::vector<double> &data);
 
     /**
-     * Retrieves the cell data array.
+     * Retrieves the cell edge data array.
      *
      * @param rVariableName the index of the data required.
      * throws if rVariableName has not been stored

@@ -77,9 +77,9 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
         Validate();
     }
 
-    const bool HasSrn = (*this->mCells.begin())->HasSrnModel();
-
-    if (HasSrn)
+    // If cells contain an SRN model, then we need to track mesh operations
+    // and update SRNs accordingly. Here we assume the first cell is a representative of other cells
+    if ((*this->mCells.begin())->HasSrnModel())
     {
         mPopulationSrn.SetVertexCellPopulation(this);
         mpMutableVertexMesh->SetMeshOperationTracking(true);
@@ -185,18 +185,22 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
 
 template<unsigned int DIM>
 std::set<std::pair<unsigned int, unsigned int>>
-VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeLocalIndex)
+VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex)
 {
     std::set<std::pair<unsigned, unsigned>> neighbours;
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
     auto element = this->GetElement(cellLocationIndex);
-    auto globalEdgeIndex = element->GetEdgeGlobalIndex(pEdgeLocalIndex);
-    auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(pEdgeLocalIndex);
+    auto globalEdgeIndex = element->GetEdgeGlobalIndex(EdgeLocalIndex);
+    auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex);
+
+    // Normally there is only one neighbouring element
     for (auto neighbourElementIndex : neighbourElementIndices)
     {
         auto neighbourElement = this->GetElement(neighbourElementIndex);
+        // Iterate over neighbouring element indices
         for (unsigned eIndex = 0; eIndex < neighbourElement->GetNumEdges(); eIndex++)
         {
+            // If the neighbours edge matches EdgeLocalIndex
             if (neighbourElement->GetEdge(eIndex)->GetIndex() == globalEdgeIndex)
             {
                 neighbours.insert(std::pair<unsigned, unsigned>(neighbourElementIndex, eIndex));
@@ -355,6 +359,7 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
     if (EdgeModelOrNot)
     {
+        // Note that SRN update after divisions is handled through Cell::Divide() method
         mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
     }
     element_map.ResetToIdentity();
@@ -438,7 +443,8 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
     //If edge SRNs are specified, then write vtk results into a mesh where quantities
     //associated with each edge are taken into account. We assume that the first cell is
-    //representative of all cells
+    //representative of all cells.
+    //Edge VTKs are also written if cells contain CellEdgeData
     if (cells.size() > 0)
     {
         //If cells contain edge data

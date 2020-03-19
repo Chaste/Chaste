@@ -524,15 +524,19 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                 index = local_indexA;
             }
 
+            // Record the edge split in neighbouring elements
             if (!original_element&&mTrackMeshOperations)
             {
                 const unsigned int n_edges = p_element->GetNumEdges();
                 const unsigned int nextIndex = (index+1)%n_edges;
+
                 auto prev_node = p_element->GetNode(index)->rGetLocation();
                 auto next_node = p_element->GetNode(nextIndex)->rGetLocation();
                 auto curr_node = this->GetNode(new_node_global_index)->rGetLocation();
+
                 c_vector<double, SPACE_DIM> last_to_next = this->GetVectorFromAtoB(prev_node, next_node);
                 c_vector<double, SPACE_DIM> last_to_curr = this->GetVectorFromAtoB(prev_node, curr_node);
+
                 double old_distance = norm_2(last_to_next);
                 double prev_curr_distance = norm_2(last_to_curr);
                 if (old_distance<prev_curr_distance)
@@ -577,7 +581,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
     if (mTrackMeshOperations)
     {
+        // Record edge rearrangements in the daughter cells ...
         mOperationRecorder.RecordCellDivideOperation(edgeIds, pElement, this->mElements[new_element_index]);
+        // ... and in each neighbouring cell
         for (unsigned int i=0; i<edge_split_pairs.size(); ++i)
         {
             mOperationRecorder.RecordEdgeSplitOperation(edge_split_pairs[i].first,

@@ -49,7 +49,9 @@ typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
  * SRN model at the cell level, has representation for edges internally.
- * Also contains cell interior (cytoplasmic) SRN
+ * Also contains cell interior (cytoplasmic) SRN.
+ * Mostly serves as a container for interior/edge SRNs. Functionality of SRNs is defined in AbstractSrnModel class
+ * and user-defined SRN models
  */
 class SrnCellModel : public AbstractSrnModel
 {
@@ -83,7 +85,7 @@ protected:
 
     /**
      * Copy constructor. Called ONLY when a cell division occurs. See parent class comment for details
-     * @param rModel
+     * @param rModel SRN model to be copied
      */
     SrnCellModel(const SrnCellModel &rModel);
 
@@ -109,13 +111,19 @@ public:
      */
     ~SrnCellModel();
 
-
+    /**
+     * Initialize constituent SRN models
+     */
     virtual void Initialise() override;
+
     /**
      * Halves the appropriate quantities in the constituent SRN models
      */
     virtual void ResetForDivision() override;
 
+    /**
+     * Simulate SRN models
+     */
     virtual void SimulateToCurrentTime() override;
 
     /**
@@ -124,24 +132,66 @@ public:
      */
     virtual AbstractSrnModel* CreateSrnModel() override;
 
+    /**
+     * Adds a vector of SRN models to this cell.
+     * @param edgeSrn vector of SRN models. Index of each SRN corresponds to the local edge index
+     */
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
 
+    /**
+     * Inserts edge SRN at the end of the list.
+     * @param edgeSrn to be inserted
+     */
     void AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn);
 
+    /**
+     * Inserts edge SRN at a particular index
+     * @param index at which SRN is inserted
+     * @param edgeSrn SRN to be inserted
+     */
     void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn);
 
+    /**
+     * Remove Edge SRN from the cell SRN
+     * @param index of the SRN to be removed
+     * @return removed SRN
+     */
     AbstractSrnModelPtr RemoveEdgeSrn(unsigned index);
 
+    /**
+     * Get number of edge SRNs
+     */
     unsigned GetNumEdgeSrn() const;
 
+    /**
+     * Get edge srn at an index
+     * @param index of the SRN to return
+     * @return SRN to be returned
+     */
     AbstractSrnModelPtr GetEdgeSrn(unsigned index) const;
 
+    /**
+     * Return all Edge SRNs
+     * @return vector of SRNs associated to this cell
+     */
     const std::vector<AbstractSrnModelPtr>& GetEdges() const;
 
+    /**
+     * Set interior SRN
+     * @param interiorSrn cytoplasmic SRN
+     */
     void SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn);
 
+    /**
+     * Returns cytoplasmic SRN
+     * @return interior SRN
+     */
     AbstractSrnModelPtr GetInteriorSrn() const;
 
+    /**
+     * Overriden method. We Set Cell for each SRN contained in this cell
+     * @param pCell
+     */
     virtual void SetCell(CellPtr pCell) override;
 };
 

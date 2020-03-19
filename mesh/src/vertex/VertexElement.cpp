@@ -87,10 +87,6 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
          this->mNodes.push_back(*node_iter);
     }
 
-    //Populate mEdges
-
-
-
     // Register element with nodes
     this->RegisterWithNodes();
 }

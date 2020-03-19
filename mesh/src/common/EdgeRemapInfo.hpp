@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Storage class contains a mapping to the old local edge indices and status of the new edges.
  */
 class EdgeRemapInfo {
-
+private:
     /**
      * Contains a mapping to the old local edge indices. Negative value means a new edge
      */
@@ -70,15 +70,12 @@ public:
 
     /**
      * Contains a mapping to the old local edges index. Negative value means a new edge
-     *
+     * @return edge map
      */
     std::vector<long int> GetEdgesMapping() const;
 
     /**
-     * Status
-     * 0 Edge has not changed
-     * 1 Edge has been split between two elements
-     * 2 Completely new edge was created
+     * @return vector containing the status of each edge
      */
     std::vector<unsigned int> GetEdgesStatus() const;
 

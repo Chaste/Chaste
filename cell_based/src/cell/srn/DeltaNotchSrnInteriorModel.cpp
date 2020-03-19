@@ -167,6 +167,7 @@ void DeltaNotchSrnInteriorModel::OutputSrnModelParameters(out_stream& rParamsFil
 
 void DeltaNotchSrnInteriorModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
 {
+    // Half of junctional Delta/Notch is endocytosed back to the cytoplasm
     auto shrunk_srn
         = static_cast<DeltaNotchSrnEdgeModel*>(p_shrunk_edge_srn);
     const double edge_notch = shrunk_srn->GetNotch();

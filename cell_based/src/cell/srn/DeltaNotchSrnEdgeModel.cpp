@@ -187,11 +187,14 @@ void DeltaNotchSrnEdgeModel::AddSrnQuantities(AbstractSrnModel *p_other_srn,
 
 void DeltaNotchSrnEdgeModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
 {
+    // Here we assume that one half of srn quantities are endocytosed and the remaining
+    // half are split between neighbouring junctions. Hence we add 1/4 of srn variables
     AddSrnQuantities(p_shrunk_edge_srn, 0.25);
 }
 
 void DeltaNotchSrnEdgeModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
 {
+    // Add all srn variables to this edge srn
     AddSrnQuantities(p_merged_edge_srn);
 }
 

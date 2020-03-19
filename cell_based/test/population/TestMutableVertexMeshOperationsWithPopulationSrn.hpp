@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+// This test is designed to check if SRN update after mesh operations works correctly
 class TestMutableVertexMeshOperationsWithPopulationSrn : public AbstractCellBasedTestSuite
 {
 public:

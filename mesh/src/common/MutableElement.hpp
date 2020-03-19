@@ -50,8 +50,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableElement : public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**

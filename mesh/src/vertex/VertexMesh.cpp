@@ -615,9 +615,6 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete this->mNodes[i];
     }
     this->mNodes.clear();
-
-
-
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

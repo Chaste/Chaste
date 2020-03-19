@@ -129,6 +129,10 @@ protected:
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
+    /**
+     * Build edges from elements. Populates edges in EdgeHelper class
+     * @param elements from which edges are built
+     */
     void GenerateEdgesFromElements(std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> &elements);
 
     /**

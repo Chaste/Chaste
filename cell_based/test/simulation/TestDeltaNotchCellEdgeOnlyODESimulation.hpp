@@ -212,7 +212,7 @@ public:
         simulator.SetEndTime(2.0);
 
         /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within
-         * the cells in {{{CellData}}} and passes it to the simulation.*/
+         * the cells in {{{CellData}}} and passes it to the simulation. Here only edge quantities are updated*/
         MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 

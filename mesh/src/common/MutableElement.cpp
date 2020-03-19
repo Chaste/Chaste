@@ -52,8 +52,6 @@ MutableElement<ELEMENT_DIM, SPACE_DIM>::MutableElement(unsigned index,
     {
         RegisterWithNodes();
     }
-
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

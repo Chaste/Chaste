@@ -49,6 +49,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned DIM>
 class VertexBasedCellPopulation;
 
+/**
+ * After topological rearrangments, e.g. T1-3, node merges, or edge splits due to mitosis,
+ * junctional srns must be updated accordingly. For example, after edge split due to mitosis
+ * a new SRN must be created that inherits modified model variables.
+ * This class deals with Cell SRN update after a topological change occurs to the cell.
+ */
 template <unsigned DIM>
 class VertexBasedPopulationSrn
 {
@@ -71,11 +77,32 @@ private:
     }
     VertexBasedCellPopulation<DIM>* mpCellPopulation;
 public:
+    /**
+     * Default constructor
+     */
     VertexBasedPopulationSrn();
+    ~VertexBasedPopulationSrn();
+
+    /**
+     * Set the cell population
+     * @param p_vertex_population
+     */
     void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* p_vertex_population);
 
+    /**
+     * This method iterates over edge operations performed on the mesh and
+     * calls on RemapCellSrn() with appropriate arguments
+     * @param rElementMap the element map to take into account that some elements are deleted after an edge operation is recorded
+     */
     void UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap);
 
+    /**
+     * Remaps cell SRN. If an edge has not been modified, the old edge SRN is mapped to its junction.
+     * Otherwise, edge SRNs are updated according to the operation performed.
+     * @param parent_srn_edges Edge SRNs before topology is changed
+     * @param pSrnCell_1 SrnCellModel of the cell
+     * @param pEdgeChange_1 Contains information about which edge changes occurred
+     */
     void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
                              SrnCellModel* pSrnCell_1,
                              EdgeRemapInfo* pEdgeChange_1);

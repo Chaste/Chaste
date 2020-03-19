@@ -182,6 +182,8 @@ public:
      * @param oldIds
      * @param pElement
      * @param merged_nodes_pair - the index of the deleted node is stored in the second position
+     * @param elementIndexIsRemapped - indicates whether the operation has been recorded before
+     *  element indices have been remapped (e.g. before elements are deleted)
      */
     void RecordNodeMergeOperation(const std::vector<unsigned int> oldIds,
                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
@@ -193,7 +195,8 @@ public:
      * @param pElement
      * @param edge_index - index of the edge being split
      * @param inserted_node_rel_position - position of the inserted node relative to the lower index node of the edge
-     * @param
+     * @param elementIndexIsRemapped - indicates whether the operation has been recorded before
+     *  element indices have been remapped (e.g. before elements are deleted)
      */
     void RecordEdgeSplitOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                   const unsigned int edge_index,

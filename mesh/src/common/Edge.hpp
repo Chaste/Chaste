@@ -220,7 +220,7 @@ public:
      * Comparison operator.
      * @param edge_1
      * @param edge_2
-     * @return
+     * @return true if edges are equal
      */
     bool operator==(const Edge<SPACE_DIM>& edge) const;
 };

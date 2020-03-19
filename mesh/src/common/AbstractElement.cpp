@@ -56,9 +56,6 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
 {
     // Sanity checking
     assert(ELEMENT_DIM <= SPACE_DIM);
-
-
-
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

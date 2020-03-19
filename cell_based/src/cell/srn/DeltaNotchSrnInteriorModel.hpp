@@ -168,6 +168,10 @@ public:
      */
     void OutputSrnModelParameters(out_stream& rParamsFile);
 
+    /**
+     * Override the method to reflect user-define assumptions
+     * @param p_shrunk_edge_srn
+     */
     virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn) override;
 };
 

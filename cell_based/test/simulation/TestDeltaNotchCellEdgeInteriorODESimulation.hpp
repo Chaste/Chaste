@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTDELTANOTCHCELLEDGEINTERIORODESIMULATION_HPP_
 
 /*
- * = An example showing how to run Delta/Notch simulations =
+ * = An example showing how to run Delta/Notch simulations with Edge and Interior SRNs =
  *
  * EMPTYLINE
  *
@@ -51,12 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This model is based on the development by Collier et al. ("Pattern formation by lateral inhibition with feedback:
  * a mathematical model of delta-notch intercellular signalling", J. Theor. Biol. 183:429-446) and comprises
- * two ODEs to describe the evolution in concentrations of Delta and Notch in each cell. The ODE
- * for Notch includes a reaction term that depends on the mean Delta concentration among neighbouring
- * cells. Thus in this simulation each cell needs to be able to access information about its
- * neighbours. We use the {{{CellData}}} class to facilitate this, and introduce a subclass
- * of {{{OffLatticeSimulation}}} called {{{DeltaNotchOffLatticeSimulation}}} to handle the updating
- * of {{{CellData}}} at each time step as cell neighbours change.
+ * two ODEs to describe the evolution in concentrations of Delta and Notch in each cell. This model is a modification of purely cell srn
+ * model. Here, the cytoplasmic concentration of Notch depends on edge concentration of Delta. See Delta/Notch edge/interior SRNs
+ * for details.
  *
  * EMPTYLINE
  *

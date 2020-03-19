@@ -507,16 +507,6 @@ if (Chaste_ENABLE_TESTING)
     find_package (CxxTest)
 endif ()
 
-################################
-####  Find OpenMP
-################################
-find_package(OpenMP)
-if(OpenMP_FOUND)
-    add_definitions(-DOPENMP)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    message (STATUS "Found OpenMP")
-endif()
 
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #
