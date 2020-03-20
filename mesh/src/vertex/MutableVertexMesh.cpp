@@ -3024,10 +3024,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIncrease(Node<
         if (hi_rank_elem_indices.count(*it) > 0)
         {
             //For node merge recording
-            std::vector<unsigned int> oldIds(this->mElements[*it]->GetNumEdges());
+            std::vector<unsigned int> oldIds(this->mElements[*it]->GetNumEdges(),0);
+
             for (unsigned int i=0; i<oldIds.size(); ++i)
             {
-                oldIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
+                oldIds[i] = this->mElements[*it]->GetEdge(i)->GetIndex();
             }
             // Delete lo_rank_node from current element
             this->mElements[*it]->DeleteNode(lo_rank_local_index);

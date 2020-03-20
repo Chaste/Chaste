@@ -33,7 +33,6 @@ vertex/TestHoneycombVertexMeshGenerator.hpp
 vertex/TestMutableVertexMesh.hpp
 vertex/TestMutableVertexMeshReMesh.hpp
 vertex/TestMutableVertexMeshRosetteMethods.hpp
-vertex/TestMutableVertexEdges.hpp
 vertex/TestToroidal2dVertexMesh.hpp
 vertex/TestToroidalHoneycombVertexMeshGenerator.hpp
 vertex/TestVertexElement.hpp

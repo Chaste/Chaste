@@ -138,13 +138,6 @@ public:
         // Merge nodes 3 and 4
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
 
-        // Test if the node merge operation has been recorded properly
-        auto operation_recorder = vertex_mesh.GetOperationRecorder();
-        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        TS_ASSERT_EQUALS(n_operations, 1u);
-        TS_ASSERT_EQUALS(edge_operations[0]->GetOperation(), EDGE_OPERATION_NODE_MERGE);
-
         //Update population srns
         VertexElementMap element_map(1);
         element_map.ResetToIdentity();
@@ -258,22 +251,6 @@ public:
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
 
-        // Test if the swap has been recorded properly
-        auto operation_recorder = vertex_mesh.GetOperationRecorder();
-        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        //Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 4u);
-        unsigned n_node_merges= 0, n_new_edges= 0;
-        for (unsigned int i=0; i<n_operations; ++i)
-        {
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_NODE_MERGE)
-                n_node_merges++;
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_ADD)
-                n_new_edges++;
-        }
-        TS_ASSERT_EQUALS(n_node_merges, 2u);
-        TS_ASSERT_EQUALS(n_node_merges, 2u);
         //Update population srns
         VertexElementMap element_map(4);
         element_map.ResetToIdentity();
@@ -462,20 +439,6 @@ public:
         VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
-
-        // Test if the swap has been recorded properly
-        auto operation_recorder = vertex_mesh.GetOperationRecorder();
-        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        //Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 3u);
-        unsigned n_node_merges= 0;
-        for (unsigned int i=0; i<n_operations; ++i)
-        {
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_NODE_MERGE)
-                n_node_merges++;
-        }
-        TS_ASSERT_EQUALS(n_node_merges, 3u);
 
         //Update population srns
         VertexElementMap element_map(4);
@@ -892,27 +855,6 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(1), 2u);
         TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(2), 3u);
         TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(3), 6u);
-
-        // Test if the swap has been recorded properly
-        auto operation_recorder = vertex_mesh.GetOperationRecorder();
-        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        // Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 2u);
-        unsigned n_edge_splits= 0, n_divisions= 0;
-        std::vector<std::vector<unsigned int> > element_to_operations(5);
-        for (unsigned int i=0; i<n_operations; ++i)
-        {
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_DIVIDE)
-                n_divisions++;
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_SPLIT)
-                n_edge_splits++;
-            //Determine operations that an element underwent
-            const unsigned int elem_index = edge_operations[i]->GetElementIndex();
-            element_to_operations[elem_index].push_back(edge_operations[i]->GetOperation());
-        }
-        TS_ASSERT_EQUALS(n_divisions, 1u);
-        TS_ASSERT_EQUALS(n_edge_splits, 1u);
 
         cell_population.Update(true);
 

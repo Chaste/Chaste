@@ -165,6 +165,11 @@ protected:
     /** List of SimulationModifier rules. */
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
 
+    /** List of SimulationModifier rules that need to be applied before locations or topology are updated.
+     *  For example, junctional tension may change after Remeshing in Vertex Based Models.
+     */
+    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mTopologyUpdateSimulationModifiers;
+
     /**
      * The ratio of the number of actual timesteps to the number
      * of timesteps at which results are written to file.
@@ -378,6 +383,18 @@ public:
      * @return a pointer to the vector of SimulationModifiers used in this simulation.
      */
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
+
+    /**
+     * Add a SimulationModifier to be used in this simulation.
+     *
+     * @param pSimulationModifier pointer to a SimulationModifier
+     */
+    void AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+
+    /**
+     * @return a pointer to the vector of SimulationModifiers that influence topology update in this simulation.
+     */
+    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetTopologyUpdateSimulationModifiers();
 
     /**
      * Main Solve() method, used to evolve the cell population. Note that prior to calling Solve()

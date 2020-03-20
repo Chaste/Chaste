@@ -46,6 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+/*
+ * Testing of edge infrastructure is also done here.
+ * In order to avoid duplication, tests for some edge infrastructure are also implemented in
+ * TestMutableVerteMeshOperationsWithPopulationSrn. There, explicit tests for correct edge rearrangements
+ * are implemented.
+ */
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {
 public:
@@ -82,8 +88,18 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
+        //For testing edge operations
+        vertex_mesh.SetMeshOperationTracking(true);
+
         // Merge nodes 3 and 4
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
+
+        // Test if the node merge operation has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned int n_operations = edge_operations.size();
+        TS_ASSERT_EQUALS(n_operations, 1u);
+        TS_ASSERT_EQUALS(edge_operations[0]->GetOperation(), EDGE_OPERATION_NODE_MERGE);
 
         // Test the mesh is correctly updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
@@ -227,11 +243,31 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
+        //For testing edge operations
+        vertex_mesh.SetMeshOperationTracking(true);
+
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
 
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+
+        // Test if the swap has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned int n_operations = edge_operations.size();
+        //Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(n_operations, 4u);
+        unsigned n_node_merges= 0, n_new_edges= 0;
+        for (unsigned int i=0; i<n_operations; ++i)
+        {
+            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_NODE_MERGE)
+                n_node_merges++;
+            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_ADD)
+                n_new_edges++;
+        }
+        TS_ASSERT_EQUALS(n_node_merges, 2u);
+        TS_ASSERT_EQUALS(n_node_merges, 2u);
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -812,11 +848,26 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);
 
         // Perform a T2 swap on the central triangle element
         VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
+
+        // Test if the swap has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned int n_operations = edge_operations.size();
+        //Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(n_operations, 3u);
+        unsigned n_node_merges= 0;
+        for (unsigned int i=0; i<n_operations; ++i)
+        {
+            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_NODE_MERGE)
+                n_node_merges++;
+        }
+        TS_ASSERT_EQUALS(n_node_merges, 3u);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
@@ -1419,6 +1470,7 @@ public:
         elements.push_back(new VertexElement<2,2>(4, nodes_in_element4));
 
         MutableVertexMesh<2,2> mesh(nodes, elements);
+        mesh.SetMeshOperationTracking(true);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
@@ -1446,6 +1498,27 @@ public:
 
         // Call method to update mesh in this situation
         mesh.ReMesh();
+
+        // Test if the swap has been recorded properly
+        auto operation_recorder = mesh.GetOperationRecorder();
+        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned int n_operations = edge_operations.size();
+        //Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(n_operations, 8u);
+        unsigned n_edge_splits= 0, n_new_edges= 0;
+        std::vector<std::vector<unsigned int> > element_to_operations(5);
+        for (unsigned int i=0; i<n_operations; ++i)
+        {
+            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_SPLIT)
+                n_edge_splits++;
+            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_ADD)
+                n_new_edges++;
+            //Determine operations that an element underwent
+            const unsigned int elem_index = edge_operations[i]->GetElementIndex();
+            element_to_operations[elem_index].push_back(edge_operations[i]->GetOperation());
+        }
+        TS_ASSERT_EQUALS(n_edge_splits, 5u);
+        TS_ASSERT_EQUALS(n_new_edges, 3);
 
         // Save the mesh data using mesh writers
         std::string dirname = "TempyTempy";
