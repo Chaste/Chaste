@@ -924,6 +924,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
             p_element->SetAttribute(attribute_value);
         }
     }
+    GenerateEdgesFromElements(mElements);
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates

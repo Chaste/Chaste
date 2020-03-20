@@ -66,7 +66,7 @@ protected:
     /** The edges forming this element **/
     std::vector<Edge<SPACE_DIM>*> mEdges;
 
-    /** EdgeHelper class to keep track of edges
+    /** EdgeHelper class to keep track of edges */
     EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
     /** The index of this element within the mesh */

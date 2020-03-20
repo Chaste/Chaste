@@ -1,8 +1,8 @@
-
 #include "VertexMeshOperationRecorder.hpp"
 #include "EdgeRemapInfo.hpp"
 template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
 VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::VertexMeshOperationRecorder()
+:mpEdgeHelper(nullptr)
 {}
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>

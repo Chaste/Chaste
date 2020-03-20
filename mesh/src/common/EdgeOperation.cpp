@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EdgeOperation.hpp"
 
+EdgeOperation::EdgeOperation()
+{}
+
 EdgeOperation::EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex,
                              EdgeRemapInfo* pRemapInfo, const bool isIndexRemapped)
 :
@@ -106,3 +109,10 @@ bool EdgeOperation::IsElementIndexRemapped() const
 {
     return mIsElementIndexRemapped;
 }
+
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+CHASTE_CLASS_EXPORT(EdgeOperation)
+
+

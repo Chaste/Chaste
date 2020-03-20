@@ -25,8 +25,34 @@
 template<unsigned int SPACE_DIM>
 struct T1SwapInfo
 {
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mLocation;
+        archive & mPreSwapEdge;
+        archive & mPostSwapEdge;
+    }
+
+    T1SwapInfo()
+    {};
+
+    ~T1SwapInfo()
+    {};
+
     c_vector<double, SPACE_DIM> mLocation;
+
+    //Vector from one node of the edge to the other
     c_vector<double, SPACE_DIM> mPreSwapEdge;
+
+    //Vector from one node of the edge to the other
     c_vector<double, SPACE_DIM> mPostSwapEdge;
 };
 /**
@@ -36,6 +62,26 @@ struct T1SwapInfo
 template<unsigned int SPACE_DIM>
 struct T2SwapInfo
 {
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mCellId;
+        archive & mLocation;
+    }
+
+    T2SwapInfo()
+    {};
+
+    ~T2SwapInfo()
+    {};
     unsigned int mCellId;
     c_vector<double, SPACE_DIM> mLocation;
 };
@@ -43,6 +89,25 @@ struct T2SwapInfo
 template<unsigned int SPACE_DIM>
 struct T3SwapInfo
 {
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mLocation;
+    }
+
+    T3SwapInfo()
+    {};
+    ~T3SwapInfo()
+    {};
+
     c_vector<double, SPACE_DIM> mLocation;
 };
 
@@ -56,6 +121,30 @@ struct T3SwapInfo
 template<unsigned int SPACE_DIM>
 struct CellDivisionInfo
 {
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mLocation;
+        archive & mDaughterLocation1;
+        archive & mDaughterLongAxis1;
+        archive & mDaughterLocation2;
+        archive & mDaughterLongAxis2;
+        archive & mDivisionAxis;
+    }
+
+    CellDivisionInfo()
+    {};
+
+    ~CellDivisionInfo()
+    {};
     c_vector<double, SPACE_DIM> mLocation;
     c_vector<double, SPACE_DIM> mDaughterLocation1;
     c_vector<double, SPACE_DIM> mDaughterLongAxis1;
@@ -79,21 +168,32 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        /*archive & mT1Swaps;
+        archive & mT1Swaps;
         archive & mT2Swaps;
         archive & mT3Swaps;
-        archive & mCellDivisions;*/
+        archive & mCellDivisions;
+        archive & mEdgeOperations;
     }
+
+    // Storage for T1 swap info
     std::vector<T1SwapInfo<SPACE_DIM> > mT1Swaps;
+    // Storage for T2 swap info
     std::vector<T2SwapInfo<SPACE_DIM> > mT2Swaps;
+    // Storage for T3 swap info
     std::vector<T3SwapInfo<SPACE_DIM> > mT3Swaps;
+    // Storage for cell division info
     std::vector<CellDivisionInfo<SPACE_DIM> > mCellDivisions;
 
+    // Stores all mesh operations
     std::vector<EdgeOperation*> mEdgeOperations;
 
+    // Pointer to edge handler
     EdgeHelper<SPACE_DIM> *mpEdgeHelper;
 
 public:
+    /**
+     * Default constructor/destructors. Do noething
+     */
     VertexMeshOperationRecorder();
     ~VertexMeshOperationRecorder();
 

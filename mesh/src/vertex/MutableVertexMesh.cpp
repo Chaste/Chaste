@@ -560,6 +560,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                pElement->GetNodeLocalIndex(division_node_global_indices[0]),
                                                pElement->GetNodeLocalIndex(division_node_global_indices[1]),
                                                placeOriginalElementBelow);
+
     //Record cell division info
     CellDivisionInfo<SPACE_DIM> division_info;
     division_info.mLocation = centroid;
@@ -576,8 +577,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     division_info.mDivisionAxis = axisOfDivision;
     mOperationRecorder.RecordCellDivisionInfo(division_info);
 
-    // Re-build edges when division is performed
-    pElement->RebuildEdges();
+
 
     if (mTrackMeshOperations)
     {
@@ -730,7 +730,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
             }
         }
     }
-    pElement->BuildEdges();
+    // Re-build edges when division is performed
+    this->mElements[new_element_index]->RebuildEdges();
+    pElement->RebuildEdges();
     return new_element_index;
 }
 

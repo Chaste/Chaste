@@ -150,11 +150,13 @@ public:
             TS_ASSERT(element->CheckEdgesAreValid());
         }
 
+        auto recorder = honeycombMesh->GetOperationRecorder();
         // Count edge operations
-        printf("Num swaps performd: %i with num edge operations: %lu \n",numSwapsPerformed, honeycombMesh->GetEdgeOperations().size());
+        printf("Num swaps performd: %i with num edge operations: %lu \n",numSwapsPerformed,
+               recorder->GetEdgeOperations().size());
 
-        TS_ASSERT(honeycombMesh->GetEdgeOperations().size() == 8);
-        for (auto edgeOperation: honeycombMesh->GetEdgeOperations())
+        TS_ASSERT(recorder->GetEdgeOperations().size() == 8);
+        for (auto edgeOperation: recorder->GetEdgeOperations())
         {
             TS_ASSERT(edgeOperation->GetOperation() != EDGE_OPERATION_DIVIDE);
         }
@@ -218,8 +220,9 @@ public:
             TS_ASSERT(element->CheckEdgesAreValid());
         }
 
-        printf("Num edge operations: %lu \n", honeycombMesh->GetEdgeOperations().size());
-        auto edgeOperations = honeycombMesh->GetEdgeOperations();
+        auto recorder = honeycombMesh->GetOperationRecorder();
+        printf("Num edge operations: %lu \n", recorder->GetEdgeOperations().size());
+        auto edgeOperations = recorder->GetEdgeOperations();
 
         // Only one divide operation
         TS_ASSERT(edgeOperations.size() == 1);
@@ -227,7 +230,7 @@ public:
 
         // Test edge remapping data for the old cell
         {
-            auto edgeRemap = edgeOperations[0]->GetNewEdges();
+            auto edgeRemap = edgeOperations[0]->GetRemapInfo();
             auto elem = element0;
 
             TS_ASSERT(edgeRemap->GetEdgesMapping().size() == elem->GetNumEdges());
@@ -276,7 +279,7 @@ public:
 
         // Test edge remapping data for the new cell
         {
-            auto edgeRemap = edgeOperations[0]->GetNewEdges2();
+            auto edgeRemap = edgeOperations[0]->GetRemapInfo2();
             auto elem = newElem;
 
             TS_ASSERT(edgeRemap->GetEdgesMapping().size() == elem->GetNumEdges());

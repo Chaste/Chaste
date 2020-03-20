@@ -38,6 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include "EdgeRemapInfo.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 
 enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
@@ -61,7 +64,30 @@ private:
     EdgeRemapInfo* mpRemapInfo2;
 
     bool mIsElementIndexRemapped;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mOperation;
+        archive & mElementIndex;
+        archive & mElementIndex2;
+        archive & mIsElementIndexRemapped;
+        archive & mpRemapInfo;
+        archive & mpRemapInfo2;
+    }
 public:
+    /**
+     * Default constructor. Here for boost serialization purposes
+     */
+    EdgeOperation();
 
     /**
      * Constructor for add, split, node and edge merge operations

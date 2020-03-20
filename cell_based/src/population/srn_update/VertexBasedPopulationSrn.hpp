@@ -78,7 +78,7 @@ private:
     VertexBasedCellPopulation<DIM>* mpCellPopulation;
 public:
     /**
-     * Default constructor
+     * Default constructor/destructor
      */
     VertexBasedPopulationSrn();
     ~VertexBasedPopulationSrn();

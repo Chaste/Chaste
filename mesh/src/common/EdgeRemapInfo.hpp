@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef EDGEREMAPINFO_HPP_
 #define EDGEREMAPINFO_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
+
 #include <vector>
 
 /**
@@ -46,7 +50,7 @@ private:
     /**
      * Contains a mapping to the old local edge indices. Negative value means a new edge
      */
-    const std::vector<long int> mEdgesMapping;
+    std::vector<long int> mEdgesMapping;
 
     /**
      * Status
@@ -56,7 +60,7 @@ private:
      * 3 Edge above or below the current edge was deleted
      * 4 Edge above has been merged into the current one
      */
-    const std::vector<unsigned int> mEdgeStatus;
+    std::vector<unsigned int> mEdgeStatus;
 
     /**
      * Determines how close the new node on the split edges is to the previous (lower) node
@@ -64,9 +68,40 @@ private:
      * and value of 1 means that its at the upper node of the edge to be split.
      */
     std::vector<double> mSplitProportions;
-public:
 
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mEdgesMapping;
+        archive & mEdgeStatus;
+        archive & mSplitProportions;
+    }
+public:
+    /**
+     * Default constructor. Does nothing.
+     */
+    EdgeRemapInfo();
+
+    /**
+     * Constructor for edge remapping.
+     * @param edgesMapping the map between the new edge indices and their local index in the element prior
+     * to rearrangement
+     * @param edgesStatus status of the edges in the element
+     */
     EdgeRemapInfo(const std::vector<long int> &edgesMapping, const std::vector<unsigned int> &edgesStatus);
+
+    /**
+     * Here for boost serialization
+     */
+    ~EdgeRemapInfo();
 
     /**
      * Contains a mapping to the old local edges index. Negative value means a new edge

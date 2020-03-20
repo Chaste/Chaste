@@ -35,12 +35,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EdgeRemapInfo.hpp"
 
+EdgeRemapInfo::EdgeRemapInfo()
+{}
+
 EdgeRemapInfo::EdgeRemapInfo(const std::vector<long int> &edgesMapping, const std::vector<unsigned int> &edgesStatus)
 :
 mEdgesMapping(edgesMapping),
 mEdgeStatus(edgesStatus)
 {}
 
+EdgeRemapInfo::~EdgeRemapInfo()
+{}
 
 std::vector<long int> EdgeRemapInfo::GetEdgesMapping() const
 {
@@ -61,3 +66,7 @@ void EdgeRemapInfo::SetSplitProportions(const std::vector<double> thetas)
 {
     mSplitProportions = thetas;
 }
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+CHASTE_CLASS_EXPORT(EdgeRemapInfo)

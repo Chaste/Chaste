@@ -36,6 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedPopulationSrn.hpp"
 template <unsigned DIM>
 VertexBasedPopulationSrn<DIM>::VertexBasedPopulationSrn()
+:
+mpCellPopulation(nullptr)
+{}
+
+template <unsigned DIM>
+VertexBasedPopulationSrn<DIM>::~VertexBasedPopulationSrn()
 {}
 
 template <unsigned DIM>

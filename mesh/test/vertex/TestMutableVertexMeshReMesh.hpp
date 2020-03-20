@@ -1508,17 +1508,22 @@ public:
         }
 
         // Test T3 swap Location tracking
-        std::vector< c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
-        TS_ASSERT_EQUALS(t3_locations.size(), 2u);
+        std::vector<T3SwapInfo<2> > swap_info
+                            = mesh.GetOperationRecorder()->GetT3SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 2u);
+        std::vector< c_vector<double, 2> > t3_locations;
+        t3_locations.push_back(swap_info[0].mLocation);
+        t3_locations.push_back(swap_info[1].mLocation);
+
         TS_ASSERT_DELTA(t3_locations[0][0], 1.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[0][1], 0.5, 1e-6);
         TS_ASSERT_DELTA(t3_locations[1][0], 0.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[1][1], 0.5, 1e-6);
 
         // Test T3 swap Location clearing
-        mesh.ClearLocationsOfT3Swaps();
-        t3_locations = mesh.GetLocationsOfT3Swaps();
-        TS_ASSERT_EQUALS(t3_locations.size(), 0u);
+        mesh.GetOperationRecorder()->ClearT3SwapsInfo();
+        swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();;
+        TS_ASSERT_EQUALS(swap_info.size(), 0u);
     }
 
     void TestPerformT3SwapException()
