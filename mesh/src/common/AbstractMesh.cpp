@@ -57,8 +57,6 @@ AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
         delete mNodes[i];
     }
 
-
-
     if (mpDistributedVectorFactory)
     {
         delete mpDistributedVectorFactory;
