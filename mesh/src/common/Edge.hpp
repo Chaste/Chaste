@@ -38,7 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <set>
 #include <vector>
-
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/set.hpp>
 #include "Node.hpp"
 
 typedef std::pair<unsigned ,unsigned> UIndexPair;
@@ -62,7 +63,18 @@ private:
 
     /** Elements that this edge belongs to **/
     std::set<unsigned> mElementIndices;
-
+    friend class boost::serialization::access;
+    /**
+         * Archive the member variables.
+         *
+         * @param archive the archive
+         * @param version the current version of this class
+         */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mElementIndices;
+    }
 public:
 
     /**
@@ -224,5 +236,50 @@ public:
      */
     bool operator==(const Edge<SPACE_DIM>& edge) const;
 };
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(Edge)
 
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a Node.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void save_construct_data(
+    Archive & ar, const Edge<SPACE_DIM> * t, const unsigned int file_version)
+{
+    const Node<SPACE_DIM>* const p_Node0 = t->GetNode(0);
+    ar & p_Node0;
+    const Node<SPACE_DIM>* const p_Node1 = t->GetNode(1);
+    ar & p_Node1;
+
+    unsigned index = t->GetIndex();
+    ar << index;
+}
+
+/**
+ * De-serialize constructor parameters and initialize an Edge.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void load_construct_data(
+    Archive & ar, Edge<SPACE_DIM> * t, const unsigned int file_version)
+{
+    // Retrieve data from archive required to construct new instance of Edge
+    Node<SPACE_DIM>* p_Node0;
+    ar & p_Node0;
+    Node<SPACE_DIM>* p_Node1;
+    ar & p_Node1;
+
+    unsigned index;
+    ar >> index;
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)Edge<SPACE_DIM>(index, p_Node0, p_Node1);
+}
+
+}
+} // namespace ...
 #endif //EDGE_HPP_
