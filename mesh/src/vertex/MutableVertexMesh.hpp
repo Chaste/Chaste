@@ -551,8 +551,6 @@ public:
     unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
                                          bool placeOriginalElementBelow=false);
 
-
-
     /**
      * Divide an element along a specified axis.
      *

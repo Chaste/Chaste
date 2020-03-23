@@ -148,8 +148,14 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
+    /**
+     * Informs all edges forming this element that they are in this element.
+     */
     void RegisterWithEdges();
 
+    /**
+     * Rebuilds edges in this element
+     */
     void RebuildEdges();
 
     /**

@@ -112,7 +112,9 @@ public:
                   unsigned elementIndex2,
                   EdgeRemapInfo* pRemapInfo,
                   EdgeRemapInfo* pRemapInfo2);
-
+    /**
+     * Destructor
+     */
     ~EdgeOperation();
 
     /**

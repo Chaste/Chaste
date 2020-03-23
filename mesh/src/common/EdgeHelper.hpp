@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Edge.hpp"
 #include "EdgeOperation.hpp"
 #include "EdgeRemapInfo.hpp"
+
 /**
  * Class for facilitating the creation and management of unique edges in a vertex mesh
  */

@@ -577,8 +577,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     division_info.mDivisionAxis = axisOfDivision;
     mOperationRecorder.RecordCellDivisionInfo(division_info);
 
-
-
     if (mTrackMeshOperations)
     {
         // Record edge rearrangements in the daughter cells ...

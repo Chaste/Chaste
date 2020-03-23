@@ -45,17 +45,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef std::pair<unsigned ,unsigned> UIndexPair;
 
 /**
- * An edge in a finite element mesh
+ * An edge in a finite element mesh.
  */
 template<unsigned SPACE_DIM>
 class Edge
 {
-
 private:
 
     /** Index of this edge within the mesh **/
     unsigned mIndex;
 
+    /** Indicates whether this edge is deleted from the mesh **/
     bool mIsDeleted;
 
     /** Nodes that form this edge **/
@@ -65,11 +65,11 @@ private:
     std::set<unsigned> mElementIndices;
     friend class boost::serialization::access;
     /**
-         * Archive the member variables.
-         *
-         * @param archive the archive
-         * @param version the current version of this class
-         */
+     * Archive the member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {

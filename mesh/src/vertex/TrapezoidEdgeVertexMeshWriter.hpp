@@ -80,8 +80,8 @@ struct MeshWriterIterators;
  *   \ __ /         \ __ /
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class TrapezoidEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>{
-
+class TrapezoidEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>
+{
 private:
 
     /**
@@ -95,7 +95,6 @@ private:
 ///\todo Merge into VtkMeshWriter (#1076)
     vtkUnstructuredGrid* mpVtkUnstructedMesh;
 #endif //CHASTE_VTK
-
 
 public:
 
@@ -140,8 +139,6 @@ public:
     ~TrapezoidEdgeVertexMeshWriter();
 
     void WriteFiles() override;
-
-
 };
 
 

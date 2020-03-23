@@ -296,7 +296,6 @@ public:
      */
     unsigned GetNumEdges() const;
 
-
     /**
      * Gets a set of element indices that neighours the element at the specified edge
      * @param localIndex Local index of the edge in this element
@@ -317,7 +316,6 @@ public:
      * @return -1 if an edge was not found
      */
     long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
-
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/

@@ -41,6 +41,9 @@ struct T1SwapInfo
         archive & mPostSwapEdge;
     }
 
+    /**
+     * Default constructor
+     */
     T1SwapInfo()
     {};
 
@@ -76,7 +79,9 @@ struct T2SwapInfo
         archive & mCellId;
         archive & mLocation;
     }
-
+    /**
+     * Default constructor/destructor so that boos does not throw errors
+     */
     T2SwapInfo()
     {};
 
@@ -103,6 +108,9 @@ struct T3SwapInfo
         archive & mLocation;
     }
 
+    /**
+     * Default constructor/destructor so that boos does not throw errors
+     */
     T3SwapInfo()
     {};
     ~T3SwapInfo()
@@ -140,6 +148,9 @@ struct CellDivisionInfo
         archive & mDivisionAxis;
     }
 
+    /**
+     * Default constructor/destructor so that boos does not throw errors
+     */
     CellDivisionInfo()
     {};
 
