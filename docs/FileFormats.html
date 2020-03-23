@@ -257,7 +257,15 @@
   </dd>
   <dt>.vizelements</dt>
   <dd>
-    The nodes associated with each element at each timestep in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time element1_node1 element1_node2 element1_node3 ... elementn_node1 elementn_node2 elementn_node3</tt>.
+    The nodes associated with each element at each timestep in
+    a <tt>CellBasedSimulation</tt>.
+    For a mesh-based simulation
+    (visualised with Visualize2dCentreCells) where elements have
+    exactly 3 nodes, each line has the form <tt>time element1_node1 element1_node2 element1_node3 ... elementn_node1 elementn_node2 elementn_node3</tt>.
+    For a vertex or Potts simulation
+    (visualised with Visualize2dVertexCells) where elements have varying
+    numbers of node, each line has the form <tt>time element1_size
+    element1_node1 element1_node2 element1_node3 element1_node4 ... elementn_size elementn_node1 elementn_node2 elementn_node3</tt>.
   </dd>
   <dt>.vizlocationindices</dt>
   <dd>
