@@ -127,9 +127,10 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
     const std::vector<double> split_proportions = pEdgeChange->GetSplitProportions();
     const unsigned int n_edges = edge_mapping.size();
     std::vector<unsigned int> shrunk_edges;
-
+  
     // Go through the edges, check its status and the index corresponding to the edge status before
     // rearrangement
+    // Go through the SRN model
     for (unsigned i = 0; i < n_edges; i++)
     {
         //The remapIndex, if +ve refers to the SRN index of the oldModel, if -ve then it's a new edge
@@ -142,7 +143,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         //3 - Edge below or above the edge that was deleted due to node merging
         //4 - Edge above was merged into this edge
         const unsigned int remapStatus = pEdgeChange->GetEdgesStatus()[i];
-
+      
         if ((remapStatus == 0 || remapStatus == 1) && remapIndex < 0)
         {
             EXCEPTION("Remap index cannot be negative when it's a direct remap or an edge split");
@@ -203,7 +204,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         if (remapStatus == 2)
             new_edge_srn[i]->InitialiseDaughterCell();
     }
-
+  
     //For the case when edge quantities are returned into interior when edge shrinks due to node merging
     boost::shared_ptr<AbstractSrnModel> interior_srn
     =boost::shared_ptr<AbstractSrnModel>(pSrnCell->GetInteriorSrn());
@@ -217,6 +218,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 
     pSrnCell->AddEdgeSrn(new_edge_srn);
     assert(n_edges == pSrnCell->GetNumEdgeSrn());
+    assert(n_edges ==pSrnCell->GetNumEdgeSrn());
 }
 
 template class VertexBasedPopulationSrn<1>;
