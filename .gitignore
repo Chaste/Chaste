@@ -10,6 +10,7 @@ build/*
 
 # Backups, SCons databases, core dumps, and temporary 'stuff'
 *~
+*.DS_Store
 .sconsign*
 core.*
 *.avi

@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2019, University of Oxford.
+# Copyright (c) 2005-2020, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -30,17 +30,13 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.5.1)
 
-# This statement can be removed when cmake_minimum_required >= 3.0
-if (POLICY CMP0048)
-    cmake_policy (SET CMP0048 NEW)
-endif ()
-
-# This statement can be removed when cmake_minimum_required >= 3.3
-if (POLICY CMP0062)
-    cmake_policy (SET CMP0062 NEW)
-endif ()
+# Set standard to C++14. Note that CMake < 3.6 does not know how to set the standard flag for the Intel compiler, so
+# the ChasteCompilerFlags.cmake also sets the --std=c++14 flag, too.
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include (EnsureOutOfSourceBuild)
@@ -53,9 +49,11 @@ message ("\n####################################")
 message ("# Setting compilers and build type")
 message ("####################################\n")
 
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste)
-set (Chaste_VERSION_MAJOR 2018 CACHE STRING "Chaste major version number")
+project (Chaste VERSION 2019.1)
+set (Chaste_VERSION_MAJOR 2019 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 include (ChasteHostOperatingSystem)
