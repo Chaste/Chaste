@@ -175,7 +175,7 @@ public:
         TS_ASSERT_EQUALS(static_cast<FixedG1GenerationalCellCycleModel*>(p_cell->GetCellCycleModel())->GetGeneration(), 0u);
 
         // Test cell property collection
-        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 5u);
+        TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().GetSize(), 6u);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_label), true);
         TS_ASSERT_EQUALS(p_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);
@@ -236,7 +236,7 @@ public:
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0.0, 1e-9);
 
         // Test cell property collection has been inherited correctly during division
-        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 5u);
+        TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().GetSize(), 6u);
 
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_wild_type), true);
         TS_ASSERT_EQUALS(p_daughter_cell->rGetCellPropertyCollection().HasProperty(p_apc2_mutation), false);

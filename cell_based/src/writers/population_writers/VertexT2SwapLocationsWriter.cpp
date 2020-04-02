@@ -70,22 +70,21 @@ void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    std::vector< c_vector<double, SPACE_DIM> > t2_swap_locations = pCellPopulation->GetLocationsOfT2Swaps();
-    std::vector< unsigned > t2_swap_ids = pCellPopulation->GetCellIdsOfT2Swaps();
+    std::vector<T2SwapInfo<SPACE_DIM> > t2_swap_info
+        = pCellPopulation->rGetMesh().GetOperationRecorder()->GetT2SwapsInfo();
 
-    *this->mpOutStream << t2_swap_locations.size() << "\t";
-    assert( t2_swap_locations.size() == t2_swap_ids.size());
+    *this->mpOutStream << t2_swap_info.size() << "\t";
 
-    for (unsigned index = 0;  index < t2_swap_locations.size(); index++)
+    for (unsigned index = 0;  index < t2_swap_info.size(); index++)
     {
-        *this->mpOutStream << t2_swap_ids[index] << "\t";
+        *this->mpOutStream << t2_swap_info[index].mCellId << "\t";
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
-            *this->mpOutStream << t2_swap_locations[index][i] << "\t";
+            *this->mpOutStream <<  t2_swap_info[index].mLocation[i] << "\t";
         }
     }
 
-    pCellPopulation->ClearLocationsAndCellIdsOfT2Swaps();
+    pCellPopulation->rGetMesh().GetOperationRecorder()->ClearT2SwapsInfo();
 }
 
 // Explicit instantiation
