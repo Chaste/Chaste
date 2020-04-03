@@ -39,6 +39,7 @@ vertex/TestVertexElement.hpp
 vertex/TestVertexMesh.hpp
 vertex/TestVertexMeshReader.hpp
 vertex/TestVertexMeshWriter.hpp
+vertex/TestTriangleEdgeVertexMeshWriter.hpp
 vertex/TestVoronoiVertexMeshGenerator.hpp
 writer/TestMeshWriters.hpp
 writer/TestXmlMeshWriters.hpp

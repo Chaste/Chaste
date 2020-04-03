@@ -1626,7 +1626,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         c_vector<double, 2> vec_data = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        for(auto& component : vec_data)
+        for (auto& component : vec_data)
         {
             TS_ASSERT_EQUALS(component, DOUBLE_UNSET);
         }

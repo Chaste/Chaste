@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #include "Node.hpp"
+#include "Edge.hpp"
+#include "EdgeHelper.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "ProcessSpecificArchive.hpp"
 #include "ChasteCuboid.hpp"
@@ -97,6 +99,9 @@ protected:  // Give access of these variables to subclasses
 
     /** Vector of pointers to boundary nodes in the mesh. */
     std::vector<Node<SPACE_DIM> *> mBoundaryNodes;
+
+    /** Vector of pointers to edges in the mesh **/
+    EdgeHelper<SPACE_DIM> mEdges;
 
     /**
      * DistributedVectorFactory capable of reproducing the
@@ -175,6 +180,20 @@ public:
      * Virtual destructor, since this class has virtual methods.
      */
     virtual ~AbstractMesh();
+
+
+    /**
+     * Gets the number of edges in the mesh
+     * @return The number of edges in the mesh
+     */
+    unsigned GetNumEdges() const;
+
+    /**
+     *
+     * @param Global index of the edge
+     * @return Pointer to the edge at the index
+     */
+    Edge<SPACE_DIM> * GetEdge(unsigned index) const;
 
     /**
      * @return the number of nodes that are actually in use.
@@ -539,6 +558,8 @@ typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator AbstractMesh<ELEMENT
 {
     return NodeIterator(*this, mNodes.end());
 }
+
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>& AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator::operator*()

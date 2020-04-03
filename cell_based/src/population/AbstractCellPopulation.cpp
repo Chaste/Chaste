@@ -442,6 +442,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultCellMutationState
     }
 }
 
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+std::set<std::pair<unsigned, unsigned>> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringEdgeIndices(CellPtr cell, unsigned pEdgeLocalIndex)
+{
+    return std::set<std::pair<unsigned, unsigned>>();
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfCellPopulation()
 {
@@ -834,6 +840,7 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonA
 
     return non_apoptotic_cell_present;
 }
+
 
 // Explicit instantiation
 template class AbstractCellPopulation<1,1>;

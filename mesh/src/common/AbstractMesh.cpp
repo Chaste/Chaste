@@ -56,10 +56,21 @@ AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
     {
         delete mNodes[i];
     }
+
     if (mpDistributedVectorFactory)
     {
         delete mpDistributedVectorFactory;
     }
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdges.GetNumEdges();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+Edge<SPACE_DIM> * AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const {
+    return mEdges[index];
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
