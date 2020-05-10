@@ -218,7 +218,6 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 
     pSrnCell->AddEdgeSrn(new_edge_srn);
     assert(n_edges == pSrnCell->GetNumEdgeSrn());
-    assert(n_edges ==pSrnCell->GetNumEdgeSrn());
 }
 
 template class VertexBasedPopulationSrn<1>;
