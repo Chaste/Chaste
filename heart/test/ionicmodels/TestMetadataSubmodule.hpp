@@ -122,7 +122,7 @@ public:
 
     void TestForPendingUpdatesToSubmodule()
     {
-        std::string latest_commit_hash = "5efca2401dd3e315af9496f3bd3167829498fd1e";
+        std::string latest_commit_hash = "e5376c254ae3ea1642fa5cc3838f150ebd2b7b29";
 
         FileFinder chaste_source("", RelativeTo::ChasteSourceRoot);
         std::stringstream command;
