@@ -59,3 +59,4 @@ _local/
 /apps/src/MeshConvert
 
 \.vscode/
+appredict_lookup_table_manifest.txt
