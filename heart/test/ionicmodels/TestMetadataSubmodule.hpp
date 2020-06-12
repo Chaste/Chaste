@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Then type 
  * git submodule
  * and copy the commit hash into the member variable in the below test. If anyone runs the
- * latest version of the code, it will fail to remind them to do a `git submodule update`.
+ * latest version of the code, then it will fail to remind them to do a `git submodule update`.
  * 
  */
 class TestMetadataSubmodule : public CxxTest::TestSuite
