@@ -74,7 +74,13 @@ http://www.CellML.org/
       <variable name="R" units="millijoule_per_mole_kelvin" initial_value="8314" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="306.15" public_interface="out"/>
       <variable name="F" units="coulomb_per_mole" initial_value="96487" public_interface="out"/>
-      <variable name="Cm" units="nanoF" initial_value="0.05"/>
+      <variable name="Cm" units="nanoF" initial_value="0.05" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="time" units="second" public_interface="in"/>
       <variable name="i_Na" units="picoA" public_interface="in"/>
       <variable name="i_Ca_L" units="picoA" public_interface="in"/>
@@ -1868,7 +1874,13 @@ http://www.CellML.org/
    </component>
    <component name="intracellular_ion_concentrations">
       <variable name="Na_i" units="millimolar" initial_value="8.5547" public_interface="out"/>
-      <variable name="Ca_i" units="millimolar" initial_value="6.729e-5" public_interface="out"/>
+      <variable name="Ca_i" units="millimolar" initial_value="6.729e-5" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="K_i" units="millimolar" initial_value="129.435" public_interface="out"/>
       <variable name="Ca_d" units="millimolar" initial_value="7.2495e-5" public_interface="out"/>
       <variable name="phi_Na_en" units="picoA" initial_value="-1.68" public_interface="out"/>
