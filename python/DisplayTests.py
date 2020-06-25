@@ -407,7 +407,7 @@ def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
        _linkBuildType(buildType, revision), machine, targets, build_log, extra_cols))
     
     # Display the status of each test suite, in alphabetical order
-    testsuites = testsuite_status.keys()
+    testsuites = list(testsuite_status.keys())
     testsuites.sort()
     bgcols = ["white", "#eedd82"]
     bgcol_index = 0
@@ -477,7 +477,7 @@ def buildType(req, buildType, revision=None):
     <p>Library/tool versions requested:</p>
     <ul>
 """
-        for lib, version in prefs.iteritems():
+        for lib, version in prefs.items():
             page_body += "    <li>%s: %s</li>\n" % (lib, version)
     page_body += "\n  </ul>\n"
     return _header() + page_body + _footer()
@@ -700,7 +700,7 @@ def _handle_renamed_test_suites(runTimes, graphs={}):
             leaf_name = suite_name[1+suite_name.rfind('-'):]
             if not leaf_name in name_map and (leaf_name in runTimes or leaf_name in graphs):
                 name_map[leaf_name] = suite_name
-    for leaf_name, full_name in name_map.iteritems():
+    for leaf_name, full_name in name_map.items():
         if leaf_name in runTimes:
             runTimes[full_name].update(runTimes[leaf_name])
             del runTimes[leaf_name]
@@ -816,7 +816,7 @@ def _importCode(code, name, add_to_sys_modules=0):
     
     module = imp.new_module(name)
     
-    exec code in module.__dict__
+    exec(code) in module.__dict__
     if add_to_sys_modules:
         sys.modules[name] = module
         
@@ -1122,7 +1122,7 @@ def _overallStatus(statuses, build):
     total = len(statuses)
     failed, warnings = 0, 0
     components = set()
-    for testsuite, status in statuses.iteritems():
+    for testsuite, status in statuses.items():
         colour = _statusColour(status, build)
         if colour == 'red':
             failed += 1
@@ -1235,7 +1235,7 @@ def _parseWinBuildTimings(logfile):
            'Test running': re.compile(r'.*?\.+.*?([0-9.]+) sec')}
     times = dict([(k, 0.0) for k in res])
     for line in logfile:
-        for key, regexp in res.iteritems():
+        for key, regexp in res.items():
             m = regexp.match(line)
             if m:
                 multiplier = 1
@@ -1264,7 +1264,7 @@ def _getCcFlags(build):
 
 def _buildLinkQuery(**parameters):
     """Build the query string for a hyperlink using the given key-value parameters."""
-    return '&amp;'.join('%s=%s' % pair for pair in sorted(parameters.iteritems()))
+    return '&amp;'.join('%s=%s' % pair for pair in sorted(parameters.items()))
 
 def _linkRecent(text, type, start, **filters):
     """Return a link tag to the recent tests page, starting at the given position."""
@@ -1404,8 +1404,8 @@ if __name__ == '__main__':
     _standalone = True
     import sys, BuildTypes, socket
     if len(sys.argv) < 2:
-        print "Syntax error."
-        print "Usage:",sys.argv[0],"<test output dir> [<build type>]"
+        print("Syntax error.")
+        print("Usage:",sys.argv[0],"<test output dir> [<build type>]")
         sys.exit(1)
     _dir = sys.argv[1]
     if len(sys.argv) > 2:
@@ -1421,15 +1421,15 @@ if __name__ == '__main__':
     _trac_url = 'https://chaste.cs.ox.ac.uk/trac/'
     _our_url = 'https://chaste.cs.ox.ac.uk/tests.py'
 
-    _fp = file(os.path.join(_dir, 'index.html'), 'w')
+    _fp = open(os.path.join(_dir, 'index.html'), 'w')
 
-    print >>_fp,_header('Test Summary For Local ' + _build_type + ' Build')
-    print >>_fp,'<h1>Test Summary For Local Build</h1>'
-    print >>_fp,'<p>Displaying info for tests with output stored in',_dir,'</p>'
-    print >>_fp,_summary(None, 'standalone', 'working copy', _machine, _build_type)
-    print >>_fp,_footer()
+    _fp.write(_header('Test Summary For Local ' + _build_type + ' Build'))
+    _fp.write('<h1>Test Summary For Local Build</h1>')
+    _fp.write('<p>Displaying info for tests with output stored in '+_dir+'</p>')
+    _fp.write(_summary(None, 'standalone', 'working copy', _machine, _build_type))
+    _fp.write(_footer())
     _fp.close()
 
-    print "Test summary generated in", 'file://' + os.path.abspath(os.path.join(_dir, 'index.html'))
-    print "Overall test status:", _overall_status
+    print("Test summary generated in", 'file://' + os.path.abspath(os.path.join(_dir, 'index.html')))
+    print("Overall test status:", _overall_status)
 

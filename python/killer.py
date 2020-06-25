@@ -59,7 +59,7 @@ else:
 our_uid = os.getuid()
 our_pid = os.getpid()
 
-print "Killing processes owned by", our_uid, "in", kill_dir
+print("Killing processes owned by", our_uid, "in", kill_dir)
 
 if psutil:
     Process = psutil.Process
@@ -137,10 +137,10 @@ for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         if len(cmdline) > 1 and 'scons' in cmdline[1]:
-            print "SCons is running as PID", pid
+            print("SCons is running as PID", pid)
             if not sim:
                 try_kill(pid, signal.SIGTERM)
-                print "  ** Killing (sent SIGTERM)"
+                print("  ** Killing (sent SIGTERM)")
                 # Now sleep for a bit to let it die
                 time.sleep(10) # seconds
                 break
@@ -150,10 +150,10 @@ for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         if len(cmdline) > 2 and 'builder' in cmdline[1] and 'no-lock' in cmdline[2]:
-            print "Builder is running as PID", pid
+            print("Builder is running as PID", pid)
             if not sim:
                 try_kill(pid, signal.SIGUSR1)
-                print "  ** Poking (sent SIGUSR1)"
+                print("  ** Poking (sent SIGUSR1)")
                 # Now sleep for a bit to let it move files
                 time.sleep(5) # seconds
                 break
@@ -162,7 +162,7 @@ for pid in get_procs():
 for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
-        print pid, "is running from our dir as", cmdline[0:3]
+        print(pid, "is running from our dir as", cmdline[0:3])
         if not sim:
             try_kill(pid, signal.SIGKILL)
-            print "  ** Killing (sent SIGKILL)"
+            print("  ** Killing (sent SIGKILL)")
