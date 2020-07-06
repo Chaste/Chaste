@@ -235,7 +235,7 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     # Now output the C++ code for all files
     output.append('\n\n= Code =\nThe full code is given below\n')
     AddCodeOutput(os.path.basename(test_file_path), test_code, output)
-    for filename, code in other_code.iteritems():
+    for filename, code in other_code.items():
         AddCodeOutput(filename, code, output)
     return ''.join(output)
 
@@ -274,7 +274,7 @@ if __name__ == '__main__':
         # Read from stdin (pipe mode)
         in_file = sys.stdin
     elif test_file[-3:] not in ['hpp', '.py'] or os.path.basename(test_file)[:4] != 'Test':
-        print >>sys.stderr, "Syntax error:", test_file, "does not appear to be a test file"
+        print("%s Syntax error: %s does not appear to be a test file" % (sys.stderr, test_file))
         sys.exit(1)
     else:
         in_file = open(test_file)

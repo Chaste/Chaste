@@ -1405,7 +1405,7 @@ if __name__ == '__main__':
     import sys, BuildTypes, socket
     if len(sys.argv) < 2:
         print("Syntax error.")
-        print("Usage:",sys.argv[0],"<test output dir> [<build type>]")
+        print("Usage: %s <test output dir> [<build type>]" % sys.argv[0])
         sys.exit(1)
     _dir = sys.argv[1]
     if len(sys.argv) > 2:
@@ -1430,6 +1430,6 @@ if __name__ == '__main__':
     _fp.write(_footer())
     _fp.close()
 
-    print("Test summary generated in", 'file://' + os.path.abspath(os.path.join(_dir, 'index.html')))
-    print("Overall test status:", _overall_status)
+    print("Test summary generated in file://%s" % os.path.abspath(os.path.join(_dir, 'index.html')))
+    print("Overall test status: %s" % _overall_status)
 

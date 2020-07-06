@@ -100,13 +100,13 @@ class BuildType(object):
 
     def DumpDebugInfo(self):
         """Print out some useful build system debugging information."""
-        print("Build class", self.__class__.__name__, "from build type", self.build_type)
-        print("Tool locations:", self.tools)
-        print("Compiler type:", self._compiler_type)
-        print("Extra CC flags:", self.CcFlags())
-        print("Extra LD flags:", self.LinkFlags())
-        print("Test packs:", self.TestPacks())
-        print("Library preferences:", self.GetPreferedVersions())
+        print("Build class %s from build type %s", (self.__class__.__name__, self.build_type))
+        print("Tool locations: %s" % self.tools)
+        print("Compiler type: %s" % self._compiler_type)
+        print("Extra CC flags: %s" % self.CcFlags())
+        print("Extra LD flags: %s" % self.LinkFlags())
+        print("Test packs: %s" % self.TestPacks())
+        print("Library preferences: %s" % self.GetPreferedVersions())
 
     def _get_cpu_flags(self):
         """Get the optional extensions supported by this system's CPUs."""
