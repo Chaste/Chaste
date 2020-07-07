@@ -453,7 +453,8 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
     }
 
     // Finally, call ReMesh if required
-    if (SimulationTime::Instance()->GetTimeStepsElapsed() % mReMeshFrequency == 0)
+    const auto numTimeSteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    if (numTimeSteps > 0 && numTimeSteps % mReMeshFrequency == 0)
     {
         mpImmersedBoundaryMesh->ReMesh();
     }
