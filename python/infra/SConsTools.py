@@ -66,9 +66,9 @@ def tsp(*args):
     """Thread-safer print, for debugging."""
     msg = ' '.join(map(str, args)) + '\n'
     try:
-        print >>fp, msg,
+        fp.write(msg)
     except:
-        print msg,
+        print(msg)
 
 # Should provide a whole-build global lock, if needed
 _lock = threading.Lock()
@@ -338,8 +338,8 @@ def DetermineLibraryDependencies(env, partialGraph):
     """
     library_mapping = env['CHASTE_LIBRARIES']
     if env['build'].debug:
-        print "Initial component dependencies:", partialGraph
-        print "Chaste libraries:", library_mapping
+        print("Initial component dependencies: %s" % partialGraph)
+        print("Chaste libraries: %s" % library_mapping)
     WHITE, GRAY, BLACK = 0, 1, 2
     PROJECT_PREFIX = 'projects/'
     full_graph = {}
@@ -414,7 +414,7 @@ def DetermineLibraryDependencies(env, partialGraph):
                 assert isinstance(dep, type(''))
                 full_graph[comp][i] = '-l' + dep
     if env['build'].debug:
-        print "Complete component dependencies:", full_graph
+        print("Complete component dependencies: %s" % full_graph)
     # Transfer results to partialGraph
     partialGraph.clear()
     partialGraph.update(full_graph)
@@ -482,8 +482,6 @@ def FindTestsToRun(env, build, BUILD_TARGETS, otherVars,
         this_comp_targets.add(comp_path)
         this_comp_targets.add(os.path.join(root_dir, comp_path))
         test_root_path = os.path.join(comp_path, 'test') + os.sep
-#        print map(str, BUILD_TARGETS)
-#        print component, project, this_comp_targets
         for targ in BUILD_TARGETS:
             targ = str(targ)
             if targ.endswith(os.sep):
@@ -505,7 +503,6 @@ def FindTestsToRun(env, build, BUILD_TARGETS, otherVars,
             else:
                 for folder in test_subset_folders:
                     testfiles.update(BuildTools.GetTestsInTestPacks('../../test', pack_names, subfolder=folder))
-#    print component, project, testfiles
     return testfiles
 
 
@@ -717,8 +714,8 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
         elif xsd_version_string.startswith('CodeSynthesis XSD XML Schema to C++ compiler'):
             xsd_version = 3 # Or 4, but we don't need the detailed version here
         else:
-            print "Unexpected XSD program found:"
-            print xsd_version_string
+            print("Unexpected XSD program found:")
+            print(xsd_version_string)
             sys.exit(1)
         # And to assist transitioning to the new builder...
         for path in glob.glob('heart/src/io/ChasteParameters*.?pp'):
@@ -816,7 +813,7 @@ def CreatePyCmlBuilder(build, buildenv):
     def RunPyCml(target, source, env):
         args = GetArgs(target, source, env)
         command = [script] + args + [str(source[0])]
-        print "Running", command
+        print("Running %s" % command)
         rc = subprocess.call(command)
         return rc
     PyCmlAction = buildenv.Action(RunPyCml)
@@ -827,7 +824,7 @@ def CreatePyCmlBuilder(build, buildenv):
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         filelist = process.communicate()[0]
         if process.returncode != 0:
-            print filelist
+            print(filelist)
             raise IOError('Failed to run PyCml; return code = ' + str(process.returncode))
         # Adjust targets to match what the script will actually create
         target = map(lambda s: s.strip(), filelist.split())
@@ -951,7 +948,6 @@ def RunAcceptanceTests(build, env, appsPath, testsPath, exes, otherVars):
     else:
         # Not found
         return
-#    print "Running acceptance tests", map(str, exes)
     tests_dir = Dir(testsPath).abspath
     output_dir = env['ENV']['CHASTE_TEST_OUTPUT']
     if not os.path.isabs(output_dir):
@@ -1105,7 +1101,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         Return("result")
     """
     if otherVars['debug']:
-        print "Executing SConscript for project", projectName
+        print("Executing SConscript for project %s" % projectName)
     # Commonly used variables
     env = CloneEnv(otherVars['env'])
     use_chaste_libs = otherVars['use_chaste_libs']
@@ -1147,7 +1143,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
                                otherVars,
                                project=projectName)
     if otherVars['debug']:
-        print "  Will run tests:", map(str, testfiles)
+        print("  Will run tests: %s" % map(str, testfiles))
 
     # Build and install the library for this project
     project_lib = test_lib = libpath = None
@@ -1258,7 +1254,7 @@ def DoComponentSConscript(component, otherVars):
         Return("result")
     """
     if otherVars['debug']:
-        print "Executing SConscript for component", component
+        print("Executing SConscript for component %s" % component)
     # Commonly used variables
     env = CloneEnv(otherVars['env'])
     use_chaste_libs = otherVars['use_chaste_libs']
@@ -1306,7 +1302,7 @@ def DoComponentSConscript(component, otherVars):
                                otherVars,
                                component=component)
     if otherVars['debug']:
-        print "  Will run tests:", map(str, testfiles)
+        print("  Will run tests: %s" % map(str, testfiles))
 
     special_objects = CheckForSpecialFiles(env, component, files, otherVars)
 

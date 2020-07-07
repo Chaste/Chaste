@@ -59,7 +59,7 @@ else:
 our_uid = os.getuid()
 our_pid = os.getpid()
 
-print("Killing processes owned by %s in %s" % (our_uid, kill_dir))
+print(("Killing processes owned by %s in %s" % (our_uid, kill_dir)))
 
 if psutil:
     Process = psutil.Process
@@ -105,7 +105,7 @@ else:
 
     def get_procs():
         """Return an iterator over running processes, yielding a Process instance for each."""
-        for pid in filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc')):
+        for pid in [pid for pid in os.listdir('/proc') if pid[0] in "0123456789"]:
             yield Process(pid)
 
 
@@ -137,7 +137,7 @@ for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         if len(cmdline) > 1 and 'scons' in cmdline[1]:
-            print("SCons is running as PID %s" % pid)
+            print(("SCons is running as PID %s" % pid))
             if not sim:
                 try_kill(pid, signal.SIGTERM)
                 print("  ** Killing (sent SIGTERM)")
@@ -150,7 +150,7 @@ for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
         if len(cmdline) > 2 and 'builder' in cmdline[1] and 'no-lock' in cmdline[2]:
-            print("Builder is running as PID %s" % pid)
+            print(("Builder is running as PID %s" % pid))
             if not sim:
                 try_kill(pid, signal.SIGUSR1)
                 print("  ** Poking (sent SIGUSR1)")
@@ -162,7 +162,7 @@ for pid in get_procs():
 for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
-        print("%s is running from our dir as %s" % (pid, cmdline[0:3]))
+        print(("%s is running from our dir as %s" % (pid, cmdline[0:3])))
         if not sim:
             try_kill(pid, signal.SIGKILL)
             print("  ** Killing (sent SIGKILL)")

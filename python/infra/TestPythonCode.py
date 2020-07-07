@@ -79,8 +79,8 @@ if sys.version_info[:2] < (2,7):
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-            print >>sys.stderr, "Called process failed; output was:"
-            print >>sys.stderr, output
+            print ("Called process failed; output was:", file=sys.stderr)
+            print (output, file=sys.stderr)
             raise subprocess.CalledProcessError(retcode, cmd)
         return output
     subprocess.check_output = check_output
@@ -254,7 +254,7 @@ def main(filepath, profile=False, lineProfile=False, numProcs=1):
     try:
         module = imp.load_module(base, file, pathname, desc)
     except ImportError:
-        print "Python module search path:", sys.path, os.environ.get('PYTHONPATH')
+        print("Python module search path: %s %s" % (sys.path, os.environ.get('PYTHONPATH')))
         raise
     finally:
         file.close()

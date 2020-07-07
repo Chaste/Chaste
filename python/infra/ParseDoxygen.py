@@ -120,8 +120,8 @@ def parse_doxygen(log_file_name, error_log_file_name, output_dir):
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print "Syntax error."
-        print "Usage:",sys.argv[0],"<log file> <error log file> <test output dir>"
+        print("Syntax error.")
+        print("Usage: %s <log file> <error log file> <test output dir>" % sys.argv[0])
         sys.exit(1)
 
     parse_doxygen(sys.argv[1], sys.argv[2], sys.argv[3])

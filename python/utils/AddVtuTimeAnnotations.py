@@ -90,10 +90,10 @@ nameTimePair is a regular expression
 lastTimeStep is calculated during an earlier pass (QueryVtuFile)
 """
 def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep, expectedVariableNames):
-    #print'--Reading from', inputFileName, 'and writing to', outputFileName
+    #print('--Reading from %s and writing to %s' % (inputFileName outputFileName))
     timevalues = range(0, lastTimeStep+1, 1)
     header_mode = True
-    out_fp = file(outputFileName, 'w')
+    out_fp = open(outputFileName, 'w')
     for line in fileinput.input(inputFileName):
         if (header_mode):
            # <UnstructuredGrid> ... or <PUnstructuredGrid>
@@ -133,14 +133,14 @@ def RenameChunks(fileName, inBase, outBase):
 if __name__ == "__main__":
     #Checking command line arguments
     if len(sys.argv) != 3:
-        print >> sys.stderr, "Usage:", sys.argv[0], "<input_vtu_file> <output_vtu_file>"
+        print("%s Usage: <input_vtu_file> <output_vtu_file>" % (sys.stderr, sys.argv[0]))
         sys.exit(1)
     #Reading in command line arguments
     input_name = sys.argv[1]
     output_name = sys.argv[2]
     
     if input_name == output_name:
-        print >> sys.stderr, "Error: input and output files should be different."
+        print("%s Error: input and output files should be different." % sys.stderr)
         sys.exit(1)
     
     pvtu_mode = False

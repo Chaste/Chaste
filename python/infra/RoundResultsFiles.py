@@ -45,11 +45,11 @@ import re
 import sys
 
 if len(sys.argv) != 2:
-    print >> sys.stderr, "Usage:", sys.argv[0], " <tolerance>"
+    print("%s Usage: %s <tolerance>" % (sys.stderr, sys.argv[0]))
     sys.exit(1)
 tolerance = int(sys.argv[1])
-print 'Warning: These have been filtered by ',sys.argv[0],'.'
-print 'This means that all floating point numbers have been rounded to', tolerance, 'decimal places.'
+print('Warning: These have been filtered by %s.' % sys.argv[0])
+print('This means that all floating point numbers have been rounded to %s decimal places.' % tolerance)
 def Replace(matchobj):
     """Given a match, round the number to the tolerance."""
     number = float(matchobj.group(0))
@@ -76,4 +76,4 @@ scientific_no_point = '(\+|-)?\de(\+|-)?\d+'
 number = re.compile('(' + scientific +'|' + decimal +'|' + scientific_no_point + ')')
 
 for line in sys.stdin:
-    print re.sub(number, Replace, line),
+    print(re.sub(number, Replace, line))

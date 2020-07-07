@@ -71,10 +71,10 @@ def index(req):
     </p>
     <ul>""")
     tests_types = os.listdir(_tests_dir)
-    tests_types = filter(lambda s: s[0] != '.', tests_types)
+    tests_types = [s for s in tests_types if s[0] != '.']
     tests_types.sort()
-    main_types = filter(lambda s: '-' not in s, tests_types)
-    branch_types = filter(lambda s: '-' in s, tests_types)
+    main_types = [s for s in tests_types if '-' not in s]
+    branch_types = [s for s in tests_types if '-' in s]
     for tests_type in main_types:
         if tests_type.endswith('_old'):
             text = 'Old %s builds.' % tests_type[:-4]
@@ -106,13 +106,13 @@ def index(req):
     # Look for the latest revision present.
     type = 'continuous'
     revision_and_timestamps = os.listdir(os.path.join(_tests_dir, type))
-    latest_revision = str(max(itertools.imap(lambda rts: int(rts[:rts.find('~')]) if '~' in rts else int(rts), revision_and_timestamps)))
+    latest_revision = str(max(map(lambda rts: int(rts[:rts.find('~')]) if '~' in rts else int(rts), revision_and_timestamps)))
     # Display summary of each build of this revision
     test_set_dirs = _getResultsParentDirs(type, latest_revision, timestamp=None)
     builds = []
     for test_set_dir in test_set_dirs:
         revision_and_timestamp = os.path.basename(test_set_dir)
-        builds.extend(map(lambda machine_and_buildtype: (revision_and_timestamp, machine_and_buildtype), os.listdir(test_set_dir)))
+        builds.extend([(revision_and_timestamp, machine_and_buildtype) for machine_and_buildtype in os.listdir(test_set_dir)])
     if len(builds) < 1:
         output.append(_error('No test set found for revision '+latest_revision+'. Probably the build is still in progress.'))
         output.append('<p><a href="/out/latest">Latest build log.</a></p>')
@@ -201,7 +201,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
         params = []
         where = []
         if filters:
-            for filter_name, filter_value in filters.items():
+            for filter_name, filter_value in list(filters.items()):
                 if filter_name in poss_filters:
                     if len(filter_value) > 0 and filter_value[0] == '!':
                         filter_value = filter_value[1:]
@@ -373,13 +373,12 @@ def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
         logurl = logpath[8:]
         if logurl:
             build_log = "Build log: <a href=\"%s\">%s</a></p>" % (logurl, logurl)
-            timings = _parseBuildTimings(logpath).items()
+            timings = list(_parseBuildTimings(logpath).items())
             timings.sort(key=operator.itemgetter(1)) # Sort by time
             timings.reverse()
             build_log += "\nTimings (for entire build log): <table><tr><th>Activity</th><th>Time (minutes)</th></tr>\n"
             build_log += "\n".join(
-                map(lambda row: '<tr><td>%s</td><td>%d:%f</td></tr>' % (row[0], row[1]//60, row[1]%60),
-                    timings))
+                ['<tr><td>%s</td><td>%d:%f</td></tr>' % (row[0], row[1]//60, row[1]%60) for row in timings])
             build_log += "\n</table>\n"
     
     # Produce output HTML
@@ -477,7 +476,7 @@ def buildType(req, buildType, revision=None):
     <p>Library/tool versions requested:</p>
     <ul>
 """
-        for lib, version in prefs.items():
+        for lib, version in list(prefs.items()):
             page_body += "    <li>%s: %s</li>\n" % (lib, version)
     page_body += "\n  </ul>\n"
     return _header() + page_body + _footer()
@@ -606,7 +605,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     output.append('<table border="1">\n  <tr><th>Revision</th>\n')
     revbts = []
     for revision in revisions:
-        cols = sum(map(lambda bt: len(builds.get((revision, bt), [])), buildTypes))
+        cols = sum([len(builds.get((revision, bt), [])) for bt in buildTypes])
         if cols > 0:
             output.append('    <th colspan="%d">%s</th>\n'
                           % (cols, _linkChangeset(revision)))
@@ -614,7 +613,7 @@ def _profileHistory(req, n=20, buildTypes=None):
             revbts.append((revision, bt))
     output.append('  </tr>\n  <tr><th>Build</th>\n')
     for rev, bt in revbts:
-        if builds.has_key((rev, bt)):
+        if (rev, bt) in builds:
             output.append('    <th colspan="%d">%s</th>\n'
                           % (len(builds[(rev, bt)]), _linkBuildType(bt, rev, wrappableText=True)))
     output.append('  </tr>\n  <tr><th>Machine</th>\n')
@@ -625,7 +624,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     output.append('  </tr>\n')
     # Display the run times
     _handle_renamed_test_suites(run_times)
-    test_suites = run_times.keys()
+    test_suites = list(run_times.keys())
     test_suites.sort()
     for test_suite in test_suites:
         output.append('  <tr><th>%s</th>\n' % test_suite)
@@ -652,7 +651,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     
     # Graphs
     machines = set()
-    for ms in builds.itervalues():
+    for ms in builds.values():
         machines.update(ms)
     gurl = '%s/profileHistoryGraph' % _our_url
     for machine in machines:
@@ -665,7 +664,7 @@ def _profileHistory(req, n=20, buildTypes=None):
                         graph_data.append((r, run_times[test_suite][(r, build_type, machine)][0]))
                     except KeyError:
                         pass
-                graph_data_str = '|'.join(map(lambda p: ','.join(map(str, p)), graph_data))
+                graph_data_str = '|'.join([','.join(map(str, p)) for p in graph_data])
                 img_url = '%s?machine=%s&amp;buildType=%s&amp;testSuite=%s&amp;data=%s' % (gurl, machine, build_type, test_suite, graph_data_str)
                 if len(img_url) > 2048:
                     # Internet Explorer will complain
@@ -695,12 +694,12 @@ def _handle_renamed_test_suites(runTimes, graphs={}):
     name but full path info.
     """
     name_map = {}
-    for suite_name in runTimes.iterkeys():
+    for suite_name in runTimes.keys():
         if '-' in suite_name:
             leaf_name = suite_name[1+suite_name.rfind('-'):]
             if not leaf_name in name_map and (leaf_name in runTimes or leaf_name in graphs):
                 name_map[leaf_name] = suite_name
-    for leaf_name, full_name in name_map.items():
+    for leaf_name, full_name in list(name_map.items()):
         if leaf_name in runTimes:
             runTimes[full_name].update(runTimes[leaf_name])
             del runTimes[leaf_name]
@@ -737,7 +736,7 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
         run_times.reverse()
     else:
         for item in data.split('|'):
-            run_times.append(map(float, item.split(',')))
+            run_times.append(list(map(float, item.split(','))))
     
     # Draw graph and send to browser
     req.content_type = 'image/png'
@@ -816,7 +815,7 @@ def _importCode(code, name, add_to_sys_modules=0):
     
     module = imp.new_module(name)
     
-    exec(code) in module.__dict__
+    exec((code), module.__dict__)
     if add_to_sys_modules:
         sys.modules[name] = module
         
@@ -1122,7 +1121,7 @@ def _overallStatus(statuses, build):
     total = len(statuses)
     failed, warnings = 0, 0
     components = set()
-    for testsuite, status in statuses.items():
+    for testsuite, status in list(statuses.items()):
         colour = _statusColour(status, build)
         if colour == 'red':
             failed += 1
@@ -1175,12 +1174,12 @@ _time_re = re.compile(r"Command execution time:(?: ([^:]+):)? ([0-9.]+) seconds"
 _states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'PyCml execution', 'Test running']
 # For older scons versions we need to parse the line before a timing output to determine what happened.
 # Note that the order must match the _states list, except that we skip the 'Other' state.
-_state_res = map(re.compile,
+_state_res = list(map(re.compile,
                  [r"[^ ]*mpicxx ",
                   r"BuildTest\(\[",
                   r"cxxtest/cxxtestgen.py",
                   r"RunPyCml\(\[",
-                  r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"])
+                  r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"]))
 # For newer scons versions the timing line includes the target that was created, so we parse that instead
 _target_state_map = [lambda t, ext: ext in ['.so', '.o', '.os'] or t.endswith('Runner'), # Compile
                      lambda t, ext: ext == '.dummy',                                     # Obj dep analysis
@@ -1223,7 +1222,7 @@ def _parseBuildTimings(logfilepath):
                         break
         logfile.close()
 
-        result = dict(zip(_states, times))
+        result = dict(list(zip(_states, times)))
     except IOError:
         result = dict.fromkeys(_states, -1.0)
     result['Total'] = sum(times)
@@ -1235,7 +1234,7 @@ def _parseWinBuildTimings(logfile):
            'Test running': re.compile(r'.*?\.+.*?([0-9.]+) sec')}
     times = dict([(k, 0.0) for k in res])
     for line in logfile:
-        for key, regexp in res.items():
+        for key, regexp in list(res.items()):
             m = regexp.match(line)
             if m:
                 multiplier = 1
@@ -1405,7 +1404,7 @@ if __name__ == '__main__':
     import sys, BuildTypes, socket
     if len(sys.argv) < 2:
         print("Syntax error.")
-        print("Usage: %s <test output dir> [<build type>]" % sys.argv[0])
+        print(("Usage: %s <test output dir> [<build type>]" % sys.argv[0]))
         sys.exit(1)
     _dir = sys.argv[1]
     if len(sys.argv) > 2:
@@ -1430,6 +1429,6 @@ if __name__ == '__main__':
     _fp.write(_footer())
     _fp.close()
 
-    print("Test summary generated in file://%s" % os.path.abspath(os.path.join(_dir, 'index.html')))
-    print("Overall test status: %s" % _overall_status)
+    print(("Test summary generated in file://%s" % os.path.abspath(os.path.join(_dir, 'index.html'))))
+    print(("Overall test status: %s" % _overall_status))
 

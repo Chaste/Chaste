@@ -73,8 +73,7 @@ except ImportError:
     psutil = None
 
 def usage():
-    print "Usage:",sys.argv[0],\
-        "<test exe> <.log file> <build type> [run time flags] [--no-stdout]"
+    print("Usage: %s <test exe> <.log file> <build type> [run time flags] [--no-stdout]" % sys.argv[0])
 
 def KillTest(pid=None, exe=None):
     """Kill off a running test, specified either by pid or by name, or both.
@@ -91,13 +90,12 @@ def KillTest(pid=None, exe=None):
             for proc in psutil.process_iter():
                 if get_prop(proc, 'ppid') == pid:
                     KillTest(proc.pid)
-            print "Killing", pid
+            print("Killing %s" % pid)
             os.kill(pid, signal.SIGKILL)
         except (psutil.NoSuchProcess, OSError):
             pass
     # Kill by name - figure out pid and call ourselves with that
     if exe:
-        #print "Killing", exe
         for proc in psutil.process_iter():
             try:
                 if get_prop(proc, 'exe') == exe:
@@ -171,7 +169,7 @@ class TestKillerTimer(object):
         KillTest(self.pid, self.exe)
         msg = '\n\nTest killed due to exceeding time limit of %d seconds\n\n' % self.timeLimit
         self.log.write(msg)
-        print msg
+        print(msg)
 
 
 def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0, env=os.environ):
@@ -207,14 +205,12 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     for line in test_proc.stdout or []:
         log_fp.write(line)
         if echo:
-            print line,
+            print(line)
     exit_code = test_proc.wait()
     end_time = time.time()
     if time_limit and psutil:
         kill_timer.Stop()
     log_fp.close()
-
-    #print "Time",end_time,start_time
 
     if True:
         import glob
@@ -223,13 +219,12 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
         if not os.path.exists(test_dir):
             os.makedirs(test_dir)
         if not os.path.isdir(test_dir):
-            print test_dir, "is not a directory; unable to copy output."
+            print("%s is not a directory; unable to copy output." % test_dir)
             sys.exit(1)
         test_name = GetTestNameFromLogFilePath(logfile)
         log_fp = open(logfile, 'r')
         status = build.EncodeStatus(exit_code, log_fp)
         log_fp.close()
-        #print test_name, status
         # Remove any old copies of results from this test
         oldfiles = glob.glob(os.path.join(test_dir, test_name+'.*'))
         for oldfile in oldfiles:
@@ -237,7 +232,6 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
         # Copy the new results
         copy_to = build.ResultsFileName(dir=test_dir, testsuite=test_name, status=status,
                                         runtime=end_time-start_time)
-        #print copy_to
         os.system("/bin/cp -f " + logfile + " " + copy_to)
         return copy_to
 
@@ -251,7 +245,7 @@ if __name__ == '__main__':
         echo = True
 
     if len(sys.argv) < 4:
-        print "Syntax error: insufficient arguments."
+        print("Syntax error: insufficient arguments.")
         usage()
         sys.exit(1)
 

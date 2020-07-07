@@ -75,19 +75,19 @@ for root_dir in (glob.glob(components + 'src') + glob.glob(components + 'test')
 num_found_dups = 0
 for file in source_files:
     if len(source_files[file]) > 1:
-        print "Duplicate occurrences of", file, ":"
+        print("Duplicate occurrences of %s:" % file)
         for loc in source_files[file]:
-            print "   ", loc
+            print("   %s" % loc)
         num_found_dups += 1
 
 # Let the test summary script know
 if num_found_dups > 0:
-    print
-    print "The next line is for the benefit of the test summary scripts."
-    print "Failed", num_found_dups, "of", len(source_files), "tests"
+    print()
+    print("The next line is for the benefit of the test summary scripts.")
+    print("Failed %s of %s tests" % (num_found_dups, len(source_files)))
 
     # Return a non-zero exit code if orphans were found
     import sys
     sys.exit(num_found_dups)
 else:
-    print "Infrastructure test passed ok."
+    print("Infrastructure test passed ok.")

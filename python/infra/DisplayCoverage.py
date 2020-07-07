@@ -58,8 +58,8 @@ gcov_flags = ' -lp '
 
 # Get output dir and build type object
 if len(sys.argv) < 2:
-    print "Syntax error."
-    print "Usage:", sys.argv[0], "<test output dir> [<build type> [<project> ...]]"
+    print("Syntax error.")
+    print("Usage: %s <test output dir> [<build type> [<project> ...]]" % sys.argv[0])
     sys.exit(1)
 output_dir = sys.argv[1]
 if len(sys.argv) > 2:
@@ -103,7 +103,7 @@ for gcda_file in gcda_files:
         try:
             toplevel, rest = gcda_file['dir'].split('build')
         except:
-            print gcda_file
+            print(gcda_file)
             raise
         # Get rid of slashes (or system equivalent)
         toplevel = os.path.dirname(toplevel)
@@ -241,7 +241,6 @@ for src_file in src_files:
                            ):
                         warn = False
                         aggregated_count = '#####'
-                        #print 'Full details of coverage: ', src_line_stripped,'\t',src_file,'\t',aggregated_count,'\t', line_no,'\t', src_line
                     else:
                         aggregated_count = 'ignored'
                     missed_line_count += 1
@@ -253,7 +252,6 @@ for src_file in src_files:
         # No gcov files found for this source file.
         # This may not be an error, if the source file in question is an .hpp file with
         # an associated .cpp file containing all the code for the class.
-        ##print src_file
         if src_file['file'][-4:] == '.hpp' and \
             os.path.exists(os.path.join(src_file['dir'], src_file['file'][:-3]+'cpp')):
             status = '' # So output file will be deleted

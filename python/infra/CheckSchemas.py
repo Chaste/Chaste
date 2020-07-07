@@ -64,7 +64,7 @@ def FilesAreDifferent(pathToFile1, pathToFile2):
         n = 10
         #Print the first n lines of the unified diff
         for _ in range(0, n):
-            print udiff.next()     
+            print("%s" % udiff.next())
         return True     
     except StopIteration:
         #The generator has little content and so was probably empty
@@ -99,17 +99,17 @@ for (path, file) in files_to_check:
         if file in exception_tests:
           num_good+=1
         else:  
-          print file_name,' is an orphan.  There is no reference schema with that name.'
+          print('%s is an orphan.  There is no reference schema with that name.' % file_name)
           num_bad+=1
 
-print "Schema test run over (",num_bad+num_good,") files"
+print("Schema test run over %s files" % (num_bad+num_good) )
 if num_bad > 0:
-    print
-    print "The next line is for the benefit of the test summary scripts."
-    print "Failed",num_bad,"of",num_bad+num_good,"tests"
+    print()
+    print("The next line is for the benefit of the test summary scripts.")
+    print("Failed %s of %s tests" % (num_bad, num_bad+num_good))
 
     # Return a non-zero exit code if orphans or bad schema were found
     sys.exit(num_bad)
 else:
-    print "Infrastructure test passed ok."
+    print("Infrastructure test passed ok.")
 
