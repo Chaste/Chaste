@@ -42,7 +42,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
                                              double botLeftX,
                                              double botLeftY)
         : mTargetNodeSpacing(DOUBLE_UNSET),
-          mHeightOfTopSurface(botLeftY + height)
+          mHeightOfTopSurface(0.3 * height)
 {
     // Validate input
     assert(numPoints > 1);

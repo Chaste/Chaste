@@ -58,6 +58,9 @@ private:
     /**
      * The height at which the point of maximal curvature is achieved in the
      * top right-hand corner of the superellipse.
+     *
+     * If the superellipse exponent is 1.0 this definition does not make sense
+     * and we choose 80% of the height of the cell.
      */
     double mHeightOfTopSurface;
 

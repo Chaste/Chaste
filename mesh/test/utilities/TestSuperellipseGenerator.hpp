@@ -142,10 +142,21 @@ public:
 
     void TestGetHeightOfTopSurface()
     {
-        //\todo implement this test
         {
-            // case 1: exponent >= 1
+            // Generate an ellipse (superellipse with exponent 1.0) that should sit inside [0, 0.6]x[0, 0.8]
+            unsigned num_points = 100;
+            double   exponent = 1.0;
+            double   width = 0.4;
+            double   height = 0.8;
+            double   bot_left_x = 0.0;
+            double   bot_left_y = 0.0;
+
+            SuperellipseGenerator gen(num_points, exponent, width, height, bot_left_x, bot_left_y);
+
+            TS_ASSERT_DELTA(gen.GetHeightOfTopSurface(), 0.8 * height, 1e-6);
         }
+
+        //\todo implement this test
         {
             // case 2: exponent < 1
         }
