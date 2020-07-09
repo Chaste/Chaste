@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Then type 
  * git submodule
  * and copy the commit hash into the member variable in the below test. If anyone runs the
- * latest version of the code, it will fail to remind them to do a `git submodule update`.
+ * latest version of the code, then it will fail to remind them to do a `git submodule update`.
  * 
  */
 class TestMetadataSubmodule : public CxxTest::TestSuite
@@ -122,7 +122,7 @@ public:
 
     void TestForPendingUpdatesToSubmodule()
     {
-        std::string latest_commit_hash = "5efca2401dd3e315af9496f3bd3167829498fd1e";
+        std::string latest_commit_hash = "e5376c254ae3ea1642fa5cc3838f150ebd2b7b29";
 
         FileFinder chaste_source("", RelativeTo::ChasteSourceRoot);
         std::stringstream command;
