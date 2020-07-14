@@ -201,7 +201,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
                                       "add_compile_options(-std=c++14)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
-                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" <<
+                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON" << codegen_args <<")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
                                       "include_directories(${Chaste_THIRD_PARTY_INCLUDE_DIRS} ${Chaste_INCLUDE_DIRS})\n" <<
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
@@ -279,22 +279,13 @@ void CellMLToSharedLibraryConverter::CreateOptionsFile(const OutputFileHandler& 
                                                        const std::vector<std::string>& rArgs,
                                                        const std::string& rExtraXml)
 {
-    if (PetscTools::AmMaster())
-    {
-        out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
-        (*p_optfile) << "<?xml version='1.0'?>" << std::endl
-                     << "<pycml_config>" << std::endl;
-        if (!rArgs.empty())
-        {
-            (*p_optfile) << "<command_line_args>" << std::endl;
-            for (unsigned i=0; i<rArgs.size(); i++)
-            {
-                (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
-            }
-            (*p_optfile) << "</command_line_args>" << std::endl;
-        }
-        (*p_optfile) << rExtraXml << "</pycml_config>" << std::endl;
-        p_optfile->close();
+    SetOptions(rArgs);
+}
+
+void CellMLToSharedLibraryConverter::SetOptions(const std::vector<std::string>& rArgs)
+{
+    codegen_args = "";
+    for(unsigned int i=0; i< rArgs.size(); i++){
+        codegen_args += " " + rArgs[i];
     }
-    PetscTools::Barrier("CellMLToSharedLibraryConverter::CreateOptionsFile");
 }
