@@ -56,7 +56,7 @@ def run_doxygen(revision, hide_undoc_classes=True):
 
 if __name__ == "__main__":
     if len(sys.argv) < 4 or len(sys.argv) > 5:
-        print >>sys.stderr, "Usage:", sys.argv[0], "<source_root>", "<docs_folder>", "<revision>", "[check_coverage]"
+	print "Usage: %s <source_root> <docs_folder> <revision> [check_coverage]" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
     SOURCE_DIR = sys.argv[1]
     DOCS_DIR = sys.argv[2]

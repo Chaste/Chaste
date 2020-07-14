@@ -58,7 +58,7 @@ def DoWalk(root_dir):
         for file in files:
             name, ext = os.path.splitext(file)
             if ext in exts:
-                if source_files.has_key(file):
+                if file in source_files:
                     # We've already found a file with this name
                     source_files[file].append(os.path.join(root, file))
                 else:
