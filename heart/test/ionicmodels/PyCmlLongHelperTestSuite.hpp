@@ -165,6 +165,8 @@ private:
         OutputFileHandler handler(rOutputDirName, true);
         FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
+
+//Out files should go later as we won't need out files anymore
         FileFinder out_file("heart/test/data/cellml/" + rModelName + ".out", RelativeTo::ChasteSourceRoot);
         if (out_file.Exists())
         {

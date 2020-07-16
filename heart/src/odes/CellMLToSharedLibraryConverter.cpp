@@ -32,7 +32,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
 #include "CellMLToSharedLibraryConverter.hpp"
 
 #include <sstream>
@@ -201,7 +200,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
                                       "add_compile_options(-std=c++14)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
-                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON" << codegen_args <<")\n" <<
+                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
                                       "include_directories(${Chaste_THIRD_PARTY_INCLUDE_DIRS} ${Chaste_INCLUDE_DIRS})\n" <<
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
@@ -274,18 +273,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
     PetscTools::ReplicateException(false);
 }
 
-void CellMLToSharedLibraryConverter::CreateOptionsFile(const OutputFileHandler& rHandler,
-                                                       const std::string& rModelName,
-                                                       const std::vector<std::string>& rArgs,
-                                                       const std::string& rExtraXml)
-{
-    SetOptions(rArgs);
-}
-
 void CellMLToSharedLibraryConverter::SetOptions(const std::vector<std::string>& rArgs)
 {
-    codegen_args = "";
-    for(unsigned int i=0; i< rArgs.size(); i++){
-        codegen_args += " " + rArgs[i];
-    }
+    std::stringstream args_stream;
+    copy(rArgs.begin(), rArgs.end(), std::ostream_iterator<std::string>(args_stream, " "));
+    codegen_args = args_stream.str();
 }
