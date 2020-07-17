@@ -106,11 +106,11 @@ public:
         AddAllModels(models);
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = boost::assign::list_of("aslanidi_model_2009")("hund_rudy_2004_a")("livshitz_rudy_2007");
-        BOOST_FOREACH (std::string bad_model, bad_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), bad_model));
-        }
+//        std::vector<std::string> bad_models = boost::assign::list_of("aslanidi_model_2009")("hund_rudy_2004_a")("livshitz_rudy_2007");
+//        BOOST_FOREACH (std::string bad_model, bad_models)
+//        {
+//            models.erase(std::find(models.begin(), models.end(), bad_model));
+//        }
 
         RunTests(dirname, models, args);
 #endif
@@ -127,24 +127,24 @@ public:
         AddAllModels(models);
 
         std::vector<std::string> diff_models; // Models that need a smaller dt
-        diff_models.push_back("iyer_model_2004");
-        diff_models.push_back("iyer_model_2007");
-        diff_models.push_back("jafri_rice_winslow_model_1998");
-        diff_models.push_back("pandit_model_2001_epi");
-        diff_models.push_back("priebe_beuckelmann_model_1998");
-        diff_models.push_back("viswanathan_model_1999_epi");
-        diff_models.push_back("winslow_model_1999");
+//        diff_models.push_back("iyer_model_2004");
+//        diff_models.push_back("iyer_model_2007");
+//        diff_models.push_back("jafri_rice_winslow_model_1998");
+//        diff_models.push_back("pandit_model_2001_epi");
+//        diff_models.push_back("priebe_beuckelmann_model_1998");
+//        diff_models.push_back("viswanathan_model_1999_epi");
+//        diff_models.push_back("winslow_model_1999");
         BOOST_FOREACH (std::string diff_model, diff_models)
         {
             models.erase(std::find(models.begin(), models.end(), diff_model));
         }
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
-        BOOST_FOREACH (std::string bad_model, bad_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), bad_model));
-        }
+//        std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
+//        BOOST_FOREACH (std::string bad_model, bad_models)
+//        {
+//            models.erase(std::find(models.begin(), models.end(), bad_model));
+//        }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true);
