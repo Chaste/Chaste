@@ -165,6 +165,8 @@ private:
         OutputFileHandler handler(rOutputDirName, true);
         FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
+
+//Out files should go later as we won't need out files anymore
         FileFinder out_file("heart/test/data/cellml/" + rModelName + ".out", RelativeTo::ChasteSourceRoot);
         if (out_file.Exists())
         {
@@ -301,46 +303,46 @@ public:
 
     void AddAllModels(std::vector<std::string>& rModels)
     {
-//        rModels.emplace_back("aslanidi_model_2009");
+        rModels.emplace_back("aslanidi_model_2009");
         rModels.emplace_back("beeler_reuter_model_1977");
-//        rModels.emplace_back("bondarenko_model_2004_apex");
-//        rModels.emplace_back("courtemanche_ramirez_nattel_model_1998");
-//        rModels.emplace_back("decker_2009");
-//        rModels.emplace_back("demir_model_1994");
-//        rModels.emplace_back("dokos_model_1996");
-//        rModels.emplace_back("earm_noble_model_1990");
-//        rModels.emplace_back("espinosa_model_1998_normal");
-//        rModels.emplace_back("fink_noble_giles_model_2008");
-//        rModels.emplace_back("grandi2010ss");
-//        rModels.emplace_back("hilgemann_noble_model_1987");
-//        rModels.emplace_back("hodgkin_huxley_squid_axon_model_1952_modified");
-//        rModels.emplace_back("hund_rudy_2004_a");
-//        rModels.emplace_back("iribe_model_2006_without_otherwise_section");
-//        rModels.emplace_back("iyer_model_2004");
-//        rModels.emplace_back("iyer_model_2007");
-//        rModels.emplace_back("jafri_rice_winslow_model_1998");
-//        rModels.emplace_back("kurata_model_2002");
-//        rModels.emplace_back("livshitz_rudy_2007");
-//        rModels.emplace_back("luo_rudy_1994");
-//        rModels.emplace_back("mahajan_2008");
-//        rModels.emplace_back("matsuoka_model_2003");
-//        rModels.emplace_back("noble_model_1991");
-//        rModels.emplace_back("noble_model_1998");
-//        rModels.emplace_back("noble_noble_SAN_model_1984");
-//        rModels.emplace_back("noble_SAN_model_1989");
-//        rModels.emplace_back("nygren_atrial_model_1998");
-//        rModels.emplace_back("pandit_model_2001_epi");
-//        rModels.emplace_back("priebe_beuckelmann_model_1998");
-//        rModels.emplace_back("sakmann_model_2000_epi");
-//        rModels.emplace_back("Shannon2004");
-//        rModels.emplace_back("stewart_zhang_model_2008_ss");
-//        rModels.emplace_back("ten_tusscher_model_2004_endo");
-//        rModels.emplace_back("ten_tusscher_model_2004_epi");
-//        rModels.emplace_back("ten_tusscher_model_2006_epi");
-//        rModels.emplace_back("viswanathan_model_1999_epi");
-//        rModels.emplace_back("winslow_model_1999");
-//        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
-//        rModels.emplace_back("zhang_SAN_model_2000_all");
+        rModels.emplace_back("bondarenko_model_2004_apex");
+        rModels.emplace_back("courtemanche_ramirez_nattel_model_1998");
+        rModels.emplace_back("decker_2009");
+        rModels.emplace_back("demir_model_1994");
+        rModels.emplace_back("dokos_model_1996");
+        rModels.emplace_back("earm_noble_model_1990");
+        rModels.emplace_back("espinosa_model_1998_normal");
+        rModels.emplace_back("fink_noble_giles_model_2008");
+        rModels.emplace_back("grandi2010ss");
+        rModels.emplace_back("hilgemann_noble_model_1987");
+        rModels.emplace_back("hodgkin_huxley_squid_axon_model_1952_modified");
+        rModels.emplace_back("hund_rudy_2004_a");
+        rModels.emplace_back("iribe_model_2006_without_otherwise_section");
+        rModels.emplace_back("iyer_model_2004");
+        rModels.emplace_back("iyer_model_2007");
+        rModels.emplace_back("jafri_rice_winslow_model_1998");
+        rModels.emplace_back("kurata_model_2002");
+        rModels.emplace_back("livshitz_rudy_2007");
+        rModels.emplace_back("luo_rudy_1994");
+        rModels.emplace_back("mahajan_2008");
+        rModels.emplace_back("matsuoka_model_2003");
+        rModels.emplace_back("noble_model_1991");
+        rModels.emplace_back("noble_model_1998");
+        rModels.emplace_back("noble_noble_SAN_model_1984");
+        rModels.emplace_back("noble_SAN_model_1989");
+        rModels.emplace_back("nygren_atrial_model_1998");
+        rModels.emplace_back("pandit_model_2001_epi");
+        rModels.emplace_back("priebe_beuckelmann_model_1998");
+        rModels.emplace_back("sakmann_model_2000_epi");
+        rModels.emplace_back("Shannon2004");
+        rModels.emplace_back("stewart_zhang_model_2008_ss");
+        rModels.emplace_back("ten_tusscher_model_2004_endo");
+        rModels.emplace_back("ten_tusscher_model_2004_epi");
+        rModels.emplace_back("ten_tusscher_model_2006_epi");
+        rModels.emplace_back("viswanathan_model_1999_epi");
+        rModels.emplace_back("winslow_model_1999");
+        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
+        rModels.emplace_back("zhang_SAN_model_2000_all");
     }
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)

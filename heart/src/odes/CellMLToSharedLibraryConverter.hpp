@@ -81,20 +81,6 @@ public:
                                       bool isCollective=true);
 
     /**
-     * Create a PyCml options file for the given model. Deprecated use SetOptions instead
-     *
-     * @param rHandler  where to create the file
-     * @param rModelName  base name of the model file (which will be "rModelName.cellml")
-     * @param rArgs  extra command-line arguments for the model conversion
-     * @param rExtraXml  any extra XML to go in the config file (e.g. LT settings)
-     */
-    [[deprecated("Config files are no longer used and this method is depricated. Use SetOptions instead")]]
-    void CreateOptionsFile(const OutputFileHandler& rHandler,
-                                  const std::string& rModelName,
-                                  const std::vector<std::string>& rArgs,
-                                  const std::string& rExtraXml="");
-
-    /**
      * Set the options to be passed to chaste_codegen for the given model.
      *
      * @param rArgs  extra command-line arguments for the model conversion

@@ -84,7 +84,7 @@ class TestRushLarsen : public CxxTest::TestSuite
             FileFinder copied_file = handler.CopyFileTo(cellml_file);
 
             // Create options file & convert
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }
@@ -97,9 +97,7 @@ class TestRushLarsen : public CxxTest::TestSuite
 
             // Create options file & convert
             args.push_back("--opt");
-            FileFinder conf_file("heart/src/odes/cellml/" + model + "-conf.xml", RelativeTo::ChasteSourceRoot);
-            args.push_back("--conf=" + conf_file.GetAbsolutePath());
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpRushLarsenCellOpt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }
@@ -117,11 +115,11 @@ public:
         // Normal Luo-Rudy for comparison
         boost::shared_ptr<EulerIvpOdeSolver> p_euler_solver(new EulerIvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model(p_euler_solver, mpRushLarsenCell->GetStimulusFunction());
-        CellLuoRudy1991FromCellMLOpt reference_model_opt(p_euler_solver, mpRushLarsenCell->GetStimulusFunction());
+        // Since config files are no longer used, the opt version is not pre-generated so compare against non-opt version instead
 
         // Check GetIIonic is identical
         TS_ASSERT_DELTA(mpRushLarsenCell->GetIIonic(), reference_model.GetIIonic(), 1e-12);
-        TS_ASSERT_DELTA(mpRushLarsenCellOpt->GetIIonic(), reference_model_opt.GetIIonic(), 1e-12);
+        TS_ASSERT_DELTA(mpRushLarsenCellOpt->GetIIonic(), reference_model.GetIIonic(), 1e-6);
 
         // The ComputeExceptVoltage method assumes voltage derivative is set to zero,
         // and the uses a new member variable to get fixed voltage (see #2116).
@@ -164,14 +162,10 @@ public:
         mpRushLarsenCellOpt->SetStimulusFunction(p_stimulus);
         mpRushLarsenCellOpt->SolveAndUpdateState(0.0, 1.0);
 
-        reference_model_opt.ResetToInitialConditions();
-        reference_model_opt.SetStimulusFunction(p_stimulus);
-        reference_model_opt.SolveAndUpdateState(0.0, 1.0);
-
         for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
         {
             TS_ASSERT_DELTA(mpRushLarsenCellOpt->rGetStateVariables()[i],
-                            reference_model_opt.rGetStateVariables()[i], 1e-2);
+                            reference_model.rGetStateVariables()[i], 1e-2);
         }
 
 

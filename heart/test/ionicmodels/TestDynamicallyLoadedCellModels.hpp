@@ -81,13 +81,14 @@ private:
         AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(rLoader, vIndex);
         SimulateLr91AndCompare(p_cell, tolerance);
 
-        if (testTables)
-        {
-            double v = p_cell->GetVoltage();
-            p_cell->SetVoltage(tableTestV);
-            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
-            p_cell->SetVoltage(v);
-        }
+	// chaste_codegen doesn't have lookup tables
+//        if (testTables)
+//        {
+//            double v = p_cell->GetVoltage();
+//            p_cell->SetVoltage(tableTestV);
+//            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
+//            p_cell->SetVoltage(v);
+//        }
 
         delete p_cell;
     }
@@ -328,7 +329,7 @@ public:
         // Create options file & convert
         std::vector<std::string> args;
         args.push_back("--opt");
-        converter.CreateOptionsFile(handler, model, args);
+        converter.SetOptions(args);
         // Ensure that conversion works if CWD != ChasteSourceRoot
         EXPECT0(chdir, "heart");
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
@@ -343,9 +344,10 @@ public:
             args[0] = "--backward-euler";
             OutputFileHandler handler2(dirname + "/BE");
             FileFinder copied_file2 = handler2.CopyFileTo(cellml_file);
+//Out files should go later as we won't need out files anymore
             FileFinder maple_output_file("heart/src/odes/cellml/LuoRudy1991.out", RelativeTo::ChasteSourceRoot);
             handler2.CopyFileTo(maple_output_file);
-            converter.CreateOptionsFile(handler2, model, args);
+            converter.SetOptions(args);
             p_loader = converter.Convert(copied_file2);
             RunLr91Test(*p_loader, 0u, true, 0.3);
         }
@@ -360,7 +362,7 @@ public:
                     + "<var type='config-name'>transmembrane_potential</var>"
                     + "<max>69.9999</max>"
                     + "</lookup_table></lookup_tables></for_model>\n";
-            converter.CreateOptionsFile(handler3, model, args, for_model);
+            converter.SetOptions(args);
             p_loader = converter.Convert(copied_file3);
             RunLr91Test(*p_loader, 0u, true, 1, 70); // Large tolerance due to different ODE solver
         }
