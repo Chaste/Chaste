@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
-#include "LuoRudy1991CvodeOpt.hpp"
+//#include "LuoRudy1991CvodeOpt.hpp"
 #endif // CHASTE_CVODE
 
 //This test is always run sequentially (never in parallel)
@@ -253,50 +253,51 @@ public:
         CellLuoRudy1991FromCellMLCvode cvode_cell(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(cvode_cell.GetVoltageIndex(), 0u);
         // Optimised CVODE version
-        CellLuoRudy1991FromCellMLCvodeOpt cvode_opt(p_solver, p_stimulus);
-        TS_ASSERT_EQUALS(cvode_opt.GetVoltageIndex(), 0u);
+	// We no longe rhave config files and chaste_codegen doesn't have lookup tables so we can't test tables
+//        CellLuoRudy1991FromCellMLCvodeOpt cvode_opt(p_solver, p_stimulus);
+//        TS_ASSERT_EQUALS(cvode_opt.GetVoltageIndex(), 0u);
 
         // Check tables using AbstractLookupTableCollection interface
         TS_ASSERT(!cvode_cell.GetLookupTableCollection());
-        p_tables = cvode_opt.GetLookupTableCollection();
-        TS_ASSERT(p_tables);
-        TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames().size(), 2u);
-        TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames()[0], "membrane_voltage");
-        TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames()[1], "cytosolic_calcium_concentration");
-        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("membrane_voltage"), 54u);
-        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("cytosolic_calcium_concentration"), 2u);
-        TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
-        p_tables->GetTableProperties("membrane_voltage", min, step, max);
-        TS_ASSERT_DELTA(min, -150.0001, 1e-12);
-        TS_ASSERT_DELTA(step, 0.001, 1e-12);
-        TS_ASSERT_DELTA(max, 199.9999, 1e-12);
-        p_tables->GetTableProperties("cytosolic_calcium_concentration", min, step, max);
-        TS_ASSERT_DELTA(min, 0.00001, 1e-12);
-        TS_ASSERT_DELTA(step, 0.0001, 1e-12);
-        TS_ASSERT_DELTA(max, 30.00001, 1e-12);
+//        p_tables = cvode_opt.GetLookupTableCollection();
+//        TS_ASSERT(p_tables);
+//        TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames().size(), 2u);
+//        TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames()[0], "membrane_voltage");
+//        TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames()[1], "cytosolic_calcium_concentration");
+//        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("membrane_voltage"), 54u);
+//        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("cytosolic_calcium_concentration"), 2u);
+//        TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
+//        p_tables->GetTableProperties("membrane_voltage", min, step, max);
+//        TS_ASSERT_DELTA(min, -150.0001, 1e-12);
+//        TS_ASSERT_DELTA(step, 0.001, 1e-12);
+//        TS_ASSERT_DELTA(max, 199.9999, 1e-12);
+//        p_tables->GetTableProperties("cytosolic_calcium_concentration", min, step, max);
+//        TS_ASSERT_DELTA(min, 0.00001, 1e-12);
+//        TS_ASSERT_DELTA(step, 0.0001, 1e-12);
+//        TS_ASSERT_DELTA(max, 30.00001, 1e-12);
+//
+//        // Check that the tables really exist!
+//        cvode_opt.SetVoltage(-100000);
+//        TS_ASSERT_THROWS_CONTAINS(cvode_opt.GetIIonic(), "membrane_voltage outside lookup table range");
+//        cvode_opt.SetVoltage(v);
 
-        // Check that the tables really exist!
-        cvode_opt.SetVoltage(-100000);
-        TS_ASSERT_THROWS_CONTAINS(cvode_opt.GetIIonic(), "membrane_voltage outside lookup table range");
-        cvode_opt.SetVoltage(v);
-
-        cvode_opt.SetStateVariable(cai_index, -1.0);
-        TS_ASSERT_THROWS_CONTAINS(cvode_opt.GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
-        cvode_opt.SetStateVariable(cai_index, cai);
+//        cvode_opt.SetStateVariable(cai_index, -1.0);
+//        TS_ASSERT_THROWS_CONTAINS(cvode_opt.GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
+//        cvode_opt.SetStateVariable(cai_index, cai);
 
         // Single parameter
         CheckParameter(cvode_cell);
-        CheckParameter(cvode_opt);
+//        CheckParameter(cvode_opt);
 
         // Derived variables
         N_Vector vec_inits = cvode_cell.GetInitialConditions();
         CheckDerivedQuantities(cvode_cell, vec_inits);
-        CheckDerivedQuantities(cvode_opt, vec_inits);
+//        CheckDerivedQuantities(cvode_opt, vec_inits);
         DeleteVector(vec_inits);
 
         // Attributes
         CheckAttributes(cvode_cell);
-        CheckAttributes(cvode_opt);
+//        CheckAttributes(cvode_opt);
 #endif // CHASTE_CVODE
 
         // Test the archiving code too
@@ -419,26 +420,26 @@ public:
         TS_ASSERT_DELTA(cvode_cell.GetIIonic(), i_ionic, 1e-1);
 
         // CVODE Optimised
-        ck_start = clock();
-        cvode_solution = cvode_opt.Solve(0.0, end_time, max_dt, max_dt);
-        cvode_solution.WriteToFile("TestIonicModels","Lr91FromPyCmlCvodeOpt","ms",1,false);
-        ck_end = clock();
-        double cvode_opt_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
-        std::cout << "\n\tCVODE Optimised: " << cvode_opt_time << std::endl;
-        CompareCellModelResults("Lr91FromPyCmlCvode", "Lr91FromPyCmlCvodeOpt", 1e-1, true);
-        // Coverage
-        cvode_opt.ResetToInitialConditions();
-        cvode_opt.SetVoltageDerivativeToZero();
-        cvode_opt.Solve(0.0, i_ionic_end_time, max_dt);
-        TS_ASSERT_DELTA(cvode_opt.GetIIonic(), 0.0, 1e-1); // Cell should be at rest
-        cvode_opt.SetVoltageDerivativeToZero(false);
-        // Check GetIIonic
-        cvode_opt.ResetToInitialConditions();
-        cvode_opt.Solve(0.0, i_ionic_end_time, max_dt);
-        TS_ASSERT_DELTA(cvode_opt.GetIIonic(), i_ionic, 1e-1);
-
-        // No stimulus at end time
-        TS_ASSERT_DELTA(cvode_opt.GetIntracellularAreaStimulus(i_ionic_end_time), 0.0, 1e-12);
+//        ck_start = clock();
+//        cvode_solution = cvode_opt.Solve(0.0, end_time, max_dt, max_dt);
+//        cvode_solution.WriteToFile("TestIonicModels","Lr91FromPyCmlCvodeOpt","ms",1,false);
+//        ck_end = clock();
+//        double cvode_opt_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
+//        std::cout << "\n\tCVODE Optimised: " << cvode_opt_time << std::endl;
+//        CompareCellModelResults("Lr91FromPyCmlCvode", "Lr91FromPyCmlCvodeOpt", 1e-1, true);
+//        // Coverage
+//        cvode_opt.ResetToInitialConditions();
+//        cvode_opt.SetVoltageDerivativeToZero();
+//        cvode_opt.Solve(0.0, i_ionic_end_time, max_dt);
+//        TS_ASSERT_DELTA(cvode_opt.GetIIonic(), 0.0, 1e-1); // Cell should be at rest
+//        cvode_opt.SetVoltageDerivativeToZero(false);
+//        // Check GetIIonic
+//        cvode_opt.ResetToInitialConditions();
+//        cvode_opt.Solve(0.0, i_ionic_end_time, max_dt);
+//        TS_ASSERT_DELTA(cvode_opt.GetIIonic(), i_ionic, 1e-1);
+//
+//        // No stimulus at end time
+//        TS_ASSERT_DELTA(cvode_opt.GetIntracellularAreaStimulus(i_ionic_end_time), 0.0, 1e-12);
 #endif // CHASTE_CVODE
 
         // Load and check simulation results still match

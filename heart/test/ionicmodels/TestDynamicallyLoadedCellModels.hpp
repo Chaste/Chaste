@@ -81,13 +81,14 @@ private:
         AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(rLoader, vIndex);
         SimulateLr91AndCompare(p_cell, tolerance);
 
-        if (testTables)
-        {
-            double v = p_cell->GetVoltage();
-            p_cell->SetVoltage(tableTestV);
-            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
-            p_cell->SetVoltage(v);
-        }
+	// chaste_codegen doesn't have lookup tables
+//        if (testTables)
+//        {
+//            double v = p_cell->GetVoltage();
+//            p_cell->SetVoltage(tableTestV);
+//            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
+//            p_cell->SetVoltage(v);
+//        }
 
         delete p_cell;
     }

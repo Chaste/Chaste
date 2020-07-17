@@ -648,7 +648,12 @@ public:
 
         std::vector<std::string> args;
         args.push_back("--cvode");
-
+	CellMLToSharedLibraryConverter converter(true);
+	converter.SetOptions(args);
+	// Need to perform conversion here as otherwise we can't tell it to convert a cvode
+        // It would work with a normal model too, without pre-converting this is tested in TestCardiacSimulationPatchwork
+       	FileFinder copied_file("DynamicallyLoadedModelCvode/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteTestOutput);
+        converter.Convert(copied_file);
         CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml");
 #else
         std::cout << "CVODE is not enabled.\n";
