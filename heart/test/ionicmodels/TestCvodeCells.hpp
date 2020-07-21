@@ -219,18 +219,18 @@ public:
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), lr91_ode_system.GetVoltage(), 1e-3);
 
         // Test parameter
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetNumberOfParameters(), 3u);
-        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterNames()[1], "membrane_fast_sodium_current_conductance");
-        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterUnits()[1], "milliS_per_cm2");
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterIndex("membrane_fast_sodium_current_conductance"), 1u);
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterUnits(1u), "milliS_per_cm2");
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(1u), 23.0);
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetNumberOfParameters(), 13u);
+        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterNames()[7], "membrane_fast_sodium_current_conductance");
+        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterUnits()[7], "milliS_per_cm2");
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterIndex("membrane_fast_sodium_current_conductance"), 7u);
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterUnits(7u), "milliS_per_cm2");
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(7u), 23.0);
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter("membrane_fast_sodium_current_conductance"), 23.0);
 
         // Parameter exceptions
         TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterIndex("b"), "No parameter named 'b'.");
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameter(3u), "The index passed in must be less than the number of parameters.");
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterUnits(3u), "The index passed in must be less than the number of parameters.");
+        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameter(13u), "The index passed in must be less than the number of parameters.");
+        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterUnits(13u), "The index passed in must be less than the number of parameters.");
 
 
         // Coverage
@@ -336,19 +336,19 @@ public:
 
         // Make a model that uses Cvode directly:
         // Need to load dynamicly as we don't have config files anymore
-       	OutputFileHandler handler("TestModifiers");
+       	OutputFileHandler handler("TestCvodeCells");
 	
-        FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
+        FileFinder cellml_file("heart/src/odes/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
        	handler.CopyFileTo(cellml_file);
 
-	CellMLToSharedLibraryConverter converter(true);
-	converter.SetOptions({"-m", "--cvode", "--expose-annotated-variables"});
+       	CellMLToSharedLibraryConverter converter(true);
+       	converter.SetOptions({"-m", "--cvode"});
 
         // Do the conversion
-       	FileFinder copied_file("TestModifiers/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+       	FileFinder copied_file("TestCvodeCells/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
 
-	AbstractCardiacCellWithModifiers<AbstractCvodeCell>* sh04_cvode_system = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
+       	AbstractCardiacCellWithModifiers<AbstractCvodeCell>* sh04_cvode_system = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
 
         TS_ASSERT_EQUALS(sh04_cvode_system->GetVoltageIndex(), 0u);
         TS_ASSERT_EQUALS(sh04_cvode_system->GetMaxSteps(), 0); // 0 means 'UNSET' and Cvode uses the default.
@@ -428,6 +428,7 @@ public:
 
         bool voltage_only = false;
         CompareCellModelResults("sh04_cvode", "sh04_chaste", tolerance, voltage_only, "TestCvodeCells");
+
 
         // Coverage of GetIIonic method.
         TS_ASSERT_DELTA(sh04_ode_system.GetIIonic(), sh04_cvode_system->GetIIonic(), 1e-4);

@@ -336,17 +336,14 @@ public:
         EXPECT0(chdir, "..");
         RunLr91Test(*p_loader, 0u, true, 0.01); // Implementation of lookup tables has improved...
         // Check the sources exist
-        TS_ASSERT(handler.FindFile(model + ".cpp").Exists());
-        TS_ASSERT(handler.FindFile(model + ".hpp").Exists());
+        TS_ASSERT(handler.FindFile(model + "Opt.cpp").Exists());
+        TS_ASSERT(handler.FindFile(model + "Opt.hpp").Exists());
 
         {
             // Backward Euler
             args[0] = "--backward-euler";
             OutputFileHandler handler2(dirname + "/BE");
             FileFinder copied_file2 = handler2.CopyFileTo(cellml_file);
-//Out files should go later as we won't need out files anymore
-            FileFinder maple_output_file("heart/src/odes/cellml/LuoRudy1991.out", RelativeTo::ChasteSourceRoot);
-            handler2.CopyFileTo(maple_output_file);
             converter.SetOptions(args);
             p_loader = converter.Convert(copied_file2);
             RunLr91Test(*p_loader, 0u, true, 0.3);
@@ -358,10 +355,6 @@ public:
             args.push_back("--cvode");
             OutputFileHandler handler3(dirname + "/CO");
             FileFinder copied_file3 = handler3.CopyFileTo(cellml_file);
-            std::string for_model = std::string("<for_model id='luo_rudy_1991'><lookup_tables><lookup_table>")
-                    + "<var type='config-name'>transmembrane_potential</var>"
-                    + "<max>69.9999</max>"
-                    + "</lookup_table></lookup_tables></for_model>\n";
             converter.SetOptions(args);
             p_loader = converter.Convert(copied_file3);
             RunLr91Test(*p_loader, 0u, true, 1, 70); // Large tolerance due to different ODE solver
@@ -372,8 +365,6 @@ public:
     void TestArchiving()
     {
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
-        // Check the previous test has left us a .so file
-        TS_ASSERT(mArchivingModel.Exists());
 
         // Get a loader for the .so and load a cell model
         CellMLToSharedLibraryConverter converter;
