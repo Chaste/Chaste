@@ -158,7 +158,7 @@ public:
         // Stimulus to use for simulation, so it matches other tests in this suite
         boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new SimpleStimulus(-25.5, 2.0, 50.0));
         {
-            OutputFileHandler handler("TestCardiacCellMLLoader");
+            OutputFileHandler handler("TestCardiacCellMLLoader", true);
             // Note that the --cvode flag will be ignored since we call the LoadCardiacCell method.
             std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
             CellMLLoader loader(cellml_file, handler, options);
@@ -183,7 +183,7 @@ public:
         }
 #ifdef CHASTE_CVODE
         {
-            OutputFileHandler handler("TestCvodeCellMLLoader");
+            OutputFileHandler handler("TestCvodeCellMLLoader", true);
             std::vector<std::string> options = boost::assign::list_of("--expose-annotated-variables");
             CellMLLoader loader(cellml_file, handler, options);
             boost::shared_ptr<AbstractCvodeCell> p_cell = loader.LoadCvodeCell();

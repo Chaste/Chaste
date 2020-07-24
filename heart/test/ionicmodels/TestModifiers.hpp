@@ -71,7 +71,7 @@ private:
        	if(!p_shannon){
        	       	boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
        	        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-       	       	OutputFileHandler handler("TestModifiers");
+       	       	OutputFileHandler handler("TestModifiers", true);
 	
        	        FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
        	       	handler.CopyFileTo(cellml_file);

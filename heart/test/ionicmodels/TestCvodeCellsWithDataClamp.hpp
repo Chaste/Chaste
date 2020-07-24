@@ -69,7 +69,7 @@ public:
     void TestInterpolatorTimesAndGenerateReferenceTrace()
     {
 #ifdef CHASTE_CVODE
-        OutputFileHandler handler("TestCvodeCellsWithDataClamp");
+        OutputFileHandler handler("TestCvodeCellsWithDataClamp", true);
 	
         FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);

@@ -2966,7 +2966,13 @@ A dynamic model of the cardiac ventricular action potential. I. Simulations of i
          </rdf:Description>
        </rdf:RDF>
     </variable>
-     <variable initial_value="0.12e-3" name="Cai" public_interface="out" units="mM">
+     <variable initial_value="0.12e-3" name="Cai" public_interface="out" units="mM" cmeta:id="cytosolic_calcium_concentration">
+       <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+           <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+         </rdf:Description>
+       </rdf:RDF>
+     </variable>
     <variable initial_value="1.8" name="Cao" public_interface="out" units="mM" cmeta:id="extracellular_calcium_concentration">
        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
          <rdf:Description rdf:about="#extracellular_calcium_concentration">

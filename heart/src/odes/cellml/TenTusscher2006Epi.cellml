@@ -1,34 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-This CellML file was generated on 10/06/2010 at 15:30:36 using:
+This CellML file was generated on 16/05/2007 at 15:41:59 using:
 
-COR (0.9.31.1371)
-Copyright 2002-2010 Dr Alan Garny
-http://cor.physiol.ox.ac.uk/ - cor@physiol.ox.ac.uk
+COR (0.9.31.583)
+Copyright 2002-2007 Oxford Cardiac Electrophysiology Group
+http://COR.physiol.ox.ac.uk/ - COR@physiol.ox.ac.uk
 
-CellML 1.0 was used to generate this model
-http://www.cellml.org/
+CellML 1.0 was used to generate this cellular model
+http://www.CellML.org/
 -->
-<model name="tentusscher_panfilov_2006_epi" cmeta:id="tentusscher_panfilov_2006_epi" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#" xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
-   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-      <rdf:Description rdf:about="#tentusscher_panfilov_2006_epi"> 
-	     <named-attribute xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#"> 
-	        <rdf:Description> 
-	           <name rdf:datatype="http://www.w3.org/2000/10/XMLSchema#string">SuggestedForwardEulerTimestep</name> 
-	           <value rdf:datatype="http://www.w3.org/2000/10/XMLSchema#double">0.001</value> 
-	        </rdf:Description> 
-	     </named-attribute> 
-	  </rdf:Description> 
-   </rdf:RDF>
+<model name="tentusscher_model_2006_epi" cmeta:id="tentusscher_model_2006_epi" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#" xmlns:cmeta="http://www.cellml.org/metadata/1.0#">
    <units name="micrometre">
       <unit units="metre" prefix="micro"/>
    </units>
    <units name="micrometre3">
       <unit units="metre" prefix="micro" exponent="3"/>
-   </units>
-   <units name="litre_micrometre3">
-      <unit units="litre"/>
-      <unit units="micrometre3" exponent="-1"/>
    </units>
    <units name="millisecond">
       <unit units="second" prefix="milli"/>
@@ -39,12 +25,6 @@ http://www.cellml.org/
    <units name="millivolt">
       <unit units="volt" prefix="milli"/>
    </units>
-   <units name="millivolt_square">
-      <unit units="volt" prefix="milli" exponent="+2"/>
-   </units>
-   <units name="per_millivolt">
-      <unit units="volt" prefix="milli" exponent="-1"/>
-   </units>
    <units name="nanoS_per_picoF">
       <unit units="siemens" prefix="nano"/>
       <unit units="farad" prefix="pico" exponent="-1"/>
@@ -54,10 +34,6 @@ http://www.cellml.org/
    </units>
    <units name="picoA">
       <unit units="ampere" prefix="pico"/>
-   </units>
-   <units name="mA_pA">
-      <unit units="ampere" prefix="milli"/>
-      <unit units="picoA" exponent="-1"/>
    </units>
    <units name="picoA_per_picoF">
       <unit units="ampere" prefix="pico"/>
@@ -90,7 +66,7 @@ http://www.cellml.org/
    </units>
    <units name="coulomb_per_millimole">
       <unit units="coulomb"/>
-      <unit units="mole" prefix="milli" exponent="-1"/>
+      <unit units="millimolar" exponent="-1"/>
    </units>
    <units name="cm2">
       <unit units="metre" prefix="centi" exponent="2"/>
@@ -99,16 +75,11 @@ http://www.cellml.org/
       <unit units="microF"/>
       <unit units="cm2" exponent="-1"/>
    </units>
-   <units name="litre_per_farad_second">
-      <unit units="litre"/>
-      <unit units="farad" exponent="-1"/>
-      <unit units="second" exponent="-1"/>
-   </units>
    <component name="environment">
       <variable name="time" units="millisecond" public_interface="out"/>
    </component>
    <component name="membrane">
-      <variable name="V" units="millivolt" initial_value="-85.23" public_interface="out"  cmeta:id="membrane_voltage">
+      <variable name="V" units="millivolt" initial_value="-85.23" public_interface="out" cmeta:id="membrane_voltage">
       	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
 			<rdf:Description rdf:about="#membrane_voltage">
 				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
@@ -118,7 +89,13 @@ http://www.cellml.org/
       <variable name="R" units="joule_per_mole_kelvin" initial_value="8314.472" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="310" public_interface="out"/>
       <variable name="F" units="coulomb_per_millimole" initial_value="96485.3415" public_interface="out"/>
-      <variable name="Cm" units="microF" initial_value="0.185" public_interface="out"/>
+      <variable name="Cm" units="microF_per_cm2" initial_value="0.185" public_interface="out" cmeta:id="Cm">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+          <rdf:Description rdf:about="#Cm">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="V_c" units="micrometre3" initial_value="0.016404" public_interface="out"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="i_K1" units="picoA_per_picoF" public_interface="in"/>
@@ -140,32 +117,38 @@ http://www.cellml.org/
 			</rdf:Description>
 		</rdf:RDF>
 	  </variable>
-      <variable name="i_Stim_Start" units="millisecond" initial_value="10" cmeta:id="membrane_stimulus_current_offset">
+      <variable name="stim_start" units="millisecond" initial_value="50" cmeta:id="membrane_stimulus_current_offset">
 	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
 			<rdf:Description rdf:about="#membrane_stimulus_current_offset">
 				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_offset"/>
 			</rdf:Description>
 		</rdf:RDF>
 	  </variable>
-      <variable name="i_Stim_End" units="millisecond" initial_value="100000"/>
-      <variable name="i_Stim_Amplitude" units="picoA_per_picoF" initial_value="-52" cmeta:id="membrane_stimulus_current_amplitude">
+      <variable name="stim_end" units="millisecond" initial_value="9000" cmeta:id="membrane_stimulus_current_end">
 	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-			<rdf:Description rdf:about="#membrane_stimulus_current_amplitude">
-				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
+			<rdf:Description rdf:about="#membrane_stimulus_current_end">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_end"/>
 			</rdf:Description>
 		</rdf:RDF>
 	  </variable>
-      <variable name="i_Stim_Period" units="millisecond" initial_value="1000" cmeta:id="membrane_stimulus_current_period">
+      <variable name="stim_period" units="millisecond" initial_value="1000" cmeta:id="membrane_stimulus_current_period">
 	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
 			<rdf:Description rdf:about="#membrane_stimulus_current_period">
 				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_period"/>
 			</rdf:Description>
 		</rdf:RDF>
 	  </variable>
-      <variable name="i_Stim_PulseDuration" units="millisecond" initial_value="1" cmeta:id="membrane_stimulus_current_duration">
+      <variable name="stim_duration" units="millisecond" initial_value="1" cmeta:id="membrane_stimulus_current_duration">
 	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
 			<rdf:Description rdf:about="#membrane_stimulus_current_duration">
 				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_duration"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
+      <variable name="stim_amplitude" units="picoA_per_picoF" initial_value="-52" cmeta:id="membrane_stimulus_current_amplitude">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current_amplitude">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
 			</rdf:Description>
 		</rdf:RDF>
 	  </variable>
@@ -175,18 +158,18 @@ http://www.cellml.org/
             <ci>i_Stim</ci>
             <piecewise>
                <piece>
-                  <ci>i_Stim_Amplitude</ci>
+                  <ci>stim_amplitude</ci>
                   <apply>
                      <and/>
                      <apply>
                         <geq/>
                         <ci>time</ci>
-                        <ci>i_Stim_Start</ci>
+                        <ci>stim_start</ci>
                      </apply>
                      <apply>
                         <leq/>
                         <ci>time</ci>
-                        <ci>i_Stim_End</ci>
+                        <ci>stim_end</ci>
                      </apply>
                      <apply>
                         <leq/>
@@ -195,7 +178,7 @@ http://www.cellml.org/
                            <apply>
                               <minus/>
                               <ci>time</ci>
-                              <ci>i_Stim_Start</ci>
+                              <ci>stim_start</ci>
                            </apply>
                            <apply>
                               <times/>
@@ -206,15 +189,15 @@ http://www.cellml.org/
                                     <apply>
                                        <minus/>
                                        <ci>time</ci>
-                                       <ci>i_Stim_Start</ci>
+                                       <ci>stim_start</ci>
                                     </apply>
-                                    <ci>i_Stim_Period</ci>
+                                    <ci>stim_period</ci>
                                  </apply>
                               </apply>
-                              <ci>i_Stim_Period</ci>
+                              <ci>stim_period</ci>
                            </apply>
                         </apply>
-                        <ci>i_Stim_PulseDuration</ci>
+                        <ci>stim_duration</ci>
                      </apply>
                   </apply>
                </piece>
@@ -233,7 +216,15 @@ http://www.cellml.org/
                <ci>V</ci>
             </apply>
             <apply>
-               <minus/>
+               <times/>
+               <apply>
+                  <divide/>
+                  <apply>
+                     <minus/>
+                     <cn cellml:units="dimensionless">1</cn>
+                  </apply>
+                  <cn cellml:units="dimensionless">1</cn>
+               </apply>
                <apply>
                   <plus/>
                   <ci>i_K1</ci>
@@ -259,7 +250,7 @@ http://www.cellml.org/
       <variable name="E_K" units="millivolt" public_interface="out"/>
       <variable name="E_Ks" units="millivolt" public_interface="out"/>
       <variable name="E_Ca" units="millivolt" public_interface="out"/>
-      <variable name="P_kna" units="dimensionless" initial_value="0.03"/>
+      <variable name="P_kna" units="nanoA_per_millimolar" initial_value="0.03"/>
       <variable name="K_o" units="millimolar" public_interface="in"/>
       <variable name="Na_o" units="millimolar" public_interface="in"/>
       <variable name="K_i" units="millimolar" public_interface="in"/>
@@ -390,7 +381,6 @@ http://www.cellml.org/
       <variable name="i_K1" units="picoA_per_picoF" public_interface="out"/>
       <variable name="g_K1" units="nanoS_per_picoF" initial_value="5.405"/>
       <variable name="V" units="millivolt" public_interface="in"/>
-      <variable name="K_o" units="millimolar" public_interface="in"/>
       <variable name="E_K" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="xK1_inf" units="dimensionless"/>
@@ -410,7 +400,7 @@ http://www.cellml.org/
                      <exp/>
                      <apply>
                         <times/>
-                        <cn cellml:units="per_millivolt">0.06</cn>
+                        <cn cellml:units="dimensionless">0.06</cn>
                         <apply>
                            <minus/>
                            <apply>
@@ -439,7 +429,7 @@ http://www.cellml.org/
                         <exp/>
                         <apply>
                            <times/>
-                           <cn cellml:units="per_millivolt">0.0002</cn>
+                           <cn cellml:units="dimensionless">0.0002</cn>
                            <apply>
                               <plus/>
                               <apply>
@@ -456,7 +446,7 @@ http://www.cellml.org/
                      <exp/>
                      <apply>
                         <times/>
-                        <cn cellml:units="per_millivolt">0.1</cn>
+                        <cn cellml:units="dimensionless">0.1</cn>
                         <apply>
                            <minus/>
                            <apply>
@@ -478,7 +468,7 @@ http://www.cellml.org/
                         <times/>
                         <apply>
                            <minus/>
-                           <cn cellml:units="per_millivolt">0.5</cn>
+                           <cn cellml:units="dimensionless">0.5</cn>
                         </apply>
                         <apply>
                            <minus/>
@@ -511,14 +501,6 @@ http://www.cellml.org/
                <ci>g_K1</ci>
                <ci>xK1_inf</ci>
                <apply>
-                  <root/>
-                  <apply>
-                     <divide/>
-                     <ci>K_o</ci>
-                     <cn cellml:units="millimolar">5.4</cn>
-                  </apply>
-               </apply>
-               <apply>
                   <minus/>
                   <ci>V</ci>
                   <ci>E_K</ci>
@@ -528,15 +510,10 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="rapid_time_dependent_potassium_current">
+      <variable name="ScaleFactorGkr" units="dimensionless" cmeta:id="ScaleFactorGkr" initial_value="1.0"/>
       <variable name="i_Kr" units="picoA_per_picoF" public_interface="out"/>
-      <variable name="g_Kr" units="nanoS_per_picoF" initial_value="0.153" cmeta:id="membrane_rapid_delayed_rectifier_potassium_current_conductance">
-      	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-      		<rdf:Description rdf:about="#membrane_rapid_delayed_rectifier_potassium_current_conductance">
-      			<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_rapid_delayed_rectifier_potassium_current_conductance"/>
-			</rdf:Description>
-		</rdf:RDF>
-	  </variable>
-	  <variable name="E_K" units="millivolt" public_interface="in"/>
+      <variable name="g_Kr" units="nanoS_per_picoF" initial_value="0.153"/>
+      <variable name="E_K" units="millivolt" public_interface="in"/>
       <variable name="K_o" units="millimolar" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in" private_interface="out"/>
       <variable name="V" units="millivolt" public_interface="in" private_interface="out"/>
@@ -548,13 +525,14 @@ http://www.cellml.org/
             <ci>i_Kr</ci>
             <apply>
                <times/>
+               <ci>ScaleFactorGkr</ci>
                <ci>g_Kr</ci>
                <apply>
                   <root/>
                   <apply>
                      <divide/>
                      <ci>K_o</ci>
-                     <cn cellml:units="millimolar">5.4</cn>
+                     <cn cellml:units="dimensionless">5.4</cn>
                   </apply>
                </apply>
                <ci>Xr1</ci>
@@ -573,8 +551,8 @@ http://www.cellml.org/
       <variable name="V" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="xr1_inf" units="dimensionless"/>
-      <variable name="alpha_xr1" units="dimensionless"/>
-      <variable name="beta_xr1" units="dimensionless"/>
+      <variable name="alpha_xr1" units="per_millisecond"/>
+      <variable name="beta_xr1" units="per_millisecond"/>
       <variable name="tau_xr1" units="millisecond"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
@@ -609,7 +587,7 @@ http://www.cellml.org/
             <ci>alpha_xr1</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">450</cn>
+               <cn cellml:units="per_millisecond">450</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -636,7 +614,7 @@ http://www.cellml.org/
             <ci>beta_xr1</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">6</cn>
+               <cn cellml:units="per_millisecond">6</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -660,7 +638,6 @@ http://www.cellml.org/
             <ci>tau_xr1</ci>
             <apply>
                <times/>
-               <cn cellml:units="millisecond">1</cn>
                <ci>alpha_xr1</ci>
                <ci>beta_xr1</ci>
             </apply>
@@ -691,8 +668,8 @@ http://www.cellml.org/
       <variable name="V" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="xr2_inf" units="dimensionless"/>
-      <variable name="alpha_xr2" units="dimensionless"/>
-      <variable name="beta_xr2" units="dimensionless"/>
+      <variable name="alpha_xr2" units="per_millisecond"/>
+      <variable name="beta_xr2" units="per_millisecond"/>
       <variable name="tau_xr2" units="millisecond"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
@@ -724,7 +701,7 @@ http://www.cellml.org/
             <ci>alpha_xr2</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">3</cn>
+               <cn cellml:units="per_millisecond">3</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -751,7 +728,7 @@ http://www.cellml.org/
             <ci>beta_xr2</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">1.12</cn>
+               <cn cellml:units="per_millisecond">1.12</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -775,7 +752,6 @@ http://www.cellml.org/
             <ci>tau_xr2</ci>
             <apply>
                <times/>
-               <cn cellml:units="millisecond">1</cn>
                <ci>alpha_xr2</ci>
                <ci>beta_xr2</ci>
             </apply>
@@ -802,6 +778,7 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="slow_time_dependent_potassium_current">
+      <variable name="ScaleFactorGks" units="dimensionless" cmeta:id="ScaleFactorGks" initial_value="1.0"/>
       <variable name="i_Ks" units="picoA_per_picoF" public_interface="out"/>
       <variable name="g_Ks" units="nanoS_per_picoF" initial_value="0.392"/>
       <variable name="E_Ks" units="millivolt" public_interface="in"/>
@@ -814,6 +791,7 @@ http://www.cellml.org/
             <ci>i_Ks</ci>
             <apply>
                <times/>
+               <ci>ScaleFactorGks</ci>
                <ci>g_Ks</ci>
                <apply>
                   <power/>
@@ -834,8 +812,8 @@ http://www.cellml.org/
       <variable name="V" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="xs_inf" units="dimensionless"/>
-      <variable name="alpha_xs" units="dimensionless"/>
-      <variable name="beta_xs" units="dimensionless"/>
+      <variable name="alpha_xs" units="per_millisecond"/>
+      <variable name="beta_xs" units="per_millisecond"/>
       <variable name="tau_xs" units="millisecond"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
@@ -870,7 +848,7 @@ http://www.cellml.org/
             <ci>alpha_xs</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">1400</cn>
+               <cn cellml:units="per_millisecond">1400</cn>
                <apply>
                   <root/>
                   <apply>
@@ -897,7 +875,7 @@ http://www.cellml.org/
             <ci>beta_xs</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">1</cn>
+               <cn cellml:units="per_millisecond">1</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -923,7 +901,6 @@ http://www.cellml.org/
                <plus/>
                <apply>
                   <times/>
-                  <cn cellml:units="millisecond">1</cn>
                   <ci>alpha_xs</ci>
                   <ci>beta_xs</ci>
                </apply>
@@ -953,13 +930,7 @@ http://www.cellml.org/
    </component>
    <component name="fast_sodium_current">
       <variable name="i_Na" units="picoA_per_picoF" public_interface="out"/>
-      <variable name="g_Na" units="nanoS_per_picoF" initial_value="14.838" cmeta:id="membrane_fast_sodium_current_conductance">
-		<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-			<rdf:Description rdf:about="#membrane_fast_sodium_current_conductance">
-				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_fast_sodium_current_conductance"/>
-			</rdf:Description>
-		</rdf:RDF>
-	  </variable>
+      <variable name="g_Na" units="nanoS_per_picoF" initial_value="14.838"/>
       <variable name="E_Na" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in" private_interface="out"/>
       <variable name="V" units="millivolt" public_interface="in" private_interface="out"/>
@@ -994,8 +965,8 @@ http://www.cellml.org/
       <variable name="V" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="m_inf" units="dimensionless"/>
-      <variable name="alpha_m" units="dimensionless"/>
-      <variable name="beta_m" units="dimensionless"/>
+      <variable name="alpha_m" units="per_millisecond"/>
+      <variable name="beta_m" units="per_millisecond"/>
       <variable name="tau_m" units="millisecond"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
@@ -1034,7 +1005,7 @@ http://www.cellml.org/
             <ci>alpha_m</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">1</cn>
+               <cn cellml:units="per_millisecond">1</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -1063,7 +1034,7 @@ http://www.cellml.org/
                <plus/>
                <apply>
                   <divide/>
-                  <cn cellml:units="dimensionless">0.1</cn>
+                  <cn cellml:units="per_millisecond">0.1</cn>
                   <apply>
                      <plus/>
                      <cn cellml:units="dimensionless">1</cn>
@@ -1083,7 +1054,7 @@ http://www.cellml.org/
                </apply>
                <apply>
                   <divide/>
-                  <cn cellml:units="dimensionless">0.1</cn>
+                  <cn cellml:units="per_millisecond">0.1</cn>
                   <apply>
                      <plus/>
                      <cn cellml:units="dimensionless">1</cn>
@@ -1108,7 +1079,6 @@ http://www.cellml.org/
             <ci>tau_m</ci>
             <apply>
                <times/>
-               <cn cellml:units="millisecond">1</cn>
                <ci>alpha_m</ci>
                <ci>beta_m</ci>
             </apply>
@@ -1223,7 +1193,7 @@ http://www.cellml.org/
                            <exp/>
                            <apply>
                               <times/>
-                              <cn cellml:units="per_millivolt">0.079</cn>
+                              <cn cellml:units="dimensionless">0.079</cn>
                               <ci>V</ci>
                            </apply>
                         </apply>
@@ -1235,7 +1205,7 @@ http://www.cellml.org/
                            <exp/>
                            <apply>
                               <times/>
-                              <cn cellml:units="per_millivolt">0.3485</cn>
+                              <cn cellml:units="dimensionless">0.3485</cn>
                               <ci>V</ci>
                            </apply>
                         </apply>
@@ -1360,50 +1330,45 @@ http://www.cellml.org/
                   <apply>
                      <divide/>
                      <apply>
-                        <divide/>
+                        <times/>
                         <apply>
-                           <times/>
+                           <minus/>
                            <apply>
-                              <minus/>
+                              <times/>
                               <apply>
-                                 <times/>
-                                 <apply>
-                                    <minus/>
-                                    <cn cellml:units="per_millisecond">25428</cn>
-                                 </apply>
-                                 <apply>
-                                    <exp/>
-                                    <apply>
-                                       <times/>
-                                       <cn cellml:units="per_millivolt">0.2444</cn>
-                                       <ci>V</ci>
-                                    </apply>
-                                 </apply>
+                                 <minus/>
+                                 <cn cellml:units="per_millisecond">25428</cn>
                               </apply>
                               <apply>
-                                 <times/>
-                                 <cn type="e-notation" cellml:units="per_millisecond">6.948   <sep/>
-                                 -6</cn>
+                                 <exp/>
                                  <apply>
-                                    <exp/>
-                                    <apply>
-                                       <times/>
-                                       <apply>
-                                          <minus/>
-                                          <cn cellml:units="per_millivolt">0.04391</cn>
-                                       </apply>
-                                       <ci>V</ci>
-                                    </apply>
+                                    <times/>
+                                    <cn cellml:units="dimensionless">0.2444</cn>
+                                    <ci>V</ci>
                                  </apply>
                               </apply>
                            </apply>
                            <apply>
-                              <plus/>
-                              <ci>V</ci>
-                              <cn cellml:units="millivolt">37.78</cn>
+                              <times/>
+                              <cn cellml:units="per_millisecond">6.948e-6</cn>
+                              <apply>
+                                 <exp/>
+                                 <apply>
+                                    <times/>
+                                    <apply>
+                                       <minus/>
+                                       <cn cellml:units="dimensionless">0.04391</cn>
+                                    </apply>
+                                    <ci>V</ci>
+                                 </apply>
+                              </apply>
                            </apply>
                         </apply>
-                        <cn cellml:units="millivolt">1</cn>
+                        <apply>
+                           <plus/>
+                           <ci>V</ci>
+                           <cn cellml:units="millivolt">37.78</cn>
+                        </apply>
                      </apply>
                      <apply>
                         <plus/>
@@ -1412,7 +1377,7 @@ http://www.cellml.org/
                            <exp/>
                            <apply>
                               <times/>
-                              <cn cellml:units="per_millivolt">0.311</cn>
+                              <cn cellml:units="dimensionless">0.311</cn>
                               <apply>
                                  <plus/>
                                  <ci>V</ci>
@@ -1452,7 +1417,7 @@ http://www.cellml.org/
                               <times/>
                               <apply>
                                  <minus/>
-                                 <cn cellml:units="per_millivolt">0.01052</cn>
+                                 <cn cellml:units="dimensionless">0.01052</cn>
                               </apply>
                               <ci>V</ci>
                            </apply>
@@ -1467,7 +1432,7 @@ http://www.cellml.org/
                               <times/>
                               <apply>
                                  <minus/>
-                                 <cn cellml:units="per_millivolt">0.1378</cn>
+                                 <cn cellml:units="dimensionless">0.1378</cn>
                               </apply>
                               <apply>
                                  <plus/>
@@ -1497,7 +1462,7 @@ http://www.cellml.org/
                            <exp/>
                            <apply>
                               <times/>
-                              <cn cellml:units="per_millivolt">0.057</cn>
+                              <cn cellml:units="dimensionless">0.057</cn>
                               <ci>V</ci>
                            </apply>
                         </apply>
@@ -1511,7 +1476,7 @@ http://www.cellml.org/
                               <times/>
                               <apply>
                                  <minus/>
-                                 <cn cellml:units="per_millivolt">0.1</cn>
+                                 <cn cellml:units="dimensionless">0.1</cn>
                               </apply>
                               <apply>
                                  <plus/>
@@ -1583,14 +1548,8 @@ http://www.cellml.org/
    </component>
    <component name="L_type_Ca_current">
       <variable name="i_CaL" units="picoA_per_picoF" public_interface="out"/>
-      <variable name="g_CaL" units="litre_per_farad_second" initial_value="0.0000398" cmeta:id="membrane_L_type_calcium_current_conductance">
-		<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-			<rdf:Description rdf:about="#membrane_L_type_calcium_current_conductance">
-				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_L_type_calcium_current_conductance"/>
-			</rdf:Description>
-		</rdf:RDF>
-  	  </variable>
-  	  <variable name="Ca_o" units="millimolar" public_interface="in"/>
+      <variable name="g_CaL" units="nanoS_per_picoF" initial_value="0.0000398"/>
+      <variable name="Ca_o" units="millimolar" public_interface="in"/>
       <variable name="Ca_ss" units="millimolar" public_interface="in" private_interface="out"/>
       <variable name="R" units="joule_per_mole_kelvin" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in"/>
@@ -1701,9 +1660,9 @@ http://www.cellml.org/
       <variable name="V" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="d_inf" units="dimensionless"/>
-      <variable name="alpha_d" units="dimensionless"/>
-      <variable name="beta_d" units="dimensionless"/>
-      <variable name="gamma_d" units="millisecond"/>
+      <variable name="alpha_d" units="per_millisecond"/>
+      <variable name="beta_d" units="per_millisecond"/>
+      <variable name="gamma_d" units="per_millisecond"/>
       <variable name="tau_d" units="millisecond"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
@@ -1740,7 +1699,7 @@ http://www.cellml.org/
                <plus/>
                <apply>
                   <divide/>
-                  <cn cellml:units="dimensionless">1.4</cn>
+                  <cn cellml:units="per_millisecond">1.4</cn>
                   <apply>
                      <plus/>
                      <cn cellml:units="dimensionless">1</cn>
@@ -1761,7 +1720,7 @@ http://www.cellml.org/
                      </apply>
                   </apply>
                </apply>
-               <cn cellml:units="dimensionless">0.25</cn>
+               <cn cellml:units="per_millisecond">0.25</cn>
             </apply>
          </apply>
          <apply>
@@ -1769,7 +1728,7 @@ http://www.cellml.org/
             <ci>beta_d</ci>
             <apply>
                <divide/>
-               <cn cellml:units="dimensionless">1.4</cn>
+               <cn cellml:units="per_millisecond">1.4</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -1793,7 +1752,7 @@ http://www.cellml.org/
             <ci>gamma_d</ci>
             <apply>
                <divide/>
-               <cn cellml:units="millisecond">1</cn>
+               <cn cellml:units="per_millisecond">1</cn>
                <apply>
                   <plus/>
                   <cn cellml:units="dimensionless">1</cn>
@@ -1819,7 +1778,6 @@ http://www.cellml.org/
                <plus/>
                <apply>
                   <times/>
-                  <cn cellml:units="millisecond">1</cn>
                   <ci>alpha_d</ci>
                   <ci>beta_d</ci>
                </apply>
@@ -1902,7 +1860,7 @@ http://www.cellml.org/
                               <cn cellml:units="dimensionless">2</cn>
                            </apply>
                         </apply>
-                        <cn cellml:units="millivolt_square">225</cn>
+                        <cn cellml:units="millivolt">225</cn>
                      </apply>
                   </apply>
                </apply>
@@ -2029,7 +1987,7 @@ http://www.cellml.org/
                               <cn cellml:units="dimensionless">2</cn>
                            </apply>
                         </apply>
-                        <cn cellml:units="millivolt_square">240</cn>
+                        <cn cellml:units="millivolt">240</cn>
                      </apply>
                   </apply>
                </apply>
@@ -2198,15 +2156,10 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="transient_outward_current">
+      <variable name="ScaleFactorIto" units="dimensionless" cmeta:id="ScaleFactorIto" initial_value="1.0"/>
       <variable name="i_to" units="picoA_per_picoF" public_interface="out"/>
-      <variable name="g_to" units="nanoS_per_picoF" initial_value="0.294" cmeta:id="membrane_transient_outward_current_conductance">
-		<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-			<rdf:Description rdf:about="#membrane_transient_outward_current_conductance">
-				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_transient_outward_current_conductance"/>
-			</rdf:Description>
-		</rdf:RDF>
-	  </variable>
-	  <variable name="E_K" units="millivolt" public_interface="in"/>
+      <variable name="g_to" units="nanoS_per_picoF" initial_value="0.294"/>
+      <variable name="E_K" units="millivolt" public_interface="in"/>
       <variable name="V" units="millivolt" public_interface="in" private_interface="out"/>
       <variable name="time" units="millisecond" public_interface="in" private_interface="out"/>
       <variable name="s" units="dimensionless" private_interface="in"/>
@@ -2217,6 +2170,7 @@ http://www.cellml.org/
             <ci>i_to</ci>
             <apply>
                <times/>
+               <ci>ScaleFactorIto</ci>
                <ci>g_to</ci>
                <ci>r</ci>
                <ci>s</ci>
@@ -2234,13 +2188,7 @@ http://www.cellml.org/
       <variable name="V" units="millivolt" public_interface="in"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="s_inf" units="dimensionless"/>
-      <variable name="tau_s" units="millisecond"/>
-      <variable name="s_gateparam" units="millivolt" initial_value="20"/>
-      <variable name="tau_sconstant1" units="millisecond" initial_value="3"/>
-      <variable name="tau_s_term1" units="millisecond" initial_value="85"/>
-      <variable name="tau_s_t1V" units="millivolt" initial_value="45"/>
-      <variable name="tau_s_t1Vdenom" units="millivolt_square" initial_value="320"/>
-      <variable name="tau_s_term2" units="millisecond" initial_value="5"/>
+      <variable name="tau_s" units="dimensionless"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
             <eq/>
@@ -2258,7 +2206,7 @@ http://www.cellml.org/
                         <apply>
                            <plus/>
                            <ci>V</ci>
-                           <ci>s_gateparam</ci>
+                           <cn cellml:units="millivolt">20</cn>
                         </apply>
                         <cn cellml:units="millivolt">5</cn>
                      </apply>
@@ -2273,7 +2221,7 @@ http://www.cellml.org/
                <plus/>
                <apply>
                   <times/>
-                  <ci>tau_s_term1</ci>
+                  <cn cellml:units="millisecond">85</cn>
                   <apply>
                      <exp/>
                      <apply>
@@ -2285,18 +2233,18 @@ http://www.cellml.org/
                               <apply>
                                  <plus/>
                                  <ci>V</ci>
-                                 <ci>tau_s_t1V</ci>
+                                 <cn cellml:units="millivolt">45</cn>
                               </apply>
                               <cn cellml:units="dimensionless">2</cn>
                            </apply>
                         </apply>
-                        <ci>tau_s_t1Vdenom</ci>
+                        <cn cellml:units="millivolt">320</cn>
                      </apply>
                   </apply>
                </apply>
                <apply>
                   <divide/>
-                  <ci>tau_s_term2</ci>
+                  <cn cellml:units="millisecond">5</cn>
                   <apply>
                      <plus/>
                      <cn cellml:units="dimensionless">1</cn>
@@ -2314,7 +2262,7 @@ http://www.cellml.org/
                      </apply>
                   </apply>
                </apply>
-               <ci>tau_sconstant1</ci>
+               <cn cellml:units="millisecond">3</cn>
             </apply>
          </apply>
          <apply>
@@ -2393,7 +2341,7 @@ http://www.cellml.org/
                               <cn cellml:units="dimensionless">2</cn>
                            </apply>
                         </apply>
-                        <cn cellml:units="millivolt_square">1800</cn>
+                        <cn cellml:units="millivolt">1800</cn>
                      </apply>
                   </apply>
                </apply>
@@ -2662,7 +2610,7 @@ http://www.cellml.org/
    </component>
    <component name="calcium_pump_current">
       <variable name="i_p_Ca" units="picoA_per_picoF" public_interface="out"/>
-      <variable name="g_pCa" units="picoA_per_picoF" initial_value="0.1238"/>
+      <variable name="g_pCa" units="nanoS_per_picoF" initial_value="0.1238"/>
       <variable name="K_pCa" units="millimolar" initial_value="0.0005"/>
       <variable name="Ca_i" units="millimolar" public_interface="in"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -2727,12 +2675,20 @@ http://www.cellml.org/
    </component>
    <component name="calcium_dynamics">
       <variable name="Ca_i" units="millimolar" initial_value="0.000126" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
-      <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
          <rdf:Description rdf:about="#cytosolic_calcium_concentration">
             <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
          </rdf:Description>
-      </rdf:RDF></variable>
-      <variable name="Ca_o" units="millimolar" initial_value="2" public_interface="out"/>
+        </rdf:RDF>
+      </variable>
+      <variable name="Ca_o" units="millimolar" initial_value="2" public_interface="out" cmeta:id="extracellular_calcium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#extracellular_calcium_concentration">
+            <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_calcium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="Ca_SR" units="millimolar" initial_value="3.64"/>
       <variable name="Ca_ss" units="millimolar" initial_value="0.00036" public_interface="out"/>
       <variable name="i_rel" units="millimolar_per_millisecond"/>
@@ -2751,14 +2707,28 @@ http://www.cellml.org/
       <variable name="max_sr" units="dimensionless" initial_value="2.5"/>
       <variable name="min_sr" units="dimensionless" initial_value="1"/>
       <variable name="kcasr" units="dimensionless"/>
-      <variable name="V_rel" units="per_millisecond" initial_value="0.102"/>
-      <variable name="V_xfer" units="per_millisecond" initial_value="0.0038"/>
+      <variable name="V_rel" units="millimolar_per_millisecond" initial_value="0.102"/>
+      <variable name="V_xfer" units="millimolar_per_millisecond" initial_value="0.0038"/>
       <variable name="K_up" units="millimolar" initial_value="0.00025"/>
-      <variable name="V_leak" units="per_millisecond" initial_value="0.00036"/>
+      <variable name="V_leak" units="millimolar_per_millisecond" initial_value="0.00036"/>
       <variable name="Vmax_up" units="millimolar_per_millisecond" initial_value="0.006375"/>
-      <variable name="Ca_i_bufc" units="dimensionless"/>
-      <variable name="Ca_sr_bufsr" units="dimensionless"/>
-      <variable name="Ca_ss_bufss" units="dimensionless"/>
+      <variable name="Ca_i_bufc" units="millimolar" cmeta:id="cytosolic_calcium_flux_scaling_from_intrinsic_buffers">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_flux_scaling_from_intrinsic_buffers">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_flux_scaling_from_intrinsic_buffers"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
+      <variable name="Ca_sr_bufsr" units="millimolar"/>
+      <variable name="Ca_ss_bufss" units="millimolar" cmeta:id="submembrane_space_calcium_flux_scaling_from_intrinsic_buffers">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#submembrane_space_calcium_flux_scaling_from_intrinsic_buffers">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#submembrane_space_calcium_flux_scaling_from_intrinsic_buffers"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Buf_c" units="millimolar" initial_value="0.2"/>
       <variable name="K_buf_c" units="millimolar" initial_value="0.001"/>
       <variable name="Buf_sr" units="millimolar" initial_value="10"/>
@@ -2772,7 +2742,7 @@ http://www.cellml.org/
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="d" units="dimensionless" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in"/>
-      <variable name="Cm" units="microF" public_interface="in"/>
+      <variable name="Cm" units="microF_per_cm2" public_interface="in"/>
       <variable name="i_CaL" units="picoA_per_picoF" public_interface="in"/>
       <variable name="i_NaCa" units="picoA_per_picoF" public_interface="in"/>
       <variable name="i_p_Ca" units="picoA_per_picoF" public_interface="in"/>
@@ -3073,7 +3043,6 @@ http://www.cellml.org/
                      <divide/>
                      <apply>
                         <times/>
-                        <cn cellml:units="mA_pA">1</cn>
                         <apply>
                            <minus/>
                            <apply>
@@ -3092,7 +3061,6 @@ http://www.cellml.org/
                      <apply>
                         <times/>
                         <cn cellml:units="dimensionless">2</cn>
-                        <cn cellml:units="litre_micrometre3">1</cn>
                         <ci>V_c</ci>
                         <ci>F</ci>
                      </apply>
@@ -3145,15 +3113,13 @@ http://www.cellml.org/
                            <times/>
                            <apply>
                               <minus/>
-                              <cn cellml:units="mA_pA">1</cn>
+                              <ci>i_CaL</ci>
                            </apply>
-                           <ci>i_CaL</ci>
                            <ci>Cm</ci>
                         </apply>
                         <apply>
                            <times/>
                            <cn cellml:units="dimensionless">2</cn>
-                           <cn cellml:units="litre_micrometre3">1</cn>
                            <ci>V_ss</ci>
                            <ci>F</ci>
                         </apply>
@@ -3183,11 +3149,24 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="sodium_dynamics">
-      <variable name="Na_i" units="millimolar" initial_value="8.604" public_interface="out"/>
-      <variable name="Na_o" units="millimolar" initial_value="140" public_interface="out"/>
+      <variable name="Na_i" units="millimolar" initial_value="8.604" public_interface="out" cmeta:id="cytosolic_sodium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_sodium_concentration">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_sodium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
+      <variable name="Na_o" units="millimolar" initial_value="140" public_interface="out" cmeta:id="extracellular_sodium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#extracellular_sodium_concentration">
+            <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_sodium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in"/>
-      <variable name="Cm" units="microF" public_interface="in"/>
+      <variable name="Cm" units="microF_per_cm2" public_interface="in"/>
       <variable name="V_c" units="micrometre3" public_interface="in"/>
       <variable name="i_Na" units="picoA_per_picoF" public_interface="in"/>
       <variable name="i_NaCa" units="picoA_per_picoF" public_interface="in"/>
@@ -3208,11 +3187,7 @@ http://www.cellml.org/
                <apply>
                   <divide/>
                   <apply>
-                     <times/>
-                     <apply>
-                        <minus/>
-                        <cn cellml:units="mA_pA">1</cn>
-                     </apply>
+                     <minus/>
                      <apply>
                         <plus/>
                         <ci>i_Na</ci>
@@ -3231,7 +3206,6 @@ http://www.cellml.org/
                   </apply>
                   <apply>
                      <times/>
-                     <cn cellml:units="litre_micrometre3">1</cn>
                      <ci>V_c</ci>
                      <ci>F</ci>
                   </apply>
@@ -3242,11 +3216,24 @@ http://www.cellml.org/
       </math>
    </component>
    <component name="potassium_dynamics">
-      <variable name="K_i" units="millimolar" initial_value="136.89" public_interface="out"/>
-      <variable name="K_o" units="millimolar" initial_value="5.4" public_interface="out"/>
+      <variable name="K_i" units="millimolar" initial_value="136.89" public_interface="out" cmeta:id="cytosolic_potassium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_potassium_concentration">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_potassium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
+      <variable name="K_o" units="millimolar" initial_value="5.4" public_interface="out" cmeta:id="extracellular_potassium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#extracellular_potassium_concentration">
+            <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_potassium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>      
       <variable name="time" units="millisecond" public_interface="in"/>
-      <variable name="F" units="coulomb_per_millimole" public_interface="in"/>
-      <variable name="Cm" units="microF" public_interface="in"/>
+      <variable name="F" units="coulomb_per_millimole" public_interface="in" cmeta:id="K_F"/>
+      <variable name="Cm" units="microF_per_cm2" public_interface="in"/>
       <variable name="V_c" units="micrometre3" public_interface="in"/>
       <variable name="i_K1" units="picoA_per_picoF" public_interface="in"/>
       <variable name="i_to" units="picoA_per_picoF" public_interface="in"/>
@@ -3270,11 +3257,7 @@ http://www.cellml.org/
                <apply>
                   <divide/>
                   <apply>
-                     <times/>
-                     <apply>
-                        <minus/>
-                        <cn cellml:units="mA_pA">1</cn>
-                     </apply>
+                     <minus/>
                      <apply>
                         <minus/>
                         <apply>
@@ -3295,7 +3278,6 @@ http://www.cellml.org/
                   </apply>
                   <apply>
                      <times/>
-                     <cn cellml:units="litre_micrometre3">1</cn>
                      <ci>V_c</ci>
                      <ci>F</ci>
                   </apply>
@@ -3572,7 +3554,6 @@ http://www.cellml.org/
    <connection>
       <map_components component_1="inward_rectifier_potassium_current" component_2="potassium_dynamics"/>
       <map_variables variable_1="i_K1" variable_2="i_K1"/>
-      <map_variables variable_1="K_o" variable_2="K_o"/>
    </connection>
    <connection>
       <map_components component_1="rapid_time_dependent_potassium_current" component_2="potassium_dynamics"/>
@@ -3710,4 +3691,29 @@ http://www.cellml.org/
       <map_components component_1="potassium_pump_current" component_2="potassium_dynamics"/>
       <map_variables variable_1="i_p_K" variable_2="i_p_K"/>
    </connection>
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:pycml="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#"
+            xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+      <rdf:Description rdf:about="#ScaleFactorIto">
+         <pycml:modifiable-parameter>yes</pycml:modifiable-parameter>
+      </rdf:Description>
+      <rdf:Description rdf:about="#ScaleFactorGkr">
+         <pycml:modifiable-parameter>yes</pycml:modifiable-parameter>
+      </rdf:Description>
+      <rdf:Description rdf:about="#ScaleFactorGks">
+         <pycml:modifiable-parameter>yes</pycml:modifiable-parameter>
+      </rdf:Description>
+      <rdf:Description rdf:about="#K_F">
+         <pycml:derived-quantity>yes</pycml:derived-quantity>
+      </rdf:Description>
+      <rdf:Description rdf:about="#stim_period">
+         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_period"/>
+      </rdf:Description>
+      <rdf:Description rdf:about="#stim_amplitude">
+         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
+      </rdf:Description>
+      <rdf:Description rdf:about="#stim_duration">
+         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_duration"/>
+      </rdf:Description>
+   </rdf:RDF>
 </model>

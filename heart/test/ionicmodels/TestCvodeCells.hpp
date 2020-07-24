@@ -219,12 +219,12 @@ public:
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), lr91_ode_system.GetVoltage(), 1e-3);
 
         // Test parameter
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetNumberOfParameters(), 13u);
-        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterNames()[7], "membrane_fast_sodium_current_conductance");
-        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterUnits()[7], "milliS_per_cm2");
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterIndex("membrane_fast_sodium_current_conductance"), 7u);
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterUnits(7u), "milliS_per_cm2");
-        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(7u), 23.0);
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetNumberOfParameters(), 3u);
+        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterNames()[1], "membrane_fast_sodium_current_conductance");
+        TS_ASSERT_EQUALS(lr91_cvode_system.rGetParameterUnits()[1], "milliS_per_cm2");
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterIndex("membrane_fast_sodium_current_conductance"), 1u);
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameterUnits(1u), "milliS_per_cm2");
+        TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter(1u), 23.0);
         TS_ASSERT_EQUALS(lr91_cvode_system.GetParameter("membrane_fast_sodium_current_conductance"), 23.0);
 
         // Parameter exceptions
@@ -336,7 +336,7 @@ public:
 
         // Make a model that uses Cvode directly:
         // Need to load dynamicly as we don't have config files anymore
-       	OutputFileHandler handler("TestCvodeCells");
+       	OutputFileHandler handler("TestCvodeCells", true);
 	
         FileFinder cellml_file("heart/src/odes/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
        	handler.CopyFileTo(cellml_file);
