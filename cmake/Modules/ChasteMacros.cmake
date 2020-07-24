@@ -66,18 +66,12 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     get_filename_component(cellml_file_name ${cellml_file} NAME_WE)
     get_filename_component(cellml_dir ${cellml_file} PATH)
     file(RELATIVE_PATH cellml_file_rel "${CMAKE_SOURCE_DIR}" "${cellml_file}")
-    set(pycml_args "")
-    set(pycml_args ${pycml_args} ${ARGN})
-
+    set(pycml_args ${ARGN})
     #if(BUILD_SHARED_LIBS)
     if (${dynamic})
         set(pycml_args ${pycml_args} "-y")
     else()
         set(pycml_args ${pycml_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
-        if(EXISTS ${cellml_dir}/${cellml_file_name}.out)
-            set(depends ${depends} ${cellml_dir}/${cellml_file_name}.out)
-            set(pycml_args ${pycml_args} "--backward-euler")
-        endif()
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
@@ -90,11 +84,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
 
     set(depends ${depends} ${PyCML_SOURCES})
 
-#    if(EXISTS ${cellml_dir}/${cellml_file_name}-conf.xml)
-#        set(depends ${depends} ${cellml_dir}/${cellml_file_name}-conf.xml)
-#        set(pycml_args ${pycml_args} "--conf=${cellml_dir}/${cellml_file_name}-conf.xml")
-#    endif()
-    execute_process(COMMAND chaste_codegen ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} --show-outputs ${cellml_file}   
+    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -107,7 +97,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} 
-        COMMAND chaste_codegen ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} ${cellml_file}
+        COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}" 
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -661,4 +651,3 @@ macro(Chaste_DO_TEST_PROJECT projectName)
     message("Configuring tests for project ${projectName}")
     Chaste_DO_TEST_COMMON(project_${projectName})
 endmacro(Chaste_DO_TEST_PROJECT)
-

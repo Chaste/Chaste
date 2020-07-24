@@ -264,6 +264,19 @@ if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
     message (FATAL_ERROR "Python 3 is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
+set(codegen_python3_venv ${CMAKE_SOURCE_DIR}/codegen_python3_venv/bin)
+
+if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)
+    message (STATUS "Installing chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
+    execute_process(
+	COMMAND "${PYTHON_EXECUTABLE}" -m venv codegen_python3_venv
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+endif ()
+# Update virtual environment and get latest chaste-codegen
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install git+https://github.com/ModellingWebLab/chaste-codegen.git@multi-model)
+
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
     if (NOT TEXTTEST_FOUND)

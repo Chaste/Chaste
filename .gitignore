@@ -60,3 +60,6 @@ _local/
 
 \.vscode/
 appredict_lookup_table_manifest.txt
+
+# chaste_codegen python3 virtual environment
+/codegen_python3_venv
