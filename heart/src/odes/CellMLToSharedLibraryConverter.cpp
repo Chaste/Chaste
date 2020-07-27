@@ -183,6 +183,13 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                           << strerror(errno));
             }
 
+
+            try {// Copy chaste_codegen virtual env if possible (if it can't be copied, it will be created by the generated CMakelist)
+                FileFinder codegen_python3_venv("codegen_python3_venv", RelativeTo::ChasteSourceRoot);
+                codegen_python3_venv.CopyTo(tmp_folder);
+            }catch (const std::exception& e) { }
+
+
             // Copy the .cellml file (and any relevant others) into the temporary folder
             FileFinder cellml_file(rCellmlFullPath, RelativeTo::Absolute);
             FileFinder cellml_folder = cellml_file.GetParent();
@@ -199,6 +206,17 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
                                       "add_compile_options(-std=c++14)\n" <<
+                                      "find_package(PythonInterp 3 REQUIRED)\n" <<
+                                      "set(codegen_python3_venv ${CMAKE_SOURCE_DIR}/codegen_python3_venv/bin)\n" <<
+                                      "if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)\n" <<
+                                      "    message (STATUS \"Installing chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv\")\n" <<
+                                      "    execute_process(\n" <<
+                                      "        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv\n" <<
+                                      "        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}\n" <<
+                                      "    )\n" <<
+                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
+                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install git+https://github.com/ModellingWebLab/chaste-codegen.git@multi-model)\n" <<
+                                      "endif ()\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<

@@ -75,13 +75,10 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    #set depends on everything in python/pycml/* except for *.pyc and protocol.py
-    file(GLOB PyCML_SOURCES 
-        ${Chaste_SOURCE_DIR}/python/pycml/* )
-    file(GLOB PyCML_NOT_SOURCES 
-        ${Chaste_SOURCE_DIR}/python/pycml/*.pyc )
-    list(REMOVE_ITEM PyCML_SOURCES ${PYCML_NOT_SOURCES} ${Chaste_SOURCE_DIR}/python/pycml/protocol.py)
-
+    #set depends on everything in codegen_python3_venv/* 
+    file(GLOB_RECURSE PyCML_SOURCES 
+        ${Chaste_SOURCE_DIR}/codegen_python3_venv/*.* )
+    
     set(depends ${depends} ${PyCML_SOURCES})
 
     execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} --show-outputs ${cellml_file}
@@ -96,10 +93,10 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         set(pycml_args ${pycml_args} "--quiet")
     endif()
 
-    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} 
+    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
         COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
-        COMMENT "Processing CellML file ${cellml_file_rel}" 
+        COMMENT "Processing CellML file ${cellml_file_rel}"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         VERBATIM
         )
