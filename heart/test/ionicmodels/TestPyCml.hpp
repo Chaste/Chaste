@@ -168,7 +168,8 @@ public:
         normal.SetTimestep(HeartConfig::Instance()->GetOdeTimeStep());
 
         // Optimised model
-        AbstractLookupTableCollection::EventHandler::Enable();
+//lookup tables not implemented
+//        AbstractLookupTableCollection::EventHandler::Enable();
         CellLuoRudy1991FromCellMLOpt opt(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(opt.GetVoltageIndex(), 0u);
         CheckCai(opt, true, 0.0002);

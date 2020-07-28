@@ -81,7 +81,7 @@ private:
         AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(rLoader, vIndex);
         SimulateLr91AndCompare(p_cell, tolerance);
 
-	// chaste_codegen doesn't have lookup tables
+//lookup tables not implemented
 //        if (testTables)
 //        {
 //            double v = p_cell->GetVoltage();
