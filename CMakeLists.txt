@@ -259,7 +259,6 @@ endif ()
 ################################
 ####  Find Python
 ################################
-#find_package (PythonInterp REQUIRED)
 find_package(PythonInterp 3 REQUIRED)
 if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
     message (FATAL_ERROR "Python 3 is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")

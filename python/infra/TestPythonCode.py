@@ -59,6 +59,7 @@ import imp
 import os
 import sys
 import time
+import functools
 
 try:
     import unittest2 as unittest
@@ -219,13 +220,13 @@ class ChasteTestLoader(unittest.TestLoader):
         def isTestMethod(attrname, testCaseClass=testCaseClass):
             return (callable(getattr(testCaseClass, attrname)) and
                     (attrname.startswith('Test') or attrname.startswith('test')))
-        test_names = filter(isTestMethod, dir(testCaseClass))
+        test_names = list(filter(isTestMethod, dir(testCaseClass)))
         for base_class in testCaseClass.__bases__:
             for test_name in self.getTestCaseNames(base_class):
                 if test_name not in test_names:  # handle overridden methods
                     test_names.append(test_name)
         if self.sortTestMethodsUsing:
-            test_names.sort(self.sortTestMethodsUsing)
+            test_names.sort(key=functools.cmp_to_key(self.sortTestMethodsUsing))
         return test_names
 
 def SetTestOutput(module):

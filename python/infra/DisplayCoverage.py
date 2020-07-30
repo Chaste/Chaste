@@ -288,4 +288,4 @@ for filename in os.listdir('.'):
         os.remove(filename)
 
 # And generate a summary page
-os.system('python python/DisplayTests.py '+output_dir+' '+build_type)
+os.system(sys.executable + ' python python/DisplayTests.py '+output_dir+' '+build_type)

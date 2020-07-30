@@ -42,11 +42,12 @@ class TestInfraFunctionality(unittest.TestCase):
         original = 'python/test/data/input/rounding_input.txt'
         output = os.path.join(CHASTE_TEST_OUTPUT, 'rounding_output.txt')
         # 8 decimal places
-        rc = os.system('python/infra/RoundResultsFiles.py 8 <' + original + ' > '+ output)
+        print(sys.executable + ' python/infra/RoundResultsFiles.py 8 <' + original + ' > '+ output)
+        rc = os.system(sys.executable + ' python/infra/RoundResultsFiles.py 8 <' + original + ' > '+ output)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output,'python/test/data/output/rounding_output8.txt'))
         # 6 decimal places
-        rc = os.system('python/infra/RoundResultsFiles.py 6 <' + original + ' > '+ output)
+        rc = os.system(sys.executable + ' python/infra/RoundResultsFiles.py 6 <' + original + ' > '+ output)
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output,'python/test/data/output/rounding_output6.txt'))
         

@@ -116,7 +116,7 @@ def parse_doxygen(log_file_name, error_log_file_name, output_dir):
         output_file.close()
 
     # And generate a summary page
-    os.system('python python/DisplayTests.py '+output_dir+' DoxygenCoverage')
+    os.system(sys.executable + ' python python/DisplayTests.py '+output_dir+' DoxygenCoverage')
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
