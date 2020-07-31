@@ -214,9 +214,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv\n" <<
                                       "        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}\n" <<
                                       "    )\n" <<
-                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
-                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install git+https://github.com/ModellingWebLab/chaste-codegen.git@multi-model)\n" <<
                                       "endif ()\n" <<
+                                      "execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
+                                      "execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade  chaste_codegen~=0.2.0)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
