@@ -259,9 +259,9 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package(PythonInterp 3 REQUIRED)
+find_package(PythonInterp 3.5 REQUIRED)
 if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
-    message (FATAL_ERROR "Python 3 is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
+    message (FATAL_ERROR "Python 3.4 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
@@ -276,7 +276,7 @@ if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)
 endif ()
 # Update virtual environment and get latest chaste-codegen
 execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install git+https://github.com/ModellingWebLab/chaste-codegen.git@multi-model)
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade  chaste_codegen~=0.2.0)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
