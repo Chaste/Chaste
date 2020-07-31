@@ -102,7 +102,8 @@ class TestUtilsFunctionality(unittest.TestCase):
         rc = os.system(sys.executable + ' python/utils/ConvertBinaryElementAttributes.py SomeFile.node output.node')
         self.assertEqual(rc, 256*2) #Not correct extension - return 2
 
-        rc = os.system(sys.executable + ' python/utils/ConvertBinaryElementAttributes.py mesh/test/data/simple_cube.ele output.ele')
+        simple_cube = 'python/test/data/output/simple_cube.ele'
+        rc = os.system(sys.executable + ' python/utils/ConvertBinaryElementAttributes.py ' + simple_cube + ' output.ele')
         self.assertEqual(rc, 256*3) #An ascii mesh file - return 3
 
         converted = 'python/test/data/output/simple_cube_binary.ele'
@@ -110,8 +111,8 @@ class TestUtilsFunctionality(unittest.TestCase):
         self.assertEqual(rc, 256*4) #A file which is already in the new format - return 4
 
         original = 'python/test/data/input/simple_cube_binary.ele'
+        os.makedirs (CHASTE_TEST_OUTPUT, exist_ok=True)
         output = os.path.join(CHASTE_TEST_OUTPUT, 'simple_cube_binary.ele')
-
         rc = os.system(sys.executable + ' python/utils/ConvertBinaryElementAttributes.py ' +  original + ' ' +  output)
         # Byte-for-byte comparion
         self.assertTrue(filecmp.cmp(output, converted))

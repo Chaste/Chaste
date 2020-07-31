@@ -274,7 +274,7 @@ if __name__ == '__main__':
         # Read from stdin (pipe mode)
         in_file = sys.stdin
     elif test_file[-3:] not in ['hpp', '.py'] or os.path.basename(test_file)[:4] != 'Test':
-        print("%s Syntax error: %s does not appear to be a test file" % (sys.stderr, test_file))
+        print("Syntax error: %s does not appear to be a test file" % test_file, file=sys.stderr)
         sys.exit(1)
     else:
         in_file = open(test_file)

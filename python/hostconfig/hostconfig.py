@@ -277,8 +277,8 @@ if sys.version_info[:2] < (2,7):
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-            print >>sys.stderr, "Called process failed; output was:"
-            print >>sys.stderr, output
+            print("Called process failed; output was:", file=sys.stderr)
+            print(output, file=sys.stderr)
             raise subprocess.CalledProcessError(retcode, cmd)
         return output
     subprocess.check_output = check_output
@@ -466,7 +466,7 @@ def OptionalLibraryDefines():
 def Configure(build):
     """Given a build object (BuildTypes.BuildType instance), configure the build."""
     if not build.quiet:
-        print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
+        print("Using hostconfig settings from %s.py" % os.path.splitext(conf.__file__)[0])
     prefs = build.GetPreferedVersions()
     if hasattr(conf, 'Configure') and callable(conf.Configure):
         # The machine config has a method to do its configuration, so call that first.
@@ -528,10 +528,10 @@ def Configure(build):
         for name in dir(conf):
             item = getattr(conf, name)
             if name[0] != '_' and type(item) != types.FunctionType:
-                print name, '=', item
-        print "Libraries:", libraries
-        print "Library paths:", libpaths
-        print "Include paths:", incpaths
+                print("%s=%s" % (name, item))
+        print("Libraries: %s" % libraries)
+        print("Library paths: %s" % libpaths)
+        print("Include paths: %s" % incpaths)
         build.DumpDebugInfo()
 
 def CppDefines():

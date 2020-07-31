@@ -45,7 +45,7 @@ import re
 import sys
 
 if len(sys.argv) != 2:
-    print("%s Usage: %s <tolerance>" % (sys.stderr, sys.argv[0]))
+    print("%s Usage: %s <tolerance>" % sys.argv[0], file=sys.stderr)
     sys.exit(1)
 tolerance = int(sys.argv[1])
 print('Warning: These have been filtered by  %s .' % sys.argv[0])
