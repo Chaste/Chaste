@@ -38,13 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-//#include <array>
-//#include <cstdio>
-//#include <iostream>
-//#include <memory>
-//#include <stdexcept>
-//#include <string>
-
 #include <boost/algorithm/string.hpp>
 
 #include "FileFinder.hpp"
@@ -53,29 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /**
- * There is a git submodule in python/pycml/ontologies
- * which is shared with other projects, and is now imported into
- * the Chaste source via a git submodule instead of living here.
- * 
- * This test suite makes sure that the submodule has been initialised and is up to date.
- * 
- * The second test should be updated by the person who decides that the
- * Chaste copy of the metadata should be updated to match the remote ontology
- * at  https://github.com/ModellingWebLab/ontologies/
- * 
- * This update is done manually, make sure you are on the develop branch and do:
- * 
- * cd $CHASTE_SRC/python/pycml/ontologies
- * git pull origin master
- * cd $CHASTE_SRC
- * git add python/pycml/ontologies
- * git commit -m "Update CellML Metadata ontology to latest remote version."
- * git push
- * 
- * Then type 
- * git submodule
- * and copy the commit hash into the member variable in the below test. If anyone runs the
- * latest version of the code, then it will fail to remind them to do a `git submodule update`.
+ * This tests checks that the cmake process has made a virtual environment for chatse_codegen
  * 
  */
 class TestCodegenPresent : public CxxTest::TestSuite
