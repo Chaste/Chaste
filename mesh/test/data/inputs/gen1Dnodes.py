@@ -33,6 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 print("101    1     0    1")
 for i in range(101):
   if(i == 0 or i == 100):
-    print(i, i/100.0, 1)
+    print("%s    %s    %s" % (i, i/100.0, 1))
   else:
-    print(i, i/100.0, 0)
+    print("%s    %s    %s" % (i, i/100.0, 0))
