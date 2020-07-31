@@ -129,7 +129,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
 
 
     if (python)
-        set(test_exe ${PYTHON_EXECUTABLE} ${Chaste_BINARY_DIR}/python/infra/TestPythonCode.py ${_filename})
+        set(test_exe ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/python/infra/TestPythonCode.py ${_filename})
     else()
         set(_exeTargetName ${_testname})
 
