@@ -146,6 +146,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
     std::string old_cwd = GetCurrentWorkingDirectory();
     // Check that the Chaste build tree exists
     FileFinder chaste_root("", RelativeTo::ChasteBuildRoot);
+    FileFinder chaste_source("", RelativeTo::ChasteSourceRoot);
 
     if (!chaste_root.IsDir())
     {
@@ -184,12 +185,6 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             }
 
 
-            try {// Copy chaste_codegen virtual env if possible (if it can't be copied, it will be created by the generated CMakelist)
-                FileFinder codegen_python3_venv("codegen_python3_venv", RelativeTo::ChasteSourceRoot);
-                codegen_python3_venv.CopyTo(tmp_folder);
-            }catch (const std::exception& e) { }
-
-
             // Copy the .cellml file (and any relevant others) into the temporary folder
             FileFinder cellml_file(rCellmlFullPath, RelativeTo::Absolute);
             FileFinder cellml_folder = cellml_file.GetParent();
@@ -207,16 +202,16 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
                                       "add_compile_options(-std=c++14)\n" <<
                                       "find_package(PythonInterp 3 REQUIRED)\n" <<
-                                      "set(codegen_python3_venv ${CMAKE_SOURCE_DIR}/codegen_python3_venv/bin)\n" <<
+                                      "set(codegen_python3_venv " + chaste_source.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
                                       "if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)\n" <<
-                                      "    message (STATUS \"Installing chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv\")\n" <<
+                                      "    message (STATUS \"Installing chaste_codegen in " + chaste_source.GetAbsolutePath() + "/codegen_python3_venv\")\n" <<
                                       "    execute_process(\n" <<
                                       "        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv\n" <<
-                                      "        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}\n" <<
+                                      "        WORKING_DIRECTORY " + chaste_source.GetAbsolutePath() + "\n" <<
                                       "    )\n" <<
+                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
+                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade  chaste_codegen~=0.3.0)\n" <<
                                       "endif ()\n" <<
-                                      "execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
-                                      "execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade  chaste_codegen~=0.2.0)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
@@ -239,7 +234,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             // Change to Chaste source folder
             EXPECT0(chdir, chaste_root.GetAbsolutePath());
             // Run scons to generate C++ code and compile it to a .so
-            EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
+            EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 chaste_libs=1 --codegen_args=\""+codegen_args+"\" --codegen_base_folder=" + chaste_source.GetAbsolutePath() + " build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
             if (mPreserveGeneratedSources)
             {
                 // Copy the generated source (.hpp and .cpp) to the same place as the .so file is going.
@@ -255,6 +250,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
 #endif
 
             FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
+std::cout<< "so file: "<< tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix <<std::endl;
             EXCEPT_IF_NOT(so_file.Exists());
             // CD back
             EXPECT0(chdir, old_cwd);

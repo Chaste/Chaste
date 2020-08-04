@@ -90,7 +90,7 @@ def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False, subfo
                 if not packNames or pack_name in packNames:
                     # Process this test pack file
                     try:
-                        pack_file = file(os.path.join(dirpath, filename), 'r')
+                        pack_file = open(os.path.join(dirpath, filename), 'r')
                         for rel_testfile in pack_file:
                             # Ignore empty lines and duplicates
                             rel_testfile = rel_testfile.strip()

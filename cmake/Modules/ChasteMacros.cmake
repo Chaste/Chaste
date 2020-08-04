@@ -67,7 +67,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     get_filename_component(cellml_dir ${cellml_file} PATH)
     file(RELATIVE_PATH cellml_file_rel "${CMAKE_SOURCE_DIR}" "${cellml_file}")
     set(pycml_args ${ARGN})
-    #if(BUILD_SHARED_LIBS)
+
     if (${dynamic})
         set(pycml_args ${pycml_args} "-y")
     else()
@@ -75,12 +75,6 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    #set depends on everything in codegen_python3_venv/* 
-    file(GLOB_RECURSE PyCML_SOURCES 
-        ${Chaste_SOURCE_DIR}/codegen_python3_venv/*.* )
-    
-    set(depends ${depends} ${PyCML_SOURCES})
-
     execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE

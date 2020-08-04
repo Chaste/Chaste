@@ -184,12 +184,12 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
             prof = ' --profile'
         else:
             prof = ''
-        command = './python/infra/TestPythonCode.py --num-procs ' + str(build.GetNumProcesses()) + ' ' + exefile + prof + ' 2>&1 ' + run_time_flags
+        command = sys.executable + ' python/infra/TestPythonCode.py --num-procs ' + str(build.GetNumProcesses()) + ' ' + exefile + prof + ' 2>&1 ' + run_time_flags
     else:
         command = build.GetTestRunnerCommand(exefile, '2>&1 ' + run_time_flags)
 
     # Run the test program and record output & exit code
-    log_fp = file(logfile, 'w')
+    log_fp = open(logfile, 'w')
     if not log_fp:
         raise IOError("Unable to open log file")
     if build.no_store_results:
@@ -203,9 +203,9 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
         # Set a Timer to kill the test if it runs too long
         kill_timer = TestKillerTimer(time_limit, test_proc.pid, os.path.abspath(exefile), log_fp)
     for line in test_proc.stdout or []:
-        log_fp.write(line)
+        log_fp.write(line.decode("utf-8"))
         if echo:
-            print(line)
+            print(line.decode("utf-8"))
     exit_code = test_proc.wait()
     end_time = time.time()
     if time_limit and psutil:

@@ -59,12 +59,12 @@ set = BuildTools.set
 
 def pns(nodes):
     """Pretty-print nodes for debugging."""
-    return map(str, nodes)
+    return list(map(str, nodes))
 
 #fp = open('tsp.txt', 'w')
 def tsp(*args):
     """Thread-safer print, for debugging."""
-    msg = ' '.join(map(str, args)) + '\n'
+    msg = ' '.join(list(map(str, args))) + '\n'
     try:
         fp.write(msg)
     except:
@@ -132,7 +132,7 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
             os.environ['CHASTE_CYTHON_CFLAGS'] = e.subst("$_CPPINCFLAGS $CCFLAGS")
             os.environ['CHASTE_CYTHON_LDFLAGS'] = e.subst("$_LIBDIRFLAGS $LINKFLAGS")
             e.Execute(SCons.Action.Action('CFLAGS="$_CPPINCFLAGS $CCFLAGS" LDFLAGS="$_LIBDIRFLAGS $LINKFLAGS"'
-                                          ' python %s build_ext --inplace' % setup_py_path,
+                                          ' %s %s build_ext --inplace' % (sys.executable, setup_py_path),
                                           chdir=os.path.dirname(setup_py_path)))
         if has_sources and (includeRoot or dirpath != rootDir):
             source_dirs.append(dirpath)
@@ -244,7 +244,7 @@ def BuildTest(target, source, env):
 
     def process(o):
         """Process an object file as described in BuildTest.__doc__"""
-        #tsp(tid, source[0], "process", o, S[o.state], os.path.exists(str(o)), map(str, o.sources), map(str, o.depends), o.implicit is None, S[o.sources[0].state])
+        #tsp(tid, source[0], "process", o, S[o.state], os.path.exists(str(o)), list(map(str, o.sources)), list(map(str, o.depends)), o.implicit is None, S[o.sources[0].state])
         while o.sources[0].state is SCons.Node.executing:
             # Wait for the sources to be generated, so scanning the object does something useful!
             time.sleep(0.01) # 10 ms
@@ -255,7 +255,7 @@ def BuildTest(target, source, env):
         obj_lock.acquire()
         o.scan()
         obj_lock.release()
-        #tsp(tid, source[0], "state post scan", o, S[o.state], os.path.exists(str(o)), map(str, o.sources), map(str, o.depends), map(str, o.implicit))
+        #tsp(tid, source[0], "state post scan", o, S[o.state], os.path.exists(str(o)), list(map(str, o.sources)), list(map(str, o.depends)), list(map(str, o.implicit)))
         # Now process the dependencies
         for d in o.implicit:
             hdr = str(d)
@@ -282,7 +282,7 @@ def BuildTest(target, source, env):
                     if has_source:
                         # Find the object file(s) and analyse it/them
                         objs = env['CHASTE_OBJECTS'][source_filename]
-                        #tsp(tid, source[0], 'src objs', map(str, objs))
+                        #tsp(tid, source[0], 'src objs', list(map(str, objs)))
                         objects.extend(objs)
                         for obj in objs:
                             process(obj)
@@ -305,7 +305,7 @@ def RegisterObjects(env, key, objs):
     for obj in objs:
         src = obj.sources[0]
         if src.is_derived():
-            #tsp('RegisterObjects', key, map(str, objs), obj, src, src.path)
+            #tsp('RegisterObjects', key, list(map(str, objs)), obj, src, src.path)
             env['CHASTE_OBJECTS'][src.path] = [obj]
 
 
@@ -396,7 +396,7 @@ def DetermineLibraryDependencies(env, partialGraph):
             if library_mapping:
                 comp_lib = get_lib(comp)
                 if comp_lib:
-                    deps = map(get_lib, full_graph[comp])
+                    deps = list(map(get_lib, full_graph[comp]))
                     if deps:
                         env.Depends(comp_lib, deps)
     # Set up construction variables that can be used in CPPPATH and PYINCPATH
@@ -531,7 +531,7 @@ def GetPathRevision(path):
         # Git repo
         commit_sha = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short=7','HEAD']).strip()
         retcode = subprocess.call(['git', '-C', path, 'diff-index', '--quiet', 'HEAD', '--'])
-        revision = '0x' + commit_sha
+        revision = '0x' + commit_sha.decode("utf-8")
         modified = (retcode != 0)
     elif os.path.exists(os.path.join(path, '.svn')):
         # Subversion repo
@@ -681,7 +681,7 @@ def _GenerateCppFromValue(env, target, source):
     env.Command('global/src/ChasteBuildRoot.cpp', [Value(GetChasteBuildRootCpp())], GenerateCppFromValue)
     """
     out = open(target[0].path, "w")
-    out.write(source[0].get_contents())
+    out.write(source[0].get_contents().decode("utf-8"))
     out.close()
 GenerateCppFromValue = SCons.Action.Action(_GenerateCppFromValue, "Generating $TARGET from build information.")
 
@@ -759,6 +759,7 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
     cxx_file.add_emitter('.xsd', XsdEmitter)
 
 def CreatePyCmlBuilder(build, buildenv):
+#here update comments
     """Create a builder for running PyCml to generate C++ source code from CellML.
 
     PyCml is run to generate as many types of output as we can.  If a .out file is
@@ -774,6 +775,18 @@ def CreatePyCmlBuilder(build, buildenv):
         env = SConsTools.CloneEnv(env)
         env['PYCML_EXTRA_ARGS'] = ['--expose-annotated-variables']
     """
+    # Set up for virtual environment for chaste_codegen. Note: config files and out files are no longer needed
+    venv_path = os.path.join(SCons.Script.Main.GetOption('codegen_base_folder'), 'codegen_python3_venv')
+    venv_python = os.path.join(venv_path, 'bin', 'python')
+    script = os.path.join(Dir('#').abspath, venv_path, 'bin', 'chaste_codegen')
+
+    # Set up virtual environment if it doesn't yet exist
+    if not os.path.exists(script):
+        os.system(sys.executable + ' -m venv ' + str(venv_path))
+        os.system(venv_python + ' -m pip install --upgrade pip setuptools wheel')
+        os.system(venv_python + ' -m pip install --upgrade chaste_codegen~=0.3.0')
+
+
     def IsDynamicSource(source):
         parts = source[0].srcnode().path.split(os.path.sep)
         if parts[0] == 'projects':
@@ -782,15 +795,11 @@ def CreatePyCmlBuilder(build, buildenv):
             dyn_i = 1
         return (parts[dyn_i] == 'dynamic' or
                 (parts[dyn_i] == 'build' and parts[dyn_i+2] == 'dynamic'))
-    def HasMapleOutput(source):
-        out_file = os.path.splitext(source[0].srcnode().abspath)[0] + '.out'
-        return os.path.exists(out_file), out_file
-    def HasConfigFile(source):
-        conf_file = os.path.splitext(source[0].srcnode().abspath)[0] + '-conf.xml'
-        return os.path.exists(conf_file), conf_file
-    script = os.path.join(Dir('#').abspath, 'python', 'ConvertCellModel.py')
+ 
     def GetArgs(target, source, env):
-        args = ['-A', '-p', '--output-dir', os.path.dirname(target[0].abspath)]
+        #args = ['-A', '--output-dir', os.path.dirname(target[0].abspath)]
+        args = ['-A']
+        args.extend(SCons.Script.Main.GetOption('codegen_args').split())
         args.extend(env.get('PYCML_EXTRA_ARGS', []))
         if SCons.Script.Main.GetOption('silent'):
             args.append('--quiet')
@@ -798,22 +807,19 @@ def CreatePyCmlBuilder(build, buildenv):
             # If we're creating a dynamic library, do things differently:
             # only create a single output .so.  The helper script will recognise
             # the -y flag.
+            args.extend(['-o', os.path.abspath(target[0].abspath)])
             args.append('-y')
         else:
-            args.extend(['--normal', '--opt', '--cvode'])
+            args.extend(['--output-dir', os.path.dirname(target[0].abspath)])
+            args.extend(['--normal', '--opt', '--cvode', '--backward-euler', '--use-analytic-jacobian'])
 # Won't work until SCons' C scanner can understand #ifdef
 #            if 'CHASTE_CVODE' not in env['CPPDEFINES']:
 #                args.remove('--cvode')
-            if HasMapleOutput(source)[0]:
-                args.append('--backward-euler')
-        has_conf, conf_file = HasConfigFile(source)
-        if has_conf:
-            args.append('--conf=' + conf_file)
         return args
     def RunPyCml(target, source, env):
         args = GetArgs(target, source, env)
         command = [script] + args + [str(source[0])]
-        print("Running %s" % command)
+        print("Running %s" % " ".join(command))
         rc = subprocess.call(command)
         return rc
     PyCmlAction = buildenv.Action(RunPyCml)
@@ -827,19 +833,8 @@ def CreatePyCmlBuilder(build, buildenv):
             print(filelist)
             raise IOError('Failed to run PyCml; return code = ' + str(process.returncode))
         # Adjust targets to match what the script will actually create
-        target = map(lambda s: s.strip(), filelist.split())
-        # Make sure the targets depend on everything they might need
-        has_maple, maple_output = HasMapleOutput(source)
-        if has_maple:
-            env.Depends(target, maple_output)
-        has_conf, conf_file = HasConfigFile(source)
-        if has_conf:
-            env.Depends(target, conf_file)
-        # Add dependency on pycml source code (ignoring .pyc files)
-        pycml_code = glob.glob(os.path.join(Dir('#/python/pycml').abspath, '*'))
-        pycml_code = filter(lambda path: not (path.endswith('.pyc') or path.endswith('protocol.py')), pycml_code)
-        env.Depends(target, pycml_code)
-        env.Depends(target, script)
+        target = list(map(lambda s: s.strip().decode("utf-8"), filelist.split()))
+
         # Install headers if requested
         if not IsDynamicSource(source) and env['INSTALL_FILES']:
             headers = [t for t in target if t.endswith('.hpp')]
@@ -1143,7 +1138,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
                                otherVars,
                                project=projectName)
     if otherVars['debug']:
-        print("  Will run tests: %s" % map(str, testfiles))
+        print("  Will run tests: %s" % list(map(str, testfiles)))
 
     # Build and install the library for this project
     project_lib = test_lib = libpath = None
@@ -1183,7 +1178,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     lib_deps = []
     if test_lib:
         lib_deps.append(test_lib) # Source code used by our tests
-    #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chasteLibsUsed)) # all Chaste libs used
+    #lib_deps.extend(list(map(lambda lib: '#lib/lib%s.so' % lib, chasteLibsUsed))) # all Chaste libs used
     if project_lib:
         lib_deps.append(project_lib)
 
@@ -1234,7 +1229,7 @@ def AddPyDirs(env, basePath, pydirs, componentName):
 
     Also sets up build data structures so other components can use them.
     """
-    pydir_paths = map(lambda d: os.path.join('#', basePath, d), pydirs)
+    pydir_paths = list(map(lambda d: os.path.join('#', basePath, d), pydirs))
     if pydirs:
         env.Append(PYINCPATH=pydir_paths)
     # Set the paths so other components/projects can use our Python code
@@ -1302,7 +1297,7 @@ def DoComponentSConscript(component, otherVars):
                                otherVars,
                                component=component)
     if otherVars['debug']:
-        print("  Will run tests: %s" % map(str, testfiles))
+        print("  Will run tests: %s" % list(map(str, testfiles)))
 
     special_objects = CheckForSpecialFiles(env, component, files, otherVars)
 
@@ -1315,8 +1310,8 @@ def DoComponentSConscript(component, otherVars):
                 lib = env.StaticLibrary(component, files + special_objects)
                 # Add explicit dependencies on the Chaste libraries we use too,
                 # so this library and its tests will be re-linked if they change
-                env.Depends(lib, map(lambda lib: '#lib/lib%s.a' % lib,
-                                     env['CHASTE_COMP_DEPS'][component]))
+                env.Depends(lib, list(map(lambda lib: '#lib/lib%s.a' % lib,
+                                     env['CHASTE_COMP_DEPS'][component])))
                 lib = env.Install('#lib', lib)[0]
             libpath = '#lib'
         else:
@@ -1353,7 +1348,7 @@ def DoComponentSConscript(component, otherVars):
     lib_deps = []
     if test_lib:
         lib_deps.append(test_lib) # Source code used by our tests
-    #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs)) # all Chaste libs used
+    #lib_deps.extend(list(map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs))) # all Chaste libs used
     if lib:
         lib_deps.append(lib)
 

@@ -133,7 +133,7 @@ def RenameChunks(fileName, inBase, outBase):
 if __name__ == "__main__":
     #Checking command line arguments
     if len(sys.argv) != 3:
-        print("Usage: <input_vtu_file> <output_vtu_file>" %sys.argv[0], file=sys.stderr)
+        print("Usage: %s <input_vtu_file> <output_vtu_file>" %sys.argv[0], file=sys.stderr)
         sys.exit(1)
     #Reading in command line arguments
     input_name = sys.argv[1]

@@ -346,8 +346,8 @@ public:
 
         // Do the conversion
        	FileFinder copied_file("TestCvodeCells/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
-        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
 
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
        	AbstractCardiacCellWithModifiers<AbstractCvodeCell>* sh04_cvode_system = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
 
         TS_ASSERT_EQUALS(sh04_cvode_system->GetVoltageIndex(), 0u);
