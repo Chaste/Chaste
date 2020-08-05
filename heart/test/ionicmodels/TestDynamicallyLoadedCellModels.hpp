@@ -336,8 +336,8 @@ public:
         EXPECT0(chdir, "..");
         RunLr91Test(*p_loader, 0u, true, 0.01); // Implementation of lookup tables has improved...
         // Check the sources exist
-        TS_ASSERT(handler.FindFile(model + "Opt.cpp").Exists());
-        TS_ASSERT(handler.FindFile(model + "Opt.hpp").Exists());
+        TS_ASSERT(handler.FindFile(model + ".cpp").Exists());
+        TS_ASSERT(handler.FindFile(model + ".hpp").Exists());
 
         {
             // Backward Euler
