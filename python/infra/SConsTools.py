@@ -345,7 +345,7 @@ def DetermineLibraryDependencies(env, partialGraph):
     full_graph = {}
     # As well as projects/<name> mapping to the project library, add a mapping for plain <name>,
     # since that's what will be used for linking.
-    for name in library_mapping.keys():
+    for name in list(library_mapping.keys()):
         if name.startswith(PROJECT_PREFIX):
             library_mapping[name[len(PROJECT_PREFIX):]] = library_mapping[name]
     def get_lib(comp, linkArg=False):
