@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # We need at least Python 3.5.
 EnsurePythonVersion(3,5)
 
-# We're also no longer compatible with SCons < 2.4
-EnsureSConsVersion(2,4)
+# We're also no longer compatible with SCons < 3.0
+EnsureSConsVersion(3,0)
 
 # Avoid deprecation warnings by changing behaviour for new SCons versions
 scons_version_two = True
