@@ -535,7 +535,7 @@ def GetPathRevision(path):
         modified = (retcode != 0)
     elif os.path.exists(os.path.join(path, '.svn')):
         # Subversion repo
-        revision = subprocess.check_output(['svnversion', path]).strip()
+        revision = subprocess.check_output(['svnversion', path]).strip().decode("utf-8")
         modified = revision[-1] in 'MSP'
         try:
             # Extract upper end of range, and store modified flag
