@@ -69,7 +69,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     set(pycml_args ${ARGN})
 
     if (${dynamic})
-        set(pycml_args ${pycml_args} "-y")
+        set(pycml_args ${pycml_args} "-y" "-o" ${cellml_file})
     else()
         set(pycml_args ${pycml_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
     endif()

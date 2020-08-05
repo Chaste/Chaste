@@ -776,16 +776,16 @@ def CreatePyCmlBuilder(build, buildenv):
         env['PYCML_EXTRA_ARGS'] = ['--expose-annotated-variables']
     """
     # Set up for virtual environment for chaste_codegen. Note: config files and out files are no longer needed
-    venv_path = os.path.join(SCons.Script.Main.GetOption('codegen_base_folder'), 'codegen_python3_venv')
-    venv_python = os.path.join(venv_path, 'bin', 'python')
-    script = os.path.join(Dir('#').abspath, venv_path, 'bin', 'chaste_codegen')
+    codegen_base_folder = str(SCons.Script.Main.GetOption('codegen_base_folder'))
+    codegen_versions = str(os.path.join(codegen_base_folder, 'chaste_codegen.txt'))
+    venv_path = str(os.path.join(codegen_base_folder, 'codegen_python3_venv'))
+    venv_python = str(os.path.join(venv_path, 'bin', 'python'))
+    script = str(os.path.join(Dir('#').abspath, venv_path, 'bin', 'chaste_codegen'))
 
     # Set up virtual environment if it doesn't yet exist
     if not os.path.exists(script):
         os.system(sys.executable + ' -m venv ' + str(venv_path))
-        os.system(venv_python + ' -m pip install --upgrade pip setuptools wheel')
-        os.system(venv_python + ' -m pip install --upgrade chaste_codegen~=0.3.0')
-
+        os.system(venv_python + ' -m pip install --upgrade -r ' + codegen_versions)
 
     def IsDynamicSource(source):
         parts = source[0].srcnode().path.split(os.path.sep)

@@ -273,10 +273,9 @@ if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)
 	COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
-    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)
-    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade chaste_codegen~=0.3.0)
 endif ()
 # Update virtual environment and get latest chaste-codegen
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
