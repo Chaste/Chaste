@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Controlling SCons build script for Chaste.
 
 # This script is executed within the root Chaste source directory.
-# We need at least Python 2.3.
-EnsurePythonVersion(2,3)
+# We need at least Python 3.5.
+EnsurePythonVersion(3,5)
 
 # We're also no longer compatible with SCons 0.96
 EnsureSConsVersion(0,97)
@@ -460,7 +460,7 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         bld_dir = os.path.join(toplevel_dir, 'build', build_dir)
         if not os.path.exists(bld_dir):
             os.mkdir(bld_dir)
-        script = os.path.join(toplevel_dir, 'SConscript')
+        script = str(os.path.join(toplevel_dir, 'SConscript'))
         if scons_version_two:
             test_log_files.append(SConscript(script, src_dir=toplevel_dir, variant_dir=bld_dir, duplicate=0))
         else:
