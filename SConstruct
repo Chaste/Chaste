@@ -77,6 +77,7 @@ import SConsTools
 Export('SConsTools')
 
 import hostconfig
+setattr(os.environ, 'has_key', lambda x: x in os.environ)  # hack to work around scons bug and make has_key work
 
 AddOption('--codegen_base_folder',
           dest='codegen_base_folder',
