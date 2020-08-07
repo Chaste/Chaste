@@ -1,4 +1,4 @@
 pip
 setuptools
 wheel
-chaste_codegen~=0.3.0
+chaste_codegen~=0.4.0
