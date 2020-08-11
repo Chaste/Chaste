@@ -73,6 +73,7 @@ class PyCmlLongHelperTestSuite : public CxxTest::TestSuite
 
 private:
     bool mUseCvodeJacobian = true;
+    double cvOdeTolerances = false;
 
     double GetAttribute(boost::shared_ptr<AbstractCardiacCellInterface> pCell,
                         const std::string& rAttrName,
@@ -110,6 +111,10 @@ private:
         AbstractCvodeSystem* p_cvode_cell = dynamic_cast<AbstractCvodeSystem*>(pCell.get());
         if (p_cvode_cell)
         {
+            // Set tolerances
+            if(cvOdeTolerances){
+                        p_cvode_cell->SetTolerances(cvOdeTolerances, cvOdeTolerances);
+            }
             // Set a larger max internal time steps per sampling interval (CVODE's default is 500)
             p_cvode_cell->SetMaxSteps(1000);
             // Numerical or analytic J for CVODE?
@@ -161,26 +166,16 @@ private:
                  bool testLookupTables = false,
                  double tableTestV = -1000)
     {
-        // Copy CellML file (and .out if present) into output dir
+        // Copy CellML file into output dir
         OutputFileHandler handler(rOutputDirName, true);
         FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
 
-//Out files should go later as we won't need out files anymore
-        FileFinder out_file("heart/test/data/cellml/" + rModelName + ".out", RelativeTo::ChasteSourceRoot);
-        if (out_file.Exists())
-        {
-            handler.CopyFileTo(out_file);
-        }
-
-        // Create options file
+	//Out files no longer needed with codegen
+        // Set options (config files no longer used)
         std::vector<std::string> args(rArgs);
         //        args.push_back("--profile");
         CellMLToSharedLibraryConverter converter(true);
-//        if (!args.empty())
-//        {
-//            converter.CreateOptionsFile(handler, rModelName, rArgs);
-//        }
 	converter.SetOptions(rArgs);
 
 	
@@ -343,12 +338,26 @@ public:
         rModels.emplace_back("winslow_model_1999");
         rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
         rModels.emplace_back("zhang_SAN_model_2000_all");
+
+        // Additional models added for testing when introducing codegen, as these caused some unit conversion isssues (in ApPredict)
+        rModels.emplace_back("difrancesco_noble_model_1985");
+        rModels.emplace_back("FaberRudy2000");
+        rModels.emplace_back("li_mouse_2010");
+        rModels.emplace_back("paci_hyttinen_aaltosetala_severi_ventricularVersion");
+        rModels.emplace_back("sachse_moreno_abildskov_2008_b");
+
     }
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)
     {
         mUseCvodeJacobian = useCvodeJacobian;
     }
+
+    void SetUseCvOdeTolerances(double tolerances)
+    {
+        cvOdeTolerances = tolerances;
+    }
+
 };
 
 #endif // PYCMLLONGHELPERCLASS_HPP_

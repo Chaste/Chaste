@@ -64,8 +64,21 @@ public:
         args.push_back("--Wu");
         std::vector<std::string> models;
         AddAllModels(models);
+
+        std::vector<std::string> small_dt_models; // Models that need a very small dt
+        small_dt_models.push_back("li_mouse_2010");
+        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), small_dt_model));
+        }
+
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args);
+
+	// See Cooper Spiteri Mirams paper table 2
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        RunTests(dirname + "-small-dt", small_dt_models, args);
+
     }
 
     void TestOptimisedCells()
@@ -76,7 +89,19 @@ public:
         args.push_back("--opt");
         std::vector<std::string> models;
         AddAllModels(models);
+
+        std::vector<std::string> small_dt_models; // Models that need a very small dt
+        small_dt_models.push_back("li_mouse_2010");
+        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), small_dt_model));
+        }
+
         RunTests(dirname, models, args, true);
+
+	// See Cooper Spiteri Mirams paper table 2
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        RunTests(dirname + "-small-dt", small_dt_models, args, true);
     }
 
     void TestCvodeCells()
@@ -86,11 +111,26 @@ public:
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
+        args.push_back("--use-analytic-jacobian");
         std::vector<std::string> models;
         AddAllModels(models);
 
+        std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
+        finer_tolerances_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), finer_tolerances_model));
+        }
+
+
         SetUseCvodeJacobian(false);
+
         RunTests(dirname, models, args);
+
+	SetUseCvOdeTolerances(1e-6);
+        RunTests(dirname, finer_tolerances_models, args);
+	SetUseCvOdeTolerances(false);
+
         SetUseCvodeJacobian(true);
 #endif
     }
@@ -102,6 +142,7 @@ public:
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
+        args.push_back("--use-analytic-jacobian");
         std::vector<std::string> models;
         AddAllModels(models);
 
@@ -127,6 +168,7 @@ public:
         AddAllModels(models);
 
         std::vector<std::string> diff_models; // Models that need a smaller dt
+        diff_models.push_back("difrancesco_noble_model_1985");
         diff_models.push_back("iyer_model_2004");
         diff_models.push_back("iyer_model_2007");
         diff_models.push_back("jafri_rice_winslow_model_1998");
@@ -164,8 +206,29 @@ public:
         AddAllModels(models);
         // Three models require a slightly smaller timestep with RL than normal forward Euler:
         // Courtemanche 1998, Demir 1994, and Grandi 2010.
+
+
+        std::vector<std::string> small_dt_models; // Models that need a very small dt
+        small_dt_models.push_back("li_mouse_2010");
+        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), small_dt_model));
+        }
+
+        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
+        allow_warning_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+        }
+
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
         RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname + "-allow_warning", allow_warning_models, args, false, 0, true);
+
+	// See Cooper Spiteri Mirams paper table 2
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
     }
 
     void TestRushLarsenOptCells()
@@ -177,7 +240,27 @@ public:
         args.push_back("--opt");
         std::vector<std::string> models;
         AddAllModels(models);
+
+        std::vector<std::string> small_dt_models; // Models that need a very small dt
+        small_dt_models.push_back("li_mouse_2010");
+        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), small_dt_model));
+        }
+
+        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
+        allow_warning_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+        }
+
+
         RunTests(dirname, models, args, true, -1000, false);
+        RunTests(dirname + "-allow_warning", allow_warning_models, args, true, -1000, true);
+	// See Cooper Spiteri Mirams paper table 2
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
     }
 };
 
