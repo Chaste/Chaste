@@ -65,9 +65,18 @@ public:
         std::vector<std::string> models;
         AddAllModels(models);
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+
+        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
+        allow_warning_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+        }
+
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, allow_warning_models, args, false, 0, true);
     }
 
     void TestGeneralizedRushLarsenFirstOrderOpt()
@@ -81,8 +90,18 @@ public:
         AddAllModels(models);
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
         // Winslow model needs a smaller timestep
+
+        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
+        allow_warning_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+        }
+
+
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
+        RunTests(dirname, allow_warning_models, args, true, -1000, true);
     }
 };
 
