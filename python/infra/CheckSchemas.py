@@ -60,15 +60,19 @@ def FilesAreDifferent(pathToFile1, pathToFile2):
     file_string_2 = open(pathToFile2).readlines()
     #Produce generator for unified diff
     udiff = difflib.unified_diff(file_string_1, file_string_2, pathToFile1, pathToFile2)
+    is_different = False
     try:
         n = 10
         #Print the first n lines of the unified diff
         for _ in range(0, n):
-            print("%s" % udiff.next())
-        return True     
+            diff = next(udiff, None)
+            if diff is not None:
+                print("%s" % diff)
+                is_different = True
     except StopIteration:
         #The generator has little content and so was probably empty
-        return (False)
+        pass
+    return is_different
 
 #Build a list of reference files (in './heart/src/io') and a list of files which need to be verified
 reference_files=[]

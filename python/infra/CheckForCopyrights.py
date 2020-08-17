@@ -228,6 +228,9 @@ def InspectFile(fileName):
     if fileName[-21:] == 'CheckForCopyrights.py':
         # Can't really check this one, since it knows all the licences
         return True
+    if "codegen_python3_venv" in fileName:
+        # Can't really check the codegen virtual environment as it would start checking 3rd party packages
+        return True
     valid_notice = False
     if (CheckForCopyrightNotice(cpp_current_notice, file_in) or
         CheckForCopyrightNotice(py_current_notice, file_in) or
