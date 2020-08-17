@@ -275,7 +275,7 @@ if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)
     )
 endif ()
 # Update virtual environment and get latest chaste-codegen
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
