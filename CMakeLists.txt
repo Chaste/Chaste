@@ -265,17 +265,23 @@ if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
 endif ()
 
 # Install chaste_codegen in virtual environment
-execute_process(COMMAND rm -rf ${CMAKE_SOURCE_DIR}/codegen_python3_venv/)
-
 set(codegen_python3_venv ${CMAKE_SOURCE_DIR}/codegen_python3_venv/bin)
 
+# Remove old venv if it's still there
+message (STATUS "Removing ${CMAKE_SOURCE_DIR}/codegen_python3_venv if it exists")
+execute_process(COMMAND rm -rf ${CMAKE_SOURCE_DIR}/codegen_python3_venv/)
 
-message (STATUS "Installing chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
+message (STATUS "Creating virtual environment for chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
-# Update virtual environment and get latest chaste-codegen
+# Update pip and friends
+message (STATUS "Updating pip setuptools and wheel")
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip install --upgrade pip setuptools wheel)
+
+# Install codegen
+message (STATUS "Install chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
 execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
