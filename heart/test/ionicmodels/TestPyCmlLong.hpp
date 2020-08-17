@@ -75,10 +75,9 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args);
 
-	// See Cooper Spiteri Mirams paper table 2
+        // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args);
-
     }
 
     void TestOptimisedCells()
@@ -99,7 +98,7 @@ public:
 
         RunTests(dirname, models, args, true);
 
-	// See Cooper Spiteri Mirams paper table 2
+        // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args, true);
     }
@@ -122,14 +121,13 @@ public:
             models.erase(std::find(models.begin(), models.end(), finer_tolerances_model));
         }
 
-
         SetUseCvodeJacobian(false);
 
         RunTests(dirname, models, args);
 
-	SetUseCvOdeTolerances(1e-6);
+        SetUseCvOdeTolerances(1e-6);
         RunTests(dirname, finer_tolerances_models, args);
-	SetUseCvOdeTolerances(false);
+        SetUseCvOdeTolerances(DOUBLE_UNSET);
 
         SetUseCvodeJacobian(true);
 #endif
@@ -207,7 +205,6 @@ public:
         // Three models require a slightly smaller timestep with RL than normal forward Euler:
         // Courtemanche 1998, Demir 1994, and Grandi 2010.
 
-
         std::vector<std::string> small_dt_models; // Models that need a very small dt
         small_dt_models.push_back("li_mouse_2010");
         BOOST_FOREACH (std::string small_dt_model, small_dt_models)
@@ -226,7 +223,7 @@ public:
         RunTests(dirname, models, args, false, 0, false);
         RunTests(dirname + "-allow_warning", allow_warning_models, args, false, 0, true);
 
-	// See Cooper Spiteri Mirams paper table 2
+        // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
     }
@@ -255,10 +252,9 @@ public:
             models.erase(std::find(models.begin(), models.end(), allow_warning_model));
         }
 
-
         RunTests(dirname, models, args, true, -1000, false);
         RunTests(dirname + "-allow_warning", allow_warning_models, args, true, -1000, true);
-	// See Cooper Spiteri Mirams paper table 2
+        // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
     }

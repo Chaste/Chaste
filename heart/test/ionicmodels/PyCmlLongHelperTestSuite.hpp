@@ -73,7 +73,7 @@ class PyCmlLongHelperTestSuite : public CxxTest::TestSuite
 
 private:
     bool mUseCvodeJacobian = true;
-    double cvOdeTolerances = false;
+    double cvOdeTolerances = DOUBLE_UNSET;
 
     double GetAttribute(boost::shared_ptr<AbstractCardiacCellInterface> pCell,
                         const std::string& rAttrName,
@@ -112,8 +112,9 @@ private:
         if (p_cvode_cell)
         {
             // Set tolerances
-            if(cvOdeTolerances){
-                        p_cvode_cell->SetTolerances(cvOdeTolerances, cvOdeTolerances);
+            if (cvOdeTolerances != DOUBLE_UNSET)
+            {
+                p_cvode_cell->SetTolerances(cvOdeTolerances, cvOdeTolerances);
             }
             // Set a larger max internal time steps per sampling interval (CVODE's default is 500)
             p_cvode_cell->SetMaxSteps(1000);
@@ -171,14 +172,13 @@ private:
         FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
 
-	//Out files no longer needed with codegen
+        //Out files no longer needed with codegen
         // Set options (config files no longer used)
         std::vector<std::string> args(rArgs);
         //        args.push_back("--profile");
         CellMLToSharedLibraryConverter converter(true);
-	converter.SetOptions(rArgs);
+        converter.SetOptions(rArgs);
 
-	
         // Do the conversion
         FileFinder copied_file(rOutputDirName + "/" + rModelName + ".cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
@@ -218,7 +218,7 @@ private:
             double v = p_cell->GetVoltage();
             p_cell->SetVoltage(tableTestV);
 
-          // This try catch used to be TS_ASSERT_THROWS_CONTAINS (see #2982)
+            // This try catch used to be TS_ASSERT_THROWS_CONTAINS (see #2982)
             try
             {
                 p_cell->GetIIonic();
@@ -345,7 +345,6 @@ public:
         rModels.emplace_back("li_mouse_2010");
         rModels.emplace_back("paci_hyttinen_aaltosetala_severi_ventricularVersion");
         rModels.emplace_back("sachse_moreno_abildskov_2008_b");
-
     }
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)
@@ -357,7 +356,6 @@ public:
     {
         cvOdeTolerances = tolerances;
     }
-
 };
 
 #endif // PYCMLLONGHELPERCLASS_HPP_
