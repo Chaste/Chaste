@@ -37,7 +37,7 @@ import re
 
 if __name__ == "__main__":
     if (len(sys.argv) < 3):
-	print("Usage: %s <profile_dir> <extension>" % sys.argv[0], file=sys.stderr)
+        print("Usage: %s <profile_dir> <extension>" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
     files = glob.glob(sys.argv[1]+'/*.'+sys.argv[2])
     index_file = open(sys.argv[1]+'/index.html','w')
