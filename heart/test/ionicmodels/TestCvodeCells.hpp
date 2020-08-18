@@ -257,6 +257,7 @@ public:
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
         lr91_cvode_system.SetVoltage(old_v);
 
+        // extra test for setting state variable by index
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), old_v, 1e-12);
         lr91_cvode_system.SetStateVariable(0, new_v);
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);

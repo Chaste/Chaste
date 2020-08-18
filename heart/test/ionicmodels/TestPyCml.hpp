@@ -234,6 +234,13 @@ public:
 //        TS_ASSERT_THROWS_CONTAINS(be.GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
 //        be.SetStateVariable(cai_index, cai);
 
+        // extra test for setting state variable by index
+        double old_v = normal.GetVoltage();
+        const double new_v = -1000.0;
+        normal.SetStateVariable(0, new_v);
+        TS_ASSERT_DELTA(normal.GetVoltage(), new_v, 1e-12);
+        normal.SetVoltage(old_v);
+
         // Single parameter
         CheckParameter(normal);
         CheckParameter(opt);
