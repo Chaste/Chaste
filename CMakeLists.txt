@@ -261,22 +261,21 @@ endif ()
 ################################
 find_package(PythonInterp 3.5 REQUIRED)
 if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
-    message (FATAL_ERROR "Python 3.4 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
+    message (FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
 set(codegen_python3_venv ${CMAKE_SOURCE_DIR}/codegen_python3_venv/bin)
 
-# Remove old venv if it's still there
-message (STATUS "Removing ${CMAKE_SOURCE_DIR}/codegen_python3_venv if it exists")
-execute_process(COMMAND rm -rf ${CMAKE_SOURCE_DIR}/codegen_python3_venv/)
+if (NOT EXISTS ${codegen_python3_venv})
+    message (STATUS "Creating virtual environment for chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+endif ()
 
-message (STATUS "Creating virtual environment for chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
-execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
-# Update pip and friends
+# Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
 execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip install --upgrade pip setuptools wheel)
 

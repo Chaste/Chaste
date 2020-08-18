@@ -785,6 +785,7 @@ def CreatePyCmlBuilder(build, buildenv):
     # Set up virtual environment if it doesn't yet exist
     if not os.path.exists(script):
         os.system(sys.executable + ' -m venv ' + str(venv_path))
+        os.system(venv_python + ' -m pip install --upgrade pip setuptools and wheel')
         os.system(venv_python + ' -m pip install --upgrade -r ' + codegen_versions)
 
     def IsDynamicSource(source):

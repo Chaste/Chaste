@@ -41,7 +41,7 @@ run externally to an SConscript.
 
 import os
 
-# Compatability with Python 2.3
+# Compatability with Python 3.5+
 try:
     set = set
 except NameError:
