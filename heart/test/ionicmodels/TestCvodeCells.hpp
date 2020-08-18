@@ -257,6 +257,11 @@ public:
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
         lr91_cvode_system.SetVoltage(old_v);
 
+        TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), old_v, 1e-12);
+        lr91_cvode_system.SetStateVariable(0, new_v);
+        TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
+        lr91_cvode_system.SetVoltage(old_v);
+
         std::vector<double> s_state_vars = lr91_cvode_system.GetStdVecStateVariables();
         N_Vector n_state_vars = lr91_cvode_system.GetStateVariables();
         TS_ASSERT_EQUALS(GetVectorSize(n_state_vars), GetVectorSize(s_state_vars));
