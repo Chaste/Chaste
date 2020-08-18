@@ -110,7 +110,7 @@ def parse_doxygen(log_file_name, error_log_file_name, output_dir):
         output_file.close()
 
     # Now write 'OK' files for those without any errors
-    ok_files = source_files - set(problem_files.iterkeys())
+    ok_files = source_files - set(problem_files.keys())
     for file_name in ok_files:
         output_file = open(munge_name(file_name, 'OK', output_dir), 'w')
         output_file.close()
