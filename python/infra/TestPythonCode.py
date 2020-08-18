@@ -70,7 +70,7 @@ if sys.version_info[:2] < (2,7):
     # Add subprocess.check_output to earlier Python versions
     import subprocess
     def check_output(*popenargs, **kwargs):
-        """Run command with arguments and return its output as a string. Copied from Python 2.7"""
+        """Run command with arguments and return its output as a string."""
         if 'stdout' in kwargs:
             raise ValueError('stdout argument not allowed, it will be overridden.')
         process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)

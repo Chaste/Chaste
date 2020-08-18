@@ -44,7 +44,7 @@ import time
 import itertools
 import re
 
-# Compatibility with Python 2.3
+# Compatibility with Python 3.5+
 try:
     set = set
 except NameError:
