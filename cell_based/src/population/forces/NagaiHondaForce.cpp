@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2020, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -152,7 +152,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             adhesion_contribution -= previous_edge_adhesion_parameter*previous_edge_gradient + next_edge_adhesion_parameter*next_edge_gradient;
 
             // Add the force contribution from this cell's membrane surface tension (note the minus sign)
-            c_vector<double, DIM> element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
+            c_vector<double, DIM> element_perimeter_gradient;
+            element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
             double cell_target_perimeter = 2*sqrt(M_PI*target_areas[elem_index]);
             membrane_surface_tension_contribution -= 2*GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeters[elem_index] - cell_target_perimeter)*element_perimeter_gradient;
         }

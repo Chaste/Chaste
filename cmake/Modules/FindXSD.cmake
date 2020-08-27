@@ -102,7 +102,7 @@ macro (xsd_schema NAME FILE)
     # the XSD cxx-tree command.
     add_custom_command (OUTPUT "${xs_CPP}" "${xs_HPP}"
                         COMMAND ${XSD_EXECUTABLE}
-                        ARGS "cxx-tree" "--output-dir" "${xs_OUT_DIR}" ${ARGN} ${xs_SRC}
+                        ARGS "cxx-tree" "--output-dir" "${xs_OUT_DIR}" "--std" "c++11" ${ARGN} ${xs_SRC}
                         DEPENDS ${xs_SRC}
                         COMMENT "Processing XML schema ${xs_FILE_REL}"
                         VERBATIM)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2020, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -104,12 +104,7 @@ private:
     BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>* mpBidomainCorrectionTermAssembler;
 
 
-    /** Overloaded InitialiseForSolve() which calls base version but also
-     *  initialises mMassMatrix and mVecForConstructingRhs
-     *
-     *  @param initialSolution initial solution
-     */
-    void InitialiseForSolve(Vec initialSolution);
+
 
     /**
      *  Implementation of SetupLinearSystem() which uses the assembler to compute the
@@ -136,6 +131,13 @@ public:
                    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
 
     ~BidomainSolver();
+
+    /** Overloaded InitialiseForSolve() which calls base version but also
+     *  initialises mMassMatrix and mVecForConstructingRhs
+     *
+     *  @param initialSolution initial solution
+     */
+    void InitialiseForSolve(Vec initialSolution);
 };
 
 

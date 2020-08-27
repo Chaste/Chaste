@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""Copyright (c) 2005-2018, University of Oxford.
+"""Copyright (c) 2005-2020, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,7 +77,7 @@ def file_stats(file_pairs):
 
 def print_stats(hash, date_line):
     """Calulate and display stats about the checkout in the current directory."""
-    rev1_epoch = 1113991642
+    rev1_epoch = 1113991642 # 20 April 2005
     revision = hash
     date_line = date_line[:-6] # Ignore daylight saving offset '.+0100' for portability
     pattern = '%a %b %d %H:%M:%S %Y'
@@ -153,8 +153,8 @@ def run(startDate):
     
 
 if __name__ == '__main__':
-    start_date = datetime.date(2016,07,01)
-    start_date = datetime.date(2017,02,01) # February
+    start_date = datetime.date(2017,02,01)
+    start_date = datetime.date(2020,06,12)
     # if len(sys.argv) > 1:
     #     start_date = int(sys.argv[1])
     run(start_date)

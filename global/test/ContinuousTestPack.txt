@@ -4,7 +4,7 @@ TestCitations.hpp
 TestCommandLineArguments.hpp
 TestCellBasedEventHandler.hpp
 TestChasteBuildInfo.hpp
-TestCpp11Features.hpp
+TestModernCppFeatures.hpp
 TestCwd.hpp
 TestDebug.hpp
 TestDistributedVector.hpp

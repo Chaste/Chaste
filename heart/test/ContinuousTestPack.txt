@@ -24,6 +24,7 @@ ionicmodels/TestGeneralizedRushLarsen.hpp
 ionicmodels/TestHodgkinHuxleySquidAxon1952OriginalOdeSystem.hpp
 ionicmodels/TestIonicModels.hpp
 ionicmodels/TestIonicModelsWithSacs.hpp
+ionicmodels/TestMetadataSubmodule.hpp
 ionicmodels/TestModifiers.hpp
 ionicmodels/TestPyCml.hpp
 ionicmodels/TestRushLarsen.hpp
