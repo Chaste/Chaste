@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2020, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,10 +59,10 @@ c_vector<double, 3> Create_c_vector(double x, double y, double z)
     return v;
 }
 
-c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA)
+c_vector<double, 3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA)
 {
     //Check for symmetry
-    if (norm_inf( rA - trans(rA)) > 10*DBL_EPSILON)
+    if (norm_inf(rA - trans(rA)) > 10 * DBL_EPSILON)
     {
         EXCEPTION("Matrix should be symmetric");
     }
@@ -70,14 +70,14 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
     // Find the eigenvector by brute-force using the power method.
     // We can't use the inverse method, because the matrix might be singular
 
-    c_matrix<double,3,3> copy_A(rA);
+    c_matrix<double, 3, 3> copy_A(rA);
     //Eigenvalue 1
     c_vector<double, 3> eigenvec1 = scalar_vector<double>(3, 1.0);
 
     double eigen1 = CalculateMaxEigenpair(copy_A, eigenvec1);
 
     // Take out maximum eigenpair
-    c_matrix<double, 3, 3> wielandt_reduce_first_vector = identity_matrix<double>(3,3);
+    c_matrix<double, 3, 3> wielandt_reduce_first_vector = identity_matrix<double>(3, 3);
     wielandt_reduce_first_vector -= outer_prod(eigenvec1, eigenvec1);
     copy_A = prod(wielandt_reduce_first_vector, copy_A);
 
@@ -85,7 +85,7 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
     double eigen2 = CalculateMaxEigenpair(copy_A, eigenvec2);
 
     // Take out maximum (second) eigenpair
-    c_matrix<double, 3, 3> wielandt_reduce_second_vector = identity_matrix<double>(3,3);
+    c_matrix<double, 3, 3> wielandt_reduce_second_vector = identity_matrix<double>(3, 3);
     wielandt_reduce_second_vector -= outer_prod(eigenvec2, eigenvec2);
     copy_A = prod(wielandt_reduce_second_vector, copy_A);
 
@@ -102,7 +102,7 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
         return eigenvec2;
     }
     UNUSED_OPT(eigen1);
-    assert( eigen1 > DBL_EPSILON);
+    assert(eigen1 > DBL_EPSILON);
     return eigenvec1;
 }
 
@@ -121,8 +121,7 @@ double CalculateMaxEigenpair(c_matrix<double, 3, 3>& rA, c_vector<double, 3>& rE
             //We don't care about a zero eigenvector, so don't polish it
             break;
         }
-        step = norm_inf(rEigenvector-old_value);
+        step = norm_inf(rEigenvector - old_value);
     }
     return norm;
 }
-

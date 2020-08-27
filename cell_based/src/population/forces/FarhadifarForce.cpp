@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2018, University of Oxford.
+Copyright (c) 2005-2020, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -155,7 +155,8 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
                     next_edge_line_tension_parameter*next_edge_gradient;
 
             // Add the force contribution from this cell's perimeter contractility (note the minus sign)
-            c_vector<double, DIM> element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
+            c_vector<double, DIM> element_perimeter_gradient;
+            element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
             perimeter_contractility_contribution -= GetPerimeterContractilityParameter()* element_perimeters[elem_index]*
                                                                                                      element_perimeter_gradient;
         }

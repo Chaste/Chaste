@@ -3,6 +3,8 @@ ionicmodels/TestDynamicallyLoadedCellModels.hpp
 ionicmodels/TestIonicModels.hpp
 ionicmodels/TestPyCml.hpp
 ionicmodels/TestPyCmlLong.hpp
+ionicmodels/TestPyCmlLongGeneralisedRushLarsenFirstOrder.hpp
+ionicmodels/TestPyCmlLongGeneralisedRushLarsenSecondOrder.hpp
 performance/Test1dMonodomainShannonCvodeBenchmarks.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp

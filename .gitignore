@@ -10,6 +10,7 @@ build/*
 
 # Backups, SCons databases, core dumps, and temporary 'stuff'
 *~
+*.DS_Store
 .sconsign*
 core.*
 *.avi
@@ -56,3 +57,6 @@ _local/
 # Built exes in /apps/src/
 /apps/src/Chaste
 /apps/src/MeshConvert
+
+\.vscode/
+appredict_lookup_table_manifest.txt

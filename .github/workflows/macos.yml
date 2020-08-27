@@ -1,0 +1,94 @@
+name: macOS continuous test suite
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+    name: Test on macOS 10.15
+    runs-on: macos-latest
+    
+    steps:
+
+    - uses: actions/checkout@v1
+
+    - name: checkout submodule
+      run: git submodule update --init
+
+    - name: install boost
+      run: |
+        brew install boost
+      if: always()
+
+    - name: install xerces
+      run: |
+        brew install xerces-c
+      if: always()
+
+    - name: install metis
+      run: |
+        brew install metis
+      if: always()
+
+    - name: install sundials
+      run: |
+        brew install sundials
+      if: always()
+
+    - name: install hdf5
+      run: |
+        brew install hdf5
+      if: always()
+
+    - name: install vtk
+      run: |
+        brew install vtk
+      if: always()
+
+    - name: install petsc
+      run: |
+        brew install petsc
+      if: always()
+
+    - name: install xsd
+      run: |
+        wget https://www.codesynthesis.com/download/xsd/4.0/macosx/i686/xsd-4.0.0-i686-macosx.tar.bz2
+        tar -jxf xsd-4.0.0-i686-macosx.tar.bz2
+        ls -ltr
+      working-directory: /usr/local/Cellar/
+      if: always()
+
+    - name: install PyCML
+      run: |
+        python2 -m pip install "python-dateutil==1.5"
+        python2 -m pip install "rdflib==2.4.2"
+        python2 -m pip install lxml
+        python2 -m pip install "4Suite-XML==1.0.2"
+        python2 -m pip install "Amara==1.2.0.2"
+      if: always()
+
+#     - name: install Amara
+#       run: |
+#         sudo easy_install https://pypi.python.org/packages/2.5/A/Amara/Amara-1.2.0.2-py2.5.egg
+#       if: always()
+
+    - name: make build directory
+      run: mkdir chaste-build-dir
+      if: always()
+
+    - name: cmake configure
+      run: cmake -DBoost_NO_BOOST_CMAKE=ON ..
+      working-directory: chaste-build-dir
+      env:
+        XSD_ROOT: /usr/local/Cellar/
+      if: always()
+
+    # - name: cmake build
+    #   run: cmake --build . --parallel 2 --target Continuous
+    #   working-directory: chaste-build-dir
+    # - name: cmake test
+    #   run: ctest -j2 -L Continuous --output-on-failure
+    #   working-directory: chaste-build-dir
