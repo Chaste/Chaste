@@ -585,10 +585,10 @@ public:
         simulator.Solve();
 
         // Check some results
-        mNode3x = 3.0454;
+        mNode3x = 3.0408;
         mNode3y = 0.0000;
-        mNode4x = 4.0468;
-        mNode4y = 0.0101;
+        mNode4x = 4.0423;
+        mNode4y = 0.0116;
 
         std::vector<double> node_3_location = simulator.GetNodeLocation(3);
         TS_ASSERT_DELTA(node_3_location[0], mNode3x, 1e-4);
