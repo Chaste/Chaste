@@ -81,14 +81,13 @@ private:
         AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(rLoader, vIndex);
         SimulateLr91AndCompare(p_cell, tolerance);
 
-//lookup tables not implemented
-//        if (testTables)
-//        {
-//            double v = p_cell->GetVoltage();
-//            p_cell->SetVoltage(tableTestV);
-//            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
-//            p_cell->SetVoltage(v);
-//        }
+        if (testTables)
+        {
+            double v = p_cell->GetVoltage();
+            p_cell->SetVoltage(tableTestV);
+            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
+            p_cell->SetVoltage(v);
+        }
 
         delete p_cell;
     }
@@ -346,7 +345,10 @@ public:
             FileFinder copied_file2 = handler2.CopyFileTo(cellml_file);
             converter.SetOptions(args);
             p_loader = converter.Convert(copied_file2);
-            RunLr91Test(*p_loader, 0u, true, 0.3);
+//lookup tables not implemented
+//for backwards euler
+//            RunLr91Test(*p_loader, 0u, true, 0.3);
+            RunLr91Test(*p_loader, 0u, false, 0.3);
         }
 #ifdef CHASTE_CVODE
         {
@@ -357,7 +359,8 @@ public:
             FileFinder copied_file3 = handler3.CopyFileTo(cellml_file);
             converter.SetOptions(args);
             p_loader = converter.Convert(copied_file3);
-            RunLr91Test(*p_loader, 0u, true, 1, 70); // Large tolerance due to different ODE solver
+            RunLr91Test(*p_loader, 0u, true, 1, 560.0); // Large tolerance due to different ODE solver
+
         }
 #endif
     }
