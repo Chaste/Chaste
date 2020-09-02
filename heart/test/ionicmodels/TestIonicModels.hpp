@@ -86,8 +86,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ArchiveLocationInfo.hpp"
 
-#include "DynamicCellModelLoader.hpp"
-#include "DynamicModelLoaderRegistry.hpp"
 #include "CellMLLoader.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
 
