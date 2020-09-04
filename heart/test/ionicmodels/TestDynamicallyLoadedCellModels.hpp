@@ -159,7 +159,7 @@ public:
         {
             OutputFileHandler handler("TestCardiacCellMLLoader", true);
             // Note that the --cvode flag will be ignored since we call the LoadCardiacCell method.
-            std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
+           std::vector<std::string> options = boost::assign::list_of("--cvode")("--expose-annotated-variables");
             CellMLLoader loader(cellml_file, handler, options);
             boost::shared_ptr<AbstractCardiacCell> p_cell = loader.LoadCardiacCell();
             TS_ASSERT_EQUALS(p_cell->GetSystemName(), "luo_rudy_1991");
@@ -340,21 +340,17 @@ public:
 
         {
             // Backward Euler
-            args[0] = "--backward-euler";
+	    args.push_back("--backward-euler");
             OutputFileHandler handler2(dirname + "/BE");
             FileFinder copied_file2 = handler2.CopyFileTo(cellml_file);
             converter.SetOptions(args);
             p_loader = converter.Convert(copied_file2);
-//lookup tables not implemented
-//for backwards euler
-//            RunLr91Test(*p_loader, 0u, true, 0.3);
-            RunLr91Test(*p_loader, 0u, false, 0.3);
+            RunLr91Test(*p_loader, 0u, true, 0.3);
         }
 #ifdef CHASTE_CVODE
         {
             // With a for_model section and Cvode
-            args[0] = "--opt";
-            args.push_back("--cvode");
+            args[1] = "--cvode";
             OutputFileHandler handler3(dirname + "/CO");
             FileFinder copied_file3 = handler3.CopyFileTo(cellml_file);
             converter.SetOptions(args);
@@ -364,73 +360,73 @@ public:
         }
 #endif
     }
-
-    void TestArchiving()
-    {
-#ifdef CHASTE_CAN_CHECKPOINT_DLLS
-
-        // Get a loader for the .so and load a cell model
-        CellMLToSharedLibraryConverter converter;
-        DynamicCellModelLoaderPtr p_loader = converter.Convert(mArchivingModel);
-        AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(*p_loader, 0u);
-
-        // Archive it
-        OutputFileHandler handler(mArchivingDirName, false);
-        handler.SetArchiveDirectory();
-        std::string archive_filename1 = ArchiveLocationInfo::GetProcessUniqueFilePath("first-save.arch");
-        {
-            AbstractCardiacCellInterface* const p_const_cell = p_cell;
-            std::ofstream ofs(archive_filename1.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
-            ///\todo #2417 this archiving throws exception on Mac OSX
-            try
-            {
-                output_arch << p_const_cell;
-            }
-            catch(boost::archive::archive_exception& boost_exception)
-            {
-                TS_ASSERT_EQUALS(boost_exception.code, boost::archive::archive_exception::unregistered_class);
-                TS_FAIL("Archiving cell models in unavailable.  Please refer to  #2417");
-                //Bail out
-                return;
-            }
-        }
-
-        // Load from archive
-        AbstractCardiacCellInterface* p_loaded_cell1;
-        {
-            std::ifstream ifs(archive_filename1.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-            input_arch >> p_loaded_cell1;
-        }
-
-        // Archive the un-archived model
-        std::string archive_filename2 = ArchiveLocationInfo::GetProcessUniqueFilePath("second-save.arch");
-        {
-            AbstractCardiacCellInterface* const p_const_cell = p_loaded_cell1;
-            std::ofstream ofs(archive_filename2.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
-            output_arch << p_const_cell;
-        }
-
-        // Load from the new archive
-        AbstractCardiacCellInterface* p_loaded_cell2;
-        {
-            std::ifstream ifs(archive_filename2.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-            input_arch >> p_loaded_cell2;
-        }
-
-        // Check simulations of both loaded cells
-        SimulateLr91AndCompare(p_loaded_cell1);
-        delete p_loaded_cell1;
-        SimulateLr91AndCompare(p_loaded_cell2);
-        delete p_loaded_cell2;
-        delete p_cell;
-#else
-        std::cout << "Note: this test can only actually test anything on Boost>=1.37 (on non-Mac systems #2417)." << std::endl;
-#endif // CHASTE_CAN_CHECKPOINT_DLLS
-    }
+//
+//    void TestArchiving()
+//    {
+//#ifdef CHASTE_CAN_CHECKPOINT_DLLS
+//
+//        // Get a loader for the .so and load a cell model
+//        CellMLToSharedLibraryConverter converter;
+//        DynamicCellModelLoaderPtr p_loader = converter.Convert(mArchivingModel);
+//        AbstractCardiacCellInterface* p_cell = CreateLr91CellFromLoader(*p_loader, 0u);
+//
+//        // Archive it
+//        OutputFileHandler handler(mArchivingDirName, false);
+//        handler.SetArchiveDirectory();
+//        std::string archive_filename1 = ArchiveLocationInfo::GetProcessUniqueFilePath("first-save.arch");
+//        {
+//            AbstractCardiacCellInterface* const p_const_cell = p_cell;
+//            std::ofstream ofs(archive_filename1.c_str());
+//            boost::archive::text_oarchive output_arch(ofs);
+//            ///\todo #2417 this archiving throws exception on Mac OSX
+//            try
+//            {
+//                output_arch << p_const_cell;
+//            }
+//            catch(boost::archive::archive_exception& boost_exception)
+//            {
+//                TS_ASSERT_EQUALS(boost_exception.code, boost::archive::archive_exception::unregistered_class);
+//                TS_FAIL("Archiving cell models in unavailable.  Please refer to  #2417");
+//                //Bail out
+//                return;
+//            }
+//        }
+//
+//        // Load from archive
+//        AbstractCardiacCellInterface* p_loaded_cell1;
+//        {
+//            std::ifstream ifs(archive_filename1.c_str(), std::ios::binary);
+//            boost::archive::text_iarchive input_arch(ifs);
+//            input_arch >> p_loaded_cell1;
+//        }
+//
+//        // Archive the un-archived model
+//        std::string archive_filename2 = ArchiveLocationInfo::GetProcessUniqueFilePath("second-save.arch");
+//        {
+//            AbstractCardiacCellInterface* const p_const_cell = p_loaded_cell1;
+//            std::ofstream ofs(archive_filename2.c_str());
+//            boost::archive::text_oarchive output_arch(ofs);
+//            output_arch << p_const_cell;
+//        }
+//
+//        // Load from the new archive
+//        AbstractCardiacCellInterface* p_loaded_cell2;
+//        {
+//            std::ifstream ifs(archive_filename2.c_str(), std::ios::binary);
+//            boost::archive::text_iarchive input_arch(ifs);
+//            input_arch >> p_loaded_cell2;
+//        }
+//
+//        // Check simulations of both loaded cells
+//        SimulateLr91AndCompare(p_loaded_cell1);
+//        delete p_loaded_cell1;
+//        SimulateLr91AndCompare(p_loaded_cell2);
+//        delete p_loaded_cell2;
+//        delete p_cell;
+//#else
+//        std::cout << "Note: this test can only actually test anything on Boost>=1.37 (on non-Mac systems #2417)." << std::endl;
+//#endif // CHASTE_CAN_CHECKPOINT_DLLS
+//    }
 };
 
 #endif /* TESTDYNAMICALLYLOADEDCELLMODELS_HPP_ */
