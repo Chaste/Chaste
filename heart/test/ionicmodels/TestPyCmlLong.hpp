@@ -330,7 +330,7 @@ public:
         }
 
 
-//        RunTests(dirname, models, args);
+        RunTests(dirname, models, args);
         SetUseCvOdeTolerances(1e-6);
         RunTests(dirname, finer_tolerances_models,
                  {"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
@@ -340,6 +340,58 @@ public:
 #endif
     }
 
+    void TestBackwardEulerCellsOpt()
+    {
+        std::string dirname("TestPyCmlLongBE-opt");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--backward-euler");
+        args.push_back("--opt");
+
+        std::vector<std::string> models;
+        AddAllModels(models);
+
+        std::vector<std::string> diff_models; // Models that need a smaller dt
+        diff_models.push_back("difrancesco_noble_model_1985");
+        diff_models.push_back("iyer_model_2004");
+        diff_models.push_back("iyer_model_2007");
+        diff_models.push_back("jafri_rice_winslow_model_1998");
+        diff_models.push_back("pandit_model_2001_epi");
+        diff_models.push_back("priebe_beuckelmann_model_1998");
+        diff_models.push_back("viswanathan_model_1999_epi");
+        diff_models.push_back("winslow_model_1999");
+        BOOST_FOREACH (std::string diff_model, diff_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), diff_model));
+        }
+
+        std::vector<std::string> different_lookup_table_models; // Models that need a smaller dt
+        different_lookup_table_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string diff_model, different_lookup_table_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), diff_model));
+        }
+
+
+        // These have NaN in the jacobian due to massive exponentials
+        std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
+        BOOST_FOREACH (std::string bad_model, bad_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), bad_model));
+        }
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, models, args, true);
+
+        RunTests(dirname, different_lookup_table_models,
+                 {"--opt", "--lookup-table", "membrane_voltage", "-250.0001", "549.9999", "0.001"},
+                 true);
+
+        dirname = dirname + "-difficult";
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
+        RunTests(dirname, diff_models, args, true);
+
+    }
 };
 
 #endif // TESTPYCMLLONG_HPP_
