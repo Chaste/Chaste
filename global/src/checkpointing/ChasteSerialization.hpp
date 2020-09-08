@@ -88,4 +88,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/type_info_implementation.hpp>
 #endif
 
+/**
+ * Add a missing #include for boost 1.74, which is needed
+ * to work around a big in that boost version.
+ *
+ * See #3038
+ */
+#if BOOST_VERSION == 107400
+#include <boost/serialization/library_version_type.hpp>
+#endif
+
 #endif // CHASTESERIALIZATION_HPP_
