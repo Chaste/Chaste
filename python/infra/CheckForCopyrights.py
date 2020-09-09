@@ -285,6 +285,28 @@ def InspectFile(fileName):
         return False
 
 
+def ignore_dir(dir_to_check):
+
+    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'venv',
+                   'testoutput', 'doc', 'projects', 'hierwikiplugin']
+
+    dir_ignore_starts_with = ['Debug_', 'cmake-build']
+
+    startchar_ignores = ['_', '.']
+
+    if dir_to_check in dir_ignores:
+        return True
+
+    if dir_to_check[0] in startchar_ignores:
+        return True
+
+    for x in dir_ignore_starts_with:
+        if dir_to_check.startswith(x):
+            return True
+
+    return False
+
+
 if __name__ == '__main__':
     # Check, apply or modify the copyright notices.
     # .cpp, .hpp., .py, .java are C++, Python and Java code.
@@ -296,10 +318,7 @@ if __name__ == '__main__':
     named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE',
                    'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
 
-    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest',
-                   'testoutput', 'doc', 'projects', 'hierwikiplugin']
 
-    startchar_ignores = ['_', '.']
     exclusions = ['python/pycml/_enum.py',
                   'python/pycml/pyparsing.py',
                   'python/pycml/schematron.py',
@@ -320,7 +339,7 @@ if __name__ == '__main__':
         relative_root = root[chaste_dir_len:]
         # Check for ignored dirs
         for dirname in dirs[:]:
-            if dirname in dir_ignores or dirname[0] in startchar_ignores:
+            if ignore_dir(dirname):
                 dirs.remove(dirname)
         # Check for source files
         for file in files:
