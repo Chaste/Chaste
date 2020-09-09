@@ -493,6 +493,7 @@ bool PetscTools::HasParMetis()
     return (parmetis_installed_error == 0);
 }
 
+#if PETSC_VERSION_GE(3, 11, 2) // PETSc 3.11.2 or newer
 PetscErrorCode PetscTools::ChasteMatCopy(Mat A, Mat B, MatStructure str)
 {
     PetscErrorCode ierr;
@@ -526,3 +527,4 @@ PetscErrorCode PetscTools::ChasteMatCopy(Mat A, Mat B, MatStructure str)
     CHKERRQ(ierr);
     PetscFunctionReturn(0);
 }
+#endif
