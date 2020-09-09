@@ -401,6 +401,20 @@ public:
          PetscOptionsSetValue(pOptionName, pOptionValue);
 #endif
      }
+
+     /**
+      * \TODO: see #3021. This function replicates OLD PETSc behaviour that changed
+      * between 3.11.1 and 3.11.2. The new PETSc functionality does not work with
+      * Chaste, and we have not yet identified why.
+      *
+      * This is a temporary stopgap to get Chaste working with newer PETSc versions.
+      *
+      * @param A the first matrix
+      * @param B the second matrix
+      * @param str the matrix structure
+      * @return any error code emitted during the function
+      */
+     static PetscErrorCode ChasteMatCopy(Mat A, Mat B, MatStructure str);
 };
 
 #endif /*PETSCTOOLS_HPP_*/
