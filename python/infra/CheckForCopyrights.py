@@ -287,10 +287,10 @@ def InspectFile(fileName):
 
 def ignore_dir(dir_to_check):
 
-    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'venv',
+    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'codegen_python3_venv',
                    'testoutput', 'doc', 'projects', 'hierwikiplugin']
 
-    dir_ignore_starts_with = ['Debug_', 'cmake-build']
+    dir_ignore_contains = ['Debug_', 'cmake-build', 'venv']
 
     startchar_ignores = ['_', '.']
 
@@ -300,8 +300,8 @@ def ignore_dir(dir_to_check):
     if dir_to_check[0] in startchar_ignores:
         return True
 
-    for x in dir_ignore_starts_with:
-        if dir_to_check.startswith(x):
+    for x in dir_ignore_contains:
+        if x in dir_to_check:
             return True
 
     return False
