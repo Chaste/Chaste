@@ -318,7 +318,6 @@ if __name__ == '__main__':
     named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE',
                    'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
 
-
     exclusions = ['python/pycml/_enum.py',
                   'python/pycml/pyparsing.py',
                   'python/pycml/schematron.py',
