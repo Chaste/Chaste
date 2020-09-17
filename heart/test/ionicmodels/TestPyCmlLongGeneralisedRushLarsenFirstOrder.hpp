@@ -141,32 +141,67 @@ public:
         }
 
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args, true, -1000, false);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-
-        RunTests(dirname, different_lookup_table_models,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
-
-
-        RunTests(dirname, different_lookup_table_models2,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
-                 true, -1000, true);
-
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models3,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
+//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+//        RunTests(dirname, models, args, true, -1000, false);
+//
+//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+//        RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
+//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+//
+//        RunTests(dirname, different_lookup_table_models,
+//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+//                 true, -1000, true);
+//
+//
+//        RunTests(dirname, different_lookup_table_models2,
+//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
+//                 true, -1000, true);
+//
+//
+//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+//        RunTests(dirname, different_lookup_table_models3,
+//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+//                 true, -1000, true);
 
 
 //        RunTests(dirname, different_lookup_table_models4,
 //                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
 //                 true, -1000, true);
+
+
+
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 2.0);
+        RunTests(dirname, different_lookup_table_models4, args, true, -1000, false);
+
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, different_lookup_table_models4, args, true, -1000, false);
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, different_lookup_table_models4, args, true, -1000, false);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+
+        RunTests(dirname, different_lookup_table_models4,
+                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 true, -1000, true);
+
+
+        RunTests(dirname, different_lookup_table_models4,
+                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
+                 true, -1000, true);
+
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, different_lookup_table_models4,
+                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 true, -1000, true);
+
+
+        RunTests(dirname, different_lookup_table_models4,
+                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 true, -1000, true);
+
 
     }
 
