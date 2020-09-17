@@ -61,12 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
-#ifdef CHASTE_CVODE
-    boost::shared_ptr<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >> mpModel;
-#endif
-
-public:
-    void TestInterpolatorTimesAndGenerateReferenceTrace()
+    void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args)
     {
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("TestCvodeCellsWithDataClamp", true);
@@ -75,7 +70,7 @@ public:
         handler.CopyFileTo(cellml_file);
 
 	CellMLToSharedLibraryConverter converter(true);
-	converter.SetOptions({"-m", "--cvode-data-clamp"});
+	converter.SetOptions(args);
 
         // Do the conversion
         FileFinder copied_file("TestCvodeCellsWithDataClamp/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
@@ -220,6 +215,21 @@ public:
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif
+    }
+
+#ifdef CHASTE_CVODE
+    boost::shared_ptr<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >> mpModel;
+#endif
+
+public:
+    void TestInterpolatorTimesAndGenerateReferenceTrace()
+    {
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp"});
+    }
+
+    void TestInterpolatorTimesAndGenerateReferenceTraceWithLookupTables()
+    {
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp", "--opt"});
     }
 
     void TestArchivingCvodeCellsWithDataClamp()
