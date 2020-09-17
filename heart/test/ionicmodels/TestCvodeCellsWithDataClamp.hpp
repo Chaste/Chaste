@@ -61,10 +61,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
-    void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args)
+    void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args, std::string outputFolder, double tol)
     {
 #ifdef CHASTE_CVODE
-        OutputFileHandler handler("TestCvodeCellsWithDataClamp", true);
+        OutputFileHandler handler(outputFolder, true);
 	
         FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
@@ -73,7 +73,7 @@ private:
 	converter.SetOptions(args);
 
         // Do the conversion
-        FileFinder copied_file("TestCvodeCellsWithDataClamp/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+        FileFinder copied_file(outputFolder + "/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
 
 
@@ -100,7 +100,7 @@ private:
         Timer::Print("OdeSolution");
         std::vector<double> expt_times = solution.rGetTimes();
         std::vector<double> expt_data = solution.GetAnyVariable("membrane_voltage");
-        solution.WriteToFile("TestCvodeCellsWithDataClamp","shannon_original_no_clamp", "ms", 1, false); // false to clean
+        solution.WriteToFile(outputFolder,"shannon_original_no_clamp", "ms", 1, false); // false to clean
 
         TS_ASSERT_THROWS_THIS(mpModel->TurnOnDataClamp(),
             "Before calling TurnOnDataClamp(), please provide experimental data via the SetExperimentalData() method.");
@@ -116,11 +116,6 @@ private:
             // So now turn on the data clamp
             mpModel->TurnOnDataClamp();
 
-# if CHASTE_SUNDIALS_VERSION >= 20400
-            double tol = 5e-3; // mV
-#else
-            double tol = 0.2; // mV
-#endif
             TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, tol);
 
             // So turn it off again
@@ -224,12 +219,17 @@ private:
 public:
     void TestInterpolatorTimesAndGenerateReferenceTrace()
     {
-        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp"});
+# if CHASTE_SUNDIALS_VERSION >= 20400
+         double tol = 5e-3; // mV
+#else
+         double tol = 0.2; // mV
+#endif
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp"}, "TestCvodeCellsWithDataClamp", tol);
     }
 
     void TestInterpolatorTimesAndGenerateReferenceTraceWithLookupTables()
     {
-        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp", "--opt"});
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp", "--opt"}, "TestCvodeCellsWithDataClampOpt", 0.2);
     }
 
     void TestArchivingCvodeCellsWithDataClamp()
