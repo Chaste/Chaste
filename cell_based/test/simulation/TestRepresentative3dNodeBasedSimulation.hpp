@@ -146,7 +146,7 @@ public:
         simulator.Solve();
 
         // Check some results
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1128u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1124u);
 
         AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
 
@@ -155,9 +155,9 @@ public:
             ++cell_iter;
         }
         c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
-        TS_ASSERT_DELTA(node_location[0],0.9604, 1e-4);
+        TS_ASSERT_DELTA(node_location[0],0.7363, 1e-4);
         TS_ASSERT_DELTA(node_location[1],8.0, 1e-4);
-        TS_ASSERT_DELTA(node_location[2],3.6539, 1e-4);
+        TS_ASSERT_DELTA(node_location[2],4.2807, 1e-4);
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)

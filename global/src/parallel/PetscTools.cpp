@@ -406,7 +406,11 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
         /// \todo: #1082 work out appropriate nz allocation.
         PetscTools::SetupMat(temp_mat, num_rows, num_rows, 100, num_local_rows, num_local_rows, false);
 
+#if PETSC_VERSION_GE(3, 11, 2) // PETSc 3.11.2 or newer
+        PetscTools::ChasteMatCopy(rMat, temp_mat, DIFFERENT_NONZERO_PATTERN);
+#else
         MatCopy(rMat, temp_mat, DIFFERENT_NONZERO_PATTERN);
+#endif
 
         PetscTools::Destroy(rMat);
         rMat = temp_mat;
@@ -488,3 +492,39 @@ bool PetscTools::HasParMetis()
 
     return (parmetis_installed_error == 0);
 }
+
+#if PETSC_VERSION_GE(3, 11, 2) // PETSc 3.11.2 or newer
+PetscErrorCode PetscTools::ChasteMatCopy(Mat A, Mat B, MatStructure str)
+{
+    PetscErrorCode ierr;
+    PetscInt i, rstart = 0, rend = 0, nz;
+    const PetscInt* cwork;
+    const PetscScalar* vwork;
+
+    PetscBool assembled;
+    MatAssembled(B, &assembled);
+    if (assembled == PETSC_TRUE)
+    {
+        ierr = MatZeroEntries(B);
+        CHKERRQ(ierr);
+    }
+
+    ierr = MatGetOwnershipRange(A, &rstart, &rend);
+    CHKERRQ(ierr);
+    for (i = rstart; i < rend; i++)
+    {
+        ierr = MatGetRow(A, i, &nz, &cwork, &vwork);
+        CHKERRQ(ierr);
+        ierr = MatSetValues(B, 1, &i, nz, cwork, vwork, INSERT_VALUES);
+        CHKERRQ(ierr);
+        ierr = MatRestoreRow(A, i, &nz, &cwork, &vwork);
+        CHKERRQ(ierr);
+    }
+
+    ierr = MatAssemblyBegin(B, MAT_FINAL_ASSEMBLY);
+    CHKERRQ(ierr);
+    ierr = MatAssemblyEnd(B, MAT_FINAL_ASSEMBLY);
+    CHKERRQ(ierr);
+    PetscFunctionReturn(0);
+}
+#endif

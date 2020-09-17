@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 /*
  * If using older an older PETSc (pre-3.2) include some citations here from a more recent version.
  * (The following are from 3.5.2)
@@ -61,19 +60,24 @@ const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
                               "  Year = {1997}\n"
                               "}\n";
 
-
 /* Main Chaste citation */
 static PetscBool ChasteCite = PETSC_FALSE;
-const char ChasteCitation[] = "@article{mirams2013chaste,\n"
-                              "  author    = {Mirams, G.R. and Arthurs, C.J. and Bernabeu, M.O. and Bordas, R. and Cooper, "
-                              "J. and Corrias, A. and Davit, Y. and Dunn, S-J. and Fletcher, A.G. and Harvey, D.G. and "
-                              "Marsh, M.E. and Osborne, J.M. and Pathmanathan, P. and Pitt-Francis, J. and Southern, J. "
-                              "and Zemzemi, N. and Gavaghan, D.J.},\n"
-                              "  title     = {Chaste: an open source C++ library for computational physiology and biology},\n"
-                              "  journal   = {PLoS computational biology},\n"
-                              "  volume    = {9},\n"
-                              "  number    = {3},\n"
-                              "  pages     = {e1002970},\n"
-                              "  year      = {2013},\n"
-                              "  publisher = {Public Library of Science}\n"
+const char ChasteCitation[] = "@article{Cooper2020Chaste,\n"
+                              "  doi = {10.21105/joss.01848},\n"
+                              "  url = {https://doi.org/10.21105/joss.01848},\n"
+                              "  year = {2020},\n"
+                              "  publisher = {The Open Journal},\n"
+                              "  volume = {5},\n"
+                              "  number = {47},\n"
+                              "  pages = {1848},\n"
+                              "  author = {Fergus R. Cooper and Ruth E. Baker and Miguel O. Bernabeu and Rafel Bordas"
+                              " and Louise Bowler and Alfonso Bueno-Orovio and Helen M. Byrne and Valentina Carapella"
+                              " and Louie Cardone-Noott and Jonathan Cooper and Sara Dutta and Benjamin D. Evans"
+                              " and Alexander G. Fletcher and James A. Grogan and Wenxian Guo and Daniel G. Harvey"
+                              " and Maurice Hendrix and David Kay and Jochen Kursawe and Philip K. Maini"
+                              " and Beth McMillan and Gary R. Mirams and James M. Osborne and Pras Pathmanathan"
+                              " and Joe M. Pitt-Francis and Martin Robinson and Blanca Rodriguez"
+                              " and Raymond J. Spiteri and David J. Gavaghan},\n"
+                              "  title = {Chaste: Cancer, Heart and Soft Tissue Environment},\n"
+                              "  journal = {Journal of Open Source Software}\n"
                               "}\n";
