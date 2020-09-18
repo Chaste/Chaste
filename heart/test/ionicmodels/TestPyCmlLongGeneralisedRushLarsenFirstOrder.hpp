@@ -56,28 +56,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPyCmlLongGeneralisedRushLarsenFirstOrder : public PyCmlLongHelperTestSuite
 {
 public:
-//    void TestGeneralizedRushLarsenFirstOrder()
-//    {
-//        std::string dirname("TestPyCmlLongGeneralizedRushLarsen1");
-//        std::vector<std::string> args;
-//        args.push_back("--Wu");
-//        args.push_back("--grl1");
-//        std::vector<std::string> models;
-//        AddAllModels(models);
-//        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
-//
-//        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
-//        allow_warning_models.push_back("difrancesco_noble_model_1985");
-//        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
-//        {
-//            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
-//        }
-//
-//        // Winslow model needs a smaller timestep
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-//        RunTests(dirname, models, args, false, 0, false);
-//        RunTests(dirname, allow_warning_models, args, false, 0, true);
-//    }
+    void TestGeneralizedRushLarsenFirstOrder()
+    {
+        std::string dirname("TestPyCmlLongGeneralizedRushLarsen1");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--grl1");
+        std::vector<std::string> models;
+        AddAllModels(models);
+        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+
+        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
+        allow_warning_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+        }
+
+        // Winslow model needs a smaller timestep
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, allow_warning_models, args, false, 0, true);
+    }
 
     void TestGeneralizedRushLarsenFirstOrderOpt()
     {
@@ -89,9 +89,11 @@ public:
         std::vector<std::string> models;
         AddAllModels(models);
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+        models.erase(std::find(models.begin(), models.end(), "difrancesco_noble_model_1985"));
 
 
         std::vector<std::string> smaller_timestep_models;
+        smaller_timestep_models.push_back("Shannon2004");
 	smaller_timestep_models.push_back("bondarenko_model_2004_apex");
 	smaller_timestep_models.push_back("courtemanche_ramirez_nattel_model_1998");
 	smaller_timestep_models.push_back("demir_model_1994");
@@ -132,76 +134,31 @@ public:
         }
 
 
-        std::vector<std::string> different_lookup_table_models4;
-        different_lookup_table_models4.push_back("Shannon2004");
-        different_lookup_table_models4.push_back("difrancesco_noble_model_1985");
-        BOOST_FOREACH (std::string diff_model, different_lookup_table_models4)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
-
-
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-//        RunTests(dirname, models, args, true, -1000, false);
-//
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-//        RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-//
-//        RunTests(dirname, different_lookup_table_models,
-//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-//                 true, -1000, true);
-//
-//
-//        RunTests(dirname, different_lookup_table_models2,
-//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
-//                 true, -1000, true);
-//
-//
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-//        RunTests(dirname, different_lookup_table_models3,
-//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-//                 true, -1000, true);
-
-
-//        RunTests(dirname, different_lookup_table_models4,
-//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-//                 true, -1000, true);
-
-
-
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 2.0);
-        RunTests(dirname, different_lookup_table_models4, args, true, -1000, false);
-
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models4, args, true, -1000, false);
+        RunTests(dirname, models, args, true, -1000, false);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models4, args, true, -1000, false);
+        RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
 
-        RunTests(dirname, different_lookup_table_models4,
+        RunTests(dirname, different_lookup_table_models,
                  {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
                  true, -1000, true);
 
 
-        RunTests(dirname, different_lookup_table_models4,
+        RunTests(dirname, different_lookup_table_models2,
                  {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
                  true, -1000, true);
 
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models4,
+        RunTests(dirname, different_lookup_table_models3,
                  {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
                  true, -1000, true);
 
 
-        RunTests(dirname, different_lookup_table_models4,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
-
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, models, args, true, -1000, false);
 
     }
 

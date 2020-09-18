@@ -56,60 +56,40 @@ class TestPyCmlLongGeneralisedRushLarsenSecondOrder : public PyCmlLongHelperTest
 {
 
 public:
-//    void TestGeneralizedRushLarsenSecondOrder()
-//    {
-//        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2");
-//        std::vector<std::string> args;
-//        args.push_back("--Wu");
-//        args.push_back("--grl2");
-//        std::vector<std::string> models;
-//        AddAllModels(models);
-//        // Winslow model needs a smaller timestep
-//
-//        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
-//        allow_warning_models.push_back("difrancesco_noble_model_1985");
-//        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
-//        {
-//            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
-//        }
-//
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-//        RunTests(dirname, models, args, false, 0, false);
-//        RunTests(dirname, allow_warning_models, args, false, 0, true);
-//    }
-//
-//    void TestGeneralizedRushLarsenSecondOrderOpt()
-//    {
-//        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2Opt");
-//        std::vector<std::string> args;
-//        args.push_back("--Wu");
-//        args.push_back("--grl2");
-//        args.push_back("--opt");
-//        std::vector<std::string> models;
-//        AddAllModels(models);
-//        // Winslow model needs a smaller timestep
-//
-//        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
-//        allow_warning_models.push_back("difrancesco_noble_model_1985");
-//        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
-//        {
-//            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
-//        }
-//
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-//        RunTests(dirname, models, args, true, -1000, false);
-//        RunTests(dirname, allow_warning_models, args, true, -1000, true);
-//    }
-
-    void TestGeneralizedRushLarsenFirstOrderOpt()
+    void TestGeneralizedRushLarsenSecondOrder()
     {
-        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2Opt2");
+        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--grl2");
+        std::vector<std::string> models;
+        AddAllModels(models);
+        // Winslow model needs a smaller timestep
+
+        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
+        allow_warning_models.push_back("difrancesco_noble_model_1985");
+        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+        }
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, allow_warning_models, args, false, 0, true);
+    }
+
+    void TestGeneralizedRushLarsenSecondOrderOpt()
+    {
+        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2Opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl2");
         args.push_back("--opt");
         std::vector<std::string> models;
         AddAllModels(models);
+        models.erase(std::find(models.begin(), models.end(), "difrancesco_noble_model_1985"));
+        models.erase(std::find(models.begin(), models.end(), "noble_model_1991"));
+        models.erase(std::find(models.begin(), models.end(), "nygren_atrial_model_1998"));
 
         std::vector<std::string> smaller_timestep_models;
 	smaller_timestep_models.push_back("bondarenko_model_2004_apex");
@@ -120,6 +100,7 @@ public:
 	smaller_timestep_models.push_back("iyer_model_2007");
 	smaller_timestep_models.push_back("jafri_rice_winslow_model_1998");
 	smaller_timestep_models.push_back("livshitz_rudy_2007");
+	smaller_timestep_models.push_back("Shannon2004");
 	smaller_timestep_models.push_back("stewart_zhang_model_2008_ss");
 	smaller_timestep_models.push_back("winslow_model_1999");
 	smaller_timestep_models.push_back("FaberRudy2000");
@@ -156,24 +137,11 @@ public:
         }
 
 
-        std::vector<std::string> different_lookup_table_models4;
-        different_lookup_table_models4.push_back("Shannon2004");
-        different_lookup_table_models4.push_back("difrancesco_noble_model_1985");
-	different_lookup_table_models4.push_back("noble_model_1991");
-	different_lookup_table_models4.push_back("nygren_atrial_model_1998");
-        BOOST_FOREACH (std::string diff_model, different_lookup_table_models4)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
-
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
-        RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
 
         RunTests(dirname, different_lookup_table_models,
                  {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
@@ -184,18 +152,10 @@ public:
                  {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
                  true, -1000, true);
 
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, different_lookup_table_models3,
                  {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
                  true, -1000, true);
-
-
-//        RunTests(dirname, different_lookup_table_models4,
-//                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-//                 true, -1000, true);
-
-
     }
 
 
