@@ -340,7 +340,7 @@ public:
         rModels.emplace_back("zhang_SAN_model_2000_all");
 
         // Additional models added for testing when introducing codegen, as these caused some unit conversion isssues (in ApPredict)
-        rModels.emplace_back("difrancesco_noble_model_1985");
+        rModels.emplace_back("DiFrancescoNoble1985");
         rModels.emplace_back("FaberRudy2000");
         rModels.emplace_back("li_mouse_2010");
         rModels.emplace_back("paci_hyttinen_aaltosetala_severi_ventricularVersion");

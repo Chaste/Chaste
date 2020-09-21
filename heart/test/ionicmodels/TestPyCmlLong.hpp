@@ -84,6 +84,8 @@ public:
     {
         std::string dirname("TestPyCmlLongOpt");
         std::vector<std::string> models;
+        std::vector<std::string> args;
+        args.push_back("--opt");
         AddAllModels(models);
 
         std::vector<std::string> small_dt_models; // Models that need a very small dt
@@ -100,11 +102,11 @@ public:
             models.erase(std::find(models.begin(), models.end(), model));
         }
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, {"--opt"}, true);
+        RunTests(dirname, models, args, true);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, {"--opt"}, true);
+        RunTests(dirname + "-small-dt", small_dt_models, args, true);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
@@ -122,21 +124,8 @@ public:
         std::vector<std::string> models;
         AddAllModels(models);
 
-        std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
-        finer_tolerances_models.push_back("difrancesco_noble_model_1985");
-        BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), finer_tolerances_model));
-        }
-
         SetUseCvodeJacobian(false);
-
         RunTests(dirname, models, args);
-
-        SetUseCvOdeTolerances(1e-6);
-        RunTests(dirname, finer_tolerances_models, args);
-        SetUseCvOdeTolerances(DOUBLE_UNSET);
-
         SetUseCvodeJacobian(true);
 #endif
     }
@@ -174,7 +163,6 @@ public:
         AddAllModels(models);
 
         std::vector<std::string> diff_models; // Models that need a smaller dt
-        diff_models.push_back("difrancesco_noble_model_1985");
         diff_models.push_back("iyer_model_2004");
         diff_models.push_back("iyer_model_2007");
         diff_models.push_back("jafri_rice_winslow_model_1998");
@@ -210,8 +198,6 @@ public:
         args.push_back("--rush-larsen");
         std::vector<std::string> models;
         AddAllModels(models);
-        // Three models require a slightly smaller timestep with RL than normal forward Euler:
-        // Courtemanche 1998, Demir 1994, and Grandi 2010.
 
         std::vector<std::string> small_dt_models; // Models that need a very small dt
         small_dt_models.push_back("li_mouse_2010");
@@ -220,16 +206,8 @@ public:
             models.erase(std::find(models.begin(), models.end(), small_dt_model));
         }
 
-        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
-        allow_warning_models.push_back("difrancesco_noble_model_1985");
-        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
-        }
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
         RunTests(dirname, models, args, false, 0, false);
-        RunTests(dirname + "-allow_warning", allow_warning_models, args, false, 0, true);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
@@ -251,21 +229,24 @@ public:
         small_dt_models.push_back("courtemanche_ramirez_nattel_model_1998");
         small_dt_models.push_back("demir_model_1994");
         small_dt_models.push_back("grandi2010ss");
-        small_dt_models.push_back("Shannon2004");
         BOOST_FOREACH (std::string small_dt_model, small_dt_models)
         {
             models.erase(std::find(models.begin(), models.end(), small_dt_model));
         }
 
-        std::vector<std::string> allow_warning_models; // Models for which we allow warnings
-        allow_warning_models.push_back("difrancesco_noble_model_1985");
-        BOOST_FOREACH (std::string allow_warning_model, allow_warning_models)
+        std::vector<std::string> different_lookup_table_models; // Models for which we allow warnings
+        different_lookup_table_models.push_back("DiFrancescoNoble1985");
+        BOOST_FOREACH (std::string model, different_lookup_table_models)
         {
-            models.erase(std::find(models.begin(), models.end(), allow_warning_model));
+            models.erase(std::find(models.begin(), models.end(), model));
         }
 
         RunTests(dirname, models, args, true, -1000, false);
-        RunTests(dirname + "-allow_warning", allow_warning_models, args, true, -1000, true);
+
+        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
+                   {"--rush-larsen", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                   true, -1000, true);
+
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
@@ -283,7 +264,6 @@ public:
         AddAllModels(models);
 
         std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
-        finer_tolerances_models.push_back("difrancesco_noble_model_1985");
         finer_tolerances_models.push_back("ten_tusscher_model_2004_endo");
         BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
         {
@@ -291,7 +271,6 @@ public:
         }
 
         SetUseCvodeJacobian(false);
-
         RunTests(dirname, models, args);
 
         SetUseCvOdeTolerances(1e-6);
@@ -322,7 +301,6 @@ public:
         }
 
         std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
-        finer_tolerances_models.push_back("difrancesco_noble_model_1985");
         finer_tolerances_models.push_back("ten_tusscher_model_2004_endo");
         BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
         {
@@ -331,9 +309,10 @@ public:
 
 
         RunTests(dirname, models, args);
+
         SetUseCvOdeTolerances(1e-6);
         RunTests(dirname, finer_tolerances_models,
-                 {"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
                  true);
         SetUseCvOdeTolerances(DOUBLE_UNSET);
 
@@ -352,7 +331,6 @@ public:
         AddAllModels(models);
 
         std::vector<std::string> diff_models; // Models that need a smaller dt
-        diff_models.push_back("difrancesco_noble_model_1985");
         diff_models.push_back("iyer_model_2004");
         diff_models.push_back("iyer_model_2007");
         diff_models.push_back("jafri_rice_winslow_model_1998");
@@ -365,14 +343,6 @@ public:
             models.erase(std::find(models.begin(), models.end(), diff_model));
         }
 
-        std::vector<std::string> different_lookup_table_models; // Models that need a smaller dt
-        different_lookup_table_models.push_back("difrancesco_noble_model_1985");
-        BOOST_FOREACH (std::string diff_model, different_lookup_table_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
-
-
         // These have NaN in the jacobian due to massive exponentials
         std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
         BOOST_FOREACH (std::string bad_model, bad_models)
@@ -382,10 +352,6 @@ public:
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true);
-
-        RunTests(dirname, different_lookup_table_models,
-                 {"--opt", "--lookup-table", "membrane_voltage", "-250.0001", "549.9999", "0.001"},
-                 true);
 
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);

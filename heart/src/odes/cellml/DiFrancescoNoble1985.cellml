@@ -75,13 +75,7 @@ http://www.CellML.org/
       <unit units="micrometre3" exponent="-1"/>
    </units>
    <component name="environment">
-      <variable name="time" units="second" public_interface="out" cmeta:id="time">
-         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-            <rdf:Description rdf:about="#time">
-               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#time"/>
-            </rdf:Description>
-         </rdf:RDF>
-      </variable>
+      <variable name="time" units="second" public_interface="out"/>
    </component>
    <component name="membrane">
       <variable name="V" units="millivolt" initial_value="-87" public_interface="out" cmeta:id="membrane_voltage">
@@ -95,7 +89,7 @@ http://www.CellML.org/
       <variable name="T" units="kelvin" initial_value="310" public_interface="out"/>
       <variable name="F" units="coulomb_per_mole" initial_value="96485.3415" public_interface="out"/>
       <variable name="RTONF" units="millivolt" public_interface="out"/>
-      <variable name="C" units="microF" initial_value="0.075" cmeta:id="membrane_capacitance">
+      <variable name="C" units="microF" initial_value="0.075"  cmeta:id="membrane_capacitance">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_capacitance">
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
@@ -2039,7 +2033,13 @@ http://www.CellML.org/
       <variable name="Cao" units="millimolar" initial_value="2" public_interface="out"/>
    </component>
    <component name="intracellular_calcium_concentration">
-      <variable name="Cai" units="millimolar" initial_value="5e-5" public_interface="out"/>
+      <variable name="Cai" units="millimolar" initial_value="5e-5" public_interface="out"  cmeta:id="cytosolic_calcium_concentration">
+               <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="V_up" units="micrometre3"/>
       <variable name="V_rel" units="micrometre3"/>
       <variable name="Vi" units="micrometre3" public_interface="in"/>
