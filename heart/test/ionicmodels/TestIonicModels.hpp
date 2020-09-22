@@ -1311,7 +1311,7 @@ public:
 
             CheckCellModelResults("Backward1AfterArchive", "", 2e-3);
             CheckCellModelResults("Backward2AfterArchive");
-            CheckCellModelResults("Backward3AfterArchive");
+            CheckCellModelResults("Backward3AfterArchive", "", 2e-3);
             CheckCellModelResults("Backward4AfterArchive");
             CheckCellModelResults("Backward5AfterArchive");
 
