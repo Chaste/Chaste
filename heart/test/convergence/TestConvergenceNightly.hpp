@@ -145,18 +145,19 @@ public:
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
         //Time steps are okay for giving a sensible upstroke
-        tester.PdeTimeStep=0.1;
-        tester.OdeTimeStep=0.1;
+        tester.PdeTimeStep=0.01;
+        tester.OdeTimeStep=0.01;
 
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.IsConverged());
 
-        ///Note that long plateau phase will force convergence to happen earlier (mesh 3 instead of 4)
-        TS_ASSERT_EQUALS(tester.MeshNum, 3u);
+        ///Note that long plateau phase will force convergence to happen earlier (mesh 2 instead of 4)
+        TS_ASSERT_EQUALS(tester.MeshNum, 2u);
 
-        TS_ASSERT_DELTA(329.5, tester.Apd90FirstQn, 1.5); //330.8
+        TS_ASSERT_DELTA(331.1049, tester.Apd90FirstQn, 1.5); //330.8
         TS_ASSERT_DELTA(329.5, tester.Apd90ThirdQn, 1.5); //329.3
-        TS_ASSERT_DELTA(0.0588, tester.ConductionVelocity, 1e-3);
+        TS_ASSERT_DELTA(0.0675, tester.ConductionVelocity, 1e-3);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
     }
 
     void TestFullActionPotentialWithRampedStimulus()
@@ -164,8 +165,8 @@ public:
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
         //Time steps are okay for giving a sensible upstroke
-        tester.PdeTimeStep=0.1;
-        tester.OdeTimeStep=0.1;
+        tester.PdeTimeStep=0.01;
+        tester.OdeTimeStep=0.01;
         tester.Stimulus = QUARTER;
 
         tester.Converge(__FUNCTION__);
@@ -176,7 +177,7 @@ public:
 
         TS_ASSERT_DELTA(329.5, tester.Apd90FirstQn, 1.5); //329.5
         TS_ASSERT_DELTA(329.5, tester.Apd90ThirdQn, 1.5); //328.7
-        TS_ASSERT_DELTA(0.0588, tester.ConductionVelocity, 1e-3);
+        TS_ASSERT_DELTA(0.0680, tester.ConductionVelocity, 1e-3);
     }
 
     //Current test takes about 20 mins.
