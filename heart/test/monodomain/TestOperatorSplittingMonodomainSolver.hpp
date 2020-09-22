@@ -143,7 +143,8 @@ public:
         }
 
         // hardcoded value to check nothing has changed
-        TS_ASSERT_DELTA(final_voltage_operator_splitting[30], 5.0577, 1e-3);
+
+        TS_ASSERT_DELTA(final_voltage_operator_splitting[30], 5.0604, 1e-3);
 
         bool some_node_depolarised = false;
         assert(final_voltage_normal.GetSize()==final_voltage_operator_splitting.GetSize());

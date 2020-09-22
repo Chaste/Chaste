@@ -287,7 +287,7 @@ public:
             AbstractCvodeCell* p_cell;
             input_arch >> p_cell;
 
-            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 39u);
+            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 45u);
 
             // Check modifiers were archived correctly
             if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == NULL)
