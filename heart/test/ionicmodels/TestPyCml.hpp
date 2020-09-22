@@ -56,12 +56,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991Opt.hpp"
 #include "LuoRudy1991BackwardEuler.hpp"
 
-#include "DiFrancescoNoble1985.hpp"
-#include "DiFrancescoNoble1985Opt.hpp"
-#include "DiFrancescoNoble1985BackwardEuler.hpp"
-
-// Note: only using the optimised model, to test linking with chaste_libs=0!
+#include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
+#include "NobleVargheseKohlNoble1998aBackwardEuler.hpp"
 
 #ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
@@ -589,21 +586,32 @@ public:
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Normal model
-        CellDiFrancescoNoble1985FromCellML normal(p_solver, p_stimulus);
+//        CellDiFrancescoNoble1985FromCellML normal(p_solver, p_stimulus);
+//std::cout<<"->4"<<std::endl;
+//        CheckCai(normal, false);
+//
+//        // Optimised model
+//        CellDiFrancescoNoble1985FromCellMLOpt opt(p_solver, p_stimulus);
+//std::cout<<"->5"<<std::endl;
+//        CheckCai(opt, false);
+//
+//        // Backward Euler model
+//        CellDiFrancescoNoble1985FromCellMLBackwardEuler be(p_solver, p_stimulus);
+//std::cout<<"->6"<<std::endl;
+//        CheckCai(be, false);
+
+
+        // Normal model
+        CellNobleVargheseKohlNoble1998aFromCellML normal(p_solver, p_stimulus);
         CheckCai(normal, false);
 
         // Optimised model
-        CellDiFrancescoNoble1985FromCellMLOpt opt(p_solver, p_stimulus);
+        CellNobleVargheseKohlNoble1998aFromCellMLOpt opt(p_solver, p_stimulus);
         CheckCai(opt, false);
 
         // Backward Euler model
-        CellDiFrancescoNoble1985FromCellMLBackwardEuler be(p_solver, p_stimulus);
+        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler be(p_solver, p_stimulus);
         CheckCai(be, false);
-
-        // N98
-        CellNobleVargheseKohlNoble1998aFromCellMLOpt n98opt(p_solver, p_stimulus);
-        n98opt.UseCellMLDefaultStimulus();
-        CheckCai(n98opt, false);
     }
 };
 
