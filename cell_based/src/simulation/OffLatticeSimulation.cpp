@@ -133,7 +133,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             {
                 ///\todo #2087 Make this a settable member variable
                 double timestep_increase = 0.01;
-                present_time_step = std::min(2*present_time_step, target_time_step - time_advanced_so_far);
+                present_time_step = std::min(present_time_step, target_time_step - time_advanced_so_far);
             }
 
         }
