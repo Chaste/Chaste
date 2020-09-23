@@ -288,7 +288,7 @@ public:
         std::string base_file = "heart/test/data/benchmark_data_orig/activation_time_h0.05_dt0.01.dat";
 
         NumericFileComparison num_comp(output_file, base_file);
-        TS_ASSERT(num_comp.CompareFiles(1.5e-3)); //Absolute difference of 1.5 microsecond is tolerated
+        TS_ASSERT(num_comp.CompareFiles(2e-3)); //Absolute difference of 2 microsecond is tolerated
     }
     void donotTestRunOtherSvi()
     {
