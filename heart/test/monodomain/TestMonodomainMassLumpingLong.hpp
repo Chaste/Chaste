@@ -43,18 +43,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
+#include "CellMLLoader.hpp"
+#include "CellMLToSharedLibraryConverter.hpp"
+
+
 template<class CELL>
 class SmallBenchmarkStimulusHeartCellFactory : public AbstractCardiacCellFactory<3>
 {
 
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
+    DynamicCellModelLoaderPtr p_loader = nullptr;
 
 public:
     SmallBenchmarkStimulusHeartCellFactory()
         : AbstractCardiacCellFactory<3>(),
           mpStimulus(new SimpleStimulus(-1000.0*500, 0.5))
     {
+	// Dynamic load version without lookup table
+	FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
+	OutputFileHandler handler("TestMonodomainMassLumpingLong", true);
+       	handler.CopyFileTo(cellml_file);
+       	CellMLToSharedLibraryConverter converter(true);
+       	converter.SetOptions({"--backward-euler"});
+       	FileFinder copied_file("TestMonodomainMassLumpingLong/LuoRudy1991.cellml", RelativeTo::ChasteTestOutput);
+        p_loader = converter.Convert(copied_file);
+
     }
 
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
@@ -62,11 +76,11 @@ public:
         // Stimulate the apex
         if (pNode->rGetLocation()[0] > 0.94)
         {
-            return new CELL(mpSolver, mpStimulus);
+            return dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(mpSolver, mpStimulus));
         }
         else
         {
-            return new CELL(mpSolver, mpZeroStimulus);
+            return dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(mpSolver, mpZeroStimulus));
         }
     }
 };
@@ -81,6 +95,7 @@ public:
     {
         HeartConfig::Reset();
         HeartConfig::Instance()->SetSimulationDuration(50); //ms
+//HeartConfig::Instance()->SetSimulationDuration(1); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
 
         double spatial_step = 0.05;
