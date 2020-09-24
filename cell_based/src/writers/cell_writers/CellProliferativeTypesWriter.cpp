@@ -42,32 +42,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizcelltypes")
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizprolifcelltypes")
 {
-    this->mVtkCellDataName = "Cell types";
+    this->mVtkCellDataName = "Prolif Cell types";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double colour = pCell->GetCellProliferativeType()->GetColour();
-
-    // Set colour dependent on cell mutation state
-    if (!pCell->GetMutationState()->IsType<WildTypeCellMutationState>())
-    {
-        colour = pCell->GetMutationState()->GetColour();
-    }
-    if (pCell->HasCellProperty<CellLabel>())
-    {
-        CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-        colour = p_label->GetColour();
-    }
-    if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())
-    {
-        ///\todo: replace this hard-coded 6 with the ApoptoticCellProperty member mColour?
-        colour = 6.0;
-    }
 
     return colour;
 }
@@ -76,23 +59,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned colour = pCell->GetCellProliferativeType()->GetColour();
-
-    // Set colour dependent on cell mutation state
-    if (!pCell->GetMutationState()->IsType<WildTypeCellMutationState>())
-    {
-        colour = pCell->GetMutationState()->GetColour();
-    }
-    if (pCell->HasCellProperty<CellLabel>())
-    {
-        CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-        colour = p_label->GetColour();
-    }
-    if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())
-    {
-        ///\todo: replace this hard-coded 6 with the ApoptoticCellProperty member mColour? (#2512)
-        colour = 6;
-    }
 
     *this->mpOutStream << colour << " ";
 }
