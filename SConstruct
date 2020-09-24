@@ -296,7 +296,7 @@ else:
              'INTEL_LICENSE_FILE': os.environ.get('INTEL_LICENSE_FILE', '.'),
              'CHASTE_TEST_OUTPUT':
                  os.environ.get('CHASTE_TEST_OUTPUT',
-                                '/data/vascrem/ChasteDeveloping/testoutput/'),
+                               '/tmp/'+os.environ['USER']+'/testoutput/'),
              'CHASTE_DEBUG': str(debug),
              'CHASTE_LIBS': os.environ.get('CHASTE_LIBS', ''),
              'LD_LIBRARY_PATH': ':'.join(other_libpaths),
