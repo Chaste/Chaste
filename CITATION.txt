@@ -1,5 +1,13 @@
 To cite Chaste in publications, please use one of these:
 
+ * F.R. Cooper, R.E. Baker, M.O. Bernabeu, R. Bordas, L. Bowler, A. Bueno-Orovio,
+   H.M. Byrne, V. Carapella, L. Cardone-Noott, J. Cooper, S. Dutta, B.D. Evans,
+   A.G. Fletcher, J.A. Grogan, W. Guo, D.G. Harvey, M. Hendrix, D. Kay, J. Kursawe,
+   P.K. Maini, B. McMillan, G.R. Mirams, J.M. Osborne, P. Pathmanathan,
+   J.M. Pitt-Francis, M. Robinson, B. Rodriguez, R.J. Spiteri, D.J. Gavaghan.
+   Chaste: Cancer, Heart and Soft Tissue Environment.
+   J. Open Source Softw. 5(47):1848, 2020. doi: 10.21105/joss.01848.
+
  * G.R. Mirams, C.J. Arthurs, M.O. Bernabeu, R. Bordas, J. Cooper, A. Corrias,
    Y. Davit, S.-J. Dunn, A.G. Fletcher, D.G. Harvey, M.E. Marsh, J.M. Osborne,
    P. Pathmanathan, J. Pitt-Francis, J. Southern, N. Zemzemi, D.J. Gavaghan.
@@ -14,6 +22,19 @@ To cite Chaste in publications, please use one of these:
    Comput. Phys. Comm. 180(12):2452-2471, 2009. doi: 10.1016/j.cpc.2009.07.019.
 
 BibTeX entries for LaTeX users are:
+
+@article{ChasteFRC2020,
+  doi = {10.21105/joss.01848},
+  url = {https://doi.org/10.21105/joss.01848},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {47},
+  pages = {1848},
+  author = {Fergus R. Cooper and Ruth E. Baker and Miguel O. Bernabeu and Rafel Bordas and Louise Bowler and Alfonso Bueno-Orovio and Helen M. Byrne and Valentina Carapella and Louie Cardone-Noott and Jonathan Cooper and Sara Dutta and Benjamin D. Evans and Alexander G. Fletcher and James A. Grogan and Wenxian Guo and Daniel G. Harvey and Maurice Hendrix and David Kay and Jochen Kursawe and Philip K. Maini and Beth McMillan and Gary R. Mirams and James M. Osborne and Pras Pathmanathan and Joe M. Pitt-Francis and Martin Robinson and Blanca Rodriguez and Raymond J. Spiteri and David J. Gavaghan},
+  title = {Chaste: Cancer, Heart and Soft Tissue Environment},
+  journal = {Journal of Open Source Software}
+}
 
 @article{ChasteGRM2013,
   title = "Chaste: an open source C++ library for computational physiology and biology",

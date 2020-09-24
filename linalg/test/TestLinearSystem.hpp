@@ -1374,7 +1374,12 @@ public:
             TS_ASSERT_THROWS_THIS(ls_diff_precond.rGetPrecondMatrix(), "LHS matrix used for preconditioner construction");
 
             ls_diff_precond.SetPrecondMatrixIsDifferentFromLhs();
+
+#if PETSC_VERSION_GE(3, 11, 2) // PETSc 3.11.2 or newer
+            PetscTools::ChasteMatCopy(ls_diff_precond.GetLhsMatrix(), ls_diff_precond.rGetPrecondMatrix(), DIFFERENT_NONZERO_PATTERN);
+#else
             MatCopy(ls_diff_precond.GetLhsMatrix(), ls_diff_precond.rGetPrecondMatrix(), DIFFERENT_NONZERO_PATTERN);
+#endif
 
             Vec solution = ls_diff_precond.Solve();
             num_it_diff_mat = ls_diff_precond.GetNumIterations();

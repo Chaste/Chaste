@@ -85,16 +85,20 @@ public:
         VecScatter second_variable_context;
         PetscVecTools::SetupInterleavedVectorScatterGather(interleaved_vec, first_variable_context, second_variable_context);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // When used in the preconditioner code within a KSP solve, the main (bidomain) vector will be locked.
         // Lock the vector so that modern PETSc (3.6) won't want to change it
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 11) //PETSc 3.11 or later
+        EXCEPT_IF_NOT(VecLockReadPush(interleaved_vec) == 0);
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         EXCEPT_IF_NOT(VecLockPush(interleaved_vec) == 0);
 #endif
 
         PetscVecTools::DoInterleavedVecScatter(interleaved_vec, first_variable_context, first_variable_vec, second_variable_context, second_variable_vec);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // Unlock the vector (for symmetry)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 11) //PETSc 3.11 or later
+        EXCEPT_IF_NOT(VecLockReadPop(interleaved_vec) == 0);
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         EXCEPT_IF_NOT(VecLockPop(interleaved_vec) == 0);
 #endif
 

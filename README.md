@@ -1,3 +1,5 @@
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01848/status.svg)](https://doi.org/10.21105/joss.01848)
+
 # Welcome to Chaste 
 
 If you are new to Chaste please see [our Getting Started wiki page](https://chaste.cs.ox.ac.uk/trac/wiki/GettingStarted).

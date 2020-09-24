@@ -94,7 +94,7 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > RandomDirec
     }
 
     c_vector<double, SPACE_DIM> parent_position = rCellPopulation.GetLocationOfCellCentre(pParentCell) - random_vector;
-    c_vector<double, SPACE_DIM> daughter_position = parent_position + random_vector;
+    c_vector<double, SPACE_DIM> daughter_position = parent_position + 2.0*random_vector;
 
     std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions(parent_position, daughter_position);
 
