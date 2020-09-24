@@ -91,7 +91,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
         COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         VERBATIM
         )
 

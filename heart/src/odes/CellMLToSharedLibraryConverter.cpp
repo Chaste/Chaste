@@ -202,7 +202,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
                                       "add_compile_options(-std=c++14)\n" <<
                                       "find_package(PythonInterp 3.5 REQUIRED)\n" <<
-                                      "set(codegen_python3_venv " + chaste_source.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
+                                      "set(codegen_python3_venv " + chaste_root.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
                                       "if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)\n" <<
                                       "    message (STATUS \"Installing chaste_codegen in " + chaste_source.GetAbsolutePath() + "/codegen_python3_venv\")\n" <<
                                       "    execute_process(\n" <<
