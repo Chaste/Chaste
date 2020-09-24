@@ -37,35 +37,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAINMASSLUMPINGLONG_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include "LuoRudy1991BackwardEulerNoLut.hpp"
 #include "MonodomainProblem.hpp"
 #include "SimpleStimulus.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-#include "CellMLLoader.hpp"
-#include "CellMLToSharedLibraryConverter.hpp"
 
-
+template<class CELL>
 class SmallBenchmarkStimulusHeartCellFactory : public AbstractCardiacCellFactory<3>
 {
 
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
-    DynamicCellModelLoaderPtr p_loader = nullptr;
 
 public:
     SmallBenchmarkStimulusHeartCellFactory()
         : AbstractCardiacCellFactory<3>(),
           mpStimulus(new SimpleStimulus(-1000.0*500, 0.5))
     {
-	// Dynamic load version without lookup table
-	FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
-	OutputFileHandler handler("TestMonodomainMassLumpingLong", true);
-       	handler.CopyFileTo(cellml_file);
-       	CellMLToSharedLibraryConverter converter(true);
-       	converter.SetOptions({"--backward-euler"});
-       	FileFinder copied_file("TestMonodomainMassLumpingLong/LuoRudy1991.cellml", RelativeTo::ChasteTestOutput);
-        p_loader = converter.Convert(copied_file);
-
     }
 
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
@@ -73,11 +62,11 @@ public:
         // Stimulate the apex
         if (pNode->rGetLocation()[0] > 0.94)
         {
-            return dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(mpSolver, mpStimulus));
+            return new CELL(mpSolver, mpStimulus);
         }
         else
         {
-            return dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(mpSolver, mpZeroStimulus));
+            return new CELL(mpSolver, mpZeroStimulus);
         }
     }
 };
@@ -92,7 +81,6 @@ public:
     {
         HeartConfig::Reset();
         HeartConfig::Instance()->SetSimulationDuration(50); //ms
-//HeartConfig::Instance()->SetSimulationDuration(1); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01,0.1,0.1);
 
         double spatial_step = 0.05;
@@ -104,7 +92,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("CompareRealisticGeometryStandard");
         HeartConfig::Instance()->SetOutputFilenamePrefix("CompareRealisticGeometryStandard");
 
-        SmallBenchmarkStimulusHeartCellFactory cell_factory;
+        SmallBenchmarkStimulusHeartCellFactory<CellLuoRudy1991FromCellMLBackwardEulerNoLut> cell_factory;
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 

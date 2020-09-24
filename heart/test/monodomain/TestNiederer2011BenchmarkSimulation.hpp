@@ -42,10 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "TenTusscher2006Epi.hpp"
+#include "TenTusscher2006EpiBackwardEulerNoLut.hpp"
 #include "NumericFileComparison.hpp"
-
-#include "CellMLLoader.hpp"
-#include "CellMLToSharedLibraryConverter.hpp"
 
 /* This test provides the code for, and runs one simulation of, the benchmark problem defined in
  * the paper:
@@ -85,22 +83,12 @@ class BenchmarkCellFactory : public AbstractCardiacCellFactory<3>
 {
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
-    DynamicCellModelLoaderPtr p_loader = nullptr;
 
 public:
     BenchmarkCellFactory()
       : AbstractCardiacCellFactory<3>(),
         mpStimulus(new SimpleStimulus(-50000.0, 2))
     {
-	// Dynamic load version without lookup table
-	FileFinder cellml_file("heart/src/odes/cellml/TenTusscher2006Epi.cellml", RelativeTo::ChasteSourceRoot);
-	OutputFileHandler handler("TestNiederer2011BenchmarkSimulation", true);
-       	handler.CopyFileTo(cellml_file);
-       	CellMLToSharedLibraryConverter converter(true);
-       	converter.SetOptions({"--backward-euler"});
-       	FileFinder copied_file("TestNiederer2011BenchmarkSimulation/TenTusscher2006Epi.cellml", RelativeTo::ChasteTestOutput);
-        p_loader = converter.Convert(copied_file);
-
     }
 
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
@@ -111,11 +99,11 @@ public:
 
         if ((x<0.15+1e-6) && (y<0.15+1e-6) && (z<0.15+1e-6))
         {
-            return dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(mpSolver, mpStimulus));
+            return new CellTenTusscher2006EpiFromCellMLBackwardEulerNoLut(mpSolver, mpStimulus);
         }
         else
         {
-            return dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(mpSolver, mpZeroStimulus));
+            return new CellTenTusscher2006EpiFromCellMLBackwardEulerNoLut(mpSolver, mpZeroStimulus);
         }
     }
 };
