@@ -37,35 +37,42 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* These lines are very useful for debugging (visualize with 'showme').
 #include "TrianglesMeshWriter.hpp"
-TrianglesMeshWriter<2,2> mesh_writer("Cylindrical2dMeshDebug", "mesh", false);
+TrianglesMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
 mesh_writer.WriteFilesUsingMesh(*this);
 */
-#include "Cylindrical2dMesh.hpp"
+#include "Toroidal2dMesh.hpp"
 #include "Exception.hpp"
 
-Cylindrical2dMesh::Cylindrical2dMesh(double width)
+Toroidal2dMesh::Toroidal2dMesh(double width, double depth)
   : MutableMesh<2,2>(),
     mWidth(width)
+    mDepth(depth)
 {
     assert(width > 0.0);
+    assert(depth > 0.0);
 }
 
-Cylindrical2dMesh::~Cylindrical2dMesh()
+Toroidal2dMesh::~Toroidal2dMesh()
 {
 }
 
-Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
+Toroidal2dMesh::Toroidal2dMesh(double width, double depth,std::vector<Node<2>* > nodes)
   : MutableMesh<2,2>(),
     mWidth(width)
+    mDepth(depth)
 {
     assert(width > 0.0);
+    ssert(depth > 0.0);
 //    mMismatchedBoundaryElements = false;
     for (unsigned index=0; index<nodes.size(); index++)
     {
         Node<2>* p_temp_node = nodes[index];
         double x = p_temp_node->rGetLocation()[0];
+        double y = p_temp_node->rGetLocation()[1];
         UNUSED_OPT(x); // Fix optimised build
+        UNUSED_OPT(y); // Fix optimised build
         assert( 0 <= x && x < width);
+        assert( 0 <= y && y < depth);
         mNodes.push_back(p_temp_node);
     }
 
@@ -73,19 +80,19 @@ Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
     ReMesh(node_map);
 }
 
-//bool Cylindrical2dMesh::GetInstanceOfMismatchedBoundaryNodes()
+//bool Toroidal2dMesh::GetInstanceOfMismatchedBoundaryNodes()
 //{
 //    return mMismatchedBoundaryElements;
 //}
 
-void Cylindrical2dMesh::UpdateTopAndBottom()
-{
-    ChasteCuboid<2> bounding_box = CalculateBoundingBox();
-    mBottom = bounding_box.rGetLowerCorner()[1];
-    mTop = bounding_box.rGetUpperCorner()[1];
-}
+// void Toroidal2dMesh::UpdateTopAndBottom()
+// {
+//     ChasteCuboid<2> bounding_box = CalculateBoundingBox();
+//     mBottom = bounding_box.rGetLowerCorner()[1];
+//     mTop = bounding_box.rGetUpperCorner()[1];
+// }
 
-void Cylindrical2dMesh::CreateMirrorNodes()
+void Toroidal2dMesh::CreateMirrorNodes()
 {
     double half_way = 0.5*mWidth;
 
@@ -152,7 +159,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     assert(mImageToRightOriginalNodeMap.size() == mRightOriginals.size());
 }
 
-void Cylindrical2dMesh::CreateHaloNodes()
+void Toroidal2dMesh::CreateHaloNodes()
 {
     UpdateTopAndBottom();
 
@@ -181,7 +188,7 @@ void Cylindrical2dMesh::CreateHaloNodes()
     }
 }
 
-void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
+void Toroidal2dMesh::ReMesh(NodeMap& rMap)
 {
     unsigned old_num_all_nodes = GetNumAllNodes();
 
@@ -326,7 +333,7 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
     mRightPeriodicBoundaryElementIndices.clear();
 }
 
-void Cylindrical2dMesh::ReconstructCylindricalMesh()
+void Toroidal2dMesh::ReconstructCylindricalMesh()
 {
     /*
      * Figure out which elements have real nodes and image nodes in them
@@ -460,7 +467,7 @@ void Cylindrical2dMesh::ReconstructCylindricalMesh()
     }
 }
 
-void Cylindrical2dMesh::DeleteHaloNodes()
+void Toroidal2dMesh::DeleteHaloNodes()
 {
     assert(mTopHaloNodes.size() == mBottomHaloNodes.size());
     for (unsigned i=0; i<mTopHaloNodes.size(); i++)
@@ -470,7 +477,7 @@ void Cylindrical2dMesh::DeleteHaloNodes()
     }
 }
 
-c_vector<double, 2> Cylindrical2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
+c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
 {
     assert(mWidth > 0.0);
 
@@ -492,7 +499,7 @@ c_vector<double, 2> Cylindrical2dMesh::GetVectorFromAtoB(const c_vector<double, 
     return vector;
 }
 
-void Cylindrical2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concreteMove)
+void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concreteMove)
 {
     // Perform a periodic movement if necessary
     if (point.rGetLocation()[0] >= mWidth)
@@ -510,7 +517,7 @@ void Cylindrical2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concr
     MutableMesh<2,2>::SetNode(index, point, concreteMove);
 }
 
-double Cylindrical2dMesh::GetWidth(const unsigned& rDimension) const
+double Toroidal2dMesh::GetWidth(const unsigned& rDimension) const
 {
     double width = 0.0;
     assert(rDimension==0 || rDimension==1);
@@ -525,7 +532,23 @@ double Cylindrical2dMesh::GetWidth(const unsigned& rDimension) const
     return width;
 }
 
-unsigned Cylindrical2dMesh::AddNode(Node<2>* pNewNode)
+double Toroidal2dMesh::GetDepth(const unsigned& rDimension) const
+{
+    double depth = 0.0;
+    assert(rDimension==0 || rDimension==1);
+    if (rDimension==0)
+    {
+        depth = mDepth;
+    }
+    else
+    {
+        depth = MutableMesh<2,2>::GetDepth(rDimension);
+    }
+    return depth;
+}
+
+
+unsigned Toroidal2dMesh::AddNode(Node<2>* pNewNode)
 {
     unsigned node_index = MutableMesh<2,2>::AddNode(pNewNode);
 
@@ -536,7 +559,7 @@ unsigned Cylindrical2dMesh::AddNode(Node<2>* pNewNode)
     return node_index;
 }
 
-void Cylindrical2dMesh::CorrectNonPeriodicMesh()
+void Toroidal2dMesh::CorrectNonPeriodicMesh()
 {
     GenerateVectorsOfElementsStraddlingPeriodicBoundaries();
 
@@ -646,7 +669,7 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     }
 }
 
-void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSideElements)
+void Toroidal2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSideElements)
 {
     assert(rMainSideElements.size() == 2);
 
@@ -728,7 +751,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
     this->ReIndex(map);
 }
 
-void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
+void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
 {
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
@@ -801,7 +824,7 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
 }
 
-unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
+unsigned Toroidal2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
 {
     unsigned corresponding_node_index = UINT_MAX;
 
@@ -846,4 +869,4 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(Cylindrical2dMesh)
+CHASTE_CLASS_EXPORT(Toroidal2dMesh)
