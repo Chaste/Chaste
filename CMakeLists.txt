@@ -277,7 +277,7 @@ endif ()
 
 # Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip install --upgrade pip setuptools wheel)
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel)
 
 # Install codegen
 message (STATUS "Install chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
