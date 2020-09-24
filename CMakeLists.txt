@@ -265,13 +265,13 @@ if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
 endif ()
 
 # Install chaste_codegen in virtual environment
-set(codegen_python3_venv ${CMAKE_SOURCE_DIR}/codegen_python3_venv/bin)
+set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
 
 if (NOT EXISTS ${codegen_python3_venv})
-    message (STATUS "Creating virtual environment for chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
+    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     )
 endif ()
 
