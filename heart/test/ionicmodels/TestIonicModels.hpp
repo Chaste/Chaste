@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTIONICMODELS_HPP_
 #define _TESTIONICMODELS_HPP_
 
+#include <memory>
 #include <cxxtest/TestSuite.h>
 #include <cmath>
 #include <iostream>
@@ -600,7 +601,7 @@ public:
        	FileFinder copied_file("TestIonicModels/FaberRudy2000.cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
 
-	AbstractCardiacCell* fr2000_ode_system_opt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
+        AbstractCardiacCell* fr2000_ode_system_opt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         CellFaberRudy2000FromCellML fr2000_ode_system(p_solver, p_stimulus);
 
         // Solve and write to file
@@ -641,6 +642,7 @@ public:
         fr2000_ode_system_opt->ComputeExceptVoltage(end_time, end_time+0.001);
         TS_ASSERT_DELTA(fr2000_ode_system_opt->GetVoltage(), voltage, 1e-10);
 
+        delete fr2000_ode_system_opt;
     }
 
 

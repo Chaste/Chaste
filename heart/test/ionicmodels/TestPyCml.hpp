@@ -229,12 +229,8 @@ public:
 	// Dynamic load with different lookup table start to the default
 	OutputFileHandler handler_be_lut("TestPyCml/BE", true);
        	copied_file = handler_be_lut.CopyFileTo(cellml_file);
-// lookup tables not implemented
-//for backward euler
-//       	converter.SetOptions({"--opt", "--backward-euler",
-//                              "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
-//                              "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
-       	converter.SetOptions({"--backward-euler"});
+       	converter.SetOptions({"--backward-euler", "--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
+                              "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_be_lut = converter.Convert(copied_file);
 	AbstractCardiacCell* be_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_be_lut->CreateCell(p_solver, p_stimulus));
 
@@ -279,10 +275,8 @@ public:
         TS_ASSERT_THROWS_CONTAINS(opt_lut->GetIIonic(), "membrane_voltage outside lookup table range");
         opt_lut->SetVoltage(v);
 
-// lookup tables not implemented
-//for backward euler
         be_lut->SetVoltage(-100000);
-//        TS_ASSERT_THROWS_CONTAINS(be_lut->GetIIonic(), "membrane_voltage outside lookup table range");
+        TS_ASSERT_THROWS_CONTAINS(be_lut->GetIIonic(), "membrane_voltage outside lookup table range");
         be_lut->SetVoltage(v);
 
         unsigned cai_index = opt_lut->GetStateVariableIndex("cytosolic_calcium_concentration");
@@ -291,10 +285,9 @@ public:
         TS_ASSERT_THROWS_CONTAINS(opt_lut->GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
         opt_lut->SetStateVariable(cai_index, cai);
 
-// lookup tables not implemented
-//for backward euler
+        cai_index = be_lut->GetStateVariableIndex("cytosolic_calcium_concentration");
         be_lut->SetStateVariable(cai_index, -1.0);
-//        TS_ASSERT_THROWS_CONTAINS(be.GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
+        TS_ASSERT_THROWS_CONTAINS(be_lut->GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
         be_lut->SetStateVariable(cai_index, cai);
 
 
@@ -382,8 +375,6 @@ public:
         cvode_lut->SetStateVariable(cai_index, -1.0);
         TS_ASSERT_THROWS_CONTAINS(cvode_lut->GetIIonic(), "cytosolic_calcium_concentration outside lookup table range");
         cvode_lut->SetStateVariable(cai_index, cai);
-
-
 
 
         // Single parameter
@@ -577,6 +568,9 @@ public:
             delete p_normal_cell;
             delete p_opt_cell;
             delete p_be_cell;
+            delete opt_lut;
+            delete be_lut;
+            delete cvode_lut;
         }
     }
 
@@ -584,22 +578,6 @@ public:
     {
         boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-
-        // Normal model
-//        CellDiFrancescoNoble1985FromCellML normal(p_solver, p_stimulus);
-//std::cout<<"->4"<<std::endl;
-//        CheckCai(normal, false);
-//
-//        // Optimised model
-//        CellDiFrancescoNoble1985FromCellMLOpt opt(p_solver, p_stimulus);
-//std::cout<<"->5"<<std::endl;
-//        CheckCai(opt, false);
-//
-//        // Backward Euler model
-//        CellDiFrancescoNoble1985FromCellMLBackwardEuler be(p_solver, p_stimulus);
-//std::cout<<"->6"<<std::endl;
-//        CheckCai(be, false);
-
 
         // Normal model
         CellNobleVargheseKohlNoble1998aFromCellML normal(p_solver, p_stimulus);
