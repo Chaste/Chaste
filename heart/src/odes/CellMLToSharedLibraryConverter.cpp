@@ -207,7 +207,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "    message (STATUS \"Installing chaste_codegen in " + chaste_source.GetAbsolutePath() + "/codegen_python3_venv\")\n" <<
                                       "    execute_process(\n" <<
                                       "        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv\n" <<
-                                      "        WORKING_DIRECTORY " + chaste_source.GetAbsolutePath() + "\n" <<
+                                      "        WORKING_DIRECTORY " + chaste_root.GetAbsolutePath() + "\n" <<
                                       "    )\n" <<
                                       "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
                                       "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade  chaste_codegen~=0.3.0)\n" <<
