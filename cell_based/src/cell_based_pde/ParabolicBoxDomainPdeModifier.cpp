@@ -90,6 +90,46 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
     this->mSolution = solver.Solve();
     PetscTools::Destroy(previous_solution);
     this->UpdateCellData(rCellPopulation);
+
+    /////////// Fudge to output the integral of the PDE solution /////////
+    double node_area[this->mpFeMesh->GetNumNodes()];
+    for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
+    {
+        node_area[i]=0.0;
+    }
+    
+    c_matrix<double, DIM, DIM> jacobian;
+    double det;
+    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator elem_iter = this->mpFeMesh->GetElementIteratorBegin();
+         elem_iter != this->mpFeMesh->GetElementIteratorEnd();
+         ++elem_iter)
+    {
+        elem_iter->CalculateJacobian(jacobian, det);
+        double element_volume = elem_iter->GetVolume(det);
+        
+        for (unsigned i=0; i<DIM+1; i++) 
+        {
+            node_area[elem_iter->GetNodeGlobalIndex(i)] += element_volume;
+        }   
+    }
+
+    ReplicatableVector solution_repl(this->mSolution);
+    double integral_of_variable = 0.0;
+    for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
+    {
+        integral_of_variable +=solution_repl[i]*node_area[i];
+    }
+    integral_of_variable /= 3;
+
+    
+
+
+    //std::cout << current_time+ dt << " " << integral_of_variable << "\n";
+
+    std::string variable_name = "total_" + this->mDependentVariableName;
+    rCellPopulation.SetDataOnAllCells(variable_name,integral_of_variable);
+    //////////////////////////////////////////////////////////////////////
+
 }
 
 template<unsigned DIM>
