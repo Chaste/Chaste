@@ -271,11 +271,13 @@ public:
         }
 
         SetUseCvodeJacobian(false);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args);
 
-        SetUseCvOdeTolerances(1e-6);
-        RunTests(dirname, finer_tolerances_models, args);
-        SetUseCvOdeTolerances(DOUBLE_UNSET);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        RunTests(dirname, finer_tolerances_models,
+                 {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 true);
 
         SetUseCvodeJacobian(true);
 #endif
@@ -302,19 +304,19 @@ public:
 
         std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
         finer_tolerances_models.push_back("ten_tusscher_model_2004_endo");
+	finer_tolerances_models.push_back("noble_model_1991");
         BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
         {
             models.erase(std::find(models.begin(), models.end(), finer_tolerances_model));
         }
 
-
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args);
 
-        SetUseCvOdeTolerances(1e-6);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname, finer_tolerances_models,
                  {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
                  true);
-        SetUseCvOdeTolerances(DOUBLE_UNSET);
 
 #endif
     }
