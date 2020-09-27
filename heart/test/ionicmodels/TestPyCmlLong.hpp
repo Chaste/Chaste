@@ -73,11 +73,11 @@ public:
         }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, args);
+//        RunTests(dirname, models, args);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args);
+//        RunTests(dirname + "-small-dt", small_dt_models, args);
     }
 
     void TestOptimisedCells()
@@ -102,16 +102,16 @@ public:
             models.erase(std::find(models.begin(), models.end(), model));
         }
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, args, true);
+//        RunTests(dirname, models, args, true);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args, true);
+//        RunTests(dirname + "-small-dt", small_dt_models, args, true);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
-                 {"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true);
+//        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
+//                 {"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+//                 true);
     }
 
     void TestCvodeCells()
@@ -125,7 +125,7 @@ public:
         AddAllModels(models);
 
         SetUseCvodeJacobian(false);
-        RunTests(dirname, models, args);
+//        RunTests(dirname, models, args);
         SetUseCvodeJacobian(true);
 #endif
     }
@@ -148,7 +148,7 @@ public:
             models.erase(std::find(models.begin(), models.end(), bad_model));
         }
 
-        RunTests(dirname, models, args);
+//        RunTests(dirname, models, args);
 #endif
     }
 
@@ -183,11 +183,11 @@ public:
         }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args, true);
+//        RunTests(dirname, models, args, true);
 
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        RunTests(dirname, diff_models, args, true);
+//        RunTests(dirname, diff_models, args, true);
     }
 
     void TestRushLarsenCells()
@@ -207,11 +207,11 @@ public:
         }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        RunTests(dirname, models, args, false, 0, false);
+//        RunTests(dirname, models, args, false, 0, false);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
+//        RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
     }
 
     void TestRushLarsenOptCells()
@@ -241,15 +241,15 @@ public:
             models.erase(std::find(models.begin(), models.end(), model));
         }
 
-        RunTests(dirname, models, args, true, -1000, false);
+//        RunTests(dirname, models, args, true, -1000, false);
 
-        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
-                   {"--rush-larsen", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                   true, -1000, true);
+//        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
+//                   {"--rush-larsen", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+//                   true, -1000, true);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
+//        RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
     }
 
     void TestCvodeCellsOpt()
@@ -263,21 +263,21 @@ public:
         std::vector<std::string> models;
         AddAllModels(models);
 
-        std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
-        finer_tolerances_models.push_back("ten_tusscher_model_2004_endo");
-        BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
+        std::vector<std::string> different_lookup_table_models; // Models we need to run it wirth finer tolerances
+        different_lookup_table_models.push_back("ten_tusscher_model_2004_endo");
+        BOOST_FOREACH (std::string model, different_lookup_table_models)
         {
-            models.erase(std::find(models.begin(), models.end(), finer_tolerances_model));
+            models.erase(std::find(models.begin(), models.end(), model));
         }
 
         SetUseCvodeJacobian(false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args);
+//        RunTests(dirname, models, args);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, finer_tolerances_models,
-                 {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true);
+//        RunTests(dirname, different_lookup_table_models,
+//                 {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+//                 true);
 
         SetUseCvodeJacobian(true);
 #endif
@@ -302,19 +302,20 @@ public:
             models.erase(std::find(models.begin(), models.end(), bad_model));
         }
 
-        std::vector<std::string> finer_tolerances_models; // Models we need to run it wirth finer tolerances
-        finer_tolerances_models.push_back("ten_tusscher_model_2004_endo");
-	finer_tolerances_models.push_back("noble_model_1991");
-        BOOST_FOREACH (std::string finer_tolerances_model, finer_tolerances_models)
+        std::vector<std::string> different_lookup_table_models; // Models we need to run it wirth finer tolerances
+//        different_lookup_table_models.push_back("ten_tusscher_model_2004_endo");
+//	different_lookup_table_models.push_back("noble_model_1991");
+different_lookup_table_models.push_back("luo_rudy_1994");
+        BOOST_FOREACH (std::string model, different_lookup_table_models)
         {
-            models.erase(std::find(models.begin(), models.end(), finer_tolerances_model));
+            models.erase(std::find(models.begin(), models.end(), model));
         }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args);
+//        RunTests(dirname, models, args);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, finer_tolerances_models,
+        RunTests(dirname, different_lookup_table_models,
                  {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
                  true);
 
@@ -353,11 +354,11 @@ public:
         }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args, true);
+//        RunTests(dirname, models, args, true);
 
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        RunTests(dirname, diff_models, args, true);
+//        RunTests(dirname, diff_models, args, true);
 
     }
 };
