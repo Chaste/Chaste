@@ -61,6 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
+    double tol = 0.2; // mV
     void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args, std::string outputFolder, double tol)
     {
 #ifdef CHASTE_CVODE
@@ -219,17 +220,13 @@ private:
 public:
     void TestInterpolatorTimesAndGenerateReferenceTrace()
     {
-# if CHASTE_SUNDIALS_VERSION >= 20400
-         double tol = 5e-3; // mV
-#else
-         double tol = 0.2; // mV
-#endif
+        double tol = 0.2; // mV
         InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp"}, "TestCvodeCellsWithDataClamp", tol);
     }
 
     void TestInterpolatorTimesAndGenerateReferenceTraceWithLookupTables()
     {
-        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp", "--opt"}, "TestCvodeCellsWithDataClampOpt", 0.2);
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp", "--opt"}, "TestCvodeCellsWithDataClampOpt", tol);
     }
 
     void TestArchivingCvodeCellsWithDataClamp()
