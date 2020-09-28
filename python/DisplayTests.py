@@ -1171,20 +1171,20 @@ def _statusColour(status, build):
 # Regexprs and state strings for _parseBuildTimings
 #Command execution time: heart/build/debug/src/io/ChasteParameters_3_3.hpp: 0.737745 seconds
 _time_re = re.compile(r"Command execution time:(?: ([^:]+):)? ([0-9.]+) seconds")
-_states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'PyCml execution', 'Test running']
+_states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'chaste_codegen execution', 'Test running']
 # For older scons versions we need to parse the line before a timing output to determine what happened.
 # Note that the order must match the _states list, except that we skip the 'Other' state.
 _state_res = list(map(re.compile,
                  [r"[^ ]*mpicxx ",
                   r"BuildTest\(\[",
                   r"cxxtest/cxxtestgen.py",
-                  r"RunPyCml\(\[",
+                  r"RunCodegen\(\[",
                   r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"]))
 # For newer scons versions the timing line includes the target that was created, so we parse that instead
 _target_state_map = [lambda t, ext: ext in ['.so', '.o', '.os'] or t.endswith('Runner'), # Compile
                      lambda t, ext: ext == '.dummy',                                     # Obj dep analysis
                      lambda t, ext: t.endswith('Runner.cpp'),                            # CxxTest
-                     lambda t, ext: ext in ['.hpp', '.cpp'] and 'cellml' in t,           # PyCml
+                     lambda t, ext: ext in ['.hpp', '.cpp'] and 'cellml' in t,           # chaste_codegen
                      lambda t, ext: ext == '.log'                                        # Test running
                      ]
 

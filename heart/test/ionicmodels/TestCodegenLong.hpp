@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPYCMLLONG_HPP_
-#define TESTPYCMLLONG_HPP_
+#ifndef TESTCODEGENLONG_HPP_
+#define TESTCODEGENLONG_HPP_
 
-#include "PyCmlLongHelperTestSuite.hpp"
+#include "CodegenLongHelperTestSuite.hpp"
 
 #include <boost/foreach.hpp>
 #include <vector>
@@ -46,20 +46,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test PyCml functionality by dynamically loading (and hence converting) a wide
+ * Test chaste_codegen functionality by dynamically loading (and hence converting) a wide
  * range of cell models.
  *
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlLong : public PyCmlLongHelperTestSuite
+class TestCodegenLong : public CodegenLongHelperTestSuite
 {
 public:
     void TestNormalCells()
     {
         std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
 
-        std::string dirname("TestPyCmlLongNormal");
+        std::string dirname("TestCodegenLongNormal");
         std::vector<std::string> args; 
         args.push_back("--Wu");
         std::vector<std::string> models;
@@ -82,7 +82,7 @@ public:
 
     void TestOptimisedCells()
     {
-        std::string dirname("TestPyCmlLongOpt");
+        std::string dirname("TestCodegenLongOpt");
         std::vector<std::string> models;
         std::vector<std::string> args;
         args.push_back("--opt");
@@ -117,7 +117,7 @@ public:
     void TestCvodeCells()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestPyCmlLongCvodeNumericalJ");
+        std::string dirname("TestCodegenLongCvodeNumericalJ");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
@@ -133,7 +133,7 @@ public:
     void TestAnalyticCvodeCells()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestPyCmlLongCvodeAnalyticJ");
+        std::string dirname("TestCodegenLongCvodeAnalyticJ");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
@@ -154,7 +154,7 @@ public:
 
     void TestBackwardEulerCells()
     {
-        std::string dirname("TestPyCmlLongBE");
+        std::string dirname("TestCodegenLongBE");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--backward-euler");
@@ -192,7 +192,7 @@ public:
 
     void TestRushLarsenCells()
     {
-        std::string dirname("TestPyCmlLongRushLarsen");
+        std::string dirname("TestCodegenLongRushLarsen");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--rush-larsen");
@@ -216,7 +216,7 @@ public:
 
     void TestRushLarsenOptCells()
     {
-        std::string dirname("TestPyCmlLongRushLarsenOpt");
+        std::string dirname("TestCodegenLongRushLarsenOpt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--rush-larsen");
@@ -255,7 +255,7 @@ public:
     void TestCvodeCellsOpt()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestPyCmlLongCvodeNumericalJ-opt");
+        std::string dirname("TestCodegenLongCvodeNumericalJ-opt");
         std::vector<std::string> args;
         args.push_back("--cvode");
         args.push_back("--opt");
@@ -286,7 +286,7 @@ public:
     void TestAnalyticCvodeCellsOpt()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestPyCmlLongCvodeAnalyticJ-opt");
+        std::string dirname("TestCodegenLongCvodeAnalyticJ-opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
@@ -324,7 +324,7 @@ public:
 
     void TestBackwardEulerCellsOpt()
     {
-        std::string dirname("TestPyCmlLongBE-opt");
+        std::string dirname("TestCodegenLongBE-opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--backward-euler");
@@ -363,4 +363,4 @@ public:
     }
 };
 
-#endif // TESTPYCMLLONG_HPP_
+#endif // TESTCODEGENLONG_HPP_

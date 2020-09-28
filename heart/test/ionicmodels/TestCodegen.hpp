@@ -34,8 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef _TESTPYCML_HPP_
-#define _TESTPYCML_HPP_
+#ifndef _TESTCODEGEN_HPP_
+#define _TESTCODEGEN_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include <iostream>
@@ -72,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMLToSharedLibraryConverter.hpp"
 
 
-class TestPyCml : public CxxTest::TestSuite
+class TestCodegen : public CxxTest::TestSuite
 {
     template<typename VECTOR_TYPE>
     void CheckDerivedQuantities(AbstractParameterisedSystem<VECTOR_TYPE>& rCell,
@@ -141,10 +141,10 @@ class TestPyCml : public CxxTest::TestSuite
 
 public:
     /**
-     * This test is designed to quickly check that PyCml-generated code matches the Chaste interfaces,
+     * This test is designed to quickly check that chaste_codegen-generated code matches the Chaste interfaces,
      * and gives expected results.
      */
-    void TestPyCmlCodeGeneration()
+    void TestCodegenCodeGeneration()
     {
         clock_t ck_start, ck_end;
 
@@ -218,7 +218,7 @@ public:
 	FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
 
 	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_lut("TestPyCml", true);
+	OutputFileHandler handler_lut("TestCodegen", true);
        	FileFinder copied_file = handler_lut.CopyFileTo(cellml_file);
 	CellMLToSharedLibraryConverter converter(true);
        	converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
@@ -227,7 +227,7 @@ public:
 	AbstractCardiacCell* opt_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_lut->CreateCell(p_solver, p_stimulus));
 
 	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_be_lut("TestPyCml/BE", true);
+	OutputFileHandler handler_be_lut("TestCodegen/BE", true);
        	copied_file = handler_be_lut.CopyFileTo(cellml_file);
        	converter.SetOptions({"--backward-euler", "--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
@@ -340,7 +340,7 @@ public:
         cvode_opt.SetVoltage(v);
 
 	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_cvode_lut("TestPyCml/CVODE", true);
+	OutputFileHandler handler_cvode_lut("TestC/CVODE", true);
        	copied_file = handler_cvode_lut.CopyFileTo(cellml_file);
        	converter.SetOptions({"--opt", "--cvode",
                               "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
@@ -395,7 +395,7 @@ public:
         // Test the archiving code too
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
-        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("lr91-pycml.arch");
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("lr91-codegen.arch");
 
         // Save all (non-CVODE) cells at initial state
         {
@@ -419,12 +419,12 @@ public:
         ck_start = clock();
         RunOdeSolverWithIonicModel(&normal,
                                    end_time,
-                                   "Lr91FromPyCml");
+                                   "Lr91FromCodegen");
         ck_end = clock();
         double normal_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
         std::cout << "\n\tNormal: " << normal_time << std::endl;
 
-        CheckCellModelResults("Lr91FromPyCml", "Lr91DelayedStim");
+        CheckCellModelResults("Lr91FromCodegen", "Lr91DelayedStim");
 
         RunOdeSolverWithIonicModel(&normal,
                                    i_ionic_end_time,
@@ -442,19 +442,19 @@ public:
         normal.ResetToInitialConditions();
         RunOdeSolverWithIonicModel(&normal,
                                    end_time,
-                                   "Lr91FromPyCmlZeroGna");
-        CheckCellModelResults("Lr91FromPyCmlZeroGna");
+                                   "Lr91FromCodegenZeroGna");
+        CheckCellModelResults("Lr91FromCodegenZeroGna");
 
         // Optimised
         ck_start = clock();
         RunOdeSolverWithIonicModel(&opt,
                                    end_time,
-                                   "Lr91FromPyCmlOpt");
+                                   "Lr91FromCodegenOpt");
         ck_end = clock();
         double opt_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
         std::cout << "\n\tOptimised: " << opt_time << std::endl;
 
-        CompareCellModelResults("Lr91FromPyCml", "Lr91FromPyCmlOpt", 2e-3, true);
+        CompareCellModelResults("Lr91FromCodegen", "Lr91FromCodegenOpt", 2e-3, true);
 
         RunOdeSolverWithIonicModel(&opt,
                                    i_ionic_end_time,
@@ -468,12 +468,12 @@ public:
         ck_start = clock();
         RunOdeSolverWithIonicModel(&be,
                                    end_time,
-                                   "Lr91FromPyCmlBackwardEuler");
+                                   "Lr91FromCodegenBackwardEuler");
         ck_end = clock();
         double be_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
         std::cout << "\n\tBackward Euler: " << be_time << std::endl;
 
-        CompareCellModelResults("Lr91FromPyCml", "Lr91FromPyCmlBackwardEuler", 2e-2, true);
+        CompareCellModelResults("Lr91FromCodegen", "Lr91FromCodegenBackwardEuler", 2e-2, true);
 
         RunOdeSolverWithIonicModel(&be,
                                    i_ionic_end_time,
@@ -485,19 +485,19 @@ public:
         be.ResetToInitialConditions();
         RunOdeSolverWithIonicModel(&be,
                                    end_time,
-                                   "Lr91BEFromPyCmlZeroGna");
-        CheckCellModelResults("Lr91BEFromPyCmlZeroGna", "Lr91FromPyCmlZeroGna", 2e-2);
+                                   "Lr91BEFromCodegenZeroGna");
+        CheckCellModelResults("Lr91BEFromCodegenZeroGna", "Lr91FromCodegenZeroGna", 2e-2);
 
 #ifdef CHASTE_CVODE
         // CVODE
         double max_dt = 1.0; //ms
         ck_start = clock();
         OdeSolution cvode_solution = cvode_cell.Solve(0.0, end_time, max_dt, max_dt);
-        cvode_solution.WriteToFile("TestIonicModels","Lr91FromPyCmlCvode","ms",1,false);
+        cvode_solution.WriteToFile("TestIonicModels","Lr91FromCodegenCvode","ms",1,false);
         ck_end = clock();
         double cvode_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
         std::cout << "\n\tCVODE: " << cvode_time << std::endl;
-        CompareCellModelResults("Lr91FromPyCml", "Lr91FromPyCmlCvode", 1e-1, true);
+        CompareCellModelResults("Lr91FromCodegen", "Lr91FromCodegenCvode", 1e-1, true);
         // Coverage
         cvode_cell.SetVoltageDerivativeToZero();
         cvode_cell.ResetToInitialConditions();
@@ -514,11 +514,11 @@ public:
         // CVODE Optimised
         ck_start = clock();
         cvode_solution = cvode_opt.Solve(0.0, end_time, max_dt, max_dt);
-        cvode_solution.WriteToFile("TestIonicModels","Lr91FromPyCmlCvodeOpt","ms",1,false);
+        cvode_solution.WriteToFile("TestIonicModels","Lr91FromCodegenCvodeOpt","ms",1,false);
         ck_end = clock();
         double cvode_opt_time = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
         std::cout << "\n\tCVODE Optimised: " << cvode_opt_time << std::endl;
-        CompareCellModelResults("Lr91FromPyCmlCvode", "Lr91FromPyCmlCvodeOpt", 1e-1, true);
+        CompareCellModelResults("Lr91FromCodegenCvode", "Lr91FromCodegenCvodeOpt", 1e-1, true);
         // Coverage
         cvode_opt.ResetToInitialConditions();
         cvode_opt.SetVoltageDerivativeToZero();
@@ -552,18 +552,18 @@ public:
 
             RunOdeSolverWithIonicModel(p_normal_cell,
                                        end_time,
-                                       "Lr91FromPyCmlAfterArchive");
-            CheckCellModelResults("Lr91FromPyCmlAfterArchive", "Lr91DelayedStim");
+                                       "Lr91FromCodegenAfterArchive");
+            CheckCellModelResults("Lr91FromCodegenAfterArchive", "Lr91DelayedStim");
 
             RunOdeSolverWithIonicModel(p_opt_cell,
                                        end_time,
-                                       "Lr91FromPyCmlOptAfterArchive");
-            CompareCellModelResults("Lr91FromPyCml", "Lr91FromPyCmlOptAfterArchive", 2e-3, true);
+                                       "Lr91FromCodegenOptAfterArchive");
+            CompareCellModelResults("Lr91FromCodegen", "Lr91FromCodegenOptAfterArchive", 2e-3, true);
 
             RunOdeSolverWithIonicModel(p_be_cell,
                                        end_time,
-                                       "Lr91FromPyCmlBackwardEulerAfterArchive");
-            CompareCellModelResults("Lr91FromPyCml", "Lr91FromPyCmlBackwardEulerAfterArchive", 1e-2, true);
+                                       "Lr91FromCodegenBackwardEulerAfterArchive");
+            CompareCellModelResults("Lr91FromCodegen", "Lr91FromCodegenBackwardEulerAfterArchive", 1e-2, true);
 
             delete p_normal_cell;
             delete p_opt_cell;
@@ -594,4 +594,4 @@ public:
 };
 
 
-#endif //_TESTPYCML_HPP_
+#endif //_TESTCODEGEN_HPP_

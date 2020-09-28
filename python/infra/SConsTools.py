@@ -815,14 +815,14 @@ def CreateCodegenBuilder(build, buildenv):
 #            if 'CHASTE_CVODE' not in env['CPPDEFINES']:
 #                args.remove('--cvode')
         return args
-    def RunPyCml(target, source, env):
+    def RunCodegen(target, source, env):
         args = GetArgs(target, source, env)
         command = [script] + args + [str(source[0])]
         print("Running %s" % " ".join(command))
         rc = subprocess.call(command)
         return rc
-    PyCmlAction = buildenv.Action(RunPyCml)
-    def PyCmlEmitter(target, source, env):
+    CodegenAction = buildenv.Action(RunCodegen)
+    def CodegenEmitter(target, source, env):
         args = GetArgs(target, source, env)
         args.append('--show-outputs')
         command = [script] + args + [str(source[0])]
@@ -830,7 +830,7 @@ def CreateCodegenBuilder(build, buildenv):
         filelist = process.communicate()[0]
         if process.returncode != 0:
             print(filelist)
-            raise IOError('Failed to run PyCml; return code = ' + str(process.returncode))
+            raise IOError('Failed to run chaste_codegen; return code = ' + str(process.returncode))
         # Adjust targets to match what the script will actually create
         target = list(map(lambda s: s.strip().decode("utf-8"), filelist.split()))
 
@@ -841,10 +841,10 @@ def CreateCodegenBuilder(build, buildenv):
             env.Alias('install', t)
         return (target, source)
 
-    # Add PyCml as a source of .cpp files
+    # Add chaste_codegen as a source of .cpp files
     c_file, cxx_file = SCons.Tool.createCFileBuilders(buildenv)
-    cxx_file.add_action('.cellml', PyCmlAction)
-    cxx_file.add_emitter('.cellml', PyCmlEmitter)
+    cxx_file.add_action('.cellml', CodegenAction)
+    cxx_file.add_emitter('.cellml', CodegenEmitter)
 
 class PyScanner(SCons.Scanner.Classic):
     """A scanner for import lines in Python source code.

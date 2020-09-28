@@ -66,16 +66,16 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     get_filename_component(cellml_file_name ${cellml_file} NAME_WE)
     get_filename_component(cellml_dir ${cellml_file} PATH)
     file(RELATIVE_PATH cellml_file_rel "${CMAKE_SOURCE_DIR}" "${cellml_file}")
-    set(pycml_args ${ARGN})
+    set(codegen_args ${ARGN})
 
     if (${dynamic})
-        set(pycml_args ${pycml_args} "-y" "-o" ${cellml_file})
+        set(codegen_args ${codegen_args} "-y" "-o" ${cellml_file})
     else()
-        set(pycml_args ${pycml_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
+        set(codegen_args ${codegen_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
+    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -84,11 +84,11 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     string(REGEX MATCHALL "[^\n]*\\.cpp" output_files_cpp "${ConvertCellModelDepends}")
 
     if (NOT Chaste_VERBOSE)
-        set(pycml_args ${pycml_args} "--quiet")
+        set(codegen_args ${codegen_args} "--quiet")
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
-        COMMAND "${codegen_python3_venv}/chaste_codegen" ${pycml_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
+        COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}

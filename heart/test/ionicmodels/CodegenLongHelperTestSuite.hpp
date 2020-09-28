@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PYCMLLONGHELPERCLASS_HPP_
-#define PYCMLLONGHELPERCLASS_HPP_
+#ifndef CODEGENLONGHELPERCLASS_HPP_
+#define CODEGENLONGHELPERCLASS_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -66,9 +66,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 /**
- * Helper class to allow us to split the PyCmlLong tests into multiple test suites.
+ * Helper class to allow us to split the CodegenLong tests into multiple test suites.
  */
-class PyCmlLongHelperTestSuite : public CxxTest::TestSuite
+class CodegenLongHelperTestSuite : public CxxTest::TestSuite
 {
 
 private:
@@ -358,4 +358,4 @@ public:
     }
 };
 
-#endif // PYCMLLONGHELPERCLASS_HPP_
+#endif // CODEGENLONGHELPERCLASS_HPP_

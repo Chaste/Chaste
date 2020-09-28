@@ -569,7 +569,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT(CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "patchwork_results", false,
-                                                foldername, "SimulationResults", true, 1.2e-5)); // the hdf5 reference was generated using pycml lookup tables
+                                                foldername, "SimulationResults", true, 1.2e-5)); // the hdf5 reference was generated using chaste_codegen lookup tables
     }
 
     void TestCardiacSimulationKirsten()

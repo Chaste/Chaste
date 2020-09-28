@@ -823,7 +823,7 @@ public:
                                    true);
         //Check against validated data
         //These data are considered valid after (visually) checking against output from  CellML code of the model for an epicardial cell
-        // and also numerically compared against pycml automatically generated code.
+        // and also numerically compared against chaste_codegen automatically generated code.
         CheckCellModelResults("TenTusscher");
 
         //Test the GetIIonic method against one hardcoded value.
@@ -1325,7 +1325,7 @@ public:
         }
      }
 
-    void TestPyCMLArchiving(void)
+    void TestCodegenArchiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);

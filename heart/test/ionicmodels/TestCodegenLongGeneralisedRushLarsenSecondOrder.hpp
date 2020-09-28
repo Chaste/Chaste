@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
-#define TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
+#ifndef TESTCODEGENLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
+#define TESTCODEGENLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
 
-#include "PyCmlLongHelperTestSuite.hpp"
+#include "CodegenLongHelperTestSuite.hpp"
 
 #include <boost/foreach.hpp>
 #include <vector>
@@ -46,19 +46,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test PyCml functionality by dynamically loading (and hence converting) a wide
+ * Test chaste_codegen functionality by dynamically loading (and hence converting) a wide
  * range of cell models.
  *
  * May need a test-suite setup or similar to define model-specific parameters?
  * Should we pick up the list of models by reading the folder heart/test/data/cellml?
  */
-class TestPyCmlLongGeneralisedRushLarsenSecondOrder : public PyCmlLongHelperTestSuite
+class TestCodegenLongGeneralisedRushLarsenSecondOrder : public CodegenLongHelperTestSuite
 {
 
 public:
     void TestGeneralizedRushLarsenSecondOrder()
     {
-        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2");
+        std::string dirname("TestCodegenLongGeneralizedRushLarsen2");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl2");
@@ -72,7 +72,7 @@ public:
 
     void TestGeneralizedRushLarsenSecondOrderOpt()
     {
-        std::string dirname("TestPyCmlLongGeneralizedRushLarsen2Opt");
+        std::string dirname("TestCodegenLongGeneralizedRushLarsen2Opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl2");
@@ -161,4 +161,4 @@ public:
 
 };
 
-#endif // TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
+#endif // TESTCODEGENLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
