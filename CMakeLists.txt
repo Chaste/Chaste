@@ -268,7 +268,6 @@ endif ()
 set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
 
 if (NOT EXISTS ${codegen_python3_venv})
-    message (STATUS "Creating virtual environment for chaste_codegen")
     message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
