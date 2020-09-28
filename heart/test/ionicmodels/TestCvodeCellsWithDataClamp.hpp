@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
-    double tol = 0.2; // mV
+    double tol = 0.02; // mV
     void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args, std::string outputFolder, double tol)
     {
 #ifdef CHASTE_CVODE
