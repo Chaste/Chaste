@@ -98,7 +98,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
             FileFinder copied_file = handler.CopyFileTo(cellml_file);
 
             // Create options file & convert
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpGeneralizedRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }
@@ -123,7 +123,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
             FileFinder copied_file = handler.CopyFileTo(cellml_file);
 
             // Create options file & convert
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpGeneralizedRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }

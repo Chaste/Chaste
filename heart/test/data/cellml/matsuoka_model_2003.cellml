@@ -154,7 +154,13 @@ http://www.CellML.org/
       <variable name="R" units="coulomb_millivolt_per_kelvin_millimole" initial_value="8.3143" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="310" public_interface="out"/>
       <variable name="F" units="coulomb_per_millimole" initial_value="96.4867" public_interface="out"/>
-      <variable name="Cm" units="picoF" initial_value="132" public_interface="out"/>
+      <variable name="Cm" units="picoF" initial_value="132" public_interface="out" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="i_ext" units="picoA" public_interface="out" cmeta:id="membrane_stimulus_current">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_stimulus_current">
@@ -322,7 +328,13 @@ http://www.CellML.org/
    </component>
    <component name="internal_ion_concentrations">
       <variable name="Nai" units="millimolar" initial_value="4.925761439682025" public_interface="out"/>
-      <variable name="Cai" units="millimolar" public_interface="out"/>
+      <variable name="Cai" units="millimolar" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Ki" units="millimolar" initial_value="143.1837333000449" public_interface="out"/>
       <variable name="Vi" units="micrometre3" initial_value="8000" public_interface="out"/>
       <variable name="i_net_Na" units="picoA"/>

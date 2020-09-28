@@ -206,7 +206,7 @@ def ReplaceStringInFile(findRe, repStr, filePath):
     output.close()
     input.close()
     UpdateFile(filePath, tempName)
-    print 'Notice: replaced deprecated copyright notice in', filePath
+    print('Notice: replaced deprecated copyright notice in %s' % filePath)
 
 
 def HeadAppendStringInFile(appendString, filePath):
@@ -220,7 +220,7 @@ def HeadAppendStringInFile(appendString, filePath):
     output.close()
     input.close()
     UpdateFile(filePath, tempName)
-    print 'Notice: applied copyright notice in ', filePath
+    print('Notice: applied copyright notice in %s' % filePath)
 
 
 def InspectFile(fileName):
@@ -228,13 +228,16 @@ def InspectFile(fileName):
     if fileName[-21:] == 'CheckForCopyrights.py':
         # Can't really check this one, since it knows all the licences
         return True
+    if "codegen_python3_venv" in fileName:
+        # Can't really check the codegen virtual environment as it would start checking 3rd party packages
+        return True
     valid_notice = False
     if (CheckForCopyrightNotice(cpp_current_notice, file_in) or
         CheckForCopyrightNotice(py_current_notice, file_in) or
         CheckForCopyrightNotice(cmake_current_notice, file_in) or
         CheckForCopyrightNotice(license_current_notice, file_in) or
             CheckForCopyrightNotice(output_notice, file_in)):
-        # print 'Found current notice in '+file_name
+        # print('Found current notice in %s' % file_name)
         valid_notice = True
     if (CheckForCopyrightNotice(pycml_notice, file_in) or
         CheckForCopyrightNotice(boost_random_distribution_notice, file_in) or
@@ -244,9 +247,9 @@ def InspectFile(fileName):
         CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
             CheckForCopyrightNotice(py_lgpl_notice, file_in)):
-        # print 'Found 3rd party notice in '+file_name
+        # print('Found 3rd party notice in %s' % file_name)
         if valid_notice:
-            print "Multiple notices on", file_name
+            print("Multiple notices on %s" % file_name)
             return False
         else:
             return True
@@ -260,18 +263,18 @@ def InspectFile(fileName):
         replacement = current_notice
 
     if CheckForCopyrightNotice(deprecated_notice, file_in):
-        print 'Found deprecated copyright notice for', fileName
+        print('Found deprecated copyright notice for %s' % fileName)
         if apply_update:
             ReplaceStringInFile(deprecated_notice, replacement, fileName)
             return True
         else:
-            print 'Fix this by doing:', sys.argv[0], '-update'
+            print('Fix this by doing: %s -update' % sys.argv[0])
             return False
 
-    print 'Found no copyright notice for', fileName
+    print('Found no copyright notice for %s' % fileName)
     if apply_new:
         if fileName[-3:] == '.py':
-            print 'Not implemented for .py files'
+            print('Not implemented for .py files')
             return False
         elif fileName[-14:] == 'CMakeLists.txt':
             HeadAppendStringInFile(cmake_current_notice + "\n\n", fileName)
@@ -281,7 +284,7 @@ def InspectFile(fileName):
             HeadAppendStringInFile(cpp_current_notice + "\n\n", fileName)
         return True
     else:
-        print 'Fix this by doing:', sys.argv[0], '-new'
+        print('Fix this by doing: %s -new' % sys.argv[0])
         return False
 
 
@@ -358,13 +361,13 @@ if __name__ == '__main__':
     else:
         dir = chaste_dir
 
-    print "Copyright test run over ", dir, " (", num_no_copyrights+num_copyrights, ") files"
+    print("Copyright test run over %s (%s%s) files" % (dir, num_no_copyrights , num_copyrights))
     if num_no_copyrights > 0:
-        print
-        print "The next line is for the benefit of the test summary scripts."
-        print "Failed", num_no_copyrights, "of", num_no_copyrights+num_copyrights, "tests"
+        print()
+        print("The next line is for the benefit of the test summary scripts.")
+        print("Failed %s of %s%s tests" % (num_no_copyrights, num_no_copyrights, num_copyrights))
 
         # Return a non-zero exit code if orphans were found
         sys.exit(num_no_copyrights)
     else:
-        print "Infrastructure test passed ok."
+        print("Infrastructure test passed ok.")

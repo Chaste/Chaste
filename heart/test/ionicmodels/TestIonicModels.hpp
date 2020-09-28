@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTIONICMODELS_HPP_
 #define _TESTIONICMODELS_HPP_
 
+#include <memory>
 #include <cxxtest/TestSuite.h>
 #include <cmath>
 #include <iostream>
@@ -85,6 +86,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Maleckar2008.hpp"
 
 #include "ArchiveLocationInfo.hpp"
+
+#include "CellMLLoader.hpp"
+#include "CellMLToSharedLibraryConverter.hpp"
+
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -273,23 +278,26 @@ public:
         TS_ASSERT_DELTA( n98_ode_system.GetIIonic(), 0.2462, 1e-3);
 
         //Stress the lookup table with a silly voltage
-        n98_ode_system.rGetStateVariables()[0] = 100.0;
-        TS_ASSERT_EQUALS(n98_ode_system.GetVoltage(), 100.0);
+        n98_ode_system.rGetStateVariables()[0] = 550.;
+        TS_ASSERT_EQUALS(n98_ode_system.GetVoltage(), 550.0);
         TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
                 err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
-        n98_ode_system.rGetStateVariables()[0] = 101.0;
+
+        n98_ode_system.rGetStateVariables()[0] = 551.0;
         TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
                 err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
-        n98_ode_system.rGetStateVariables()[0] = 99.0;
-        TS_ASSERT_THROWS_NOTHING( n98_ode_system.GetIIonic());
-        n98_ode_system.rGetStateVariables()[0] = -100.1;
-        TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
-                err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
-        n98_ode_system.rGetStateVariables()[0] = -100.0;
+
+        n98_ode_system.rGetStateVariables()[0] = 549.9;
         TS_ASSERT_THROWS_NOTHING( n98_ode_system.GetIIonic());
 
-        n98_ode_system.rGetStateVariables()[0] = -100.1;
+        n98_ode_system.rGetStateVariables()[0] = -250.1;
+        TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
+                err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
 
+        n98_ode_system.rGetStateVariables()[0] = -250.0;
+        TS_ASSERT_THROWS_NOTHING( n98_ode_system.GetIIonic());
+
+        n98_ode_system.rGetStateVariables()[0] = -250.1;
         TS_ASSERT_THROWS_EQUALS( RunOdeSolverWithIonicModel(&n98_ode_system, 150.0, "DoNotRun"),
                 const Exception &err, err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
     }
@@ -584,7 +592,16 @@ public:
 
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
-        CellFaberRudy2000FromCellMLOpt fr2000_ode_system_opt(p_solver, p_stimulus);
+	// Dynamic load fr2000_ode_system_opt as we need a different lookup table start to the default
+	FileFinder cellml_file("heart/src/odes/cellml/FaberRudy2000.cellml", RelativeTo::ChasteSourceRoot);
+	OutputFileHandler handler("TestIonicModels", true);
+       	handler.CopyFileTo(cellml_file);
+       	CellMLToSharedLibraryConverter converter(true);
+       	converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"});
+       	FileFinder copied_file("TestIonicModels/FaberRudy2000.cellml", RelativeTo::ChasteTestOutput);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
+
+        AbstractCardiacCell* fr2000_ode_system_opt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         CellFaberRudy2000FromCellML fr2000_ode_system(p_solver, p_stimulus);
 
         // Solve and write to file
@@ -597,7 +614,7 @@ public:
         double forward = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
 
         ck_start = clock();
-        RunOdeSolverWithIonicModel(&fr2000_ode_system_opt,
+        RunOdeSolverWithIonicModel(fr2000_ode_system_opt,
                                    end_time,
                                    "FR2000DelayedStimOpt",
                                    500, false);
@@ -615,16 +632,17 @@ public:
         // that GetIionic has no errors, therefore we can test here against
         // a hardcoded result
         TS_ASSERT_DELTA(fr2000_ode_system.GetIIonic(), 0.0002, 1e-4);
-        TS_ASSERT_DELTA(fr2000_ode_system_opt.GetIIonic(), 0.0002, 1e-4);
+        TS_ASSERT_DELTA(fr2000_ode_system_opt->GetIIonic(), 0.0002, 1e-4);
 
         // Check that ComputeExceptVoltage does the correct thing (doesn't change the voltage)
         double voltage = fr2000_ode_system.GetVoltage();
         fr2000_ode_system.ComputeExceptVoltage(end_time, end_time+0.001);
         TS_ASSERT_DELTA(fr2000_ode_system.GetVoltage(), voltage, 1e-10);
-        voltage = fr2000_ode_system_opt.GetVoltage();
-        fr2000_ode_system_opt.ComputeExceptVoltage(end_time, end_time+0.001);
-        TS_ASSERT_DELTA(fr2000_ode_system_opt.GetVoltage(), voltage, 1e-10);
+        voltage = fr2000_ode_system_opt->GetVoltage();
+        fr2000_ode_system_opt->ComputeExceptVoltage(end_time, end_time+0.001);
+        TS_ASSERT_DELTA(fr2000_ode_system_opt->GetVoltage(), voltage, 1e-10);
 
+        delete fr2000_ode_system_opt;
     }
 
 
@@ -1295,7 +1313,7 @@ public:
 
             CheckCellModelResults("Backward1AfterArchive", "", 2e-3);
             CheckCellModelResults("Backward2AfterArchive");
-            CheckCellModelResults("Backward3AfterArchive");
+            CheckCellModelResults("Backward3AfterArchive", "", 2e-3);
             CheckCellModelResults("Backward4AfterArchive");
             CheckCellModelResults("Backward5AfterArchive");
 

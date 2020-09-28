@@ -65,29 +65,6 @@ class TestCardiacSimulation : public CxxTest::TestSuite
     {
         HeartEventHandler::Reset();
     }
-//
-//    void CreateOptionsFile(const OutputFileHandler& rHandler,
-//                           const std::string& rModelName,
-//                           const std::vector<std::string>& rArgs,
-//                           const std::string& rExtraXml="")
-//    {
-//        if (PetscTools::AmMaster())
-//        {
-//            out_stream p_optfile = rHandler.OpenOutputFile(rModelName + "-conf.xml");
-//            (*p_optfile) << "<?xml version='1.0'?>" << std::endl
-//                         << "<pycml_config>" << std::endl
-//                         << "<command_line_args>" << std::endl;
-//            for (unsigned i=0; i<rArgs.size(); i++)
-//            {
-//                (*p_optfile) << "<arg>" << rArgs[i] << "</arg>" << std::endl;
-//            }
-//            (*p_optfile) << "</command_line_args>" << std::endl
-//                         << rExtraXml
-//                         << "</pycml_config>" << std::endl;
-//            p_optfile->close();
-//        }
-//        PetscTools::Barrier("CreateOptionsFile");
-//    }
 public:
 
     void TestMono1dSmall()
@@ -592,7 +569,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT(CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "patchwork_results", false,
-                                                foldername, "SimulationResults", true, 1e-5));
+                                                foldername, "SimulationResults", true, 1.2e-5)); // the hdf5 reference was generated using pycml lookup tables
     }
 
     void TestCardiacSimulationKirsten()
@@ -671,8 +648,12 @@ public:
 
         std::vector<std::string> args;
         args.push_back("--cvode");
-
-        CellMLToSharedLibraryConverter::CreateOptionsFile(handler_cvode, "luo_rudy_1991_dyn", args);
+	CellMLToSharedLibraryConverter converter(true);
+	converter.SetOptions(args);
+	// Need to perform conversion here as otherwise we can't tell it to convert a cvode
+        // It would work with a normal model too, without pre-converting this is tested in TestCardiacSimulationPatchwork
+       	FileFinder copied_file("DynamicallyLoadedModelCvode/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteTestOutput);
+        converter.Convert(copied_file);
         CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml");
 #else
         std::cout << "CVODE is not enabled.\n";

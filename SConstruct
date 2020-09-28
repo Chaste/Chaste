@@ -33,11 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Controlling SCons build script for Chaste.
 
 # This script is executed within the root Chaste source directory.
-# We need at least Python 2.3.
-EnsurePythonVersion(2,3)
+# We need at least Python 3.5.
+EnsurePythonVersion(3,5)
 
-# We're also no longer compatible with SCons 0.96
-EnsureSConsVersion(0,97)
+# We're also no longer compatible with SCons < 3.0
+EnsureSConsVersion(3,0)
 
 # Avoid deprecation warnings by changing behaviour for new SCons versions
 scons_version_two = True
@@ -77,6 +77,25 @@ import SConsTools
 Export('SConsTools')
 
 import hostconfig
+setattr(os.environ, 'has_key', lambda x: x in os.environ)  # hack to work around scons bug and make has_key work
+
+AddOption('--codegen_base_folder',
+          dest='codegen_base_folder',
+          type='string',
+          nargs=1,
+          action='store',
+          default='',
+          help='Location of chaste source base folder to place codegen virtual environment in, if different to where you are calling scons from')
+
+
+AddOption('--codegen_args',
+          dest='codegen_args',
+          type='string',
+          nargs=1,
+          action='store',
+          default='',
+          help='Arguments to pass to chaste_codegen in a dynamic build scenario.')
+
 
 # If building a loadable module at run-time
 dyn_libs_only = int(ARGUMENTS.get('dyn_libs_only', 0))
@@ -145,7 +164,7 @@ if offline_mode:
 # This will force the test suite to be run even if the source is unchanged.
 # To run multiple tests in this way, separate the paths by commas.
 # Also allow test .hpp files to be given as normal targets.
-requested_tests = filter(None, ARGUMENTS.get('test_suite', ARGUMENTS.get('ts', '')).split(','))
+requested_tests = list(filter(None, ARGUMENTS.get('test_suite', ARGUMENTS.get('ts', '')).split(',')))
 for target in COMMAND_LINE_TARGETS[:]:
     if target.endswith('.hpp') or target.endswith('.py'):
         requested_tests.append(target)
@@ -161,7 +180,7 @@ for test_idx, test_path in enumerate(requested_tests):
             break
     else:
         raise ValueError('Test suite "%s" is not in a test folder' % test_path)
-    #print requested_tests
+    #print(requested_tests)
 Export('requested_tests')
 
 # Force re-running of all (selected) tests even if the source is unchanged.
@@ -324,10 +343,10 @@ env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
 env.Append(LINKFLAGS = link_flags)
 env.Append(CPPDEFINES = hostconfig.CppDefines() + ['TRILIBRARY', 'TETLIBRARY', 'ANSI_DECLARATORS'])
 if debug:
-    print "Core compiler flags used by Chaste:"
-    print "    CCFLAGS =", env['CCFLAGS']
-    print "    LDFLAGS =", env['LINKFLAGS']
-    print "    Defines =", env['CPPDEFINES']
+    print("Core compiler flags used by Chaste:")
+    print("    CCFLAGS = %s" % env['CCFLAGS'])
+    print("    LDFLAGS = %s" % env['LINKFLAGS'])
+    print("    Defines = %s" % env['CPPDEFINES'])
 
 # Base search path for Chaste #includes, common to all components
 cpppath = [Dir('.'), Dir('cxxtest')]
@@ -408,7 +427,7 @@ if run_infrastructure_tests and not GetOption('clean'):
     if not os.path.exists(build.GetTestReportDir()):
         os.makedirs(build.GetTestReportDir())
     if not env.GetOption('silent'):
-        print "Running infrastructure tests..."
+        print("Running infrastructure tests...")
     # Check for orphaned test files
     out = File(build.GetTestReportDir() + 'OrphanedTests.log')
     run_infra('CheckForOrphanedTests.py', out, ' '.join(RequestedProjects()))
@@ -442,7 +461,7 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         bld_dir = os.path.join(toplevel_dir, 'build', build_dir)
         if not os.path.exists(bld_dir):
             os.mkdir(bld_dir)
-        script = os.path.join(toplevel_dir, 'SConscript')
+        script = str(os.path.join(toplevel_dir, 'SConscript'))
         if scons_version_two:
             test_log_files.append(SConscript(script, src_dir=toplevel_dir, variant_dir=bld_dir, duplicate=0))
         else:
@@ -453,10 +472,10 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
     for project in glob.glob('projects/*'):
         if not os.path.isdir(project):
             if debug:
-                print "Found non-dir", project, "in projects folder"
+                print("Found non-dir %s in projects folder" % project)
             continue
         if not os.path.exists(os.path.join(project, 'SConscript')):
-            print >>sys.stderr, "Unexpected folder", project, "in projects folder."
+            print("Unexpected folder %s in projects folder." % project,  file=sys.stderr)
             continue
         real_path = os.path.realpath(project)
         if real_path in project_path_list:
@@ -540,7 +559,7 @@ if test_summary and not compile_only:
         # Include projects?
         project_inputs = RequestedProjects()
         if project_inputs:
-            doxy_conf.append('echo "INPUT += %s"' % (' '.join(map(lambda p: os.path.join(p, 'src'), project_inputs))))
+            doxy_conf.append('echo "INPUT += %s"' % (' '.join(list(map(lambda p: os.path.join(p, 'src'), project_inputs)))))
         build.ExtendDoxygenConfig(doxy_conf)
         cmd = ('( ' + ' ; '.join(doxy_conf) + ' ) '
                + '| doxygen - 2>doxygen-error.log 1>doxygen-output.log')
@@ -580,17 +599,17 @@ if offline_mode:
     # \todo #136: Make the template file an argument 
     Execute(Copy('run-tests.sh','python/infra/offline_template.sh'))
     handle = open('run-tests.sh', 'a')
-    print >> handle, ""
-    print >> handle, "export LD_LIBRARY_PATH=" + ':'.join(ld_lib_paths)
-    print >> handle, "export PATH=" + env['ENV']['PATH']
-    print >> handle, ""
+    print("", file=handle)
+    print("export LD_LIBRARY_PATH=" + ':'.join(ld_lib_paths), file=handle)
+    print("export PATH=" + env['ENV']['PATH'], file=handle)
+    print("", file=handle)
     for runner in offline_test_runners:
         if isinstance(runner, (list, UserList.UserList)):
             # For chaste_libs=1
-            print >> handle, "$MPI_LAUNCH_COMMAND", runner[0]
+            print("$MPI_LAUNCH_COMMAND", runner[0], file=handle)
         else:
             # For chaste_libs=0
-            print >> handle, "$MPI_LAUNCH_COMMAND", runner
-    print >> handle, ""
+            print("$MPI_LAUNCH_COMMAND", runner, file=handle)
+    print("", file=handle)
     handle.close()
-    os.chmod('run-tests.sh', 0740)
+    os.chmod('run-tests.sh', 0o0740)

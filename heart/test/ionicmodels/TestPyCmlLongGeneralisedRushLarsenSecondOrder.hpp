@@ -64,6 +64,7 @@ public:
         args.push_back("--grl2");
         std::vector<std::string> models;
         AddAllModels(models);
+
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, models, args, false, 0, false);
@@ -78,10 +79,86 @@ public:
         args.push_back("--opt");
         std::vector<std::string> models;
         AddAllModels(models);
-        // Winslow model needs a smaller timestep
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        models.erase(std::find(models.begin(), models.end(), "nygren_atrial_model_1998"));
+
+        std::vector<std::string> smaller_timestep_models;
+	smaller_timestep_models.push_back("bondarenko_model_2004_apex");
+	smaller_timestep_models.push_back("courtemanche_ramirez_nattel_model_1998");
+	smaller_timestep_models.push_back("demir_model_1994");
+	smaller_timestep_models.push_back("dokos_model_1996");
+	smaller_timestep_models.push_back("iyer_model_2004");
+	smaller_timestep_models.push_back("iyer_model_2007");
+	smaller_timestep_models.push_back("jafri_rice_winslow_model_1998");
+	smaller_timestep_models.push_back("livshitz_rudy_2007");
+	smaller_timestep_models.push_back("Shannon2004");
+	smaller_timestep_models.push_back("stewart_zhang_model_2008_ss");
+	smaller_timestep_models.push_back("winslow_model_1999");
+	smaller_timestep_models.push_back("FaberRudy2000");
+	smaller_timestep_models.push_back("li_mouse_2010");
+        BOOST_FOREACH (std::string model, smaller_timestep_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), model));
+        }
+
+        std::vector<std::string> very_small_timestep_models;
+	very_small_timestep_models.push_back("nygren_atrial_model_1998");
+        BOOST_FOREACH (std::string model, very_small_timestep_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), model));
+        }
+
+
+        std::vector<std::string> different_lookup_table_models;
+        different_lookup_table_models.push_back("fink_noble_giles_model_2008");
+        different_lookup_table_models.push_back("ten_tusscher_model_2006_epi");
+        BOOST_FOREACH (std::string diff_model, different_lookup_table_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), diff_model));
+        }
+
+        std::vector<std::string> different_lookup_table_models2;
+        different_lookup_table_models2.push_back("decker_2009");
+        different_lookup_table_models2.push_back("ten_tusscher_model_2004_epi");
+        BOOST_FOREACH (std::string diff_model, different_lookup_table_models2)
+        {
+            models.erase(std::find(models.begin(), models.end(), diff_model));
+        }
+
+        std::vector<std::string> different_lookup_table_models3;
+        different_lookup_table_models3.push_back("grandi2010ss");
+        BOOST_FOREACH (std::string diff_model, different_lookup_table_models3)
+        {
+            models.erase(std::find(models.begin(), models.end(), diff_model));
+        }
+
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
+        RunTests(dirname, very_small_timestep_models, args, true, -1000, false);
+
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, different_lookup_table_models,
+                 {"--opt", "--grl2", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 true, -1000, true);
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, different_lookup_table_models2,
+                 {"--opt", "--grl2", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
+                 true, -1000, true);
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, different_lookup_table_models3,
+                 {"--opt", "--grl2", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
+                 true, -1000, true);
+
     }
+
 };
 
 #endif // TESTPYCMLLONGGENERALISEDRUSHLARSENSECONDORDER_HPP_
