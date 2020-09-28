@@ -766,12 +766,12 @@ def CreateCodegenBuilder(build, buildenv):
     It is installed in a python3 virtual environment and can be called as chaste_codegen.
     Extra can be passed directly to chaste_codegen.
 
-    The SCons environment variable PYCML_EXTRA_ARGS may also be used to pass additional
+    The SCons environment variable CODEGEN_EXTRA_ARGS may also be used to pass additional
     command-line arguments to ConvertCellModel.py.  This can be set in a project
     SConscript file, by including lines like the following prior to the DoProjectSConscript
     call:
         env = SConsTools.CloneEnv(env)
-        env['PYCML_EXTRA_ARGS'] = ['--expose-annotated-variables']
+        env['CODEGEN_EXTRA_ARGS'] = ['--use-modifiers']
     """
     # Set up for virtual environment for chaste_codegen. Note: config files and out files are no longer needed
     codegen_base_folder = str(SCons.Script.Main.GetOption('codegen_base_folder'))
@@ -799,7 +799,7 @@ def CreateCodegenBuilder(build, buildenv):
         #args = ['-A', '--output-dir', os.path.dirname(target[0].abspath)]
         args = ['-A']
         args.extend(SCons.Script.Main.GetOption('codegen_args').split())
-        args.extend(env.get('PYCML_EXTRA_ARGS', []))
+        args.extend(env.get('CODEGEN_EXTRA_ARGS', []))
         if SCons.Script.Main.GetOption('silent'):
             args.append('--quiet')
         if IsDynamicSource(source):
