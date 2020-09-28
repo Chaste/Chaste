@@ -147,7 +147,7 @@ def printVersion():
 def setFiles( patterns ):
     '''Set input files specified on command line'''
     files = expandWildcards( patterns )
-    if len(files) is 0 and not root:
+    if len(files) == 0 and not root:
         usage( "No input files found" )
     return files
 
