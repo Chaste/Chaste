@@ -209,8 +209,8 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv\n" <<
                                       "        WORKING_DIRECTORY " + chaste_root.GetAbsolutePath() + "\n" <<
                                       "    )\n" <<
-                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade pip setuptools wheel)\n" <<
-                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --upgrade  chaste_codegen~=0.3.0)\n" <<
+                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel\n" <<
+                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r " + chaste_source..GetAbsolutePath() + "${CMAKE_SOURCE_DIR}/chaste_codegen.txt)\n" <<
                                       "endif ()\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
@@ -219,9 +219,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
                                       "if (${CMAKE_SYSTEM_NAME} MATCHES \"Darwin\")\n" <<
                                       "   target_link_libraries(" << cellml_leaf_name << " \"-Wl,-undefined,dynamic_lookup\")\n" <<
-                                      "endif()\n"
-                                      //"target_link_libraries(" << cellml_leaf_name << " ${Chaste_LIBRARIES})\n"
-                                      ;
+                                      "endif()\n";
             cmake_lists_filestream.close();
             std::string cmake_args = " -DCMAKE_PREFIX_PATH=" + chaste_root.GetAbsolutePath() +
                                      " -DCMAKE_BUILD_TYPE=" + ChasteBuildType() +

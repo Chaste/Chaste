@@ -280,10 +280,7 @@ message (STATUS "Updating pip setuptools and wheel")
 execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel)
 
 # Install codegen
-message (STATUS "Install chaste_codegen in ${CMAKE_SOURCE_DIR}/codegen_python3_venv")
-execute_process(COMMAND git clone --recursive --branch lookup_tables https://github.com/ModellingWebLab/chaste-codegen.git ${codegen_python3_venv}/../chaste-codegen)
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install -e ${codegen_python3_venv}/../chaste-codegen)
-#execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
