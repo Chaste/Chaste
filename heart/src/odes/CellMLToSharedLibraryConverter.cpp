@@ -203,15 +203,6 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "add_compile_options(-std=c++14)\n" <<
                                       "find_package(PythonInterp 3.5 REQUIRED)\n" <<
                                       "set(codegen_python3_venv " + chaste_root.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
-                                      "if (NOT EXISTS ${codegen_python3_venv}/chaste_codegen)\n" <<
-                                      "    message (STATUS \"Installing chaste_codegen in " + chaste_source.GetAbsolutePath() + "/codegen_python3_venv\")\n" <<
-                                      "    execute_process(\n" <<
-                                      "        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv\n" <<
-                                      "        WORKING_DIRECTORY " + chaste_root.GetAbsolutePath() + "\n" <<
-                                      "    )\n" <<
-                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel\n" <<
-                                      "    execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r " + chaste_source..GetAbsolutePath() + "${CMAKE_SOURCE_DIR}/chaste_codegen.txt)\n" <<
-                                      "endif ()\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
@@ -231,6 +222,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
 #else
             // Change to Chaste source folder
             EXPECT0(chdir, chaste_root.GetAbsolutePath());
+
             // Run scons to generate C++ code and compile it to a .so
             EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 chaste_libs=1 --codegen_args=\""+codegen_args+"\" --codegen_base_folder=" + chaste_source.GetAbsolutePath() + " build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
             if (mPreserveGeneratedSources)
