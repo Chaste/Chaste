@@ -758,15 +758,13 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
     cxx_file.add_action('.xsd', XsdAction)
     cxx_file.add_emitter('.xsd', XsdEmitter)
 
-def CreatePyCmlBuilder(build, buildenv):
-#here update comments
-    """Create a builder for running PyCml to generate C++ source code from CellML.
+def CreateCodegenBuilder(build, buildenv):
+    """Create a builder for running chaste_codegen to generate C++ source code from CellML.
 
-    PyCml is run to generate as many types of output as we can.  If a .out file is
-    present, giving output from Maple, this will include backward Euler code.  A
-    -conf.xml file may be given to tune this process somewhat, by specifying extra
-    arguments to be passed to ConvertCellModel.py; it will also be used as the
-    configuration file for PyCml itself.
+    chaste_codegenis run to generate as many types of output as we can.
+    Unlike it's predecessor (called PyCml) it does not use config files and does not require maple files to generate backward Euler code.
+    It is installed in a python3 virtual environment and can be called as chaste_codegen.
+    Extra can be passed directly to chaste_codegen.
 
     The SCons environment variable PYCML_EXTRA_ARGS may also be used to pass additional
     command-line arguments to ConvertCellModel.py.  This can be set in a project
