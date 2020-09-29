@@ -339,14 +339,14 @@ public:
         TS_ASSERT_THROWS_CONTAINS(cvode_opt.GetIIonic(), "membrane_voltage outside lookup table range");
         cvode_opt.SetVoltage(v);
 
-	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_cvode_lut("TestC/CVODE", true);
+        // Dynamic load with different lookup table start to the default
+        OutputFileHandler handler_cvode_lut("TestC/CVODE", true);
        	copied_file = handler_cvode_lut.CopyFileTo(cellml_file);
        	converter.SetOptions({"--opt", "--cvode",
                               "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_cvode_lut = converter.Convert(copied_file);
-	AbstractCvodeCell* cvode_lut = dynamic_cast<AbstractCvodeCell*>(p_loader_cvode_lut->CreateCell(p_solver, p_stimulus));
+        AbstractCvodeCell* cvode_lut = dynamic_cast<AbstractCvodeCell*>(p_loader_cvode_lut->CreateCell(p_solver, p_stimulus));
 
         // Check tables using AbstractLookupTableCollection interface
         TS_ASSERT(!cvode_cell.GetLookupTableCollection());
@@ -390,6 +390,8 @@ public:
         // Attributes
         CheckAttributes(cvode_cell);
         CheckAttributes(cvode_opt);
+        
+        delete cvode_lut;
 #endif // CHASTE_CVODE
 
         // Test the archiving code too
@@ -570,7 +572,6 @@ public:
             delete p_be_cell;
             delete opt_lut;
             delete be_lut;
-            delete cvode_lut;
         }
     }
 
