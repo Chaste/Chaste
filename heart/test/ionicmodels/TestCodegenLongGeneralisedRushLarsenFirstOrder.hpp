@@ -47,11 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test chaste_codegen functionality by dynamically loading (and hence converting) a wide
- * range of cell models.
- *
- * May need a test-suite setup or similar to define model-specific parameters?
- * Should we pick up the list of models by reading the folder heart/test/data/cellml?
+ * Test chaste_codegen functionality to generate Generalised RushLarsen First Order cells,
+ * by dynamically loading (and hence converting) a wide range of cell models.
  */
 class TestCodegenLongGeneralisedRushLarsenFirstOrder : public CodegenLongHelperTestSuite
 {

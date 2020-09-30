@@ -1,8 +1,5 @@
 bidomain/TestBidomainHeart.hpp
 convergence/TestConvergenceWeekly.hpp
-ionicmodels/TestCodegenLong.hpp
-ionicmodels/TestCodegenLongGeneralisedRushLarsenFirstOrder.hpp
-ionicmodels/TestCodegenLongGeneralisedRushLarsenSecondOrder.hpp
 monodomain/TestMonodomainHeart.hpp
 monodomain/TestMonodomainMassLumpingLong.hpp
 monodomain/TestMonodomainSlabLong.hpp
@@ -10,3 +7,11 @@ monodomain/TestNiederer2011BenchmarkSimulation.hpp
 mechanics/TestCardiacElectroMechanicsOnEllipsoid.hpp
 performance/Test3dPerformance.hpp
 postprocessing/TestPseudoEcgCalculatorNightly.hpp
+ionicmodels/TestCodegen.hpp
+ionicmodels/TestCodegenLongNormal.hpp
+ionicmodels/TestCodegenLongNumericalCvode.hpp
+ionicmodels/TestCodegenLongAnalyticCvode.hpp
+ionicmodels/TestCodegenLongBackwardEuler.hpp
+ionicmodels/TestCodegenLongRushLarsen.hpp
+ionicmodels/TestCodegenLongGeneralisedRushLarsenFirstOrder.hpp
+ionicmodels/TestCodegenLongGeneralisedRushLarsenSecondOrder.hpp
