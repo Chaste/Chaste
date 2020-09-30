@@ -60,15 +60,8 @@ public:
         args.push_back("--cvode");
         args.push_back("--opt");
 
-        std::vector<std::string> models;
-        AddAllModels(models);
-
-        std::vector<std::string> different_lookup_table_models; // Models we need to run it wirth finer tolerances
-        different_lookup_table_models.push_back("ten_tusscher_model_2004_endo");
-        BOOST_FOREACH (std::string model, different_lookup_table_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), model));
-        }
+        // Models we need to run it wirth finer tolerances
+        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"ten_tusscher_model_2004_endo"});
 
         SetUseCvodeJacobian(false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);

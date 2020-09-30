@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCODEGENLONGANALYTICCVODE_HPP_
-#define TESTCODEGENLONGANALYTICCVODE_HPP_
+#ifndef TESTCODEGENLONGEASYMODELS_HPP_
+#define TESTCODEGENLONGEASYMODELS_HPP_
 
 #include "CodegenLongHelperTestSuite.hpp"
 
@@ -46,29 +46,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test chaste_codegen functionality to generate Analytic Cvode cells,
+ * Test chaste_codegen functionality to generate Normal cells,
  * by dynamically loading (and hence converting) a wide range of cell models.
  */
-class TestCodegenLongAnalyticCvode : public CodegenLongHelperTestSuite
+class TestCodegenLongEasyModels : public CodegenLongHelperTestSuite
 {
 public:
-    void TestAnalyticCvodeCells()
+    void TestAnalyticCvodeCellsOpt()
     {
 #ifdef CHASTE_CVODE
-        std::string dirname("TestCodegenLongCvodeAnalyticJ");
+        std::string dirname("TestCodegenLongCvodeAnalyticJ-easy_models-opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
         args.push_back("--use-analytic-jacobian");
+        args.push_back("--opt");
 
-        // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = spectail_streatment_models(models, {"aslanidi_model_2009",
-                                                                                  "hund_rudy_2004_a",
-                                                                                  "livshitz_rudy_2007"});
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, args);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, easy_models, args);
 #endif
+    }
+
+    void TestBackwardEulerCellsOpt()
+    {
+        std::string dirname("TestCodegenLongBE-easy_models-opt");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--backward-euler");
+        args.push_back("--opt");
+
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        RunTests(dirname, easy_models, args, true);
     }
 };
 
-#endif // TESTCODEGENLONGANALYTICCVODE_HPP_
+#endif // TESTCODEGENLONGEASYMODELS_HPP_

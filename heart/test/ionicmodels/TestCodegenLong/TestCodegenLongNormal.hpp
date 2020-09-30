@@ -58,16 +58,9 @@ public:
 
         std::string dirname("TestCodegenLongNormal");
         std::vector<std::string> args; 
-        args.push_back("--Wu");
-        std::vector<std::string> models;
-        AddAllModels(models);
 
-        std::vector<std::string> small_dt_models; // Models that need a very small dt
-        small_dt_models.push_back("li_mouse_2010");
-        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), small_dt_model));
-        }
+        // Models that need a very small dt
+        std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args);

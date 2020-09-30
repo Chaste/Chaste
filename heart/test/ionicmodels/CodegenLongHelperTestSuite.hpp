@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include "AbstractCardiacCell.hpp"
 #include "AbstractCardiacCellInterface.hpp"
@@ -235,6 +236,36 @@ private:
         Simulate(rOutputDirName, rModelName, p_cell);
     }
 
+protected:
+    std::vector<std::string> models;
+    std::vector<std::string> easy_models;
+
+    // Returns a list of all models in special_treatment_models that exist in all_models and deletes these models from all_models
+    std::vector<std::string> spectail_streatment_models(std::vector<std::string>& all_models, std::vector<std::string> special_treatment_models)
+    {
+        BOOST_FOREACH (std::string model, special_treatment_models)
+        {
+            auto special_model = std::find(all_models.begin(), all_models.end(), model);
+            bool found = special_model != all_models.end();
+            if(found)
+            {
+                all_models.erase(special_model);
+            }
+            else
+            {
+                special_treatment_models.erase(std::find(special_treatment_models.begin(), special_treatment_models.end(), model));
+
+            }
+        }
+        return special_treatment_models;
+    }
+
+    void setUp()
+    {
+        AddAllModels(models);
+        AddEasyModels(easy_models);
+    }
+
 public:
     void RunTests(const std::string& rOutputDirName,
                   const std::vector<std::string>& rModels,
@@ -299,36 +330,24 @@ public:
     void AddAllModels(std::vector<std::string>& rModels)
     {
         rModels.emplace_back("aslanidi_model_2009");
-        rModels.emplace_back("beeler_reuter_model_1977");
         rModels.emplace_back("bondarenko_model_2004_apex");
         rModels.emplace_back("courtemanche_ramirez_nattel_model_1998");
         rModels.emplace_back("decker_2009");
         rModels.emplace_back("demir_model_1994");
         rModels.emplace_back("dokos_model_1996");
-        rModels.emplace_back("earm_noble_model_1990");
-        rModels.emplace_back("espinosa_model_1998_normal");
         rModels.emplace_back("fink_noble_giles_model_2008");
         rModels.emplace_back("grandi2010ss");
-        rModels.emplace_back("hilgemann_noble_model_1987");
-        rModels.emplace_back("hodgkin_huxley_squid_axon_model_1952_modified");
         rModels.emplace_back("hund_rudy_2004_a");
-        rModels.emplace_back("iribe_model_2006_without_otherwise_section");
         rModels.emplace_back("iyer_model_2004");
         rModels.emplace_back("iyer_model_2007");
         rModels.emplace_back("jafri_rice_winslow_model_1998");
-        rModels.emplace_back("kurata_model_2002");
         rModels.emplace_back("livshitz_rudy_2007");
         rModels.emplace_back("luo_rudy_1994");
-        rModels.emplace_back("mahajan_2008");
-        rModels.emplace_back("matsuoka_model_2003");
         rModels.emplace_back("noble_model_1991");
         rModels.emplace_back("noble_model_1998");
-        rModels.emplace_back("noble_noble_SAN_model_1984");
-        rModels.emplace_back("noble_SAN_model_1989");
         rModels.emplace_back("nygren_atrial_model_1998");
         rModels.emplace_back("pandit_model_2001_epi");
         rModels.emplace_back("priebe_beuckelmann_model_1998");
-        rModels.emplace_back("sakmann_model_2000_epi");
         rModels.emplace_back("Shannon2004");
         rModels.emplace_back("stewart_zhang_model_2008_ss");
         rModels.emplace_back("ten_tusscher_model_2004_endo");
@@ -336,8 +355,6 @@ public:
         rModels.emplace_back("ten_tusscher_model_2006_epi");
         rModels.emplace_back("viswanathan_model_1999_epi");
         rModels.emplace_back("winslow_model_1999");
-        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
-        rModels.emplace_back("zhang_SAN_model_2000_all");
 
         // Additional models added for testing when introducing codegen, as these caused some unit conversion isssues (in ApPredict)
         rModels.emplace_back("DiFrancescoNoble1985");
@@ -346,6 +363,26 @@ public:
         rModels.emplace_back("paci_hyttinen_aaltosetala_severi_ventricularVersion");
         rModels.emplace_back("sachse_moreno_abildskov_2008_b");
     }
+
+    // These models passed first time requiring no special treatment for any model type
+    void AddEasyModels(std::vector<std::string>& rModels)
+    {
+       rModels.emplace_back("beeler_reuter_model_1977");
+       rModels.emplace_back("earm_noble_model_1990");
+       rModels.emplace_back("espinosa_model_1998_normal");
+       rModels.emplace_back("hilgemann_noble_model_1987");
+       rModels.emplace_back("hodgkin_huxley_squid_axon_model_1952_modified");
+       rModels.emplace_back("iribe_model_2006_without_otherwise_section");
+       rModels.emplace_back("kurata_model_2002");
+       rModels.emplace_back("mahajan_2008");
+       rModels.emplace_back("matsuoka_model_2003");
+       rModels.emplace_back("noble_noble_SAN_model_1984");
+       rModels.emplace_back("noble_SAN_model_1989");
+       rModels.emplace_back("sakmann_model_2000_epi");
+       rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
+       rModels.emplace_back("zhang_SAN_model_2000_all");
+    }
+    
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)
     {

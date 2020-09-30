@@ -55,24 +55,15 @@ public:
     void TestOptimisedCells()
     {
         std::string dirname("TestCodegenLongNormalOpt");
-        std::vector<std::string> models;
         std::vector<std::string> args;
         args.push_back("--opt");
-        AddAllModels(models);
 
-        std::vector<std::string> small_dt_models; // Models that need a very small dt
-        small_dt_models.push_back("li_mouse_2010");
-        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), small_dt_model));
-        }
+        // Models that need a very small dt
+        std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});
 
-        std::vector<std::string> different_lookup_table_models; // Models that need a different lookup table
-        different_lookup_table_models.push_back("fink_noble_giles_model_2008");
-        BOOST_FOREACH (std::string model, different_lookup_table_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), model));
-        }
+        // Models that need a different lookup table
+        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"fink_noble_giles_model_2008"});
+
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args, true);
 

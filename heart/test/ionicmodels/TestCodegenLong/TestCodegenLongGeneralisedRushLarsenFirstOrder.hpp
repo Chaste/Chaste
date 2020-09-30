@@ -57,10 +57,8 @@ public:
     {
         std::string dirname("TestCodegenLongGeneralizedRushLarsen1");
         std::vector<std::string> args;
-        args.push_back("--Wu");
         args.push_back("--grl1");
-        std::vector<std::string> models;
-        AddAllModels(models);
+
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
 
 

@@ -57,56 +57,34 @@ public:
     {
         std::string dirname("TestCodegenLongGeneralizedRushLarsen1Opt");
         std::vector<std::string> args;
-        args.push_back("--Wu");
         args.push_back("--grl1");
         args.push_back("--opt");
-        std::vector<std::string> models;
-        AddAllModels(models);
+
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
 
-        std::vector<std::string> smaller_timestep_models;
-        smaller_timestep_models.push_back("Shannon2004");
-        smaller_timestep_models.push_back("bondarenko_model_2004_apex");
-        smaller_timestep_models.push_back("courtemanche_ramirez_nattel_model_1998");
-        smaller_timestep_models.push_back("demir_model_1994");
-        smaller_timestep_models.push_back("dokos_model_1996");
-        smaller_timestep_models.push_back("iyer_model_2007");
-        smaller_timestep_models.push_back("jafri_rice_winslow_model_1998");
-        smaller_timestep_models.push_back("livshitz_rudy_2007");
-        smaller_timestep_models.push_back("stewart_zhang_model_2008_ss");
-        smaller_timestep_models.push_back("winslow_model_1999");
-        smaller_timestep_models.push_back("FaberRudy2000");
-        smaller_timestep_models.push_back("li_mouse_2010");
-        smaller_timestep_models.push_back("noble_model_1998");
-        BOOST_FOREACH (std::string model, smaller_timestep_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), model));
-        }
+        std::vector<std::string> smaller_timestep_models = spectail_streatment_models(models, {"Shannon2004",
+                                                                                               "bondarenko_model_2004_apex",
+                                                                                               "courtemanche_ramirez_nattel_model_1998",
+                                                                                               "demir_model_1994",
+                                                                                               "dokos_model_1996",
+                                                                                               "iyer_model_2007",
+                                                                                               "jafri_rice_winslow_model_1998",
+                                                                                               "livshitz_rudy_2007",
+                                                                                               "stewart_zhang_model_2008_ss",
+                                                                                               "winslow_model_1999",
+                                                                                               "FaberRudy2000",
+                                                                                               "li_mouse_2010",
+                                                                                               "noble_model_1998"});
 
 
 
-        std::vector<std::string> different_lookup_table_models;
-        different_lookup_table_models.push_back("fink_noble_giles_model_2008");
-        different_lookup_table_models.push_back("ten_tusscher_model_2006_epi");
-        BOOST_FOREACH (std::string diff_model, different_lookup_table_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
+        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"fink_noble_giles_model_2008",
+                                                                                                     "ten_tusscher_model_2006_epi"});
 
-        std::vector<std::string> different_lookup_table_models2;
-        different_lookup_table_models2.push_back("decker_2009");
-        different_lookup_table_models2.push_back("ten_tusscher_model_2004_epi");
-        BOOST_FOREACH (std::string diff_model, different_lookup_table_models2)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
+        std::vector<std::string> different_lookup_table_models2 = spectail_streatment_models(models, {"decker_2009",
+                                                                                                      "ten_tusscher_model_2004_epi"});
 
-        std::vector<std::string> different_lookup_table_models3;
-        different_lookup_table_models3.push_back("grandi2010ss");
-        BOOST_FOREACH (std::string diff_model, different_lookup_table_models3)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
+        std::vector<std::string> different_lookup_table_models3 = spectail_streatment_models(models, {"grandi2010ss"});
 
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);

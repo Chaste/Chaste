@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCODEGENLONGANALYTICCVODE_HPP_
-#define TESTCODEGENLONGANALYTICCVODE_HPP_
+#ifndef TESTCODEGENLONGRUSHLARSENOPT_HPP_
+#define TESTCODEGENLONGRUSHLARSENOPT_HPP_
 
 #include "CodegenLongHelperTestSuite.hpp"
 
@@ -45,30 +45,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
+#include "TestCodegenLongNormal.hpp"
+
 /**
- * Test chaste_codegen functionality to generate Analytic Cvode cells,
+ * Test chaste_codegen functionality to generate RushLarsen Optimised cells,
  * by dynamically loading (and hence converting) a wide range of cell models.
  */
-class TestCodegenLongAnalyticCvode : public CodegenLongHelperTestSuite
+class TestCodegenLongDifficultModels : public CodegenLongHelperTestSuite
 {
 public:
-    void TestAnalyticCvodeCells()
+    void TestdifficultModels()
     {
-#ifdef CHASTE_CVODE
-        std::string dirname("TestCodegenLongCvodeAnalyticJ");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--cvode");
-        args.push_back("--use-analytic-jacobian");
-
-        // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = spectail_streatment_models(models, {"aslanidi_model_2009",
-                                                                                  "hund_rudy_2004_a",
-                                                                                  "livshitz_rudy_2007"});
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, args);
-#endif
+        TestCodegenLongNormal normal;
+        normal.models = {"DiFrancescoNoble1985", "FaberRudy2000", "li_mouse_2010", "paci_hyttinen_aaltosetala_severi_ventricularVersion", "sachse_moreno_abildskov_2008_b"};
+        normal.TestNormalCells();
     }
 };
 
-#endif // TESTCODEGENLONGANALYTICCVODE_HPP_
+#endif // TESTCODEGENLONGRUSHLARSENOPT_HPP_

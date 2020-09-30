@@ -61,24 +61,17 @@ public:
         args.push_back("--cvode");
         args.push_back("--use-analytic-jacobian");
         args.push_back("--opt");
-        std::vector<std::string> models;
-        AddAllModels(models);
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = boost::assign::list_of("aslanidi_model_2009")("hund_rudy_2004_a")("livshitz_rudy_2007");
-        BOOST_FOREACH (std::string bad_model, bad_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), bad_model));
-        }
+        std::vector<std::string> bad_models = spectail_streatment_models(models, {"aslanidi_model_2009",
+                                                                                  "hund_rudy_2004_a",
+                                                                                  "livshitz_rudy_2007"});
 
-        std::vector<std::string> different_lookup_table_models; // Models we need to run it wirth finer tolerances
-        different_lookup_table_models.push_back("ten_tusscher_model_2004_endo");
-        different_lookup_table_models.push_back("noble_model_1991");
-        different_lookup_table_models.push_back("luo_rudy_1994");
-        BOOST_FOREACH (std::string model, different_lookup_table_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), model));
-        }
+        // Models that need a different lookup table
+        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"ten_tusscher_model_2004_endo",
+                                                                                                     "noble_model_1991",
+                                                                                                     "luo_rudy_1994"});
+
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args);

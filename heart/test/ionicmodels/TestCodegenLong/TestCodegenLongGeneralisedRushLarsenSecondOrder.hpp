@@ -57,10 +57,7 @@ public:
     {
         std::string dirname("TestCodegenLongGeneralizedRushLarsen2");
         std::vector<std::string> args;
-        args.push_back("--Wu");
         args.push_back("--grl2");
-        std::vector<std::string> models;
-        AddAllModels(models);
 
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);

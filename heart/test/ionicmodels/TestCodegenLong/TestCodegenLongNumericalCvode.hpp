@@ -57,10 +57,7 @@ public:
 #ifdef CHASTE_CVODE
         std::string dirname("TestCodegenLongCvodeNumericalJ");
         std::vector<std::string> args;
-        args.push_back("--Wu");
         args.push_back("--cvode");
-        std::vector<std::string> models;
-        AddAllModels(models);
 
         SetUseCvodeJacobian(false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
