@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCODEGENLONGRUSHLARSEN_HPP_
-#define TESTCODEGENLONGRUSHLARSEN_HPP_
+#ifndef TESTCODEGENLONG_HPP_
+#define TESTCODEGENLONG_HPP_
 
 #include "CodegenLongHelperTestSuite.hpp"
 
@@ -46,18 +46,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test chaste_codegen functionality to generate RushLarsen cells,
+ * Test chaste_codegen functionality to generate Normal cells,
  * by dynamically loading (and hence converting) a wide range of cell models.
  */
-class TestCodegenLongRushLarsen : public CodegenLongHelperTestSuite
+class TestCodegenLongNormal : public CodegenLongHelperTestSuite
 {
 public:
-    void TestRushLarsenCells()
+    void TestNormalCells()
     {
-        std::string dirname("TestCodegenLongRushLarsen");
-        std::vector<std::string> args;
+        std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
+
+        std::string dirname("TestCodegenLongNormal");
+        std::vector<std::string> args; 
         args.push_back("--Wu");
-        args.push_back("--rush-larsen");
         std::vector<std::string> models;
         AddAllModels(models);
 
@@ -68,51 +69,13 @@ public:
             models.erase(std::find(models.begin(), models.end(), small_dt_model));
         }
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        RunTests(dirname, models, args, false, 0, false);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
+        RunTests(dirname, models, args);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
-    }
-
-    void TestRushLarsenOptCells()
-    {
-        std::string dirname("TestCodegenLongRushLarsenOpt");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--rush-larsen");
-        args.push_back("--opt");
-        std::vector<std::string> models;
-        AddAllModels(models);
-
-        std::vector<std::string> small_dt_models; // Models that need a very small dt
-        small_dt_models.push_back("li_mouse_2010");
-        small_dt_models.push_back("courtemanche_ramirez_nattel_model_1998");
-        small_dt_models.push_back("demir_model_1994");
-        small_dt_models.push_back("grandi2010ss");
-        BOOST_FOREACH (std::string small_dt_model, small_dt_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), small_dt_model));
-        }
-
-        std::vector<std::string> different_lookup_table_models; // Models for which we allow warnings
-        different_lookup_table_models.push_back("DiFrancescoNoble1985");
-        BOOST_FOREACH (std::string model, different_lookup_table_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), model));
-        }
-
-        RunTests(dirname, models, args, true, -1000, false);
-
-        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
-                   {"--rush-larsen", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                   true, -1000, true);
-
-        // See Cooper Spiteri Mirams paper table 2
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
+        RunTests(dirname + "-small-dt", small_dt_models, args);
     }
 };
 
-#endif // TESTCODEGENLONGRUSHLARSEN_HPP_
+#endif // TESTCODEGENLONGNORMAL_HPP_

@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCODEGENLONGNUMERICALCVODE_HPP_
-#define TESTCODEGENLONGNUMERICALCVODE_HPP_
+#ifndef TESTCODEGENLONGBACKWARDEULER_HPP_
+#define TESTCODEGENLONGBACKWARDEULER_HPP_
 
 #include "CodegenLongHelperTestSuite.hpp"
 
@@ -46,59 +46,49 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test chaste_codegen functionality to generate Numerical Cvode cells,
+ * Test chaste_codegen functionality to generate Backward Euler cells,
  * by dynamically loading (and hence converting) a wide range of cell models.
  */
-class TestCodegenLongNumericalCvode : public CodegenLongHelperTestSuite
+class TestCodegenLongBackwardEuler : public CodegenLongHelperTestSuite
 {
 public:
-    void TestCvodeCells()
+    void TestBackwardEulerCells()
     {
-#ifdef CHASTE_CVODE
-        std::string dirname("TestCodegenLongCvodeNumericalJ");
+        std::string dirname("TestCodegenLongBE");
         std::vector<std::string> args;
         args.push_back("--Wu");
-        args.push_back("--cvode");
-        std::vector<std::string> models;
-        AddAllModels(models);
-
-        SetUseCvodeJacobian(false);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname, models, args);
-        SetUseCvodeJacobian(true);
-#endif
-    }
-
-    void TestCvodeCellsOpt()
-    {
-#ifdef CHASTE_CVODE
-        std::string dirname("TestCodegenLongCvodeNumericalJ-opt");
-        std::vector<std::string> args;
-        args.push_back("--cvode");
-        args.push_back("--opt");
+        args.push_back("--backward-euler");
 
         std::vector<std::string> models;
         AddAllModels(models);
 
-        std::vector<std::string> different_lookup_table_models; // Models we need to run it wirth finer tolerances
-        different_lookup_table_models.push_back("ten_tusscher_model_2004_endo");
-        BOOST_FOREACH (std::string model, different_lookup_table_models)
+        std::vector<std::string> diff_models; // Models that need a smaller dt
+        diff_models.push_back("iyer_model_2004");
+        diff_models.push_back("iyer_model_2007");
+        diff_models.push_back("jafri_rice_winslow_model_1998");
+        diff_models.push_back("pandit_model_2001_epi");
+        diff_models.push_back("priebe_beuckelmann_model_1998");
+        diff_models.push_back("viswanathan_model_1999_epi");
+        diff_models.push_back("winslow_model_1999");
+        BOOST_FOREACH (std::string diff_model, diff_models)
         {
-            models.erase(std::find(models.begin(), models.end(), model));
+            models.erase(std::find(models.begin(), models.end(), diff_model));
         }
 
-        SetUseCvodeJacobian(false);
+        // These have NaN in the jacobian due to massive exponentials
+        std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
+        BOOST_FOREACH (std::string bad_model, bad_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), bad_model));
+        }
+
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args);
+        RunTests(dirname, models, args, true);
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models,
-                 {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true);
-
-        SetUseCvodeJacobian(true);
-#endif
+        dirname = dirname + "-difficult";
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
+        RunTests(dirname, diff_models, args, true);
     }
 };
 
-#endif // TESTCODEGENLONGNUMERICALCVODE_HPP_
+#endif // TESTCODEGENLONGBACKWARDEULER_HPP_

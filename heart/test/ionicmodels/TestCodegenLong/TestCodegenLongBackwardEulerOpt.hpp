@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTCODEGENLONGBACKWARDEULER_HPP_
-#define TESTCODEGENLONGBACKWARDEULER_HPP_
+#ifndef TESTCODEGENLONGBACKWARDEULEROPT_HPP_
+#define TESTCODEGENLONGBACKWARDEULEROPT_HPP_
 
 #include "CodegenLongHelperTestSuite.hpp"
 
@@ -46,50 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /**
- * Test chaste_codegen functionality to generate Backward Euler cells,
+ * Test chaste_codegen functionality to generate Backward Euler Optimised cells,
  * by dynamically loading (and hence converting) a wide range of cell models.
  */
-class TestCodegenLongBackwardEuler : public CodegenLongHelperTestSuite
+class TestCodegenLongBackwardEulerOpt : public CodegenLongHelperTestSuite
 {
 public:
-    void TestBackwardEulerCells()
-    {
-        std::string dirname("TestCodegenLongBE");
-        std::vector<std::string> args;
-        args.push_back("--Wu");
-        args.push_back("--backward-euler");
-
-        std::vector<std::string> models;
-        AddAllModels(models);
-
-        std::vector<std::string> diff_models; // Models that need a smaller dt
-        diff_models.push_back("iyer_model_2004");
-        diff_models.push_back("iyer_model_2007");
-        diff_models.push_back("jafri_rice_winslow_model_1998");
-        diff_models.push_back("pandit_model_2001_epi");
-        diff_models.push_back("priebe_beuckelmann_model_1998");
-        diff_models.push_back("viswanathan_model_1999_epi");
-        diff_models.push_back("winslow_model_1999");
-        BOOST_FOREACH (std::string diff_model, diff_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), diff_model));
-        }
-
-        // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = boost::assign::list_of("hund_rudy_2004_a");
-        BOOST_FOREACH (std::string bad_model, bad_models)
-        {
-            models.erase(std::find(models.begin(), models.end(), bad_model));
-        }
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args, true);
-
-        dirname = dirname + "-difficult";
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        RunTests(dirname, diff_models, args, true);
-    }
-
     void TestBackwardEulerCellsOpt()
     {
         std::string dirname("TestCodegenLongBE-opt");
@@ -131,4 +93,4 @@ public:
     }
 };
 
-#endif // TESTCODEGENLONGBACKWARDEULER_HPP_
+#endif // TESTCODEGENLONGBACKWARDEULEROPT_HPP_
