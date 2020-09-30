@@ -79,6 +79,7 @@ public:
             models.erase(std::find(models.begin(), models.end(), model));
         }
 
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
 
         RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
