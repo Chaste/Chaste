@@ -69,7 +69,7 @@ public:
         smaller_timestep_models.push_back("courtemanche_ramirez_nattel_model_1998");
         smaller_timestep_models.push_back("demir_model_1994");
         smaller_timestep_models.push_back("dokos_model_1996");
-        maller_timestep_models.push_back("iyer_model_2004");
+        smaller_timestep_models.push_back("iyer_model_2004");
         smaller_timestep_models.push_back("iyer_model_2007");
         smaller_timestep_models.push_back("jafri_rice_winslow_model_1998");
         smaller_timestep_models.push_back("livshitz_rudy_2007");

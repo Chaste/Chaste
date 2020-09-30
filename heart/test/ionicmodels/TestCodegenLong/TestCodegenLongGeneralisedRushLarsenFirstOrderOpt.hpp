@@ -65,19 +65,19 @@ public:
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
 
         std::vector<std::string> smaller_timestep_models;
-	smaller_timestep_models.push_back("Shannon2004");
-	smaller_timestep_models.push_back("bondarenko_model_2004_apex");
-	smaller_timestep_models.push_back("courtemanche_ramirez_nattel_model_1998");
-	smaller_timestep_models.push_back("demir_model_1994");
-	smaller_timestep_models.push_back("dokos_model_1996");
-	smaller_timestep_models.push_back("iyer_model_2007");
-	smaller_timestep_models.push_back("jafri_rice_winslow_model_1998");
-	smaller_timestep_models.push_back("livshitz_rudy_2007");
-	smaller_timestep_models.push_back("stewart_zhang_model_2008_ss");
-	smaller_timestep_models.push_back("winslow_model_1999");
-	smaller_timestep_models.push_back("FaberRudy2000");
-	smaller_timestep_models.push_back("li_mouse_2010");
-	smaller_timestep_models.push_back("noble_model_1998");
+        smaller_timestep_models.push_back("Shannon2004");
+        smaller_timestep_models.push_back("bondarenko_model_2004_apex");
+        smaller_timestep_models.push_back("courtemanche_ramirez_nattel_model_1998");
+        smaller_timestep_models.push_back("demir_model_1994");
+        smaller_timestep_models.push_back("dokos_model_1996");
+        smaller_timestep_models.push_back("iyer_model_2007");
+        smaller_timestep_models.push_back("jafri_rice_winslow_model_1998");
+        smaller_timestep_models.push_back("livshitz_rudy_2007");
+        smaller_timestep_models.push_back("stewart_zhang_model_2008_ss");
+        smaller_timestep_models.push_back("winslow_model_1999");
+        smaller_timestep_models.push_back("FaberRudy2000");
+        smaller_timestep_models.push_back("li_mouse_2010");
+        smaller_timestep_models.push_back("noble_model_1998");
         BOOST_FOREACH (std::string model, smaller_timestep_models)
         {
             models.erase(std::find(models.begin(), models.end(), model));
