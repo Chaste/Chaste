@@ -29,7 +29,6 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import platfrom
 
 # Controlling SCons build script for Chaste.
 
@@ -455,7 +454,6 @@ if check_failing_tests:
     run_infra('CheckForFailingTests.py', out)
     test_log_files.append(out)
 
-assert platform.python_version_tuple()[0] >= '3', "This version of chaste required Python3, if you see this message you may need to update scons"
 build_dir = build.build_dir
 if not isinstance(build, BuildTypes.DoxygenCoverage):
     # Build each component.

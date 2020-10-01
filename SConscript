@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
 
-
 Import("*")
 
 # Note that this script is executed from within the <component>/build/<something>/ folder
