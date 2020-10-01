@@ -36,7 +36,6 @@ import platfrom
 # This script is executed within the root Chaste source directory.
 # We need at least Python 3.5.
 EnsurePythonVersion(3,5)
-assert platform.python_version_tuple()[0] >= '3', "This version of chaste required Python3, if you see this message you may need to update scons"
 
 # We're also no longer compatible with SCons < 3.0
 EnsureSConsVersion(3,0)
@@ -421,6 +420,7 @@ test_log_files = []
 
 # 'Infrastructure' tests of the codebase layout etc.
 def run_infra(test, out, run_time_flags=''):
+    assert platform.python_version_tuple()[0] >= '3', "This version of chaste required Python3, if you see this message you may need to update scons"
     if run_time_flags:
         run_time_flags = ' "%s"' % run_time_flags
     os.system('python/infra/TestRunner.py python/infra/' + test + ' ' + str(out)
