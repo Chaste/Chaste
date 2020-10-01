@@ -53,8 +53,8 @@ chaste_libs_path =  '/Users/administrator1/Documents/chaste-libs'
 #EDIT HERE
 
 if not os.path.exists(chaste_libs_path) or not os.path.isdir(chaste_libs_path):
-    print >>sys.stderr, "Chaste dependencies folder", chaste_libs_path, \
-        "not found; please edit python/hostconfig/default.py"
+    print("Chaste dependencies folder %s not found; please edit python/hostconfig/default.py" %
+          chaste_libs_path, file=sys.stderr)
     sys.exit(1)
 
 petsc_3_0_path = chaste_libs_path+'petsc-3.0.0-p8/'
