@@ -320,7 +320,7 @@ else:
              'CHASTE_LIBS': os.environ.get('CHASTE_LIBS', ''),
              'LD_LIBRARY_PATH': ':'.join(other_libpaths),
              'HOME': os.environ['HOME'],
-             'LANG': os.environ['LANG'],
+             'LANG': os.environ.get('LANG', 'en_GB.UTF-8'),
             })
 env.Append(BOPT = 'g_c++') # Needed for some versions of PETSc?
 env.Replace(CXX = build.tools['mpicxx'])
