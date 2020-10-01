@@ -29,12 +29,14 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+import platfrom
 
 # Controlling SCons build script for Chaste.
 
 # This script is executed within the root Chaste source directory.
 # We need at least Python 3.5.
 EnsurePythonVersion(3,5)
+assert platform.python_version_tuple()[0] >= '3', "This version of chaste required Python3, if you see this message you may need to update scons"
 
 # We're also no longer compatible with SCons < 3.0
 EnsureSConsVersion(3,0)

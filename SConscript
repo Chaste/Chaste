@@ -33,9 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # SCons build script for core Chaste components.
 
 import os
-import platfrom
 
-assert platform.python_version_tuple()[0] >= '3', "This version of chaste required Python3, if you see this message you may need to update scons"
 
 Import("*")
 
