@@ -97,9 +97,11 @@ except ImportError:
             else:
                 # Get distro via Python
                 distro = ''
-                import platform
                 try:
+                    import platform
                     distro = platform.linux_distribution()[0].lower()
+                except AttributeError:
+                    pass
                 finally:
                     # Get distro manually
                     if distro == '':
