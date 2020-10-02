@@ -245,7 +245,7 @@ def BuildTest(target, source, env):
     def process(o):
         """Process an object file as described in BuildTest.__doc__"""
         #tsp(tid, source[0], "process", o, S[o.state], os.path.exists(str(o)), list(map(str, o.sources)), list(map(str, o.depends)), o.implicit is None, S[o.sources[0].state])
-        while o.sources[0].state is SCons.Node.executing:
+        while o.sources[0].state == SCons.Node.executing:
             # Wait for the sources to be generated, so scanning the object does something useful!
             time.sleep(0.01) # 10 ms
         # Ensure scons' dependencies are set up, in a thread-safe fashion
@@ -380,7 +380,7 @@ def DetermineLibraryDependencies(env, partialGraph):
                 process_comp(dep, root, colours, gray_stack)
         colours[node] = BLACK
         gray_stack.pop()
-        if node is not root:
+        if node != root:
             node_lib = get_lib(node, linkArg=True)
             if node_lib:
                 full_graph[root].append(node_lib)
@@ -585,7 +585,7 @@ def GetVersionCpp(templateFilePath, env):
         # Extract just the revision number from the file.
         full_version = open(version_file).read().strip()
         last_component = full_version[1+full_version.rfind('.'):]
-        if last_component[0] is not 'r':
+        if last_component[0] != 'r':
             # It's a git SHA
             chaste_revision = '0x' + last_component[1:]
         else:
