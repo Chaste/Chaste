@@ -96,21 +96,17 @@ except ImportError:
                 distro = 'macosx'
             else:
                 # Get distro via Python
+                distro = ''
                 import platform
                 try:
                     distro = platform.linux_distribution()[0].lower()
+                finally:
                     # Get distro manually
                     if distro == '':
                         fp = open('/etc/issue')
-                        distro = fp.read().split()[0].lower()
+                        distro = fp.read().lower().replace('welcome to ', '')
+                        distro = distro.split()[0]
                         fp.close()
-                except AttributeError:
-                    platform_version = platform.version().lower()
-                    conf_available = [c[:-3] for c in os.listdir('python/hostconfig') if c.endswith('.py')]
-                    distro = 'default'
-                    for conf in conf_available:
-                        if conf in platform_version:
-                            distro = conf
             (file, pathname, desc) = imp.find_module(distro, ['python/hostconfig'])
             try:
                 conf = imp.load_module(distro, file, pathname, desc)
