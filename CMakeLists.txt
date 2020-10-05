@@ -343,11 +343,12 @@ endif ()
 ####  Find Boost
 ################################
 add_definitions (-DBOOST_ALL_NO_LIB)
-set (Boost_USE_STATIC_RUNTIME ON)
 if (BUILD_SHARED_LIBS)
     set (Boost_USE_STATIC_LIBS OFF)
+    set (Boost_USE_STATIC_RUNTIME OFF)
 else ()
     set (Boost_USE_STATIC_LIBS ON)
+    set (Boost_USE_STATIC_RUNTIME ON)
 endif ()
 find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
 list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
