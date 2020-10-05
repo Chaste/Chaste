@@ -59,11 +59,15 @@ public:
 
         double elapsed_time = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
+        double elapsed_time2 = Timer::GetElapsedTime();
+        TS_ASSERT_LESS_THAN(elapsed_time, elapsed_time2);
 
         double current_time = Timer::GetWallTime();
         // Note: on some systems this is seconds since the epoch, on others
         // it is seconds since last reboot!  So it might be quite small...
-        TS_ASSERT_LESS_THAN(10.0, current_time);
+        // On OpenMPI version 4 it appears to be seconds since the time of the first call
+        // i.e. a very small number 
+        TS_ASSERT_LESS_THAN(elapsed_time, current_time);
     }
 };
 
