@@ -1,4 +1,4 @@
-name: Ubuntu continuous test suite
+name: Ubuntu 18.04 continuous test suite
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
 
     - name: cmake build
       run: |
-        cmake --build . --parallel 2 --target Continuous
+        cmake --build . --parallel 1 --target Continuous
       working-directory: chaste-build-dir
 
     - name: cmake test
