@@ -59,6 +59,12 @@ public:
 
         double elapsed_time = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
+
+        // Small amount of work in a loop that can't be optimized by unrolling
+        for (unsigned i=2; i<1000; )
+        {
+            i += (int) floor(sqrt(i));
+        }
         double elapsed_time2 = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN(elapsed_time, elapsed_time2);
 
