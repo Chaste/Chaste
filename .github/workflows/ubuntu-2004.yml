@@ -1,0 +1,42 @@
+name: Ubuntu 20.04 continuous test suite
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+    name: Test on Ubuntu 20.04
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v2
+
+    - name: install dependencies
+      run: |
+        echo 'deb http://www.cs.ox.ac.uk/chaste/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 422C4D99
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: make build directory
+      run: |
+        mkdir chaste-build-dir
+
+    - name: cmake configure
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+      working-directory: chaste-build-dir
+
+    - name: cmake build
+      run: |
+        cmake --build . --parallel 1 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: cmake test
+      run: |
+        ctest -j2 -L Continuous --output-on-failure
+      working-directory: chaste-build-dir
