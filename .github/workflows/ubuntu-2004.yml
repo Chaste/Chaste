@@ -23,20 +23,44 @@ jobs:
         sudo apt install chaste-dependencies
 
     - name: make build directory
-      run: |
-        mkdir chaste-build-dir
+      run: mkdir chaste-build-dir
 
     - name: cmake configure
-      run: |
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug ..
       working-directory: chaste-build-dir
 
-    - name: cmake build
-      run: |
-        cmake --build . --parallel 1 --target Continuous
+    - name: build core libraries
+      run: cmake --build . --parallel 2 --target chaste_core
       working-directory: chaste-build-dir
 
-    - name: cmake test
-      run: |
-        ctest -j2 -L Continuous --output-on-failure
+    - name: build cell_based
+      run: cmake --build . --parallel 2 --target chaste_cell_based
+      working-directory: chaste-build-dir
+
+    - name: build crypt
+      run: cmake --build . --parallel 2 --target chaste_crypt
+      working-directory: chaste-build-dir
+
+    - name: build heart
+      run: cmake --build . --parallel 2 --target chaste_heart
+      working-directory: chaste-build-dir
+
+    - name: build lung
+      run: cmake --build . --parallel 2 --target chaste_lung
+      working-directory: chaste-build-dir
+
+    - name: build continuous test pack
+      run: cmake --build . --parallel 2 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: build nightly test pack
+      run: cmake --build . --parallel 2 --target Nightly
+      working-directory: chaste-build-dir
+
+    - name: run Continuous test pack
+      run: ctest -j2 -L Continuous --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j2 -L Nightly --output-on-failure
       working-directory: chaste-build-dir
