@@ -261,7 +261,7 @@ endif ()
 ################################
 find_package(PythonInterp 3.5 REQUIRED)
 if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
-    message (FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
+    message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
@@ -342,17 +342,17 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-add_definitions (-DBOOST_ALL_NO_LIB)
+add_definitions(-DBOOST_ALL_NO_LIB)
 if (BUILD_SHARED_LIBS)
-    set (Boost_USE_STATIC_LIBS OFF)
-    set (Boost_USE_STATIC_RUNTIME OFF)
+    set(Boost_USE_STATIC_LIBS OFF)
+    set(Boost_USE_STATIC_RUNTIME OFF)
 else ()
-    set (Boost_USE_STATIC_LIBS ON)
-    set (Boost_USE_STATIC_RUNTIME ON)
+    set(Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_STATIC_RUNTIME ON)
 endif ()
-find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
+list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
 ################################
