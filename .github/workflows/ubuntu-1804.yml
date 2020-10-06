@@ -37,9 +37,6 @@ jobs:
         mkdir -p chaste-build-dir
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
-    - name: make test directory
-      run: mkdir chaste-test-dir
-
     - name: cmake configure
       run: cmake -DCMAKE_BUILD_TYPE=Release ..
       working-directory: chaste-build-dir
