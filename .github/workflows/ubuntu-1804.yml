@@ -8,8 +8,11 @@ on:
 jobs:
   
   build-and-test:
+
     name: Test on Ubuntu 18.04
     runs-on: ubuntu-18.04
+    env:
+      CHASTE_TEST_OUTPUT: ${{ GITHUB_WORKSPACE }}/chaste-test-dir
     
     steps:
     - name: checkout repository
@@ -22,11 +25,23 @@ jobs:
         sudo apt update
         sudo apt install chaste-dependencies
 
-    - name: make build directory
-      run: mkdir chaste-build-dir
+    - name: cache build directory
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: chaste-build-dir
+        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html') }}
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: make test directory
+      run: mkdir chaste-test-dir
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+      run: cmake -DCMAKE_BUILD_TYPE=Release ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
