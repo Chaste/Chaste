@@ -35,7 +35,7 @@ jobs:
       id: cache
       with:
         path: chaste-build-dir
-        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html', 'gcc.version') }}
+        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html') }}-${{ hashFiles('gcc.version') }}
 
     - name: make build and test directories
       run: |
