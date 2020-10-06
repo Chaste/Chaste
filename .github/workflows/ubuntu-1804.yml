@@ -25,12 +25,17 @@ jobs:
         sudo apt update
         sudo apt install chaste-dependencies
 
+    - name: g++ version
+      run: |
+        g++ --version
+        g++ --version > gcc.version
+
     - name: cache build directory
       uses: actions/cache@v2
       id: cache
       with:
         path: chaste-build-dir
-        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html') }}
+        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html', 'gcc.version') }}
 
     - name: make build and test directories
       run: |
