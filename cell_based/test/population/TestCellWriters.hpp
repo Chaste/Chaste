@@ -83,6 +83,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
+#include "LegacyCellProliferativeTypesWriter.hpp"
 #include "CellRadiusWriter.hpp"
 #include "CellRosetteRankWriter.hpp"
 #include "CellVolumesWriter.hpp"
@@ -1112,12 +1113,12 @@ public:
         cell_iter->AddCellProperty(p_apoptotic_state);
 
         // Create output directory
-        std::string output_directory = "TestCellProliferativeTypesWriter";
+        std::string output_directory = "TestLegacyCellProliferativeTypesWriter";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellProliferativeTypesWriter<2,2> cell_writer;
+        LegacyCellProliferativeTypesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
@@ -1131,16 +1132,12 @@ public:
         // Test that the data are output correctly
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellWriters/results.vizcelltypes").CompareFiles();
 
-        // Test the correct data are returned for VTK output for the first cell
+        // Test the correct data are returned for VTK output for the first cell Note as this is labeled the legacy writer will overwrite the cell ptoliferative type.
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 5.0, 1e-6);
 
         // Test GetVtkCellDataName() method
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Legacy Cell types");
-
-        // James there is an issue here with the names of the cell writers -- if we call this 
-        // Prolif Cell types it wil mess with the current name Cell types where it is called in subsequent 
-        // codes -- Is this an issue we should worry about? 
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
@@ -1154,10 +1151,10 @@ public:
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativeTypesWriter.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "LegacyCellProliferativeTypesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellProliferativeTypesWriter<2,2>();
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new LegacyCellProliferativeTypesWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
