@@ -219,7 +219,7 @@ protected:
      * @param numLocalRows the number of rows that should be owned by this process.
      * @param isPeriodic whether the DistributedBoxCollection should be periodic.
      */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodic = false);
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX = false, bool isPeriodicInY = false, bool isPeriodicInZ = false);
 
      /** @return mpBoxCollection */
      DistributedBoxCollection<SPACE_DIM>* GetBoxCollection();
@@ -378,6 +378,11 @@ public:
      * the size of it if necessary.
      */
     void ResizeBoxCollection();
+
+    /**
+     * Gets the periodicity across processors information from mpBoxCollection
+    */
+    bool GetIsPeriodicAcrossProcsFromBoxCollection() const;
 
     /**
      * Iterate through each node and add it to its appropriate box.

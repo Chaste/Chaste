@@ -104,6 +104,15 @@ private:
     /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
     bool mIsPeriodicInX;
 
+    /** Whether the domain is periodic in the Y dimension. Note this currently only works for DIM=2*/
+    bool mIsPeriodicInY;
+
+    /** Whether the domain is periodic in the Z dimension. Note this doesn't work*/
+    bool mIsPeriodicInZ;
+
+    /** Whether the domain is periodic across different processors (i.e. in parallel if DIM==3 and periodic in z, or DIM==2 and periodic in Y)*/
+    bool mIsPeriodicAcrossProcs;
+
     /** Whether the local boxes have been setup or not. */
     bool mAreLocalBoxesSet;
 
@@ -152,7 +161,7 @@ public:
      * if there are more than 3 processes the domain will be swollen to [(0,0,0), (3,3,num_procs)].  The
      * user is warned when this happens.
      */
-    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, int localRows = PETSC_DECIDE);
+    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool mIsPeriodicInY=false, bool mIsPeriodicInZ=false, int localRows = PETSC_DECIDE);
 
 
     /**
@@ -269,6 +278,27 @@ public:
      * @return Whether the domain is periodic in x
      */
     bool GetIsPeriodicInX() const;
+
+        /**
+     * @return Whether the domain is periodic in y
+     */
+    bool GetIsPeriodicInY() const;
+
+        /**
+     * @return Whether the domain is periodic in z
+     */
+    bool GetIsPeriodicInZ() const;
+
+    /**
+    * @return Whether the domain is periodic across processors
+    */
+    bool GetIsPeriodicAcrossProcs() const;
+
+    /**
+     * A function to get whether each dimension is periodic
+     * @return A vector containing booleans of the periodicity
+     */
+    c_vector<bool,DIM> GetIsPeriodicAllDims() const;
 
     /**
      * @return the number of rows in the DIM-1th direction on this process.
@@ -467,7 +497,7 @@ inline void load_construct_data(
     }
 
     // Invoke inplace constructor to initialise instance. Assume non-periodic
-    ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, false, num_rows);
+    ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, false, false, false, num_rows);
 
     if (are_boxes_set)
     {

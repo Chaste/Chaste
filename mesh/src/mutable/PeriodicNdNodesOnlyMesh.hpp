@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CYLINDRICAL2DNODESONLYMESH_HPP_
-#define CYLINDRICAL2DNODESONLYMESH_HPP_
+#ifndef PERIODICNDNODESONLYMESH_HPP_
+#define PERIODICNDNODESONLYMESH_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -49,15 +49,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * GetVectorFromAtoB() so that simulation classes can treat this
  * class in exactly the same way as a NodesOnlyMesh<2>.
  */
-class Cylindrical2dNodesOnlyMesh: public NodesOnlyMesh<2>
+template<unsigned SPACE_DIM>
+class PeriodicNdNodesOnlyMesh: public NodesOnlyMesh<SPACE_DIM>
 {
 private:
-    /**
-     * The periodic width of the domain
-     */
-    double mWidth;
+    /*
+     * The number of periodic dimensions
+    */
+    unsigned mNumPeriodicDims;
 
-    friend class TestCylindrical2dNodesOnlyMesh;
+    /**
+     * The periodic widths of the domain
+     */
+    std::vector< double > mWidth;
+
+    /**
+     * Which dimensions are periodic
+     */
+    std::vector< unsigned > mPeriodicDims;
+
+    /*
+     * Whether a dimension is periodic
+     */
+    c_vector<bool,3> mIsDimPeriodic;
+
+    friend class TestPeriodicNdNodesOnlyMesh;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -75,8 +91,11 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<NodesOnlyMesh<2> >(*this);
+        archive & boost::serialization::base_object<NodesOnlyMesh<SPACE_DIM> >(*this);
+        archive & mNumPeriodicDims;
         archive & mWidth;
+        archive & mPeriodicDims;
+        archive & mIsDimPeriodic;
     }
 
 public:
@@ -84,9 +103,9 @@ public:
     /**
      * Constructor.
      *
-     * @param width the width of the mesh (circumference)
+     * @param width the periodic widths of the mesh
      */
-    Cylindrical2dNodesOnlyMesh(double width);
+    PeriodicNdNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY=false, bool periodicInZ=false);
 
     /**
      * Set up the box collection
@@ -96,7 +115,7 @@ public:
      * @param numLocalRows the number of rows of the collection that this process should own.
      * @param isPeriodic whether the box collection should be periodic. Defaults to true.
      */
-    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX = true, bool isPeriodicInY = false, bool isPeriodicInZ = false);
+    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX=false, bool isPeriodicInY=false, bool isPeriodicInZ=false);
 
     /**
      * Overridden GetVectorFromAtoB() method.
@@ -108,7 +127,7 @@ public:
      * @param rLocation2 the x and y co-ordinates of point 2
      * @return the vector from location1 to location2
      */
-    c_vector<double, 2> GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2);
+    c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2);
 
     /**
      * Overridden GetWidth() method.
@@ -121,7 +140,19 @@ public:
      */
     double GetWidth(const unsigned& rDimension) const;
 
-    /**
+    /*
+     * Method to get the periodic dimensions
+     * @return The value of the mPeriodicDims vector
+    */
+    std::vector<unsigned> GetPeriodicDimensions() const;
+
+    /*
+     * Method to get the width of the periodic dimensions
+     * @return The value of the mWidth vector
+    */
+    std::vector<double> GetPeriodicWidths() const;
+
+    /*
      * Overridden SetNode() method.
      *
      * If the location should be set outside a cylindrical boundary
@@ -131,7 +162,8 @@ public:
      * @param point is the new target location of the node
      * @param concreteMove is set to false if we want to skip the signed area tests in the parent Class Note this should always be false here
      */
-    void SetNode(unsigned nodeIndex, ChastePoint<2> point, bool concreteMove = false);
+     
+    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove = false);
 
     /**
      * Overridden AddNode() method.
@@ -139,7 +171,7 @@ public:
      * @param pNewNode  pointer to the new node
      * @return index of new node
      */
-    unsigned AddNode(Node<2>* pNewNode);
+    unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
     /**
      * Overridden RefreshMesh() method.
@@ -155,35 +187,71 @@ namespace boost
 namespace serialization
 {
 /**
- * Serialize information required to construct a Cylindrical2dNodesOnlyMesh.
+ * Serialize information required to construct a PeriodicNdNodesOnlyMesh.
  */
-template<class Archive>
+template<class Archive, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const Cylindrical2dNodesOnlyMesh * t, const unsigned int file_version)
+    Archive & ar, const PeriodicNdNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const double width = t->GetWidth(0);
-    ar & width;
+    const std::vector<unsigned> pdc_dims = t->GetPeriodicDimensions();
+    unsigned num_pdc_dims = pdc_dims.size();
+    // Required to save for the load function
+    ar << num_pdc_dims;
+    
+    for ( unsigned i=0; i<num_pdc_dims; i++ )
+    {
+        ar << pdc_dims[i];
+    }
+
+    const std::vector<double> width = t->GetPeriodicWidths();
+    for ( unsigned i=0; i < width.size(); i++ )
+    {
+        ar << width[i];
+    }
 }
 
 /**
- * De-serialize constructor parameters and initialise a Cylindrical2dNodesOnlyMesh.
+ * De-serialize constructor parameters and initialise a PeriodicNdNodesOnlyMesh.
  */
-template<class Archive>
+template<class Archive, unsigned SPACE_DIM>
 inline void load_construct_data(
-    Archive & ar, Cylindrical2dNodesOnlyMesh * t, const unsigned int file_version)
+    Archive & ar, PeriodicNdNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
 {
-    // Retrieve data from archive required to construct new instance
-    double width;
-    ar & width;
+    // Retrieve data from archive required to construct new instance of the mesh
+    unsigned dims_size;
+    ar & dims_size;
+
+    bool isPeriodicInX=false, isPeriodicInY=false, isPeriodicInZ=false;
+    for (unsigned i=0; i<dims_size; i++)
+    {
+        unsigned current_dim;
+        ar & current_dim;
+        switch(current_dim) {
+            case 0 :    isPeriodicInX = true;
+                        break;
+            case 1 :    isPeriodicInY = true;
+                        break;
+            case 2 :    isPeriodicInZ = true;
+                        break;
+        }
+    }
+
+    std::vector<double> width(dims_size);
+    for (unsigned i=0; i<dims_size; i++)
+    {
+        double current_width;
+        ar & current_width;
+        width[i] = current_width;
+    }
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)Cylindrical2dNodesOnlyMesh(width);
+    ::new(t)PeriodicNdNodesOnlyMesh<SPACE_DIM>(width,isPeriodicInX, isPeriodicInY, isPeriodicInZ);
 }
 }
 } // namespace ...
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(Cylindrical2dNodesOnlyMesh)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PeriodicNdNodesOnlyMesh)
 
-#endif /*CYLINDRICAL2DNODESONLYMESH_HPP_*/
+#endif /*PERIODICNDNODESONLYMESH_HPP_*/

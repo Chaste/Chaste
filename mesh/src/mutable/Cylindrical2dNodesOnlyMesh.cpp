@@ -43,7 +43,7 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
     assert(width > 0.0);
 }
 
-void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, bool isPeriodic)
+void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, bool isPeriodicInX, bool isPeriodicInY, bool isPeriodicInZ)
 {
     // Ensure that the width is a multiple of cut-off length
     if (fmod( mWidth,cutOffLength ) > 1e-14)
