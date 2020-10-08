@@ -94,7 +94,8 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth,std::vector<Node<2>* >
 
 void Toroidal2dMesh::CreateMirrorNodes()
 {
-    double half_way = 0.5*mWidth;
+    double half_width = 0.5*mWidth;
+    double half_depth = 0.5*mDepth;
 
     mLeftOriginals.clear();
     mLeftImages.clear();
@@ -105,6 +106,34 @@ void Toroidal2dMesh::CreateMirrorNodes()
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
 
+    mTopOriginals.clear();
+    mTopImages.clear();
+    mImageToTopOriginalNodeMap.clear();
+    mBottomOriginals.clear();
+    mBottomImages.clear();
+    mImageToBottomOriginalNodeMap.clear();
+    mTopPeriodicBoundaryElementIndices.clear();
+    mBottomPeriodicBoundaryElementIndices.clear();
+
+    mTopLeftOriginals.clear();
+    mTopLeftImages.clear();
+    mImageToTopLeftOriginalNodeMap.clear();
+    mBottomLeftOriginals.clear();
+    mBottomLeftImages.clear();
+    mImageToBottomLeftOriginalNodeMap.clear();
+    mTopLeftPeriodicBoundaryElementIndices.clear();
+    mBottomLeftPeriodicBoundaryElementIndices.clear();
+
+    mTopRightOriginals.clear();
+    mTopRightImages.clear();
+    mImageToTopRightOriginalNodeMap.clear();
+    mBottomRightOriginals.clear();
+    mBottomRightImages.clear();
+    mImageToBottomRightOriginalNodeMap.clear();
+    mTopRightPeriodicBoundaryElementIndices.clear();
+    mBottomRightPeriodicBoundaryElementIndices.clear();
+
+
     for (AbstractMesh<2,2>::NodeIterator node_iter = GetNodeIteratorBegin();
          node_iter != GetNodeIteratorEnd();
          ++node_iter)
@@ -113,13 +142,16 @@ void Toroidal2dMesh::CreateMirrorNodes()
         location = node_iter->rGetLocation();
         unsigned this_node_index = node_iter->GetIndex();
         double this_node_x_location = location[0];
+        double this_node_y_location = location[1];
 
         // Check the mesh currently conforms to the dimensions given
         assert(0.0 <= location[0]);
         assert(location[0] <= mWidth);
+        assert(0.0 <= location[1]);
+        assert(location[1] <= mDepth);
 
         // Put the nodes which are to be mirrored in the relevant vectors
-        if (this_node_x_location < half_way)
+        if (this_node_x_location < half_width)
         {
             mLeftOriginals.push_back(this_node_index);
         }
@@ -127,6 +159,41 @@ void Toroidal2dMesh::CreateMirrorNodes()
         {
             mRightOriginals.push_back(this_node_index);
         }
+
+        if (this_node_y_location < half_depth)
+        {
+            mBottomOriginals.push_back(this_node_index);
+        }
+        else
+        {
+            mTopOriginals.push_back(this_node_index);
+        }
+
+        if (this_node_x_location < half_width)
+        {
+            if(this_node_y_location < half_depth)
+            {
+                mBottomLeftOriginals.push_back(this_node_index);
+            }
+            else
+            {
+                mTopLeftOriginals.push_back(this_node_index);
+            }
+        }
+        else
+        {
+            if(this_node_y_location < half_depth)
+            {
+                mBottomRightOriginals.push_back(this_node_index);
+            }
+            else
+            {
+                mTopRightOriginals.push_back(this_node_index);
+            }
+        }
+
+
+        
     }
 
     // For each left original node, create an image node and record its new index
@@ -157,36 +224,127 @@ void Toroidal2dMesh::CreateMirrorNodes()
     assert(mLeftOriginals.size() == mLeftImages.size());
     assert(mImageToLeftOriginalNodeMap.size() == mLeftOriginals.size());
     assert(mImageToRightOriginalNodeMap.size() == mRightOriginals.size());
-}
 
-void Toroidal2dMesh::CreateHaloNodes()
-{
-    UpdateTopAndBottom();
-
-    mTopHaloNodes.clear();
-    mBottomHaloNodes.clear();
-
-    unsigned num_halo_nodes = (unsigned)(floor(mWidth*2.0));
-    double halo_node_separation = mWidth/((double)(num_halo_nodes));
-    double y_top_coordinate = mTop + halo_node_separation;
-    double y_bottom_coordinate = mBottom - halo_node_separation;
-
-    c_vector<double, 2> location;
-    for (unsigned i=0; i<num_halo_nodes; i++)
+    // For each bottom original node, create an image node and record its new index
+    for (unsigned i=0; i<mBottomOriginals.size(); i++)
     {
-       double x_coordinate = 0.5*halo_node_separation + (double)(i)*halo_node_separation;
+        c_vector<double, 2> location;
+        location = mNodes[mBottomOriginals[i]]->rGetLocation();
+        location[1] = location[1] + mDepth;
 
-       // Inserting top halo node in mesh
-       location[0] = x_coordinate;
-       location[1] = y_top_coordinate;
-       unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
-       mTopHaloNodes.push_back(new_node_index);
-
-       location[1] = y_bottom_coordinate;
-       new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
-       mBottomHaloNodes.push_back(new_node_index);
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mBottomImages.push_back(new_node_index);
+        mImageToBottomOriginalNodeMap[new_node_index] = mBottomOriginals[i];
     }
+
+    // For each top original node, create an image node and record its new index
+    for (unsigned i=0; i<mTopOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mTopOriginals[i]]->rGetLocation();
+        location[1] = location[1] - mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mTopImages.push_back(new_node_index);
+        mImageToTopOriginalNodeMap[new_node_index] = mTopOriginals[i];
+    }
+    assert(mTopOriginals.size() == mTopImages.size());
+    assert(mBottomOriginals.size() == mBottomImages.size());
+    assert(mImageToTopOriginalNodeMap.size() == mTopOriginals.size());
+    assert(mImageToBottomOriginalNodeMap.size() == mBottomOriginals.size());
+    
+    // For each top right original node, create an image node and record its new index
+    for (unsigned i=0; i<mTopRightOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mTopRightOriginals[i]]->rGetLocation();
+        location[0] = location[0] - mWidth;
+        location[1] = location[1] - mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mTopRightImages.push_back(new_node_index);
+        mImageToTopRightOriginalNodeMap[new_node_index] = mTopRightOriginals[i];
+    }
+
+    // For each top left original node, create an image node and record its new index
+    for (unsigned i=0; i<mTopLeftOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mTopLeftOriginals[i]]->rGetLocation();
+        location[0] = location[0] + mWidth;
+        location[1] = location[1] - mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mTopLeftImages.push_back(new_node_index);
+        mImageToTopLeftOriginalNodeMap[new_node_index] = mTopLeftOriginals[i];
+    }
+
+    // For each bottom right original node, create an image node and record its new index
+    for (unsigned i=0; i<mBottomRightOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mBottomRightOriginals[i]]->rGetLocation();
+        location[0] = location[0] - mWidth;
+        location[1] = location[1] + mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mBottomRightImages.push_back(new_node_index);
+        mImageToBottomRightOriginalNodeMap[new_node_index] = mBottomRightOriginals[i];
+    }
+
+    // For each bottom left original node, create an image node and record its new index
+    for (unsigned i=0; i<mBottomLeftOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mBottomLeftOriginals[i]]->rGetLocation();
+        location[0] = location[0] + mWidth;
+        location[1] = location[1] + mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mBottomLeftImages.push_back(new_node_index);
+        mImageToBottomLeftOriginalNodeMap[new_node_index] = mBottomLeftOriginals[i];
+    }
+
+    assert(mTopRightOriginals.size() == mTopRightImages.size());
+    assert(mTopLeftOriginals.size() == mTopLeftImages.size());
+    assert(mBottomRightOriginals.size() == mBottomRightImages.size());
+    assert(mBottomLeftOriginals.size() == mBottomLeftImages.size());
+    assert(mImageToTopRightOriginalNodeMap.size() == mTopRightOriginals.size());
+    assert(mImageToTopLeftOriginalNodeMap.size() == mTopLeftOriginals.size());
+    assert(mImageToBottomRightOriginalNodeMap.size() == mBottomRightOriginals.size());
+    assert(mImageToBottomLeftOriginalNodeMap.size() == mBottomLeftOriginals.size());
+
+    
 }
+
+// void Toroidal2dMesh::CreateHaloNodes()
+// {
+//     UpdateTopAndBottom();
+
+//     mTopHaloNodes.clear();
+//     mBottomHaloNodes.clear();
+
+//     unsigned num_halo_nodes = (unsigned)(floor(mWidth*2.0));
+//     double halo_node_separation = mWidth/((double)(num_halo_nodes));
+//     double y_top_coordinate = mTop + halo_node_separation;
+//     double y_bottom_coordinate = mBottom - halo_node_separation;
+
+//     c_vector<double, 2> location;
+//     for (unsigned i=0; i<num_halo_nodes; i++)
+//     {
+//        double x_coordinate = 0.5*halo_node_separation + (double)(i)*halo_node_separation;
+
+//        // Inserting top halo node in mesh
+//        location[0] = x_coordinate;
+//        location[1] = y_top_coordinate;
+//        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+//        mTopHaloNodes.push_back(new_node_index);
+
+//        location[1] = y_bottom_coordinate;
+//        new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+//        mBottomHaloNodes.push_back(new_node_index);
+//     }
+// }
 
 void Toroidal2dMesh::ReMesh(NodeMap& rMap)
 {
@@ -204,7 +362,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         }
     }
 
-    CreateHaloNodes();
+    // CreateHaloNodes();
 
     // Create mirrored nodes for the normal remesher to work with
     CreateMirrorNodes();
@@ -248,10 +406,62 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         mImageToRightOriginalNodeMap[mRightImages[i]] = mRightOriginals[i];
     }
 
-    for (unsigned i=0; i<mTopHaloNodes.size(); i++)
+    mImageToTopOriginalNodeMap.clear();
+    mImageToBottomOriginalNodeMap.clear();
+
+    assert(mTopOriginals.size() == mTopImages.size());
+    assert(mBottomOriginals.size() == mBottomImages.size());
+
+    for (unsigned i=0; i<mTopOriginals.size(); i++)
     {
-        mTopHaloNodes[i] = big_map.GetNewIndex(mTopHaloNodes[i]);
-        mBottomHaloNodes[i] = big_map.GetNewIndex(mBottomHaloNodes[i]);
+        mTopOriginals[i] = big_map.GetNewIndex(mTopOriginals[i]);
+        mTopImages[i] = big_map.GetNewIndex(mTopImages[i]);
+        mImageToTopOriginalNodeMap[mTopImages[i]] = mTopOriginals[i];
+    }
+
+    for (unsigned i=0; i<mBottomOriginals.size(); i++)
+    {
+        mBottomOriginals[i] = big_map.GetNewIndex(mBottomOriginals[i]);
+        mBottomImages[i] = big_map.GetNewIndex(mBottomImages[i]);
+        mImageToBottomOriginalNodeMap[mBottomImages[i]] = mBottomOriginals[i];
+    }
+
+    mImageToTopLeftOriginalNodeMap.clear();
+    mImageToBottomLeftOriginalNodeMap.clear();
+    mImageToTopRightOriginalNodeMap.clear();
+    mImageToBottomRightOriginalNodeMap.clear();
+
+    assert(mTopLeftOriginals.size() == mTopLeftImages.size());
+    assert(mBottomLeftOriginals.size() == mBottomLeftImages.size());
+    assert(mTopRightOriginals.size() == mTopRightImages.size());
+    assert(mBottomRightOriginals.size() == mBottomRightImages.size());
+
+    for (unsigned i=0; i<mTopLeftOriginals.size(); i++)
+    {
+        mTopLeftOriginals[i] = big_map.GetNewIndex(mTopLeftOriginals[i]);
+        mTopLeftImages[i] = big_map.GetNewIndex(mTopLeftImages[i]);
+        mImageToTopLeftOriginalNodeMap[mTopLeftImages[i]] = mTopLeftOriginals[i];
+    }
+
+    for (unsigned i=0; i<mBottomLeftOriginals.size(); i++)
+    {
+        mBottomLeftOriginals[i] = big_map.GetNewIndex(mBottomLeftOriginals[i]);
+        mBottomLeftImages[i] = big_map.GetNewIndex(mBottomLeftImages[i]);
+        mImageToBottomLeftOriginalNodeMap[mBottomLeftImages[i]] = mBottomLeftOriginals[i];
+    }
+
+    for (unsigned i=0; i<mTopRightOriginals.size(); i++)
+    {
+        mTopRightOriginals[i] = big_map.GetNewIndex(mTopRightOriginals[i]);
+        mTopRightImages[i] = big_map.GetNewIndex(mTopRightImages[i]);
+        mImageToTopRightOriginalNodeMap[mTopRightImages[i]] = mTopRightOriginals[i];
+    }
+
+    for (unsigned i=0; i<mBottomRightOriginals.size(); i++)
+    {
+        mBottomRightOriginals[i] = big_map.GetNewIndex(mBottomRightOriginals[i]);
+        mBottomRightImages[i] = big_map.GetNewIndex(mBottomRightImages[i]);
+        mImageToBottomRightOriginalNodeMap[mBottomRightImages[i]] = mBottomRightOriginals[i];
     }
 
     /*
@@ -266,8 +476,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      * a proper periodic mesh.
      */
     ReconstructCylindricalMesh();
-
-    DeleteHaloNodes();
 
     /*
      * Create a random boundary element between two nodes of the first
@@ -467,26 +675,28 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     }
 }
 
-void Toroidal2dMesh::DeleteHaloNodes()
-{
-    assert(mTopHaloNodes.size() == mBottomHaloNodes.size());
-    for (unsigned i=0; i<mTopHaloNodes.size(); i++)
-    {
-        DeleteBoundaryNodeAt(mTopHaloNodes[i]);
-        DeleteBoundaryNodeAt(mBottomHaloNodes[i]);
-    }
-}
+// void Toroidal2dMesh::DeleteHaloNodes()
+// {
+//     assert(mTopHaloNodes.size() == mBottomHaloNodes.size());
+//     for (unsigned i=0; i<mTopHaloNodes.size(); i++)
+//     {
+//         DeleteBoundaryNodeAt(mTopHaloNodes[i]);
+//         DeleteBoundaryNodeAt(mBottomHaloNodes[i]);
+//     }
+// }
 
 c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
 {
     assert(mWidth > 0.0);
+    assert(mDepth > 0.0);
 
     c_vector<double, 2> vector = rLocation2 - rLocation1;
     vector[0] = fmod(vector[0], mWidth);
+    vector[1] = fmod(vector[1], mDepth);
 
     /*
-     * Handle the cylindrical condition here: if the points are more
-     * than halfway around the cylinder apart, measure the other way.
+     * Handle the toroidal condition here: if the points are more
+     * than halfway around the torus apart, measure the other way.
      */
     if (vector[0] > 0.5*mWidth)
     {
@@ -495,6 +705,15 @@ c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>&
     else if (vector[0] < -0.5*mWidth)
     {
         vector[0] += mWidth;
+    }
+
+    if (vector[1] > 0.5*mDepth)
+    {
+        vector[1] -= mDepth;
+    }
+    else if (vector[1] < -0.5*mDepth)
+    {
+        vector[1] += mDepth;
     }
     return vector;
 }
@@ -511,6 +730,18 @@ void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concrete
     {
         // Move point to the right
         point.SetCoordinate(0, point.rGetLocation()[0] + mWidth);
+    }
+
+        // Perform a periodic movement if necessary
+    if (point.rGetLocation()[1] >= mDepth)
+    {
+        // Move point to the left
+        point.SetCoordinate(1, point.rGetLocation()[0] - mDepth);
+    }
+    else if (point.rGetLocation()[1] < 0.0)
+    {
+        // Move point to the right
+        point.SetCoordinate(1, point.rGetLocation()[0] + mDepth);
     }
 
     // Update the node's location
@@ -570,13 +801,27 @@ void Toroidal2dMesh::CorrectNonPeriodicMesh()
     std::set<unsigned> temp_left_hand_side_elements = mLeftPeriodicBoundaryElementIndices;
     std::set<unsigned> temp_right_hand_side_elements = mRightPeriodicBoundaryElementIndices;
 
-//    if ((mLeftPeriodicBoundaryElementIndices.size()!=mRightPeriodicBoundaryElementIndices.size())
-//            || (temp_left_hand_side_elements.size() <= 2)
-//            || (temp_right_hand_side_elements.size() <= 2) )
-//    {
-//        mMismatchedBoundaryElements = true;
-//    }
+    std::set<unsigned> temp_top_hand_side_elements = mTopPeriodicBoundaryElementIndices;
+    std::set<unsigned> temp_bottom_hand_side_elements = mBottomPeriodicBoundaryElementIndices;
+
+    std::set<unsigned> temp_top_left_hand_side_elements = mTopLeftPeriodicBoundaryElementIndices;
+    std::set<unsigned> temp_bottom_left_hand_side_elements = mBottomLeftPeriodicBoundaryElementIndices;
+
+    std::set<unsigned> temp_top_right_hand_side_elements = mTopRightPeriodicBoundaryElementIndices;
+    std::set<unsigned> temp_bottom_right_hand_side_elements = mBottomRightPeriodicBoundaryElementIndices;
+
+    
+
+    //    if ((mLeftPeriodicBoundaryElementIndices.size()!=mRightPeriodicBoundaryElementIndices.size())
+    //            || (temp_left_hand_side_elements.size() <= 2)
+    //            || (temp_right_hand_side_elements.size() <= 2) )
+    //    {
+    //        mMismatchedBoundaryElements = true;
+    //    }
     assert(mLeftPeriodicBoundaryElementIndices.size()==mRightPeriodicBoundaryElementIndices.size());
+    assert(mTopPeriodicBoundaryElementIndices.size()==mBottomPeriodicBoundaryElementIndices.size());
+    assert(mTopLeftPeriodicBoundaryElementIndices.size()==mBottomRightPeriodicBoundaryElementIndices.size());
+    assert(mTopRightPeriodicBoundaryElementIndices.size()==mBottomLeftPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the left periodic boundary
     for (std::set<unsigned>::iterator left_iter = mLeftPeriodicBoundaryElementIndices.begin();
@@ -630,6 +875,162 @@ void Toroidal2dMesh::CorrectNonPeriodicMesh()
         }
     }
 
+    // Go through all of the elements on the top periodic boundary
+    for (std::set<unsigned>::iterator top_iter = mTopPeriodicBoundaryElementIndices.begin();
+         top_iter != mTopPeriodicBoundaryElementIndices.end();
+         ++top_iter)
+    {
+        unsigned elem_index = *top_iter;
+
+        Element<2,2>* p_element = GetElement(elem_index);
+
+        /*
+         * Make lists of the nodes which the elements on the top contain and
+         * the nodes which should be in a corresponding element on the bottom.
+         */
+        c_vector<unsigned,3> original_element_node_indices;
+        c_vector<unsigned,3> corresponding_element_node_indices;
+        for (unsigned i=0; i<3; i++)
+        {
+            original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
+            corresponding_element_node_indices[i] = GetCorrespondingNodeIndex(original_element_node_indices[i]);
+        }
+
+        // Search the bottom hand side elements for the corresponding element
+        for (std::set<unsigned>::iterator bottom_iter = mBottomPeriodicBoundaryElementIndices.begin();
+             bottom_iter != mBottomPeriodicBoundaryElementIndices.end();
+             ++bottom_iter)
+        {
+            unsigned corresponding_elem_index = *bottom_iter;
+
+            Element<2,2>* p_corresponding_element = GetElement(corresponding_elem_index);
+
+            bool is_corresponding_node = true;
+
+            for (unsigned i=0; i<3; i++)
+            {
+                if ((corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(2)) )
+                {
+                    is_corresponding_node = false;
+                    break;
+                }
+            }
+
+            if (is_corresponding_node)
+            {
+                // Remove original and corresponding element from sets
+                temp_top_hand_side_elements.erase(elem_index);
+                temp_bottom_hand_side_elements.erase(corresponding_elem_index);
+            }
+        }
+    }
+
+     // Go through all of the elements on the top left periodic boundary
+    for (std::set<unsigned>::iterator top_left_iter = mTopLeftPeriodicBoundaryElementIndices.begin();
+         top_left_iter != mTopLeftPeriodicBoundaryElementIndices.end();
+         ++top_left_iter)
+    {
+        unsigned elem_index = *top_left_iter;
+
+        Element<2,2>* p_element = GetElement(elem_index);
+
+        /*
+         * Make lists of the nodes which the elements on the top left contain and
+         * the nodes which should be in a corresponding element on the bottom right.
+         */
+        c_vector<unsigned,3> original_element_node_indices;
+        c_vector<unsigned,3> corresponding_element_node_indices;
+        for (unsigned i=0; i<3; i++)
+        {
+            original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
+            corresponding_element_node_indices[i] = GetCorrespondingNodeIndex(original_element_node_indices[i]);
+        }
+
+        // Search the bottom right hand side elements for the corresponding element
+        for (std::set<unsigned>::iterator bottom_right_iter = mBottomRightPeriodicBoundaryElementIndices.begin();
+             bottom_right_iter != mBottomRightPeriodicBoundaryElementIndices.end();
+             ++bottom_right_iter)
+        {
+            unsigned corresponding_elem_index = *bottom_right_iter;
+
+            Element<2,2>* p_corresponding_element = GetElement(corresponding_elem_index);
+
+            bool is_corresponding_node = true;
+
+            for (unsigned i=0; i<3; i++)
+            {
+                if ((corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(2)) )
+                {
+                    is_corresponding_node = false;
+                    break;
+                }
+            }
+
+            if (is_corresponding_node)
+            {
+                // Remove original and corresponding element from sets
+                temp_top_left_hand_side_elements.erase(elem_index);
+                temp_bottom_right_hand_side_elements.erase(corresponding_elem_index);
+            }
+        }
+    }
+
+    // Go through all of the elements on the top right periodic boundary
+    for (std::set<unsigned>::iterator top_right_iter = mTopRightPeriodicBoundaryElementIndices.begin();
+         top_right_iter != mTopRightPeriodicBoundaryElementIndices.end();
+         ++top_right_iter)
+    {
+        unsigned elem_index = *top_right_iter;
+
+        Element<2,2>* p_element = GetElement(elem_index);
+
+        /*
+         * Make lists of the nodes which the elements on the top right contain and
+         * the nodes which should be in a corresponding element on the bottom left.
+         */
+        c_vector<unsigned,3> original_element_node_indices;
+        c_vector<unsigned,3> corresponding_element_node_indices;
+        for (unsigned i=0; i<3; i++)
+        {
+            original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
+            corresponding_element_node_indices[i] = GetCorrespondingNodeIndex(original_element_node_indices[i]);
+        }
+
+        // Search the bottom left hand side elements for the corresponding element
+        for (std::set<unsigned>::iterator bottom_left_iter = mBottomLeftPeriodicBoundaryElementIndices.begin();
+             bottom_left_iter != mBottomLeftPeriodicBoundaryElementIndices.end();
+             ++bottom_left_iter)
+        {
+            unsigned corresponding_elem_index = *bottom_left_iter;
+
+            Element<2,2>* p_corresponding_element = GetElement(corresponding_elem_index);
+
+            bool is_corresponding_node = true;
+
+            for (unsigned i=0; i<3; i++)
+            {
+                if ((corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
+                    (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(2)) )
+                {
+                    is_corresponding_node = false;
+                    break;
+                }
+            }
+
+            if (is_corresponding_node)
+            {
+                // Remove original and corresponding element from sets
+                temp_top_right_hand_side_elements.erase(elem_index);
+                temp_bottom_left_hand_side_elements.erase(corresponding_elem_index);
+            }
+        }
+    }
+
     /*
      * If either of these ever throw you have more than one situation where the mesher has an option
      * of how to mesh. If it does ever throw you need to be cleverer and match up the
@@ -663,6 +1064,88 @@ void Toroidal2dMesh::CorrectNonPeriodicMesh()
                  * We need to knock the pair out and then rerun this function. This shouldn't be
                  * too hard to do but is as yet unnecessary.
                  */
+                 TRACE("We got more than two mixed elements (left-right), check GenerateVectorsOfElementsStraddlingPeriodicBoundaries"); //Remove me
+                NEVER_REACHED;
+            }
+        }
+    }
+
+    if (temp_top_hand_side_elements.empty() || temp_bottom_hand_side_elements.empty())
+    {
+        assert(temp_bottom_hand_side_elements.empty());
+        assert(temp_top_hand_side_elements.empty());
+    }
+    else
+    {
+        if (temp_bottom_hand_side_elements.size() == 2 && temp_top_hand_side_elements.size() == 2)
+        {
+            if (temp_bottom_hand_side_elements.size() == 2)
+            {
+                // Use the bottom hand side meshing and map to top
+                UseTheseElementsToDecideMeshing(temp_bottom_hand_side_elements);
+            }
+            else
+            {
+                /*
+                 * If you get here there are more than two mixed up elements on the periodic edge.
+                 * We need to knock the pair out and then rerun this function. This shouldn't be
+                 * too hard to do but is as yet unnecessary.
+                 */
+                 TRACE("We got more than two mixed elements (top-bottom), check GenerateVectorsOfElementsStraddlingPeriodicBoundaries"); //Remove me
+                NEVER_REACHED;
+            }
+        }
+    }
+
+    if (temp_top_left_hand_side_elements.empty() || temp_bottom_right_hand_side_elements.empty())
+    {
+        assert(temp_bottom_right_hand_side_elements.empty());
+        assert(temp_top_left_hand_side_elements.empty());
+    }
+    else
+    {
+        if (temp_bottom_right_hand_side_elements.size() == 2 && temp_top_left_hand_side_elements.size() == 2)
+        {
+            if (temp_bottom_right_hand_side_elements.size() == 2)
+            {
+                // Use the bottom right hand side meshing and map to top left
+                UseTheseElementsToDecideMeshing(temp_bottom_right_hand_side_elements);
+            }
+            else
+            {
+                /*
+                 * If you get here there are more than two mixed up elements on the periodic edge.
+                 * We need to knock the pair out and then rerun this function. This shouldn't be
+                 * too hard to do but is as yet unnecessary.
+                 */
+                 TRACE("We got more than two mixed elements (top_left-bottom_right), check GenerateVectorsOfElementsStraddlingPeriodicBoundaries"); //Remove me
+                NEVER_REACHED;
+            }
+        }
+    }
+
+    if (temp_top_right_hand_side_elements.empty() || temp_bottom_left_hand_side_elements.empty())
+    {
+        assert(temp_bottom_left_hand_side_elements.empty());
+        assert(temp_top_right_hand_side_elements.empty());
+    }
+    else
+    {
+        if (temp_bottom_left_hand_side_elements.size() == 2 && temp_top_right_hand_side_elements.size() == 2)
+        {
+            if (temp_bottom_left_hand_side_elements.size() == 2)
+            {
+                // Use the bottom left hand side meshing and map to top right
+                UseTheseElementsToDecideMeshing(temp_bottom_left_hand_side_elements);
+            }
+            else
+            {
+                /*
+                 * If you get here there are more than two mixed up elements on the periodic edge.
+                 * We need to knock the pair out and then rerun this function. This shouldn't be
+                 * too hard to do but is as yet unnecessary.
+                 */
+                 TRACE("We got more than two mixed elements (top_right-bottom_left), check GenerateVectorsOfElementsStraddlingPeriodicBoundaries"); //Remove me
                 NEVER_REACHED;
             }
         }
@@ -675,11 +1158,11 @@ void Toroidal2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSi
 
     // We find the four nodes surrounding the dodgy meshing, on each side.
     std::set<unsigned> main_four_nodes;
-    for (std::set<unsigned>::iterator left_iter = rMainSideElements.begin();
-         left_iter != rMainSideElements.end();
-         ++left_iter)
+    for (std::set<unsigned>::iterator direction_iter = rMainSideElements.begin();
+         direction_iter != rMainSideElements.end();
+         ++direction_iter)
     {
-        unsigned elem_index = *left_iter;
+        unsigned elem_index = *direction_iter;
         Element<2,2>* p_element = GetElement(elem_index);
         for (unsigned i=0; i<3; i++)
         {
@@ -699,8 +1182,8 @@ void Toroidal2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSi
     assert(other_four_nodes.size() == 4);
 
     /*
-     * Find the elements surrounded by the nodes on the right
-     * and change them to match the elements on the left.
+     * Find the elements surrounded by the nodes on the initial direction
+     * and change them to match the elements on the mapped direction.
      */
     std::vector<unsigned> corresponding_elements;
 
@@ -756,9 +1239,27 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
 
+    mTopPeriodicBoundaryElementIndices.clear();
+    mBottomPeriodicBoundaryElementIndices.clear();
+
+    mTopLeftPeriodicBoundaryElementIndices.clear();
+    mBottomLeftPeriodicBoundaryElementIndices.clear();
+
+    mTopRightPeriodicBoundaryElementIndices.clear();
+    mBottomRightPeriodicBoundaryElementIndices.clear();
+
     unsigned incidences_of_zero_left_image_nodes = 0;
     unsigned incidences_of_zero_right_image_nodes = 0;
 
+    unsigned incidences_of_zero_top_image_nodes = 0;
+    unsigned incidences_of_zero_bottom_image_nodes = 0;
+    
+    unsigned incidences_of_zero_top_left_image_nodes = 0;
+    unsigned incidences_of_zero_bottom_left_image_nodes = 0;
+    
+    unsigned incidences_of_zero_top_right_image_nodes = 0;
+    unsigned incidences_of_zero_bottom_right_image_nodes = 0;
+    
     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
@@ -766,6 +1267,17 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
         // Left images are on the right of the mesh
         unsigned number_of_left_image_nodes = 0;
         unsigned number_of_right_image_nodes = 0;
+
+        // Top images are on the bottom of the mesh
+        unsigned number_of_top_image_nodes = 0;
+        unsigned number_of_bottom_image_nodes = 0;
+
+        // Corners... 
+        unsigned number_of_top_left_image_nodes = 0;
+        unsigned number_of_bottom_left_image_nodes = 0;
+
+        unsigned number_of_top_right_image_nodes = 0;
+        unsigned number_of_bottom_right_image_nodes = 0;
 
         for (unsigned i=0; i<3; i++)
         {
@@ -779,6 +1291,34 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
             {
                 number_of_right_image_nodes++;
             }
+
+            if (mImageToTopOriginalNodeMap.find(this_node_index) != mImageToTopOriginalNodeMap.end())
+            {
+                number_of_top_image_nodes++;
+            }
+            else if (mImageToBottomOriginalNodeMap.find(this_node_index) != mImageToBottomOriginalNodeMap.end())
+            {
+                number_of_bottom_image_nodes++;
+            }
+
+            if (mImageToTopLeftOriginalNodeMap.find(this_node_index) != mImageToTopLeftOriginalNodeMap.end())
+            {
+                number_of_top_left_image_nodes++;
+            }
+            else if (mImageToBottomRightOriginalNodeMap.find(this_node_index) != mImageToBottomRightOriginalNodeMap.end())
+            {
+                number_of_bottom_right_image_nodes++;
+            }
+
+            if (mImageToTopRightOriginalNodeMap.find(this_node_index) != mImageToTopRightOriginalNodeMap.end())
+            {
+                number_of_top_right_image_nodes++;
+            }
+            else if (mImageToBottomLeftOriginalNodeMap.find(this_node_index) != mImageToBottomLeftOriginalNodeMap.end())
+            {
+                number_of_bottom_left_image_nodes++;
+            }
+
         }
 
         if ((number_of_left_image_nodes == 0) && (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2) )
@@ -790,15 +1330,32 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
             incidences_of_zero_right_image_nodes++;
         }
 
-        /* SJ - Have checked the following:
-         * - It is never the case that number_of_left_image_nodes + number_of_right_image_nodes > 3
-         * - There are 1264 incidences of zero left image nodes, and 1252 incidences of zero right image nodes
-         * - There are 450 incidences of zero left image nodes and non-zero right image nodes; 438 incidences of zero right image nodes and non-zero left
-         *   image nodes
-         * - There are 40 incidences of 0 left image nodes, and 1/2 right image nodes; 39 incidences of 0 right image nodes and 1/2 left image nodes
-         * As this corresponds to 40 left-hand boundary elements and 39 right-hand boundary elements, then it is this extra occurrence of a 0 left
-         * image node with 1/2 right image nodes that is responsible for the extra element.
-         */
+        if ((number_of_top_image_nodes == 0) && (number_of_bottom_image_nodes == 1 || number_of_bottom_image_nodes == 2) )
+        {
+            incidences_of_zero_top_image_nodes++;
+        }
+        if ((number_of_bottom_image_nodes == 0) && (number_of_top_image_nodes == 1 || number_of_top_image_nodes == 2) )
+        {
+            incidences_of_zero_bottom_image_nodes++;
+        }
+
+        if ((number_of_top_left_image_nodes == 0) && (number_of_bottom_right_image_nodes == 1 || number_of_bottom_right_image_nodes == 2) )
+        {
+            incidences_of_zero_top_left_image_nodes++;
+        }
+        if ((number_of_bottom_right_image_nodes == 0) && (number_of_top_left_image_nodes == 1 || number_of_top_left_image_nodes == 2) )
+        {
+            incidences_of_zero_bottom_right_image_nodes++;
+        }
+
+        if ((number_of_top_right_image_nodes == 0) && (number_of_bottom_left_image_nodes == 1 || number_of_bottom_left_image_nodes == 2) )
+        {
+            incidences_of_zero_top_right_image_nodes++;
+        }
+        if ((number_of_bottom_left_image_nodes == 0) && (number_of_top_right_image_nodes == 1 || number_of_top_right_image_nodes == 2) )
+        {
+            incidences_of_zero_bottom_left_image_nodes++;
+        }
 
         // Elements on the left hand side (images of right nodes)
         if (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2)
@@ -811,18 +1368,66 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
         {
             mRightPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
         }
+
+        // Elements on the top hand side (images of bottom nodes)
+        if (number_of_bottom_image_nodes == 1 || number_of_bottom_image_nodes == 2)
+        {
+            mTopPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
+        }
+
+        // Elements on the bottom hand side (images of top nodes)
+        if (number_of_top_image_nodes == 1 || number_of_top_image_nodes == 2)
+        {
+            mBottomPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
+        }
+
+        // Elements on the top left corner (images of bottom right nodes)
+        if (number_of_bottom_right_image_nodes == 1 || number_of_bottom_right_image_nodes == 2)
+        {
+            mTopLeftPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
+        }
+
+        // Elements on the bottom right corner (images of top left nodes)
+        if (number_of_top_left_image_nodes == 1 || number_of_top_left_image_nodes == 2)
+        {
+            mBottomRightPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
+        }
+
+        // Elements on the top right corner (images of bottom left nodes)
+        if (number_of_bottom_left_image_nodes == 1 || number_of_bottom_left_image_nodes == 2)
+        {
+            mTopRightPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
+        }
+
+        // Elements on the bottom left corner (images of top right nodes)
+        if (number_of_top_right_image_nodes == 1 || number_of_top_right_image_nodes == 2)
+        {
+            mBottomLeftPeriodicBoundaryElementIndices.insert(elem_iter->GetIndex());
+        }
+
     }
 
-//    if (mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
-//    {
-//        mMismatchedBoundaryElements = true;
-//        // In here - if you hit this case, we want to stop the test and move on, so we work with a stopping event
-//
-//    }
+    //    if (mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
+    //    {
+    //        mMismatchedBoundaryElements = true;
+    //        // In here - if you hit this case, we want to stop the test and move on, so we work with a stopping event
+    //
+    //    }
 
     // Every boundary element on the left must have a corresponding element on the right
     assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
+
+    // Every boundary element on the top must have a corresponding element on the bottom
+    assert(mTopPeriodicBoundaryElementIndices.size() == mBottomPeriodicBoundaryElementIndices.size());
+
+    // Every boundary element on the top left must have a corresponding element on the bottom right
+    assert(mTopLeftPeriodicBoundaryElementIndices.size() == mBottomRightPeriodicBoundaryElementIndices.size());
+
+    // Every boundary element on the top right must have a corresponding element on the bottom left
+    assert(mTopRightPeriodicBoundaryElementIndices.size() == mBottomLeftPeriodicBoundaryElementIndices.size());
+
 }
+
 
 unsigned Toroidal2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
 {
