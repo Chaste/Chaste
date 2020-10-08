@@ -94,11 +94,35 @@ private:
     /** The indices of elements which straddle the right periodic boundary. */
     std::set<unsigned> mRightPeriodicBoundaryElementIndices;
 
+    /** The top nodes which have been mirrored during the remesh. */
+    std::vector<unsigned> mTopOriginals;
+
+    /** The image nodes corresponding to these top nodes (on bottom of mesh). */
+    std::vector<unsigned> mTopImages;
+
+    /** A map from image node index (on bottom of mesh) to original node index (on top of mesh). */
+    std::map<unsigned, unsigned> mImageToTopOriginalNodeMap;
+
+    /** The bottom nodes which have been mirrored during the remesh. */
+    std::vector<unsigned> mBottomOriginals;
+
+    /** The image nodes corresponding to these bottom nodes (on top of mesh). */
+    std::vector<unsigned> mBottomImages;
+
+    /** A map from image node index (on top of mesh) to original node index (on bottom of mesh). */
+    std::map<unsigned, unsigned> mImageToBottomOriginalNodeMap;
+
+    /** The indices of elements which straddle the top periodic boundary. */
+    std::set<unsigned> mTopPeriodicBoundaryElementIndices;
+
+    /** The indices of elements which straddle the bottom periodic boundary. */
+    std::set<unsigned> mBottomPeriodicBoundaryElementIndices;
+
     /** The indices of nodes on the top boundary. */
-    std::vector<unsigned > mTopHaloNodes;
+    // std::vector<unsigned > mTopHaloNodes;
 
     /** The indices of nodes on the bottom boundary. */
-    std::vector<unsigned > mBottomHaloNodes;
+    // std::vector<unsigned > mBottomHaloNodes;
 
     /** Whether the number of left hand boundary nodes does not equal the number of right hand boundary nodes */
     bool mMismatchedBoundaryElements;
@@ -119,7 +143,7 @@ private:
      *
      * The nodes which are created are later removed by DeleteHaloNodes().
      */
-    void CreateHaloNodes();
+    // void CreateHaloNodes();
 
     /**
      * Creates a set of mirrored nodes for a cylindrical re-mesh. Updates
@@ -149,7 +173,7 @@ private:
      * This method removes the nodes which were added by CreateHaloNodes()
      * before the remeshing algorithm was called.
      */
-    void DeleteHaloNodes();
+    // void DeleteHaloNodes();
 
     /**
      * This method should only ever be called by the public ReMesh() method.
