@@ -1236,7 +1236,7 @@ public:
 
         // Test that the correct cell proliferative types were recorded
         std::vector<double> proliferative_types_data;
-        vtk_reader.GetPointData("Cell types", proliferative_types_data);
+        vtk_reader.GetPointData("Legacy Cell types", proliferative_types_data);
         TS_ASSERT_EQUALS(proliferative_types_data.size(), 4u);
         TS_ASSERT_DELTA(proliferative_types_data[0], 5.0, 1e-9);
         TS_ASSERT_DELTA(proliferative_types_data[1], 3.0, 1e-9);
