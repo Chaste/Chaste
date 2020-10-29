@@ -889,7 +889,7 @@ public:
 
     }
 
-    void TestSetupLocalBoxesHalfOnly3d() throw(Exception)
+    void TestSetupLocalBoxesHalfOnly3d()
     {
         if (PetscTools::GetNumProcs() > 2)
         {
@@ -1418,7 +1418,7 @@ public:
         double cut_off_length = 0.2;
 
         c_vector<double, 2*2> domain_size;
-        domain_size(0) = -0.1;
+        domain_size[0] = -0.1;
         domain_size(1) = 1.09;
         domain_size(2) = -0.1;
         domain_size(3) = 1.09;
@@ -2402,7 +2402,7 @@ public:
     }
 
     void TestBoxGeneration3d() throw (Exception)
-
+{
         // Create a mesh
         TetrahedralMesh<3,3> mesh;
 
