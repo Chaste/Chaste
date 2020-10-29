@@ -36,19 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef REPULSIONFORCE_HPP_
 #define REPULSIONFORCE_HPP_
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "ExponentialDecayForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
 /**
  * A class for a simple two-body repulsion force law. Designed
  * for use in node-based simulations
  *
- * The force just creates a linear repulsive force between cells
- * with a nonlinear separation less than 2. This force does not
+ * The force just creates a repulsive force between cells
+ * with a linear separation less than 2. This force does not
  * take a cell's age or cell cycle phase into account.
  */
 template<unsigned DIM>
-class RepulsionForce : public GeneralisedLinearSpringForce<DIM>
+class RepulsionForce : public ExponentialDecayForce<DIM>
 {
 private :
 
@@ -63,7 +63,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<DIM> >(*this);
+        archive & boost::serialization::base_object<ExponentialDecayForce<DIM> >(*this);
     }
 
 public :

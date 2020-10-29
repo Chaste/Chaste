@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "Cylindrical2dNodesOnlyMesh.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "ExponentialDecayForce.hpp"
 #include "RandomCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -109,7 +109,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -169,7 +169,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -308,7 +308,7 @@ public:
         simulator.SetEndTime(12.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
         simulator.AddForce(p_linear_force);
 
@@ -374,7 +374,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
         simulator.AddForce(p_linear_force);
 
@@ -451,7 +451,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -507,7 +507,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -571,7 +571,7 @@ public:
         simulator.SetEndTime(2.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -628,7 +628,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -723,7 +723,7 @@ public:
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationThreshold");
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -819,7 +819,7 @@ public:
             simulator.SetEndTime(0.5);
 
             // Create a force law and pass it to the simulation
-            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            MAKE_PTR(ExponentialDecayForce<2>, p_linear_force);
             p_linear_force->SetCutOffLength(1.5);
             simulator.AddForce(p_linear_force);
 

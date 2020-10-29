@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 RepulsionForce<DIM>::RepulsionForce()
-   : GeneralisedLinearSpringForce<DIM>()
+   : ExponentialDecayForce<DIM>()
 {
 }
 
@@ -97,7 +97,7 @@ template<unsigned DIM>
 void RepulsionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     // Call direct parent class
-    GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
+    ExponentialDecayForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

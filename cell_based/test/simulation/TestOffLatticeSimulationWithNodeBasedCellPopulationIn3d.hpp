@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "ExponentialDecayForce.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
@@ -92,7 +92,7 @@ public:
         simulator.SetEndTime(10.0); // 50.0
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -153,7 +153,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
+        MAKE_PTR(ExponentialDecayForce<3>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 

@@ -34,23 +34,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "ExponentialDecayForce.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GeneralisedLinearSpringForce()
-   : AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>(),
-     mMeinekeSpringStiffness(15.0),        // denoted by mu in Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
-     mMeinekeDivisionRestingSpringLength(0.5),
-     mMeinekeSpringGrowthDuration(1.0)
+ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::ExponentialDecayForce()
+   :  GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>()
 {
-    if (SPACE_DIM == 1)
-    {
-        mMeinekeSpringStiffness = 30.0;
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
+double ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
                                                                                      unsigned nodeBGlobalIndex,
                                                                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                                                      bool isCloserThanRestLength)
@@ -59,12 +52,12 @@ double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConsta
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::~GeneralisedLinearSpringForce()
+ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::~ExponentialDecayForce()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+c_vector<double, SPACE_DIM> ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                                                     unsigned nodeBGlobalIndex,
                                                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
 {
@@ -205,71 +198,39 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
     double spring_stiffness = mMeinekeSpringStiffness;
 
-    return multiplication_factor * spring_stiffness * unit_difference * overlap;
-
+    // A reasonably stable simple force law
+    if (is_closer_than_rest_length) //overlap is negative
+    {
+        //log(x+1) is undefined for x<=-1
+        assert(overlap > -rest_length_final);
+        c_vector<double, SPACE_DIM> temp = multiplication_factor*spring_stiffness * unit_difference * rest_length_final* log(1.0 + overlap/rest_length_final);
+        return temp;
+    }
+    else
+    {
+        double alpha = 5.0;
+        c_vector<double, SPACE_DIM> temp = multiplication_factor*spring_stiffness * unit_difference * overlap * exp(-alpha * overlap/rest_length_final);
+        return temp;
+    }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeSpringStiffness()
-{
-    return mMeinekeSpringStiffness;
-}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeDivisionRestingSpringLength()
+void ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    return mMeinekeDivisionRestingSpringLength;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeSpringGrowthDuration()
-{
-    return mMeinekeSpringGrowthDuration;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeSpringStiffness(double springStiffness)
-{
-    assert(springStiffness > 0.0);
-    mMeinekeSpringStiffness = springStiffness;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeDivisionRestingSpringLength(double divisionRestingSpringLength)
-{
-    assert(divisionRestingSpringLength <= 1.0);
-    assert(divisionRestingSpringLength >= 0.0);
-
-    mMeinekeDivisionRestingSpringLength = divisionRestingSpringLength;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeSpringGrowthDuration(double springGrowthDuration)
-{
-    assert(springGrowthDuration >= 0.0);
-
-    mMeinekeSpringGrowthDuration = springGrowthDuration;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
-{
-    *rParamsFile << "\t\t\t<MeinekeSpringStiffness>" << mMeinekeSpringStiffness << "</MeinekeSpringStiffness>\n";
-    *rParamsFile << "\t\t\t<MeinekeDivisionRestingSpringLength>" << mMeinekeDivisionRestingSpringLength << "</MeinekeDivisionRestingSpringLength>\n";
-    *rParamsFile << "\t\t\t<MeinekeSpringGrowthDuration>" << mMeinekeSpringGrowthDuration << "</MeinekeSpringGrowthDuration>\n";
-
     // Call method on direct parent class
-    AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
+    GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class GeneralisedLinearSpringForce<1,1>;
-template class GeneralisedLinearSpringForce<1,2>;
-template class GeneralisedLinearSpringForce<2,2>;
-template class GeneralisedLinearSpringForce<1,3>;
-template class GeneralisedLinearSpringForce<2,3>;
-template class GeneralisedLinearSpringForce<3,3>;
+template class ExponentialDecayForce<1,1>;
+template class ExponentialDecayForce<1,2>;
+template class ExponentialDecayForce<2,2>;
+template class ExponentialDecayForce<1,3>;
+template class ExponentialDecayForce<2,3>;
+template class ExponentialDecayForce<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(GeneralisedLinearSpringForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(ExponentialDecayForce)
