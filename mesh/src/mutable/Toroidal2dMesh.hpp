@@ -165,7 +165,7 @@ private:
      *
      * This method should only ever be called by the public ReMesh() method.
      */
-    void ReconstructCylindricalMesh();
+    void ReconstructToroidalMesh();
 
     /**
      * This method should only ever be called by the public ReMesh method.
@@ -206,7 +206,11 @@ private:
      * @return the index of the corresponding mirror image of that node
      *         (can be either an original or mirror node)
      */
-    unsigned GetCorrespondingNodeIndex(unsigned nodeIndex);
+    unsigned GetCorrespondingNodeIndexLeftRight(unsigned nodeIndex);
+
+    unsigned GetCorrespondingNodeIndexTopBottom(unsigned nodeIndex);
+    unsigned GetCorrespondingNodeIndexTopLeftBottomRight(unsigned nodeIndex);
+    unsigned GetCorrespondingNodeIndexTopRightBottomLeft(unsigned nodeIndex);
 
     /**
      * This method takes in two elements which are not meshed in the same way
@@ -218,7 +222,11 @@ private:
      * @param rMainSideElements two elements (usually in a square) which have
      *                          been meshed differently on the opposite boundary
      */
-    void UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideLeftRightMeshing(std::set<unsigned>& rMainSideElements);
+
+    void UseTheseElementsToDecideTopBottomMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideTopLeftBottomRightMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideTopRightBottomLeftMeshing(std::set<unsigned>& rMainSideElements);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
