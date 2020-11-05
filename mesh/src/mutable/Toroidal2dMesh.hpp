@@ -118,6 +118,24 @@ private:
     /** The indices of elements which straddle the bottom periodic boundary. */
     std::set<unsigned> mBottomPeriodicBoundaryElementIndices;
 
+    std::vector<unsigned> mTopLeftOriginals;
+    std::vector<unsigned> mTopLeftImages;
+    std::map<unsigned, unsigned> mImageToTopLeftOriginalNodeMap;
+    std::set<unsigned> mTopLeftPeriodicBoundaryElementIndices;
+    std::vector<unsigned> mBottomLeftOriginals;
+    std::vector<unsigned> mBottomLeftImages;
+    std::map<unsigned, unsigned> mImageToBottomLeftOriginalNodeMap;
+    std::set<unsigned> mBottomLeftPeriodicBoundaryElementIndices;
+
+    std::vector<unsigned> mTopRightOriginals;
+    std::vector<unsigned> mTopRightImages;
+    std::map<unsigned, unsigned> mImageToTopRightOriginalNodeMap;
+    std::set<unsigned> mTopRightPeriodicBoundaryElementIndices;
+    std::vector<unsigned> mBottomRightOriginals;
+    std::vector<unsigned> mBottomRightImages;
+    std::map<unsigned, unsigned> mImageToBottomRightOriginalNodeMap;
+    std::set<unsigned> mBottomRightPeriodicBoundaryElementIndices;
+
     /** The indices of nodes on the top boundary. */
     // std::vector<unsigned > mTopHaloNodes;
 
@@ -367,6 +385,9 @@ inline void save_construct_data(
     // Save data required to construct instance
     const double width = t->GetWidth(0);
     ar & width;
+    const double depth = t->GetDepth(0);
+    ar & depth;
+    
 }
 
 /**
@@ -379,9 +400,11 @@ inline void load_construct_data(
     // Retrieve data from archive required to construct new instance
     double width;
     ar & width;
+    double depth;
+    ar & depth;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)Toroidal2dMesh(width);
+    ::new(t)Toroidal2dMesh(width, depth);
 }
 }
 } // namespace ...
