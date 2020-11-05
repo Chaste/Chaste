@@ -1052,7 +1052,7 @@ public:
 
     }
 
-    void TestNodesPairs2DWithPeriodicity() throw (Exception)
+    void TestNodesPairs2DWithPeriodicity() 
     {
         // Re-implemented from TestObsoleteBoxCollection
         
@@ -2401,7 +2401,7 @@ public:
         }
     }
 
-    void TestBoxGeneration3d() throw (Exception)
+    void TestBoxGeneration3d() 
 {
         // Create a mesh
         TetrahedralMesh<3,3> mesh;
