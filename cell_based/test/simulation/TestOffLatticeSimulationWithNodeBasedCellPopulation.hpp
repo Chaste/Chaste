@@ -150,7 +150,7 @@ public:
         TS_ASSERT(min_distance_between_cells > 0.999);
     }
 
-    void TestBoxSizeWithSimpleMonolayer() throw (Exception)
+    void TestBoxSizeWithSimpleMonolayer()
     {
         // Create a simple mesh
         unsigned num_cells_depth = 5;
@@ -357,7 +357,7 @@ public:
      * to test periodicity.
      */
     
-    void TestSimpleYPeriodicMonolayer() throw (Exception)
+    void TestSimpleYPeriodicMonolayer() 
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -497,7 +497,7 @@ public:
      * to test periodicity.
      */
     
-    void TestSimpleXYPeriodicMonolayer() throw (Exception)
+    void TestSimpleXYPeriodicMonolayer() 
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
