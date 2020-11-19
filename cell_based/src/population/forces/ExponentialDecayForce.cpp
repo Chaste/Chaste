@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #include "ExponentialDecayForce.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -97,7 +96,6 @@ c_vector<double, SPACE_DIM> ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::Calcul
     assert(!std::isnan(distance_between_nodes));
 
     unit_difference /= distance_between_nodes;
-
     /*
      * If mUseCutOffLength has been set, then there is zero force between
      * two nodes located a distance apart greater than mMechanicsCutOffLength in AbstractTwoBodyInteractionForce.
@@ -141,7 +139,7 @@ c_vector<double, SPACE_DIM> ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::Calcul
      * If the cells are both newly divided, then the rest length of the spring
      * connecting them grows linearly with time, until 1 hour after division.
      */
-    if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
+    if (ageA < this->mMeinekeSpringGrowthDuration && ageB < this->mMeinekeSpringGrowthDuration)
     {
         AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
 
@@ -150,10 +148,10 @@ c_vector<double, SPACE_DIM> ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::Calcul
         if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
             // Spring rest length increases from a small value to the normal rest length over 1 hour
-            double lambda = mMeinekeDivisionRestingSpringLength;
-            rest_length = lambda + (rest_length_final - lambda) * ageA/mMeinekeSpringGrowthDuration;
+            double lambda = this->mMeinekeDivisionRestingSpringLength;
+            rest_length = lambda + (rest_length_final - lambda) * ageA/this->mMeinekeSpringGrowthDuration;
         }
-        if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
+        if (ageA + SimulationTime::Instance()->GetTimeStep() >= this->mMeinekeSpringGrowthDuration)
         {
             // This spring is about to go out of scope
             p_static_cast_cell_population->UnmarkSpring(cell_pair);
@@ -196,13 +194,14 @@ c_vector<double, SPACE_DIM> ExponentialDecayForce<ELEMENT_DIM,SPACE_DIM>::Calcul
     double overlap = distance_between_nodes - rest_length;
     bool is_closer_than_rest_length = (overlap <= 0);
     double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
-    double spring_stiffness = mMeinekeSpringStiffness;
+    double spring_stiffness = this->mMeinekeSpringStiffness;
 
     // A reasonably stable simple force law
     if (is_closer_than_rest_length) //overlap is negative
     {
         //log(x+1) is undefined for x<=-1
         assert(overlap > -rest_length_final);
+        
         c_vector<double, SPACE_DIM> temp = multiplication_factor*spring_stiffness * unit_difference * rest_length_final* log(1.0 + overlap/rest_length_final);
         return temp;
     }
