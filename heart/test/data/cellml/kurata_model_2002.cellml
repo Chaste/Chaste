@@ -89,7 +89,13 @@ http://www.CellML.org/
       <variable name="R" units="attojoule_per_millimole_kelvin" initial_value="8314400000000000" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="310.15" public_interface="out"/>
       <variable name="F" units="femtocoulomb_per_millimole" initial_value="96485000000000000" public_interface="out"/>
-      <variable name="Cm" units="picoF" initial_value="32" public_interface="out"/>
+      <variable name="Cm" units="picoF" initial_value="32" public_interface="out" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="i_CaT" units="picoA" public_interface="in"/>
       <variable name="i_CaL" units="picoA" public_interface="in"/>
@@ -2824,10 +2830,22 @@ http://www.CellML.org/
    <component name="intracellular_ion_concentrations">
       <variable name="Cai" units="millimolar" initial_value="0.000312494921" public_interface="out"/>
       <variable name="Cao" units="millimolar" initial_value="2" public_interface="out"/>
+                                                                                                                                  
+                                                                              
+                                                                                                                                       
+                              
+                   
+                 
       <variable name="Ca_up" units="millimolar" initial_value="1.462338380106" public_interface="out"/>
       <variable name="Ca_rel" units="millimolar" initial_value="0.296742023718" public_interface="out"/>
       <variable name="Ca_sub" units="millimolar" initial_value="0.00019074741" public_interface="out"/>
-      <variable name="Nai" units="millimolar" initial_value="9.438646305915" public_interface="out"/>
+      <variable name="Nai" units="millimolar" initial_value="9.438646305915" public_interface="out" cmeta:id="cytosolic_sodium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_sodium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_sodium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Nao" units="millimolar" initial_value="140" public_interface="out"/>
       <variable name="Ki" units="millimolar" initial_value="139.984146485614" public_interface="out"/>
       <variable name="Ko" units="millimolar" initial_value="5.4" public_interface="out"/>

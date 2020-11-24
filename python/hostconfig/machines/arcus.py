@@ -40,7 +40,7 @@ chaste_libs_path = '/system/software/recipes/chaste/3.2/lib'
 # PETSc (assumes you have done module load)
 petsc_path = os.environ.get("PETSC_DIR")
 if petsc_path == None:
-  print "*** WARNING: PETSC_DIR not set.  Please do \"module add PETSc\" for a compatible PETSc." 
+  print( "*** WARNING: PETSC_DIR not set.  Please do \"module add PETSc\" for a compatible PETSc." )
 petsc_build_name = ''
 petsc_build_name_profile = ''
 petsc_build_name_optimized = 'linux-intel-opt'
