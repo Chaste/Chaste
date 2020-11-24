@@ -43,10 +43,10 @@ import unittest
 class TestTest(unittest.TestCase):
     """A simple test case for testing the framework."""
     def TestSimpleMathematics(self):
-        self.failUnless(2 > 1)
-        self.failIf(1 > 2)
+        self.assertTrue(2 > 1)
+        self.assertFalse(1 > 2)
         self.assertEqual(2, 1+1)
-        self.failIfEqual(1, 1+1, "You can also give messages")
+        self.assertNotEqual(1, 1+1, "You can also give messages")
         self.assertAlmostEqual(1.005, 1.006, 2)
     
     def TestStrings(self):

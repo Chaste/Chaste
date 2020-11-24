@@ -56,13 +56,13 @@ for item in whole_file.split("\n"):
         version_line = item.strip()
 
 ubuntu_ver = version_line.replace('DISTRIB_RELEASE=','')
-ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
+ubuntu_ver = list(map(int, ubuntu_ver.split('.')[0:2]))
 
 if ubuntu_ver >= [18,10]:
     petsc_ver = 3.9
     petsc_path = '/usr/lib/petscdir/'
     petsc_build_name = '3.9'
-elif ubuntu_ver >= [18,04]:
+elif ubuntu_ver >= [18,4]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/'
     petsc_build_name = '3.7'
@@ -70,16 +70,16 @@ elif ubuntu_ver >= [18,04]:
 elif ubuntu_ver >= [17,10]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.6/'
-elif ubuntu_ver >= [17,04]:
+elif ubuntu_ver >= [17,4]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.5/'
 elif ubuntu_ver >= [16,10]:
     petsc_ver = 3.7
     petsc_path = '/usr/lib/petscdir/3.7.3/'
-elif ubuntu_ver >= [16,04]:
+elif ubuntu_ver >= [16,4]:
     petsc_ver = 3.6
     petsc_path = '/usr/lib/petscdir/3.6.2/'
-elif ubuntu_ver >= [14,04]:
+elif ubuntu_ver >= [14,4]:
     petsc_ver = 3.4
     petsc_path = '/usr/lib/petscdir/3.4.2/'
 elif ubuntu_ver >= [12,10]:
@@ -96,8 +96,8 @@ else:
     petsc_2_3_path = '/usr/lib/petscdir/2.3.3/'
 
 petsc_2_2_path = ''
-if ubuntu_ver < [18,04]:
-    if ubuntu_ver >= [16,04]:
+if ubuntu_ver < [18,4]:
+    if ubuntu_ver >= [16,4]:
         petsc_build_name_optimized = os.path.basename(glob.glob(os.path.join(petsc_path, '*-real'))[0])
         _dbg = glob.glob(os.path.join(petsc_path, '*-real-debug'))
         if _dbg:
@@ -133,7 +133,7 @@ if os.path.isdir('/opt/intel'):
 else:
     intel_path = None
 
-if ubuntu_ver >= [15,04]:
+if ubuntu_ver >= [15,4]:
     hdf5_lib = 'hdf5_openmpi'
     other_includepaths.append('/usr/include/hdf5/openmpi/')
 else:
@@ -144,7 +144,7 @@ libs_for_petsc = ['petsccontrib', 'X11',
                   'umfpack', 'amd' # Both for Umfpack
                   ]
 
-if ubuntu_ver >= [11,04]:
+if ubuntu_ver >= [11,4]:
     libs_for_petsc.append(['HYPRE_utilities', 
                            'HYPRE_struct_mv', 'HYPRE_struct_ls',  
                            'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
@@ -168,7 +168,7 @@ try:
 except:
     xerces3 = False
 if xerces3:
-    if ubuntu_ver >= [18,04]:
+    if ubuntu_ver >= [18,4]:
         # Xerces 3.2
         xerces_lib = 'xerces-c-3.2'
     else:
@@ -210,9 +210,9 @@ def Configure(prefs, build):
 
     # Extra libraries for VTK output
     vtk_base = '/usr/include/vtk-'
-    vtk5_include_path = filter(os.path.isdir, glob.glob(vtk_base + '5*'))
-    vtk6_include_path = filter(os.path.isdir, glob.glob(vtk_base + '6*'))
-    vtk7_include_path = filter(os.path.isdir, glob.glob(vtk_base + '7*'))
+    vtk5_include_path = list(filter(os.path.isdir, glob.glob(vtk_base + '5*')))
+    vtk6_include_path = list(filter(os.path.isdir, glob.glob(vtk_base + '6*')))
+    vtk7_include_path = list(filter(os.path.isdir, glob.glob(vtk_base + '7*')))
     if vtk5_include_path:
         vtk_include_path = vtk5_include_path[0]
     elif vtk6_include_path:
@@ -231,10 +231,10 @@ def Configure(prefs, build):
         other_includepaths.append(vtk_include_path)
         if vtk_version[0] >= '6':
             vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources','FiltersGeneral']
-            vtk_ver = map(int, vtk_version.split('.')[:2])
+            vtk_ver = list(map(int, vtk_version.split('.')[:2]))
             if vtk_ver >= [6,2]:
                 vtk_libs[2:2] = ['IOParallelXML']
-            vtk_libs = map(lambda l: 'vtk' + l + '-' + vtk_version, vtk_libs)
+            vtk_libs = list(map(lambda l: 'vtk' + l + '-' + vtk_version, vtk_libs))
             other_libraries.extend(vtk_libs)
         else:
             other_libraries.extend(['vtkIO', 'vtkCommon', 'vtkGraphics', 'z'])
@@ -244,7 +244,7 @@ def Configure(prefs, build):
     # Is CVODE installed?
     use_cvode = int(prefs.get('use-cvode', True))
     use_cvode = use_cvode and (os.path.exists('/usr/lib/libsundials_cvode.so') or os.path.exists('/usr/lib/x86_64-linux-gnu/libsundials_cvode.so'))
-    if ubuntu_ver <= [9,04]:
+    if ubuntu_ver <= [9,4]:
         # We don't support CVODE 2.4
         use_cvode = False
     if use_cvode:
