@@ -164,6 +164,7 @@ public:
 
             // A standard CVODE adaptor solve
             p_cvode_adaptor->SetMaxSteps(0xffffffff);
+            std::cout<<max_time_step<<" "<<simulation_duration <<std::endl;
             p_cell_cvode_adaptor->SetTimestep(max_time_step);
 
             Timer::Reset();

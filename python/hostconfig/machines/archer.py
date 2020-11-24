@@ -36,7 +36,7 @@ import sys
 chaste_libs = os.environ.get("CHASTE_LIBS")
 compiler = os.environ.get("PE_ENV")
 if compiler != 'INTEL':
-    print "Only the Intel compiler is supported. Load PrgEnv-intel module."
+    print( "Only the Intel compiler is supported. Load PrgEnv-intel module.")
     sys.exit(1)
 
 # The modules system deals with most include/lib paths transparently.

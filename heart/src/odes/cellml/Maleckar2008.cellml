@@ -233,21 +233,33 @@ The complete original paper reference is cited below:
    </units>
    
    <component xmlns="http://www.cellml.org/cellml/1.0#" name="environment">
-      <variable name="time" units="second" public_interface="out"/>
+      <variable name="time" units="second" public_interface="out" cmeta:id="time">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#time">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#time"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
    </component>
    
    <component xmlns="http://www.cellml.org/cellml/1.0#" name="membrane">
       <variable name="V" units="millivolt" initial_value="-73.941851" public_interface="out" cmeta:id="membrane_voltage">
-          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-              <rdf:Description rdf:about="#membrane_voltage">
-                  <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
-              </rdf:Description>
-          </rdf:RDF>
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_voltage">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
+            </rdf:Description>
+         </rdf:RDF>
       </variable>
       <variable name="R" units="millijoule_per_mole_kelvin" initial_value="8314" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="306.15" public_interface="out"/>
       <variable name="F" units="coulomb_per_mole" initial_value="96487" public_interface="out"/>
-      <variable name="Cm" units="nanoF" initial_value="0.05" public_interface="out"/>
+      <variable name="Cm" units="nanoF" initial_value="0.05" public_interface="out" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Q_tot" units="millivolt"/>
       <variable name="time" units="second" public_interface="in"/>
       <variable name="i_Na" units="picoA" public_interface="in"/>
@@ -265,11 +277,11 @@ The complete original paper reference is cited below:
       <variable name="i_KACh" units="picoA" public_interface="in"/>
       <variable name="I" units="picoA"/>
       <variable name="i_Stim" units="picoA" public_interface="out" cmeta:id="membrane_stimulus_current">
-          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-              <rdf:Description rdf:about="#membrane_stimulus_current">
-                  <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current"/>
-              </rdf:Description>
-          </rdf:RDF>
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_stimulus_current">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current"/>
+            </rdf:Description>
+         </rdf:RDF>
       </variable>
       <variable name="stim_offset" units="second" initial_value="0.1" cmeta:id="membrane_stimulus_current_offset">
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">

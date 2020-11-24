@@ -1,3 +1,0 @@
-[submodule "python/pycml/ontologies"]
-	path = python/pycml/ontologies
-	url = https://github.com/ModellingWebLab/ontologies

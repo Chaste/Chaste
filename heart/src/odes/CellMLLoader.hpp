@@ -63,7 +63,7 @@ public:
      *
      * @param rCellMLFile  the location of a CellML file to load on the fly
      * @param rOutputFileHandler  where to put the generated files
-     * @param rOptions  any options to be passed to PyCML e.g. "--expose-annotated-variables"
+     * @param rOptions  any options to be passed to chaste_codegen e.g. "--use-modifiers"
      */
     CellMLLoader(const FileFinder& rCellMLFile,
                  const OutputFileHandler& rOutputFileHandler,
@@ -91,7 +91,7 @@ private:
     /** The location of an output folder to put the converted file and shared library in */
     OutputFileHandler mOutputFileHandler;
 
-    /** A vector of options to be passed to the CellML converter (PyCML) e.g. "--expose-annotated-variables" */
+    /** A vector of options to be passed to the CellML converter (chaste_codegen) e.g. "--use-modifiers" */
     std::vector<std::string> mOptions;
 
     /** The converter we will use */
