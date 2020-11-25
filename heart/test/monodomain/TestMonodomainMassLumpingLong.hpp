@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAINMASSLUMPINGLONG_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerNoLut.hpp"
 #include "MonodomainProblem.hpp"
 #include "SimpleStimulus.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -92,7 +92,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("CompareRealisticGeometryStandard");
         HeartConfig::Instance()->SetOutputFilenamePrefix("CompareRealisticGeometryStandard");
 
-        SmallBenchmarkStimulusHeartCellFactory<CellLuoRudy1991FromCellMLBackwardEuler> cell_factory;
+        SmallBenchmarkStimulusHeartCellFactory<CellLuoRudy1991FromCellMLBackwardEulerNoLut> cell_factory;
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 

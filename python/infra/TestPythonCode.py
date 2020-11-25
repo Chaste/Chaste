@@ -59,6 +59,7 @@ import imp
 import os
 import sys
 import time
+import functools
 
 try:
     import unittest2 as unittest
@@ -69,7 +70,7 @@ if sys.version_info[:2] < (2,7):
     # Add subprocess.check_output to earlier Python versions
     import subprocess
     def check_output(*popenargs, **kwargs):
-        """Run command with arguments and return its output as a string. Copied from Python 2.7"""
+        """Run command with arguments and return its output as a string."""
         if 'stdout' in kwargs:
             raise ValueError('stdout argument not allowed, it will be overridden.')
         process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
@@ -79,8 +80,10 @@ if sys.version_info[:2] < (2,7):
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-            print >>sys.stderr, "Called process failed; output was:"
-            print >>sys.stderr, output
+            print("Called process failed; output was:", file=sys.stderr)
+            print("%s" % output, file=sys.stderr)
+            print("Called process failed; output was:")
+            print(output)
             raise subprocess.CalledProcessError(retcode, cmd)
         return output
     subprocess.check_output = check_output
@@ -219,13 +222,13 @@ class ChasteTestLoader(unittest.TestLoader):
         def isTestMethod(attrname, testCaseClass=testCaseClass):
             return (callable(getattr(testCaseClass, attrname)) and
                     (attrname.startswith('Test') or attrname.startswith('test')))
-        test_names = filter(isTestMethod, dir(testCaseClass))
+        test_names = list(filter(isTestMethod, dir(testCaseClass)))
         for base_class in testCaseClass.__bases__:
             for test_name in self.getTestCaseNames(base_class):
                 if test_name not in test_names:  # handle overridden methods
                     test_names.append(test_name)
         if self.sortTestMethodsUsing:
-            test_names.sort(self.sortTestMethodsUsing)
+            test_names.sort(key=functools.cmp_to_key(self.sortTestMethodsUsing))
         return test_names
 
 def SetTestOutput(module):
@@ -254,7 +257,7 @@ def main(filepath, profile=False, lineProfile=False, numProcs=1):
     try:
         module = imp.load_module(base, file, pathname, desc)
     except ImportError:
-        print "Python module search path:", sys.path, os.environ.get('PYTHONPATH')
+        print("Python module search path: %s %s" % (sys.path, os.environ.get('PYTHONPATH')))
         raise
     finally:
         file.close()

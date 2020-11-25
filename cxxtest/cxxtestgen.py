@@ -57,7 +57,7 @@ def main():
 def usage( problem = None ):
     '''Print usage info and exit'''
     if problem is None:
-        print usageString()
+        print(usageString())
         sys.exit(0)
     else:
         sys.stderr.write( usageString() )
@@ -82,7 +82,7 @@ def parseCommandline():
                                             'error-printer', 'abort-on-fail', 'have-std', 'no-std',
                                             'have-eh', 'no-eh', 'template=', 'include=',
                                             'root', 'part', 'no-static-init', 'factor', 'longlong='] )
-    except getopt.error, problem:
+    except getopt.error as problem:
         usage( problem )
     setOptions( options )
     return setFiles( patterns )
@@ -147,7 +147,7 @@ def printVersion():
 def setFiles( patterns ):
     '''Set input files specified on command line'''
     files = expandWildcards( patterns )
-    if len(files) is 0 and not root:
+    if len(files) == 0 and not root:
         usage( "No input files found" )
     return files
 
@@ -169,7 +169,7 @@ def scanInputFiles(files):
     for file in files:
         scanInputFile(file)
     global suites
-    if len(suites) is 0 and not root:
+    if len(suites) == 0 and not root:
         abort( 'No tests defined' )
 
 def scanInputFile(fileName):
@@ -315,12 +315,12 @@ def scanLineForDestroy( suite, lineNo, line ):
 
 def cstr( str ):
     '''Convert a string to its C representation'''
-    return '"' + string.replace( str, '\\', '\\\\' ) + '"'
+    return '"' + str.replace('\\', '\\\\' ) + '"'
 
 
 def addSuiteCreateDestroy( suite, which, line ):
     '''Add createSuite()/destroySuite() to current suite'''
-    if suite.has_key(which):
+    if which in suite:
         abort( '%s:%s: %sSuite() already declared' % ( suite['file'], str(line), which ) )
     suite[which] = line
 
@@ -328,17 +328,17 @@ def closeSuite():
     '''Close current suite and add it to the list if valid'''
     global suite
     if suite is not None:
-        if len(suite['tests']) is not 0:
+        if len(suite['tests']) != 0:
             verifySuite(suite)
             rememberSuite(suite)
         suite = None
 
 def verifySuite(suite):
     '''Verify current suite is legal'''
-    if suite.has_key('create') and not suite.has_key('destroy'):
+    if 'create' in suite and 'destroy' not in suite:
         abort( '%s:%s: Suite %s has createSuite() but no destroySuite()' %
                (suite['file'], suite['create'], suite['name']) )
-    if suite.has_key('destroy') and not suite.has_key('create'):
+    if 'destroy' in suite and 'create' not in suite:
         abort( '%s:%s: Suite %s has destroySuite() but no createSuite()' %
                (suite['file'], suite['destroy'], suite['name']) )
 
@@ -477,7 +477,7 @@ def isGenerated(suite):
 
 def isDynamic(suite):
     '''Checks whether a suite is dynamic'''
-    return suite.has_key('create')
+    return 'create' in suite
 
 lastIncluded = ''
 def writeInclude(output, file):

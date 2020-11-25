@@ -182,7 +182,7 @@ endif ()
 option (Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option (Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
-set (Chaste_PYCML_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for PyCML here")
+set (Chaste_CODEGEN_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for chaste_codegen here")
 
 #Some Chaste-specific #defines
 add_definitions (-DCHASTE_CMAKE)
@@ -259,10 +259,29 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package (PythonInterp REQUIRED)
-if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 2)
-    message (FATAL_ERROR "Python 2 is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python2")
+find_package(PythonInterp 3.5 REQUIRED)
+if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
+    message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
+
+# Install chaste_codegen in virtual environment
+set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
+
+if (NOT EXISTS ${codegen_python3_venv})
+    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    )
+endif ()
+
+# Update pip setuptools and wheel
+message (STATUS "Updating pip setuptools and wheel")
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel)
+
+# Install chaste_codegen in virtual environment
+message (STATUS "Installing chaste_codegen")
+execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
@@ -323,16 +342,17 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-add_definitions (-DBOOST_ALL_NO_LIB)
-set (Boost_USE_STATIC_RUNTIME ON)
+add_definitions(-DBOOST_ALL_NO_LIB)
 if (BUILD_SHARED_LIBS)
-    set (Boost_USE_STATIC_LIBS OFF)
+    set(Boost_USE_STATIC_LIBS OFF)
+    set(Boost_USE_STATIC_RUNTIME OFF)
 else ()
-    set (Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_STATIC_RUNTIME ON)
 endif ()
-find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
+list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
 ################################

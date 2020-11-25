@@ -152,7 +152,13 @@ Improved guinea-pig ventricular cell model incorporating a diadic space, IKr and
       </variable>
    </component>
    <component name="membrane">
-      <variable cmeta:id="membrane_voltage" initial_value="-92.849333" name="V" public_interface="out" units="millivolt"/>
+      <variable cmeta:id="membrane_voltage" initial_value="-92.849333" name="V" public_interface="out" units="millivolt">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_voltage">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable initial_value="8314.472" name="R" public_interface="out" units="joule_per_kilomole_kelvin"/>
       <variable initial_value="310" name="T" public_interface="out" units="kelvin"/>
       <variable initial_value="96485.3415" name="F" public_interface="out" units="coulomb_per_mole"/>
