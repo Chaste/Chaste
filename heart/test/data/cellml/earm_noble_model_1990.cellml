@@ -89,7 +89,13 @@ http://www.CellML.org/
       <variable name="T" units="kelvin" initial_value="310" public_interface="out"/>
       <variable name="F" units="coulomb_per_mole" initial_value="96485.3415" public_interface="out"/>
       <variable name="RTONF" units="millivolt" public_interface="out"/>
-      <variable name="C_m" units="microF" initial_value="4e-5"/>
+      <variable name="C_m" units="microF" initial_value="4e-5" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="time" units="second" public_interface="in"/>
       <variable name="i_b_K" units="nanoA" public_interface="in"/>
       <variable name="i_K1" units="nanoA" public_interface="in"/>
@@ -1986,7 +1992,13 @@ http://www.CellML.org/
       </math>
    </component>
    <component name="intracellular_calcium_concentration">
-      <variable name="Ca_i" units="millimolar" initial_value="1e-5" public_interface="out"/>
+	  <variable name="Ca_i" units="millimolar" initial_value="1e-5" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>                 
       <variable name="Ca_up" units="millimolar" initial_value="0.3" public_interface="out"/>
       <variable name="Ca_rel" units="millimolar" initial_value="0.3" public_interface="out"/>
       <variable name="Ca_Calmod" units="millimolar" initial_value="0.0005"/>

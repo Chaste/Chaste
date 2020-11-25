@@ -101,13 +101,13 @@ class BuildType(object):
 
     def DumpDebugInfo(self):
         """Print out some useful build system debugging information."""
-        print "Build class", self.__class__.__name__, "from build type", self.build_type
-        print "Tool locations:", self.tools
-        print "Compiler type:", self._compiler_type
-        print "Extra CC flags:", self.CcFlags()
-        print "Extra LD flags:", self.LinkFlags()
-        print "Test packs:", self.TestPacks()
-        print "Library preferences:", self.GetPreferedVersions()
+        print(("Build class %s from build type %s", (self.__class__.__name__, self.build_type)))
+        print(("Tool locations: %s" % self.tools))
+        print(("Compiler type: %s" % self._compiler_type))
+        print(("Extra CC flags: %s" % self.CcFlags()))
+        print(("Extra LD flags: %s" % self.LinkFlags()))
+        print(("Test packs: %s" % self.TestPacks()))
+        print(("Library preferences: %s" % self.GetPreferedVersions()))
 
     def _get_cpu_flags(self):
         """Get the optional extensions supported by this system's CPUs."""
@@ -349,7 +349,7 @@ class BuildType(object):
         dealii_libs = ['deal_II_1d', 'deal_II_2d', 'deal_II_3d', 'lac', 'base']
         dealii_petsc = dealii_basepath + 'lib/libpetsc'
         if self.dealii_debugging:
-            dealii_libs = map(lambda s: s + '.g', dealii_libs)
+            dealii_libs = [s + '.g' for s in dealii_libs]
             dealii_petsc = dealii_petsc + '.g'
         dealii_petsc = dealii_petsc + '.so'
         return dealii_libs + metis_libs
@@ -567,8 +567,7 @@ class CovTool(Coverage):
                                          '-EXT .cpp .c++'])
         self.tools['mpicxx'] += ' -DIAG -VER' # for debugging
         # Don't instrument other people's code
-        self.tools['mpicxx'] += ''.join(map(lambda p: ' -skip '+p,
-                                            other_includepaths + ['/usr']))
+        self.tools['mpicxx'] += ''.join([' -skip '+p for p in other_includepaths + ['/usr']])
         # Must be last
         other_libs.append('covtoolhelper')
 
@@ -743,8 +742,8 @@ class MemoryTesting(GccDebug):
         # Figure out the valgrind version
         try:
             version = os.popen(self.tools['valgrind'] + ' --version').readline().strip()
-            version = filter(lambda c: c.isdigit() or c == '.', version)
-            if map(int, version.split('.')[:3]) >= [3,5,0]:
+            version = [c for c in version if c.isdigit() or c == '.']
+            if list(map(int, version.split('.')[:3])) >= [3,5,0]:
                 self._valgrind_flags += " --suppressions=chaste-lucid.supp"
         except:
             # Probably means valgrind isn't installed, so don't add extra suppressions
@@ -969,7 +968,7 @@ class GccOptNative(GccOpt):
 
     def GetGccVersion(self):
         version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
-        version = map(int, version_str.split('.')[0:2])
+        version = list(map(int, version_str.split('.')[0:2]))
         return tuple(version)
 
     def __init__(self, *args, **kwargs):
@@ -989,7 +988,7 @@ class GccOptNative(GccOpt):
                 self._cc_flags.append('-mno-fma')
             if gcc_version >= (3,1):
                 self._cc_flags.append('-mfpmath=sse')
-            for minver in self.supported_flags.iterkeys():
+            for minver in self.supported_flags.keys():
                 if gcc_version >= minver:
                     for flag in self.supported_flags[minver]:
                         if flag in cpu_flags:
@@ -1501,7 +1500,7 @@ def GetBuildType(buildType):
         extras = ['onlytests', 'Failing'] + extras
     try:
         obj = globals()[classname](buildType)
-    except Exception, e:
+    except Exception as e:
         raise ValueError("Invalid build type '%s': %s" % (buildType, str(e)))
 
     for extra in extras:

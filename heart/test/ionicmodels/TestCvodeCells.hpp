@@ -44,7 +44,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991Cvode.hpp"
 #include "LuoRudy1991.hpp"
 #include "Shannon2004.hpp"
-#include "Shannon2004Cvode.hpp"
+
+#include "CellMLToSharedLibraryConverter.hpp"
+#include "AbstractCvodeCell.hpp"
+#include "AbstractCardiacCellWithModifiers.hpp"
+#include "AbstractModifier.hpp"
+
+
 #include "FixedModifier.hpp"
 #include "DummyModifier.hpp"
 #include "SmartPointers.hpp"
@@ -223,8 +229,8 @@ public:
 
         // Parameter exceptions
         TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterIndex("b"), "No parameter named 'b'.");
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameter(3u), "The index passed in must be less than the number of parameters.");
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterUnits(3u), "The index passed in must be less than the number of parameters.");
+        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameter(13u), "The index passed in must be less than the number of parameters.");
+        TS_ASSERT_THROWS_THIS(lr91_cvode_system.GetParameterUnits(13u), "The index passed in must be less than the number of parameters.");
 
 
         // Coverage
@@ -248,6 +254,12 @@ public:
         lr91_cvode_system.SetVoltage(old_v);
 
         lr91_cvode_system.SetStateVariable("membrane_voltage", new_v);
+        TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
+        lr91_cvode_system.SetVoltage(old_v);
+
+        // extra test for setting state variable by index
+        TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), old_v, 1e-12);
+        lr91_cvode_system.SetStateVariable(0, new_v);
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), new_v, 1e-12);
         lr91_cvode_system.SetVoltage(old_v);
 
@@ -329,9 +341,23 @@ public:
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Make a model that uses Cvode directly:
-        CellShannon2004FromCellMLCvode sh04_cvode_system(p_solver, p_stimulus);
-        TS_ASSERT_EQUALS(sh04_cvode_system.GetVoltageIndex(), 0u);
-        TS_ASSERT_EQUALS(sh04_cvode_system.GetMaxSteps(), 0); // 0 means 'UNSET' and Cvode uses the default.
+        // Need to load dynamicly as we don't have config files anymore
+       	OutputFileHandler handler("TestCvodeCells", true);
+	
+        FileFinder cellml_file("heart/src/odes/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
+       	handler.CopyFileTo(cellml_file);
+
+       	CellMLToSharedLibraryConverter converter(true);
+       	converter.SetOptions({"-m", "--cvode"});
+
+        // Do the conversion
+       	FileFinder copied_file("TestCvodeCells/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
+       	AbstractCardiacCellWithModifiers<AbstractCvodeCell>* sh04_cvode_system = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
+
+        TS_ASSERT_EQUALS(sh04_cvode_system->GetVoltageIndex(), 0u);
+        TS_ASSERT_EQUALS(sh04_cvode_system->GetMaxSteps(), 0); // 0 means 'UNSET' and Cvode uses the default.
 
         // 'Traditional' Chaste cell model for comparison of results:
         CellShannon2004FromCellML sh04_ode_system(p_solver, p_stimulus);
@@ -341,12 +367,12 @@ public:
         double sampling_time = 1.0;
 
         // Take a copy of the state variables, solve once, reset state variables and solve again (should get same answer)
-        N_Vector state_vars = sh04_cvode_system.GetStateVariables(); // This returns the initial conditions
-        sh04_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time);
-        N_Vector state_vars_after_solve = sh04_cvode_system.GetStateVariables(); // This returns the state variables at the end (for coverage)...
+        N_Vector state_vars = sh04_cvode_system->GetStateVariables(); // This returns the initial conditions
+        sh04_cvode_system->Solve(start_time, end_time, max_timestep, sampling_time);
+        N_Vector state_vars_after_solve = sh04_cvode_system->GetStateVariables(); // This returns the state variables at the end (for coverage)...
 
-        sh04_cvode_system.SetStateVariables(state_vars);
-        OdeSolution solution_cvode = sh04_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time);
+        sh04_cvode_system->SetStateVariables(state_vars);
+        OdeSolution solution_cvode = sh04_cvode_system->Solve(start_time, end_time, max_timestep, sampling_time);
 
         // Check we get the right answer both times
         std::vector<double> final_state_vars = solution_cvode.rGetSolutions().back();
@@ -365,13 +391,13 @@ public:
          * class:OdeSolution - see also [wiki:ChasteGuides/CodeGenerationFromCellML#Derivedquantities this page].
          */
         // Note that the ODE system must have "derived quantities" defined (and a method for calculating them).
-        // This is auto-generated by PyCML if the quantity is tagged appropriately - see CodeGenerationFromCellML wiki page.
+        // This is auto-generated by chaste_codegen if the quantity is tagged appropriately - see CodeGenerationFromCellML wiki page.
 
         // Solve using Chaste solvers for comparison.
         OdeSolution solution_chaste = sh04_ode_system.Compute(start_time, end_time, sampling_time);
 
         // These don't seem to need template arguments, I suppose the compiler figures out which to use from the last argument?
-        solution_cvode.CalculateDerivedQuantitiesAndParameters(&sh04_cvode_system);
+        solution_cvode.CalculateDerivedQuantitiesAndParameters(sh04_cvode_system);
         solution_chaste.CalculateDerivedQuantitiesAndParameters(&sh04_ode_system);
 
         // Check methods for directly getting any quantity out of an OdeSolution
@@ -409,30 +435,31 @@ public:
         bool voltage_only = false;
         CompareCellModelResults("sh04_cvode", "sh04_chaste", tolerance, voltage_only, "TestCvodeCells");
 
+
         // Coverage of GetIIonic method.
-        TS_ASSERT_DELTA(sh04_ode_system.GetIIonic(), sh04_cvode_system.GetIIonic(), 1e-4);
-        TS_ASSERT_DELTA(sh04_cvode_system.GetIIonic(), 0.0004, 1e-4);
+        TS_ASSERT_DELTA(sh04_ode_system.GetIIonic(), sh04_cvode_system->GetIIonic(), 1e-4);
+        TS_ASSERT_DELTA(sh04_cvode_system->GetIIonic(), 0.0004, 1e-4);
 
         // Clamping V
-        sh04_cvode_system.SetVoltageDerivativeToZero();
-        solution_cvode = sh04_cvode_system.Solve(end_time, end_time+100.0, max_timestep, sampling_time);
-        std::vector<double> voltages = solution_cvode.GetVariableAtIndex(sh04_cvode_system.GetVoltageIndex());
+        sh04_cvode_system->SetVoltageDerivativeToZero();
+        solution_cvode = sh04_cvode_system->Solve(end_time, end_time+100.0, max_timestep, sampling_time);
+        std::vector<double> voltages = solution_cvode.GetVariableAtIndex(sh04_cvode_system->GetVoltageIndex());
         for (unsigned i=0; i<voltages.size(); i++)
         {
-            TS_ASSERT_EQUALS(voltages[i], sh04_cvode_system.GetVoltage());
+            TS_ASSERT_EQUALS(voltages[i], sh04_cvode_system->GetVoltage());
         }
 
-        sh04_cvode_system.SetVoltageDerivativeToZero(false);
+        sh04_cvode_system->SetVoltageDerivativeToZero(false);
 
         // Clamp V with a modifier
-        sh04_cvode_system.ResetToInitialConditions();
-        MAKE_PTR_ABS(AbstractModifier, FixedModifier, p_modifier, (sh04_cvode_system.GetVoltage()));
-        sh04_cvode_system.SetModifier("membrane_voltage", p_modifier);
-        solution_cvode = sh04_cvode_system.Solve(0.0, start+10.0, max_timestep, sampling_time);
+        sh04_cvode_system->ResetToInitialConditions();
+        MAKE_PTR_ABS(AbstractModifier, FixedModifier, p_modifier, (sh04_cvode_system->GetVoltage()));
+        sh04_cvode_system->SetModifier("membrane_voltage", p_modifier);
+        solution_cvode = sh04_cvode_system->Solve(0.0, start+10.0, max_timestep, sampling_time);
         // The behaviour isn't quite the same - dV/dt isn't clamped in this case - but we should
         // see a reduced response.
-        voltages = solution_cvode.GetVariableAtIndex(sh04_cvode_system.GetVoltageIndex());
-        double test_v = solution_chaste.GetVariableAtIndex(sh04_cvode_system.GetVoltageIndex())[voltages.size()-1];
+        voltages = solution_cvode.GetVariableAtIndex(sh04_cvode_system->GetVoltageIndex());
+        double test_v = solution_chaste.GetVariableAtIndex(sh04_cvode_system->GetVoltageIndex())[voltages.size()-1];
         for (unsigned i=0; i<voltages.size(); i++)
         {
             TS_ASSERT_LESS_THAN(voltages[i], test_v);
@@ -442,20 +469,22 @@ public:
         sh04_ode_system.ComputeExceptVoltage(end_time,end_time+0.01);
 
         // Blocking membrane_fast_sodium_current_conductance (a parameter), but using modifiers
-        sh04_cvode_system.ResetToInitialConditions();
+        sh04_cvode_system->ResetToInitialConditions();
         ASSIGN_PTR(p_modifier, FixedModifier, (0.0));
-        sh04_cvode_system.SetModifier("membrane_fast_sodium_current_conductance", p_modifier);
+        sh04_cvode_system->SetModifier("membrane_fast_sodium_current_conductance", p_modifier);
         ASSIGN_PTR(p_modifier, DummyModifier, ());
-        sh04_cvode_system.SetModifier("membrane_voltage", p_modifier);
-        OdeSolution solution_block = sh04_cvode_system.Solve(0.0, 100.0, max_timestep, sampling_time);
+        sh04_cvode_system->SetModifier("membrane_voltage", p_modifier);
+        OdeSolution solution_block = sh04_cvode_system->Solve(0.0, 100.0, max_timestep, sampling_time);
         solution_block.WriteToFile("TestCvodeCells","sh04_block_modifier","ms",1,clean_dir);
         // Now set the parameter instead
-        sh04_cvode_system.ResetToInitialConditions();
-        sh04_cvode_system.SetModifier("membrane_fast_sodium_current_conductance", p_modifier);
-        sh04_cvode_system.SetParameter("membrane_fast_sodium_current_conductance", 0.0);
-        solution_block = sh04_cvode_system.Solve(0.0, 100.0, max_timestep, sampling_time);
+        sh04_cvode_system->ResetToInitialConditions();
+        sh04_cvode_system->SetModifier("membrane_fast_sodium_current_conductance", p_modifier);
+        sh04_cvode_system->SetParameter("membrane_fast_sodium_current_conductance", 0.0);
+        solution_block = sh04_cvode_system->Solve(0.0, 100.0, max_timestep, sampling_time);
         solution_block.WriteToFile("TestCvodeCells","sh04_block_param","ms",1,clean_dir);
         CompareCellModelResults("sh04_block_param", "sh04_block_modifier", 1e-6, voltage_only, "TestCvodeCells");
+
+        delete sh04_cvode_system;
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE

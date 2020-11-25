@@ -64,7 +64,7 @@ def config_module():
     if len(name_parts) == 1:
         name_parts.append('')
     machine_name, machine_domain = name_parts
-    #print machine_fqdn, machine_name, machine_domain
+    #print("%s %s %s" %(machine_fqdn, machine_name, machine_domain))
 
     # Oxford intel compiler licence
     if machine_fqdn.endswith('ox.ac.uk'):

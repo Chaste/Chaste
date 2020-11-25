@@ -96,13 +96,19 @@ except ImportError:
                 distro = 'macosx'
             else:
                 # Get distro via Python
-                import platform
-                distro = platform.linux_distribution()[0].lower()
-                # Get distro manually
-                if distro == '':
-                    fp = open('/etc/issue')
-                    distro = fp.read().split()[0].lower()
-                    fp.close()
+                distro = ''
+                try:
+                    import platform
+                    distro = platform.linux_distribution()[0].lower()
+                except AttributeError:
+                    pass
+                finally:
+                    # Get distro manually
+                    if distro == '':
+                        fp = open('/etc/issue')
+                        distro = fp.read().lower().replace('welcome to ', '')
+                        distro = distro.split()[0]
+                        fp.close()
             (file, pathname, desc) = imp.find_module(distro, ['python/hostconfig'])
             try:
                 conf = imp.load_module(distro, file, pathname, desc)
@@ -267,7 +273,7 @@ if sys.version_info[:2] < (2,7):
     # Add subprocess.check_output to earlier Python versions
     import subprocess
     def check_output(*popenargs, **kwargs):
-        """Run command with arguments and return its output as a string. Copied from Python 2.7"""
+        """Run command with arguments and return its output as a string."""
         if 'stdout' in kwargs:
             raise ValueError('stdout argument not allowed, it will be overridden.')
         process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
@@ -277,8 +283,8 @@ if sys.version_info[:2] < (2,7):
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-            print >>sys.stderr, "Called process failed; output was:"
-            print >>sys.stderr, output
+            print("Called process failed; output was:", file=sys.stderr)
+            print(output, file=sys.stderr)
             raise subprocess.CalledProcessError(retcode, cmd)
         return output
     subprocess.check_output = check_output
@@ -311,7 +317,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
     conf.petsc_3_0_path = getattr(conf, 'petsc_3_0_path', None)
     conf.petsc_path = getattr(conf, 'petsc_path', None)
     requested_version = version
-    version_number = map(int, version.split('.'))
+    version_number = list(map(int, version.split('.')))
     if version_number > [3,0] and (conf.petsc_path is None or not os.path.isdir(conf.petsc_path)):
         # Use 3.0 instead
         version = '3.0'
@@ -327,7 +333,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
                              not os.path.isdir(conf.petsc_2_2_path)):
         # Raise a friendly error
         ConfigError('PETSc %s requested, but no path for this or an earlier version given in the host config.' % requested_version)
-    version_number = map(int, version.split('.')) # The actual version being used, now
+    version_number = list(map(int, version.split('.'))) # The actual version being used, now
     
     def GetBuildNameList():
         build_names = []
@@ -423,13 +429,13 @@ def DoDealii(build):
     # Add Deal.II libraries
     libpaths.append(os.path.join(base, 'lib'))
     relative_incpaths = ['base/include', 'lac/include', 'deal.II/include']
-    incpaths.extend(map(lambda relpath: os.path.join(base, relpath),
-                        relative_incpaths))
+    incpaths.extend(list(map(lambda relpath: os.path.join(base, relpath),
+                        relative_incpaths)))
     libs = ['deal_II_1d', 'deal_II_2d', 'deal_II_3d', 'lac', 'base']
     if version.startswith('6.'):
         libs.append('petscall')
     if build.dealii_debugging:
-        libs = map(lambda s: s + '.g', libs)
+        libs = list(map(lambda s: s + '.g', libs))
     libraries.extend(libs)
 
 def Flatten(iterable):
@@ -454,7 +460,7 @@ def OptionalLibraryDefines():
     if getattr(conf, 'use_cvode', False):
         # Need to set a define for CVODE version.  Assume 2.3.0 if not specified.
         actual_flags.append('CHASTE_SUNDIALS_VERSION=' + getattr(conf, 'cvode_version', '20300'))
-    for libname, symbol in possible_flags.iteritems():
+    for libname, symbol in possible_flags.items():
         if getattr(conf, 'use_' + libname, False):
             actual_flags.append(symbol)
     for lib in Flatten(conf.other_libraries):
@@ -466,7 +472,7 @@ def OptionalLibraryDefines():
 def Configure(build):
     """Given a build object (BuildTypes.BuildType instance), configure the build."""
     if not build.quiet:
-        print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
+        print("Using hostconfig settings from %s.py" % os.path.splitext(conf.__file__)[0])
     prefs = build.GetPreferedVersions()
     if hasattr(conf, 'Configure') and callable(conf.Configure):
         # The machine config has a method to do its configuration, so call that first.
@@ -503,7 +509,7 @@ def Configure(build):
         if os.path.exists(intel_lib_path):
             libpaths.append(intel_lib_path)
     incpaths.extend(conf.other_includepaths)
-    libpaths.extend(map(os.path.abspath, conf.other_libpaths))
+    libpaths.extend(list(map(os.path.abspath, conf.other_libpaths)))
     # Needed for dynamically loaded cell models
     libraries.append('dl')
 
@@ -528,10 +534,10 @@ def Configure(build):
         for name in dir(conf):
             item = getattr(conf, name)
             if name[0] != '_' and type(item) != types.FunctionType:
-                print name, '=', item
-        print "Libraries:", libraries
-        print "Library paths:", libpaths
-        print "Include paths:", incpaths
+                print("%s=%s" % (name, item))
+        print("Libraries: %s" % libraries)
+        print("Library paths: %s" % libpaths)
+        print("Include paths: %s" % incpaths)
         build.DumpDebugInfo()
 
 def CppDefines():

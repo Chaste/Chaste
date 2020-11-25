@@ -68,14 +68,14 @@ def CompileChaste(target, build='GccOpt'):
     
     target gives the target to build.
     """
-    print 'Compiling dynamically-linked executable'
+    print('Compiling dynamically-linked executable')
     if os.system('scons build=' + build + ' static=0 chaste_libs=1 exe=1 compile_only=1 ' + target):
-        print "General build failure.  You aren't ready to release!"
+        print("General build failure.  You aren't ready to release!")
         sys.exit(1)
 
 def CopySharedLibraries(executablePath, librariesPath):
     """Copy shared libraries needed by executablePath into librariesPath, which will be created."""
-    print 'Making a subdirectory of library dependencies'
+    print('Making a subdirectory of library dependencies')
     found_chaste_libraries = False
     ldd = subprocess.Popen(['ldd', executablePath], stdout=subprocess.PIPE ).communicate()[0]
     os.mkdir(librariesPath)
@@ -83,16 +83,16 @@ def CopySharedLibraries(executablePath, librariesPath):
     lib_location = re.compile(r'(\S*)\s*=>\s*(\S*)\s*')
     for lib_pair in lib_location.findall(ldd):
         if lib_pair[1][0] == '(' or lib_pair[1] == 'not':
-            print 'No library found for ', lib_pair[0]
+            print('No library found for %s' % lib_pair[0])
         elif lib_pair[0].startswith('libc.so') or lib_pair[0].startswith('libpthread.so'):
-            print 'Ignoring library ', lib_pair[0], 'for compatibility'
+            print('Ignoring library %s for compatibility' % lib_pair[0])
         else:
             if lib_pair[0] == 'libglobal.so':
                 found_chaste_libraries = True
             shutil.copy(lib_pair[1], librariesPath)
     
     if not found_chaste_libraries:
-      print 'Could not find Chaste libraries (e.g. libglobal.so).  Please set LD_LIBRARY_PATH.'
+      print('Could not find Chaste libraries (e.g. libglobal.so).  Please set LD_LIBRARY_PATH.')
       sys.exit(1)
 
 def CopyXmlFiles(destPath):
