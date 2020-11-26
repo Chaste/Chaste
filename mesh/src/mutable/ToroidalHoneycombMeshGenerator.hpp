@@ -57,11 +57,11 @@ public:
      * Default constructor.
      *
      * @param numNodesAlongWidth  The number of cells you want along the bottom of the domain
-     * @param numNodesAlongLength  The number of cells you want sides of the domain
-     * @param ghosts  The thickness of ghost nodes to put around the edge (defaults to 3)
-     * @param scaleFactor  The scale factor for the width (circumference) of the cells (defaults to 1.0)
+     * @param numNodesAlongDepth  The number of cells you want sides of the domain
+     * @param widthScaleFactor  The scale factor for the width of the cells (defaults to 1.0)
+     * @param depthScaleFactor  The scale factor for the depth of the cells (defaults to 1.0)
      */
-    ToroidalHoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts=3, double scaleFactor=1.0);
+    ToroidalHoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongDepth, double widthScaleFactor=1.0, double depthScaleFactor=1.0);
 
     /**
      * @return a 2D honeycomb mesh
@@ -69,7 +69,7 @@ public:
     MutableMesh<2,2>* GetMesh();
 
     /**
-     * @return a 2D honeycomb mesh with periodic left/right boundaries
+     * @return a 2D honeycomb mesh with periodic left/right and top/bottom boundaries
      */
     Toroidal2dMesh* GetToroidalMesh();
 };

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A subclass of MutableMesh<2,2> for a rectangular mesh with
- * periodic left and right boundaries, representing a Toroidal geometry.
+ * periodic left and right boundaries, representing a cylindrical geometry.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
@@ -57,12 +57,18 @@ class Toroidal2dMesh : public MutableMesh<2,2>
     friend class TestToroidal2dMesh;
 private:
 
-    /** The periodic width of the domina. */
+    /** The width of the torus. */
     double mWidth;
 
-    /** The periodic height of the domain. */
+    /** The depth of the torus. */
     double mDepth;
 
+
+    // /** The top of the torus (y coordinate). */
+    // double mTop;
+
+    // /** The bottom of the cylinder (y coordinate). */
+    // double mBottom;
 
     /** The left nodes which have been mirrored during the remesh. */
     std::vector<unsigned> mLeftOriginals;
@@ -88,17 +94,77 @@ private:
     /** The indices of elements which straddle the right periodic boundary. */
     std::set<unsigned> mRightPeriodicBoundaryElementIndices;
 
+    /** The top nodes which have been mirrored during the remesh. */
+    std::vector<unsigned> mTopOriginals;
+
+    /** The image nodes corresponding to these top nodes (on bottom of mesh). */
+    std::vector<unsigned> mTopImages;
+
+    /** A map from image node index (on bottom of mesh) to original node index (on top of mesh). */
+    std::map<unsigned, unsigned> mImageToTopOriginalNodeMap;
+
+    /** The bottom nodes which have been mirrored during the remesh. */
+    std::vector<unsigned> mBottomOriginals;
+
+    /** The image nodes corresponding to these bottom nodes (on top of mesh). */
+    std::vector<unsigned> mBottomImages;
+
+    /** A map from image node index (on top of mesh) to original node index (on bottom of mesh). */
+    std::map<unsigned, unsigned> mImageToBottomOriginalNodeMap;
+
+    /** The indices of elements which straddle the top periodic boundary. */
+    std::set<unsigned> mTopPeriodicBoundaryElementIndices;
+
+    /** The indices of elements which straddle the bottom periodic boundary. */
+    std::set<unsigned> mBottomPeriodicBoundaryElementIndices;
+
+    std::vector<unsigned> mTopLeftOriginals;
+    std::vector<unsigned> mTopLeftImages;
+    std::map<unsigned, unsigned> mImageToTopLeftOriginalNodeMap;
+    std::set<unsigned> mTopLeftPeriodicBoundaryElementIndices;
+    std::vector<unsigned> mBottomLeftOriginals;
+    std::vector<unsigned> mBottomLeftImages;
+    std::map<unsigned, unsigned> mImageToBottomLeftOriginalNodeMap;
+    std::set<unsigned> mBottomLeftPeriodicBoundaryElementIndices;
+
+    std::vector<unsigned> mTopRightOriginals;
+    std::vector<unsigned> mTopRightImages;
+    std::map<unsigned, unsigned> mImageToTopRightOriginalNodeMap;
+    std::set<unsigned> mTopRightPeriodicBoundaryElementIndices;
+    std::vector<unsigned> mBottomRightOriginals;
+    std::vector<unsigned> mBottomRightImages;
+    std::map<unsigned, unsigned> mImageToBottomRightOriginalNodeMap;
+    std::set<unsigned> mBottomRightPeriodicBoundaryElementIndices;
+
     /** The indices of nodes on the top boundary. */
-    std::vector<unsigned > mTopHaloNodes;
+    // std::vector<unsigned > mTopHaloNodes;
 
     /** The indices of nodes on the bottom boundary. */
-    std::vector<unsigned > mBottomHaloNodes;
+    // std::vector<unsigned > mBottomHaloNodes;
 
     /** Whether the number of left hand boundary nodes does not equal the number of right hand boundary nodes */
     bool mMismatchedBoundaryElements;
 
     /**
-     * Creates a set of mirrored nodes for a Toroidal re-mesh. Updates
+     * Calls AbstractMesh<2,2>::CalculateBoundingBox() to calculate mTop and mBottom
+     * for the cylindrical mesh.
+     *
+     * This method should only ever be called by the public ReMesh() method.
+     */
+    // void UpdateTopAndBottom();
+
+    /**
+     * This method creates a compressed row of nodes, just above and below the main mesh
+     * at a constant height (a 'halo'). These will mesh to a known configuration
+     * (each one on the boundary), this avoids boundary elements of lengths over
+     * half the mesh width, which prevent the process of cylindrical meshing.
+     *
+     * The nodes which are created are later removed by DeleteHaloNodes().
+     */
+    // void CreateHaloNodes();
+
+    /**
+     * Creates a set of mirrored nodes for a cylindrical re-mesh. Updates
      * mRightImages and mLeftImages. All mesh points should be 0 < x < mWidth.
      *
      * This method should only ever be called by the public ReMesh() method.
@@ -109,7 +175,7 @@ private:
      *
      * After any corrections have been made to the boundary elements (see UseTheseElementsToDecideMeshing())
      * this method deletes the mirror image nodes, elements and boundary elements created
-     * for a Toroidal remesh by cycling through the elements and changing
+     * for a cylindrical remesh by cycling through the elements and changing
      * elements with partly real and partly imaginary elements to be real with
      * periodic real nodes instead of mirror image nodes. We end up with very
      * strangely shaped elements which cross the whole mesh but specify the correct
@@ -125,7 +191,7 @@ private:
      * This method removes the nodes which were added by CreateHaloNodes()
      * before the remeshing algorithm was called.
      */
-    void DeleteHaloNodes();
+    // void DeleteHaloNodes();
 
     /**
      * This method should only ever be called by the public ReMesh() method.
@@ -144,7 +210,7 @@ private:
      *
      * The elements which straddle the periodic boundaries need to be
      * identified in order to compare the list on the right with
-     * the list on the left and reconstruct a Toroidal mesh.
+     * the list on the left and reconstruct a cylindrical mesh.
      *
      * Empties and repopulates the member variables
      * mLeftPeriodicBoundaryElementIndices and mRightPeriodicBoundaryElementIndices
@@ -158,19 +224,27 @@ private:
      * @return the index of the corresponding mirror image of that node
      *         (can be either an original or mirror node)
      */
-    unsigned GetCorrespondingNodeIndex(unsigned nodeIndex);
+    unsigned GetCorrespondingNodeIndexLeftRight(unsigned nodeIndex);
+
+    unsigned GetCorrespondingNodeIndexTopBottom(unsigned nodeIndex);
+    unsigned GetCorrespondingNodeIndexTopLeftBottomRight(unsigned nodeIndex);
+    unsigned GetCorrespondingNodeIndexTopRightBottomLeft(unsigned nodeIndex);
 
     /**
      * This method takes in two elements which are not meshed in the same way
      * on the opposite boundary. It deletes the corresponding two elements
      * (connecting the same four nodes) and makes two new elements which are
      * connected in the same way. We should then be able to reconstruct the
-     * Toroidal mesh properly.
+     * cylindrical mesh properly.
      *
      * @param rMainSideElements two elements (usually in a square) which have
      *                          been meshed differently on the opposite boundary
      */
-    void UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideLeftRightMeshing(std::set<unsigned>& rMainSideElements);
+
+    void UseTheseElementsToDecideTopBottomMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideTopLeftBottomRightMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideTopRightBottomLeftMeshing(std::set<unsigned>& rMainSideElements);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -191,6 +265,8 @@ private:
         archive & boost::serialization::base_object<MutableMesh<2,2> >(*this);
         archive & mWidth;
         archive & mDepth;
+        // archive & mTop;
+        // archive & mBottom;
     }
 
 public:
@@ -198,8 +274,7 @@ public:
     /**
      * Constructor.
      *
-     * @param width the periodic width of the mesh 
-     * @param depth the periodic depth of the mesh 
+     * @param width the width of the mesh (circumference)
      */
     Toroidal2dMesh(double width, double depth);
 
@@ -207,11 +282,11 @@ public:
      * A constructor which reads in a width and collection of nodes, then
      * calls a ReMesh() command to create the elements of the mesh.
      *
-     * @param width the periodic width of the mesh
-     * @param depth the periodic depth of the mesh 
+     * @param width the periodic length scale
+     * @param depth the periodic length scale
      * @param nodes a collection of nodes to construct the mesh with
      */
-    Toroidal2dMesh(double width, double depth, std::vector<Node<2>*> nodes);
+    Toroidal2dMesh(double width, double depth,std::vector<Node<2>*> nodes);
 
     /**
      * Destructor.
@@ -221,9 +296,9 @@ public:
     /**
      * Overridden ReMesh() method.
      *
-     * Conduct a Toroidal remesh by calling CreateMirrorNodes() to create
+     * Conduct a cylindrical remesh by calling CreateMirrorNodes() to create
      * mirror image nodes, then calling ReMesh() on the parent class, then
-     * mapping the new node indices and calling ReconstructToroidalMesh()
+     * mapping the new node indices and calling ReconstructCylindricalMesh()
      * to remove surplus nodes, leaving a fully periodic mesh.
      *
      * @param rMap a reference to a nodemap which should be created with the required number of nodes.
@@ -233,7 +308,7 @@ public:
     /**
      * Overridden GetVectorFromAtoB() method.
      *
-     * Evaluates the (surface) distance between two points in a 2D Toroidal
+     * Evaluates the (surface) distance between two points in a 2D cylindrical
      * geometry.
      *
      * @param rLocation1 the x and y co-ordinates of point 1
@@ -245,7 +320,7 @@ public:
     /**
      * Overridden SetNode() method.
      *
-     * If the location should be set outside a Toroidal boundary, it is moved
+     * If the location should be set outside a cylindrical boundary, it is moved
      * back onto the cylinder.
      *
      * @param index is the index of the node to be moved
@@ -265,6 +340,18 @@ public:
      */
     double GetWidth(const unsigned& rDimension) const;
 
+
+    /**
+     * Overridden GetDepth() method.
+     *
+     * Calculate the 'depth' of any dimension of the mesh, taking periodicity
+     * into account.
+     *
+     * @param rDimension a dimension (0 or 1)
+     * @return The maximum distance between any nodes in this dimension.
+     */
+    double GetDepth(const unsigned& rDimension) const;
+
     /**
      * Overridden AddNode() method.
      *
@@ -283,6 +370,11 @@ namespace boost
 {
 namespace serialization
 {
+
+
+////////////////////////////////////////////////////////////////////////
+// extend these two below for depth too.... somehow
+////////////////////////////////////////////////////////////////////////
 /**
  * Serialize information required to construct a Toroidal2dMesh.
  */
@@ -293,8 +385,9 @@ inline void save_construct_data(
     // Save data required to construct instance
     const double width = t->GetWidth(0);
     ar & width;
-    const double depth = t->GetWidth(1);
+    const double depth = t->GetDepth(0);
     ar & depth;
+    
 }
 
 /**
@@ -311,7 +404,7 @@ inline void load_construct_data(
     ar & depth;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)Toroidal2dMesh(width,depth);
+    ::new(t)Toroidal2dMesh(width, depth);
 }
 }
 } // namespace ...
@@ -319,4 +412,4 @@ inline void load_construct_data(
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(Toroidal2dMesh)
 
-#endif /*TOROIDAL2DMESH_HPP_*/
+#endif /*Toroidal2dMesh_HPP_*/

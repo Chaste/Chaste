@@ -18,6 +18,7 @@ mutable/TestCylindrical2dMesh.hpp
 mutable/TestCylindrical2dNodesOnlyMesh.hpp
 mutable/TestCylindricalHoneycombMeshGenerator.hpp
 mutable/TestHoneycombMeshGenerator.hpp
+mutable/TestToroidal2dMesh.hpp
 reader/TestFemlabMeshReader.hpp
 reader/TestGmshMeshReader.hpp
 reader/TestMemfemMeshReader.hpp
