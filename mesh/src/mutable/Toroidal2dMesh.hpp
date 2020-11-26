@@ -136,15 +136,21 @@ private:
      *
      * This method should only ever be called by the public ReMesh() method.
      */
-    void ReconstructToroidalMesh();
+    void ReconstructCylindricalMesh();
 
-    /**
-     * This method should only ever be called by the public ReMesh method.
+     /**
      *
-     * This method removes the nodes which were added by CreateHaloNodes()
-     * before the remeshing algorithm was called.
+     * After any corrections have been made to the boundary elements (see UseTheseElementsToDecideMeshing())
+     * this method deletes the mirror image nodes, elements and boundary elements created
+     * for a Toroidal remesh by cycling through the elements and changing
+     * elements with partly real and partly imaginary elements to be real with
+     * periodic real nodes instead of mirror image nodes. We end up with very
+     * strangely shaped elements which cross the whole mesh but specify the correct
+     * connections between nodes.
+     *
+     * This method should only ever be called by the public ReMesh() method.
      */
-    void DeleteHaloNodes();
+    void ReconstructToroidalMesh();
 
     /**
      * This method should only ever be called by the public ReMesh() method.
@@ -156,7 +162,20 @@ private:
      * side and uses the meshing of the elements on the right hand boundary to decide
      * on how to mesh the left hand side.
      */
-    void CorrectNonPeriodicMesh();
+    void CorrectCylindricalNonPeriodicMesh();
+
+    /**
+     * This method should only ever be called by the public ReMesh() method.
+     *
+     * Uses mLeftPeriodicBoundaryElementIndices and mRightPeriodicBoundaryElementIndices
+     * and compares the nodes in each to ensure that both boundaries have been meshed
+     * identically. If they have not it calls UseTheseElementsToDecideMeshing() to
+     * sort out the troublesome elements which have been meshed differently on each
+     * side and uses the meshing of the elements on the right hand boundary to decide
+     * on how to mesh the left hand side.
+     */
+    void CorrectToroidalNonPeriodicMesh();
+
 
     /**
      * This method should only ever be called by the public ReMesh method.
@@ -168,7 +187,19 @@ private:
      * Empties and repopulates the member variables
      * mLeftPeriodicBoundaryElementIndices and mRightPeriodicBoundaryElementIndices
      */
-    void GenerateVectorsOfElementsStraddlingPeriodicBoundaries();
+    void GenerateVectorsOfElementsStraddlingCylindricalPeriodicBoundaries();
+
+        /**
+     * This method should only ever be called by the public ReMesh method.
+     *
+     * The elements which straddle the periodic boundaries need to be
+     * identified in order to compare the list on the right with
+     * the list on the left and reconstruct a Toroidal mesh.
+     *
+     * Empties and repopulates the member variables
+     * mLeftPeriodicBoundaryElementIndices and mRightPeriodicBoundaryElementIndices
+     */
+    void GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundaries();
 
     /**
      * This method should only ever be called by the public ReMesh() method.
@@ -177,7 +208,16 @@ private:
      * @return the index of the corresponding mirror image of that node
      *         (can be either an original or mirror node)
      */
-    unsigned GetCorrespondingNodeIndex(unsigned nodeIndex);
+    unsigned GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex);
+
+    /**
+     * This method should only ever be called by the public ReMesh() method.
+     *
+     * @param nodeIndex  The index of an original/mirrored node
+     * @return the index of the corresponding mirror image of that node
+     *         (can be either an original or mirror node)
+     */
+    unsigned GetCorrespondingToroidalNodeIndex(unsigned nodeIndex);
 
     /**
      * This method takes in two elements which are not meshed in the same way
@@ -189,7 +229,19 @@ private:
      * @param rMainSideElements two elements (usually in a square) which have
      *                          been meshed differently on the opposite boundary
      */
-    void UseTheseElementsToDecideMeshing(std::set<unsigned>& rMainSideElements);
+    void UseTheseElementsToDecideCylindricalMeshing(std::set<unsigned>& rMainSideElements);
+
+    /**
+     * This method takes in two elements which are not meshed in the same way
+     * on the opposite boundary. It deletes the corresponding two elements
+     * (connecting the same four nodes) and makes two new elements which are
+     * connected in the same way. We should then be able to reconstruct the
+     * Toroidal mesh properly.
+     *
+     * @param rMainSideElements two elements (usually in a square) which have
+     *                          been meshed differently on the opposite boundary
+     */
+    void UseTheseElementsToDecideToroidalMeshing(std::set<unsigned>& rMainSideElements);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -215,7 +267,7 @@ private:
 public:
 
     /**
-     * Constructor.
+     * Con+structor.
      *
      * @param width the periodic width of the mesh 
      * @param depth the periodic depth of the mesh 
