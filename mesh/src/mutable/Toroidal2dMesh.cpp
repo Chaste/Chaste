@@ -86,16 +86,83 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
 
 void Toroidal2dMesh::CreateMirrorNodes()
 {
-    double half_way = 0.5*mWidth;
+    double x_half_way = 0.5*mWidth;
+    double y_half_way = 0.5*mDepth;
 
     mLeftOriginals.clear();
     mLeftImages.clear();
     mImageToLeftOriginalNodeMap.clear();
+    mLeftPeriodicBoundaryElementIndices.clear();
+    
     mRightOriginals.clear();
     mRightImages.clear();
     mImageToRightOriginalNodeMap.clear();
-    mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
+
+    mTopOriginals.clear();
+    mTopImages.clear();
+    mImageToTopOriginalNodeMap.clear();
+    mTopPeriodicBoundaryElementIndices.clear();
+
+    mBottomOriginals.clear();
+    mBottomImages.clear();
+    mImageToBottomOriginalNodeMap.clear();
+    mBottomPeriodicBoundaryElementIndices.clear();
+
+
+    for (AbstractMesh<2,2>::NodeIterator node_iter = GetNodeIteratorBegin();
+         node_iter != GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        c_vector<double, 2> location;
+        location = node_iter->rGetLocation();
+        unsigned this_node_index = node_iter->GetIndex();
+        double this_node_y_location = location[1];
+
+        // Check the mesh currently conforms to the dimensions given
+        assert(0.0 <= this_node_y_location);
+        assert(this_node_y_location <= mDepth);
+
+        // Put the nodes which are to be mirrored in the relevant vectors
+        if (this_node_y_location < y_half_way)
+        {
+            mBottomOriginals.push_back(this_node_index);
+        }
+        else
+        {
+            mTopOriginals.push_back(this_node_index);
+        }
+    }
+
+    // For each Bottom original node, create an image node and record its new index
+    for (unsigned i=0; i<mBottomOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mBottomOriginals[i]]->rGetLocation();
+        location[1] = location[1] + mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mBottomImages.push_back(new_node_index);
+        mImageToBottomOriginalNodeMap[new_node_index] = mBottomOriginals[i];
+    }
+
+    // For each Top original node, create an image node and record its new index
+    for (unsigned i=0; i<mTopOriginals.size(); i++)
+    {
+        c_vector<double, 2> location;
+        location = mNodes[mTopOriginals[i]]->rGetLocation();
+        location[1] = location[1] - mDepth;
+
+        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        mTopImages.push_back(new_node_index);
+        mImageToTopOriginalNodeMap[new_node_index] = mTopOriginals[i];
+    }
+
+    assert(mTopOriginals.size() == mTopImages.size());
+    assert(mBottomOriginals.size() == mBottomImages.size());
+    assert(mImageToBottomOriginalNodeMap.size() == mBottomOriginals.size());
+    assert(mImageToTopOriginalNodeMap.size() == mTopOriginals.size());
+
 
     for (AbstractMesh<2,2>::NodeIterator node_iter = GetNodeIteratorBegin();
          node_iter != GetNodeIteratorEnd();
@@ -107,11 +174,11 @@ void Toroidal2dMesh::CreateMirrorNodes()
         double this_node_x_location = location[0];
 
         // Check the mesh currently conforms to the dimensions given
-        assert(0.0 <= location[0]);
-        assert(location[0] <= mWidth);
+        assert(0.0 <= this_node_x_location);
+        assert(this_node_x_location<= mWidth);
 
         // Put the nodes which are to be mirrored in the relevant vectors
-        if (this_node_x_location < half_way)
+        if (this_node_x_location < x_half_way)
         {
             mLeftOriginals.push_back(this_node_index);
         }
@@ -149,6 +216,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     assert(mLeftOriginals.size() == mLeftImages.size());
     assert(mImageToLeftOriginalNodeMap.size() == mLeftOriginals.size());
     assert(mImageToRightOriginalNodeMap.size() == mRightOriginals.size());
+
 }
 
 void Toroidal2dMesh::ReMesh(NodeMap& rMap)

@@ -75,6 +75,10 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*cells_up); //18 no periodicity // 24 half periodicity 
 
 
+        
+TrianglesMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
+mesh_writer.WriteFilesUsingMesh(*p_mesh);
+
         // p_mesh->CreateMirrorNodes();
 
         // // Check the vectors are the right size...

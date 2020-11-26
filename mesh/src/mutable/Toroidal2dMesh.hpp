@@ -88,13 +88,32 @@ private:
     /** The indices of elements which straddle the right periodic boundary. */
     std::set<unsigned> mRightPeriodicBoundaryElementIndices;
 
-    /** The indices of nodes on the top boundary. */
-    std::vector<unsigned > mTopHaloNodes;
+    /** The Bottom nodes which have been mirrored during the remesh. */
+    std::vector<unsigned> mBottomOriginals;
 
-    /** The indices of nodes on the bottom boundary. */
-    std::vector<unsigned > mBottomHaloNodes;
+    /** The image nodes corresponding to these Bottom nodes (on Top of mesh). */
+    std::vector<unsigned> mBottomImages;
 
-    /** Whether the number of left hand boundary nodes does not equal the number of right hand boundary nodes */
+    /** A map from image node index (on Top of mesh) to original node index (on Bottom of mesh). */
+    std::map<unsigned, unsigned> mImageToBottomOriginalNodeMap;
+
+    /** The Top nodes which have been mirrored during the remesh. */
+    std::vector<unsigned> mTopOriginals;
+
+    /** The image nodes corresponding to these Top nodes (on Bottom of mesh). */
+    std::vector<unsigned> mTopImages;
+
+    /** A map from image node index (on Bottom of mesh) to original node index (on Top of mesh). */
+    std::map<unsigned, unsigned> mImageToTopOriginalNodeMap;
+
+    /** The indices of elements which straddle the Bottom periodic boundary. */
+    std::set<unsigned> mBottomPeriodicBoundaryElementIndices;
+
+    /** The indices of elements which straddle the Top periodic boundary. */
+    std::set<unsigned> mTopPeriodicBoundaryElementIndices;
+
+
+    /** Whether the number of left hand boundary nodes does not equal the number of right hand boundary nodes (and top=bottom) */
     bool mMismatchedBoundaryElements;
 
     /**
