@@ -293,32 +293,32 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     ReconstructCylindricalMesh();
 
 
-    /*
-     * Create a random boundary element between two nodes of the first
-     * element if it is not deleted. This is a temporary measure to get
-     * around re-index crashing when there are no boundary elements.
-     */
-    unsigned num_elements = GetNumAllElements();
-    bool boundary_element_made = false;
-    unsigned elem_index = 0;
+    // /*
+    //  * Create a random boundary element between two nodes of the first
+    //  * element if it is not deleted. This is a temporary measure to get
+    //  * around re-index crashing when there are no boundary elements.
+    //  */
+    // unsigned num_elements = GetNumAllElements();
+    // bool boundary_element_made = false;
+    // unsigned elem_index = 0;
 
-    while (elem_index<num_elements && !boundary_element_made)
-    {
-        Element<2,2>* p_element = GetElement(elem_index);
-        if (!p_element->IsDeleted())
-        {
-            boundary_element_made = true;
-            std::vector<Node<2>*> nodes;
-            nodes.push_back(p_element->GetNode(0));
-            nodes.push_back(p_element->GetNode(1));
-            BoundaryElement<1,2>* p_boundary_element = new BoundaryElement<1,2>(0, nodes);
-            p_boundary_element->RegisterWithNodes();
-            mBoundaryElements.push_back(p_boundary_element);
-            this->mBoundaryElementWeightedDirections.push_back(zero_vector<double>(2));
-            this->mBoundaryElementJacobianDeterminants.push_back(0.0);
-        }
-        elem_index++;
-    }
+    // while (elem_index<num_elements && !boundary_element_made)
+    // {
+    //     Element<2,2>* p_element = GetElement(elem_index);
+    //     if (!p_element->IsDeleted())
+    //     {
+    //         boundary_element_made = true;
+    //         std::vector<Node<2>*> nodes;
+    //         nodes.push_back(p_element->GetNode(0));
+    //         nodes.push_back(p_element->GetNode(1));
+    //         BoundaryElement<1,2>* p_boundary_element = new BoundaryElement<1,2>(0, nodes);
+    //         p_boundary_element->RegisterWithNodes();
+    //         mBoundaryElements.push_back(p_boundary_element);
+    //         this->mBoundaryElementWeightedDirections.push_back(zero_vector<double>(2));
+    //         this->mBoundaryElementJacobianDeterminants.push_back(0.0);
+    //     }
+    //     elem_index++;
+    // }
 
     // Now call ReIndex() to remove the temporary nodes which are marked as deleted
     NodeMap reindex_map(GetNumAllNodes());
@@ -398,9 +398,9 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      * element if it is not deleted. This is a temporary measure to get
      * around re-index crashing when there are no boundary elements.
      */
-    num_elements = GetNumAllElements();
-    boundary_element_made = false;
-    elem_index = 0;
+    unsigned num_elements = GetNumAllElements();
+    bool boundary_element_made = false;
+    unsigned elem_index = 0;
 
     while (elem_index<num_elements && !boundary_element_made)
     {
@@ -666,7 +666,6 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
             for (unsigned i=0; i<2; i++)
             {
                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-
                 if (mImageToBottomOriginalNodeMap.find(this_node_index) != mImageToBottomOriginalNodeMap.end())
                 {
                     number_of_image_nodes++;
@@ -943,7 +942,6 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
         for (unsigned i=0; i<3; i++)
         {
             original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
-            PRINT_3_VARIABLES(elem_index,i,original_element_node_indices[i])
             corresponding_element_node_indices[i] = GetCorrespondingToroidalNodeIndex(original_element_node_indices[i]);
         }
 

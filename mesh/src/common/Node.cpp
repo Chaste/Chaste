@@ -286,6 +286,7 @@ void Node<SPACE_DIM>::RemoveBoundaryElement(unsigned index)
     unsigned count = mBoundaryElementIndices.erase(index);
     if (count == 0)
     {
+        assert(0);
         EXCEPTION("Tried to remove an index which was not in the set");
     }
 }
