@@ -38,8 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include "AbstractCardiacCellWithModifiers.hpp"
+#include "AbstractModifier.hpp"
 #include "AbstractCvodeCellWithDataClamp.hpp"
-#include "Shannon2004CvodeDataClamp.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "ArchiveLocationInfo.hpp"
@@ -49,18 +50,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FakePetscSetup.hpp"
 
+#include "DynamicLoadingHelperFunctions.hpp"
+
+#include "CellMLToSharedLibraryConverter.hpp"
+#include "DynamicCellModelLoader.hpp"
+#include "DynamicModelLoaderRegistry.hpp"
+#include "FileFinder.hpp"
+
+
 class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
-#ifdef CHASTE_CVODE
-    boost::shared_ptr<CellShannon2004FromCellMLCvodeDataClamp> mpModel;
-#endif
-
-public:
-    void TestInterpolatorTimesAndGenerateReferenceTrace()
+    double tol = 0.02; // mV
+    void InterpolatorTimesAndGenerateReferenceTrace(std::vector<std::string> args, std::string outputFolder, double tol)
     {
 #ifdef CHASTE_CVODE
-        OutputFileHandler handler("CvodeCellsWithDataClamp");
+        OutputFileHandler handler(outputFolder, true);
+	
+        FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
+        handler.CopyFileTo(cellml_file);
+
+	CellMLToSharedLibraryConverter converter(true);
+	converter.SetOptions(args);
+
+        // Do the conversion
+        FileFinder copied_file(outputFolder + "/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
+
+
 
         boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
         boost::shared_ptr<AbstractStimulusFunction> p_empty_stimulus;
@@ -68,7 +85,8 @@ public:
         // N.B. Because we use the Shannon model as a lot of examples,
         // here it is actually a Shannon->WithModifiers->WithDataClamp->CvodeCell
         // (the WithModifiers doesn't need to be there to use the data clamp!)
-        mpModel.reset(new CellShannon2004FromCellMLCvodeDataClamp(p_empty_solver,p_empty_stimulus));
+        mpModel.reset(dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >*>(p_loader->CreateCell(p_empty_solver, p_empty_stimulus)));
+
 
         TS_ASSERT_EQUALS(mpModel->HasParameter("membrane_data_clamp_current_conductance"), true);
 
@@ -83,7 +101,7 @@ public:
         Timer::Print("OdeSolution");
         std::vector<double> expt_times = solution.rGetTimes();
         std::vector<double> expt_data = solution.GetAnyVariable("membrane_voltage");
-        solution.WriteToFile("CvodeCellsWithDataClamp","shannon_original_no_clamp", "ms", 1, false); // false to clean
+        solution.WriteToFile(outputFolder,"shannon_original_no_clamp", "ms", 1, false); // false to clean
 
         TS_ASSERT_THROWS_THIS(mpModel->TurnOnDataClamp(),
             "Before calling TurnOnDataClamp(), please provide experimental data via the SetExperimentalData() method.");
@@ -99,12 +117,7 @@ public:
             // So now turn on the data clamp
             mpModel->TurnOnDataClamp();
 
-# if CHASTE_SUNDIALS_VERSION >= 20400
-            double tol = 5e-3; // mV
-#else
-            double tol = 0.2; // mV
-#endif
-            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, tol);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.56934e+01, tol);
 
             // So turn it off again
             mpModel->TurnOffDataClamp();
@@ -118,11 +131,11 @@ public:
 
             // Test a couple of times where no interpolation is needed (on data points).
             time = 116.0;
-            double v_at_116 = 1.53670634e+01;
+            double v_at_116 = 2.66211e+01;
             TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116, tol);
 
             time = 116.2;
-            double v_at_116_2 = 1.50089546e+01;
+            double v_at_116_2 = 2.65416e+01;
             TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116_2, tol);
 
             // Now test a time where interpolation is required.
@@ -200,6 +213,22 @@ public:
 #endif
     }
 
+#ifdef CHASTE_CVODE
+    boost::shared_ptr<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp >> mpModel;
+#endif
+
+public:
+    void TestInterpolatorTimesAndGenerateReferenceTrace()
+    {
+        double tol = 0.2; // mV
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp"}, "TestCvodeCellsWithDataClamp", tol);
+    }
+
+    void TestInterpolatorTimesAndGenerateReferenceTraceWithLookupTables()
+    {
+        InterpolatorTimesAndGenerateReferenceTrace({"-m", "--cvode-data-clamp", "--opt"}, "TestCvodeCellsWithDataClampOpt", tol);
+    }
+
     void TestArchivingCvodeCellsWithDataClamp()
     {
         // We also hijack this test to test the archiving and restoration of modifiers.
@@ -255,7 +284,7 @@ public:
             AbstractCvodeCell* p_cell;
             input_arch >> p_cell;
 
-            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 39u);
+            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 45u);
 
             // Check modifiers were archived correctly
             if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == NULL)

@@ -475,7 +475,7 @@ public:
             TS_ASSERT_DELTA(oldstyle_v_values[i], newstyle_v_values[i], 1e-5);
         }
     }
-    // This test is abstracted from TestPyCmlNightly
+    // This test is abstracted from TestCodegenNightly
     void TestReadingAnotherOldFile()
     {
         ColumnDataReader old_data_reader("io/test/data", "earm_noble_model_1990", false);

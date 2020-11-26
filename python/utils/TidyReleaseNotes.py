@@ -58,7 +58,7 @@ modifiers = [(re.compile(r'(<a[^>]+)class=".*?"'), r'\1'),                  # Re
 
 def TidyFile(filepath):
     """Tidy a release notes style HTML file."""
-    print "Tidying file", filepath
+    print("Tidying file %s" % filepath)
     # Make a backup of the original file
     shutil.copy2(filepath, filepath+'~')
     # Now open the backup and edit each line, writing to the original location
@@ -71,5 +71,5 @@ def TidyFile(filepath):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print >>sys.stderr, "Usage:", sys.argv[0], "<path_to_release_notes.html>"
+        print("Usage: %s <path_to_release_notes.html>" % sys.argv[0])
     TidyFile(sys.argv[1])

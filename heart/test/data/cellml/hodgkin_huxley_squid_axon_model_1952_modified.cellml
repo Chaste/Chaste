@@ -37,7 +37,13 @@ http://www.CellML.org/
       <unit units="metre" prefix="centi" exponent="-2"/>
    </units>
    <component name="environment">
-      <variable name="time" units="millisecond" public_interface="out"/>
+      <variable name="time" units="millisecond" public_interface="out" cmeta:id="time">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#time">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#time"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>                 
    </component>
    <component name="membrane">
       <variable name="V" units="millivolt" initial_value="-75" public_interface="out" cmeta:id="membrane_voltage">

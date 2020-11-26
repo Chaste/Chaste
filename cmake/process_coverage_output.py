@@ -41,7 +41,7 @@ if __name__ == "__main__":
     table_cell_counter=0
     match_counter=0;
     for line in genhtml_output:
-        #print line
+        #print(line)
         if table_cell_counter > 0:
             table_cell_counter = table_cell_counter + 1
         if re.match('(.*)headerItem(.*)Lines(.*)',line):
