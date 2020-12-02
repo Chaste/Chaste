@@ -1903,7 +1903,7 @@ public:
         CellCycleTimesGenerator::Destroy();
     }
 
-    void TestUniformG1GenerationalCellCycleModelNoGenerations() throw(Exception)
+    void TestUniformG1GenerationalCellCycleModelNoGenerations()
     {
         UniformG1GenerationalCellCycleModel* p_stem_model = new UniformG1GenerationalCellCycleModel;
         // Change G1 duration for this model
