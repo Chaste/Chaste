@@ -1902,6 +1902,27 @@ public:
 
         CellCycleTimesGenerator::Destroy();
     }
+
+    void TestUniformG1GenerationalCellCycleModelNoGenerations() throw(Exception)
+    {
+        UniformG1GenerationalCellCycleModel* p_stem_model = new UniformG1GenerationalCellCycleModel;
+        // Change G1 duration for this model
+        p_stem_model->SetStemCellG1Duration(1.0);
+        // Change number of generations
+        p_stem_model->SetMaxTransitGenerations(0);
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
+        p_stem_cell->SetBirthTime(-4.0 * (p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()));
+        p_stem_cell->InitialiseCellCycleModel();
+        p_stem_cell->ReadyToDivide();
+        // Run reset for division on cell cycle model
+        p_stem_cell->GetCellCycleModel()->ResetForDivision();
+        // Check that it is still a stem cell
+        TS_ASSERT(p_stem_cell->GetCellProliferativeType()->IsType<StemCellProliferativeType>());
+    }
 };
 
 #endif /*TESTSIMPLECELLCYCLEMODELS_HPP_*/
