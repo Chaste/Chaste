@@ -43,11 +43,11 @@ PeriodicNdNodesOnlyMesh<SPACE_DIM>::PeriodicNdNodesOnlyMesh(std::vector<double> 
 {
     // Convert periodic bools into unsigned vector and boolean vector
     mPeriodicDims = std::vector<unsigned>(0); // Ensure empty vector
-    if ( periodicInX )
+    if (periodicInX)
     {
         mPeriodicDims.push_back(0);
     }
-    if ( periodicInY )
+    if (periodicInY)
     {
         mPeriodicDims.push_back(1);
     }
@@ -60,6 +60,7 @@ PeriodicNdNodesOnlyMesh<SPACE_DIM>::PeriodicNdNodesOnlyMesh(std::vector<double> 
     mIsDimPeriodic(2) = periodicInZ;
     
     mNumPeriodicDims = mPeriodicDims.size();
+    assert(mNumPeriodicDims >0);
     assert(mNumPeriodicDims <= SPACE_DIM);
     assert( width.size() == mNumPeriodicDims);
     

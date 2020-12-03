@@ -42,12 +42,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 
 /**
- * A subclass of NodesOnlyMesh<2> for a rectangular mesh with
- * periodic left and right boundaries, representing a cylindrical geometry.
+ * A subclass of NodesOnlyMesh<SPACE_DIM> for a rectangular mesh with
+ * periodic boundaries.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
- * class in exactly the same way as a NodesOnlyMesh<2>.
+ * class in exactly the same way as a NodesOnlyMesh<SPACE_DIM>.
  */
 template<unsigned SPACE_DIM>
 class PeriodicNdNodesOnlyMesh: public NodesOnlyMesh<SPACE_DIM>
@@ -103,7 +103,11 @@ public:
     /**
      * Constructor.
      *
-     * @param width the periodic widths of the mesh
+     * @param width the periodic widths of the mesh.
+     * @param periodicInX whether the domain is periodic in the x direction.
+     * @param periodicInY whether the domain is periodic in the y direction. Defaults to false.
+     * @param periodicInZ whether the domain is periodic in the z direction. Defaults to false.
+     * 
      */
     PeriodicNdNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY=false, bool periodicInZ=false);
 
@@ -113,18 +117,20 @@ public:
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows of the collection that this process should own.
-     * @param isPeriodic whether the box collection should be periodic. Defaults to true.
+     * @param isPeriodicInX whether the box collection should be periodic in the x direction. Defaults to false.
+     * @param isPeriodicInY whether the box collection should be periodic in the x direction. Defaults to false.
+     * @param isPeriodicInZ whether the box collection should be periodic in the x direction. Defaults to false.
      */
     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX=false, bool isPeriodicInY=false, bool isPeriodicInZ=false);
 
     /**
      * Overridden GetVectorFromAtoB() method.
      *
-     * Evaluates the (surface) distance between two points in a 2D cylindrical
+     * Evaluates the (surface) distance between two points in ND periodic
      * geometry.
      *
-     * @param rLocation1 the x and y co-ordinates of point 1
-     * @param rLocation2 the x and y co-ordinates of point 2
+     * @param rLocation1 the x y and z co-ordinates of point 1
+     * @param rLocation2 the x y and z co-ordinates of point 2
      * @return the vector from location1 to location2
      */
     c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2);
