@@ -158,7 +158,9 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
         double fudge_factor = 1.0e-13;
         if ( point_coord(d) >= mWidth[i] )
         {
-            point.SetCoordinate(d,point_coord(d)-mWidth[i]);
+            double new_coord = point_coord(d) - mWidth[i];
+
+            point.SetCoordinate(d,new_coord);
         }
         else if ( point_coord(d) > (mWidth[i]-fudge_factor))
         {
