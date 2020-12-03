@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PERIODICNDNODESONLYMESH_HPP_
-#define PERIODICNDNODESONLYMESH_HPP_
+#ifndef PERIODICNODESONLYMESH_HPP_
+#define PERIODICNODESONLYMESH_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * class in exactly the same way as a NodesOnlyMesh<SPACE_DIM>.
  */
 template<unsigned SPACE_DIM>
-class PeriodicNdNodesOnlyMesh: public NodesOnlyMesh<SPACE_DIM>
+class PeriodicNodesOnlyMesh: public NodesOnlyMesh<SPACE_DIM>
 {
 private:
     /*
@@ -73,7 +73,7 @@ private:
      */
     c_vector<bool,3> mIsDimPeriodic;
 
-    friend class TestPeriodicNdNodesOnlyMesh;
+    friend class TestPeriodicNodesOnlyMesh;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -109,7 +109,7 @@ public:
      * @param periodicInZ whether the domain is periodic in the z direction. Defaults to false.
      * 
      */
-    PeriodicNdNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY=false, bool periodicInZ=false);
+    PeriodicNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY=false, bool periodicInZ=false);
 
     /**
      * Set up the box collection
@@ -193,11 +193,11 @@ namespace boost
 namespace serialization
 {
 /**
- * Serialize information required to construct a PeriodicNdNodesOnlyMesh.
+ * Serialize information required to construct a PeriodicNodesOnlyMesh.
  */
 template<class Archive, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const PeriodicNdNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
+    Archive & ar, const PeriodicNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
     const std::vector<unsigned> pdc_dims = t->GetPeriodicDimensions();
@@ -218,11 +218,11 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a PeriodicNdNodesOnlyMesh.
+ * De-serialize constructor parameters and initialise a PeriodicNodesOnlyMesh.
  */
 template<class Archive, unsigned SPACE_DIM>
 inline void load_construct_data(
-    Archive & ar, PeriodicNdNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
+    Archive & ar, PeriodicNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance of the mesh
     unsigned dims_size;
@@ -252,12 +252,12 @@ inline void load_construct_data(
     }
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)PeriodicNdNodesOnlyMesh<SPACE_DIM>(width,isPeriodicInX, isPeriodicInY, isPeriodicInZ);
+    ::new(t)PeriodicNodesOnlyMesh<SPACE_DIM>(width,isPeriodicInX, isPeriodicInY, isPeriodicInZ);
 }
 }
 } // namespace ...
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PeriodicNdNodesOnlyMesh)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PeriodicNodesOnlyMesh)
 
-#endif /*PERIODICNDNODESONLYMESH_HPP_*/
+#endif /*PERIODICNODESONLYMESH_HPP_*/

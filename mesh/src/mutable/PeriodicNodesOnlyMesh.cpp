@@ -34,10 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <map>
-#include "PeriodicNdNodesOnlyMesh.hpp"
+#include "PeriodicNodesOnlyMesh.hpp"
 
 template<unsigned SPACE_DIM>
-PeriodicNdNodesOnlyMesh<SPACE_DIM>::PeriodicNdNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY, bool periodicInZ)
+PeriodicNodesOnlyMesh<SPACE_DIM>::PeriodicNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY, bool periodicInZ)
         : NodesOnlyMesh<SPACE_DIM>(),
           mWidth(width)
 {
@@ -72,7 +72,7 @@ PeriodicNdNodesOnlyMesh<SPACE_DIM>::PeriodicNdNodesOnlyMesh(std::vector<double> 
 }
 
 template<unsigned SPACE_DIM>
-void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, bool isPeriodicInX, bool isPeriodicInY, bool isPeriodicInZ)
+void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, bool isPeriodicInX, bool isPeriodicInY, bool isPeriodicInZ)
 {
     // Check that we haven't got too many processors; the maximum number of processors is width/cutOffLength in the y (2D)/z (3D) direction
     if ( mIsDimPeriodic[SPACE_DIM-1] && ((mWidth[mWidth.size()-1]+1e-14)/cutOffLength) < PetscTools::GetNumProcs() )
@@ -105,19 +105,19 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength,
 }
 
 template<unsigned SPACE_DIM>
-std::vector<unsigned> PeriodicNdNodesOnlyMesh<SPACE_DIM>::GetPeriodicDimensions() const
+std::vector<unsigned> PeriodicNodesOnlyMesh<SPACE_DIM>::GetPeriodicDimensions() const
 {
     return mPeriodicDims;
 }
 
 template<unsigned SPACE_DIM>
-std::vector<double> PeriodicNdNodesOnlyMesh<SPACE_DIM>::GetPeriodicWidths() const
+std::vector<double> PeriodicNodesOnlyMesh<SPACE_DIM>::GetPeriodicWidths() const
 {
     return mWidth;
 }
 
 template<unsigned SPACE_DIM>
-double PeriodicNdNodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) const
+double PeriodicNodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) const
 {
     double width = 0.0;
     assert(rDimension < 3);
@@ -141,7 +141,7 @@ double PeriodicNdNodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) 
 }
 
 template<unsigned SPACE_DIM>
-void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove)
+void PeriodicNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove)
 {
     // concreteMove should always be false for NodesOnlyMesh as no elements to check
     assert(!concreteMove);
@@ -189,7 +189,7 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
 }
 
 template<unsigned SPACE_DIM>
-unsigned PeriodicNdNodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
+unsigned PeriodicNodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
     // Call method on parent class
     unsigned node_index = NodesOnlyMesh<SPACE_DIM>::AddNode(pNewNode);
@@ -203,7 +203,7 @@ unsigned PeriodicNdNodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 }
 
 template<unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PeriodicNdNodesOnlyMesh<SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
+c_vector<double, SPACE_DIM> PeriodicNodesOnlyMesh<SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
 {
     c_vector<double, SPACE_DIM> vector = rLocation2 - rLocation1;
 
@@ -228,7 +228,7 @@ c_vector<double, SPACE_DIM> PeriodicNdNodesOnlyMesh<SPACE_DIM>::GetVectorFromAto
 
 // Refresh mesh -> Check and then move if outside box
 template<unsigned SPACE_DIM>
-void PeriodicNdNodesOnlyMesh<SPACE_DIM>::RefreshMesh()
+void PeriodicNodesOnlyMesh<SPACE_DIM>::RefreshMesh()
 {
     // Loop over the periodic dimensions and if they are 
     // outside the domain, get the fmod and relocate
@@ -258,10 +258,10 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::RefreshMesh()
 // Explicit instantiation
 //////////////////////////////////////////////////////////////////////////
 
-template class PeriodicNdNodesOnlyMesh<1>;
-template class PeriodicNdNodesOnlyMesh<2>;
-template class PeriodicNdNodesOnlyMesh<3>;
+template class PeriodicNodesOnlyMesh<1>;
+template class PeriodicNodesOnlyMesh<2>;
+template class PeriodicNodesOnlyMesh<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(PeriodicNdNodesOnlyMesh)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(PeriodicNodesOnlyMesh)
