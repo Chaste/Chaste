@@ -151,37 +151,37 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
     // Loop over the periodic dimensions and perform a periodic movement if necessary
     for ( unsigned i = 0; i < mNumPeriodicDims; i++ )
     {
-        // // Get the appropriate dimension index
-        // unsigned d = mPeriodicDims[i];
-        // double local_point_coord = point_coord(d);
-        // double local_width = mWidth[i];
-        // // We need to make sure that the fudge factor is greater than the one used to calculate the containing
-        // // box in distributed box collection. Otherwise the forced domain width causes issues at the right domain edge.
-        // double fudge_factor = 1.0e-13;
-        // if ( local_point_coord >= local_width )
-        // {
-        //     double new_coord = local_point_coord - local_width;
+        // Get the appropriate dimension index
+        unsigned d = mPeriodicDims[i];
+        double local_point_coord = point_coord(d);
+        double local_width = mWidth[i];
+        // We need to make sure that the fudge factor is greater than the one used to calculate the containing
+        // box in distributed box collection. Otherwise the forced domain width causes issues at the right domain edge.
+        double fudge_factor = 1.0e-13;
+        if ( local_point_coord >= local_width )
+        {
+            double new_coord = local_point_coord - local_width;
 
-        //     point.SetCoordinate(d,new_coord);
-        // }
-        // else if ( local_point_coord > (local_width-fudge_factor))
-        // {
-        //     // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
-        //     // This is due to the fact that mWidth-1e-16=mWidth
-        //     point.SetCoordinate(d,local_width-fudge_factor);
-        // }
-        // else if ( local_point_coord < 0.0 )
-        // {
-        //     double new_coord = local_point_coord + local_width;
+            point.SetCoordinate(d,new_coord);
+        }
+        else if ( local_point_coord > (local_width-fudge_factor))
+        {
+            // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
+            // This is due to the fact that mWidth-1e-16=mWidth
+            point.SetCoordinate(d,local_width-fudge_factor);
+        }
+        else if ( local_point_coord < 0.0 )
+        {
+            double new_coord = local_point_coord + local_width;
             
-        //     // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
-        //     // This is due to the fact that mWidth-1e-16=mWidth
-        //     if ( new_coord > local_width-fudge_factor )
-        //     {
-        //         new_coord = local_width-fudge_factor;
-        //     }
-        //     point.SetCoordinate(d, new_coord);
-        // }
+            // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
+            // This is due to the fact that mWidth-1e-16=mWidth
+            if ( new_coord > local_width-fudge_factor )
+            {
+                new_coord = local_width-fudge_factor;
+            }
+            point.SetCoordinate(d, new_coord);
+        }
     }
 
     // Update the node's location
