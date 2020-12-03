@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "Cylindrical2dNodesOnlyMesh.hpp"
-#include "PeriodicNdNodesOnlyMesh.hpp"
+#include "PeriodicNodesOnlyMesh.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "RandomCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
@@ -353,7 +353,7 @@ public:
     }
 
      /**
-     * Create a simulation of a NodeBasedCellPopulation with a PeriodicNdNodesOnlyMesh
+     * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
      * to test periodicity.
      */
     
@@ -369,7 +369,7 @@ public:
 
         // Convert this to a PeriodicdNodesOnlyMesh
         std::vector<double> periodic_width(1,6.0);
-        PeriodicNdNodesOnlyMesh<2> mesh(periodic_width, false, true);
+        PeriodicNodesOnlyMesh<2> mesh(periodic_width, false, true);
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
@@ -409,7 +409,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<2> mesh_2(periodic_width, false, true);
+        PeriodicNodesOnlyMesh<2> mesh_2(periodic_width, false, true);
         mesh_2.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Add an offset
@@ -443,7 +443,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<2> mesh_3(periodic_width, false, true);
+        PeriodicNodesOnlyMesh<2> mesh_3(periodic_width, false, true);
         mesh_3.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
@@ -493,7 +493,7 @@ public:
 
 
     /**
-     * Create a simulation of a NodeBasedCellPopulation with a PeriodicNdNodesOnlyMesh
+     * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
      * to test periodicity.
      */
     
@@ -509,7 +509,7 @@ public:
 
         // Convert this to a PeriodicdNodesOnlyMesh
         std::vector<double> periodic_width(2,6.0);
-        PeriodicNdNodesOnlyMesh<2> mesh(periodic_width, true, true);
+        PeriodicNodesOnlyMesh<2> mesh(periodic_width, true, true);
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
@@ -549,7 +549,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<2> mesh_2(periodic_width, true, true);
+        PeriodicNodesOnlyMesh<2> mesh_2(periodic_width, true, true);
         mesh_2.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Add an offset

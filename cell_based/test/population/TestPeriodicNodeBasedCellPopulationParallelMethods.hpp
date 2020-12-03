@@ -40,8 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "NodeBasedCellPopulation.hpp"
-#include "PeriodicNdNodesOnlyMesh.hpp"
-#include "PeriodicNdNodesOnlyMesh.hpp"
+#include "PeriodicNodesOnlyMesh.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -72,7 +71,7 @@ class TestPeriodicNodeBasedCellPopulationParallelMethods : public AbstractCellBa
 {
 private:
 
-    PeriodicNdNodesOnlyMesh<3>* mpPeriodicNodesOnlyMesh;
+    PeriodicNodesOnlyMesh<3>* mpPeriodicNodesOnlyMesh;
 
     NodeBasedCellPopulation<3>* mpNodeBasedCellPopulation;
 
@@ -87,7 +86,7 @@ private:
         }
 
         std::vector<double> widths(1,(double)PetscTools::GetNumProcs());
-        mpPeriodicNodesOnlyMesh = new PeriodicNdNodesOnlyMesh<3>(widths,false,false,true);
+        mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(widths,false,false,true);
         mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0);
 
         std::vector<CellPtr> cells;

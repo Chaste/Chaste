@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
-#include "PeriodicNdNodesOnlyMesh.hpp"
+#include "PeriodicNodesOnlyMesh.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 
 // Cell population writers
@@ -226,7 +226,7 @@ public:
 
 	    // Create the mesh
         std::vector<double> periodic_width(1,6.0);
-	    PeriodicNdNodesOnlyMesh<3> mesh(periodic_width, true); 
+	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, true); 
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -253,9 +253,9 @@ public:
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
+        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
         {
             double x_node = (*node_iter).rGetLocation()[0];
             TS_ASSERT_LESS_THAN_EQUALS(0,x_node);
@@ -269,8 +269,8 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
         RandomNumberGenerator::Instance()->Reseed(0);
 
-        // Convert this to a PeriodicNdNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<3> mesh_2(periodic_width,true);
+        // Convert this to a PeriodicNodesOnlyMesh
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width,true);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -310,7 +310,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNdNodesOnlyMesh<3> mesh_3(periodic_width,true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,true);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
@@ -369,7 +369,7 @@ public:
 
 	    // Create the mesh
         std::vector<double> periodic_width(1,6.0);
-	    PeriodicNdNodesOnlyMesh<3> mesh(periodic_width, false, true); 
+	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, false, true); 
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -396,9 +396,9 @@ public:
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
+        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
         {
             double y_node = (*node_iter).rGetLocation()[1];
             TS_ASSERT_LESS_THAN_EQUALS(0,y_node);
@@ -413,7 +413,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<3> mesh_2(periodic_width,false,true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width,false,true);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -449,7 +449,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNdNodesOnlyMesh<3> mesh_3(periodic_width,false,true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,false,true);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
@@ -508,7 +508,7 @@ public:
 
 	    // Create the mesh
         std::vector<double> periodic_width(1,6.0);
-	    PeriodicNdNodesOnlyMesh<3> mesh(periodic_width, false, false, true); 
+	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, false, false, true); 
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -535,9 +535,9 @@ public:
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
+        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
         {
             double z_node = (*node_iter).rGetLocation()[2];
             TS_ASSERT_LESS_THAN_EQUALS(0,z_node);
@@ -552,7 +552,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<3> mesh_2(periodic_width,false, false, true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width,false, false, true);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -588,7 +588,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNdNodesOnlyMesh<3> mesh_3(periodic_width,false, false, true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,false, false, true);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
@@ -645,7 +645,7 @@ public:
 
 	    // Create the mesh
         std::vector<double> periodic_width(2,6.0);
-	    PeriodicNdNodesOnlyMesh<3> mesh(periodic_width, true, false, true); 
+	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, true, false, true); 
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -673,11 +673,11 @@ public:
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
-        PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNdNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
+        PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
+        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
         {
-            c_vector<double,3> node_location = (*node_iter).rGetLocation();
+            c_vector<double,3>& node_location = (*node_iter).rGetLocation();
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[0]);
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[2]);
             TS_ASSERT_LESS_THAN_EQUALS(node_location[0], periodic_width[0]);
@@ -692,7 +692,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        PeriodicNdNodesOnlyMesh<3> mesh_2(periodic_width, true, false, true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width, true, false, true);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -728,7 +728,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNdNodesOnlyMesh<3> mesh_3(periodic_width,true, false, true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,true, false, true);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
