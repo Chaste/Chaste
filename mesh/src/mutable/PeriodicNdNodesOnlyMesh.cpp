@@ -171,7 +171,7 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
         }
         else if ( local_point_coord < 0.0 )
         {
-            double new_coord = local_point_coord) + mWidth[i];
+            double new_coord = local_point_coord + mWidth[i];
             
             // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
             // This is due to the fact that mWidth-1e-16=mWidth
