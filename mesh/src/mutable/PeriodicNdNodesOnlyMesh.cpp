@@ -152,7 +152,7 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
     for ( unsigned i = 0; i < mNumPeriodicDims; i++ )
     {
         // Get the appropriate dimension index
-        unsigned d=mPeriodicDims[i];
+        unsigned d = mPeriodicDims[i];
         double local_point_coord = point_coord(d);
         double local_width = mWidth[i];
         // We need to make sure that the fudge factor is greater than the one used to calculate the containing
@@ -160,9 +160,9 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
         double fudge_factor = 1.0e-13;
         if ( local_point_coord >= local_width )
         {
-            double new_coord = local_point_coord - local_width;
+            //double new_coord = local_point_coord - local_width;
 
-            point.SetCoordinate(d,new_coord);
+            //point.SetCoordinate(d,new_coord);
         }
         else if ( local_point_coord > (local_width-fudge_factor))
         {
