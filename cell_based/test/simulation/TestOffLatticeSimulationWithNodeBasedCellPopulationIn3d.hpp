@@ -677,7 +677,7 @@ public:
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
         for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
         {
-            c_vector<double,3>& node_location = (*node_iter).rGetLocation();
+            const c_vector<double,3>& node_location = (*node_iter).rGetLocation();
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[0]);
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[2]);
             TS_ASSERT_LESS_THAN_EQUALS(node_location[0], periodic_width[0]);
