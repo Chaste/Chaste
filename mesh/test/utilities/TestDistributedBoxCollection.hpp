@@ -892,9 +892,18 @@ public:
 
     void TestSetupLocalBoxesHalfOnly3d()
     {
-        if (PetscTools::GetNumProcs() > 5)
+        if (PetscTools::GetNumProcs() > 3)
         {
-            TS_TRACE("This test is only designed for up to 5 processes");
+            /*
+             * Note will run for more but the numebr of processors changes the local boxes as 
+             * boxes not on the same processor need to be included.
+             * 
+             * With 1 processor you only have boxes above and to the left. 
+             * With 2 processoes you have three rows on 0 and 2 row on 1.
+             * With 3 processors you have two rows on 0 two rows on 1 
+             * and the top row on processor.  
+             */
+            TS_TRACE("This test is only designed for up to 3 processes");
             return;
         }
         double width = 1.0;
@@ -921,12 +930,6 @@ public:
         box_collection_pdc_XZ.SetupLocalBoxesHalfOnly();
         box_collection_pdc_XYZ.SetupLocalBoxesHalfOnly();
 
-	if (box_collection.IsBoxOwned(11))
-	{
-	    PRINT_VARIABLE(PetscTools::GetMyRank());
-	    TS_ASSERT_EQUALS(box_collection_pdc_XYZ.rGetLocalBoxes(11), std::set<unsigned>());
-	}
-
         if (box_collection.IsBoxOwned(0))
         {
             std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
@@ -945,28 +948,36 @@ public:
             // Now look at the periodic
             if (PetscTools::GetNumProcs() > 1)
             {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
                 correct_answer_0.insert(48);
                 correct_answer_0.insert(49);
                 correct_answer_0.insert(52);
                 correct_answer_0.insert(53);
             }
-	    TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(0), correct_answer_0);
+	        TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(0), correct_answer_0);
+            
             if (PetscTools::GetNumProcs() > 1)
             {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
                 correct_answer_0.insert(51);
                 correct_answer_0.insert(55);
             }
-	    correct_answer_0.insert(7);
+	        correct_answer_0.insert(7);
             correct_answer_0.insert(15);
             correct_answer_0.insert(19);
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(0), correct_answer_0);
+            
             if (PetscTools::GetNumProcs() > 1)
             {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
                 correct_answer_0.insert(56);
                 correct_answer_0.insert(57);
                 correct_answer_0.insert(59);
             }
-	    correct_answer_0.insert(20);
+	        correct_answer_0.insert(20);
             correct_answer_0.insert(21);
             correct_answer_0.insert(23);
             TS_ASSERT_EQUALS(box_collection_pdc_XYZ.rGetLocalBoxes(0), correct_answer_0);
@@ -985,13 +996,41 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_3, correct_answer_3);
 
             // Now look at the periodic
+
+            if (PetscTools::GetNumProcs() > 1)
+            {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
+                correct_answer_3.insert(50);
+                correct_answer_3.insert(51);
+                correct_answer_3.insert(54);
+                correct_answer_3.insert(55);
+            }
             TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(3), correct_answer_3);
 
+
+            if (PetscTools::GetNumProcs() > 1)
+            {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
+                correct_answer_3.insert(48);
+                correct_answer_3.insert(52);
+            }
             correct_answer_3.insert(0);
             correct_answer_3.insert(4);
             correct_answer_3.insert(12);
             correct_answer_3.insert(16);
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(3), correct_answer_3);
+            
+            
+            if (PetscTools::GetNumProcs() > 1)
+            {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
+                correct_answer_3.insert(58);
+                correct_answer_3.insert(59);
+                correct_answer_3.insert(56);
+            }
             correct_answer_3.insert(20);
             correct_answer_3.insert(22);
             correct_answer_3.insert(23);
@@ -1018,6 +1057,20 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
 
             // Now look at the periodic
+            if (PetscTools::GetNumProcs() > 1)          
+            {
+                // If more than one processor then you need to include the 
+                // lower and left boxes that are on different processors
+                correct_answer_5.insert(48);
+                correct_answer_5.insert(49);
+                correct_answer_5.insert(50);
+                correct_answer_5.insert(52);
+                correct_answer_5.insert(53);
+                correct_answer_5.insert(54);
+                correct_answer_5.insert(56);
+                correct_answer_5.insert(57);
+                correct_answer_5.insert(58);
+            }
             TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(5), correct_answer_5);
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(5), correct_answer_5);
             TS_ASSERT_EQUALS(box_collection_pdc_XYZ.rGetLocalBoxes(5), correct_answer_5);
@@ -1051,6 +1104,18 @@ public:
         {
             std::set<unsigned>& local_boxes_to_box_58 = box_collection.rGetLocalBoxes(58);
             std::set<unsigned> correct_answer_58;
+
+            if (PetscTools::GetNumProcs() > 2 )
+            {
+                // If more than two processors then you need to include the 
+                // lower and left boxes that are on different processors
+                correct_answer_58.insert(41);
+                correct_answer_58.insert(42);
+                correct_answer_58.insert(43);
+                correct_answer_58.insert(45);
+                correct_answer_58.insert(46);
+                correct_answer_58.insert(47);
+            }
             correct_answer_58.insert(58);
             correct_answer_58.insert(59);
             TS_ASSERT_EQUALS(local_boxes_to_box_58, correct_answer_58);
@@ -1066,6 +1131,14 @@ public:
 
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(58), correct_answer_58);
 
+            if (PetscTools::GetNumProcs() > 2 )
+            {
+                // If more than two processors then you need to include the 
+                // lower and left boxes that are on different processors
+                correct_answer_58.insert(37);
+                correct_answer_58.insert(38);
+                correct_answer_58.insert(39);
+            }
             correct_answer_58.insert(1);
             correct_answer_58.insert(2);
             correct_answer_58.insert(3);

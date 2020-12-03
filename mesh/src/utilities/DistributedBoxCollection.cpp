@@ -715,7 +715,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                 // Clear the local boxes
                 mLocalBoxes.clear();
 
-                // Now we need to work out the min and max y indices
+                // Now we need to work out the min and max z indices
                 int k_start = CalculateGridIndices(mMinBoxIndex)(2);
                 int k_end = CalculateGridIndices(mMaxBoxIndex)(2);
                 
@@ -765,10 +765,6 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                 if ( j < (nJ-1) )
                                 {
                                     local_boxes.insert( z_offset + (j+2)*nI - 1 );
-                                    if ( j==0 && mIsPeriodicInY && top_proc < nJ )
-                                    {
-                                        local_boxes.insert( z_offset + nI*nJ - 1 );
-                                    }
                                 }
                                 else if ( mIsPeriodicInY )
                                 {
