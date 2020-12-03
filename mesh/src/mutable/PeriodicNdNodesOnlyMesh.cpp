@@ -146,7 +146,7 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
     // concreteMove should always be false for NodesOnlyMesh as no elements to check
     assert(!concreteMove);
 
-    c_vector<double, SPACE_DIM> point_coord = point.rGetLocation();
+    c_vector<double, SPACE_DIM>& point_coord = point.rGetLocation();
 
     // Loop over the periodic dimensions and perform a periodic movement if necessary
     for ( unsigned i = 0; i < mNumPeriodicDims; i++ )
