@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
+#include "Debug.hpp"
 
 class TestDistributedBoxCollection : public CxxTest::TestSuite
 {
@@ -237,7 +238,7 @@ private:
 
 public:
 
-    void TestBox()
+    void DNRTestBox()
     {
         Box<2> test_box;
 
@@ -259,7 +260,7 @@ public:
     }
 
 
-    void TestBoxGeneration1d()
+    void DNRTestBoxGeneration1d()
     {
         // Create a mesh
         TetrahedralMesh<1,1> mesh;
@@ -343,7 +344,7 @@ public:
         miles_away(0) = 47323854;
         TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "The point provided is outside all of the boxes");
 
-        // Test whether we can correctly identify interior boxes
+        // DNRTest whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
             // In serial everything is an interior box.
@@ -365,7 +366,7 @@ public:
 
 
     // very simple test
-    void TestAddElement()
+    void DNRTestAddElement()
     {
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0);
@@ -393,7 +394,7 @@ public:
         }
     }
 
-    void TestSetupAllLocalBoxes2d()
+    void DNRTestSetupAllLocalBoxes2d()
     {
         double width = 1.0;
 
@@ -534,7 +535,7 @@ public:
     }
 
 
-    void TestSetupAllLocalBoxes2dPeriodic()
+    void DNRTestSetupAllLocalBoxes2dPeriodic()
     {
         double width = 1.0;
 
@@ -681,7 +682,7 @@ public:
     }
 
 
-    void TestSetupAllLocalBoxes3d()
+    void DNRTestSetupAllLocalBoxes3d()
     {
         if (PetscTools::GetNumProcs() > 2)
         {
@@ -891,9 +892,9 @@ public:
 
     void TestSetupLocalBoxesHalfOnly3d()
     {
-        if (PetscTools::GetNumProcs() > 2)
+        if (PetscTools::GetNumProcs() > 5)
         {
-            TS_TRACE("This test is only designed for up to 2 processes");
+            TS_TRACE("This test is only designed for up to 5 processes");
             return;
         }
         double width = 1.0;
@@ -920,6 +921,12 @@ public:
         box_collection_pdc_XZ.SetupLocalBoxesHalfOnly();
         box_collection_pdc_XYZ.SetupLocalBoxesHalfOnly();
 
+	if (box_collection.IsBoxOwned(11))
+	{
+	    PRINT_VARIABLE(PetscTools::GetMyRank());
+	    TS_ASSERT_EQUALS(box_collection_pdc_XYZ.rGetLocalBoxes(11), std::set<unsigned>());
+	}
+
         if (box_collection.IsBoxOwned(0))
         {
             std::set<unsigned>& local_boxes_to_box_0 = box_collection.rGetLocalBoxes(0);
@@ -936,12 +943,30 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
 
             // Now look at the periodic
-            TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(0), correct_answer_0);
-            correct_answer_0.insert(7);
+            if (PetscTools::GetNumProcs() > 1)
+            {
+                correct_answer_0.insert(48);
+                correct_answer_0.insert(49);
+                correct_answer_0.insert(52);
+                correct_answer_0.insert(53);
+            }
+	    TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(0), correct_answer_0);
+            if (PetscTools::GetNumProcs() > 1)
+            {
+                correct_answer_0.insert(51);
+                correct_answer_0.insert(55);
+            }
+	    correct_answer_0.insert(7);
             correct_answer_0.insert(15);
             correct_answer_0.insert(19);
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(0), correct_answer_0);
-            correct_answer_0.insert(20);
+            if (PetscTools::GetNumProcs() > 1)
+            {
+                correct_answer_0.insert(56);
+                correct_answer_0.insert(57);
+                correct_answer_0.insert(59);
+            }
+	    correct_answer_0.insert(20);
             correct_answer_0.insert(21);
             correct_answer_0.insert(23);
             TS_ASSERT_EQUALS(box_collection_pdc_XYZ.rGetLocalBoxes(0), correct_answer_0);
@@ -1052,9 +1077,9 @@ public:
 
     }
 
-    void TestNodesPairs2DWithPeriodicity() 
+    void DNRTestNodesPairs2DWithPeriodicity() 
     {
-        // Re-implemented from TestObsoleteBoxCollection
+        // Re-implemented from DNRTestObsoleteBoxCollection
         
         // Set up a box collection
         c_vector<double, 2 * 2> domain_size;
@@ -1153,7 +1178,7 @@ public:
     //
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
-    void TestSetupHaloBoxes1d2d3d()
+    void DNRTestSetupHaloBoxes1d2d3d()
     {
         unsigned num_procs = PetscTools::GetNumProcs();
         DoSetupHaloBoxes<1>(num_procs);
@@ -1161,7 +1186,7 @@ public:
         DoSetupHaloBoxes<3>(num_procs);
     }
 
-    void TestUpdateHaloBoxes1d2d3d()
+    void DNRTestUpdateHaloBoxes1d2d3d()
     {
         unsigned num_procs = PetscTools::GetNumProcs();
         DoUpdateHaloBoxes<1>(num_procs);
@@ -1179,7 +1204,7 @@ public:
     //
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
-    void TestPairsReturned1d()
+    void DNRTestPairsReturned1d()
     {
         std::vector< ChastePoint<1>* > points(5);
         points[0] = new ChastePoint<1>(0.2);
@@ -1403,11 +1428,11 @@ public:
         }
     }
 
-    void TestBoxGeneration2d()
+    void DNRTestBoxGeneration2d()
     {
         if (PetscTools::GetNumProcs() > 3)
         {
-            TS_TRACE("TestBoxGeneration2d only designed for up to 3 processes.");
+            TS_TRACE("DNRTestBoxGeneration2d only designed for up to 3 processes.");
             return;
         }
         // Create a simple mesh
@@ -1480,7 +1505,7 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
         }
 
-        // Test whether we can correctly identify interior boxes
+        // DNRTest whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
             // In serial everything is an interior box.
@@ -1515,7 +1540,7 @@ public:
      * calculations.  Note that failure of this test on a given architecture implies
      * the failure of node-based cell simulations
      */
-    void TestLargeBoxCollection2d()
+    void DNRTestLargeBoxCollection2d()
     {
         double cut_off_length = 1e-3;
 
@@ -1545,7 +1570,7 @@ public:
 
     }
 
-    void TestPairsReturned2d()
+    void DNRTestPairsReturned2d()
     {
         std::vector< ChastePoint<2>* > points(10);
         points[0] = new ChastePoint<2>(0.2, 3.7);
@@ -1921,11 +1946,11 @@ public:
         }
     }
 
-    void TestPairsReturned3d()
+    void DNRTestPairsReturned3d()
     {
         if (PetscTools::GetNumProcs() > 3)
         {
-            TS_TRACE("TestPairsReturned3d only designed for up to 3 processes");
+            TS_TRACE("DNRTestPairsReturned3d only designed for up to 3 processes");
             return;
         }
         // 3D cube of nodes, set up so that there is one node in each of the 3x3x3 boxes.
@@ -2082,7 +2107,7 @@ public:
         }
     }
 
-    void TestSplitNeighbourCalculation()
+    void DNRTestSplitNeighbourCalculation()
     {
         std::vector<Node<2>* > nodes;
         for (unsigned j=0; j<3; j++)
@@ -2213,7 +2238,7 @@ public:
                 TS_ASSERT_EQUALS(neighbours_of_4, expected);
             }
         }
-        /* Test the all node neighbours have been calculated on 3 processes */
+        /* DNRTest the all node neighbours have been calculated on 3 processes */
         if (PetscTools::GetNumProcs() == 3)
         {
             if (PetscTools::GetMyRank() == 1)
@@ -2240,7 +2265,7 @@ public:
         }
     }
 
-    void TestPairsReturned2dPeriodic()
+    void DNRTestPairsReturned2dPeriodic()
     {
         EXIT_IF_PARALLEL;
 
@@ -2401,7 +2426,7 @@ public:
         }
     }
 
-    void TestBoxGeneration3d() 
+    void DNRTestBoxGeneration3d() 
 {
         // Create a mesh
         TetrahedralMesh<3,3> mesh;
@@ -2511,7 +2536,7 @@ public:
                 TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
             }
         }
-        // Test whether we can correctly identify interior boxes
+        // DNRTest whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
             // In serial everything is an interior box.
@@ -2542,7 +2567,7 @@ public:
         }
     }
 
-    void TestArchivingDistributedBoxCollection()
+    void DNRTestArchivingDistributedBoxCollection()
     {
          FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
          std::string archive_file = "box_collection.arch";
@@ -2603,9 +2628,9 @@ public:
          }
     }
 
-    void TestLoadBalanceFunction()
+    void DNRTestLoadBalanceFunction()
     {
-        // This test is designed for 3 process environment. Tests that an equal spread of load results
+        // This test is designed for 3 process environment. DNRTests that an equal spread of load results
         // in an equal spread of the domain size between processes.
         if (PetscTools::GetNumProcs() == 3)
         {
@@ -2672,7 +2697,7 @@ public:
      * can encounter problems of domain shrinking to zero size at the next load balance. This test
      * makes sure that this cannot happen.
      */
-    void TestLoadBalanceMaintainsMinimumLocalRegion()
+    void DNRTestLoadBalanceMaintainsMinimumLocalRegion()
     {
         if (PetscTools::GetNumProcs() == 3)
         {
@@ -2699,7 +2724,7 @@ public:
         }
     }
 
-    void TestGetDistributionOfNodes()
+    void DNRTestGetDistributionOfNodes()
     {
         double cut_off_length = 1.0;
 
