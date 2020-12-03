@@ -153,24 +153,25 @@ void PeriodicNdNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint
     {
         // Get the appropriate dimension index
         unsigned d=mPeriodicDims[i];
+        double local_point_coord = point_coord(d);
         // We need to make sure that the fudge factor is greater than the one used to calculate the containing
         // box in distributed box collection. Otherwise the forced domain width causes issues at the right domain edge.
         double fudge_factor = 1.0e-13;
-        if ( point_coord(d) >= mWidth[i] )
+        if ( local_point_coord >= mWidth[i] )
         {
-            double new_coord = point_coord(d) - mWidth[i];
+            double new_coord = local_point_coord - mWidth[i];
 
             point.SetCoordinate(d,new_coord);
         }
-        else if ( point_coord(d) > (mWidth[i]-fudge_factor))
+        else if ( local_point_coord > (mWidth[i]-fudge_factor))
         {
             // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
             // This is due to the fact that mWidth-1e-16=mWidth
             point.SetCoordinate(d,mWidth[i]-fudge_factor);
         }
-        else if ( point_coord(d) < 0.0 )
+        else if ( local_point_coord < 0.0 )
         {
-            double new_coord = point_coord(d) + mWidth[i];
+            double new_coord = local_point_coord) + mWidth[i];
             
             // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
             // This is due to the fact that mWidth-1e-16=mWidth
