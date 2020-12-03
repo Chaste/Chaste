@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 
