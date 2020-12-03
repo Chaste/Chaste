@@ -110,7 +110,7 @@ private:
         AbstractCellBasedTestSuite::tearDown();
     }
 public:
-    void TestSendAndReceiveCells() throw (Exception)
+    void TestSendAndReceiveCells()
     {
         unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -147,7 +147,7 @@ public:
         }
     }
 
-    void TestSendAndReceiveCellsNonBlocking() throw (Exception)
+    void TestSendAndReceiveCellsNonBlocking()
     {
         unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -186,7 +186,7 @@ public:
         }
     }
 
-    void TestUpdateCellProcessLocation() throw (Exception)
+    void TestUpdateCellProcessLocation()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -224,7 +224,7 @@ public:
         }
     }
 
-    void TestRefreshHaloCells() throw (Exception)
+    void TestRefreshHaloCells()
     {
         // Set up the halo boxes and nodes.
         mpNodeBasedCellPopulation->Update();

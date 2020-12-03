@@ -219,7 +219,7 @@ public:
     }
 
     // Periodicity tests
-    void TestSimpleXPeriodic3dLayer() throw (Exception)
+    void TestSimpleXPeriodic3dLayer()
     {   
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
@@ -360,7 +360,7 @@ public:
 
     }
 
-    void TestSimpleYPeriodic3dLayer() throw (Exception)
+    void TestSimpleYPeriodic3dLayer()
     {
         //EXIT_IF_PARALLEL;
         
@@ -499,7 +499,7 @@ public:
 
     }
 
-    void TestSimpleZPeriodic3dLayer() throw (Exception)
+    void TestSimpleZPeriodic3dLayer()
     {
         //EXIT_IF_PARALLEL;
         
@@ -638,7 +638,7 @@ public:
 
     }
 
-    void TestSimpleXZPeriodic3dLayer() throw (Exception)
+    void TestSimpleXZPeriodic3dLayer()
     {
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
