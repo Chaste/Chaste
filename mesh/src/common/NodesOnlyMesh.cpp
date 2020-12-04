@@ -588,18 +588,36 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
         domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - 1e-14;
         domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + 1e-14;
     }
-
     SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, bool isPeriodicInX, bool isPeriodicInY, bool isPeriodicInZ)
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, c_vector<bool,SPACE_DIM> isDimPeriodic)
 {
-     ClearBoxCollection();
+    ClearBoxCollection();
 
-     mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodicInX, isPeriodicInY, isPeriodicInZ, numLocalRows);
-     mpBoxCollection->SetupLocalBoxesHalfOnly();
-     mpBoxCollection->SetCalculateNodeNeighbours(mCalculateNodeNeighbours);
+    bool isPeriodicInX = false;
+    bool isPeriodicInY = false;
+    bool isPeriodicInZ = false;
+
+    for ( unsigned i=0; i<SPACE_DIM; i++ )
+    {
+        if ( i==0 )
+        {
+            isPeriodicInX = isDimPeriodic(i);
+        }
+        if ( i==1 )
+        {
+            isPeriodicInY = isDimPeriodic(i);
+        }
+        if ( i==2 )
+        {
+            isPeriodicInZ = isDimPeriodic(i);
+        }
+    }
+    mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodicInX, isPeriodicInY, isPeriodicInZ, numLocalRows);
+    mpBoxCollection->SetupLocalBoxesHalfOnly();
+    mpBoxCollection->SetCalculateNodeNeighbours(mCalculateNodeNeighbours);
 }
 
 template<unsigned SPACE_DIM>

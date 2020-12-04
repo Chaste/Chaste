@@ -217,9 +217,9 @@ protected:
      * @param cutOffLength the cut off length for node neighbours.
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows that should be owned by this process.
-     * @param isPeriodic whether the DistributedBoxCollection should be periodic.
+     * @param isDimPeriodic whether the DistributedBoxCollection should be periodic.
      */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX = false, bool isPeriodicInY = false, bool isPeriodicInZ = false);
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE,  c_vector<bool,SPACE_DIM> isDimPeriodic  = zero_vector<bool>(SPACE_DIM));
 
      /** @return mpBoxCollection */
      DistributedBoxCollection<SPACE_DIM>* GetBoxCollection();

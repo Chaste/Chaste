@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
+
 class TestPeriodicNodesOnlyMesh : public CxxTest::TestSuite
 {
 public:
@@ -58,9 +59,12 @@ public:
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-        // Convert this to a Cylindrical2dNodesOnlyMesh
-        std::vector<double> periodic_width(2,4.0);
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width, true,true,false);
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        periodic_width[1] = 4.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
+
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         // Test CalculateBoundingBox() method
@@ -91,10 +95,10 @@ public:
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-        // Convert this to a Cylindrical2dNodesOnlyMesh
-        std::vector<double> periodic_width(1,4.0);
-        std::vector<unsigned> periodic_dims(1,0);
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width,true,false,false);
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5),
                               "The periodic width must be a multiple of cut off length.");
 
@@ -114,8 +118,10 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicNodesOnlyMesh
-        std::vector<double> periodic_width(2,4.0);
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width,true,true,false);
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        periodic_width[1] = 4.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         c_vector<double, 2> node10_location = p_mesh->GetNode(10)->rGetLocation();
@@ -171,8 +177,10 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicNodesOnlyMesh
-        std::vector<double> periodic_width(2,4.0);
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width,true,true,false);
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        periodic_width[1] = 4.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         // Move one of the nodes to past the periodic boundaries
@@ -215,8 +223,10 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicNodesOnlyMesh
-        std::vector<double> periodic_width(2,4.0);
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width, true,true,false);
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        periodic_width[1] = 4.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         // ReMesh to make the box collection big enough to accommodate new nodes.
@@ -272,8 +282,10 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        std::vector<double> periodic_width(2,4.0);
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width,true,true,false);
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        periodic_width[1] = 4.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
         //Check some node positions
@@ -307,7 +319,7 @@ public:
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
 
         double cut_off = 1.0;
-        std::vector<double> periodic_width(1,3.0);
+        
         /*
          * Nodes chosen so to test the cases that the domain width in x is
          * "divisible" by the cut_off, the y-dimension is not "divisible".
@@ -320,7 +332,10 @@ public:
         nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 2.5, 1.0));
 
-        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width,true,false,false);
+        // Convert this to a PeriodicdNodesOnlyMesh
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 3.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(nodes, cut_off);
 
         // Call SetupBoxCollection method not called unless EnlargeBoxCollection is called so we call manually
@@ -353,94 +368,96 @@ public:
         delete p_mesh;
     }
 
-    // // NB This checks that periodicity is maintained through archiving...
-    // void TestArchiving()
-    // {
-    //     EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+    // NB This checks that periodicity is maintained through archiving...
+    void TestArchiving()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
-    //     FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-    //     std::string archive_file = "cylindrical_nodes_only_mesh_base.arch";
-    //     ArchiveLocationInfo::SetMeshFilename("cylindrical_nodes_only_mesh");
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "periodic_nodes_only_mesh_base.arch";
+        ArchiveLocationInfo::SetMeshFilename("periodic_nodes_only_mesh");
 
-    //     // Create generating mesh
-    //     unsigned num_cells_across = 4;
-    //     unsigned num_cells_up = 7;
-    //     HoneycombMeshGenerator generator(num_cells_across,num_cells_up);
-    //     TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        // Create generating mesh
+        HoneycombMeshGenerator generator(4, 4);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-    //     // Convert this to a Cylindrical2dNodesOnlyMesh
-    //     double periodic_width = 4.0;
-    //     Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-    //     p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 4.0;
+        periodic_width[1] = 6.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
-    //     AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
+        AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
 
-    //     /*
-    //      * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
-    //      * This is because the serialization library only allows you to save
-    //      * tracked objects while the compiler considers them const, to prevent
-    //      * the objects changing during the save, and so object tracking leading
-    //      * to wrong results. For example, A is saved once via pointer, then
-    //      * changed, then saved again.  The second save notes that A was saved
-    //      * before, so doesn't write its data again, and the change is lost.
-    //      */
-    //     {
-    //         // Serialize the mesh
-    //         TS_ASSERT_DELTA((static_cast<Cylindrical2dNodesOnlyMesh*>(p_saved_mesh))->GetWidth(0), periodic_width, 1e-7);
+        /*
+         * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
+         * This is because the serialization library only allows you to save
+         * tracked objects while the compiler considers them const, to prevent
+         * the objects changing during the save, and so object tracking leading
+         * to wrong results. For example, A is saved once via pointer, then
+         * changed, then saved again.  The second save notes that A was saved
+         * before, so doesn't write its data again, and the change is lost.
+         */
+        {
+            // Serialize the mesh
+            TS_ASSERT_DELTA((static_cast<PeriodicNodesOnlyMesh<2>*>(p_saved_mesh))->GetWidth(0), periodic_width[0], 1e-7);
+            TS_ASSERT_DELTA((static_cast<PeriodicNodesOnlyMesh<2>*>(p_saved_mesh))->GetWidth(1), periodic_width[1], 1e-7);
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-    //         // Create output archive
-    //         ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-    //         boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+            // We have to serialize via a pointer here, or the derived class information is lost.
+            (*p_arch) << p_saved_mesh;
+        }
 
-    //         // We have to serialize via a pointer here, or the derived class information is lost.
-    //         (*p_arch) << p_saved_mesh;
-    //     }
+        {
+            // De-serialize and compare
+            AbstractMesh<2,2>* p_loaded_mesh;
 
-    //     {
-    //         // De-serialize and compare
-    //         AbstractMesh<2,2>* p_loaded_mesh;
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-    //         // Create an input archive
-    //         ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-    //         boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+            // Restore from the archive
+            (*p_arch) >> p_loaded_mesh;
 
-    //         // Restore from the archive
-    //         (*p_arch) >> p_loaded_mesh;
+            // Compare the loaded mesh against the original
+            PeriodicNodesOnlyMesh<2>* p_static_cast_loaded_mesh = static_cast<PeriodicNodesOnlyMesh<2>*>(p_loaded_mesh);
+            PeriodicNodesOnlyMesh<2>* p_static_cast_saved_mesh = static_cast<PeriodicNodesOnlyMesh<2>*>(p_saved_mesh);
 
-    //         // Compare the loaded mesh against the original
-    //         Cylindrical2dNodesOnlyMesh* p_static_cast_loaded_mesh = static_cast<Cylindrical2dNodesOnlyMesh*>(p_loaded_mesh);
-    //         Cylindrical2dNodesOnlyMesh* p_static_cast_saved_mesh = static_cast<Cylindrical2dNodesOnlyMesh*>(p_saved_mesh);
+            // Compare widths
+            TS_ASSERT_DELTA(p_static_cast_loaded_mesh->GetWidth(0), periodic_width[0], 1e-7);
+            TS_ASSERT_DELTA(p_static_cast_saved_mesh->GetWidth(0), periodic_width[0], 1e-7);
+            TS_ASSERT_DELTA(p_static_cast_loaded_mesh->GetWidth(1), periodic_width[1], 1e-7);
+            TS_ASSERT_DELTA(p_static_cast_saved_mesh->GetWidth(1), periodic_width[1], 1e-7);
 
-    //         // Compare width
-    //         TS_ASSERT_DELTA(p_static_cast_loaded_mesh->GetWidth(0), periodic_width, 1e-7);
-    //         TS_ASSERT_DELTA(p_static_cast_saved_mesh->GetWidth(0), periodic_width, 1e-7);
+            // Compare nodes
+            TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), p_static_cast_loaded_mesh->GetNumNodes());
+            TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), 16u);
 
-    //         // Compare nodes
-    //         TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), p_static_cast_loaded_mesh->GetNumNodes());
-    //         TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), 28u);
+            for (unsigned i=0; i<p_static_cast_saved_mesh->GetNumNodes(); i++)
+            {
+                Node<2>* p_node = p_static_cast_saved_mesh->GetNode(i);
+                Node<2>* p_node2 = p_static_cast_loaded_mesh->GetNode(i);
 
-    //         for (unsigned i=0; i<p_static_cast_saved_mesh->GetNumNodes(); i++)
-    //         {
-    //             Node<2>* p_node = p_static_cast_saved_mesh->GetNode(i);
-    //             Node<2>* p_node2 = p_static_cast_loaded_mesh->GetNode(i);
+                TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
+                TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
 
-    //             TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
-    //             TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
+                TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-    //             TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
+                for (unsigned j=0; j<2; j++)
+                {
+                    TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
+                }
+            }
+            // Avoid memory leak
+            delete p_loaded_mesh;
+        }
 
-    //             for (unsigned j=0; j<2; j++)
-    //             {
-    //                 TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
-    //             }
-    //         }
-    //         // Avoid memory leak
-    //         delete p_loaded_mesh;
-    //     }
-
-    //     // Avoid memory leak
-    //     delete p_mesh;
-    // }
+        // Avoid memory leak
+        delete p_mesh;
+    }
 };
 
-#endif /*TestPeriodicNdNODESONLYMESH_HPP_*/
+#endif /*TESTPERIODICNODESONLYMESH_HPP_*/

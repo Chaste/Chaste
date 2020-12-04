@@ -85,8 +85,10 @@ private:
             nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5+(double)i));
         }
 
-        std::vector<double> widths(1,(double)PetscTools::GetNumProcs());
-        mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(widths,false,false,true);
+        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        periodic_width[2] = (double)PetscTools::GetNumProcs();
+
+        mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(periodic_width);
         mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0);
 
         std::vector<CellPtr> cells;

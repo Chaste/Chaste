@@ -53,25 +53,15 @@ template<unsigned SPACE_DIM>
 class PeriodicNodesOnlyMesh: public NodesOnlyMesh<SPACE_DIM>
 {
 private:
-    /*
-     * The number of periodic dimensions
-    */
-    unsigned mNumPeriodicDims;
-
     /**
      * The periodic widths of the domain
      */
-    std::vector< double > mWidth;
-
-    /**
-     * Which dimensions are periodic
-     */
-    std::vector< unsigned > mPeriodicDims;
+    c_vector<double,SPACE_DIM> mWidth;
 
     /*
      * Whether a dimension is periodic
      */
-    c_vector<bool,3> mIsDimPeriodic;
+    c_vector<bool,SPACE_DIM> mIsDimPeriodic;
 
     friend class TestPeriodicNodesOnlyMesh;
 
@@ -92,9 +82,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<NodesOnlyMesh<SPACE_DIM> >(*this);
-        archive & mNumPeriodicDims;
         archive & mWidth;
-        archive & mPeriodicDims;
         archive & mIsDimPeriodic;
     }
 
@@ -103,13 +91,10 @@ public:
     /**
      * Constructor.
      *
-     * @param width the periodic widths of the mesh.
-     * @param periodicInX whether the domain is periodic in the x direction.
-     * @param periodicInY whether the domain is periodic in the y direction. Defaults to false.
-     * @param periodicInZ whether the domain is periodic in the z direction. Defaults to false.
+     * @param width the periodic widths of the mesh. (Note if width=0.0 then not periodic)
      * 
      */
-    PeriodicNodesOnlyMesh(std::vector<double> width, bool periodicInX, bool periodicInY=false, bool periodicInZ=false);
+    PeriodicNodesOnlyMesh(c_vector<double,SPACE_DIM> width);
 
     /**
      * Set up the box collection
@@ -117,11 +102,9 @@ public:
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows of the collection that this process should own.
-     * @param isPeriodicInX whether the box collection should be periodic in the x direction. Defaults to false.
-     * @param isPeriodicInY whether the box collection should be periodic in the x direction. Defaults to false.
-     * @param isPeriodicInZ whether the box collection should be periodic in the x direction. Defaults to false.
+     * @param isDimPeriodic whether the box collection should be periodic in the x y and/or z direction. 
      */
-    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodicInX=false, bool isPeriodicInY=false, bool isPeriodicInZ=false);
+    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE,  c_vector<bool,SPACE_DIM> isDimPeriodic = zero_vector<bool>(SPACE_DIM));
 
     /**
      * Overridden GetVectorFromAtoB() method.
@@ -141,22 +124,16 @@ public:
      * Calculate the 'width' of any dimension of the mesh, taking periodicity
      * into account.
      *
-     * @param rDimension a dimension (0 or 1)
+     * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension) const;
 
     /*
-     * Method to get the periodic dimensions
-     * @return The value of the mPeriodicDims vector
-    */
-    std::vector<unsigned> GetPeriodicDimensions() const;
-
-    /*
      * Method to get the width of the periodic dimensions
      * @return The value of the mWidth vector
     */
-    std::vector<double> GetPeriodicWidths() const;
+    c_vector<double,SPACE_DIM> GetPeriodicWidths() const;
 
     /*
      * Overridden SetNode() method.
@@ -200,20 +177,10 @@ inline void save_construct_data(
     Archive & ar, const PeriodicNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const std::vector<unsigned> pdc_dims = t->GetPeriodicDimensions();
-    unsigned num_pdc_dims = pdc_dims.size();
-    // Required to save for the load function
-    ar << num_pdc_dims;
-    
-    for ( unsigned i=0; i<num_pdc_dims; i++ )
+    const c_vector<double,SPACE_DIM> width = t->GetPeriodicWidths();
+    for ( unsigned i=0; i < SPACE_DIM; i++ )
     {
-        ar << pdc_dims[i];
-    }
-
-    const std::vector<double> width = t->GetPeriodicWidths();
-    for ( unsigned i=0; i < width.size(); i++ )
-    {
-        ar << width[i];
+        ar << width(i);
     }
 }
 
@@ -225,34 +192,16 @@ inline void load_construct_data(
     Archive & ar, PeriodicNodesOnlyMesh<SPACE_DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance of the mesh
-    unsigned dims_size;
-    ar & dims_size;
-
-    bool isPeriodicInX=false, isPeriodicInY=false, isPeriodicInZ=false;
-    for (unsigned i=0; i<dims_size; i++)
-    {
-        unsigned current_dim;
-        ar & current_dim;
-        switch(current_dim) {
-            case 0 :    isPeriodicInX = true;
-                        break;
-            case 1 :    isPeriodicInY = true;
-                        break;
-            case 2 :    isPeriodicInZ = true;
-                        break;
-        }
-    }
-
-    std::vector<double> width(dims_size);
-    for (unsigned i=0; i<dims_size; i++)
+    c_vector<double,SPACE_DIM> width;
+    for (unsigned i=0; i<SPACE_DIM; i++)
     {
         double current_width;
         ar & current_width;
-        width[i] = current_width;
+        width(i) = current_width;
     }
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)PeriodicNodesOnlyMesh<SPACE_DIM>(width,isPeriodicInX, isPeriodicInY, isPeriodicInZ);
+    ::new(t)PeriodicNodesOnlyMesh<SPACE_DIM>(width);
 }
 }
 } // namespace ...

@@ -224,9 +224,10 @@ public:
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
-	    // Create the mesh
-        std::vector<double> periodic_width(1,6.0);
-	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, true); 
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        periodic_width[0] = 6.0;
+        PeriodicNodesOnlyMesh<3> mesh(periodic_width); 
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -271,7 +272,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a PeriodicNodesOnlyMesh
-        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width,true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -332,7 +333,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
@@ -371,9 +372,10 @@ public:
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
-	    // Create the mesh
-        std::vector<double> periodic_width(1,6.0);
-	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, false, true); 
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        periodic_width[1] = 6.0;
+        PeriodicNodesOnlyMesh<3> mesh(periodic_width);
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -407,7 +409,7 @@ public:
         {
             double y_node = (*node_iter).rGetLocation()[1];
             TS_ASSERT_LESS_THAN_EQUALS(0,y_node);
-            TS_ASSERT_LESS_THAN_EQUALS(y_node, periodic_width[0]);
+            TS_ASSERT_LESS_THAN_EQUALS(y_node, periodic_width[1]);
         }
 
         // Now run the simulation again with the periodic boundary in a different place and check its the same
@@ -418,7 +420,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width,false,true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -478,7 +480,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,false,true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
@@ -519,9 +521,10 @@ public:
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
-	    // Create the mesh
-        std::vector<double> periodic_width(1,6.0);
-	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, false, false, true); 
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        periodic_width[2] = 6.0;
+        PeriodicNodesOnlyMesh<3> mesh(periodic_width);
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -555,7 +558,7 @@ public:
         {
             double z_node = (*node_iter).rGetLocation()[2];
             TS_ASSERT_LESS_THAN_EQUALS(0,z_node);
-            TS_ASSERT_LESS_THAN_EQUALS(z_node, periodic_width[0]);
+            TS_ASSERT_LESS_THAN_EQUALS(z_node, periodic_width[2]);
         }
 
         // Now run the simulation again with the periodic boundary in a different place and check its the same
@@ -566,7 +569,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width,false, false, true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -626,7 +629,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,false, false, true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
@@ -665,9 +668,11 @@ public:
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
-	    // Create the mesh
-        std::vector<double> periodic_width(2,6.0);
-	    PeriodicNodesOnlyMesh<3> mesh(periodic_width, true, false, true); 
+        // Convert this to a PeriodicNodesOnlyMesh
+        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        periodic_width[0] = 6.0;
+        periodic_width[2] = 6.0;
+        PeriodicNodesOnlyMesh<3> mesh(periodic_width);
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
@@ -703,7 +708,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[0]);
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[2]);
             TS_ASSERT_LESS_THAN_EQUALS(node_location[0], periodic_width[0]);
-            TS_ASSERT_LESS_THAN_EQUALS(node_location[2], periodic_width[1]);
+            TS_ASSERT_LESS_THAN_EQUALS(node_location[2], periodic_width[2]);
         }
 
         // Now run the simulation again with the periodic boundary in a different place and check its the same
@@ -714,7 +719,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
-        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width, true, false, true);
+        PeriodicNodesOnlyMesh<3> mesh_2(periodic_width);
         mesh_2.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Add an offset
@@ -784,7 +789,7 @@ public:
             RandomNumberGenerator::Instance()->Reseed(0);
 
             // Convert this to a Cylindrical2dNodesOnlyMesh
-            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width,true, false, true);
+            PeriodicNodesOnlyMesh<3> mesh_3(periodic_width);
             mesh_3.ConstructNodesWithoutMesh(nodes, 2.0);
 
             // Create cells
