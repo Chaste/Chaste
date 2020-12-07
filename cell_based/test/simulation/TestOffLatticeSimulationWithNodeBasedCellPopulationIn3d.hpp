@@ -302,23 +302,27 @@ public:
 
         simulator_2.Solve();
 
-        // Check that cells are in the same place in each simulation
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        if ( PetscTools::GetNumProcs() == 1 )
         {
-            double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
-            double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
-            
-            if (x_1 < x_offset)
+            // Check that cells are in the same place in each simulation 
+            // Note the way we do this only works on 1 processor
+            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
             {
-                TS_ASSERT_DELTA(x_1+x_offset, x_2, 1e-6)
-            }
-            else
-            {
-                TS_ASSERT_DELTA(x_1-x_offset, x_2, 1e-6)
-            }
+                double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+                double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+                
+                if (x_1 < x_offset)
+                {
+                    TS_ASSERT_DELTA(x_1+x_offset, x_2, 1e-6)
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(x_1-x_offset, x_2, 1e-6)
+                }
 
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
+            }
         }
 
 
@@ -450,23 +454,27 @@ public:
 
         simulator_2.Solve();
 
-        // Check that cells are in the same place in each simulation
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        if ( PetscTools::GetNumProcs() == 1 )
         {
-            double y_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
-            double y_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
-            
-            if (y_1 < y_offset)
+            // Check that cells are in the same place in each simulation 
+            // Note the way we do this only works on 1 processor
+            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
             {
-                TS_ASSERT_DELTA(y_1+y_offset, y_2, 1e-6)
-            }
-            else
-            {
-                TS_ASSERT_DELTA(y_1-y_offset, y_2, 1e-6)
-            }
+                double y_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+                double y_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+                
+                if (y_1 < y_offset)
+                {
+                    TS_ASSERT_DELTA(y_1+y_offset, y_2, 1e-6)
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(y_1-y_offset, y_2, 1e-6)
+                }
 
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
+            }
         }
 
         if ( PetscTools::GetNumProcs() == 1 )
@@ -597,24 +605,28 @@ public:
 
         simulator_2.Solve();
 
-        // Check that cells are in the same place in each simulation
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        if ( PetscTools::GetNumProcs() == 1 )
         {
-            double z_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
-            double z_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
-            
-            if (z_1 < z_offset)
+            // Check that cells are in the same place in each simulation 
+            // Note the way we do this only works on 1 processor
+            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
             {
-                TS_ASSERT_DELTA(z_1+z_offset, z_2, 1e-6)
-            }
-            else
-            {
-                TS_ASSERT_DELTA(z_1-z_offset, z_2, 1e-6)
-            }
+                double z_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
+                double z_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
+                
+                if (z_1 < z_offset)
+                {
+                    TS_ASSERT_DELTA(z_1+z_offset, z_2, 1e-6)
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(z_1-z_offset, z_2, 1e-6)
+                }
 
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
-        }
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
+            }
+        }   
 
         if ( PetscTools::GetNumProcs() == 1 )
         {
@@ -747,33 +759,37 @@ public:
 
         simulator_2.Solve();
 
-        // Check that cells are in the same place in each simulation
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        if ( PetscTools::GetNumProcs() == 1 )
         {
-            double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
-            double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
-            double z_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
-            double z_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
-            
-            if (x_1 < offset)
+            // Check that cells are in the same place in each simulation 
+            // Note the way we do this only works on 1 processor
+            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
             {
-                TS_ASSERT_DELTA(x_1+offset, x_2, 1e-6)
-            }
-            else
-            {
-                TS_ASSERT_DELTA(x_1-offset, x_2, 1e-6)
-            }
+                double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+                double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+                double z_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
+                double z_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
+                
+                if (x_1 < offset)
+                {
+                    TS_ASSERT_DELTA(x_1+offset, x_2, 1e-6)
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(x_1-offset, x_2, 1e-6)
+                }
 
-            if (z_1 < offset)
-            {
-                TS_ASSERT_DELTA(z_1+offset, z_2, 1e-6)
-            }
-            else
-            {
-                TS_ASSERT_DELTA(z_1-offset, z_2, 1e-6)
-            }
+                if (z_1 < offset)
+                {
+                    TS_ASSERT_DELTA(z_1+offset, z_2, 1e-6)
+                }
+                else
+                {
+                    TS_ASSERT_DELTA(z_1-offset, z_2, 1e-6)
+                }
 
-            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
+                TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
+            }
         }
 
         if ( PetscTools::GetNumProcs() == 1 )
