@@ -92,11 +92,13 @@ private:
 public:
 
     /**
-     * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem.
+     * Create a simulation of a NodeBasedCellPopulation with a simple force law.
      * Test that no exceptions are thrown, and write the results to file.
      */
     void TestSimpleMonolayer()
     {
+        EXIT_IF_PARALLEL; // Cant access cells with index loop on multiple processors.
+
         // Create a simple mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;

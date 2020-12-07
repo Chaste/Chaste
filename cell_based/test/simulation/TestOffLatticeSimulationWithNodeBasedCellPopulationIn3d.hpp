@@ -89,6 +89,8 @@ public:
 
     void Test3dNodeBasedRestrictedToSphere()
     {
+        EXIT_IF_PARALLEL; // Output doesn't work in parallel so we cannot solve a simulation #2365
+
         // Create a simple 3D NodeBasedCellPopulation
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false,  0.5, 0.0, 0.0));
@@ -516,8 +518,6 @@ public:
 
     void TestSimple3dTissueZPeriodic()
     {
-        EXIT_IF_PARALLEL;
-        
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
@@ -663,7 +663,7 @@ public:
         }
     }
 
-    void TestSimple2dTissueXZPeriodic()
+    void TestSimple3dTissueXZPeriodic()
     {
         // Set up the node positions
 	    std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
