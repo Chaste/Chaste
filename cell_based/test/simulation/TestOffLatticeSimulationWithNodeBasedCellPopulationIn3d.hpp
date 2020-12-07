@@ -228,7 +228,7 @@ public:
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,3> periodic_width = zero_vector<double>(3);
-        periodic_width[0] = 6.0;
+        periodic_width[0] = 6.0; //periodic in x with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width); 
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
@@ -380,7 +380,7 @@ public:
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,3> periodic_width = zero_vector<double>(3);
-        periodic_width[1] = 6.0;
+        periodic_width[1] = 6.0; //periodic in y with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
@@ -531,7 +531,7 @@ public:
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,3> periodic_width = zero_vector<double>(3);
-        periodic_width[2] = 6.0;
+        periodic_width[2] = 6.0; //periodic in y with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
@@ -682,8 +682,8 @@ public:
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,3> periodic_width = zero_vector<double>(3);
-        periodic_width[0] = 6.0;
-        periodic_width[2] = 6.0;
+        periodic_width[0] = 6.0;//periodic in x with width 6.0
+        periodic_width[2] = 6.0;//periodic in z with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
 	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
