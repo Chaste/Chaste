@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
-#include "Debug.hpp"
 
 class TestDistributedBoxCollection : public CxxTest::TestSuite
 {

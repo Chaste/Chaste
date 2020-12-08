@@ -73,7 +73,13 @@ class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellB
 {
 
 private:
-    // Generate a simple mesh that can be done in parallel
+    /**
+     * Helper method to generate a simple mesh that works in parallel
+     * 
+     * @param nx number of nodes in the x direction
+     * @param ny number of nodes in the y direction
+     * @return the nodes for the nodes only mesh
+     */
     std::vector<Node<2>*> GenerateMesh(unsigned nx, unsigned ny)
     {
         std::vector<Node<2>*> nodes(nx*ny);

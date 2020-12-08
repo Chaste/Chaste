@@ -101,13 +101,13 @@ private:
     /** The largest index of the boxes owned by this process. */
     unsigned mMaxBoxIndex;
 
-    /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
+    /** Whether the domain is periodic in the X dimension.*/
     bool mIsPeriodicInX;
 
-    /** Whether the domain is periodic in the Y dimension. Note this currently only works for DIM=2*/
+    /** Whether the domain is periodic in the Y dimension.*/
     bool mIsPeriodicInY;
 
-    /** Whether the domain is periodic in the Z dimension. Note this doesn't work*/
+    /** Whether the domain is periodic in the Z dimension.*/
     bool mIsPeriodicInZ;
 
     /** Whether the domain is periodic across different processors (i.e. in parallel if DIM==3 and periodic in z, or DIM==2 and periodic in Y)*/
@@ -153,7 +153,9 @@ public:
     /**
      * @param boxWidth the width of each box (cut-off length in NodeBasedCellPopulation simulations)
      * @param domainSize the size of the domain, in the form (xmin, xmax, ymin, ymax) (etc)
-     * @param isPeriodicInX whether the domain is periodic in the x direction
+     * @param isPeriodicInX whether the domain is periodic in the x direction (defaults to false)
+     * @param isPeriodicInY whether the domain is periodic in the y direction (defaults to true)
+     * @param isPeriodicInZ whether the domain is periodic in the z direction (defaults to true)
      * @param localRows the number of local rows in a parallel DistributedBoxCollection.
      *
      * Note that the domain size may be increased because each process should have at least one slice of boxes
@@ -162,7 +164,6 @@ public:
      * user is warned when this happens.
      */
     DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool mIsPeriodicInY=false, bool mIsPeriodicInZ=false, int localRows = PETSC_DECIDE);
-
 
     /**
      * Destructor - frees memory allocated to distributed vector.

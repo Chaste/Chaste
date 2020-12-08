@@ -315,13 +315,13 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
         {
             // We are on the base and need to send to the top (i.e. left)
             mNodesToSendLeft.push_back(node_iter->GetIndex());
-    }
+        }
         else if ( owning_process == 0 )
         {
             // We are on the top and need to send to the bottom process (i.e. right)
             mNodesToSendRight.push_back(node_iter->GetIndex());
-}
-}
+        }
+    }
 }
 
 template<unsigned SPACE_DIM>

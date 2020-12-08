@@ -716,41 +716,41 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                 mLocalBoxes.clear();
 
                 // Now we need to work out the min and max z indices
-                int k_start = CalculateGridIndices(mMinBoxIndex)(2);
-                int k_end = CalculateGridIndices(mMaxBoxIndex)(2);
+                unsigned k_start = CalculateGridIndices(mMinBoxIndex)(2);
+                unsigned k_end = CalculateGridIndices(mMaxBoxIndex)(2);
                 
                 // Determine the number of boxes in each direction
-                int nI = mNumBoxesEachDirection(0);
-                int nJ = mNumBoxesEachDirection(1);
-                int nK = mNumBoxesEachDirection(2);
+                unsigned nI = mNumBoxesEachDirection(0);
+                unsigned nJ = mNumBoxesEachDirection(1);
+                unsigned nK = mNumBoxesEachDirection(2);
 
                 // Work out the bottom/top processor
-                int bottom_proc = mpDistributedBoxStackFactory->GetLow();
-                int top_proc = mpDistributedBoxStackFactory->GetHigh();
+                unsigned bottom_proc = mpDistributedBoxStackFactory->GetLow();
+                unsigned top_proc = mpDistributedBoxStackFactory->GetHigh();
                 
                 // Outer loop: over z
-                for ( int k = k_start; k <= k_end; k++ )
+                for ( unsigned k = k_start; k <= k_end; k++ )
                 {
                     // Middle loop: over y
-                    for ( int j = 0; j < nJ; j++ )
+                    for ( unsigned j = 0; j < nJ; j++ )
                     {
                         // Inner loop: over x
-                        for ( int i = 0; i < nI; i++ )
+                        for ( unsigned i = 0; i < nI; i++ )
                         {
                             std::set<unsigned> local_boxes;
                             
                             // Same z level
-                            int z_offset = k*nI*nJ;
+                            unsigned z_offset = k*nI*nJ;
                             // (See case dim=2 for commented code of X-Y implementation)
-                            int j_mod = j;
-                            for ( int dj = 0; dj < std::min(nJ-j_mod,2); dj++ )
+                            int j_mod = (int)j;
+                            for ( int dj = 0; dj < std::min((int)nJ-j_mod,2); dj++ )
                             {
                                 for ( int boxi = std::max((int)i-1*dj,0); 
-                                            boxi < std::min((int)i+2,nI); boxi++ )
+                                            boxi < std::min((int)i+2,(int)nI); boxi++ )
                                 {
                                     local_boxes.insert( z_offset + (j_mod+dj)*nI + boxi );
                                 }
-                                if ( i==(nI-1) && mIsPeriodicInX )
+                                if ( i==((int)nI-1) && mIsPeriodicInX )
                                 {
                                     local_boxes.insert( z_offset + (j_mod+dj)*nI );
                                 }
@@ -798,26 +798,24 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                 // Periodicity adjustments
                                 int pX = (int) mIsPeriodicInX;
                                 int pY = (int) mIsPeriodicInY;
-                                for ( int boxi = std::max((int)i-1,-1*pX); boxi < std::min((int)i+2,nI+pX); boxi++ )
+                                for ( int boxi = std::max((int)i-1,-1*pX); boxi < std::min((int)i+2,(int)nI+pX); boxi++ )
                                 {
-                                    for ( int boxj = std::max((int)j-1,-1*pY); boxj < std::min((int)j+2,nJ+pY); boxj++ )
+                                    for ( int boxj = std::max((int)j-1,-1*pY); boxj < std::min((int)j+2,(int)nJ+pY); boxj++ )
                                     {
-                                        int box_to_add = z_offset + (boxj*nI) + boxi;
+                                        int box_to_add = z_offset + (boxj*(int)nI) + boxi;
                                         // Check for x periodicity
                                         // i==(nI-1) only when we are periodic and on the right, 
                                         // i==-1 only when we are periodic and on the left
-                                        box_to_add += ( (unsigned)(boxi==-1) - (unsigned)(boxi==nI) )*nI;
+                                        box_to_add += ( (unsigned)(boxi==-1) - (unsigned)(boxi==(int)nI) )*nI;
                                         // Check for y periodicity
                                         // j==nJ only when we are periodic and on the right, 
                                         // j==-1 only when we are periodic and on the left
-                                        box_to_add += ( (unsigned)(boxj==-1) - (unsigned)(boxj==nJ) )*nI*nJ;
+                                        box_to_add += ( (unsigned)(boxj==-1) - (unsigned)(boxj==(int)nJ) )*nI*nJ;
                                         local_boxes.insert( box_to_add );
                                     }
                                 }
                             }
 
-                            
-                            
                             // Add to the local boxes
                             mLocalBoxes.push_back(local_boxes);
                         }

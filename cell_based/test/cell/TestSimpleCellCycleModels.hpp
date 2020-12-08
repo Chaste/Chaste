@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "ContactInhibitionCellCycleModel.hpp"
-#include "Debug.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "ExponentialG1GenerationalCellCycleModel.hpp"
 #include "FileComparison.hpp"

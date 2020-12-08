@@ -66,6 +66,15 @@ class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractC
 {
 
 private:
+
+    /**
+     * Helper method to generate a simple mesh that works in parallel
+     * 
+     * @param nx number of nodes in the x direction
+     * @param ny number of nodes in the y direction
+     * @param nz number of nodes in the z direction
+     * @return the nodes for the nodes only mesh
+     */
     std::vector<Node<3>*> GenerateMesh( unsigned nx, unsigned ny, unsigned nz )
     {
         std::vector<Node<3>*> nodes(nx*ny*nz);
@@ -220,7 +229,7 @@ public:
         }
     }
 
-    // Periodicity tests
+    // Now Test Periodicity
     void TestSimple3dTissueXPeriodic()
     {   
         // Set up the node positions

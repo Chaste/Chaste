@@ -240,7 +240,7 @@ private:
      * @param receiverJ receiver processor rank
      * @return a unique tag number
      */
-    unsigned calcMessageTag(unsigned senderI, unsigned receiverJ);
+    unsigned CalculateMessageTag(unsigned senderI, unsigned receiverJ);
 
 public:
 
