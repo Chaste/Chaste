@@ -750,7 +750,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                 {
                                     local_boxes.insert( z_offset + (j_mod+dj)*nI + boxi );
                                 }
-                                if ( i==((int)nI-1) && mIsPeriodicInX )
+                                if ( i==(nI-1) && mIsPeriodicInX )
                                 {
                                     local_boxes.insert( z_offset + (j_mod+dj)*nI );
                                 }
