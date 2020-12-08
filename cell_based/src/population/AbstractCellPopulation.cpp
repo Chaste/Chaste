@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell writers
 #include "BoundaryNodeWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
+#include "LegacyCellProliferativeTypesWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -523,6 +524,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
         if (!HasWriter<CellProliferativeTypesWriter>())
         {
             AddCellWriter<CellProliferativeTypesWriter>();
+        }
+        if (!HasWriter<LegacyCellProliferativeTypesWriter>())
+        {
+            AddCellWriter<LegacyCellProliferativeTypesWriter>();
         }
     }
 
