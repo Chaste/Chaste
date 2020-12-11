@@ -113,77 +113,83 @@ private:
 public:
     void TestSendAndReceiveCells()
     {
-        unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
-        mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
-        mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
-
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mCellCommunicationTag, 123u);
-
-        TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
-        TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
-
-        mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses();
-
-        // Check the nodes transferred correctly
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvRight->size(), 1u);
-        unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvRight->begin()).second->GetIndex();
-        if ( PetscTools::AmTopMost() )
+        if (PetscTools::GetNumProcs() > 1)
         {
-            TS_ASSERT_EQUALS(index, 0);
-        }
-        else
-        {
-            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
-        }
-        
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
-        index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
-        if (PetscTools::AmMaster())
-        {
-            TS_ASSERT_EQUALS(index, PetscTools::GetNumProcs() - 1);
-        }
-        else
-        {
-            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
+            unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
+            mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
+            mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
+
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mCellCommunicationTag, 123u);
+
+            TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
+            TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
+
+            mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses();
+
+            // Check the nodes transferred correctly
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvRight->size(), 1u);
+            unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvRight->begin()).second->GetIndex();
+            if ( PetscTools::AmTopMost() )
+            {
+                TS_ASSERT_EQUALS(index, 0);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
+            }
+            
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
+            index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
+            if (PetscTools::AmMaster())
+            {
+                TS_ASSERT_EQUALS(index, PetscTools::GetNumProcs() - 1);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
+            }
         }
     }
 
     void TestSendAndReceiveCellsNonBlocking()
     {
-        unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
-        mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
-        mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
-
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mCellCommunicationTag, 123u);
-
-        TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
-        TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
-
-        mpNodeBasedCellPopulation->NonBlockingSendCellsToNeighbourProcesses();
-
-        mpNodeBasedCellPopulation->GetReceivedCells();
-
-
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvRight->size(), 1u);
-        unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvRight->begin()).second->GetIndex();
-        if (PetscTools::AmTopMost())
+        if (PetscTools::GetNumProcs() > 1)
         {
-            TS_ASSERT_EQUALS(index, 0);
-        }
-        else
-        {
-            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
-        }
-        
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
-        index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
-        if (PetscTools::AmMaster())
-        {
-            TS_ASSERT_EQUALS(index, PetscTools::GetNumProcs() - 1);
-        }
-        else
-        {
-            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
+            unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
+            mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
+            mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
+
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mCellCommunicationTag, 123u);
+
+            TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
+            TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
+
+            mpNodeBasedCellPopulation->NonBlockingSendCellsToNeighbourProcesses();
+
+            mpNodeBasedCellPopulation->GetReceivedCells();
+
+
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvRight->size(), 1u);
+            unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvRight->begin()).second->GetIndex();
+            if (PetscTools::AmTopMost())
+            {
+                TS_ASSERT_EQUALS(index, 0);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
+            }
+            
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
+            index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
+            if (PetscTools::AmMaster())
+            {
+                TS_ASSERT_EQUALS(index, PetscTools::GetNumProcs() - 1);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
+            }
         }
     }
 
@@ -227,30 +233,33 @@ public:
 
     void TestRefreshHaloCells()
     {
-        // Set up the halo boxes and nodes.
-        mpNodeBasedCellPopulation->Update();
+        if (PetscTools::GetNumProcs() > 1)
+        {
+            // Set up the halo boxes and nodes.
+            mpNodeBasedCellPopulation->Update();
 
-        // Send and receive halo nodes.
-        mpNodeBasedCellPopulation->RefreshHaloCells();
+            // Send and receive halo nodes.
+            mpNodeBasedCellPopulation->RefreshHaloCells();
 
-        mpNodeBasedCellPopulation->AddReceivedHaloCells();
+            mpNodeBasedCellPopulation->AddReceivedHaloCells();
 
-        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
-        if ( PetscTools::AmMaster() )
-        {
-            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetNumProcs() - 1);
-        }
-        else
-        {
-            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
-        }
-        if ( PetscTools::AmTopMost() )
-        {
-            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], 0);
-        }
-        else
-        {
-           TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
+            if ( PetscTools::AmMaster() )
+            {
+                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetNumProcs() - 1);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
+            }
+            if ( PetscTools::AmTopMost() )
+            {
+                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], 0);
+            }
+            else
+            {
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+            }
         }
     }
 };
