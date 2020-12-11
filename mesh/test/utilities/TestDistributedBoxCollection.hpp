@@ -554,6 +554,20 @@ public:
         DistributedBoxCollection<2> box_collection_pdc_Y(width, domain_size,false,true);
         DistributedBoxCollection<2> box_collection_pdc_XY(width, domain_size,true,true);
 
+        // Check periodic getter method
+        TS_ASSERT_EQUALS(box_collection_pdc_X.GetIsPeriodicInX(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_X.GetIsPeriodicInY(),false);
+        TS_ASSERT_EQUALS(box_collection_pdc_X.GetIsPeriodicInZ(),false);
+        
+        TS_ASSERT_EQUALS(box_collection_pdc_Y.GetIsPeriodicInX(),false);
+        TS_ASSERT_EQUALS(box_collection_pdc_Y.GetIsPeriodicInY(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_Y.GetIsPeriodicInZ(),false);
+
+        TS_ASSERT_EQUALS(box_collection_pdc_XY.GetIsPeriodicInX(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_XY.GetIsPeriodicInY(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_XY.GetIsPeriodicInZ(),false);
+
+
         if (PetscTools::GetNumProcs() > 3u)
         {
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -704,6 +718,21 @@ public:
         DistributedBoxCollection<3> box_collection_pdc_Z(width, domain_size,false,false,true);
         DistributedBoxCollection<3> box_collection_pdc_XZ(width, domain_size,true,false,true);
         DistributedBoxCollection<3> box_collection_pdc_XYZ(width, domain_size,true,true,true);
+
+        // Check periodic getter method
+        TS_ASSERT_EQUALS(box_collection_pdc_Z.GetIsPeriodicInX(),false);
+        TS_ASSERT_EQUALS(box_collection_pdc_Z.GetIsPeriodicInY(),false);
+        TS_ASSERT_EQUALS(box_collection_pdc_Z.GetIsPeriodicInZ(),true);
+        
+        TS_ASSERT_EQUALS(box_collection_pdc_XZ.GetIsPeriodicInX(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_XZ.GetIsPeriodicInY(),false);
+        TS_ASSERT_EQUALS(box_collection_pdc_XZ.GetIsPeriodicInZ(),true);
+
+        TS_ASSERT_EQUALS(box_collection_pdc_XYZ.GetIsPeriodicInX(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_XYZ.GetIsPeriodicInY(),true);
+        TS_ASSERT_EQUALS(box_collection_pdc_XYZ.GetIsPeriodicInZ(),true);
+
+
 
         assert(box_collection.GetNumBoxes()==60); // 4 * 3 * 5 boxes altogether
 
