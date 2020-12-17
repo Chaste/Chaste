@@ -75,7 +75,6 @@ class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellB
 private:
     /**
      * Helper method to generate a simple mesh that works in parallel
-     * 
      * @param nx number of nodes in the x direction
      * @param ny number of nodes in the y direction
      * @return the nodes for the nodes only mesh
@@ -156,6 +155,12 @@ public:
         }
 
         TS_ASSERT(min_distance_between_cells > 0.999);
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestBoxSizeWithSimpleMonolayer()
@@ -221,6 +226,12 @@ public:
         simulator_2.AddForce(p_linear_force);
 
         simulator_2.Solve();
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     /**
@@ -497,7 +508,6 @@ public:
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
         }
-
     }
 
 
