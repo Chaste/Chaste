@@ -111,7 +111,7 @@ private:
         AbstractCellBasedTestSuite::tearDown();
     }
 public:
-    void TestSendAndReceiveCells()
+    void NoTestSendAndReceiveCells()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -151,7 +151,7 @@ public:
         }
     }
 
-    void TestSendAndReceiveCellsNonBlocking()
+    void NoTestSendAndReceiveCellsNonBlocking()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -193,7 +193,7 @@ public:
         }
     }
 
-    void TestUpdateCellProcessLocation()
+    void NoTestUpdateCellProcessLocation()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -231,7 +231,7 @@ public:
         }
     }
 
-    void TestRefreshHaloCells()
+    void NoTestRefreshHaloCells()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
