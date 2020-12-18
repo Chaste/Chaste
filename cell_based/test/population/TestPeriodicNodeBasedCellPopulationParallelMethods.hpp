@@ -111,6 +111,15 @@ private:
         AbstractCellBasedTestSuite::tearDown();
     }
 public:
+
+    void TestSendAndReceiveCells()
+    {
+        if (PetscTools::GetNumProcs() > 1)
+        {
+            TS_ASSERT(true);
+        }
+    }
+    
     void NoTestSendAndReceiveCells()
     {
         if (PetscTools::GetNumProcs() > 1)
