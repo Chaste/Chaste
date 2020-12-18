@@ -79,48 +79,48 @@ private:
     {
         AbstractCellBasedTestSuite::setUp();
 
-        std::vector<Node<3>* > nodes;
-        for (unsigned i=0; i<PetscTools::GetNumProcs(); i++)
+        
+        if (PetscTools::GetNumProcs() > 1)
         {
-            nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5+(double)i));
-        }
+            std::vector<Node<3>* > nodes;
+            unsigned num_processors = PetscTools::GetNumProcs();
+            for (unsigned i=0; i<num_processors; i++)
+            {
+                nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5+(double)i));
+            }
 
-        c_vector<double,3> periodic_width = zero_vector<double>(3);
-        periodic_width[2] = (double)PetscTools::GetNumProcs();
+            c_vector<double,3> periodic_width = zero_vector<double>(3);
+            periodic_width[2] = (double)num_processors;
 
-        mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(periodic_width);
-        mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0);
+            mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(periodic_width);
+            mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 0.5); // Cutoff length of 0.5 so wor-ks on 2 processors as well
 
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasic(cells, mpPeriodicNodesOnlyMesh->GetNumNodes());
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
+            cells_generator.GenerateBasic(cells, mpPeriodicNodesOnlyMesh->GetNumNodes());
 
-        mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpPeriodicNodesOnlyMesh, cells);
+            mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpPeriodicNodesOnlyMesh, cells);
 
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
+            for (unsigned i=0; i<nodes.size(); i++)
+            {
+                delete nodes[i];
+            }
         }
     }
 
     void tearDown()
     {
-        delete mpNodeBasedCellPopulation;
-        delete mpPeriodicNodesOnlyMesh;
-
+        if (PetscTools::GetNumProcs() > 1)
+        {
+            delete mpNodeBasedCellPopulation;
+            delete mpPeriodicNodesOnlyMesh;
+        }
         AbstractCellBasedTestSuite::tearDown();
     }
+    
 public:
 
     void TestSendAndReceiveCells()
-    {
-        if (PetscTools::GetNumProcs() > 1)
-        {
-            TS_ASSERT(true);
-        }
-    }
-    
-    void NoTestSendAndReceiveCells()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -160,7 +160,7 @@ public:
         }
     }
 
-    void NoTestSendAndReceiveCellsNonBlocking()
+    void TestSendAndReceiveCellsNonBlocking()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -202,7 +202,7 @@ public:
         }
     }
 
-    void NoTestUpdateCellProcessLocation()
+    void TestUpdateCellProcessLocation()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -240,7 +240,7 @@ public:
         }
     }
 
-    void NoTestRefreshHaloCells()
+    void TestRefreshHaloCells()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
