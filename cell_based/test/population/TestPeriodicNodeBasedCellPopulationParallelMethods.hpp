@@ -202,7 +202,7 @@ public:
         }
     }
 
-    void TestUpdateCellProcessLocation()
+    void noTestUpdateCellProcessLocation()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
