@@ -80,7 +80,7 @@ private:
         AbstractCellBasedTestSuite::setUp();
 
         
-        if (PetscTools::GetNumProcs() > 1)
+        if (PetscTools::GetNumProcs() > 2)
         {
             std::vector<Node<3>* > nodes;
             unsigned num_processors = PetscTools::GetNumProcs();
@@ -93,7 +93,7 @@ private:
             periodic_width[2] = (double)num_processors;
 
             mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(periodic_width);
-            mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 0.5); // Cutoff length of 0.5 so wor-ks on 2 processors as well
+            mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0); // Cutoff length of means we need at least 3 processors
 
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
@@ -110,7 +110,7 @@ private:
 
     void tearDown()
     {
-        if (PetscTools::GetNumProcs() > 1)
+        if (PetscTools::GetNumProcs() > 2)
         {
             delete mpNodeBasedCellPopulation;
             delete mpPeriodicNodesOnlyMesh;
@@ -122,7 +122,7 @@ public:
 
     void TestSendAndReceiveCells()
     {
-        if (PetscTools::GetNumProcs() > 1)
+        if (PetscTools::GetNumProcs() > 2)
         {
             unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
             mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -162,7 +162,7 @@ public:
 
     void TestSendAndReceiveCellsNonBlocking()
     {
-        if (PetscTools::GetNumProcs() > 1)
+        if (PetscTools::GetNumProcs() > 2)
         {
             unsigned index_of_node_to_send = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
             mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -202,9 +202,9 @@ public:
         }
     }
 
-    void noTestUpdateCellProcessLocation()
+    void TestUpdateCellProcessLocation()
     {
-        if (PetscTools::GetNumProcs() > 1)
+        if (PetscTools::GetNumProcs() > 2)
         {
             if (PetscTools::AmMaster())
             {
@@ -240,9 +240,9 @@ public:
         }
     }
 
-    void noTestRefreshHaloCells()
+    void TestRefreshHaloCells()
     {
-        if (PetscTools::GetNumProcs() > 1)
+        if (PetscTools::GetNumProcs() > 2)
         {
             // Set up the halo boxes and nodes.
             mpNodeBasedCellPopulation->Update();
@@ -267,7 +267,7 @@ public:
             }
             else
             {
-            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
             }
         }
     }
