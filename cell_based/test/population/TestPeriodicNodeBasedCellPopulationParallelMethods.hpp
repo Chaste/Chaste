@@ -117,7 +117,7 @@ private:
         }
         AbstractCellBasedTestSuite::tearDown();
     }
-    
+
 public:
 
     void TestSendAndReceiveCells()
@@ -240,7 +240,7 @@ public:
         }
     }
 
-    void TestRefreshHaloCells()
+    void noTestRefreshHaloCells()
     {
         if (PetscTools::GetNumProcs() > 1)
         {
