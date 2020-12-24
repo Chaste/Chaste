@@ -95,8 +95,6 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
         cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
         cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
 
-
-
         /* Interior delta notch collection */
         //Filling interior delta/notch value, interior model must be specified for this edge-interior example
         assert(p_cell_edge_model->GetInteriorSrn() != nullptr);
@@ -106,8 +104,6 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
         // Note that the state variables must be in the same order as listed in DeltaNotchOdeSystem
         cell_iter->GetCellData()->SetItem("interior delta", p_interior_model->GetDelta());
         cell_iter->GetCellData()->SetItem("interior notch", p_interior_model->GetNotch());
-
-
     }
 
     //After the edge data is filled, fill the edge neighbour data
