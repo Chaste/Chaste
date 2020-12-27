@@ -380,6 +380,12 @@ public:
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
             }
         }
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestSimple3dTissueYPeriodic()
@@ -530,6 +536,12 @@ public:
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
             }
+        }
+        
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
@@ -682,6 +694,13 @@ public:
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
             }
         }
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+
     }
 
     void TestSimple3dTissueXZPeriodic()
@@ -846,6 +865,12 @@ public:
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[2],1e-6);
             }
 
+        }
+        
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 
