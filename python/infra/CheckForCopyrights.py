@@ -70,7 +70,7 @@ deprecated_notice = re.compile(r"""(# ){0,1}Copyright \(c\) 2005-\d{4}, Universi
 """, re.MULTILINE)
 
 
-current_notice = """Copyright (c) 2005-2020, University of Oxford.
+current_notice = """Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
