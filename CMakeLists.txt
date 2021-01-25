@@ -259,8 +259,8 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package(PythonInterp 3.5 REQUIRED)
-if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
+find_package(PythonInterp 3.5)
+if (PYTHON_VERSION_STRING VERSION_LESS 3.5.0)
     message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
@@ -277,11 +277,17 @@ endif ()
 
 # Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel)
+if (${PYTHON_VERSION_STRING} VERSION_LESS 3.6.0)
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
+else()
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
+endif()
+
 
 # Install chaste_codegen in virtual environment
 message (STATUS "Installing chaste_codegen")
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
