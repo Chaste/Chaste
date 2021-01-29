@@ -98,8 +98,6 @@ public:
 
     void Test3dNodeBasedRestrictedToSphere()
     {
-        EXIT_IF_PARALLEL; // Output doesn't work in parallel so we cannot solve a simulation #2365
-
         // Create a simple 3D NodeBasedCellPopulation
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false,  0.5, 0.0, 0.0));
