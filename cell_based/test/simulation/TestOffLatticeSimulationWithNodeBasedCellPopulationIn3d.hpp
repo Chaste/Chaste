@@ -151,6 +151,28 @@ public:
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);
         }
 
+        std::vector<unsigned> mutation_state_count_after_solve = simulator.rGetCellPopulation().GetCellMutationStateCount();
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve.size(), 4u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[0], 4u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[1], 0u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[2], 0u);
+        TS_ASSERT_EQUALS(mutation_state_count_after_solve[3], 0u);
+
+        std::vector<unsigned> prolif_type_count_after_solve = simulator.rGetCellPopulation().GetCellProliferativeTypeCount();
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve.size(), 4u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[0], 0u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[1], 2u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[2], 0u);
+        TS_ASSERT_EQUALS(prolif_type_count_after_solve[3], 0u);
+
+        std::vector<unsigned> cell_cycle_phase_count = simulator.rGetCellPopulation().GetCellCyclePhaseCount();
+        TS_ASSERT_EQUALS(cell_cycle_phase_count.size(), 5u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count[0], 0u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count[1], 1u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count[2], 3u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count[3], 0u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count[4], 0u);
+
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {
