@@ -49,6 +49,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestPeriodicNodesOnlyMesh : public CxxTest::TestSuite
 {
+
+private:
+    /**
+     * Helper method to generate a simple 2D mesh that works in parallel
+     * @param nx number of nodes in the x direction
+     * @param ny number of nodes in the y direction
+     * @return the nodes for the nodes only mesh
+     */
+    std::vector<Node<2>*> GenerateMesh(unsigned nx, unsigned ny)
+    {
+        std::vector<Node<2>*> nodes(nx*ny);
+        for ( unsigned j = 0; j < ny; j++ )
+        {
+            for ( unsigned i = 0; i < nx; i++ )
+            {
+                double x = (double)i + 0.5*(double)(j % 2);
+                double y = (double)j * std::sqrt(3.0)/2.0;
+                nodes[j*nx+i] = new Node<2>(j*nx+i, false, x, y );
+            }
+        }
+        return nodes;
+    }
+
+
 public:
 
     void TestMeshGetWidth()
@@ -83,30 +107,73 @@ public:
         TS_ASSERT_DELTA(width, 4, 1e-4);
         TS_ASSERT_DELTA(height, 4, 1e-4);
 
+        // No have one dim non periodic for coverage
+        periodic_width[1] = 0.0;
+        PeriodicNodesOnlyMesh<2>* p_mesh_2 = new PeriodicNodesOnlyMesh<2>(periodic_width);
+
+        p_mesh_2->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
+
+        // Test CalculateBoundingBox() method
+        bounds = p_mesh_2->CalculateBoundingBox();
+
+        ///\todo this should really be 4 as mesh is periodic
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], 3.5, 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 3.0*0.5*sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], 0.0,1e-4);
+
+        // Test GetWidth() method
+        width = p_mesh->GetWidth(0);
+        height = p_mesh->GetWidth(1);
+
+        TS_ASSERT_DELTA(width, 4, 1e-4);
+        TS_ASSERT_DELTA(height, 3.0*0.5*sqrt(3.0), 1e-4);
+
         // Avoid memory leak
         delete p_mesh;
+        delete p_mesh_2;     
     }
 
     void TestExceptions()
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+        // Create nodes
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
+        std::vector<Node<2>*> nodes = GenerateMesh(num_cells_width,num_cells_depth);
 
-        // Create generating mesh
-        HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
-        TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5),
+        TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(nodes, 1.5),
                               "The periodic width must be a multiple of cut off length.");
 
-        TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0),
+        TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(nodes, 2.0),
                               "The periodic domain width cannot be less than 2*CutOffLength.");
+
+
+        if ( PetscTools::GetNumProcs() > 1 )
+        {
+            periodic_width[1] = 2.0;
+            PeriodicNodesOnlyMesh<2>* p_mesh_2 = new PeriodicNodesOnlyMesh<2>(periodic_width);
+            TS_ASSERT_THROWS_THIS(p_mesh_2->ConstructNodesWithoutMesh(nodes, 2.0),
+                                  "Too many processors for the periodic domain width and cut off length. NumProcs should be less than or equal to Y (in 2D) or Z (in 3D) width / Cut off length.\n");
+            // Avoid memory leak
+            delete p_mesh_2;
+        }
 
         // Avoid memory leak
         delete p_mesh;
+        
+        
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestGetVectorFromAtoB()
