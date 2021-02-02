@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
+#include "Debug.hpp"
+
 
 class TestPeriodicNodesOnlyMesh : public CxxTest::TestSuite
 {
@@ -123,8 +125,8 @@ public:
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], 0.0,1e-4);
 
         // Test GetWidth() method
-        width = p_mesh->GetWidth(0);
-        height = p_mesh->GetWidth(1);
+        width = p_mesh_2->GetWidth(0);
+        height = p_mesh_2->GetWidth(1);
 
         TS_ASSERT_DELTA(width, 4, 1e-4);
         TS_ASSERT_DELTA(height, 3.0*0.5*sqrt(3.0), 1e-4);
@@ -154,7 +156,6 @@ public:
 
         TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(nodes, 2.0),
                               "The periodic domain width cannot be less than 2*CutOffLength.");
-
 
         if ( PetscTools::GetNumProcs() > 1 )
         {
