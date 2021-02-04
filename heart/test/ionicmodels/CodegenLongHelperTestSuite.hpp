@@ -301,10 +301,15 @@ public:
             }
             if (!warningsOk)
             {
-                if (rModels[i] == "demir_model_1994" || strncmp((rModels[i]).c_str(), "zhang_SAN_model_2000", strlen("zhang_SAN_model_2000")) == 0 || rModels[i] == "courtemanche_ramirez_nattel_model_1998")
+                if (rModels[i] == "demir_model_1994" || strncmp((rModels[i]).c_str(), "zhang_SAN_model_2000", strlen("zhang_SAN_model_2000")) == 0)
                 {
                     // We know this model does something that provokes one warning...
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+                }
+                else if(rModels[i] == "courtemanche_ramirez_nattel_model_1998")
+                {
+                    // Can throw 1 lookup table warning
+                   TS_ASSERT_LESS_THAN(Warnings::Instance()->GetNumWarnings(), 2u)
                 }
                 else
                 {
