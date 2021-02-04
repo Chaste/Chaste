@@ -311,6 +311,12 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
             mNodesToSendLeft.push_back(node_iter->GetIndex());
         }
         // Periodic cases
+
+        // LCOV_EXCL_START 
+        /* This block cannot be covered by regular testing, 
+         * but it is covered by the Nightly -np 3 builder 
+         * See TestGetNodesOutsideLocalDomainwithPeriodicMesh
+         */
         else if ( owning_process == (PetscTools::GetNumProcs()-1) )
         {
             // We are on the base and need to send to the top (i.e. left)
@@ -321,6 +327,7 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
             // We are on the top and need to send to the bottom process (i.e. right)
             mNodesToSendRight.push_back(node_iter->GetIndex());
         }
+        // LCOV_EXCL_STOP
     }
 }
 
