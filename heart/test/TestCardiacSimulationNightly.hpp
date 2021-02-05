@@ -113,6 +113,7 @@ public:
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_monodomain_results", false,
                                                  foldername, "SimulationResults", true, 1e-4 /*tol*/));
 
+
         FileFinder file(foldername + "_checkpoints/10ms/" + foldername + "_10ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);
         TS_ASSERT(file.Exists());
