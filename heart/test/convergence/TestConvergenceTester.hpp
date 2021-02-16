@@ -89,12 +89,9 @@ public:
         tester.AbsoluteStimulus = -5e10;
         tester.Converge(__FUNCTION__);
 
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 11u);
-
-        std::string msg = Warnings::Instance()->GetNextWarningMessage();
-        TS_ASSERT(msg == "This run threw an exception.  Check convergence results\n" ||
-                  msg.compare(0, 18, "Lookup table 0 at ") == 0);
-
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 10u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
+                         "This run threw an exception.  Check convergence results\n");
         Warnings::Instance()->QuietDestroy();
     }
 

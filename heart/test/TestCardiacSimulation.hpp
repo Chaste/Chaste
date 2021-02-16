@@ -116,7 +116,7 @@ public:
             if (p_vector_factory->GetLocalOwnership() > 0)
             {
                 // One warning will come from the lookup table hitting an nan                
-                TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings() - 1, p_vector_factory->GetLocalOwnership());
+                TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
                 std::stringstream msg;
                 msg << "Cannot apply drug to cell at node " << p_vector_factory->GetLow() << " as it has no parameter named 'not_a_current_conductance'.";
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
