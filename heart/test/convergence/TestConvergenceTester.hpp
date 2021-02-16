@@ -93,7 +93,6 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
                          "This run threw an exception.  Check convergence results\n");
         Warnings::Instance()->QuietDestroy();
-
     }
 
     void Test1DPdeTime()

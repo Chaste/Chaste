@@ -67,6 +67,7 @@ public:
                                                                                                "courtemanche_ramirez_nattel_model_1998",
                                                                                                "demir_model_1994",
                                                                                                "dokos_model_1996",
+                                                                                               "grandi2010ss",
                                                                                                "iyer_model_2007",
                                                                                                "jafri_rice_winslow_model_1998",
                                                                                                "livshitz_rudy_2007",
@@ -76,36 +77,11 @@ public:
                                                                                                "li_mouse_2010",
                                                                                                "noble_model_1998"});
 
-
-
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"fink_noble_giles_model_2008",
-                                                                                                     "ten_tusscher_model_2006_epi"});
-
-        std::vector<std::string> different_lookup_table_models2 = spectail_streatment_models(models, {"decker_2009",
-                                                                                                      "ten_tusscher_model_2004_epi"});
-
-        std::vector<std::string> different_lookup_table_models3 = spectail_streatment_models(models, {"grandi2010ss"});
-
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
-
-        RunTests(dirname, different_lookup_table_models2,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
-                 true, -1000, true);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models3,
-                 {"--opt", "--grl1", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
     }
 };
 

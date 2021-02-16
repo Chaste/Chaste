@@ -190,9 +190,9 @@ public:
         TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
         double min, max, step;
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
-        TS_ASSERT_DELTA(min, -250.0001, 1e-12);
+        TS_ASSERT_DELTA(min, -250.0, 1e-12);
         TS_ASSERT_DELTA(step, 0.001, 1e-12);
-        TS_ASSERT_DELTA(max, 549.9999, 1e-12);
+        TS_ASSERT_DELTA(max, 550.0, 1e-12);
 
         // Check set methods for coverage
         AbstractLookupTableCollection::EventHandler::Headings();
@@ -330,9 +330,9 @@ public:
         TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("membrane_voltage"), 23u);
         TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
-        TS_ASSERT_DELTA(min, -250.0001, 1e-12);
+        TS_ASSERT_DELTA(min, -250.0, 1e-12);
         TS_ASSERT_DELTA(step, 0.001, 1e-12);
-        TS_ASSERT_DELTA(max, 549.9999, 1e-12);
+        TS_ASSERT_DELTA(max, 550.0, 1e-12);
 
         // Check that the tables really exist!
         cvode_opt.SetVoltage(-100000);

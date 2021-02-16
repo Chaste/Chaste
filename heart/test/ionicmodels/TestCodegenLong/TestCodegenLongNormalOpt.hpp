@@ -61,20 +61,12 @@ public:
         // Models that need a very small dt
         std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});
 
-        // Models that need a different lookup table
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"fink_noble_giles_model_2008"});
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args, true);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args, true);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
-                 {"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true);
     }
 };
 

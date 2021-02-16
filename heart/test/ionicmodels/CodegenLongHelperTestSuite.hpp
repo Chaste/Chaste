@@ -306,6 +306,11 @@ public:
                     // We know this model does something that provokes one warning...
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
                 }
+                else if(rModels[i] == "courtemanche_ramirez_nattel_model_1998")
+                {
+                    // Can throw 1 lookup table warning
+                   TS_ASSERT_LESS_THAN(Warnings::Instance()->GetNumWarnings(), 2u)
+                }
                 else
                 {
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
