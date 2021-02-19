@@ -373,6 +373,7 @@ public:
     void AddEasyModels(std::vector<std::string>& rModels)
     {
        rModels.emplace_back("beeler_reuter_model_1977");
+       rModels.emplace_back("bondarenko_szigeti_bett_kim_rasmusson_2004_apical");
        rModels.emplace_back("earm_noble_model_1990");
        rModels.emplace_back("espinosa_model_1998_normal");
        rModels.emplace_back("hilgemann_noble_model_1987");
