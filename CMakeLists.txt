@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2020, University of Oxford.
+# Copyright (c) 2005-2021, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -136,7 +136,7 @@ option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-
 
 option (RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
 set (TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations")
+set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)
@@ -259,8 +259,8 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package(PythonInterp 3.5 REQUIRED)
-if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 3)
+find_package(PythonInterp 3.5)
+if (PYTHON_VERSION_STRING VERSION_LESS 3.5.0)
     message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
@@ -277,11 +277,17 @@ endif ()
 
 # Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade pip setuptools wheel)
+if (${PYTHON_VERSION_STRING} VERSION_LESS 3.6.0)
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
+else()
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
+endif()
+
 
 # Install chaste_codegen in virtual environment
 message (STATUS "Installing chaste_codegen")
-execute_process(COMMAND ${codegen_python3_venv}/python -m pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,9 +77,7 @@ public:
         RunTests(dirname, models, args);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models,
-                 {"--cvode", "--use-analytic-jacobian", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true);
+        RunTests(dirname, different_lookup_table_models, args);
 
 #endif
     }

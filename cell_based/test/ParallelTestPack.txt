@@ -1,1 +1,2 @@
-population/TestNodeBasedCellPopulationParallelMethods.hpp
+population/TestPeriodicNodeBasedCellPopulationParallelMethods.hpp
+simulation/TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d.hpp

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,7 +93,6 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
                          "This run threw an exception.  Check convergence results\n");
         Warnings::Instance()->QuietDestroy();
-
     }
 
     void Test1DPdeTime()
