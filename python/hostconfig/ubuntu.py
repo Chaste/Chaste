@@ -149,7 +149,7 @@ libs_for_petsc = ['petsccontrib', 'X11',
                   ]
 
 if ubuntu_ver >= [11,4] and ubuntu_ver < [20,4]:
-    libs_for_petsc.append(['HYPRE_utilities', 'spooles',
+    libs_for_petsc.append(['HYPRE_utilities', 'spooles', # Spooles removed from PETSc in v3.4, removed from Ubuntu 20.04
                            'HYPRE_struct_mv', 'HYPRE_struct_ls',  
                            'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
                            'HYPRE_IJ_mv', 'HYPRE_parcsr_ls', 'dmumps'])
