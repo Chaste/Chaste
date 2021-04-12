@@ -164,11 +164,14 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         case 2:
             //The edge is new
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[0]->CreateSrnModel());
+            new_edge_srn[i]->SetCell(pSrnCell->GetCell());
+            new_edge_srn[i]->InitialiseDaughterCell();
             break;
         case 3:
         {
             // If the edge above or below this edge was deleted
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
+
             const bool isPrevEdge = pEdgeChange->GetEdgesStatus()[(i+1)%n_edges]==3;
             //Find the shrunk edge
             unsigned int shrunkEdge = 0;
@@ -201,8 +204,6 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         //Setting the new local edge index and the cell
         new_edge_srn[i]->SetEdgeLocalIndex(i);
         new_edge_srn[i]->SetCell(pSrnCell->GetCell());
-        if (remapStatus == 2)
-            new_edge_srn[i]->InitialiseDaughterCell();
     }
   
     //For the case when edge quantities are returned into interior when edge shrinks due to node merging

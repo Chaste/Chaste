@@ -129,7 +129,16 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     const unsigned int node_A_index = merged_nodes_pair.first;
     const unsigned int node_B_index = merged_nodes_pair.second;
     //Node B is also considered upper node if the last two nodes are merged
-    const bool is_B_upper = node_B_index>node_A_index||(node_B_index==0&&node_A_index==oldIds.size()-1);
+    bool is_B_upper = node_B_index>node_A_index;
+    if (node_A_index==0)
+    {
+        is_B_upper = node_B_index ==1;
+    }
+    if (node_B_index==0)
+    {
+        is_B_upper = node_A_index != 1;
+    }
+
     unsigned int lower_node = node_A_index;
     unsigned int upper_node = node_B_index;
     if (!is_B_upper)
@@ -140,20 +149,33 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     //Previous edge denotes the edge below the lower node index
     //and nextEdge denotes the edge above the upper node index
     unsigned int prevEdge = 0;
-    if (upper_node == 0)
+    if (is_B_upper)
     {
-        prevEdge = elementNumEdges - 2;
-    }
-    else if (upper_node == 1)
-    {
-        prevEdge = elementNumEdges - 1;
+        if (upper_node == 0)
+        {
+            prevEdge = elementNumEdges - 2;
+        }
+        else if (upper_node == 1)
+        {
+            prevEdge = elementNumEdges - 1;
+        }
+        else
+        {
+            prevEdge = upper_node - 2;
+        }
     }
     else
     {
-        prevEdge = upper_node - 2;
+        if (upper_node==0||upper_node == 1)
+        {
+            prevEdge = elementNumEdges - 1;
+        }
+        else
+        {
+            prevEdge = upper_node-2;
+        }
     }
     const unsigned int nextEdge = (prevEdge+1)%elementNumEdges;
-
     //Marking edges below and above the deleted edge
     edge_status[prevEdge] = 3;
     edge_status[nextEdge] = 3;
@@ -178,6 +200,23 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     //Sanity check
     for (unsigned int i=0; i<edge_mapping.size(); ++i)
     {
+        if(edge_mapping[i]<0)
+        {
+            std::cout<<"M size "<<edge_mapping.size()<<" Old size: "<<oldIds.size()<<std::endl;
+            for (unsigned int j=0; j<oldIds.size(); ++j)
+            {
+                std::cout<<(*mpEdgeHelper)[oldIds[j]]->GetIndex()<<std::endl;
+            }
+            std::cout<<"Mappings: ";
+            for (unsigned int j=0; j<edge_mapping.size(); ++j)
+            {
+                std::cout<<edge_mapping[j]<<" ";
+            }
+            std::cout<<std::endl;
+            std::cout<<"P: "<<prevEdge<<" N: "<<nextEdge<<std::endl;
+            std::cout<<"lower: "<<lower_node<<" Upper: "<<upper_node
+                    <<"Node A: "<<node_A_index<<" B: "<<node_B_index<<std::endl;
+        }
         assert(edge_mapping[i]>=0);
     }
 

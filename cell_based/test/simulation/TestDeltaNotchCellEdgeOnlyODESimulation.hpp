@@ -134,7 +134,7 @@ public:
         /* We include the next line because Vertex simulations cannot be run in parallel */
         EXIT_IF_PARALLEL;
         /* First we create a regular vertex mesh. */
-        HoneycombVertexMeshGenerator generator(3, 3);
+        HoneycombVertexMeshGenerator generator(6, 6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
