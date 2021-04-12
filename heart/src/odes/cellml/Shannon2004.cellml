@@ -630,10 +630,10 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
       <variable name="i_Na_jct" units="microA_per_microF" public_interface="out"/>
       <variable name="i_Na_SL" units="microA_per_microF" public_interface="out"/>
       <variable name="G_INa" units="milliS_per_microF" initial_value="16" cmeta:id="membrane_fast_sodium_current_conductance">
-        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_fast_sodium_current_conductance">
-                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_fast_sodium_current_conductance"/>
-            </rdf:Description>
+<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_fast_sodium_current_conductance"/>
+               </rdf:Description>
          </rdf:RDF>
       </variable>
       <variable name="Fx_Na_jct" units="dimensionless" initial_value="0.11"/>
@@ -4511,7 +4511,13 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
       <variable name="J_Ca_SL_myo" units="millimole_per_millisecond" public_interface="out"/>
       <variable name="Na_SL" units="millimolar" public_interface="in"/>
       <variable name="Na_jct" units="millimolar" public_interface="in"/>
-      <variable name="Nai" units="millimolar" public_interface="in"/>
+      <variable name="Nai" units="millimolar" public_interface="in" cmeta:id="cytosolic_sodium_concentration">
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_sodium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_sodium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Ca_SL" units="millimolar" public_interface="in"/>
       <variable name="Cai" units="millimolar" public_interface="in"/>
       <variable name="Ca_jct" units="millimolar" public_interface="in"/>
@@ -4579,13 +4585,7 @@ A mathematical treatment of integrated Ca dynamics within the ventricular myocyt
       <variable name="Na_jct" units="millimolar" initial_value="8.80329" public_interface="out"/>
       <variable name="Na_SL_buf" units="millimolar" initial_value="7.720854e-1" public_interface="out"/>
       <variable name="Na_jct_buf" units="millimolar" initial_value="3.539892" public_interface="out"/>
-      <variable name="Nai" units="millimolar" initial_value="8.80853" public_interface="out" cmeta:id="cytosolic_sodium_concentration">
-         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-            <rdf:Description rdf:about="#cytosolic_sodium_concentration">
-               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_sodium_concentration"/>
-            </rdf:Description>
-         </rdf:RDF>
-      </variable>
+      <variable name="Nai" units="millimolar" initial_value="8.80853" public_interface="out"/>
       <variable name="Bmax_SL" units="millimolar" initial_value="1.65"/>
       <variable name="Bmax_jct" units="millimolar" initial_value="7.561"/>
       <variable name="kon" units="per_millimolar_per_millisecond" initial_value="0.0001"/>

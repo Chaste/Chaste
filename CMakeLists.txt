@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2020, University of Oxford.
+# Copyright (c) 2005-2021, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -136,7 +136,7 @@ option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-
 
 option (RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
 set (TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations")
+set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)
@@ -182,7 +182,7 @@ endif ()
 option (Chaste_ENABLE_TESTING "Enable Chaste Testing" ON)
 option (Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
-set (Chaste_PYCML_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for PyCML here")
+set (Chaste_CODEGEN_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for chaste_codegen here")
 
 #Some Chaste-specific #defines
 add_definitions (-DCHASTE_CMAKE)
@@ -259,10 +259,35 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package (PythonInterp REQUIRED)
-if (NOT ${PYTHON_VERSION_MAJOR} VERSION_EQUAL 2)
-    message (FATAL_ERROR "Python 2 is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python2")
+find_package(PythonInterp 3.5)
+if (PYTHON_VERSION_STRING VERSION_LESS 3.5.0)
+    message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
+
+# Install chaste_codegen in virtual environment
+set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
+
+if (NOT EXISTS ${codegen_python3_venv})
+    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    )
+endif ()
+
+# Update pip setuptools and wheel
+message (STATUS "Updating pip setuptools and wheel")
+if (${PYTHON_VERSION_STRING} VERSION_LESS 3.6.0)
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
+else()
+    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
+endif()
+
+
+# Install chaste_codegen in virtual environment
+message (STATUS "Installing chaste_codegen")
+execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
@@ -323,16 +348,17 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-add_definitions (-DBOOST_ALL_NO_LIB)
-set (Boost_USE_STATIC_RUNTIME ON)
+add_definitions(-DBOOST_ALL_NO_LIB)
 if (BUILD_SHARED_LIBS)
-    set (Boost_USE_STATIC_LIBS OFF)
+    set(Boost_USE_STATIC_LIBS OFF)
+    set(Boost_USE_STATIC_RUNTIME OFF)
 else ()
-    set (Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_STATIC_RUNTIME ON)
 endif ()
-find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
+list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
 ################################
@@ -808,7 +834,7 @@ if (Chaste_COVERAGE)
 
                        # Capturing lcov counters and generating report
                        COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file ${_outputname}.info
-                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* */global/src/random/* Debug/* cxxtest/* --output-file ${_outputname}.info.cleaned
+                       COMMAND ${LCOV_PATH} --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove ${_outputname}.info /home/bob/petsc* /usr/* */fortests/* */test/* */3rdparty/* */global/src/random/* Debug/* Debug_*/* cxxtest/* --output-file ${_outputname}.info.cleaned
                        set (_page_title "\"Chaste Coverage Results for commit ${Chaste_REVISION}\"")
                        COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
                        COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,15 +60,19 @@ def FilesAreDifferent(pathToFile1, pathToFile2):
     file_string_2 = open(pathToFile2).readlines()
     #Produce generator for unified diff
     udiff = difflib.unified_diff(file_string_1, file_string_2, pathToFile1, pathToFile2)
+    is_different = False
     try:
         n = 10
         #Print the first n lines of the unified diff
         for _ in range(0, n):
-            print udiff.next()     
-        return True     
+            diff = next(udiff, None)
+            if diff is not None:
+                print("%s" % diff)
+                is_different = True
     except StopIteration:
         #The generator has little content and so was probably empty
-        return (False)
+        pass
+    return is_different
 
 #Build a list of reference files (in './heart/src/io') and a list of files which need to be verified
 reference_files=[]
@@ -99,17 +103,17 @@ for (path, file) in files_to_check:
         if file in exception_tests:
           num_good+=1
         else:  
-          print file_name,' is an orphan.  There is no reference schema with that name.'
+          print('%s is an orphan.  There is no reference schema with that name.' % file_name)
           num_bad+=1
 
-print "Schema test run over (",num_bad+num_good,") files"
+print("Schema test run over %s files" % (num_bad+num_good) )
 if num_bad > 0:
-    print
-    print "The next line is for the benefit of the test summary scripts."
-    print "Failed",num_bad,"of",num_bad+num_good,"tests"
+    print()
+    print("The next line is for the benefit of the test summary scripts.")
+    print("Failed %s of %s tests" % (num_bad, num_bad+num_good))
 
     # Return a non-zero exit code if orphans or bad schema were found
     sys.exit(num_bad)
 else:
-    print "Infrastructure test passed ok."
+    print("Infrastructure test passed ok.")
 

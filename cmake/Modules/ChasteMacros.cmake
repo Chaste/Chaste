@@ -66,34 +66,16 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     get_filename_component(cellml_file_name ${cellml_file} NAME_WE)
     get_filename_component(cellml_dir ${cellml_file} PATH)
     file(RELATIVE_PATH cellml_file_rel "${CMAKE_SOURCE_DIR}" "${cellml_file}")
-    set(pycml_args "-A" "-p")
-    set(pycml_args ${pycml_args} ${ARGN})
-    #if(BUILD_SHARED_LIBS)
+    set(codegen_args ${ARGN})
+
     if (${dynamic})
-        set(pycml_args ${pycml_args} "-y")
+        set(codegen_args ${codegen_args} "-y" "-o" ${cellml_file})
     else()
-        set(pycml_args ${pycml_args} "--normal" "--opt" "--cvode")
-        if(EXISTS ${cellml_dir}/${cellml_file_name}.out)
-            set(depends ${depends} ${cellml_dir}/${cellml_file_name}.out)
-            set(pycml_args ${pycml_args} "--backward-euler")
-        endif()
+        set(codegen_args ${codegen_args} "--normal" "--opt" "--cvode" "--backward-euler" "--use-analytic-jacobian")
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    #set depends on everything in python/pycml/* except for *.pyc and protocol.py
-    file(GLOB PyCML_SOURCES 
-        ${Chaste_SOURCE_DIR}/python/pycml/* )
-    file(GLOB PyCML_NOT_SOURCES 
-        ${Chaste_SOURCE_DIR}/python/pycml/*.pyc )
-    list(REMOVE_ITEM PyCML_SOURCES ${PYCML_NOT_SOURCES} ${Chaste_SOURCE_DIR}/python/pycml/protocol.py)
-
-    set(depends ${depends} ${PyCML_SOURCES})
-
-    if(EXISTS ${cellml_dir}/${cellml_file_name}-conf.xml)
-        set(depends ${depends} ${cellml_dir}/${cellml_file_name}-conf.xml)
-        set(pycml_args ${pycml_args} "--conf=${cellml_dir}/${cellml_file_name}-conf.xml")
-    endif()
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} --show-outputs ${cellml_file}   
+    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -102,14 +84,14 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     string(REGEX MATCHALL "[^\n]*\\.cpp" output_files_cpp "${ConvertCellModelDepends}")
 
     if (NOT Chaste_VERBOSE)
-        set(pycml_args ${pycml_args} "--quiet")
+        set(codegen_args ${codegen_args} "--quiet")
     endif()
 
-    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} 
-        COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${Chaste_PYCML_EXTRA_ARGS} ${cellml_file}
+    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
+        COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
-        COMMENT "Processing CellML file ${cellml_file_rel}" 
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Processing CellML file ${cellml_file_rel}"
+        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
         VERBATIM
         )
 
@@ -133,6 +115,15 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         set(_testname ${_testTargetName})
     endif()
 
+    string(REGEX MATCH "^.*Codegen$" foundCodegen ${_testTargetName})
+    if (foundCodegen)
+        set(codegen ON)
+        string(REGEX REPLACE "(Codegen)$" "" _testname "${_testTargetName}")
+    else()
+        set(codegen OFF)
+        set(_testname ${_testTargetName})
+    endif()
+
     if (${_filename} MATCHES ".py$")
         set(python ON)
     else()
@@ -141,7 +132,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
 
 
     if (python)
-        set(test_exe ${Chaste_BINARY_DIR}/python/infra/TestPythonCode.py ${_filename})
+        set(test_exe ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/python/infra/TestPythonCode.py ${_filename})
     else()
         set(_exeTargetName ${_testname})
 
@@ -230,7 +221,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     set_property(TEST ${_testTargetName} PROPERTY PROCESSORS ${num_cpus})
     if (python)
         set_property(TEST ${_testTargetName} PROPERTY
-            ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH}:${Chaste_BINARY_DIR}/python/pycml"
+            ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH}:${Chaste_BINARY_DIR}/python"
             )
     endif()
 
@@ -577,6 +568,12 @@ macro(Chaste_DO_TEST_COMMON component)
                 if (${type} STREQUAL "Parallel")
                     set(testTargetName ${testTargetName}Parallel)
                     set(parallel ON)
+                endif()
+                set(codegen OFF)
+                set(exeTargetName ${testTargetName})
+                if (${type} STREQUAL "Codegen")
+                    set(testTargetName ${testTargetName}Codegen)
+                    set(codegen ON)
                 endif()
 
                 if (NOT DEFINED ${testTargetName})

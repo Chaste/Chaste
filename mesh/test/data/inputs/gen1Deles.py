@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -30,6 +30,6 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-print "100    2     0    "
+print("100    2     0    ")
 for i in range(100):
-  print i, i, i+1
+  print("%s    %s    %s" %(i, i, i+1))

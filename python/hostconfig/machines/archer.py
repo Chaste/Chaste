@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,7 @@ import sys
 chaste_libs = os.environ.get("CHASTE_LIBS")
 compiler = os.environ.get("PE_ENV")
 if compiler != 'INTEL':
-    print "Only the Intel compiler is supported. Load PrgEnv-intel module."
+    print( "Only the Intel compiler is supported. Load PrgEnv-intel module.")
     sys.exit(1)
 
 # The modules system deals with most include/lib paths transparently.

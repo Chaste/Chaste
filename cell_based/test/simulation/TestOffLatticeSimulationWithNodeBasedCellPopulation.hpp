@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "Cylindrical2dNodesOnlyMesh.hpp"
+#include "PeriodicNodesOnlyMesh.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "RandomCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
@@ -70,25 +71,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
+
+private:
+    /**
+     * Helper method to generate a simple mesh that works in parallel
+     * @param nx number of nodes in the x direction
+     * @param ny number of nodes in the y direction
+     * @return the nodes for the nodes only mesh
+     */
+    std::vector<Node<2>*> GenerateMesh(unsigned nx, unsigned ny)
+    {
+        std::vector<Node<2>*> nodes(nx*ny);
+        for ( unsigned j = 0; j < ny; j++ )
+        {
+            for ( unsigned i = 0; i < nx; i++ )
+            {
+                double x = (double)i + 0.5*(double)(j % 2);
+                double y = (double)j * std::sqrt(3.0)/2.0;
+                nodes[j*nx+i] = new Node<2>(j*nx+i, false, x, y );
+            }
+        }
+        return nodes;
+    }
+
 public:
 
     /**
-     * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem.
+     * Create a simulation of a NodeBasedCellPopulation with a simple force law.
      * Test that no exceptions are thrown, and write the results to file.
      */
     void TestSimpleMonolayer()
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+        EXIT_IF_PARALLEL; // Cant access cells with index loop on multiple processors.
 
         // Create a simple mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
-        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        std::vector<Node<2>*> nodes = GenerateMesh(num_cells_width,num_cells_depth);
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -132,6 +155,83 @@ public:
         }
 
         TS_ASSERT(min_distance_between_cells > 0.999);
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestBoxSizeWithSimpleMonolayer()
+    {
+        // Create a simple mesh
+        unsigned num_cells_depth = 5;
+        unsigned num_cells_width = 5;
+        std::vector<Node<2>*> nodes = GenerateMesh(num_cells_width,num_cells_depth);
+
+        // Create the mesh
+	    NodesOnlyMesh<2> mesh; 
+	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic bounday influencing the cells
+        simulator.SetEndTime(10.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        // Now run the simulation again with a different box size
+
+        // First reset the singletons
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Create the mesh
+        NodesOnlyMesh<2> mesh_2;
+        mesh_2.ConstructNodesWithoutMesh(nodes, 2.0);
+
+        // Create cells
+        std::vector<CellPtr> cells_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_2(mesh_2, cells_2);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator_2(node_based_cell_population_2);
+        simulator_2.SetOutputDirectory("TestOffLatticeSimulationWith2ndNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic boundary influencing the cells
+        simulator_2.SetEndTime(10.0);
+
+        // Pass the same force law to the simulation
+        simulator_2.AddForce(p_linear_force);
+
+        simulator_2.Solve();
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     /**
@@ -269,6 +369,268 @@ public:
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
         }
+    }
+
+     /**
+     * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
+     * to test periodicity.
+     */
+    
+    void TestSimpleYPeriodicMonolayer() 
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
+        // Create a simple periodic mesh
+        unsigned num_cells_depth = 3;
+        unsigned num_cells_width = 3;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a PeriodicdNodesOnlyMesh
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[1] = 6.0;
+        PeriodicNodesOnlyMesh<2> mesh(periodic_width);
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithYPeriodicNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic bounday influencing the cells
+        simulator.SetEndTime(10.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            TS_ASSERT_LESS_THAN_EQUALS(0,simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1]);
+            TS_ASSERT_LESS_THAN_EQUALS(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],periodic_width[1]);
+        }
+
+        // Now run the simulation again with the periodic boundary in a different place and check its the same
+
+        // First reset the singletons
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Convert this to a PeriodicdNodesOnlyMesh
+        PeriodicNodesOnlyMesh<2> mesh_2(periodic_width);
+        mesh_2.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Add an offset
+        double y_offset = periodic_width[0]/2.0;
+        mesh_2.Translate(0.0,-y_offset);
+
+        // Create cells
+        std::vector<CellPtr> cells_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_2(mesh_2, cells_2);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator_2(node_based_cell_population_2);
+        simulator_2.SetOutputDirectory("TestOffLatticeSimulationWith2ndYPeriodicNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic boundary influencing the cells
+        simulator_2.SetEndTime(10.0);
+
+        // Pass the same force law to the simulation
+        simulator_2.AddForce(p_linear_force);
+
+        simulator_2.Solve();
+
+        // Check with a different interaction distance
+        // First reset the singletons
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Convert this to a PeriodicdNodesOnlyMesh
+        PeriodicNodesOnlyMesh<2> mesh_3(periodic_width);
+        mesh_3.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells_3;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_3;
+        cells_generator_3.GenerateBasicRandom(cells_3, mesh_3.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_3(mesh_3, cells_3);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator_3(node_based_cell_population_3);
+        simulator_3.SetOutputDirectory("TestOffLatticeSimulationWith3rdYPeriodicNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic boundary influencing the cells
+        simulator_3.SetEndTime(10.0);
+
+        // Pass the same force law to the simulation
+        simulator_3.AddForce(p_linear_force);
+
+        simulator_3.Solve();
+
+
+        // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            double y_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+            double y_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+            double y_3 = simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+
+            if (y_1 < y_offset)
+            {
+                TS_ASSERT_DELTA(y_1+y_offset, y_2, 1e-6)
+            }
+            else
+            {
+                TS_ASSERT_DELTA(y_1-y_offset, y_2, 1e-6)
+            }
+
+            TS_ASSERT_DELTA(y_1,y_3,1e-6);
+
+            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
+            TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
+        }
+    }
+
+
+    /**
+     * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
+     * to test periodicity.
+     */
+    
+    void TestSimpleXYPeriodicMonolayer() 
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
+        // Create a simple periodic mesh
+        unsigned num_cells_depth = 3;
+        unsigned num_cells_width = 3;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a PeriodicdNodesOnlyMesh
+        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        periodic_width[0] = 6.0;
+        periodic_width[1] = 6.0;
+        PeriodicNodesOnlyMesh<2> mesh(periodic_width);
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithXYPeriodicNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic bounday influencing the cells
+        simulator.SetEndTime(10.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            TS_ASSERT_LESS_THAN_EQUALS(0,simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1]);
+            TS_ASSERT_LESS_THAN_EQUALS(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],periodic_width[0]);
+        }
+
+        // Now run the simulation again with the periodic boundary in a different place and check its the same
+
+        // First reset the singletons
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Convert this to a PeriodicdNodesOnlyMesh
+        PeriodicNodesOnlyMesh<2> mesh_2(periodic_width);
+        mesh_2.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Add an offset
+        double offset = periodic_width[0]/2.0;
+        mesh_2.Translate(-offset,-offset);
+
+        // Create cells
+        std::vector<CellPtr> cells_2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator_2;
+        cells_generator_2.GenerateBasicRandom(cells_2, mesh_2.GetNumNodes());
+
+        // Create a node-based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population_2(mesh_2, cells_2);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator_2(node_based_cell_population_2);
+        simulator_2.SetOutputDirectory("TestOffLatticeSimulationWith2ndXYPeriodicNodeBasedCellPopulation");
+
+        // Run for long enough to see the periodic boundary influencing the cells
+        simulator_2.SetEndTime(10.0);
+
+        // Pass the same force law to the simulation
+        simulator_2.AddForce(p_linear_force);
+
+        simulator_2.Solve();
+
+        // Check with a different interaction distance
+        // First reset the singletons
+        SimulationTime::Instance()->Destroy();
+        SimulationTime::Instance()->SetStartTime(0.0);
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
+        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        {
+            double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+            double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
+            double y_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+            double y_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
+
+            if (x_1 < offset)
+            {
+                TS_ASSERT_DELTA(x_1+offset, x_2, 1e-6)
+            }
+            else
+            {
+                TS_ASSERT_DELTA(x_1-offset, x_2, 1e-6)
+            }
+
+            if (y_1 < offset)
+            {
+                TS_ASSERT_DELTA(y_1+offset, y_2, 1e-6)
+            }
+            else
+            {
+                TS_ASSERT_DELTA(y_1-offset, y_2, 1e-6)
+            }
+            
+        }
+
     }
 
     /**
@@ -585,10 +947,10 @@ public:
         simulator.Solve();
 
         // Check some results
-        mNode3x = 3.0454;
+        mNode3x = 3.0408;
         mNode3y = 0.0000;
-        mNode4x = 4.0468;
-        mNode4y = 0.0101;
+        mNode4x = 4.0423;
+        mNode4y = 0.0116;
 
         std::vector<double> node_3_location = simulator.GetNodeLocation(3);
         TS_ASSERT_DELTA(node_3_location[0], mNode3x, 1e-4);

@@ -3,7 +3,7 @@ name: macOS continuous test suite
 on:
   push:
     branches:
-      - develop
+      - none
 
 jobs:
   

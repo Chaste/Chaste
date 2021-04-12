@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell writers
 #include "BoundaryNodeWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
+#include "LegacyCellProliferativeTypesWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -529,6 +530,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
         if (!HasWriter<CellProliferativeTypesWriter>())
         {
             AddCellWriter<CellProliferativeTypesWriter>();
+        }
+        if (!HasWriter<LegacyCellProliferativeTypesWriter>())
+        {
+            AddCellWriter<LegacyCellProliferativeTypesWriter>();
         }
     }
 

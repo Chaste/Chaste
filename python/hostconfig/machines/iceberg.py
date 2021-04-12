@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,8 +48,7 @@ chaste_libs_path = '/usr/local/extras/Chaste/'
 #EDIT HERE
 
 if not os.path.exists(chaste_libs_path) or not os.path.isdir(chaste_libs_path):
-    print >>sys.stderr, "Chaste dependencies folder", chaste_libs_path, \
-        "not found; please edit python/hostconfig/machines/iceberg.py"
+    print("%s not found; please edit python/hostconfig/machines/iceberg.py" % Chaste dependencies folder, file=sys.stderr)
     sys.exit(1)
     
 petsc_ver = 3.2

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,21 +50,21 @@ void PoleZeroMaterialLaw<DIM>::SetParameters(std::vector<std::vector<double> > k
         EXCEPTION("Can only have a 2 or 3d incompressible pole-zero law");
     }
 
-    assert(k.size()==DIM);
-    assert(a.size()==DIM);
-    assert(b.size()==DIM);
+    assert(k.size() == DIM);
+    assert(a.size() == DIM);
+    assert(b.size() == DIM);
 
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; i++)
     {
-        assert(k[i].size()==DIM);
-        assert(a[i].size()==DIM);
-        assert(b[i].size()==DIM);
+        assert(k[i].size() == DIM);
+        assert(a[i].size() == DIM);
+        assert(b[i].size() == DIM);
 
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; j++)
         {
-            assert( k[i][j] = k[j][i] );
-            assert( a[i][j] = a[j][i] );
-            assert( b[i][j] = b[j][i] );
+            assert(k[i][j] == k[j][i]);
+            assert(a[i][j] == a[j][i]);
+            assert(b[i][j] == b[j][i]);
         }
     }
 

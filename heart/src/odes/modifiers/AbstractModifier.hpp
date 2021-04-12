@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the result of that instead.
  *
  * Clearly for this to work the cell model must be modified to include calls to instances
- * of these classes.  PyCml has some experimental support for this, generating subclasses
+ * of these classes. Chaste_codegen has some experimental support for this, generating subclasses
  * of AbstractCardiacCellWithModifiers.
  */
 class AbstractModifier

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,7 +70,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
         local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(*cell_iter)] = local_cell_id;
         local_cell_id++;
     }
-    assert(local_cell_id = num_cells+1);
+    assert(local_cell_id == num_cells);
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
     std::vector<double> adjacency_matrix(num_cells*num_cells);
@@ -154,7 +154,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
         local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(*cell_iter)] = local_cell_id;
         local_cell_id++;
     }
-    assert(local_cell_id = num_cells+1);
+    assert(local_cell_id == num_cells);
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
     std::vector<double> adjacency_matrix(num_cells*num_cells);

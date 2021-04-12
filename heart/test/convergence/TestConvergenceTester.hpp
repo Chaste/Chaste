@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -83,7 +83,10 @@ public:
     {
         OdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum = 1;
-        tester.AbsoluteStimulus = -5e8; // We want V to go out of range for lookup tables
+
+        // Codegen Generated Backward Euler models don't have lookup tables (only the Backward Euler opt models do)
+        // So Pick a value that will cause a convergence issue
+        tester.AbsoluteStimulus = -5e10;
         tester.Converge(__FUNCTION__);
 
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 10u);

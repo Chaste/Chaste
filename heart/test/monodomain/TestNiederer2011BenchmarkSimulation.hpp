@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "TenTusscher2006Epi.hpp"
-#include "TenTusscher2006EpiBackwardEuler.hpp"
+#include "TenTusscher2006EpiBackwardEulerNoLut.hpp"
 #include "NumericFileComparison.hpp"
 
 /* This test provides the code for, and runs one simulation of, the benchmark problem defined in
@@ -99,11 +99,11 @@ public:
 
         if ((x<0.15+1e-6) && (y<0.15+1e-6) && (z<0.15+1e-6))
         {
-            return new CellTenTusscher2006EpiFromCellMLBackwardEuler(mpSolver, mpStimulus);
+            return new CellTenTusscher2006EpiFromCellMLBackwardEulerNoLut(mpSolver, mpStimulus);
         }
         else
         {
-            return new CellTenTusscher2006EpiFromCellMLBackwardEuler(mpSolver, mpZeroStimulus);
+            return new CellTenTusscher2006EpiFromCellMLBackwardEulerNoLut(mpSolver, mpZeroStimulus);
         }
     }
 };

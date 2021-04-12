@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -634,7 +634,7 @@ public:
         // Check that the second VTK file for Potts specific data (element IDs)
         VtkMeshReader<3,3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
         std::vector<double> cell_types;
-        vtk_reader.GetPointData("Cell types", cell_types);
+        vtk_reader.GetPointData("Legacy Cell types", cell_types);
         TS_ASSERT_EQUALS(cell_types.size(), 1000u);
 
         // The cell types are between -1 and 5. Check the maximum

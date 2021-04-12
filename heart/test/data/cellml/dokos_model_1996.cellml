@@ -87,7 +87,13 @@ http://www.CellML.org/
               </rdf:Description>
           </rdf:RDF>
       </variable>
-      <variable name="C" units="nanoF" initial_value="3.2e-5"/>
+      <variable name="C" units="nanoF" initial_value="3.2e-5" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="i_tot" units="picoA"/>
       <variable name="time" units="second" public_interface="in"/>
       <variable name="i_CaL" units="picoA" public_interface="in"/>
@@ -2134,7 +2140,13 @@ http://www.CellML.org/
       </math>
    </component>
    <component name="ion_concentrations">
-      <variable name="Cai" units="millimolar" initial_value="0.000034" public_interface="out"/>
+      <variable name="Cai" units="millimolar" initial_value="0.000034" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Cao" units="millimolar" initial_value="2.0004" public_interface="out"/>
       <variable name="Caup" units="millimolar" initial_value="0.5832" public_interface="out"/>
       <variable name="Carel" units="millimolar" initial_value="0.1101" public_interface="out"/>

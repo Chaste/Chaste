@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -68,7 +68,7 @@ def IsTestFile(test_dir, test_file_path):
                 is_test = True
                 break
         fp.close()
-    #print test_dir, test_file, test_ext, is_test
+    #print("%s %s %s %s" % (test_dir, test_file, test_ext, is_test))
     return is_test
     
 test_packs  = set()  # Names of test packs found
@@ -79,9 +79,9 @@ test_dirs = glob.glob('*/test')
 test_dirs.extend(map(lambda p: os.path.join(p, 'test'), projects_to_check))
 
 # First get a list of all tests in all test packs
-print "Test folders checked:"
+print("Test folders checked:")
 for test_dir in sorted(test_dirs):
-    print "   ", test_dir
+    print("   %s" % test_dir)
     tf, pn = BuildTools.GetTestsInTestPacks(test_dir, returnFoundPacks=True)
     found_tests.update(tf)
     test_packs.update(pn)
@@ -101,7 +101,7 @@ local_found_tests = {} # Names of tests found in test packs in each folder
 
 for test_dir in test_dirs:
     local_found_tests[test_dir] = BuildTools.GetTestsInTestPacks(test_dir)
-    #print test_dir, local_found_tests[test_dir]
+    #print("%s %s" % (test_dir, local_found_tests[test_dir]))
     # Check for orphans in this folder
     for dirpath, dirnames, filenames in os.walk(test_dir):
         for dirname in dirnames[:]:
@@ -119,10 +119,10 @@ for test_dir in test_dirs:
 
 # Output the names of test packs found
 if test_packs:
-    print "Test packs found:"
+    print("Test packs found:")
     for test_pack in sorted(test_packs):
-        print "   ", test_pack
-    print
+        print("   %s" % test_pack)
+    print()
     
 # Compute a list of tests listed in test packs without .hpp files
 not_found = []
@@ -133,26 +133,26 @@ for test_dir in local_found_tests.keys():
 # Display results
 if orphans or not_found or parallel_not_tested_continuous_too:
     if orphans:
-        print "Orphaned tests found:"
+        print("Orphaned tests found:")
         for orphan in sorted(orphans):
-            print "   ", orphan
-        print
+            print("   %s" % orphan)
+        print()
     if not_found:
-        print "Tests that don't exist:"
+        print("Tests that don't exist:")
         for test in sorted(not_found):
-            print "   ", test
-        print
+            print("   %s" % test)
+        print()
     if parallel_not_tested_continuous_too:
-        print "Parallel tests that need to be in a continuous test pack too:"
+        print("Parallel tests that need to be in a continuous test pack too:")
         for test in sorted(parallel_not_tested_continuous_too):
-            print "   ", test
-        print
-    print "The next line is for the benefit of the test summary scripts."
+            print("   %s" % test)
+        print()
+    print("The next line is for the benefit of the test summary scripts.")
     n_orphans, n_found = len(orphans)+len(parallel_not_tested_continuous_too), len(found_tests),
-    print "Failed", n_orphans, "of", n_orphans+n_found, "tests"
+    print("Failed %s of %s tests" % (n_orphans, n_orphans + n_found))
 
     # Return a non-zero exit code if problems were found
     sys.exit(n_orphans + len(not_found) + len(parallel_not_tested_continuous_too))
 else:
-    print "Infrastructure test passed ok."
+    print("Infrastructure test passed ok.")
   

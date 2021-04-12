@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,7 @@ import re
 
 if __name__ == "__main__":
     if (len(sys.argv) < 3):
-        print >>sys.stderr, "Usage:", sys.argv[0], "<profile_dir>", "<extension>"
+        print("Usage: %s <profile_dir> <extension>" % sys.argv[0], file=sys.stderr)
         sys.exit(1)
     files = glob.glob(sys.argv[1]+'/*.'+sys.argv[2])
     index_file = open(sys.argv[1]+'/index.html','w')

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ for root, dirs, files in os.walk(chaste_dir):
         if ext in exts:
             file_name = os.path.join(root, file)
             command = "sed -i 's/\\t/%s/g' %s" % (tab_spaces, file_name)
-            print "Checking " + file_name
+            print("Checking %s" % file_name)
             os.system(command)
             ### for removing trailing whitespace
             command = " sed -i 's/[ \\t]*$//' " + file_name

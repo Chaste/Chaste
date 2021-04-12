@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,35 +95,35 @@ def print_stats(hash, date_line):
     test_stats = file_stats(test_files)
     source_stats = file_stats(source_files)
 
-    print revision,'\t',epoch_weeks,'\t',source_stats[0],'\t',source_stats[1],\
-        '\t',test_stats[0],'\t',test_stats[1],'\t',test_stats[2],'\t',test_stats[3],\
-        '\t',source_stats[1]+test_stats[1],'\t',rev_date
+    print('%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s' % (revision, '\t', epoch_weeks, '\t', source_stats[0], '\t', source_stats[1],\
+        '\t', test_stats[0], '\t', test_stats[1], '\t', test_stats[2], '\t', test_stats[3],\
+        '\t', source_stats[1], test_stats[1], '\t', rev_date))
 
 def print_header():
     """Print a TSV header line corresponding to the output of print_stats."""
-    print '#rev\ttime (weeks)\tsrc_files\tsrc_loc\ttest_files\ttests_loc\ttest_suites\ttests\ttotal_loc\tdate'
+    print('#rev\ttime (weeks)\tsrc_files\tsrc_loc\ttest_files\ttests_loc\ttest_suites\ttests\ttotal_loc\tdate')
 
 def run(startDate):
     """Do the processing."""
 
     dir='../temp_lines_of_code'
 
-    print '### Start date =', start_date
-    print '###'
+    print('### Start date =%s' % start_date)
+    print('###')
     erase_old = True
     #erase_old = False
     if erase_old:
-        print '### Starting a fresh checkout in', dir
-        print '###'
+        print('### Starting a fresh checkout in %s' % dir)
+        print('###')
         if os.path.isdir(dir):
-            print '### Erasing previous', dir
+            print('### Erasing previous %s' % dir)
             shutil.rmtree(dir)
-        print '### Checking out...'
+        print('### Checking out...')
         os.system('git clone -q -b develop https://chaste.cs.ox.ac.uk/git/chaste.git '+dir+' > /dev/null')
-        print '### Checked out'
-        print '###'
-    print '### Switch to', dir
-    print '###'
+        print('### Checked out')
+        print('###')
+    print('### Switch to %s' % dir)
+    print('###')
     os.chdir(dir)
 
     print_header()
@@ -135,6 +135,7 @@ def run(startDate):
     while (date <= datetime.date.today()):
         p = subprocess.Popen('git log develop --abbrev-commit --max-count=1 --before=' + str(date), shell=True, stdout=subprocess.PIPE, stderr=None)
         (out, _) = p.communicate()
+        out = out.decode("utf-8")
         out_lines = out.split('\n')
         date_line = out_lines[2]
         if (date_line[:5] != 'Date:'):
@@ -153,8 +154,8 @@ def run(startDate):
     
 
 if __name__ == '__main__':
-    start_date = datetime.date(2017,02,01)
-    start_date = datetime.date(2020,06,12)
+    start_date = datetime.date(2017, 2, 1)
+    start_date = datetime.date(2020, 6, 12)
     # if len(sys.argv) > 1:
     #     start_date = int(sys.argv[1])
     run(start_date)

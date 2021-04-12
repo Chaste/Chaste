@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -236,7 +236,7 @@ public:
         distance_between(1) = node_a_location[1] - node_b_location[1];
         // Note that this distance varies based on the quality of the original honeycomb mesh,
         // the precision of the machine and the optimisation level
-        TS_ASSERT_DELTA(norm_2(distance_between), 6.1701, 4.0e-3);
+        TS_ASSERT_DELTA(norm_2(distance_between), 6.0546, 4.0e-3);
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();

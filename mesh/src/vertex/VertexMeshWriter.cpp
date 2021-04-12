@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -290,7 +290,8 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
     p_pts->GetData()->SetName("Vertex positions");
     for (unsigned node_num=0; node_num<rMesh.GetNumNodes(); node_num++)
     {
-        c_vector<double, SPACE_DIM> position = rMesh.GetNode(node_num)->rGetLocation();
+        c_vector<double, SPACE_DIM> position;
+        position = rMesh.GetNode(node_num)->rGetLocation();
         if (SPACE_DIM==2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);

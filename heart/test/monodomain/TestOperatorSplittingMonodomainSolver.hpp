@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -107,7 +107,6 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.1);
-
         double h = 0.01;
 
         // Normal
@@ -143,7 +142,8 @@ public:
         }
 
         // hardcoded value to check nothing has changed
-        TS_ASSERT_DELTA(final_voltage_operator_splitting[30], 5.0577, 1e-3);
+
+        TS_ASSERT_DELTA(final_voltage_operator_splitting[30], 5.0567, 1e-3);
 
         bool some_node_depolarised = false;
         assert(final_voltage_normal.GetSize()==final_voltage_operator_splitting.GetSize());

@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,12 +50,11 @@ do_inf_tests = 1
 #EDIT HERE
 #For a simple installation all paths will be below this directory
 chaste_libs_path = '/home/scratch/chaste-libs/'
-print 'kylie.py'
+print('kylie.py')
 #EDIT HERE
 
 if not os.path.exists(chaste_libs_path) or not os.path.isdir(chaste_libs_path):
-    print >>sys.stderr, "Chaste dependencies folder", chaste_libs_path, \
-        "not found; please edit python/hostconfig/default.py"
+    print("Chaste dependencies folder %s not found; please edit python/hostconfig/default.py" % chaste_libs_path, file=sys.stderr)
     sys.exit(1)
 
 petsc_3_0_path = chaste_libs_path+'petsc-3.0.0-p8/'
