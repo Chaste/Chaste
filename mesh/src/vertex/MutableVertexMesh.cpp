@@ -1018,27 +1018,70 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
     // If checking for internal intersections as well as on the boundary, then check that no nodes have overlapped any elements...
     if (mCheckForInternalIntersections)
     {
-        ///\todo Change to only loop over neighbouring elements (see #2401)
-        for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+        // First neighbours are elements that contain the node.  Second
+        // neighbours are elements that share a cell-cell boundary with first
+        // neighbours, but do not contain the node.  Nodes can only intersect
+        // second neighbours.
+        for (auto node_iter = this->GetNodeIteratorBegin();
              node_iter != this->GetNodeIteratorEnd();
              ++node_iter)
         {
             assert(!(node_iter->IsDeleted()));
 
-            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
-                 elem_iter != this->GetElementIteratorEnd();
+            // Get all nodes of first neighbours
+            std::set<unsigned> first_neighbour_node_indices;
+
+            auto first_neighbour_indices = node_iter->rGetContainingElementIndices();
+
+            for (auto elem_iter = first_neighbour_indices.begin();
+                    elem_iter != first_neighbour_indices.end();
+                    ++elem_iter)
+            {
+                auto p_element = this->GetElement(*elem_iter);
+
+                for (auto local_node_index = 0u;
+                        local_node_index < p_element->GetNumNodes();
+                        ++local_node_index)
+                {
+                    first_neighbour_node_indices.insert(p_element->GetNodeGlobalIndex(local_node_index));
+                }
+            }
+
+            // Get all first and second neighbours
+            std::set<unsigned> all_neighbours;
+
+            for (auto second_node_iter = first_neighbour_node_indices.begin();
+                    second_node_iter != first_neighbour_node_indices.end();
+                    ++second_node_iter)
+            {
+                auto containing_element_indices =
+                    this->GetNode(*second_node_iter)->rGetContainingElementIndices();
+                all_neighbours.insert(containing_element_indices.begin(),
+                        containing_element_indices.end());
+            }
+
+            // Second neighbours are the difference between all neighbours and
+            // first neighbours
+            std::set<unsigned> second_neighbour_indices;
+            std::set_difference(
+                    all_neighbours.begin(), all_neighbours.end(),
+                    first_neighbour_indices.begin(), first_neighbour_indices.end(),
+                    std::inserter(second_neighbour_indices, second_neighbour_indices.begin()));
+
+            // Loop over second neighbours only
+            for (auto elem_iter = second_neighbour_indices.begin();
+                 elem_iter != second_neighbour_indices.end();
                  ++elem_iter)
             {
-                unsigned elem_index = elem_iter->GetIndex();
+                unsigned elem_index = *elem_iter;
 
-                // Check that the node is not part of this element
-                if (node_iter->rGetContainingElementIndices().count(elem_index) == 0)
+                // Node should not be part of this element
+                assert(node_iter->rGetContainingElementIndices().count(elem_index) == 0);
+
+                if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
                 {
-                    if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
-                    {
-                        PerformIntersectionSwap(&(*node_iter), elem_index);
-                        return true;
-                    }
+                    PerformIntersectionSwap(&(*node_iter), elem_index);
+                    return true;
                 }
             }
         }
