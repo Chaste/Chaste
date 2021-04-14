@@ -380,7 +380,7 @@ public:
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
 
-        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
+        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -444,7 +444,7 @@ public:
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
 
-        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
+        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -506,7 +506,7 @@ public:
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
 
-        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
+        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -577,7 +577,7 @@ public:
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
 
-        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
+        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -635,7 +635,7 @@ public:
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
 
-        // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
+        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);

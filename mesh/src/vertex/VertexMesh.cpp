@@ -97,6 +97,8 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         }
     }
 
+    this->GenerateEdgesFromElements(mElements);
+
     this->mMeshChangesDuringSimulation = false;
 }
 
@@ -386,6 +388,18 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
+        std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM> *> &elements)
+{
+    // Build a list of unique edges from nodes within all the elements
+    for (auto elem : elements)
+    {
+        elem->SetEdgeHelper(&this->mEdges);
+        elem->BuildEdges();
+    }
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
@@ -591,6 +605,9 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete mFaces[i];
     }
     mFaces.clear();
+
+    //Delete edges
+    this->mEdges.Clear();
 
     // Delete nodes
     for (unsigned i = 0; i < this->mNodes.size(); i++)
@@ -907,6 +924,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
             p_element->SetAttribute(attribute_value);
         }
     }
+    GenerateEdgesFromElements(mElements);
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -1534,6 +1552,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELE
     c_vector<double, SPACE_DIM> unit_normal;
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
+
+
 
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)

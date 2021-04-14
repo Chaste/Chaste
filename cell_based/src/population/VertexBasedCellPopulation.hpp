@@ -38,7 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
-
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
+#include "VertexBasedPopulationSrn.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
@@ -46,7 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
-
+template<unsigned DIM>
+class VertexBasedPopulationSrn;
 /**
  * A facade class encapsulating a vertex-based cell population.
  *
@@ -63,7 +65,8 @@ private:
      * This test uses the private constructor to simplify testing.
      */
     friend class TestVertexBasedDivisionRules;
-
+    friend class TestVertexBasedCellPopulation;
+    friend class TestMutableVertexMeshOperationsWithPopulationSrn;
     /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if this cell population has been de-serialized.
@@ -108,12 +111,33 @@ private:
      */
      bool mThrowStepSizeException = true;
 
+     /**
+      * SRN remapping helper class
+      */
+     VertexBasedPopulationSrn<DIM> mPopulationSrn;
+
     /**
-     * Overridden WriteVtkResultsToFile() method.
-     *
+     * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
+     * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,
+     * otherwise WriteCellVtkResultsToFile() is used to represent entire cells.
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes a representation of cells to file.
+     * @param rDirectory
+     */
+    virtual void WriteCellVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes an edge-based representation of the cells to file.
+     * Each cell is divided into a number of triangles equaling the number of edges.
+     *
+     * Cell ID property is added by default so individual cells can still be differentiated.
+     * @param rDirectory
+     */
+    virtual void WriteCellEdgeVtkResultsToFile(const std::string& rDirectory);
 
     friend class boost::serialization::access;
     /**
@@ -245,6 +269,17 @@ public:
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
+
+    /**
+     * Overridden GetNeighbouringEdgeIndices() method.
+     * Gets the local edge index of the neighbouring element and the element index
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * @return set of pairs consisting of element index neighbouring pCell and local edge index
+     */
+    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex) override;
+
+
     /**
      * Overridden AddNode() method.
      *
@@ -334,6 +369,8 @@ public:
     */
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
+
+
     /**
      * A virtual method to accept a cell population writer so it can
      * write data from this object to file.
@@ -376,39 +413,6 @@ public:
      * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
-
-    /**
-     * Return all locations of T2 swaps since the last sampling time step.
-     *
-     * @return mLocationsOfT2Swaps
-     */
-    std::vector< c_vector< double, DIM > > GetLocationsOfT2Swaps();
-
-     /**
-     * Return all IDs of cells undergoing T2 swaps since the last sampling time step.
-     *
-     * @return mLocationsOfT2Swaps
-     */
-    std::vector< unsigned > GetCellIdsOfT2Swaps();
-
-    /**
-     * Add location of T2 Swap.
-     *
-     * @param locationOfT2Swap  Location of the T2 swap
-     */
-    void AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap);
-
-    /**
-     * Add ID of T2 Swap.
-     *
-     * @param idOfT2Swap ID of the cell undergoing a T2 swap
-     */
-    void AddCellIdOfT2Swap(unsigned idOfT2Swap);
-
-    /**
-     * Clear the locations and IDs of cells undergoing T2 Swaps.
-     */
-    void ClearLocationsAndCellIdsOfT2Swaps();
 
     /**
      * @return mOutputCellRearrangementLocations
@@ -551,6 +555,11 @@ public:
      * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
+
+    /**
+     * Get VertexBasedPopulationSrn object. Used e.g. in TestMutableVertexMeshRemeshWithPopulationSrn.
+     */
+    VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn();
 };
 
 #include "SerializationExportWrapper.hpp"

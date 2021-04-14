@@ -104,7 +104,7 @@ c_vector<double,DIM> ContinuumMechanicsProblemDefinition<DIM>::EvaluateBodyForce
 template<unsigned DIM>
 c_vector<double,DIM> ContinuumMechanicsProblemDefinition<DIM>::GetBodyForce(c_vector<double,DIM>& rX, double t)
 {
-    switch(mBodyForceType)
+    switch (mBodyForceType)
     {
         case CONSTANT_BODY_FORCE:
         {

@@ -56,6 +56,7 @@ class VertexMeshWriter;
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
 
+
 /**
  * A vertex-based mesh class, in which elements may contain different numbers of nodes.
  * This is facilitated by the VertexElement class.
@@ -74,6 +75,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestVertexMesh;
+
 
 protected:
     /** Vector of pointers to VertexElements. */
@@ -126,6 +128,12 @@ protected:
      * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
+
+    /**
+     * Build edges from elements. Populates edges in EdgeHelper class
+     * @param elements from which edges are built
+     */
+    void GenerateEdgesFromElements(std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> &elements);
 
     /**
      * Populate mNodes with locations corresponding to the element
@@ -183,7 +191,6 @@ protected:
     void save(Archive& archive, const unsigned int version) const
     {
         archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
-
         // Create a mesh writer pointing to the correct file and directory
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
                                                              ArchiveLocationInfo::GetMeshFilename(),

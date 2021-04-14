@@ -47,10 +47,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : mNodes(rNodes),
+      mEdgeHelper(nullptr),
       mIndex(index),
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(nullptr)
+
 {
     // Sanity checking
     assert(ELEMENT_DIM <= SPACE_DIM);
@@ -58,15 +60,18 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
-    : mIndex(index),
+    : mEdgeHelper(nullptr),
+      mIndex(index),
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(nullptr)
+
 {}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
 {
+
     delete mpElementAttributes;
 }
 
@@ -83,6 +88,7 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldN
         }
     }
     EXCEPTION("You didn't have that node to start with.");
+
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -129,6 +135,121 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode)
 {
     mNodes.push_back(pNode);
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
+{
+    this->mEdgeHelper = edgeHelper;
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ClearEdges()
+{
+    for (auto edge: mEdges)
+    {
+        edge->RemoveElement(this->mIndex);
+    }
+    mEdges.clear();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::BuildEdges()
+{
+    assert(mEdgeHelper != nullptr);
+
+    // If SPACE_DIM == 2 then we can assume that the node layout
+    // in the array corresponds to its connections
+    // We can then infer the edge connection information
+    if (SPACE_DIM == 2)
+    {
+        this->ClearEdges();
+        for (unsigned i = 0; i < mNodes.size(); i++)
+        {
+            unsigned i_next = (i+1) % mNodes.size();
+            mEdges.push_back(mEdgeHelper->GetEdgeFromNodes(this->mIndex, mNodes[i], mNodes[i_next]));
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex]->GetIndex();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Edge<SPACE_DIM> *AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdges.size();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementAtEdgeIndex(unsigned localIndex)
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex]->GetOtherElements(this->mIndex);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::CheckEdgesAreValid()
+{
+    if (SPACE_DIM != 2)
+    {
+        return false;
+    }
+
+    if (mEdges.size() != mNodes.size())
+    {
+        return false;
+    }
+
+    bool edgesOk = true;
+    for (unsigned i = 0; i < mEdges.size(); i++)
+    {
+        auto i_next = (i+1) % mEdges.size();
+        auto edge = mEdges[i];
+
+        if (!edge->IsEdgeValid())
+        {
+            printf("[Error] Element index: %i edge index: %i - edge is not valid \n", this->mIndex, i);
+            edgesOk = false;
+        }
+
+        // Edge at index i must contain nodes at index i and i+1
+        if (!(edge->ContainsNode(mNodes[i]) && edge->ContainsNode(mNodes[i_next])))
+        {
+            printf("[Error] Element index: %i edge index: %i - doesn't contain the correct nodes \n", this->mIndex, i);
+            edgesOk = false;
+        }
+    }
+
+    if (!edgesOk)
+    {
+        printf("[Debug] Element index: %i Node Indices: ", this->mIndex);
+        for (auto nodeOut: this->mNodes)
+        {
+            printf(" %i ", nodeOut->GetIndex());
+        }
+        printf("\n Edge-node indices");
+        for (auto edgeOut : this->mEdges)
+        {
+            printf(" %i (%i -> %i)", edgeOut->GetIndex(),
+                    edgeOut->GetNode(0)->GetIndex(), edgeOut->GetNode(1)->GetIndex());
+        }
+        printf("\n");
+
+        return false;
+    }
+
+    return true;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -223,6 +344,32 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes()
 {
     return mpElementAttributes == nullptr ? 0 : mpElementAttributes->rGetAttributes().size();
 }
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
+{
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+            return true;
+    }
+    return false;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+long AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
+{
+    long result = -1;
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+        {
+            result = i;
+        }
+    }
+    return result;
+}
+
 
 // Explicit instantiation
 template class AbstractElement<0,1>;

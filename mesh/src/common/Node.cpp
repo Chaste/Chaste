@@ -260,6 +260,33 @@ void Node<SPACE_DIM>::SetRadius(double radius)
     mpNodeAttributes->SetRadius(radius);
 }
 
+template<unsigned int SPACE_DIM>
+void Node<SPACE_DIM>::AddEdge(unsigned index)
+{
+    mEdgeIndices.insert(index);
+}
+
+template<unsigned int SPACE_DIM>
+void Node<SPACE_DIM>::RemoveEdge(unsigned index)
+{
+    unsigned count = mEdgeIndices.erase(index);
+    if (count == 0)
+    {
+        EXCEPTION("Tried to remove an edge index which was not in the set");
+    }
+}
+
+template<unsigned int SPACE_DIM>
+void Node<SPACE_DIM>::SetEdgeIndices(std::set<unsigned int> edge_indices)
+{
+    mEdgeIndices = edge_indices;
+}
+template<unsigned int SPACE_DIM>
+std::set<unsigned int> Node<SPACE_DIM>::GetEdgeIndices() const
+{
+    return mEdgeIndices;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Tracking (boundary) elements which contain this node as a vertex
 //////////////////////////////////////////////////////////////////////////
@@ -445,6 +472,8 @@ unsigned Node<SPACE_DIM>::GetRegion() const
 
     return region;
 }
+
+
 
 // Explicit instantiation
 template class Node<1>;

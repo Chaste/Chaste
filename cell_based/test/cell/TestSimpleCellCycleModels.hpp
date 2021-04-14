@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 #include "AbstractCellBasedTestSuite.hpp"
+#include "AlwaysDivideCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApoptoticCellProperty.hpp"
@@ -102,6 +103,35 @@ public:
         {
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
+        }
+    }
+
+    void TestAlwaysDivideCellCycleModel()
+    {
+        // Test constructor
+        TS_ASSERT_THROWS_NOTHING(AlwaysDivideCellCycleModel cell_cycle_model);
+
+        // Test methods
+        AlwaysDivideCellCycleModel* p_model = new AlwaysDivideCellCycleModel;
+        TS_ASSERT_DELTA(p_model->GetAverageStemCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_DELTA(p_model->GetAverageTransitCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_EQUALS(p_model->ReadyToDivide(), true);
+
+        // Test the cell-cycle model works correctly with a cell
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
+        CellPtr p_cell(new Cell(p_healthy_state, p_model));
+        p_cell->SetCellProliferativeType(p_stem_type);
+        p_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        for (unsigned i = 0; i < 10; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
         }
     }
 

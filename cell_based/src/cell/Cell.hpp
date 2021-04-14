@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellProliferativeType.hpp"
 #include "CellData.hpp"
 #include "CellVecData.hpp"
+#include "CellEdgeData.hpp"
+
 
 #include "AbstractCellCycleModel.hpp"
 #include "AbstractSrnModel.hpp"
@@ -148,6 +150,8 @@ protected:
     /** Whether the cell is being tracked specially. */
     bool mIsLogged;
 
+    /**Whether the cell has SRN associated to it*/
+    bool mHasSrnModel;
 public:
 
     /**
@@ -264,6 +268,13 @@ public:
      * @return a pointer to the cell data
      */
     boost::shared_ptr<CellData> GetCellData() const;
+
+    /**
+     * Get the CellEdgeData associated with the cell.
+     *
+     * @return a pointer to the cell edge data
+     */
+    boost::shared_ptr<CellEdgeData> GetCellEdgeData() const;
 
     /**
      * Checks whether there is CellVecData associated with this cell
@@ -416,6 +427,11 @@ public:
      * @return The cell identifier.
      */
     unsigned GetCellId() const;
+
+    /**
+     * @return True if cell has SRN model associated to it
+     */
+    bool HasSrnModel() const;
 };
 
 
@@ -436,13 +452,10 @@ inline void save_construct_data(
     // Save data required to construct instance
     const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
-
     const AbstractCellCycleModel* const p_cell_cycle_model = t->GetCellCycleModel();
     ar & p_cell_cycle_model;
-
     const AbstractSrnModel* const p_srn_model = t->GetSrnModel();
     ar & p_srn_model;
-
     const CellPropertyCollection& r_cell_property_collection = t->rGetCellPropertyCollection();
     ar & r_cell_property_collection;
 }

@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
+
 /**
  *  A mutable element containing functionality
  *  to add and remove nodes.
@@ -49,8 +50,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableElement : public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -150,6 +149,16 @@ public:
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
     /**
+     * Informs all edges forming this element that they are in this element.
+     */
+    void RegisterWithEdges();
+
+    /**
+     * Rebuilds edges in this element
+     */
+    void RebuildEdges();
+
+    /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
      *
      * @return whether or not the element is on the boundary.
@@ -238,6 +247,8 @@ public:
      */
     void AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
 
+
+
     /**
      * Calculate the local index of a node given a global index
      * if node is not contained in element return UINT_MAX
@@ -246,6 +257,11 @@ public:
      * @return local_index.
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
+
+    void RegisterWithEdges();
+
+    void RebuildEdges();
+
 
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
