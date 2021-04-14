@@ -67,6 +67,3 @@ void EdgeRemapInfo::SetSplitProportions(const std::vector<double> thetas)
     mSplitProportions = thetas;
 }
 
-#include "SerializationExportWrapperForCpp.hpp"
-// Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(EdgeRemapInfo)
