@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <vector>
 #include "ChasteSerialization.hpp"
+#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/set.hpp>
 #include "Node.hpp"
 
