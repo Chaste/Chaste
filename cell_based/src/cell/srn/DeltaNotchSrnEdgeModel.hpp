@@ -96,14 +96,14 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    AbstractSrnModel* CreateSrnModel();
+    virtual AbstractSrnModel* CreateSrnModel() override;
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    void Initialise(); // override
+    virtual void Initialise() override; // override
 
     /**
      * Overriden method. This simply resets the model variables/parameters
@@ -116,7 +116,7 @@ public:
      *
      * \todo #2752 say what it does in this class
      */
-    void SimulateToCurrentTime();
+    virtual void SimulateToCurrentTime() override;
 
     /**
      * Update the current levels of Delta and Notch in the cell.
@@ -174,7 +174,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSrnModelParameters(out_stream& rParamsFile);
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
      * Override the method declared in AbstractSrnModel class
