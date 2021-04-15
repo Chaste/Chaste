@@ -184,9 +184,8 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
                 auto p_edge = elem->GetEdge(edge_index);
                 assert(p_edge->GetNumNodes()==2);
                 //See the diagram above for storing pattern
-                std::array<unsigned, 2> base_ids{p_edge->GetNode(0)->GetIndex(),
-                    p_edge->GetNode(1)->GetIndex()};
-                std::array<unsigned, 2> top_ids{elem->GetNodeLocalIndex(base_ids[0])
+                std::array<unsigned, 2> base_ids = {p_edge->GetNode(0)->GetIndex(), p_edge->GetNode(1)->GetIndex()};
+                std::array<unsigned, 2> top_ids = {elem->GetNodeLocalIndex(base_ids[0])
                     +cell_offset_dist[elem->GetIndex()],
                     elem->GetNodeLocalIndex(base_ids[1])+
                     cell_offset_dist[elem->GetIndex()]};
