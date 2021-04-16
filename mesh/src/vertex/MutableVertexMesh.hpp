@@ -71,12 +71,13 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexEdges;
     friend class TestCellEdgeInteriorSrn;
     friend class TestMutableVertexMeshOperationsWithPopulationSrn;
-private:
+protected:
     /** Whether we need to record mesh operations, e.g. when SRN models are used */
     bool mTrackMeshOperations = false;
+
     /** Helper class to record rearrangements and mesh operations */
     VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM> mOperationRecorder = VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>();
-protected:
+
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
 
