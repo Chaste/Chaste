@@ -76,7 +76,7 @@ protected:
     bool mTrackMeshOperations = false;
 
     /** Helper class to record rearrangements and mesh operations */
-    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM> mOperationRecorder = VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>();
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM> mOperationRecorder;
 
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
