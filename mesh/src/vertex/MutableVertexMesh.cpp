@@ -1812,8 +1812,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
         assert((intersected_edge+1)%num_nodes==node_B_local_index_in_3);
 
         // Add node B to element 1 before node A and add node A to element 3 before node B
-        unsigned node_before_A_in_1 = (node_A_local_index_in_1 - 1)%this->GetElement(element_1_index)->GetNumNodes();
-        unsigned node_before_B_in_3 = (node_B_local_index_in_3 - 1)%this->GetElement(element_3_index)->GetNumNodes();
+        unsigned node_before_A_in_1 = (node_A_local_index_in_1 + this->GetElement(element_1_index)->GetNumNodes() - 1)%this->GetElement(element_1_index)->GetNumNodes();
+        unsigned node_before_B_in_3 = (node_B_local_index_in_3 + this->GetElement(element_3_index)->GetNumNodes() - 1)%this->GetElement(element_3_index)->GetNumNodes();
         this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
         this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_before_B_in_3);
 
