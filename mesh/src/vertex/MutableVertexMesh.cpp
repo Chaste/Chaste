@@ -1730,6 +1730,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_a = this->GetElement(element_a_index);
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_b = this->GetElement(element_b_index);
 
+    if ((p_element_a->GetNumNodes() == 3) || (p_element_b->GetNumNodes() == 3))
+    {
+        EXCEPTION("A triangular element has become concave. "
+                  "You need to rerun the simulation with a smaller time step to prevent this.");
+    }
+
     std::set<unsigned> element_a_nodes;
     for (unsigned node_index = 0;  node_index < p_element_a->GetNumNodes(); node_index++)
     {
