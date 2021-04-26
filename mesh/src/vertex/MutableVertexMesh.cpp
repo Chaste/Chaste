@@ -1706,6 +1706,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
      * Element 2 has nodes B and A (in that order)
      * Element 3 only contains node B
      * Element 4 has nodes A and B (in that order)
+     *
+     * If node A is a boundary node, then elements 1, 2, or 4 can be missing.
      */
     unsigned node_A_index = pNode->GetIndex();
     unsigned node_B_index = UINT_MAX;
@@ -1898,6 +1900,73 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
             this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
         }
     }
+
+    // Set as boundary nodes if intersecting node is a boundary node
+    if (all_elements_containing_intersecting_node.size() == 2)
+    {
+        // Case 1: element 1 is missing
+        if (elements_containing_intersecting_node.size() == 2)
+        {
+            assert(this->mNodes[node_A_index]->IsBoundaryNode() == true);
+            assert(this->mNodes[node_B_index]->IsBoundaryNode() == false);
+            this->mNodes[node_B_index]->SetAsBoundaryNode(true);
+        }
+        else if (elements_containing_intersecting_node.size() == 1)
+        {
+            assert(this->mNodes[node_A_index]->IsBoundaryNode() == true);
+            assert(this->mNodes[node_B_index]->IsBoundaryNode() == true);
+            // Case 2: element 2 is missing
+            if (element_2_index == UINT_MAX)
+            {
+                if (intersected_edge==node_B_local_index_in_3)
+                {
+                    this->mNodes[node_B_index]->SetAsBoundaryNode(false);
+                }
+                else
+                {
+                    this->mNodes[node_A_index]->SetAsBoundaryNode(false);
+                }
+            }
+            // Case 3: element 4 is missing
+            if (element_4_index == UINT_MAX)
+            {
+                if (intersected_edge==node_B_local_index_in_3)
+                {
+                    this->mNodes[node_A_index]->SetAsBoundaryNode(false);
+                }
+                else
+                {
+                    this->mNodes[node_B_index]->SetAsBoundaryNode(false);
+                }
+            }
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
+    }
+#ifndef NDEBUG
+    // Case 4: elements 1 and 2 are missing
+    // Case 5: elements 1 and 4 are missing
+    else if (all_elements_containing_intersecting_node.size() == 1)
+    {
+        if (elements_containing_intersecting_node.size() == 1)
+        {
+            assert(this->mNodes[node_A_index]->IsBoundaryNode() == true);
+            assert(this->mNodes[node_B_index]->IsBoundaryNode() == true);
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
+    }
+    // Node A is not a boundary node
+    else
+    {
+        assert(this->mNodes[node_A_index]->IsBoundaryNode() == false);
+        assert(this->mNodes[node_B_index]->IsBoundaryNode() == false);
+    }
+#endif
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
