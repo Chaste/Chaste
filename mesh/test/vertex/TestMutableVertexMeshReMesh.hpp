@@ -2995,6 +2995,64 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForIntersections(), "A triangular element has become concave. "
                 "You need to rerun the simulation with a smaller time step to prevent this.");
     }
+
+    void TestPerformIntersectionSwapSplitting()
+    {
+        /*
+         * Create a mesh comprising eight nodes contained in two triangle, two rhomboid elements,
+         * and one pentagonal element.  We will test that an exception is raised when an intersection
+         * splits the element into two new elements.
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true,  0.8, 1.0));
+        nodes.push_back(new Node<2>(4, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(5, false, 0.4, 0.5));
+        nodes.push_back(new Node<2>(6, false, 0.6, 0.5));
+        nodes.push_back(new Node<2>(7, false, 0.6, 0.6));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3, nodes_elem_4;
+        unsigned node_indices_elem_0[3] = {3, 4, 7};
+        unsigned node_indices_elem_1[4] = {2, 3, 7, 6};
+        unsigned node_indices_elem_2[4] = {1, 2, 6, 5};
+        unsigned node_indices_elem_3[3] = {0, 1, 5};
+        unsigned node_indices_elem_4[5] = {0, 5, 6, 7, 4};
+        for (unsigned i=0; i<3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
+        }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 5 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
+        point.SetCoordinate(1u, 0.8);
+        vertex_mesh.SetNode(5, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForIntersections(), "Intersection cannot be resolved "
+                "without splitting the element into two new elements.");
+        }
 };
 
 #endif /*TESTMUTABLEVERTEXMESHREMESH_HPP_*/
