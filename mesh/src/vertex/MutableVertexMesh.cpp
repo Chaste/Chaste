@@ -1691,11 +1691,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
             }
         }
     }
-    /*
-     * If there are not two elements containing the intersecting node then the node is coming from the other side of the element
-     * and there is no way to fix it unless you want to make two new elements.
-     */
-    assert(elements_containing_intersecting_node.size() == 2);
 
     std::set<unsigned> all_elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
 
@@ -1758,7 +1753,15 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
             break;
         }
     }
-    assert(node_B_index != UINT_MAX);
+    /*
+     * If node B cannot be found then there are no nodes before or after node A
+     * in element a that are contained in the intersected element, and there is
+     * no way to fix it unless you want to make two new elements.
+     */
+    if (node_B_index == UINT_MAX)
+    {
+        EXCEPTION("Intersection cannot be resolved without splitting the element into two new elements.");
+    }
 
     // Now identify elements 2 and 4
     unsigned node_B_local_index_in_a = p_element_a->GetNodeLocalIndex(node_B_index);
