@@ -1716,7 +1716,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
      * Element 4 has nodes A and B (in that order)
      */
     unsigned node_A_index = pNode->GetIndex();
-    unsigned node_B_index;
+    unsigned node_B_index = UINT_MAX;
     unsigned element_1_index = *(intersecting_element.begin());
     unsigned element_2_index;
     unsigned element_3_index = elementIndex;
@@ -1736,35 +1736,31 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
                   "You need to rerun the simulation with a smaller time step to prevent this.");
     }
 
-    std::set<unsigned> element_a_nodes;
-    for (unsigned node_index = 0;  node_index < p_element_a->GetNumNodes(); node_index++)
+    // Get node B index
+    unsigned node_A_local_index_in_a = p_element_a->GetNodeLocalIndex(node_A_index);
+
+    unsigned node_before_A_in_a = (node_A_local_index_in_a + p_element_a->GetNumNodes() - 1) % p_element_a->GetNumNodes();
+    unsigned node_after_A_in_a = (node_A_local_index_in_a + 1) % p_element_a->GetNumNodes();
+
+    unsigned global_node_before_A_in_a = p_element_a->GetNodeGlobalIndex(node_before_A_in_a);
+    unsigned global_node_after_A_in_a = p_element_a->GetNodeGlobalIndex(node_after_A_in_a);
+
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
-        element_a_nodes.insert(p_element_a->GetNodeGlobalIndex(node_index));
+        if (p_element->GetNodeGlobalIndex(node_index) == global_node_before_A_in_a)
+        {
+            node_B_index = global_node_before_A_in_a;
+            break;
+        }
+        else if (p_element->GetNodeGlobalIndex(node_index) == global_node_after_A_in_a)
+        {
+            node_B_index = global_node_after_A_in_a;
+            break;
+        }
     }
-
-    std::set<unsigned> element_b_nodes;
-    for (unsigned node_index = 0;  node_index < p_element_b->GetNumNodes(); node_index++)
-    {
-        element_b_nodes.insert(p_element_b->GetNodeGlobalIndex(node_index));
-    }
-
-    std::set<unsigned> switching_nodes;
-    std::set_intersection(element_a_nodes.begin(), element_a_nodes.end(),
-                          element_b_nodes.begin(), element_b_nodes.end(),
-                          std::inserter(switching_nodes, switching_nodes.begin()));
-
-    assert(switching_nodes.size() == 2);
-
-    // Check intersecting node is this set
-    assert(switching_nodes.find(node_A_index) != switching_nodes.end());
-    switching_nodes.erase(node_A_index);
-
-    assert(switching_nodes.size() == 1);
-
-    node_B_index = *(switching_nodes.begin());
+    assert(node_B_index != UINT_MAX);
 
     // Now identify elements 2 and 4
-    unsigned node_A_local_index_in_a = p_element_a->GetNodeLocalIndex(node_A_index);
     unsigned node_B_local_index_in_a = p_element_a->GetNodeLocalIndex(node_B_index);
 
     if ((node_B_local_index_in_a+1)%p_element_a->GetNumNodes() == node_A_local_index_in_a)
