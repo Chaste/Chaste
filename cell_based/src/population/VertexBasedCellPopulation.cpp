@@ -448,14 +448,15 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     if (cells.size() > 0)
     {
         //If cells contain edge data
-        if (p_cell_edge_data != nullptr)
+        if (p_cell_edge_data != nullptr&&mWriteEdgeVtkResults)
         {
             this->WriteCellEdgeVtkResultsToFile(rDirectory);
             return;
         }
     }
 
-    this->WriteCellVtkResultsToFile(rDirectory);
+    if (mWriteCellVtkResults)
+        this->WriteCellVtkResultsToFile(rDirectory);
 
 }
 
@@ -1118,6 +1119,17 @@ VertexBasedPopulationSrn<DIM>& VertexBasedCellPopulation<DIM>::rGetVertexBasedPo
     return mPopulationSrn;
 }
 
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetWriteCellVtkResults(const bool new_val)
+{
+    mWriteCellVtkResults = new_val;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetWriteEdgeVtkResults(const bool new_val)
+{
+    mWriteEdgeVtkResults = new_val;
+}
 // Explicit instantiation
 template class VertexBasedCellPopulation<1>;
 template class VertexBasedCellPopulation<2>;

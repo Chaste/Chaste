@@ -116,6 +116,16 @@ private:
       */
      VertexBasedPopulationSrn<DIM> mPopulationSrn;
 
+     /**
+      * Whether to write cell vtk results. True by default
+      */
+     bool mWriteCellVtkResults = true;
+
+     /**
+      * Whether to write edge vtk results. True by default
+      */
+     bool mWriteEdgeVtkResults = true;
+
     /**
      * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
      * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,
@@ -558,6 +568,18 @@ public:
      * Get VertexBasedPopulationSrn object. Used e.g. in TestMutableVertexMeshRemeshWithPopulationSrn.
      */
     VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn();
+
+    /**
+     * Set whether to write cell vtk results
+     * @param new_val whether to write cell vtk
+     */
+    void SetWriteCellVtkResults(const bool new_val);
+
+    /**
+     * Set whether to write cell vtk results
+     * @param new_val whether to write cell vtk
+     */
+    void SetWriteEdgeVtkResults(const bool new_val);
 };
 
 #include "SerializationExportWrapper.hpp"
