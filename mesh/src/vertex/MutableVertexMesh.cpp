@@ -1694,11 +1694,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
 
     std::set<unsigned> all_elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
 
-    std::set<unsigned> intersecting_element;
-
-    std::set_difference(all_elements_containing_intersecting_node.begin(), all_elements_containing_intersecting_node.end(),
-                        elements_containing_intersecting_node.begin(), elements_containing_intersecting_node.end(),
-                        std::inserter(intersecting_element, intersecting_element.begin()));
+    assert(elements_containing_intersecting_node.size() >= 1);
+    assert(all_elements_containing_intersecting_node.size() >= 1);
 
     /*
      * Identify nodes and elements to perform switch on
@@ -1712,20 +1709,40 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
      */
     unsigned node_A_index = pNode->GetIndex();
     unsigned node_B_index = UINT_MAX;
-    unsigned element_1_index = *(intersecting_element.begin());
-    unsigned element_2_index;
-    unsigned element_3_index = elementIndex;
-    unsigned element_4_index;
 
+    unsigned element_1_index = UINT_MAX;
+    unsigned element_2_index = UINT_MAX;
+    unsigned element_3_index = elementIndex;
+    unsigned element_4_index = UINT_MAX;
+
+    // Get element 1
+    std::set<unsigned> intersecting_element;
+
+    std::set_difference(all_elements_containing_intersecting_node.begin(), all_elements_containing_intersecting_node.end(),
+                        elements_containing_intersecting_node.begin(), elements_containing_intersecting_node.end(),
+                        std::inserter(intersecting_element, intersecting_element.begin()));
+
+    if (intersecting_element.size() == 1)
+    {
+        element_1_index = *(intersecting_element.begin());
+    }
+
+    // Get element A
     std::set<unsigned>::iterator iter = elements_containing_intersecting_node.begin();
     unsigned element_a_index = *(iter);
-    iter++;
-    unsigned element_b_index = *(iter);
-
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_a = this->GetElement(element_a_index);
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_b = this->GetElement(element_b_index);
 
-    if ((p_element_a->GetNumNodes() == 3) || (p_element_b->GetNumNodes() == 3))
+    // Get element B
+    unsigned element_b_index = UINT_MAX;
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_b = nullptr;
+    if (elements_containing_intersecting_node.size() == 2)
+    {
+        iter++;
+        element_b_index = *(iter);
+        p_element_b = this->GetElement(element_b_index);
+    }
+
+    if ((p_element_a->GetNumNodes() == 3) || ((p_element_b != nullptr) && p_element_b->GetNumNodes() == 3))
     {
         EXCEPTION("A triangular element has become concave. "
                   "You need to rerun the simulation with a smaller time step to prevent this.");
@@ -1768,8 +1785,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
 
     if ((node_B_local_index_in_a+1)%p_element_a->GetNumNodes() == node_A_local_index_in_a)
     {
-        assert((p_element_b->GetNodeLocalIndex(node_A_index)+1)%p_element_b->GetNumNodes()
-               == p_element_b->GetNodeLocalIndex(node_B_index));
+#ifndef NDEBUG
+        if (element_b_index != UINT_MAX)
+        {
+            assert(p_element_b != nullptr);
+            assert((p_element_b->GetNodeLocalIndex(node_A_index)+1)%p_element_b->GetNumNodes()
+                    == p_element_b->GetNodeLocalIndex(node_B_index));
+        }
+#endif
 
         // Element 2 is element a, element 4 is element b
         element_2_index = element_a_index;
@@ -1777,26 +1800,50 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     }
     else
     {
-        assert((p_element_b->GetNodeLocalIndex(node_B_index)+1)%p_element_b->GetNumNodes()
-               == p_element_b->GetNodeLocalIndex(node_A_index));
+#ifndef NDEBUG
+        if (element_b_index != UINT_MAX)
+        {
+            assert(p_element_b != nullptr);
+            assert((p_element_b->GetNodeLocalIndex(node_B_index)+1)%p_element_b->GetNumNodes()
+                    == p_element_b->GetNodeLocalIndex(node_A_index));
+        }
+#endif
 
         // Element 2 is element b, element 4 is element a
         element_2_index = element_b_index;
         element_4_index = element_a_index;
     }
 
+    // Get local indices
     unsigned intersected_edge = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
 
-    unsigned node_A_local_index_in_1 = this->GetElement(element_1_index)->GetNodeLocalIndex(node_A_index);
+    unsigned node_A_local_index_in_1 = UINT_MAX;
+    if (element_1_index != UINT_MAX)
+    {
+        node_A_local_index_in_1 = this->GetElement(element_1_index)->GetNodeLocalIndex(node_A_index);
+    }
 
-    unsigned node_A_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_A_index);
-    unsigned node_B_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_B_index);
+    unsigned node_A_local_index_in_2 = UINT_MAX;
+    unsigned node_B_local_index_in_2 = UINT_MAX;
+
+    if (element_2_index != UINT_MAX)
+    {
+        node_A_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_A_index);
+        node_B_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_B_index);
+    }
 
     unsigned node_B_local_index_in_3 = this->GetElement(elementIndex)->GetNodeLocalIndex(node_B_index);
 
-    unsigned node_A_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_A_index);
-    unsigned node_B_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_B_index);
+    unsigned node_A_local_index_in_4 = UINT_MAX;
+    unsigned node_B_local_index_in_4 = UINT_MAX;
 
+    if (element_4_index != UINT_MAX)
+    {
+        node_A_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_A_index);
+        node_B_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_B_index);
+    }
+
+    // Switch nodes
     if (intersected_edge==node_B_local_index_in_3)
     {
         /*
@@ -1806,25 +1853,50 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
          * Remove node B from element 2
          * Remove node A from element 4
          */
-        this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_A_local_index_in_1);
+        if (element_1_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_1 != UINT_MAX);
+            this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_A_local_index_in_1);
+        }
         this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_B_local_index_in_3);
 
-        this->mElements[element_2_index]->DeleteNode(node_B_local_index_in_2);
-        this->mElements[element_4_index]->DeleteNode(node_A_local_index_in_4);
+        if (element_2_index != UINT_MAX)
+        {
+            assert(node_B_local_index_in_2 != UINT_MAX);
+            this->mElements[element_2_index]->DeleteNode(node_B_local_index_in_2);
+        }
+        if (element_4_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_4 != UINT_MAX);
+            this->mElements[element_4_index]->DeleteNode(node_A_local_index_in_4);
+        }
     }
     else
     {
         assert((intersected_edge+1)%num_nodes==node_B_local_index_in_3);
 
         // Add node B to element 1 before node A and add node A to element 3 before node B
-        unsigned node_before_A_in_1 = (node_A_local_index_in_1 + this->GetElement(element_1_index)->GetNumNodes() - 1)%this->GetElement(element_1_index)->GetNumNodes();
+        if (element_1_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_1 != UINT_MAX);
+            unsigned node_before_A_in_1 = (node_A_local_index_in_1 + this->GetElement(element_1_index)->GetNumNodes() - 1)%this->GetElement(element_1_index)->GetNumNodes();
+            this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
+        }
+
         unsigned node_before_B_in_3 = (node_B_local_index_in_3 + this->GetElement(element_3_index)->GetNumNodes() - 1)%this->GetElement(element_3_index)->GetNumNodes();
-        this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
         this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_before_B_in_3);
 
         // Remove node A from element 2 and remove node B from element 4
-        this->mElements[element_2_index]->DeleteNode(node_A_local_index_in_2);
-        this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
+        if (element_2_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_2 != UINT_MAX);
+            this->mElements[element_2_index]->DeleteNode(node_A_local_index_in_2);
+        }
+        if (element_4_index != UINT_MAX)
+        {
+            assert(node_B_local_index_in_4 != UINT_MAX);
+            this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
+        }
     }
 }
 
