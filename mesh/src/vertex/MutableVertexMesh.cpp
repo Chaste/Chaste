@@ -313,6 +313,12 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfIntersectionSwaps()
+{
+    return mLocationsOfIntersectionSwaps;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
 {
     mLocationsOfT1Swaps.clear();
@@ -322,6 +328,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
 {
     mLocationsOfT3Swaps.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfIntersectionSwaps()
+{
+    mLocationsOfIntersectionSwaps.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
+#include "VertexIntersectionSwapLocationsWriter.hpp"
 #include "AbstractCellBasedSimulation.hpp"
 
 template<unsigned DIM>
@@ -500,6 +501,10 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutput
         if (!this-> template HasWriter<VertexT3SwapLocationsWriter>())
         {
             this-> template AddPopulationWriter<VertexT3SwapLocationsWriter>();
+        }
+        if (!this-> template HasWriter<VertexIntersectionSwapLocationsWriter>())
+        {
+            this-> template AddPopulationWriter<VertexIntersectionSwapLocationsWriter>();
         }
     }
 

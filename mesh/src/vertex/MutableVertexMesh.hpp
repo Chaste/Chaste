@@ -126,6 +126,12 @@ protected:
     std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
 
     /**
+     * Locations of intersection swaps (the mid point of the switching nodes), stored so they can be accessed and output by the cell population.
+     * The locations are stored until they are cleared by ClearLocationsOfIntersectionSwaps().
+     */
+    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfIntersectionSwaps;
+
+    /**
      * Divide an element along the axis passing through two of its nodes.
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
@@ -530,6 +536,11 @@ public:
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
 
     /**
+     * @return the locations of the intersection swaps
+     */
+    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfIntersectionSwaps();
+
+    /**
      * Helper method to clear the stored T1 swaps
      */
     void ClearLocationsOfT1Swaps();
@@ -538,6 +549,11 @@ public:
      * Helper method to clear the stored T3 swaps
      */
     void ClearLocationsOfT3Swaps();
+
+    /**
+     * Helper method to clear the stored intersection swaps
+     */
+    void ClearLocationsOfIntersectionSwaps();
 
     /**
      * Add a node to the mesh.
