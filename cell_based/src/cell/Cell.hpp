@@ -116,6 +116,7 @@ private:
         archive & mApoptosisTime;
         archive & mIsDead;
         archive & mIsLogged;
+        archive & mHasSrnModel;
     }
 
 protected:

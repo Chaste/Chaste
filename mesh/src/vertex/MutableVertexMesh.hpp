@@ -343,6 +343,7 @@ protected:
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
         archive & mDistanceForT3SwapChecking;
+        archive & mOperationRecorder;
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }

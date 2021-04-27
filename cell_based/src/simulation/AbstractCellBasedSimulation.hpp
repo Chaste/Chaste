@@ -103,6 +103,7 @@ private:
         archive & mOutputCellVelocities;
         archive & mCellKillers;
         archive & mSimulationModifiers;
+        archive & mTopologyUpdateSimulationModifiers;
         archive & mSamplingTimestepMultiple;
     }
 

@@ -168,6 +168,7 @@ private:
         archive & mOutputCellRearrangementLocations;
         archive & mpVertexBasedDivisionRule;
         archive & mRestrictVertexMovement;
+        archive & mPopulationSrn;
     }
 
     /**
