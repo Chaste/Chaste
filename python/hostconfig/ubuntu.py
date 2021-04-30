@@ -233,7 +233,7 @@ def Configure(prefs, build):
 
     # Is CVODE installed?
     use_cvode = int(prefs.get('use-cvode', True))
-    use_cvode = use_cvode and os.path.exists('/usr/lib/x86_64-linux-gnu/libsundials_cvode.so')
+    use_cvode = use_cvode and os.path.exists('/usr/include/sundials')
     if ubuntu_ver <= [9,04]:
         # We don't support CVODE 2.4
         use_cvode = False
