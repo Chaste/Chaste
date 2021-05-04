@@ -290,8 +290,31 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
         old_split_edges[i] = i;
     unsigned int counter_1 = 0;
     unsigned int counter_2 = 0;
+
+    std::cout<<"OLD"<<std::endl;
+    for (unsigned int i=0; i<oldIds.size(); ++i)
+    {
+        std::cout<<oldIds[i]<<": "<<mpEdgeHelper->GetEdge(oldIds[i])->GetNode(0)->GetIndex()
+                 <<" "<<mpEdgeHelper->GetEdge(oldIds[i])->GetNode(1)->GetIndex()<<"; ";
+    }
+    std::cout<<std::endl;
+    std::cout<<"EL1:"<<std::endl;
+    for (unsigned int i=0; i<n_edges_1; ++i)
+    {
+        std::cout<<pElement1->GetEdge(i)->GetIndex()<<": "<<pElement1->GetEdge(i)->GetNode(0)->GetIndex()
+                         <<" "<<pElement1->GetEdge(i)->GetNode(1)->GetIndex()<<"; ";
+    }
+    std::cout<<std::endl;
+    std::cout<<"EL2:"<<std::endl;
+    for (unsigned int i=0; i<n_edges_2; ++i)
+    {
+        std::cout<<pElement2->GetEdge(i)->GetIndex()<<": "<<pElement2->GetEdge(i)->GetNode(0)->GetIndex()
+                                 <<" "<<pElement2->GetEdge(i)->GetNode(1)->GetIndex()<<"; ";
+    }
+    std::cout<<std::endl;
     //First find parent edges that correspond directly to daughter cells' edges
     //At the end of the loop, old_split_edges contains parent edge indices that are split
+    std::cout<<"LOOP: "<<std::endl;
     for (unsigned int i=0; i<oldIds.size(); ++i)
     {
         //Index of parent edge corresponding to daughter cell's edge.
@@ -299,6 +322,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
         long index_1 = pElement1->GetLocalEdgeIndex((*mpEdgeHelper)[oldIds[i]]);
         long index_2 = pElement2->GetLocalEdgeIndex((*mpEdgeHelper)[oldIds[i]]);
         auto position = std::find(old_split_edges.begin(), old_split_edges.end(),i);
+        std::cout<<index_1<<" "<<index_2<<" "<<*position<<std::endl;
         //Modify edge map and status
         if (index_1>=0)
         {

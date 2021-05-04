@@ -176,6 +176,29 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
      * require the two cases below for nodes.
      */
 
+    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr && !this->mEdges.empty())
+    {
+        // Take the 3 node element as shown below (N# are nodes and E# are edges)
+        // N0 ==E0== N1 ==E1== N2 ==E2== N0
+        // If rIndex = 1, the new edge (NE) is added after the new node (NN)
+        // Edge ==E1== is marked for delete
+        // N0 ==E0== N1 --NE-- NN --NE-- N2 ==E2== N0
+
+
+        unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
+
+        auto prevNode = this->mNodes[rIndex];
+        auto currentNode = pNode;
+        auto nextNode = this->mNodes[rNextIndex];
+
+        this->mEdges[rIndex]->RemoveElement(this->GetIndex());
+        this->mEdges[rIndex] = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, prevNode, currentNode);
+
+        auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);
+        this->mEdges.insert(this->mEdges.begin() + rIndex+1, edge);
+
+    }
+
     if (this->mNodes.empty())
     {
         // Populate mNodes with pNode
@@ -193,29 +216,6 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
 
         // Add element to this node
         this->mNodes[rIndex+1]->AddElement(this->mIndex);
-    }
-
-    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr &&this->mNodes.size()>1)
-    {
-        // Take the 3 node element as shown below (N# are nodes and E# are edges)
-        // N0 ==E0== N1 ==E1== N2 ==E2== N0
-        // If rIndex = 1, the new edge (NE) is added after the new node (NN)
-        // Edge ==E1== is marked for delete
-        // N0 ==E0== N1 --NE-- NN --NE-- N2 ==E2== N0
-
-        // Carefull here when T1 transitions occur.
-        unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
-
-        auto prevNode = this->mNodes[rIndex];
-        auto currentNode = pNode;
-        auto nextNode = this->mNodes[rNextIndex];
-
-        this->mEdges[rIndex]->RemoveElement(this->GetIndex());
-        this->mEdges[rIndex] = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, prevNode, currentNode);
-
-        auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);
-        this->mEdges.insert(this->mEdges.begin() + rIndex+1, edge);
-
     }
 }
 
