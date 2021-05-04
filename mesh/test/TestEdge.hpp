@@ -197,8 +197,8 @@ public:
 
         // Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-        Edge<SPACE_DIM>* edge0 = elements[0]->GetEdge(0);
-        Edge<SPACE_DIM>* edge1 = elements[0]->GetEdge(1);
+        Edge<SPACE_DIM>* edge0 = mesh->GetElement(0)->GetEdge(0);
+        Edge<SPACE_DIM>* edge1 = mesh->GetElement(0)->GetEdge(1);
         TS_ASSERT(!edge0->IsBoundaryEdge());
         TS_ASSERT(edge1->IsBoundaryEdge());
     }
