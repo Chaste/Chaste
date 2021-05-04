@@ -80,6 +80,8 @@ private:
         // DO NOT archive & mpCell; -- The SrnModel is only ever archived from the Cell
         // which knows this and it is handled in the load_construct of Cell.
         archive & mSimulatedToTime;
+        archive & mEdgeLocalIndex;
+        archive & mIsEdgeBasedModel;
     }
 
     /**

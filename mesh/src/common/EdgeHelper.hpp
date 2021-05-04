@@ -131,22 +131,6 @@ public:
      * returns total number of edges
      */
     unsigned GetNumEdges() const;
-
-    /**
-     * @return iterator to the first edge in the mesh
-     */
-    typename std::vector<Edge<SPACE_DIM>*>::iterator begin()
-    {
-        return mEdges.begin();
-    }
-
-    /**
-     * @return iterator to the last edge in the mesh
-     */
-    typename std::vector<Edge<SPACE_DIM>*>::iterator end()
-    {
-        return mEdges.end();
-    }
 };
 
 #endif //CHASTE_EDGEHELPER_HPP

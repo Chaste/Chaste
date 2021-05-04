@@ -64,9 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "SrnCellModel.hpp"
-#include "DeltaNotchSrnEdgeModel.hpp"
-
+#include "CellSrnModel.hpp"
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
@@ -1553,6 +1551,9 @@ public:
         TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(11,var_name), expected_value_11, 1e-6);
     }
 
+    /**
+     * Tests VTK writing when only CellEdgeData and no CellData have been specified
+     */
     void TestOutputVtkCellEdges()
     {
 #ifdef CHASTE_VTK
@@ -1570,35 +1571,16 @@ public:
 
         for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
-
-            /* Initialise edge based SRN */
             auto p_element = p_mesh->GetElement(elem_index);
-
-            auto p_cell_edge_srn_model = new SrnCellModel();
-
-            double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
-            {
-                total_edge_length += p_element->GetEdge(i)->rGetLength();
-            }
-
-            /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
-            {
-
-                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
-                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
-            }
-
-            cells[elem_index]->SetSrnModel(p_cell_edge_srn_model);
-            cells[elem_index]->InitialiseSrnModel();
+            const unsigned int n_edges = p_element->GetNumEdges();
+            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(n_edges, 1.0));
         }
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkCellEdges";
-
-
+        cell_population.SetWriteCellVtkResults(false);
+                        cell_population.SetWriteEdgeVtkResults(true);
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.OpenWritersFiles(output_file_handler);
@@ -1610,7 +1592,6 @@ public:
         cell_population.WriteVtkResultsToFile(output_directory);
 
         cell_population.CloseWritersFiles();
-
 
         // Test that VTK writer has produced some files
 
@@ -1635,14 +1616,14 @@ public:
         // PVD file
         FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file3.Exists());
-
-
-
 #endif //CHASTE_VTK
 
 
     }
 
+    /**
+     * Tests VTK writing when both CellEdgeData and CellData have been specified
+     */
     void TestOutputVtkCellEdgesWithInterior()
     {
 #ifdef CHASTE_VTK
@@ -1660,38 +1641,17 @@ public:
 
         for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
-
-            /* Initialise edge based SRN */
             auto p_element = p_mesh->GetElement(elem_index);
-
-            auto p_cell_edge_srn_model = new SrnCellModel();
-
-            double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
-            {
-                total_edge_length += p_element->GetEdge(i)->rGetLength();
-            }
-
-            /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
-            {
-
-                MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
-                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
-            }
-
-            MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_interior_model);
-            p_cell_edge_srn_model->SetInteriorSrnModel(p_srn_interior_model);
-
-            cells[elem_index]->SetSrnModel(p_cell_edge_srn_model);
-            cells[elem_index]->InitialiseSrnModel();
+            const unsigned int n_edges = p_element->GetNumEdges();
+            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(n_edges, 1.0));
+            cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
         }
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkCellEdgesWithInterior";
-
-
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkAllCellData";
+        cell_population.SetWriteCellVtkResults(true);
+                cell_population.SetWriteEdgeVtkResults(true);
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.OpenWritersFiles(output_file_handler);
@@ -1703,7 +1663,6 @@ public:
         cell_population.WriteVtkResultsToFile(output_directory);
 
         cell_population.CloseWritersFiles();
-
 
         // Test that VTK writer has produced some files
 
@@ -1728,12 +1687,65 @@ public:
         // PVD file
         FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
         TS_ASSERT(vtk_file3.Exists());
-
-
-
 #endif //CHASTE_VTK
+    }
+
+    /**
+         * Tests VTK writing when only CellData and no CellEdgeData have been specified
+         */
+    void TestOutputVtkCell()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+            cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
+        }
+        TS_ASSERT(cells[0]->GetCellEdgeData()->GetNumItems()==0);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkWithCellData";
+        cell_population.SetWriteCellVtkResults(true);
+        cell_population.SetWriteEdgeVtkResults(false);
+
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        cell_population.CloseWritersFiles();
 
 
+        // Test that VTK writer has produced some files
+
+        // Initial condition file
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Final file
+        FileFinder vtk_file2(output_directory + "/results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file3.Exists());
+#endif //CHASTE_VTK
     }
 };
 

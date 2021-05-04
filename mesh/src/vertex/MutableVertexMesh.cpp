@@ -538,10 +538,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
                 double old_distance = norm_2(last_to_next);
                 double prev_curr_distance = norm_2(last_to_curr);
-                if (old_distance<prev_curr_distance)
-                {
-                    EXCEPTION("New node in split edge is not between a pair old nodes");
-                }
+                //Assert that new node in split edge is between a pair old nodes
+                assert(old_distance>=prev_curr_distance);// LCOV_EXCL_LINE
+
                 double theta = prev_curr_distance/old_distance;
                 relative_new_node.push_back(theta);
                 edge_split_pairs.push_back(std::pair<VertexElement<ELEMENT_DIM,SPACE_DIM>*, unsigned int>(p_element,index));

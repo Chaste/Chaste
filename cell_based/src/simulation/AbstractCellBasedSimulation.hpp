@@ -386,8 +386,9 @@ public:
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
 
     /**
-     * Add a SimulationModifier to be used in this simulation.
-     *
+     * Add a Topology SimulationModifier to be used in this simulation. This modifier updates cell population after topology has been
+     * changed (e.g. after T1 swap or cell division in case of vertex based models) and before cell locations updated.
+     * This can be useful when a topology update (e.g. cell division) influences movement of cells.
      * @param pSimulationModifier pointer to a SimulationModifier
      */
     void AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);

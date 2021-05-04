@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DELTANOTCHSRNINTERIORMODEL_HPP_
-#define DELTANOTCHSRNINTERIORMODEL_HPP_
+#ifndef DELTANOTCHINTERIORSRNMODEL_HPP_
+#define DELTANOTCHINTERIORSRNMODEL_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -44,10 +44,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in the sub-cellular reaction network.
- *
- * \todo #2752 document this class more thoroughly here
+ * This class represents model describing cytoplasmic (interior, nuclear) concentration of Delta Notch
+ * Together with DeltaNotchEdgeSrn, this class can model feedback between cytoplasmic and junctional concentration,
+ * and cell-cell communication via edge (junctional) concentrations
+ * \todo #2987 document this class more thoroughly here
  */
-class DeltaNotchSrnInteriorModel : public AbstractOdeSrnModel
+class DeltaNotchInteriorSrnModel : public AbstractOdeSrnModel
 {
 private:
 
@@ -78,7 +80,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchSrnInteriorModel(const DeltaNotchSrnInteriorModel& rModel);
+    DeltaNotchInteriorSrnModel(const DeltaNotchInteriorSrnModel& rModel);
 
 public:
 
@@ -87,7 +89,7 @@ public:
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
-    DeltaNotchSrnInteriorModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchInteriorSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Overridden builder method to create new copies of
@@ -105,25 +107,19 @@ public:
     /**
      * Initialise the SRN model at the start of a simulation.
      *
-     * This overridden method sets up a new Delta-Notch ODE system.
+     * This overridden method sets up a new Delta-Notch ODE system for cell interior.
      */
     virtual void Initialise() override; // override
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      *
-     * \todo #2752 say what it does in this class
      */
     virtual void SimulateToCurrentTime() override;
 
     /**
-     * Update the current levels of Delta and Notch in the cell.
-     *
-     * N.B. Despite the name, this doesn't update the levels of delta or notch, or compute mean levels.
-     * It just copies the current mean delta from the CellData
-     * (set by DeltaNotchTrackingModifier) to the DeltaNotchOdeSystem.
-     *
-     * \todo #2752 Improve the name of this method!
+     * Updates model parameters, such as total edge concnetration of Delta/Notch, via processing data
+     * from CellData()() object
      */
     void UpdateDeltaNotch();
 
@@ -151,9 +147,6 @@ public:
 
     /**
      * @return the current total level of Delta in the edges.
-     *
-     * N.B. This doesn't calculate anything, it just returns the parameter
-     * from the DeltaNotchInteriorOdeSystem.
      */
     double GetTotalEdgeDelta();
     /**
@@ -162,13 +155,13 @@ public:
     double GetTotalEdgeNotch();
 
     /**
-     * Output SRN model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
+     * Sets how much of Delta/Notch is returned back to interior after a junction is shrunk
      * Override the method to reflect user-define assumptions
      * @param p_shrunk_edge_srn
      */
@@ -177,9 +170,9 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchSrnInteriorModel)
+CHASTE_CLASS_EXPORT(DeltaNotchInteriorSrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnInteriorModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchInteriorSrnModel)
 
 
-#endif /* DELTANOTCHSRNINTERIORMODEL_HPP_ */
+#endif /* DELTANOTCHINTERIORSRNMODEL_HPP_ */

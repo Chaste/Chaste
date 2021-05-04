@@ -86,14 +86,14 @@ public:
     ~DeltaNotchInteriorOdeSystem();
 
     /**
-     * Compute the RHS of the  Collier et al. system of ODEs.
-     *
+     * Compute the RHS of the  Collier et al. system of ODEs except that here
+     * we use values of Delta in neighbouring edges and Notch in edges of this cell
      * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
      * An ODE solver will call this function repeatedly to solve for y = [y1 ... yn].
      *
      * @param time used to evaluate the RHS.
      * @param rY value of the solution vector used to evaluate the RHS.
-     * @param rDY filled in with the resulting derivatives (using  Collier et al. system of equations).
+     * @param rDY filled in with the resulting derivatives.
      */
     void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
 };

@@ -33,19 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DeltaNotchSrnEdgeModel.hpp"
+#include "DeltaNotchInteriorSrnModel.hpp"
+#include "DeltaNotchEdgeSrnModel.hpp"
 
-DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-    : AbstractOdeSrnModel(2, pOdeSolver)
+DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+        : AbstractOdeSrnModel(2, pOdeSolver)
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 #ifdef CHASTE_CVODE
-        mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchSrnEdgeModel, CvodeAdaptor>::Instance();
+        mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchInteriorSrnModel, CvodeAdaptor>::Instance();
         mpOdeSolver->Initialise();
         mpOdeSolver->SetMaxSteps(10000);
 #else
-        mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchSrnEdgeModel, RungeKutta4IvpOdeSolver>::Instance();
+        mpOdeSolver = CellCycleModelOdeSolver<DeltaNotchInteriorSrnModel, RungeKutta4IvpOdeSolver>::Instance();
         mpOdeSolver->Initialise();
         SetDt(0.001);
 #endif //CHASTE_CVODE
@@ -53,8 +54,8 @@ DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(boost::shared_ptr<AbstractCellCyc
     assert(mpOdeSolver->IsSetUp());
 }
 
-DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rModel)
-    : AbstractOdeSrnModel(rModel)
+DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(const DeltaNotchInteriorSrnModel& rModel)
+        : AbstractOdeSrnModel(rModel)
 {
     /*
      * Set each member variable of the new SRN model that inherits
@@ -70,142 +71,117 @@ DeltaNotchSrnEdgeModel::DeltaNotchSrnEdgeModel(const DeltaNotchSrnEdgeModel& rMo
      * Note 3: Only set the variables defined in this class. Variables defined
      * in parent classes will be defined there.
      */
+
     assert(rModel.GetOdeSystem());
     AbstractOdeSystem* p_parent_system(rModel.GetOdeSystem());
-    SetOdeSystem(new DeltaNotchEdgeOdeSystem(p_parent_system->rGetStateVariables()));
+    SetOdeSystem(new DeltaNotchInteriorOdeSystem(p_parent_system->rGetStateVariables()));
     for (unsigned int i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
         mpOdeSystem->SetParameter(i, p_parent_system->GetParameter(i));
 }
 
-AbstractSrnModel* DeltaNotchSrnEdgeModel::CreateSrnModel()
+AbstractSrnModel* DeltaNotchInteriorSrnModel::CreateSrnModel()
 {
-    return new DeltaNotchSrnEdgeModel(*this);
+    return new DeltaNotchInteriorSrnModel(*this);
 }
 
-void DeltaNotchSrnEdgeModel::SimulateToCurrentTime()
+void DeltaNotchInteriorSrnModel::ResetForDivision()
+{
+    assert(mpOdeSystem != nullptr);
+    assert(mpCell != nullptr);
+    ScaleSrnVariables(0.5);
+}
+
+void DeltaNotchInteriorSrnModel::SimulateToCurrentTime()
 {
     // Custom behaviour
     UpdateDeltaNotch();
+
     // Run the ODE simulation as needed
     AbstractOdeSrnModel::SimulateToCurrentTime();
 }
 
-void DeltaNotchSrnEdgeModel::Initialise()
+void DeltaNotchInteriorSrnModel::Initialise()
 {
-    AbstractOdeSrnModel::Initialise(new DeltaNotchEdgeOdeSystem);
+    AbstractOdeSrnModel::Initialise(new DeltaNotchInteriorOdeSystem);
 }
 
-void DeltaNotchSrnEdgeModel::InitialiseDaughterCell()
-{
-    assert(mpOdeSystem != nullptr);
-    assert(mpCell != nullptr);
-    mpOdeSystem->SetStateVariable("Notch",0.0);
-    mpOdeSystem->SetStateVariable("Delta",0.0);
-
-    mpOdeSystem->SetParameter("neighbour delta",0.0);
-    mpOdeSystem->SetParameter("interior delta",0.0);
-    mpOdeSystem->SetParameter("interior notch",0.0);
-}
-
-void DeltaNotchSrnEdgeModel::UpdateDeltaNotch()
+void DeltaNotchInteriorSrnModel::UpdateDeltaNotch()
 {
     assert(mpOdeSystem != nullptr);
     assert(mpCell != nullptr);
-    double neigh_delta
-    = mpCell->GetCellEdgeData()->GetItem("neighbour delta")[this->GetEdgeLocalIndex()];
-    mpOdeSystem->SetParameter("neighbour delta", neigh_delta);
 
-    double interior_delta = mpCell->GetCellData()->GetItem("interior delta");
-    mpOdeSystem->SetParameter("interior delta", interior_delta);
-    double interior_notch = mpCell->GetCellData()->GetItem("interior notch");
-    mpOdeSystem->SetParameter("interior notch", interior_notch);
+    const double total_edge_delta = mpCell->GetCellData()->GetItem("total neighbour edge delta");
+    mpOdeSystem->SetParameter("total neighbour edge delta", total_edge_delta);
+
+    const double total_edge_notch = mpCell->GetCellData()->GetItem("total edge notch");
+    mpOdeSystem->SetParameter("total edge notch", total_edge_notch);
 }
 
-double DeltaNotchSrnEdgeModel::GetNotch()
+double DeltaNotchInteriorSrnModel::GetNotch()
 {
     assert(mpOdeSystem != nullptr);
     double notch = mpOdeSystem->rGetStateVariables()[0];
     return notch;
 }
 
-void DeltaNotchSrnEdgeModel::SetNotch(double value)
+void DeltaNotchInteriorSrnModel::SetNotch(double value)
 {
     assert(mpOdeSystem != nullptr);
     mpOdeSystem->rGetStateVariables()[0] = value;
 }
 
-double DeltaNotchSrnEdgeModel::GetDelta()
+double DeltaNotchInteriorSrnModel::GetDelta()
 {
     assert(mpOdeSystem != nullptr);
     double delta = mpOdeSystem->rGetStateVariables()[1];
     return delta;
 }
 
-void DeltaNotchSrnEdgeModel::SetDelta(double value)
+void DeltaNotchInteriorSrnModel::SetDelta(double value)
 {
     assert(mpOdeSystem != nullptr);
     mpOdeSystem->rGetStateVariables()[1] = value;
 }
 
-double DeltaNotchSrnEdgeModel::GetNeighbouringDelta() const
+double DeltaNotchInteriorSrnModel::GetTotalEdgeDelta()
 {
     assert(mpOdeSystem != nullptr);
-    return mpOdeSystem->GetParameter("neighbour delta");
+    double total_edge_delta = mpOdeSystem->GetParameter("total neighbour edge delta");
+    return total_edge_delta;
 }
 
-double DeltaNotchSrnEdgeModel::GetInteriorDelta() const
+double DeltaNotchInteriorSrnModel::GetTotalEdgeNotch()
 {
     assert(mpOdeSystem != nullptr);
-    return mpOdeSystem->GetParameter("interior delta");
+    double total_edge_notch = mpOdeSystem->GetParameter("total edge notch");
+    return total_edge_notch;
 }
 
-double DeltaNotchSrnEdgeModel::GetInteriorNotch() const
-{
-    assert(mpOdeSystem != nullptr);
-    return mpOdeSystem->GetParameter("interior notch");
-}
-
-
-void DeltaNotchSrnEdgeModel::OutputSrnModelParameters(out_stream& rParamsFile)
+void DeltaNotchInteriorSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
 }
 
-void DeltaNotchSrnEdgeModel::AddSrnQuantities(AbstractSrnModel *p_other_srn,
-                                              const double scale)
+void DeltaNotchInteriorSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
 {
-    auto other_srn
-    = static_cast<DeltaNotchSrnEdgeModel*>(p_other_srn);
-    const double other_delta = other_srn->GetDelta();
-    const double other_notch = other_srn->GetNotch();
-    const double this_delta = GetDelta();
+    // Half of junctional Delta/Notch is endocytosed back to the cytoplasm
+    auto shrunk_srn
+        = static_cast<DeltaNotchEdgeSrnModel*>(p_shrunk_edge_srn);
+    const double edge_notch = shrunk_srn->GetNotch();
+    const double edge_delta = shrunk_srn->GetDelta();
     const double this_notch = GetNotch();
-    SetDelta(this_delta+scale*other_delta);
-    SetNotch(this_notch+scale*other_notch);
+    const double this_delta = GetDelta();
+
+    const double fraction = 0.5;
+    SetDelta(this_delta+fraction*edge_delta);
+    SetNotch(this_notch+fraction*edge_notch);
 }
 
-void DeltaNotchSrnEdgeModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
-{
-    // Here we assume that one half of srn quantities are endocytosed and the remaining
-    // half are split between neighbouring junctions. Hence we add 1/4 of srn variables
-    AddSrnQuantities(p_shrunk_edge_srn, 0.25);
-}
-
-void DeltaNotchSrnEdgeModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
-{
-    // Add all srn variables to this edge srn
-    AddSrnQuantities(p_merged_edge_srn);
-}
-
-void DeltaNotchSrnEdgeModel::SplitEdgeSrn(const double relative_position)
-{
-    ScaleSrnVariables(relative_position);
-}
 
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(DeltaNotchSrnEdgeModel)
+CHASTE_CLASS_EXPORT(DeltaNotchInteriorSrnModel)
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
-EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchSrnEdgeModel)
+EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(DeltaNotchInteriorSrnModel)

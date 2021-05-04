@@ -351,7 +351,7 @@ public:
 
         // Make an empty mesh
         MutableVertexMesh<2,2> mesh;
-
+        mesh.SetMeshOperationTracking(true);//For coverage
         // Add 6 nodes, three each for two triangular elements
         mesh.AddNode(new Node<2>(0, true, 0.0, 0.0));
         mesh.AddNode(new Node<2>(1, true, 1.0, 0.0));
@@ -403,7 +403,7 @@ public:
     {
         // Create the standard five-cell rosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
-
+        p_mesh->SetMeshOperationTracking(true);//For coverage
         /**
          * Modify the mesh to incorporate an additional element which will go on to increase the rosette rank
          */
@@ -476,7 +476,7 @@ public:
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructProtorosette();
-
+        p_mesh->SetMeshOperationTracking(true);//For coverage
         VertexElement<2,2>* p_elem_0 = p_mesh->GetElement(0);
         VertexElement<2,2>* p_elem_1 = p_mesh->GetElement(1);
         VertexElement<2,2>* p_elem_2 = p_mesh->GetElement(2);
@@ -561,7 +561,7 @@ public:
     {
         // Let us first create a protorosette
         MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
-
+        p_mesh->SetMeshOperationTracking(true);//For coverage
         Node<2>* p_node_0 = p_mesh->GetNode(0);
 
         // Perform the protorosette resolution

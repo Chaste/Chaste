@@ -187,13 +187,6 @@ public:
     void AddNode(Node<SPACE_DIM>* pNode);
 
     /**
-     * TODO: Proper description
-     * @return
-     */
-    bool CheckEdgesAreValid();
-
-
-    /**
      * Get whether the element is marked as deleted.
      *
      * @return mIsDeleted

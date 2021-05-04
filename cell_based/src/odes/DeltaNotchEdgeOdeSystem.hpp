@@ -49,8 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * "Pattern formation by lateral inhibition with feedback: a mathematical
  * model of delta-notch intercellular signalling" (Journal of Theoretical
  * Biology 183:429-446, 1996).
- * Here, however, we include edge based model: instead of using mean neighbouring delta
- * we simply use neighbours edge data
+ * Here, however, we include edge based model: Delta and Notch interactions between each cell
+ * are modelled directly. We use similar ODE system as by Collier et al., except that we modify terms
+ * corresponding to means of neighbour concentrations of Delta/Notch.
+ * In this ODE model, concentration of edge Delta/Notch depend on intracellular (interior)
+ * concentrations
  */
 class DeltaNotchEdgeOdeSystem : public AbstractOdeSystem
 {
@@ -68,9 +71,6 @@ private:
     {
         archive & boost::serialization::base_object<AbstractOdeSystem>(*this);
     }
-
-    ///\todo extract model parameters as member variables
-
 public:
 
     /**
@@ -86,11 +86,8 @@ public:
     ~DeltaNotchEdgeOdeSystem();
 
     /**
-     * Compute the RHS of the  Collier et al. system of ODEs.
-     *
-     * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
-     * An ODE solver will call this function repeatedly to solve for y = [y1 ... yn].
-     *
+     * Notch in this edge is inhibited by Delta in neighbouring edge. Cytoplasmic Notch is trafficked into
+     * this junction. The type of interactions of Delta and Notch in this edge are similar to interior SRN model
      * @param time used to evaluate the RHS.
      * @param rY value of the solution vector used to evaluate the RHS.
      * @param rDY filled in with the resulting derivatives (using  Collier et al. system of equations).

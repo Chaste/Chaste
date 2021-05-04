@@ -198,60 +198,6 @@ std::set<unsigned> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringEleme
     return mEdges[localIndex]->GetOtherElements(this->mIndex);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::CheckEdgesAreValid()
-{
-    if (SPACE_DIM != 2)
-    {
-        return false;
-    }
-
-    if (mEdges.size() != mNodes.size())
-    {
-        return false;
-    }
-
-    bool edgesOk = true;
-    for (unsigned i = 0; i < mEdges.size(); i++)
-    {
-        auto i_next = (i+1) % mEdges.size();
-        auto edge = mEdges[i];
-
-        if (!edge->IsEdgeValid())
-        {
-            printf("[Error] Element index: %i edge index: %i - edge is not valid \n", this->mIndex, i);
-            edgesOk = false;
-        }
-
-        // Edge at index i must contain nodes at index i and i+1
-        if (!(edge->ContainsNode(mNodes[i]) && edge->ContainsNode(mNodes[i_next])))
-        {
-            printf("[Error] Element index: %i edge index: %i - doesn't contain the correct nodes \n", this->mIndex, i);
-            edgesOk = false;
-        }
-    }
-
-    if (!edgesOk)
-    {
-        printf("[Debug] Element index: %i Node Indices: ", this->mIndex);
-        for (auto nodeOut: this->mNodes)
-        {
-            printf(" %i ", nodeOut->GetIndex());
-        }
-        printf("\n Edge-node indices");
-        for (auto edgeOut : this->mEdges)
-        {
-            printf(" %i (%i -> %i)", edgeOut->GetIndex(),
-                    edgeOut->GetNode(0)->GetIndex(), edgeOut->GetNode(1)->GetIndex());
-        }
-        printf("\n");
-
-        return false;
-    }
-
-    return true;
-}
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::IsDeleted() const
 {

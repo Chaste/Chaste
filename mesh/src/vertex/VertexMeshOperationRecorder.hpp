@@ -64,9 +64,10 @@ struct T1SwapInfo
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & mLocation;
+        // \todo Archiving
+        /*archive & mLocation;
         archive & mPreSwapEdge;
-        archive & mPostSwapEdge;
+        archive & mPostSwapEdge;*/
     }
 
     /**
@@ -104,8 +105,9 @@ struct T2SwapInfo
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & mCellId;
-        archive & mLocation;
+        // \todo Archiving
+        /*archive & mCellId;
+        archive & mLocation;*/
     }
     /**
      * Default constructor/destructor so that boos does not throw errors
@@ -133,7 +135,8 @@ struct T3SwapInfo
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & mLocation;
+        // \todo Archiving
+        /*archive & mLocation;*/
     }
 
     /**
@@ -168,12 +171,13 @@ struct CellDivisionInfo
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & mLocation;
+        // \todo Archiving
+        /*archive & mLocation;
         archive & mDaughterLocation1;
         archive & mDaughterLongAxis1;
         archive & mDaughterLocation2;
         archive & mDaughterLongAxis2;
-        archive & mDivisionAxis;
+        archive & mDivisionAxis;*/
     }
 
     /**

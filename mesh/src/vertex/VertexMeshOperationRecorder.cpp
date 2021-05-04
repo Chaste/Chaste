@@ -235,23 +235,6 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     //Sanity check
     for (unsigned int i=0; i<edge_mapping.size(); ++i)
     {
-        if(edge_mapping[i]<0)
-        {
-            std::cout<<"M size "<<edge_mapping.size()<<" Old size: "<<oldIds.size()<<std::endl;
-            for (unsigned int j=0; j<oldIds.size(); ++j)
-            {
-                std::cout<<(*mpEdgeHelper)[oldIds[j]]->GetIndex()<<std::endl;
-            }
-            std::cout<<"Mappings: ";
-            for (unsigned int j=0; j<edge_mapping.size(); ++j)
-            {
-                std::cout<<edge_mapping[j]<<" ";
-            }
-            std::cout<<std::endl;
-            std::cout<<"P: "<<prevEdge<<" N: "<<nextEdge<<std::endl;
-            std::cout<<"lower: "<<lower_node<<" Upper: "<<upper_node
-                    <<"Node A: "<<node_A_index<<" B: "<<node_B_index<<std::endl;
-        }
         assert(edge_mapping[i]>=0);
     }
 
@@ -332,8 +315,6 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
             counter_2++;
         }
     }
-    if (old_split_edges.size()!=2)
-        EXCEPTION("edge split size is wrong");
     //Two parent edges are split
     assert(old_split_edges.size()==2);
     //Three edges in daughter cells are unmapped

@@ -43,10 +43,7 @@ EdgeHelper<SPACE_DIM>::EdgeHelper()
 template<unsigned int SPACE_DIM>
 EdgeHelper<SPACE_DIM>::~EdgeHelper()
 {
-    for (unsigned int i=0; i<mEdges.size(); ++i)
-    {
-        delete mEdges[i];
-    }
+    Clear();
 }
 
 template<unsigned int SPACE_DIM>

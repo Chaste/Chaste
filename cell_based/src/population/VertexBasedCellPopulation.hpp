@@ -202,7 +202,8 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh);
+    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                              VertexBasedPopulationSrn<DIM>& rPopSrn);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -567,8 +568,14 @@ public:
 
     /**
      * Get VertexBasedPopulationSrn object. Used e.g. in TestMutableVertexMeshRemeshWithPopulationSrn.
+     * @return reference to mPopulationSrn
      */
     VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn();
+
+    /**
+     * @return const reference to mPopulationSrn (used in archiving).
+     */
+    const VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn() const;
 
     /**
      * Set whether to write cell vtk results
@@ -600,6 +607,9 @@ inline void save_construct_data(
     // Save data required to construct instance
     const MutableVertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
+
+    const VertexBasedPopulationSrn<DIM>& pop_srn = t->rGetVertexBasedPopulationSrn();
+    ar & pop_srn;
 }
 
 /**
@@ -614,8 +624,10 @@ inline void load_construct_data(
     MutableVertexMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
+    VertexBasedPopulationSrn<DIM> pop_srn;
+    ar & pop_srn;
     // Invoke inplace constructor to initialise instance
-    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh);
+    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh, pop_srn);
 }
 }
 } // namespace ...

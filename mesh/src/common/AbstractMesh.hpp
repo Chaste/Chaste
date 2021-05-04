@@ -189,11 +189,18 @@ public:
     unsigned GetNumEdges() const;
 
     /**
-     *
+     * Fetches an edge
      * @param Global index of the edge
      * @return Pointer to the edge at the index
      */
-    Edge<SPACE_DIM> * GetEdge(unsigned index) const;
+    Edge<SPACE_DIM>* GetEdge(unsigned index) const;
+
+    /**
+     * Fetches EdgeHelper
+     * @param Global index of the edge
+     * @return Pointer to the edge at the index
+     */
+    EdgeHelper<SPACE_DIM> GetEdgeHelper() const;
 
     /**
      * @return the number of nodes that are actually in use.

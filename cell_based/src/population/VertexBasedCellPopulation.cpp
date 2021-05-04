@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "T2SwapCellKiller.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "SrnCellModel.hpp"
+#include "CellSrnModel.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
@@ -87,13 +87,16 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
 }
 
 template<unsigned DIM>
-VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh)
+VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                                                          VertexBasedPopulationSrn<DIM>& rPopSrn)
     : AbstractOffLatticeCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
       mOutputCellRearrangementLocations(true),
-      mRestrictVertexMovement(true)
+      mRestrictVertexMovement(true),
+      mPopulationSrn(rPopSrn)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
+    mPopulationSrn.SetVertexCellPopulation(this);
 }
 
 template<unsigned DIM>
@@ -355,6 +358,7 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
         Validate();
     }
+
     //First cell is representative of other cells
     bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
     if (EdgeModelOrNot)
@@ -362,6 +366,7 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         // Note that SRN update after divisions is handled through Cell::Divide() method
         mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
     }
+
     element_map.ResetToIdentity();
 }
 
@@ -448,15 +453,17 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     if (cells.size() > 0)
     {
         //If cells contain edge data
-        if (p_cell_edge_data != nullptr&&mWriteEdgeVtkResults)
+        if (p_cell_edge_data->GetNumItems() != 0&&mWriteEdgeVtkResults)
         {
             this->WriteCellEdgeVtkResultsToFile(rDirectory);
             return;
         }
     }
 
-    if (mWriteCellVtkResults)
+    if (p_cell_edge_data->GetNumItems() == 0&&mWriteCellVtkResults)
+    {
         this->WriteCellVtkResultsToFile(rDirectory);
+    }
 
 }
 
@@ -1115,6 +1122,12 @@ void VertexBasedCellPopulation<DIM>::SetRestrictVertexMovementBoolean(bool restr
 
 template<unsigned DIM>
 VertexBasedPopulationSrn<DIM>& VertexBasedCellPopulation<DIM>::rGetVertexBasedPopulationSrn()
+{
+    return mPopulationSrn;
+}
+
+template<unsigned DIM>
+const VertexBasedPopulationSrn<DIM>& VertexBasedCellPopulation<DIM>::rGetVertexBasedPopulationSrn() const
 {
     return mPopulationSrn;
 }

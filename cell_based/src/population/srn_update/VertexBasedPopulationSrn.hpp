@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <VertexBasedCellPopulation.hpp>
 #include "ChasteSerialization.hpp"
-#include "SrnCellModel.hpp"
+#include "CellSrnModel.hpp"
 #include "EdgeRemapInfo.hpp"
 #include "EdgeOperation.hpp"
 #include "VertexElementMap.hpp"
@@ -74,6 +74,8 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        // DO NOT archive & mpCellPopulation; -- The VertexBasedPopulationSrn is only ever archived from the VertexBasedCellPopulation
+        // which knows this and it is handled in the load_construct of VertexBasedCellPopulation.
     }
     VertexBasedCellPopulation<DIM>* mpCellPopulation;
 public:
@@ -100,11 +102,11 @@ public:
      * Remaps cell SRN. If an edge has not been modified, the old edge SRN is mapped to its junction.
      * Otherwise, edge SRNs are updated according to the operation performed.
      * @param parent_srn_edges Edge SRNs before topology is changed
-     * @param pSrnCell_1 SrnCellModel of the cell
+     * @param pCellSrn_1 CellSrnModel of the cell
      * @param pEdgeChange_1 Contains information about which edge changes occurred
      */
     void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
-                             SrnCellModel* pSrnCell_1,
+                             CellSrnModel* pCellSrn_1,
                              EdgeRemapInfo* pEdgeChange_1);
 };
 #include "SerializationExportWrapper.hpp"

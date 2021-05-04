@@ -1243,6 +1243,52 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
+    void TestArchiveAlwaysDivideCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AlwaysDivideCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new AlwaysDivideCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(p_model2->ReadyToDivide(), true);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
     void TestArchiveNoCellCycleModel()
     {
         OutputFileHandler handler("archive", false);

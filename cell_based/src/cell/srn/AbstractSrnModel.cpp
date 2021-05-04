@@ -141,6 +141,10 @@ void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
     this->mIsEdgeBasedModel = indicator;
 }
 
+/*
+ * We exclude the following from coverage, as these method are implemented elsewhere and tested accordingly
+ */
+// LCOV_EXCL_START
 void AbstractSrnModel::ScaleSrnVariables(const double theta)
 {
 }
@@ -162,5 +166,5 @@ void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_s
 
 void AbstractSrnModel::SplitEdgeSrn(const double relative_position)
 {}
-
+// LCOV_EXCL_STOP
 

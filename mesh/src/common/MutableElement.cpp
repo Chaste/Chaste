@@ -173,38 +173,8 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
     /**
      * When constructing a VertexMesh as the Voronoi dual to a Delaunay mesh,
      * each MutableElement is initially constructed without nodes. We therefore
-     * require the two cases below for both edges and nodes.
+     * require the two cases below for nodes.
      */
-
-    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
-    {
-        if (this->mEdges.empty())
-        {
-            auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, pNode, pNode);
-            this->mEdges.push_back(edge);
-        }
-        else
-        {
-            // Take the 3 node element as shown below (N# are nodes and E# are edges)
-            // N0 ==E0== N1 ==E1== N2 ==E2== N0
-            // If rIndex = 1, the new edge (NE) is added after the new node (NN)
-            // Edge ==E1== is marked for delete
-            // N0 ==E0== N1 --NE-- NN --NE-- N2 ==E2== N0
-
-            // Carefull here when T1 transitions occur.
-            unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
-
-            auto prevNode = this->mNodes[rIndex];
-            auto currentNode = pNode;
-            auto nextNode = this->mNodes[rNextIndex];
-
-            this->mEdges[rIndex]->RemoveElement(this->GetIndex());
-            this->mEdges[rIndex] = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, prevNode, currentNode);
-
-            auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);
-            this->mEdges.insert(this->mEdges.begin() + rIndex+1, edge);
-        }
-    }
 
     if (this->mNodes.empty())
     {
@@ -223,6 +193,29 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, con
 
         // Add element to this node
         this->mNodes[rIndex+1]->AddElement(this->mIndex);
+    }
+
+    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr &&this->mNodes.size()>1)
+    {
+        // Take the 3 node element as shown below (N# are nodes and E# are edges)
+        // N0 ==E0== N1 ==E1== N2 ==E2== N0
+        // If rIndex = 1, the new edge (NE) is added after the new node (NN)
+        // Edge ==E1== is marked for delete
+        // N0 ==E0== N1 --NE-- NN --NE-- N2 ==E2== N0
+
+        // Carefull here when T1 transitions occur.
+        unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
+
+        auto prevNode = this->mNodes[rIndex];
+        auto currentNode = pNode;
+        auto nextNode = this->mNodes[rNextIndex];
+
+        this->mEdges[rIndex]->RemoveElement(this->GetIndex());
+        this->mEdges[rIndex] = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, prevNode, currentNode);
+
+        auto edge = this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode);
+        this->mEdges.insert(this->mEdges.begin() + rIndex+1, edge);
+
     }
 }
 
@@ -338,15 +331,6 @@ void MutableElement<1, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE
 {
     assert(rIndex < this->mNodes.size());
 
-    // Update surrounding edges
-    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
-    {
-        auto pOldNode = this->mNodes[rIndex];
-        unsigned rPrevIndex = (rIndex-1) % this->mEdges.size();
-        this->mEdges[rPrevIndex]->ReplaceNode(pOldNode, pNode);
-        this->mEdges[rIndex]->ReplaceNode(pOldNode, pNode);
-    }
-
     // Remove it from the node at this location
     this->mNodes[rIndex]->RemoveElement(this->mIndex);
 
@@ -362,22 +346,6 @@ void MutableElement<1, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
 
-    // Update surrounding edges
-    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
-    {
-        unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
-        unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
-
-        auto currentNode = this->mNodes[rIndex];
-        auto nextNode = this->mNodes[rNextIndex];
-
-        // Connect the non-deleted edge
-        this->mEdges[rPrevIndex]->ReplaceNode(currentNode, nextNode);
-
-        // Delete the edge
-        this->mEdges.erase(this->mEdges.begin() + rIndex);
-    }
-
     // Remove element from the node at this location
     this->mNodes[rIndex]->RemoveElement(this->mIndex);
 
@@ -389,33 +357,6 @@ template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex)
 {
     assert(rIndex < this->mNodes.size());
-
-    if (SPACE_DIM == 2 && this->mEdgeHelper != nullptr)
-    {
-        if (this->mEdges.empty())
-        {
-            this->mEdges.push_back(this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, pNode, pNode));
-        }
-        else
-        {
-            // Take the 3 node element as shown below (N# are nodes and E# are edges)
-            // N0 ==E0== N1 ==E1== N2 ==E2== N0
-            // If rIndex = 1, the new edge (NE) is added after the new node (NN)
-            // N0 ==E0== N1 ==E1== NN --NE-- N2 ==E2== N0
-
-            unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
-
-            auto prevNode = this->mNodes[rIndex];
-            auto currentNode = pNode;
-            auto nextNode = this->mNodes[rNextIndex];
-
-            this->mEdges[rIndex]->SetNodes(prevNode, currentNode);
-
-            this->mEdges.insert(this->mEdges.begin() + rIndex+1,
-                                this->mEdgeHelper->GetEdgeFromNodes(this->mIndex, currentNode, nextNode));
-        }
-
-    }
 
     // Add pNode to rIndex+1 element of mNodes pushing the others up
     this->mNodes.insert(this->mNodes.begin() + rIndex+1,  pNode);
@@ -441,17 +382,12 @@ unsigned MutableElement<1, SPACE_DIM>::GetNodeLocalIndex(unsigned globalIndex) c
 
 template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::RegisterWithEdges(){
-    for(auto edge: this->mEdges)
-    {
-        edge->AddElement(this->mIndex);
-    }
-
+    //Does nothing in 1D
 }
 
 template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::RebuildEdges(){
-    this->BuildEdges();
-
+    //Does nothing in 1D
 }
 
 template<unsigned SPACE_DIM>

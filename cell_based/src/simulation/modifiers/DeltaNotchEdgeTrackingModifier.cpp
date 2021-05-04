@@ -33,31 +33,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DeltaNotchCellEdgeTrackingModifier.hpp"
-#include "SrnCellModel.hpp"
-#include "DeltaNotchSrnInteriorModel.hpp"
-#include "DeltaNotchSrnEdgeModel.hpp"
+#include "DeltaNotchEdgeTrackingModifier.hpp"
+#include "CellSrnModel.hpp"
+#include "DeltaNotchInteriorSrnModel.hpp"
+#include "DeltaNotchEdgeSrnModel.hpp"
 
 template<unsigned DIM>
-DeltaNotchCellEdgeTrackingModifier<DIM>::DeltaNotchCellEdgeTrackingModifier()
+DeltaNotchEdgeTrackingModifier<DIM>::DeltaNotchEdgeTrackingModifier()
         : AbstractCellBasedSimulationModifier<DIM>()
 {
 }
 
 template<unsigned DIM>
-DeltaNotchCellEdgeTrackingModifier<DIM>::~DeltaNotchCellEdgeTrackingModifier()
+DeltaNotchEdgeTrackingModifier<DIM>::~DeltaNotchEdgeTrackingModifier()
 {
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchEdgeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Update the cell
     this->UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void DeltaNotchEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -67,7 +67,7 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Recovers each cell's edge levels of notch and delta, and those of its neighbor's
     // Then saves them
@@ -75,15 +75,15 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
+        auto p_cell_edge_model = static_cast<CellSrnModel*>(cell_iter->GetSrnModel());
 
         /* Cells edge data */
         std::vector<double> notch_vec;
         std::vector<double> delta_vec;
         for (unsigned i = 0 ; i  < p_cell_edge_model->GetNumEdgeSrn(); i++)
         {
-            boost::shared_ptr<DeltaNotchSrnEdgeModel> p_model
-            = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_model->GetEdgeSrn(i));
+            boost::shared_ptr<DeltaNotchEdgeSrnModel> p_model
+            = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_model->GetEdgeSrn(i));
             double this_delta = p_model->GetDelta();
             double this_notch = p_model->GetNotch();
             delta_vec.push_back(this_delta);
@@ -104,7 +104,7 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
             cell_iter != rCellPopulation.End();
             ++cell_iter)
     {
-        auto p_cell_edge_model = static_cast<SrnCellModel*>(cell_iter->GetSrnModel());
+        auto p_cell_edge_model = static_cast<CellSrnModel*>(cell_iter->GetSrnModel());
         const unsigned int n_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
         std::vector<double> neigh_mean_delta(n_cell_edges);
 
@@ -129,18 +129,18 @@ void DeltaNotchCellEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulat
 }
 
 template<unsigned DIM>
-void DeltaNotchCellEdgeTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void DeltaNotchEdgeTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class DeltaNotchCellEdgeTrackingModifier<1>;
-template class DeltaNotchCellEdgeTrackingModifier<2>;
-template class DeltaNotchCellEdgeTrackingModifier<3>;
+template class DeltaNotchEdgeTrackingModifier<1>;
+template class DeltaNotchEdgeTrackingModifier<2>;
+template class DeltaNotchEdgeTrackingModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellEdgeTrackingModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchEdgeTrackingModifier)

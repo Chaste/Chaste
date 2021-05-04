@@ -793,7 +793,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
 
@@ -1750,7 +1750,7 @@ public:
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1/1.5);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Call PerformT3Swap(); note that we don't call ReMesh(), since this would also perform T1 swaps
         vertex_mesh.PerformT3Swap(vertex_mesh.GetNode(4), 0u);
 
@@ -1863,7 +1863,7 @@ public:
         elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations.
         vertex_mesh.SetCellRearrangementThreshold(0.2);
 
@@ -1981,7 +1981,7 @@ public:
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Node 6 and 8 are close to, but not overlapping, an edge of element 0
         TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(6)->rGetLocation(), 0), false);
         TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(8)->rGetLocation(), 0), false);
@@ -2102,7 +2102,7 @@ public:
         elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.15);
 
@@ -2220,7 +2220,7 @@ public:
         elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
 
@@ -2340,6 +2340,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh;
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         vertex_mesh.SetDistanceForT3SwapChecking(100.0);
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
@@ -2411,7 +2412,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         vertex_mesh.ReMesh(); // Edges too long so nothing happens
@@ -2517,7 +2518,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         // Call IdentifySwapType on nodes 6 and 4 (ordering for coverage)
@@ -2585,7 +2586,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         vertex_mesh.ReMesh(); // Edges too long so nothing happens
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
@@ -2683,7 +2684,7 @@ public:
         elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
 
         MutableVertexMesh<2,2> mesh(nodes, elements);
-
+        mesh.SetMeshOperationTracking(true);//For coverage
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
 
@@ -2781,7 +2782,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Move node 4 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
         point.SetCoordinate(1u, 0.7);
@@ -2861,7 +2862,7 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         // Move node 5 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
         point.SetCoordinate(1u, 0.7);

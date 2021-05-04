@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SRNCELLMODEL_HPP_
-#define SRNCELLMODEL_HPP_
+#ifndef CELLSRNMODEL_HPP_
+#define CELLSRNMODEL_HPP_
 
 #include <vector>
 #include "ChasteSerialization.hpp"
@@ -50,10 +50,10 @@ typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 /**
  * SRN model at the cell level, has representation for edges internally.
  * Also contains cell interior (cytoplasmic) SRN.
- * Mostly serves as a container for interior/edge SRNs. Functionality of SRNs is defined in AbstractSrnModel class
- * and user-defined SRN models
+ * Mostly serves to coordinate between interior/edge SRNs, in case these are specified. Functionality of SRNs is defined in AbstractSrnModel class
+ * and user-defined SRN models.
  */
-class SrnCellModel : public AbstractSrnModel
+class CellSrnModel : public AbstractSrnModel
 {
 
 private:
@@ -72,9 +72,6 @@ private:
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
         archive & mEdgeSrnModels;
         archive & mInteriorSrnModel;
-//        archive & boost::serialization::base_object<CellCycleModelOdeHandler>(*this);
-//        archive & mInitialConditions;
-//        archive & mStateSize;
     }
 
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
@@ -87,7 +84,7 @@ protected:
      * Copy constructor. Called ONLY when a cell division occurs. See parent class comment for details
      * @param rModel SRN model to be copied
      */
-    SrnCellModel(const SrnCellModel &rModel);
+    CellSrnModel(const CellSrnModel &rModel);
 
 public:
 
@@ -104,12 +101,12 @@ public:
     /**
      * Default constuctor.
      */
-    SrnCellModel();
+    CellSrnModel();
 
     /**
      * Destructor.
      */
-    ~SrnCellModel();
+    ~CellSrnModel();
 
     /**
      * Initialize constituent SRN models
@@ -143,20 +140,6 @@ public:
      * @param edgeSrn to be inserted
      */
     void AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn);
-
-    /**
-     * Inserts edge SRN at a particular index
-     * @param index at which SRN is inserted
-     * @param edgeSrn SRN to be inserted
-     */
-    void InsertEdgeSrn(unsigned index, AbstractSrnModelPtr edgeSrn);
-
-    /**
-     * Remove Edge SRN from the cell SRN
-     * @param index of the SRN to be removed
-     * @return removed SRN
-     */
-    AbstractSrnModelPtr RemoveEdgeSrn(unsigned index);
 
     /**
      * Get number of edge SRNs
@@ -197,6 +180,6 @@ public:
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(SrnCellModel)
+CHASTE_CLASS_EXPORT(CellSrnModel)
 
-#endif /* SRNCELLMODEL_HPP_ */
+#endif /* CELLSRNMODEL_HPP_ */

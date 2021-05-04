@@ -77,6 +77,7 @@ void DeltaNotchInteriorOdeSystem::EvaluateYDerivatives(double time, const std::v
     const double edge_notch = this->mParameters[1];
     // The next two lines define the DeltaNotch ODE system
     // The decay rate is modified to reflect recruitment into membrane
+    // Here, Notch production is activated by total edge delta and Delta production inhibitied by total edge Notch
     rDY[0] = edge_delta*edge_delta/(0.01 + edge_delta*edge_delta) - notch*(1.0+0.1);  // d[Notch]/dt
     rDY[1] = 1.0/(1.0 + 100.0*edge_notch*edge_notch) - delta*(1.0+0.1);                   // d[Delta]/dt
 }
@@ -86,19 +87,17 @@ void CellwiseOdeSystemInformation<DeltaNotchInteriorOdeSystem>::Initialise()
 {
     this->mVariableNames.push_back("Notch");
     this->mVariableUnits.push_back("non-dim");
-    this->mInitialConditions.push_back(0.0); // will be filled in later
+    this->mInitialConditions.push_back(0.0); // will be initialised later
 
     this->mVariableNames.push_back("Delta");
     this->mVariableUnits.push_back("non-dim");
-    this->mInitialConditions.push_back(0.0); // will be filled in later
+    this->mInitialConditions.push_back(0.0); // will be initialised later
 
     this->mParameterNames.push_back("total neighbour edge delta");
     this->mParameterUnits.push_back("non-dim");
     this->mParameterNames.push_back("total edge notch");
     this->mParameterUnits.push_back("non-dim");
     this->mInitialised = true;
-
-
 }
 
 // Serialization for Boost >= 1.36

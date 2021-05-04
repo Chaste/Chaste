@@ -39,46 +39,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "CellAgesWriter.hpp"
-#include "CellIdWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellAgesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
-#include "CellProliferativeTypesCountWriter.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
-#include "NoCellCycleModel.hpp"
 #include "AlwaysDivideCellCycleModel.hpp"
 #include "TransitCellProliferativeType.hpp"
 
-/*
- * The next header file defines a simple subcellular reaction network model that includes the functionality
- * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
- * cells through the {{{CellEdgeData}}} class.
- */
-#include "DeltaNotchSrnEdgeModel.hpp"
-#include "SrnCellModel.hpp"
-#include "DeltaNotchCellEdgeTrackingModifier.hpp"
+#include "DeltaNotchEdgeSrnModel.hpp"
+#include "CellSrnModel.hpp"
+#include "DeltaNotchEdgeTrackingModifier.hpp"
 
-#include "DeltaNotchSrnInteriorModel.hpp"
+#include "DeltaNotchInteriorSrnModel.hpp"
 #include "DeltaNotchEdgeInteriorTrackingModifier.hpp"
 
+#include "FileComparison.hpp"
 /**
  * The tests below are designed for the pure edge SRN case, and the case with both edge and
- * interior SRN
+ * interior SRN. Here we test basic behavior of Edge and Interior Srn classes
  */
 class TestCellEdgeInteriorSrn: public AbstractCellBasedTestSuite
 {
@@ -88,13 +79,13 @@ public:
      */
     void TestDeltaNotchEdgeSrnCorrectBehaviour()
         {
-            TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);
+            TS_ASSERT_THROWS_NOTHING(DeltaNotchEdgeSrnModel srn_model);
 
             // Create cell edge SRN with four edges
-            auto p_cell_edge_srn_model = new SrnCellModel();
+            auto p_cell_edge_srn_model = new CellSrnModel();
             for (int i = 0; i < 4; i++)
             {
-                boost::shared_ptr<DeltaNotchSrnEdgeModel> p_delta_notch_edge_srn_model(new DeltaNotchSrnEdgeModel());
+                boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
                 // Create a vector of initial conditions
                 std::vector<double> starter_conditions;
@@ -123,7 +114,7 @@ public:
             // Now updated to initial conditions
             for (unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
             {
-                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
 
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.5, 1e-4);
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.5, 1e-4);
@@ -144,7 +135,7 @@ public:
             // Test converged to steady state
             for (unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
             {
-                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
+                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
 
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.9900, 1e-4);
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.0101, 1e-4);
@@ -155,10 +146,10 @@ public:
         {
             int numEdges = 4;
 
-            auto p_cell_edge_srn_model = new SrnCellModel();
+            auto p_cell_edge_srn_model = new CellSrnModel();
             for (int i = 0; i < numEdges; i++)
             {
-                boost::shared_ptr<DeltaNotchSrnEdgeModel> p_delta_notch_edge_srn_model(new DeltaNotchSrnEdgeModel());
+                boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
                 // Set ODE system
                 std::vector<double> state_variables;
@@ -170,11 +161,11 @@ public:
             }
 
             // Create a copy
-            SrnCellModel* p_cell_edge_srn_model2 = static_cast<SrnCellModel*> (p_cell_edge_srn_model->CreateSrnModel());
+            CellSrnModel* p_cell_edge_srn_model2 = static_cast<CellSrnModel*> (p_cell_edge_srn_model->CreateSrnModel());
 
             for (int i = 0; i < numEdges; i++)
             {
-                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_edge_srn_model2->GetEdgeSrn(i));
+                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model2->GetEdgeSrn(i));
                 // Check correct initializations
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetNotch(), 2.0);
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetDelta(), 3.0);
@@ -200,11 +191,11 @@ public:
                 UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
 
                 // As usual, we archive via a pointer to the most abstract class possible
-                AbstractSrnModel* p_srn_model = new SrnCellModel();
+                AbstractSrnModel* p_srn_model = new CellSrnModel();
                 for (int i = 0; i < numEdges; i++)
                 {
-                    MAKE_PTR(DeltaNotchSrnEdgeModel, p_delta_notch_edge_srn_model);
-                    static_cast<SrnCellModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
+                    MAKE_PTR(DeltaNotchEdgeSrnModel, p_delta_notch_edge_srn_model);
+                    static_cast<CellSrnModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
                 }
 
                 MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -227,7 +218,7 @@ public:
                 for (int i = 0; i < numEdges; i++)
                 {
                     auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(static_cast<SrnCellModel*>(p_srn_model)->GetEdgeSrn(i));
+                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     p_delta_notch_edge_model->UpdateDeltaNotch();
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
@@ -254,7 +245,7 @@ public:
                 for (int i = 0; i < numEdges; i++)
                 {
                     auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(static_cast<SrnCellModel*>(p_srn_model)->GetEdgeSrn(i));
+                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorNotch(), 1.0, 1e-12);
@@ -282,7 +273,7 @@ public:
 
                 /* Initialise edge based SRN */
                 auto p_element = p_mesh->GetElement(elem_index);
-                auto p_cell_edge_srn_model = new SrnCellModel();
+                auto p_cell_edge_srn_model = new CellSrnModel();
 
                 /* Gets the edges of the element and create an SRN for each edge */
                 for (unsigned i = 0; i < p_element->GetNumEdges() ; i ++)
@@ -293,7 +284,7 @@ public:
                     initial_conditions.push_back(2.0);
                     initial_conditions.push_back(2.0);
 
-                    MAKE_PTR(DeltaNotchSrnEdgeModel, p_srn_model);
+                    MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
                     p_srn_model->SetInitialConditions(initial_conditions);
                     p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
                 }
@@ -310,7 +301,7 @@ public:
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
             /* Create an edge tracking modifier */
-            MAKE_PTR(DeltaNotchCellEdgeTrackingModifier<2>, p_modifier);
+            MAKE_PTR(DeltaNotchEdgeTrackingModifier<2>, p_modifier);
 
             p_modifier->SetupSolve(cell_population,"testVertexMeshCellEdgeSrnDivision");
 
@@ -329,14 +320,14 @@ public:
             /* Check the 0th cell */
             {
                 auto p_cell = cell_population.GetCellUsingLocationIndex(0);
-                auto p_cell_edge_srn = static_cast<SrnCellModel*>(p_cell->GetSrnModel());
+                auto p_cell_edge_srn = static_cast<CellSrnModel*>(p_cell->GetSrnModel());
                 TS_ASSERT_EQUALS(p_cell_edge_srn->GetNumEdgeSrn(), 5);
             }
 
             /* Check the 4th cell */
             {
                 auto p_cell = cell_population.GetCellUsingLocationIndex(4);
-                auto p_cell_edge_srn = static_cast<SrnCellModel*>(p_cell->GetSrnModel());
+                auto p_cell_edge_srn = static_cast<CellSrnModel*>(p_cell->GetSrnModel());
                 TS_ASSERT_EQUALS(p_cell_edge_srn->GetNumEdgeSrn(), 5);
             }
         }
@@ -346,13 +337,13 @@ public:
          */
         void TestDeltaNotchEdgeInteriorSrnCorrectBehaviour()
         {
-            TS_ASSERT_THROWS_NOTHING(DeltaNotchSrnEdgeModel srn_model);
+            TS_ASSERT_THROWS_NOTHING(DeltaNotchEdgeSrnModel srn_model);
 
             // Create cell edge SRN with four edges
-            auto p_cell_srn_model = new SrnCellModel();
+            auto p_cell_srn_model = new CellSrnModel();
             for (int i = 0; i < 4; i++)
             {
-                boost::shared_ptr<DeltaNotchSrnEdgeModel> p_delta_notch_edge_srn_model(new DeltaNotchSrnEdgeModel());
+                boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
                 // Create a vector of initial conditions
                 std::vector<double> starter_conditions;
@@ -361,7 +352,7 @@ public:
                 p_delta_notch_edge_srn_model->SetInitialConditions(starter_conditions);
                 p_cell_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
-            boost::shared_ptr<DeltaNotchSrnInteriorModel> p_delta_notch_interior_srn_model(new DeltaNotchSrnInteriorModel());
+            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_delta_notch_interior_srn_model(new DeltaNotchInteriorSrnModel());
 
             // Create a vector of initial conditions
             std::vector<double> starter_conditions;
@@ -391,13 +382,13 @@ public:
             // Now updated to initial conditions
             for (unsigned i = 0; i < p_cell_srn_model->GetNumEdgeSrn(); i++)
             {
-                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_srn_model->GetEdgeSrn(i));
+                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_srn_model->GetEdgeSrn(i));
 
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.5, 1e-4);
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.5, 1e-4);
             }
             {
-                auto p_interior_srn = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_srn_model->GetInteriorSrn());
+                auto p_interior_srn = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_srn_model->GetInteriorSrn());
                 TS_ASSERT_DELTA(p_interior_srn->GetNotch(), 1.0, 1e-4);
                 TS_ASSERT_DELTA(p_interior_srn->GetDelta(), 1.0, 1e-4);
             }
@@ -416,13 +407,13 @@ public:
             // Test convergence to the steady state
             for (unsigned i = 0; i < p_cell_srn_model->GetNumEdgeSrn(); i++)
             {
-                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_srn_model->GetEdgeSrn(i));
+                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_srn_model->GetEdgeSrn(i));
 
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 1.0900, 1e-4);
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.1083, 1e-4);
             }
             auto p_interior_srn
-            = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_srn_model->GetInteriorSrn());
+            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_srn_model->GetInteriorSrn());
             TS_ASSERT_DELTA(p_interior_srn->GetNotch(), 0.9085, 1e-4);
             TS_ASSERT_DELTA(p_interior_srn->GetDelta(), 0.0022, 1e-4);
         }
@@ -431,10 +422,10 @@ public:
         {
             int numEdges = 4;
 
-            auto p_cell_srn_model = new SrnCellModel();
+            auto p_cell_srn_model = new CellSrnModel();
             for (int i = 0; i < numEdges; i++)
             {
-                boost::shared_ptr<DeltaNotchSrnEdgeModel> p_delta_notch_edge_srn_model(new DeltaNotchSrnEdgeModel());
+                boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
                 // Set ODE system
                 std::vector<double> state_variables;
@@ -444,7 +435,7 @@ public:
                 p_delta_notch_edge_srn_model->SetInitialConditions(state_variables);
                 p_cell_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
-            boost::shared_ptr<DeltaNotchSrnInteriorModel> p_delta_notch_interior_srn_model(new DeltaNotchSrnInteriorModel());
+            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_delta_notch_interior_srn_model(new DeltaNotchInteriorSrnModel());
             std::vector<double> state_variables;
             state_variables.push_back(5.0);
             state_variables.push_back(7.0);
@@ -452,16 +443,16 @@ public:
             p_delta_notch_interior_srn_model->SetInitialConditions(state_variables);
             p_cell_srn_model->SetInteriorSrnModel(p_delta_notch_interior_srn_model);
             // Create a copy
-            SrnCellModel* p_cell_srn_model2 = static_cast<SrnCellModel*> (p_cell_srn_model->CreateSrnModel());
+            CellSrnModel* p_cell_srn_model2 = static_cast<CellSrnModel*> (p_cell_srn_model->CreateSrnModel());
 
             for (int i = 0; i < numEdges; i++)
             {
-                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(p_cell_srn_model2->GetEdgeSrn(i));
+                auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_srn_model2->GetEdgeSrn(i));
                 // Check correct initializations
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetNotch(), 2.0);
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetDelta(), 3.0);
             }
-            auto p_interior_srn_model2 = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(p_cell_srn_model2->GetInteriorSrn());
+            auto p_interior_srn_model2 = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_srn_model2->GetInteriorSrn());
             TS_ASSERT_EQUALS(p_interior_srn_model2->GetNotch(), 5.0);
             TS_ASSERT_EQUALS(p_interior_srn_model2->GetDelta(), 7.0);
             // Destroy models
@@ -484,14 +475,14 @@ public:
                 UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
 
                 // As usual, we archive via a pointer to the most abstract class possible
-                AbstractSrnModel* p_srn_model = new SrnCellModel();
+                AbstractSrnModel* p_srn_model = new CellSrnModel();
                 for (int i = 0; i < numEdges; i++)
                 {
-                    MAKE_PTR(DeltaNotchSrnEdgeModel, p_delta_notch_edge_srn_model);
-                    static_cast<SrnCellModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
+                    MAKE_PTR(DeltaNotchEdgeSrnModel, p_delta_notch_edge_srn_model);
+                    static_cast<CellSrnModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
                 }
-                MAKE_PTR(DeltaNotchSrnInteriorModel, p_interior_srn_model);
-                static_cast<SrnCellModel*>(p_srn_model)->SetInteriorSrnModel(p_interior_srn_model);
+                MAKE_PTR(DeltaNotchInteriorSrnModel, p_interior_srn_model);
+                static_cast<CellSrnModel*>(p_srn_model)->SetInteriorSrnModel(p_interior_srn_model);
                 MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
                 MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
@@ -514,14 +505,14 @@ public:
                 for (int i = 0; i < numEdges; i++)
                 {
                     auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(static_cast<SrnCellModel*>(p_srn_model)->GetEdgeSrn(i));
+                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     p_delta_notch_edge_model->UpdateDeltaNotch();
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorNotch(), 1.0, 1e-12);
                 }
                 auto p_interior_srn
-                = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(static_cast<SrnCellModel*>(p_srn_model)->GetInteriorSrn());
+                = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetInteriorSrn());
                 p_interior_srn->UpdateDeltaNotch();
                 TS_ASSERT_DELTA(p_interior_srn ->GetTotalEdgeDelta(), 40.0, 1e-12);
                 TS_ASSERT_DELTA(p_interior_srn ->GetTotalEdgeNotch(), 4.0, 1e-12);
@@ -546,16 +537,65 @@ public:
                 for (int i = 0; i < numEdges; i++)
                 {
                     auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchSrnEdgeModel>(static_cast<SrnCellModel*>(p_srn_model)->GetEdgeSrn(i));
+                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorNotch(), 1.0, 1e-12);
                 }
                 /*auto p_interior_srn
-                = boost::static_pointer_cast<DeltaNotchSrnInteriorModel>(static_cast<SrnCellModel*>(p_srn_model)->GetInteriorSrn());
+                = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetInteriorSrn());
                 TS_ASSERT_DELTA(p_interior_srn ->GetTotalEdgeDelta(), 40.0, 1e-12);
                 TS_ASSERT_DELTA(p_interior_srn ->GetTotalEdgeNotch(), 4.0, 1e-12);*/
                 delete p_srn_model;
+            }
+        }
+
+        void TestSrnModelOutputParameters()
+        {
+            std::string output_directory1 = "TestSrnModelOutputParameters1";
+            OutputFileHandler output_file_handler1(output_directory1, false);
+
+            // Test with DeltaNotchEdgeSrnModel
+            {
+                DeltaNotchEdgeSrnModel srn_model;
+
+                TS_ASSERT_EQUALS(srn_model.GetIdentifier(), "DeltaNotchEdgeSrnModel");
+
+                out_stream parameter_file = output_file_handler1.OpenOutputFile("delta_notch_srn_results1.parameters");
+                srn_model.OutputSrnModelParameters(parameter_file);
+                parameter_file->close();
+
+                {
+                    // Compare the generated file in test output with a reference copy in the source code.
+                    FileFinder generated = output_file_handler1.FindFile("delta_notch_srn_results1.parameters");
+                    FileFinder reference("cell_based/test/data/TestSrnModels/delta_notch_srn_results.parameters",
+                                         RelativeTo::ChasteSourceRoot);
+                    FileComparison comparer(generated, reference);
+                    TS_ASSERT(comparer.CompareFiles());
+                }
+            }
+
+            std::string output_directory = "TestSrnModelOutputParameters";
+            OutputFileHandler output_file_handler(output_directory, false);
+
+            // Test with DeltaNotchInteriorSrnModel
+            {
+                DeltaNotchInteriorSrnModel srn_model;
+
+                TS_ASSERT_EQUALS(srn_model.GetIdentifier(), "DeltaNotchInteriorSrnModel");
+
+                out_stream parameter_file = output_file_handler.OpenOutputFile("delta_notch_srn_results.parameters");
+                srn_model.OutputSrnModelParameters(parameter_file);
+                parameter_file->close();
+
+                {
+                    // Compare the generated file in test output with a reference copy in the source code.
+                    FileFinder generated = output_file_handler.FindFile("delta_notch_srn_results.parameters");
+                    FileFinder reference("cell_based/test/data/TestSrnModels/delta_notch_srn_results.parameters",
+                                         RelativeTo::ChasteSourceRoot);
+                    FileComparison comparer(generated, reference);
+                    TS_ASSERT(comparer.CompareFiles());
+                }
             }
         }
 };

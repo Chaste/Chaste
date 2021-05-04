@@ -38,12 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "SrnCellModel.hpp"
+
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 
 template<unsigned DIM>
-class DeltaNotchCellEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class DeltaNotchEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
 
     /** Needed for serialization. */
@@ -66,12 +66,12 @@ public:
     /**
      * Default constructor.
      */
-    DeltaNotchCellEdgeTrackingModifier();
+    DeltaNotchEdgeTrackingModifier();
 
     /**
      * Destructor.
      */
-    virtual ~DeltaNotchCellEdgeTrackingModifier();
+    virtual ~DeltaNotchEdgeTrackingModifier();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -113,6 +113,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchCellEdgeTrackingModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DeltaNotchEdgeTrackingModifier)
 
 #endif //DELTANOTCHTCELLEDGERACKINGMODIFIER_HPP_

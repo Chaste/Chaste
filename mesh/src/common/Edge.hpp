@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/set.hpp>
+#include <boost/serialization/vector.hpp>
 #include "Node.hpp"
 
 typedef std::pair<unsigned ,unsigned> UIndexPair;
@@ -75,6 +76,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & mElementIndices;
+        archive & mIndex;
+        archive & mNodes;
     }
 public:
 
@@ -214,14 +217,6 @@ public:
      * @return The number of Elements associated with this Edge
      */
     unsigned GetNumElements();
-
-    /**
-     * Checks whether this edge is valid i.e. must have 2 valid Nodes, can't have associated Elements if 1D
-     * and maximum of 2 associated Elements if 2D. A consistency check is also performed for Edge's associated elements
-     * and contain Nodes' associated elements.
-     * @return
-     */
-    bool IsEdgeValid();
 
     /**
      * Checks whether the edge is on the boundary

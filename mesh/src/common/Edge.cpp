@@ -53,7 +53,6 @@ Edge<SPACE_DIM>::Edge(unsigned index, Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* 
 template<unsigned SPACE_DIM>
 Edge<SPACE_DIM>::~Edge()
 {
-    mNodes.clear();
 }
 
 template<unsigned SPACE_DIM>
@@ -208,50 +207,6 @@ template<unsigned SPACE_DIM>
 unsigned Edge<SPACE_DIM>::GetNumElements()
 {
     return mElementIndices.size();
-}
-
-template<unsigned SPACE_DIM>
-bool Edge<SPACE_DIM>::IsEdgeValid()
-{
-    // MUST have 2 existing nodes to form an edge
-    if (mNodes.size() != 2)
-    {
-        printf("[Error] Edge %i - has less than two nodes\n", this->mIndex);
-        return false;
-    }
-
-    // Nodes should not be nullptr
-    for (auto node : mNodes)
-    {
-        if (node == nullptr)
-        {
-            printf("[Error] Edge %i - has a nullptr node\n", this->mIndex);
-            return false;
-        }
-    }
-
-    // Can't have associated elements if we're less than 2D
-    if (SPACE_DIM <= 1 && mElementIndices.size() > 0)
-    {
-        printf("[Error] Edge %i - Can't have an associated element if less than 2D\n", this->mIndex);
-        return false;
-    }
-
-    // An edge can only have a maximum of two elements in 2D
-    if (SPACE_DIM == 2 && mElementIndices.size() > 2)
-    {
-        printf("[Error] Edge %i - an edge can only have a maximum of two neighbouring elements in 2D\n", this->mIndex);
-        return false;
-    }
-
-    auto neighbour_indices = GetNeighbouringElementIndices();
-    if (neighbour_indices != mElementIndices)
-    {
-        printf("[Error] Edge %i - the neighbouring elements in mElementIndices does not match with node\n", this->mIndex);
-        return false;
-    }
-
-    return true;
 }
 
 template<unsigned SPACE_DIM>

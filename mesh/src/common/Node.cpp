@@ -269,10 +269,13 @@ void Node<SPACE_DIM>::AddEdge(unsigned index)
 template<unsigned int SPACE_DIM>
 void Node<SPACE_DIM>::RemoveEdge(unsigned index)
 {
-    unsigned count = mEdgeIndices.erase(index);
-    if (count == 0)
+    if (mEdgeIndices.count(index)==0)
     {
         EXCEPTION("Tried to remove an edge index which was not in the set");
+    }
+    else
+    {
+        mEdgeIndices.erase(index);
     }
 }
 
