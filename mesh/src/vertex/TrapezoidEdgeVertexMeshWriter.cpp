@@ -99,7 +99,8 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Ve
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh)
 {
-    assert(SPACE_DIM==2);// Only 2D version is supported at the moment
+    // Only 2D version is supported at the moment
+    assert(SPACE_DIM==2); // LCOV_EXCL_LINE
 #ifdef CHASTE_VTK
     // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);

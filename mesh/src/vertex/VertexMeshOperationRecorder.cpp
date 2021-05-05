@@ -477,17 +477,17 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperati
     mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_MERGE, element_index, remap_info));
 }
 
-template class T1SwapInfo<1>;
-template class T1SwapInfo<2>;
-template class T1SwapInfo<3>;
+template struct T1SwapInfo<1>;
+template struct T1SwapInfo<2>;
+template struct T1SwapInfo<3>;
 
-template class T2SwapInfo<1>;
-template class T2SwapInfo<2>;
-template class T2SwapInfo<3>;
+template struct T2SwapInfo<1>;
+template struct T2SwapInfo<2>;
+template struct T2SwapInfo<3>;
 
-template class T3SwapInfo<1>;
-template class T3SwapInfo<2>;
-template class T3SwapInfo<3>;
+template struct T3SwapInfo<1>;
+template struct T3SwapInfo<2>;
+template struct T3SwapInfo<3>;
 
 template class VertexMeshOperationRecorder<1,1>;
 template class VertexMeshOperationRecorder<1,2>;
