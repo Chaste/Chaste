@@ -43,13 +43,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include "ArchiveOpener.hpp"
+
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 /*
  * Testing of edge infrastructure is also done here.
  * In order to avoid duplication, tests for some edge infrastructure are also implemented in
- * TestMutableVerteMeshOperationsWithPopulationSrn. There, explicit tests for correct edge rearrangements
+ * TestMutableVerteMeshOperationsWithPopulationSrn. There, explicit tests for correct edge rearrangements with SRNs
  * are implemented.
  */
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
@@ -301,19 +305,57 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.2+0.2*sqrt(41.0), 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.0+0.2*sqrt(41.0), 1e-6);
 
-        // Test T1 swap location tracking
+        // Test T1 swap information tracking
         std::vector<T1SwapInfo<2> > swap_info
                     = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
         std::vector< c_vector<double, 2> > t1_locations;
         t1_locations.push_back(swap_info[0].mLocation);
+        //Check location
         TS_ASSERT_EQUALS(t1_locations.size(), 1u);
         TS_ASSERT_DELTA(t1_locations[0][0], 0.5, 1e-6);
         TS_ASSERT_DELTA(t1_locations[0][1], 0.5, 1e-6);
+        //Check edge orientation
+        TS_ASSERT_DELTA(swap_info[0].mPreSwapEdge(0), 0.0, 1e-6);
+        TS_ASSERT_DELTA(swap_info[0].mPreSwapEdge(1), 0.2, 1e-6);
+        TS_ASSERT_DELTA(swap_info[0].mPostSwapEdge(0), -0.2, 1e-6);
+        TS_ASSERT_DELTA(swap_info[0].mPostSwapEdge(1), 0.0, 1e-6);
+
+        OutputFileHandler handler("TestT1InfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "T1Info.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write VertexMeshOperationRecorder
+            output_arch << *vertex_mesh.GetOperationRecorder();
+        }
 
         // Test T1 swap location clearing
         vertex_mesh.GetOperationRecorder()->ClearT1SwapsInfo();
         swap_info = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
         TS_ASSERT_EQUALS(swap_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load T1 swap info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<T1SwapInfo<2> > all_swaps = recorder.GetT1SwapsInfo();
+            TS_ASSERT_EQUALS(all_swaps.size(), 1u);
+            T1SwapInfo<2> info = all_swaps[0];
+            TS_ASSERT_DELTA(info.mLocation[0], 0.5, 1e-6);
+            TS_ASSERT_DELTA(info.mLocation[1], 0.5, 1e-6);
+
+            TS_ASSERT_DELTA(info.mPreSwapEdge(0), 0.0, 1e-6);
+            TS_ASSERT_DELTA(info.mPreSwapEdge(1), 0.2, 1e-6);
+            TS_ASSERT_DELTA(info.mPostSwapEdge(0), -0.2, 1e-6);
+            TS_ASSERT_DELTA(info.mPostSwapEdge(1), 0.0, 1e-6);
+        }
     }
 
     void TestPerformT1SwapOnBoundary()
@@ -897,6 +939,52 @@ public:
         // Test the tracking of the T2 swap location:
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
+
+        // Test T2 swap information tracking
+        std::vector<T2SwapInfo<2> > swap_info
+        = vertex_mesh.GetOperationRecorder()->GetT2SwapsInfo();
+
+        //Check location
+        TS_ASSERT_EQUALS(swap_info.size(), 1u);
+        TS_ASSERT_DELTA(swap_info[0].mLocation(0), centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(swap_info[0].mLocation(1), centroid_of_element_0_before_swap[1], 1e-10);
+        //Check cell ID of T2 swapped cell
+        TS_ASSERT_EQUALS(swap_info[0].mCellId, 0);
+
+        OutputFileHandler handler("TestT2InfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "T2Info.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the OperationRecorder object with the swap info
+            output_arch << *vertex_mesh.GetOperationRecorder();
+        }
+
+        // Test T2 swap info clearing
+        vertex_mesh.GetOperationRecorder()->ClearT2SwapsInfo();
+        swap_info = vertex_mesh.GetOperationRecorder()->GetT2SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load T2 swap info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<T2SwapInfo<2> > all_swaps = recorder.GetT2SwapsInfo();
+            TS_ASSERT_EQUALS(all_swaps.size(), 1u);
+            T2SwapInfo<2> info = all_swaps[0];
+
+            TS_ASSERT_DELTA(info.mLocation[0], centroid_of_element_0_before_swap[0], 1e-10);
+            TS_ASSERT_DELTA(info.mLocation[1], centroid_of_element_0_before_swap[1], 1e-10);
+
+            TS_ASSERT_EQUALS(info.mCellId, 0);
+        }
     }
 
     void TestPerformT2SwapWithBoundaryNodes()
@@ -1593,10 +1681,39 @@ public:
         TS_ASSERT_DELTA(t3_locations[1][0], 0.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[1][1], 0.5, 1e-6);
 
+        OutputFileHandler handler("TestT3InfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "T3Info.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the T3 swap info
+            output_arch << *mesh.GetOperationRecorder();
+        }
+
         // Test T3 swap Location clearing
         mesh.GetOperationRecorder()->ClearT3SwapsInfo();
         swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();;
         TS_ASSERT_EQUALS(swap_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load T3 swap info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<T3SwapInfo<2> > all_swaps = recorder.GetT3SwapsInfo();
+            TS_ASSERT_EQUALS(all_swaps.size(), 2u);
+
+            TS_ASSERT_DELTA(all_swaps[0].mLocation[0], 1.0, 1e-6);
+            TS_ASSERT_DELTA(all_swaps[0].mLocation[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(all_swaps[1].mLocation[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(all_swaps[1].mLocation[1], 0.5, 1e-6);
+        }
     }
 
     void TestPerformT3SwapException()

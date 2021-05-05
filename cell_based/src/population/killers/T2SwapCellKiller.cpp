@@ -68,17 +68,13 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
         /*
          * There might have maximally one T2 swap happened above, where a vertex element was removed from the
          * mesh but the associated cell is still there. Here we check whether a new cell
-         * underwent a T2 swap and label it as dead as well as record its location and ID.
+         * underwent a T2 swap and label it as dead.
          */
         for (unsigned elem_index = 0; elem_index < element_map.Size(); elem_index++)
         {
             CellPtr p_cell = this->mpCellPopulation->GetCellUsingLocationIndex(elem_index);
             if (element_map.IsDeleted(elem_index) && !(p_cell->IsDead()))
             {
-                T2SwapInfo<DIM> swap_info;
-                swap_info.mCellId = p_cell->GetCellId();
-                swap_info.mLocation = mesh.GetLastT2SwapLocation();
-                mesh.GetOperationRecorder()->RecordT2Swap(swap_info);
                 p_cell->Kill();
 
                 // There can't have been more than one new cell death, so leave the for loop here.

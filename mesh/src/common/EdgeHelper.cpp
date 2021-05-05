@@ -101,24 +101,28 @@ EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(unsigned elementIndex, Node<SPACE_DIM> *
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::GetEdge(unsigned index)
 {
+    assert(index<mEdges.size());
     return mEdges[index];
 }
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::GetEdge(unsigned index) const
 {
+    assert(index<mEdges.size());
     return mEdges[index];
 }
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::operator[](unsigned index)
 {
+    assert(index<mEdges.size());
     return mEdges[index];
 }
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::operator[](unsigned index) const
 {
+    assert(index<mEdges.size());
     return mEdges[index];
 }
 

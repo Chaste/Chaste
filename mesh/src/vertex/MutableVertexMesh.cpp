@@ -1981,6 +1981,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
     mLastT2SwapLocation = new_node_location;
 
+    T2SwapInfo<SPACE_DIM> swap_info;
+    swap_info.mCellId = rElement.GetIndex();
+    swap_info.mLocation = new_node_location;
+    mOperationRecorder.RecordT2Swap(swap_info);
+
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
     bool is_node_on_boundary = false;
     for (unsigned i=0; i<3; i++)

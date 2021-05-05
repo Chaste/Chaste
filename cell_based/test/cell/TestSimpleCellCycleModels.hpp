@@ -1975,6 +1975,23 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
+        // Test with AlwaysDivideCellCycleModel
+        AlwaysDivideCellCycleModel always_divide_cell_cycle_model;
+        TS_ASSERT_EQUALS(always_divide_cell_cycle_model.GetIdentifier(), "AlwaysDivideCellCycleModel");
+
+        out_stream always_divide_parameter_file = output_file_handler.OpenOutputFile("always_divide_results.parameters");
+        always_divide_cell_cycle_model.OutputCellCycleModelParameters(always_divide_parameter_file);
+        always_divide_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("always_divide_results.parameters");
+            //The model does not have any parameters and therefore it is compared to NoCellCycleModel
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/no_model_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
         CellCycleTimesGenerator::Destroy();
     }
 

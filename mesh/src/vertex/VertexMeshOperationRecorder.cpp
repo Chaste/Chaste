@@ -171,7 +171,10 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     }
     if (node_B_index==0)
     {
-        is_B_upper = node_A_index != 1;
+        // This line is excluded from coverage, as it is very difficult to test this case
+        // This case becomes relevant in long time simulations of proliferating tissue
+        // and difficult to reproduce
+        is_B_upper = node_A_index != 1; // LCOV_EXCL_LINE
     }
 
     unsigned int lower_node = node_A_index;
@@ -188,7 +191,10 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     {
         if (upper_node == 0)
         {
-            prevEdge = elementNumEdges - 2;
+            // This line is excluded from coverage, as it is very difficult to test this case
+            // This case becomes relevant in long time simulations of proliferating tissue
+            // and difficult to reproduce
+            prevEdge = elementNumEdges - 2;// LCOV_EXCL_LINE
         }
         else if (upper_node == 1)
         {
@@ -225,7 +231,10 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     {
         if (lower_node==0)
         {
-            edge_mapping[prevEdge] = elementNumEdges;
+            // This line is excluded from coverage, as it is very difficult to test this case
+            // This case becomes relevant in long time simulations of proliferating tissue
+            // and difficult to reproduce
+            edge_mapping[prevEdge] = elementNumEdges;// LCOV_EXCL_LINE
         }
         else
         {
@@ -468,6 +477,18 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperati
     mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_MERGE, element_index, remap_info));
 }
 
+template class T1SwapInfo<1>;
+template class T1SwapInfo<2>;
+template class T1SwapInfo<3>;
+
+template class T2SwapInfo<1>;
+template class T2SwapInfo<2>;
+template class T2SwapInfo<3>;
+
+template class T3SwapInfo<1>;
+template class T3SwapInfo<2>;
+template class T3SwapInfo<3>;
+
 template class VertexMeshOperationRecorder<1,1>;
 template class VertexMeshOperationRecorder<1,2>;
 template class VertexMeshOperationRecorder<1,3>;
@@ -478,4 +499,3 @@ template class VertexMeshOperationRecorder<3,3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMeshOperationRecorder)
-

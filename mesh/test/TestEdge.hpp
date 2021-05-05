@@ -132,6 +132,7 @@ public:
             {
                 Edge<SPACE_DIM>* p_edge = mesh_const->GetEdge(i);
                 TS_ASSERT(edge_helper_for_const.GetEdge(i)==p_edge);
+                TS_ASSERT(edge_helper_for_const[i]==p_edge);
                 TS_ASSERT(elements[0]->ContainsEdge(p_edge)||elements[1]->ContainsEdge(p_edge));
             }
         }
@@ -201,6 +202,12 @@ public:
         Edge<SPACE_DIM>* edge1 = mesh->GetElement(0)->GetEdge(1);
         TS_ASSERT(!edge0->IsBoundaryEdge());
         TS_ASSERT(edge1->IsBoundaryEdge());
+
+        std::set<unsigned> elements_contain_edge = edge0->GetNeighbouringElementIndices();
+        std::set<unsigned> expected_elements;
+        expected_elements.insert(0);
+        expected_elements.insert(1);
+        TS_ASSERT_EQUALS(elements_contain_edge, expected_elements);
     }
 
     void TestArchiveEdge()

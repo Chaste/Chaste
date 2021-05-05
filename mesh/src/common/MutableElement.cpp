@@ -317,13 +317,10 @@ void MutableElement<1, SPACE_DIM>::ResetIndex(unsigned index)
     {
        this->mNodes[i]->RemoveElement(this->mIndex);
     }
-    for (unsigned i=0; i<this->GetNumEdges(); i++)
-    {
-        this->mEdges[i]->RemoveElement(this->mIndex);
-    }
     this->mIndex = index;
     RegisterWithNodes();
-    RegisterWithEdges();
+    RegisterWithEdges();//does nothing in 1D
+    RebuildEdges();//does nothing in 1D
 }
 
 template<unsigned SPACE_DIM>

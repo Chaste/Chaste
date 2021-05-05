@@ -193,6 +193,7 @@ public:
         MAKE_PTR(CellEdgeData, p_cell_edge_data);
 
         TS_ASSERT_THROWS_THIS(p_cell_edge_data->GetItem("thing1"), "The item thing1 is not stored");
+        TS_ASSERT_THROWS_THIS(p_cell_edge_data->GetItemAtIndex("thing1", 0), "The item thing1 is not stored");
 
         std::vector<double> thing1 {1.0, 2.0, 3.0};
         std::vector<double> thing2 {4.0, 5.0, 6.0};
@@ -212,6 +213,8 @@ public:
         TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing3",0), 7.0, 1e-8);
         TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing3",1), 8.0, 1e-8);
         TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing3",2), 9.0, 1e-8);
+
+        TS_ASSERT_THROWS_THIS(p_cell_edge_data->GetItemAtIndex("thing1", 3), "The item thing1 does not have index 3");
 
         std::vector<double> another_thing1 = p_cell_edge_data->GetItem("thing1");
 
