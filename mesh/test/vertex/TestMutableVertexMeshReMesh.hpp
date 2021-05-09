@@ -2666,7 +2666,20 @@ public:
     void TestPerformIntersectionSwap()
     {
         /*
-         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements.
+         * Create a mesh comprising six nodes contained in two triangle and two
+         * rhomboid elements, as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  |  \    0   / |
+         *  |    \     /  |
+         *  |      \  /   |
+         *  | 3   ---   1 |
+         *  |   /  \      |
+         *  |  /     \    |
+         *  | /   2    \  |
+         *  |/___________\|
+         *
          * We will test that when a node is moved to overlap with an element, it is correctly
          * found and dealt with by the CheckForIntersections() method.
          */
@@ -2749,6 +2762,19 @@ public:
         /*
          * This test is very similar to TestPerformIntersectionSwap() but with a different ordering
          * of nodes and elements, to ensure full coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  | \    0   /  |
+         *  |  \     /    |
+         *  |   \  /      |
+         *  | 1   ---   3 |
+         *  |      /  \   |
+         *  |    /     \  |
+         *  |  /   2    \ |
+         *  |/___________\|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -2906,6 +2932,19 @@ public:
         /*
          * This test is very similar to TestPerformIntersectionSwap() but the intersected
          * element is a triangle element, to ensure that this exception is caught.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *    \\    0   / |
+         *     \3\     /  |
+         *      \  \  /   |
+         *        ---   1 |
+         *      /  \      |
+         *     /     \    |
+         *    /   2    \  |
+         *   /___________\|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -2954,6 +2993,19 @@ public:
         /*
          * This test is very similar to TestPerformIntersectionSwapTriangle() but the intersected
          * element is a triangle element, to ensure that this exception is caught.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  | \    0   //
+         *  |  \     /3/
+         *  |   \  /  /
+         *  | 1   ---
+         *  |      /  \
+         *  |    /     \
+         *  |  /   2    \
+         *  |/___________\
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3002,6 +3054,19 @@ public:
          * Create a mesh comprising eight nodes contained in two triangle, two rhomboid elements,
          * and one pentagonal element.  We will test that an exception is raised when an intersection
          * splits the element into two new elements.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\          //|
+         *  |   \   0 / / |
+         *  |      \/ 1/  |
+         *  |       | /   |
+         *  | 4   ---   2 |
+         *  |   /  \      |
+         *  |  /     \    |
+         *  | /   3    \  |
+         *  |/___________\|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3060,6 +3125,19 @@ public:
          * This test is similar to TestPerformIntersectionSwap, but with the
          * bottom triangle element missing, such that the intersecting node is
          * a boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  |  \    0   / |
+         *  |    \     /  |
+         *  |      \  /   |
+         *  | 2   ---   1 |
+         *  |   /  \      |
+         *  |  /     \    |
+         *  | /        \  |
+         *  |/           \|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3141,6 +3219,19 @@ public:
          * This test is similar to TestPerformBoundaryIntersectionSwap1, but
          * with a different ordering of nodes and elements, to ensure full
          * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  | \    0   /  |
+         *  |  \     /    |
+         *  |   \  /      |
+         *  | 1   ---   2 |
+         *  |      /  \   |
+         *  |    /     \  |
+         *  |  /        \ |
+         *  |/           \|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3222,6 +3313,19 @@ public:
          * This test is similar to TestPerformIntersectionSwap, but with the
          * right rhomboid element missing, such that the intersecting node is a
          * boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  |  \    0   /
+         *  |    \     /
+         *  |      \  /
+         *  | 1   ---
+         *  |   /  \
+         *  |  /     \
+         *  | /   2    \
+         *  |/___________\
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3302,6 +3406,19 @@ public:
          * This test is similar to TestPerformBoundaryIntersectionSwap2, but
          * with a different ordering of nodes and elements, to ensure full
          * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  | \    0   /
+         *  |  \     /
+         *  |   \  /
+         *  | 1   ---
+         *  |      /  \
+         *  |    /     \
+         *  |  /   2    \
+         *  |/___________\
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3382,6 +3499,19 @@ public:
          * This test is similar to TestPerformIntersectionSwap, but with the
          * left rhomboid element missing, such that the intersecting node is a
          * boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *     \    0   / |
+         *       \     /  |
+         *         \  /   |
+         *        ---   1 |
+         *      /  \      |
+         *     /     \    |
+         *    /   2    \  |
+         *   /___________\|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3462,6 +3592,19 @@ public:
          * This test is similar to TestPerformBoundaryIntersectionSwap3, but
          * with a different ordering of nodes and elements, to ensure full
          * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *    \    0   /  |
+         *     \     /    |
+         *      \  /      |
+         *        ---   1 |
+         *         /  \   |
+         *       /     \  |
+         *     /   2    \ |
+         *   /___________\|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3542,6 +3685,19 @@ public:
          * This test is similar to TestPerformIntersectionSwap, but with the
          * bottom triangle and right rhomboid element missing, such that the
          * intersecting node is a boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  |  \    0   /
+         *  |    \     /
+         *  |      \  /
+         *  | 1   ---
+         *  |   /
+         *  |  /
+         *  | /
+         *  |/
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3613,6 +3769,19 @@ public:
          * This test is similar to TestPerformBoundaryIntersectionSwap4, but
          * with a different ordering of nodes and elements, to ensure full
          * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  | \    0   /
+         *  |  \     /
+         *  |   \  /
+         *  | 1   ---
+         *  |      /
+         *  |    /
+         *  |  /
+         *  |/
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
@@ -3684,6 +3853,19 @@ public:
          * This test is similar to TestPerformIntersectionSwap, but with the
          * bottom triangle and left rhomboid element missing, such that the
          * intersecting node is a boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *     \    0   / |
+         *       \     /  |
+         *         \  /   |
+         *        ---   1 |
+         *         \      |
+         *           \    |
+         *             \  |
+         *               \|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  1.0, 0.0));
@@ -3755,6 +3937,19 @@ public:
          * This test is similar to TestPerformBoundaryIntersectionSwap5, but
          * with a different ordering of nodes and elements, to ensure full
          * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *    \    0   /  |
+         *     \     /    |
+         *      \  /      |
+         *        ---   1 |
+         *            \   |
+         *             \  |
+         *              \ |
+         *               \|
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true,  1.0, 0.0));
