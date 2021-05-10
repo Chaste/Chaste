@@ -1794,6 +1794,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
         EXCEPTION("Intersection cannot be resolved without splitting the element into two new elements.");
     }
 
+    // Store location of intersection swap, which is at midpoint of nodes A and B
+    c_vector<double, SPACE_DIM> nodeA_location = pNode->rGetLocation();
+    c_vector<double, SPACE_DIM> nodeB_location = this->GetNode(node_B_index)->rGetLocation();
+    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
+    mLocationsOfIntersectionSwaps.push_back(nodeA_location + 0.5*vector_AB);
+
     // Now identify elements 2 and 4
     unsigned node_B_local_index_in_a = p_element_a->GetNodeLocalIndex(node_B_index);
 
