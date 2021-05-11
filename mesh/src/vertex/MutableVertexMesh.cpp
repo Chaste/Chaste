@@ -1998,6 +1998,23 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
     mLastT2SwapLocation = new_node_location;
 
+    // If this element has no neighbours, delete the element, its nodes and exit function
+    if (this->GetNeighbouringElementIndices(rElement.GetIndex()).size() == 0)
+    {
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(0));
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(1));
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(2));
+
+        rElement.GetNode(0)->MarkAsDeleted();
+        rElement.GetNode(1)->MarkAsDeleted();
+        rElement.GetNode(2)->MarkAsDeleted();
+
+        mDeletedElementIndices.push_back(rElement.GetIndex());
+        rElement.MarkAsDeleted();
+
+        return;
+    }
+
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
     bool is_node_on_boundary = false;
     for (unsigned i=0; i<3; i++)
