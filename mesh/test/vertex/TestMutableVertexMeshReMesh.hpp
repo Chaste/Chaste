@@ -1130,6 +1130,119 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(3), 7u);
     }
 
+    void TestPerformT2SwapWithoutNeighbours()
+    {
+        /*
+         * Create a mesh comprising three nodes contained in one triangle
+         * element, as shown below. We will test that a T2 swap is performed
+         * correctly when an element has no neighbouring elements.
+         *        _
+         *       / \
+         *      /   \
+         *     /     \
+         *    /   0   \
+         *   /         \
+         *  /___________\
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.2, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.05));
+
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Perform a T2 swap on the central triangle element
+        auto p_element_0 = vertex_mesh.GetElement(0);
+        vertex_mesh.PerformT2Swap(*p_element_0);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 0u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 3u);
+
+        /*
+         *  Make two disconnected triangular elements
+         *        _
+         *       / \                 / \
+         *      /   \               /   \
+         *     /     \             /     \
+         *    /   0   \           /   1   \
+         *   /         \         /         \
+         *  /___________\       /___________\
+         *
+         */
+        std::vector<Node<2>*> nodes2;
+        nodes2.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes2.push_back(new Node<2>(1, true, 0.2, 0.0));
+        nodes2.push_back(new Node<2>(2, true, 0.1, 0.05));
+        nodes2.push_back(new Node<2>(3, true, 1.0, 0.0));
+        nodes2.push_back(new Node<2>(4, true, 1.2, 0.0));
+        nodes2.push_back(new Node<2>(5, true, 1.1, 0.05));
+
+        std::vector<Node<2>*> nodes2_elem_0;
+        nodes2_elem_0.push_back(nodes2[0]);
+        nodes2_elem_0.push_back(nodes2[1]);
+        nodes2_elem_0.push_back(nodes2[2]);
+
+        std::vector<Node<2>*> nodes2_elem_1;
+        nodes2_elem_1.push_back(nodes2[3]);
+        nodes2_elem_1.push_back(nodes2[4]);
+        nodes2_elem_1.push_back(nodes2[5]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements2;
+        vertex_elements2.push_back(new VertexElement<2,2>(0, nodes2_elem_0));
+        vertex_elements2.push_back(new VertexElement<2,2>(1, nodes2_elem_1));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh2(nodes2, vertex_elements2);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 6u);
+
+        // Perform a T2 swap on the left triangle element
+        p_element_0 = vertex_mesh2.GetElement(0);
+        vertex_mesh2.PerformT2Swap(*p_element_0);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 3u);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllNodes(), 6u);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
+
+        // Test boundary property of nodes. All are boundary nodes.
+        for (unsigned i=0; i<vertex_mesh2.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
+        }
+
+        // Perform a T2 swap on the remaining triangle element
+        auto p_element_1 = vertex_mesh2.GetElement(1);
+        vertex_mesh2.PerformT2Swap(*p_element_1);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 0u);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllNodes(), 6u);
+    }
+
     void TestReMeshForT1Swaps()
     {
         /*
