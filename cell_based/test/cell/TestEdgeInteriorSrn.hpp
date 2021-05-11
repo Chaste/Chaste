@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 /**
  * The tests below are designed for the pure edge SRN case, and the case with both edge and
- * interior SRN. Here we test basic behavior of Edge and Interior Srn classes
+ * interior SRN. Here we test basic behaviour of CellSrn class containing  edge and interior Delta-Notch Srn models
  */
 class TestCellEdgeInteriorSrn: public AbstractCellBasedTestSuite
 {
@@ -92,6 +92,7 @@ public:
                 starter_conditions.push_back(0.5);
                 starter_conditions.push_back(0.5);
                 p_delta_notch_edge_srn_model->SetInitialConditions(starter_conditions);
+                //Add srn to each edge
                 p_cell_edge_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
             }
 
@@ -106,6 +107,7 @@ public:
             std::vector<double> interior_delta(4);
             std::vector<double> interior_notch(4);
             p_cell->GetCellEdgeData()->SetItem("neighbour delta", neigbour_delta);
+            //The Delta-Notch edge SRNs require these cell data
             p_cell->GetCellData()->SetItem("interior delta", 0);
             p_cell->GetCellData()->SetItem("interior notch", 0);
             p_cell->InitialiseCellCycleModel();

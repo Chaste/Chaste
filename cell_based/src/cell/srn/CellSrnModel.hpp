@@ -114,7 +114,9 @@ public:
     virtual void Initialise() override;
 
     /**
-     * Halves the appropriate quantities in the constituent SRN models
+     * Calls SRN model specific behaviour at the time of cell division
+     * All constituent SRNs models (edge and/or interior, if there are any) call their
+     * implementation of this method
      */
     virtual void ResetForDivision() override;
 

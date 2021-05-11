@@ -535,7 +535,6 @@ if (Chaste_ENABLE_TESTING)
     find_package (CxxTest)
 endif ()
 
-
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #
 ###########################################
