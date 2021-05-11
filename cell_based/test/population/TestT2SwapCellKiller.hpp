@@ -697,6 +697,80 @@ public:
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(),1u);
     }
 
+    void TestKillerForT2SwapWithoutNeighboursInSimulation()
+    {
+        /**
+         * We conduct the same test as before, but now within an OffLatticeSimulation. We make sure that
+         * the killed cell and the corresponding vertex element get correctly deleted.
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.05));
+        nodes.push_back(new Node<2>(1, true, 0.9, 0.05));
+        nodes.push_back(new Node<2>(2, true, 0.5, 0.475));
+
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        vertex_mesh.SetT2Threshold(0.01);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Get a cell population
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        std::vector<CellPtr> cells;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        // make a simulator
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestT2SwapCellKillerWithoutNeighboursInSimulation");
+        simulator.SetEndTime(0.003);
+
+        // Perform swaps
+        simulator.Solve();
+
+        // We should not have had any T2 swaps yet
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Move the inner vertices inwards
+        c_vector<double, 2>& new_location_0 = vertex_elements[0]->GetNode(0)->rGetModifiableLocation();
+        new_location_0(0) = 0.499;
+        new_location_0(1) = 0.249;
+
+        c_vector<double, 2>& new_location_1 = vertex_elements[0]->GetNode(1)->rGetModifiableLocation();
+        new_location_1(0) = 0.501;
+        new_location_1(1) = 0.249;
+
+        c_vector<double, 2>& new_location_2 = vertex_elements[0]->GetNode(2)->rGetModifiableLocation();
+        new_location_2(0) = 0.5;
+        new_location_2(1) = 0.251;
+
+        // T2 swaps should now happen
+        simulator.SetEndTime(0.005);
+
+        // Perform swaps
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 0u);
+
+        // Check that we have the right number of cells
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 0u)
+
+        // We also do not have any undeleted cells
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 0u);
+    }
+
     /**
      * This tests that T1 swaps rearrange to form a triangular element for a T2 swap
      */
