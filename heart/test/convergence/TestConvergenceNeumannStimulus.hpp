@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <cmath>
 
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "LuoRudy1991.hpp"
 #include "PdeConvergenceTester.hpp"
 #include "SpaceConvergenceTester.hpp"
@@ -63,7 +63,7 @@ public:
 
     void TestConvergenceMonodomain1d()
     {
-        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.Stimulus=NEUMANN;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
@@ -72,7 +72,7 @@ public:
 
     void TestSpaceConvergence1d()
     {
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<1>, 1, 1> tester;
         tester.Stimulus=NEUMANN;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
@@ -81,7 +81,7 @@ public:
 
     void TestSpaceConvergence2d()
     {
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<2>, 2, 1> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, MonodomainProblem<2>, 2, 1> tester;
         tester.Stimulus=NEUMANN;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);

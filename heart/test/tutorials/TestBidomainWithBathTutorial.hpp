@@ -74,7 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (note: requires Maple). (This step creates the .out files that are already present in heart/src/odes/cellml)
  *
  */
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "PetscSetupAndFinalize.hpp"
 /* This test will show how to load a mesh in the test and pass it into the problem,
  * for which the following includes are needed */
@@ -106,7 +106,7 @@ public: // Tests should be public!
          * of Luo-Rudy cells. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEuler,2> cell_factory(0.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,2> cell_factory(0.0);
 
         /*
          * Now, we load up a rectangular mesh (in triangle/tetgen format), done as follows,
