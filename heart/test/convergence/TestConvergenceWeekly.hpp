@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <cmath>
 
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "LuoRudy1991.hpp"
 #include "PdeConvergenceTester.hpp"
 #include "SpaceConvergenceTester.hpp"
@@ -61,7 +61,7 @@ public:
     void xxTest3DSpace()
     {
 
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-8);
         //tester.SetKspRelativeTolerance(1e-8);
         tester.SetMeshWidth(0.15);//cm
@@ -77,7 +77,7 @@ public:
     {
         HeartConfig::Instance()->SetKSPSolver("gmres");
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
        //tester.SetKspAbsoluteTolerance(1e-5);
         tester.Converge(__FUNCTION__);
@@ -95,7 +95,7 @@ public:
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
         //tester.SetKspAbsoluteTolerance(1e-7);
         tester.OdeTimeStep /= 2.0;
@@ -113,7 +113,7 @@ public:
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         PetscTools::SetOption("-log_summary", "");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-7);
         //tester.SetKspAbsoluteTolerance(1e-7);
         tester.OdeTimeStep /= 2.0;
@@ -132,7 +132,7 @@ public:
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2, 2> tester;
         //tester.SetKspAbsoluteTolerance(1e-5);
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
         tester.Converge(__FUNCTION__);
@@ -150,7 +150,7 @@ public:
     {
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
-        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
+        SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester;
         //tester.SetKspAbsoluteTolerance(1e-3);
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-3);
         tester.SetMeshWidth(0.15);//cm

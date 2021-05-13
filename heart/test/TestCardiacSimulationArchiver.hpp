@@ -26,7 +26,7 @@ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; ORF::For BUSINESS INTERRUPTION)
 HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneStimulusCellFactory.hpp"
 #include "ZeroStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
-#include "FoxModel2002BackwardEuler.hpp"
+#include "FoxModel2002BackwardEulerOpt.hpp"
 #include "FaberRudy2000.hpp"
 
 #include "BidomainProblem.hpp"
@@ -299,7 +299,7 @@ cp -r /tmp/$USER/testoutput/SaveBidomain/ ~/eclipse/workspace/Chaste/apps/textte
         HeartConfig::Instance()->SetOutputFilenamePrefix("Bidomain_3d");
 
         // This cell factory should apply the same stimulus described in the xml config file.
-        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEuler, 3> cell_factory(-80000.0, 1.0);
+        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEulerOpt, 3> cell_factory(-80000.0, 1.0);
         BidomainProblem<3> bidomain_problem( &cell_factory );
 
         bidomain_problem.Initialise();
@@ -361,7 +361,7 @@ cp -r /tmp/$USER/testoutput/SaveMonodomain/ ~/eclipse/workspace/Chaste/apps/text
         HeartConfig::Instance()->SetOutputFilenamePrefix("Monodomain_2d");
 
         // This cell factory should apply the same stimulus described in the xml config file.
-        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEuler, 2> cell_factory(-600000.0, 1.0);
+        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEulerOpt, 2> cell_factory(-600000.0, 1.0);
         MonodomainProblem<2> monodomain_problem( &cell_factory );
 
         monodomain_problem.Initialise();
@@ -618,7 +618,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
         HeartConfig::Instance()->SetOutputFilenamePrefix("simulation");
         HeartConfig::Instance()->SetUseAbsoluteTolerance(ABS_TOL);
 
-        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEuler, 3> cell_factory(-80000.0, 1.0);
+        PlaneStimulusCellFactory<CellFoxModel2002FromCellMLBackwardEulerOpt, 3> cell_factory(-80000.0, 1.0);
         BidomainProblem<3> bidomain_problem( &cell_factory );
 
         bidomain_problem.Initialise();
