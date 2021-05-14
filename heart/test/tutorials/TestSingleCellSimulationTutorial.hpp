@@ -169,12 +169,11 @@ public:
         p_model->SetTolerances(1e-8, 1e-8);
 
         /*
-         * By default we use an analytic Jacobian for CVODE cells (where available - see [wiki:ChasteGuides/CodeGenerationFromCellML]
-         * for instructions on how to provide one using Maple). In some cases (the Hund-Rudy model particularly being one) the
+         * By default we use an analytic Jacobian for CVODE cells. 
+         * In some cases (the Hund-Rudy model particularly being one) the
          * analytic Jacobian contains effectively divide-by-zero entries, even at resting potential. If you observe
          * CVODE errors when trying to run simulations, it can be worth switching off the analytic Jacobian and resorting
-         * to a numerical approximation (as happens by default if no analytic Jacobian is available). This can be done with the
-         * following command:
+         * to a numerical approximation. This can be done with the following command:
          *
          * {{{p_model->ForceUseOfNumericalJacobian();}}}
          *
