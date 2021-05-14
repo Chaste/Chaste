@@ -1756,6 +1756,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
         p_element_b = this->GetElement(element_b_index);
     }
 
+    // T1 swaps can sometimes result in a concave triangular element (#3067)
     if ((p_element_a->GetNumNodes() == 3) || ((p_element_b != nullptr) && p_element_b->GetNumNodes() == 3))
     {
         EXCEPTION("A triangular element has become concave. "
