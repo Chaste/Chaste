@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
+#include "VertexIntersectionSwapLocationsWriter.hpp"
 #include "AbstractCellBasedSimulation.hpp"
 
 template<unsigned DIM>
@@ -474,17 +475,51 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
     // Create mesh writer for VTK output
     VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
-    // Iterate over any cell writers that are present
+    // We avoid writing out CellData if the population is empty (i.e. no cells).
     unsigned num_cells = this->GetNumAllCells();
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
-            cell_writer_iter != this->mCellWriters.end();
-            ++cell_writer_iter)
-    {
-        // Create vector to store VTK cell data
-        std::vector<double> vtk_cell_data(num_cells);
 
-        // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+    if (num_cells > 0)
+    {
+        // Iterate over any cell writers that are present
+        for (auto cell_writer_iter = this->mCellWriters.begin();
+             cell_writer_iter != this->mCellWriters.end();
+             ++cell_writer_iter)
+        {
+            // Create vector to store VTK cell data
+            std::vector<double> vtk_cell_data(num_cells);
+
+            // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
+            for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+                 elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+                 ++elem_iter)
+            {
+                // Get index of this element in the vertex mesh
+                unsigned elem_index = elem_iter->GetIndex();
+
+                // Get the cell corresponding to this element
+                CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+                assert(p_cell);
+
+                // Populate the vector of VTK cell data
+                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            }
+
+            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        }
+
+        // When outputting any CellData, we assume that the first cell is representative of all cells
+        unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
+        std::vector<std::vector<double> > cell_data;
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            std::vector<double> cell_data_var(num_cells);
+            cell_data.push_back(cell_data_var);
+        }
+
+        // Loop over vertex elements ///\todo #2512 - replace with loop over cells
+        for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
                 elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
                 ++elem_iter)
         {
@@ -495,44 +530,15 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
             assert(p_cell);
 
-            // Populate the vector of VTK cell data
-            vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            for (unsigned var=0; var<num_cell_data_items; var++)
+            {
+                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            }
         }
-
-        mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
-    }
-
-    // When outputting any CellData, we assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
-
-    std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
-    {
-        std::vector<double> cell_data_var(num_cells);
-        cell_data.push_back(cell_data_var);
-    }
-
-    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
-            elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
-            ++elem_iter)
-    {
-        // Get index of this element in the vertex mesh
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the cell corresponding to this element
-        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
-        assert(p_cell);
-
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
         }
-    }
-    for (unsigned var=0; var<num_cell_data_items; var++)
-    {
-        mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
     }
 
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -803,6 +809,10 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutput
         if (!this-> template HasWriter<VertexT3SwapLocationsWriter>())
         {
             this-> template AddPopulationWriter<VertexT3SwapLocationsWriter>();
+        }
+        if (!this-> template HasWriter<VertexIntersectionSwapLocationsWriter>())
+        {
+            this-> template AddPopulationWriter<VertexIntersectionSwapLocationsWriter>();
         }
     }
 

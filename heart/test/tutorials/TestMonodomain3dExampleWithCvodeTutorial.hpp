@@ -59,14 +59,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  1. via a `CvodeAdaptor` solver - this would work on the usual cell model as in the previous tutorial.
  *
- *  2. via an `AbstractCvodeCell` instead of an `AbstractCardiacCell` - this class uses native CVODE vectors.
+ *  2. via an `AbstractCvodeCell` instead of an `AbstractCardiacCell` - this class uses native CVODE vectors and is preferred.
  *
  * In order to generate CVODE cells please see [wiki:ChasteGuides/CodeGenerationFromCellML CodeGenerationFromCellML].
  *
- * '''NB:''' recent improvements (becoming available from release 3.2) mean that
- * maple can be used to generate an ''analytic jacobian'' which is then made available to CVODE via the
+ * '''NB:''' recent improvements (available from release 2021.1) mean that
+ * an ''analytic jacobian'' is automatically made available to CVODE via the
  * native `AbstractCvodeCell`, and this will provide a speed up of between 5-30% (depending on the size of
- * the ODE system). But this is not compulsory to use CVODE, which will still work well.
+ * the ODE system). 
  *
  * So here we do the `#include` to import the native CVODE version of the cell model.
  */

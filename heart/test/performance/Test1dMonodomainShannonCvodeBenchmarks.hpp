@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RegularStimulus.hpp"
 #include "Shannon2004.hpp"
 #include "Shannon2004Cvode.hpp"
-//#include "Shannon2004BackwardEuler.hpp"
+//#include "Shannon2004BackwardEulerOpt.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "HeartConfig.hpp"
 #include "CvodeAdaptor.hpp"
@@ -270,7 +270,7 @@ public:
          * i.e. go to heart/src/odes/cellml/Shannon2004-conf.xml and add
          * <arg>--backward-euler</arg>
          *
-         * then uncomment the //#include "Shannon2004BackwardEuler.hpp" and the below block of code.
+         * then uncomment the //#include "Shannon2004BackwardEulerOpt.hpp" and the below block of code.
          *
          * Same idea for checking optimised models.
          */
@@ -278,7 +278,7 @@ public:
 //        {
 //            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/backward_euler");
 //            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
-//            ShannonCardiacCellFactory<CellShannon2004FromCellMLBackwardEuler> cell_factory;
+//            ShannonCardiacCellFactory<CellShannon2004FromCellMLBackwardEulerOpt> cell_factory;
 //            MonodomainProblem<1> monodomain_problem( &cell_factory );
 //
 //            monodomain_problem.Initialise();

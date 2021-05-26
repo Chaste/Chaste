@@ -300,6 +300,36 @@ c_vector<double, SPACE_DIM> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLastT2
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT3Swaps()
+{
+    return mLocationsOfT3Swaps;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfIntersectionSwaps()
+{
+    return mLocationsOfIntersectionSwaps;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
+{
+    mLocationsOfT1Swaps.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
+{
+    mLocationsOfT3Swaps.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfIntersectionSwaps()
+{
+    mLocationsOfIntersectionSwaps.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
     if (mDeletedNodeIndices.empty())
@@ -1801,19 +1831,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
             }
         }
     }
-    /*
-     * If there are not two elements containing the intersecting node then the node is coming from the other side of the element
-     * and there is no way to fix it unless you want to make two new elements.
-     */
-    assert(elements_containing_intersecting_node.size() == 2);
 
     std::set<unsigned> all_elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
 
-    std::set<unsigned> intersecting_element;
-
-    std::set_difference(all_elements_containing_intersecting_node.begin(), all_elements_containing_intersecting_node.end(),
-                        elements_containing_intersecting_node.begin(), elements_containing_intersecting_node.end(),
-                        std::inserter(intersecting_element, intersecting_element.begin()));
+    assert(elements_containing_intersecting_node.size() >= 1);
+    assert(all_elements_containing_intersecting_node.size() >= 1);
 
     /*
      * Identify nodes and elements to perform switch on
@@ -1824,57 +1846,102 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
      * Element 2 has nodes B and A (in that order)
      * Element 3 only contains node B
      * Element 4 has nodes A and B (in that order)
+     *
+     * If node A is a boundary node, then elements 1, 2, or 4 can be missing.
      */
     unsigned node_A_index = pNode->GetIndex();
-    unsigned node_B_index;
-    unsigned element_1_index = *(intersecting_element.begin());
-    unsigned element_2_index;
-    unsigned element_3_index = elementIndex;
-    unsigned element_4_index;
+    unsigned node_B_index = UINT_MAX;
 
+    unsigned element_1_index = UINT_MAX;
+    unsigned element_2_index = UINT_MAX;
+    unsigned element_3_index = elementIndex;
+    unsigned element_4_index = UINT_MAX;
+
+    // Get element 1
+    std::set<unsigned> intersecting_element;
+
+    std::set_difference(all_elements_containing_intersecting_node.begin(), all_elements_containing_intersecting_node.end(),
+                        elements_containing_intersecting_node.begin(), elements_containing_intersecting_node.end(),
+                        std::inserter(intersecting_element, intersecting_element.begin()));
+
+    if (intersecting_element.size() == 1)
+    {
+        element_1_index = *(intersecting_element.begin());
+    }
+
+    // Get element A
     std::set<unsigned>::iterator iter = elements_containing_intersecting_node.begin();
     unsigned element_a_index = *(iter);
-    iter++;
-    unsigned element_b_index = *(iter);
-
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_a = this->GetElement(element_a_index);
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_b = this->GetElement(element_b_index);
 
-    std::set<unsigned> element_a_nodes;
-    for (unsigned node_index = 0;  node_index < p_element_a->GetNumNodes(); node_index++)
+    // Get element B
+    unsigned element_b_index = UINT_MAX;
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_b = nullptr;
+    if (elements_containing_intersecting_node.size() == 2)
     {
-        element_a_nodes.insert(p_element_a->GetNodeGlobalIndex(node_index));
+        iter++;
+        element_b_index = *(iter);
+        p_element_b = this->GetElement(element_b_index);
     }
 
-    std::set<unsigned> element_b_nodes;
-    for (unsigned node_index = 0;  node_index < p_element_b->GetNumNodes(); node_index++)
+    // T1 swaps can sometimes result in a concave triangular element (#3067)
+    if ((p_element_a->GetNumNodes() == 3) || ((p_element_b != nullptr) && p_element_b->GetNumNodes() == 3))
     {
-        element_b_nodes.insert(p_element_b->GetNodeGlobalIndex(node_index));
+        EXCEPTION("A triangular element has become concave. "
+                  "You need to rerun the simulation with a smaller time step to prevent this.");
     }
 
-    std::set<unsigned> switching_nodes;
-    std::set_intersection(element_a_nodes.begin(), element_a_nodes.end(),
-                          element_b_nodes.begin(), element_b_nodes.end(),
-                          std::inserter(switching_nodes, switching_nodes.begin()));
+    // Get node B index
+    unsigned node_A_local_index_in_a = p_element_a->GetNodeLocalIndex(node_A_index);
 
-    assert(switching_nodes.size() == 2);
+    unsigned node_before_A_in_a = (node_A_local_index_in_a + p_element_a->GetNumNodes() - 1) % p_element_a->GetNumNodes();
+    unsigned node_after_A_in_a = (node_A_local_index_in_a + 1) % p_element_a->GetNumNodes();
 
-    // Check intersecting node is this set
-    assert(switching_nodes.find(node_A_index) != switching_nodes.end());
-    switching_nodes.erase(node_A_index);
+    unsigned global_node_before_A_in_a = p_element_a->GetNodeGlobalIndex(node_before_A_in_a);
+    unsigned global_node_after_A_in_a = p_element_a->GetNodeGlobalIndex(node_after_A_in_a);
 
-    assert(switching_nodes.size() == 1);
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
+    {
+        if (p_element->GetNodeGlobalIndex(node_index) == global_node_before_A_in_a)
+        {
+            node_B_index = global_node_before_A_in_a;
+            break;
+        }
+        else if (p_element->GetNodeGlobalIndex(node_index) == global_node_after_A_in_a)
+        {
+            node_B_index = global_node_after_A_in_a;
+            break;
+        }
+    }
+    /*
+     * If node B cannot be found then there are no nodes before or after node A
+     * in element a that are contained in the intersected element, and there is
+     * no way to fix it unless you want to make two new elements.
+     */
+    if (node_B_index == UINT_MAX)
+    {
+        EXCEPTION("Intersection cannot be resolved without splitting the element into two new elements.");
+    }
 
-    node_B_index = *(switching_nodes.begin());
+    // Store location of intersection swap, which is at midpoint of nodes A and B
+    c_vector<double, SPACE_DIM> nodeA_location = pNode->rGetLocation();
+    c_vector<double, SPACE_DIM> nodeB_location = this->GetNode(node_B_index)->rGetLocation();
+    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
+    mLocationsOfIntersectionSwaps.push_back(nodeA_location + 0.5*vector_AB);
 
     // Now identify elements 2 and 4
-    unsigned node_A_local_index_in_a = p_element_a->GetNodeLocalIndex(node_A_index);
     unsigned node_B_local_index_in_a = p_element_a->GetNodeLocalIndex(node_B_index);
 
     if ((node_B_local_index_in_a+1)%p_element_a->GetNumNodes() == node_A_local_index_in_a)
     {
-        assert((p_element_b->GetNodeLocalIndex(node_A_index)+1)%p_element_b->GetNumNodes()
-               == p_element_b->GetNodeLocalIndex(node_B_index));
+#ifndef NDEBUG
+        if (element_b_index != UINT_MAX)
+        {
+            assert(p_element_b != nullptr);
+            assert((p_element_b->GetNodeLocalIndex(node_A_index)+1)%p_element_b->GetNumNodes()
+                    == p_element_b->GetNodeLocalIndex(node_B_index));
+        }
+#endif
 
         // Element 2 is element a, element 4 is element b
         element_2_index = element_a_index;
@@ -1882,26 +1949,50 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     }
     else
     {
-        assert((p_element_b->GetNodeLocalIndex(node_B_index)+1)%p_element_b->GetNumNodes()
-               == p_element_b->GetNodeLocalIndex(node_A_index));
+#ifndef NDEBUG
+        if (element_b_index != UINT_MAX)
+        {
+            assert(p_element_b != nullptr);
+            assert((p_element_b->GetNodeLocalIndex(node_B_index)+1)%p_element_b->GetNumNodes()
+                    == p_element_b->GetNodeLocalIndex(node_A_index));
+        }
+#endif
 
         // Element 2 is element b, element 4 is element a
         element_2_index = element_b_index;
         element_4_index = element_a_index;
     }
 
+    // Get local indices
     unsigned intersected_edge = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
 
-    unsigned node_A_local_index_in_1 = this->GetElement(element_1_index)->GetNodeLocalIndex(node_A_index);
+    unsigned node_A_local_index_in_1 = UINT_MAX;
+    if (element_1_index != UINT_MAX)
+    {
+        node_A_local_index_in_1 = this->GetElement(element_1_index)->GetNodeLocalIndex(node_A_index);
+    }
 
-    unsigned node_A_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_A_index);
-    unsigned node_B_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_B_index);
+    unsigned node_A_local_index_in_2 = UINT_MAX;
+    unsigned node_B_local_index_in_2 = UINT_MAX;
+
+    if (element_2_index != UINT_MAX)
+    {
+        node_A_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_A_index);
+        node_B_local_index_in_2 = this->GetElement(element_2_index)->GetNodeLocalIndex(node_B_index);
+    }
 
     unsigned node_B_local_index_in_3 = this->GetElement(elementIndex)->GetNodeLocalIndex(node_B_index);
 
-    unsigned node_A_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_A_index);
-    unsigned node_B_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_B_index);
+    unsigned node_A_local_index_in_4 = UINT_MAX;
+    unsigned node_B_local_index_in_4 = UINT_MAX;
 
+    if (element_4_index != UINT_MAX)
+    {
+        node_A_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_A_index);
+        node_B_local_index_in_4 = this->GetElement(element_4_index)->GetNodeLocalIndex(node_B_index);
+    }
+
+    // Switch nodes
     if (intersected_edge==node_B_local_index_in_3)
     {
         /*
@@ -1911,64 +2002,151 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
          * Remove node B from element 2
          * Remove node A from element 4
          */
-        this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_A_local_index_in_1);
-        if (mTrackMeshOperations)
-            mOperationRecorder.RecordNewEdgeOperation(this->mElements[element_1_index], node_A_local_index_in_1);
-
-        //Insertion of node A splits the intersected edge
+        if (element_1_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_1 != UINT_MAX);
+            this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_A_local_index_in_1);
+            if (mTrackMeshOperations)
+                        mOperationRecorder.RecordNewEdgeOperation(this->mElements[element_1_index], node_A_local_index_in_1);
+        }
         this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_B_local_index_in_3);
         c_vector<double, SPACE_DIM> vector_B_to_node
         = this->GetVectorFromAtoB(this->GetElement(elementIndex)->GetNode(intersected_edge)->rGetLocation(), this->mNodes[node_B_index]->rGetLocation());
         c_vector<double, SPACE_DIM> vector_A_to_B
         = this->GetVectorFromAtoB(this->mNodes[node_B_index]->rGetLocation(), this->mNodes[node_A_index]->rGetLocation());
+        //Insertion of node A splits the intersected edge
         if (mTrackMeshOperations)
             mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), intersected_edge,
                                                         norm_2(vector_A_to_B)/norm_2(vector_B_to_node));
 
-        this->mElements[element_2_index]->DeleteNode(node_B_local_index_in_2);
-        if (mTrackMeshOperations)
-            mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_2_index], node_B_local_index_in_2);
+        if (element_2_index != UINT_MAX)
+        {
+            assert(node_B_local_index_in_2 != UINT_MAX);
+            this->mElements[element_2_index]->DeleteNode(node_B_local_index_in_2);
 
-        this->mElements[element_4_index]->DeleteNode(node_A_local_index_in_4);
-        if (mTrackMeshOperations)
-            mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_4_index], node_A_local_index_in_4);
+            if (mTrackMeshOperations)
+                mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_2_index], node_B_local_index_in_2);
+        }
+        if (element_4_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_4 != UINT_MAX);
+            this->mElements[element_4_index]->DeleteNode(node_A_local_index_in_4);
+            if (mTrackMeshOperations)
+                mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_4_index], node_A_local_index_in_4);
+        }
     }
     else
     {
         assert((intersected_edge+1)%num_nodes==node_B_local_index_in_3);
 
         // Add node B to element 1 before node A and add node A to element 3 before node B
-        unsigned node_before_A_in_1 = (node_A_local_index_in_1 - 1)%this->GetElement(element_1_index)->GetNumNodes();
-        unsigned node_before_B_in_3 = (node_B_local_index_in_3 - 1)%this->GetElement(element_3_index)->GetNumNodes();
+        if (element_1_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_1 != UINT_MAX);
+            unsigned node_before_A_in_1 = (node_A_local_index_in_1 + this->GetElement(element_1_index)->GetNumNodes() - 1)%this->GetElement(element_1_index)->GetNumNodes();
+            this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
+            //Insertion of node B creates a new edge
+            if (mTrackMeshOperations)
+                mOperationRecorder.RecordNewEdgeOperation(this->mElements[element_1_index], node_before_A_in_1+1);
+        }
 
-        //Insertion of node B creates a new edge
-        this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
-        if (mTrackMeshOperations)
-            mOperationRecorder.RecordNewEdgeOperation(this->mElements[element_1_index], node_before_A_in_1+1);
-
-        //Insertion of node A splits the intersected edge
+        unsigned node_before_B_in_3 = (node_B_local_index_in_3 + this->GetElement(element_3_index)->GetNumNodes() - 1)%this->GetElement(element_3_index)->GetNumNodes();
         this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_before_B_in_3);
         c_vector<double, SPACE_DIM> vector_B_to_node
         = this->GetVectorFromAtoB(this->GetElement(elementIndex)->GetNode(intersected_edge)->rGetLocation(), this->mNodes[node_B_index]->rGetLocation());
         c_vector<double, SPACE_DIM> vector_A_to_B
         = this->GetVectorFromAtoB(this->mNodes[node_B_index]->rGetLocation(), this->mNodes[node_A_index]->rGetLocation());
+        //Insertion of node A splits the intersected edge
         if (mTrackMeshOperations)
             mOperationRecorder.RecordEdgeSplitOperation(this->GetElement(elementIndex), intersected_edge,
                                                         norm_2(vector_A_to_B)/norm_2(vector_B_to_node));
 
         // Remove node A from element 2 and remove node B from element 4
-        this->mElements[element_2_index]->DeleteNode(node_A_local_index_in_2);
-        if (mTrackMeshOperations)
-            mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_2_index], node_A_local_index_in_2);
-
-        this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
-        if (mTrackMeshOperations)
-            mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_4_index], node_B_local_index_in_4);
+        if (element_2_index != UINT_MAX)
+        {
+            assert(node_A_local_index_in_2 != UINT_MAX);
+            this->mElements[element_2_index]->DeleteNode(node_A_local_index_in_2);
+            if (mTrackMeshOperations)
+                mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_2_index], node_A_local_index_in_2);
+        }
+        if (element_4_index != UINT_MAX)
+        {
+            assert(node_B_local_index_in_4 != UINT_MAX);
+            this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
+            if (mTrackMeshOperations)
+                mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_4_index], node_B_local_index_in_4);
+        }
     }
     this->mElements[element_1_index]->RebuildEdges();
     this->mElements[element_2_index]->RebuildEdges();
     this->mElements[element_3_index]->RebuildEdges();
     this->mElements[element_4_index]->RebuildEdges();
+    // Set as boundary nodes if intersecting node is a boundary node
+    if (all_elements_containing_intersecting_node.size() == 2)
+    {
+        // Case 1: element 1 is missing
+        if (elements_containing_intersecting_node.size() == 2)
+        {
+            assert(this->mNodes[node_A_index]->IsBoundaryNode() == true);
+            assert(this->mNodes[node_B_index]->IsBoundaryNode() == false);
+            this->mNodes[node_B_index]->SetAsBoundaryNode(true);
+        }
+        else if (elements_containing_intersecting_node.size() == 1)
+        {
+            assert(this->mNodes[node_A_index]->IsBoundaryNode() == true);
+            assert(this->mNodes[node_B_index]->IsBoundaryNode() == true);
+            // Case 2: element 2 is missing
+            if (element_2_index == UINT_MAX)
+            {
+                if (intersected_edge==node_B_local_index_in_3)
+                {
+                    this->mNodes[node_B_index]->SetAsBoundaryNode(false);
+                }
+                else
+                {
+                    this->mNodes[node_A_index]->SetAsBoundaryNode(false);
+                }
+            }
+            // Case 3: element 4 is missing
+            if (element_4_index == UINT_MAX)
+            {
+                if (intersected_edge==node_B_local_index_in_3)
+                {
+                    this->mNodes[node_A_index]->SetAsBoundaryNode(false);
+                }
+                else
+                {
+                    this->mNodes[node_B_index]->SetAsBoundaryNode(false);
+                }
+            }
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
+    }
+#ifndef NDEBUG
+    // Case 4: elements 1 and 2 are missing
+    // Case 5: elements 1 and 4 are missing
+    else if (all_elements_containing_intersecting_node.size() == 1)
+    {
+        if (elements_containing_intersecting_node.size() == 1)
+        {
+            assert(this->mNodes[node_A_index]->IsBoundaryNode() == true);
+            assert(this->mNodes[node_B_index]->IsBoundaryNode() == true);
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
+    }
+    // Node A is not a boundary node
+    else
+    {
+        assert(this->mNodes[node_A_index]->IsBoundaryNode() == false);
+        assert(this->mNodes[node_B_index]->IsBoundaryNode() == false);
+    }
+#endif
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1985,6 +2163,23 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     swap_info.mCellId = rElement.GetIndex();
     swap_info.mLocation = new_node_location;
     mOperationRecorder.RecordT2Swap(swap_info);
+
+    // If this element has no neighbours, delete the element, its nodes and exit function
+    if (this->GetNeighbouringElementIndices(rElement.GetIndex()).size() == 0)
+    {
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(0));
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(1));
+        mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(2));
+
+        rElement.GetNode(0)->MarkAsDeleted();
+        rElement.GetNode(1)->MarkAsDeleted();
+        rElement.GetNode(2)->MarkAsDeleted();
+
+        mDeletedElementIndices.push_back(rElement.GetIndex());
+        rElement.MarkAsDeleted();
+
+        return;
+    }
 
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
     bool is_node_on_boundary = false;

@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include "PetscSetupAndFinalize.hpp"
 #include "AbstractCardiacCellFactory.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "RegularStimulus.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "AbstractIvpOdeSolver.hpp"
@@ -73,11 +73,11 @@ public:
         if (pNode->GetPoint()[0] == 0.0)
         {
             //std::cout << node+1 << "\n";
-            return new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpRegStimulus);
+            return new CellLuoRudy1991FromCellMLBackwardEulerOpt(p_solver, mpRegStimulus);
         }
         else
         {
-            return new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpZeroStimulus);
+            return new CellLuoRudy1991FromCellMLBackwardEulerOpt(p_solver, mpZeroStimulus);
         }
     }
 };

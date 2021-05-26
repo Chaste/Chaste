@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991Cvode.hpp"
 #include "MonodomainProblem.hpp"
-//#include "LuoRudy1991BackwardEuler.hpp"
+//#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "ActivationOutputModifier.hpp"
 #include "ArchiveOpener.hpp"
 #include "CardiacSimulationArchiver.hpp"

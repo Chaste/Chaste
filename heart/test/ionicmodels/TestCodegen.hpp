@@ -54,11 +54,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991Opt.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 
 #include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
-#include "NobleVargheseKohlNoble1998aBackwardEuler.hpp"
+#include "NobleVargheseKohlNoble1998aBackwardEulerOpt.hpp"
 
 #ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
@@ -175,7 +175,7 @@ public:
         CheckCai(opt, true, 0.0002);
 
         // Backward Euler optimised model
-        CellLuoRudy1991FromCellMLBackwardEuler be(p_solver, p_stimulus);
+        CellLuoRudy1991FromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
 
         TS_ASSERT_EQUALS(be.GetVoltageIndex(), 0u);
         CheckCai(be, true, 0.0002);
@@ -589,7 +589,7 @@ public:
         CheckCai(opt, false);
 
         // Backward Euler model
-        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler be(p_solver, p_stimulus);
+        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
         CheckCai(be, false);
     }
 };
