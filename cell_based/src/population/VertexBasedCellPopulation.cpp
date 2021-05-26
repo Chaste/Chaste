@@ -363,7 +363,7 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
     if (EdgeModelOrNot)
     {
-        // Note that SRN update after divisions is handled through Cell::Divide() method
+        // Note that SRN initialisation in daughter cell is handled through Cell::Divide() method
         mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
     }
 
@@ -443,7 +443,6 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-
     auto cells = this->rGetCells();
     boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
     //If edge SRNs are specified, then write vtk results into a mesh where quantities
@@ -460,11 +459,11 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
         }
     }
 
+    //If cells don't contain edge data, output CellData only
     if (p_cell_edge_data->GetNumItems() == 0&&mWriteCellVtkResults)
     {
         this->WriteCellVtkResultsToFile(rDirectory);
     }
-
 }
 
 template<unsigned int DIM>
