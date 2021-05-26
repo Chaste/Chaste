@@ -87,18 +87,6 @@ private:
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
 
     /**
-     * Locations of T2 swaps (the centre of the removed triangle), stored so they can be accessed and output by the cell killer and
-     * population writer classes. The locations are stored until they are cleared by ClearLocationsAndCellIdsOfT2Swaps().
-     */
-    std::vector< c_vector<double, DIM> > mLocationsOfT2Swaps;
-
-    /**
-     * The Ids of cells that have undergone T2 swaps, stored so they can be accessed and output by the cell killer and population
-     * writer classes. The Ids are stored until they are cleared by ClearLocationsAndCellIdsOfT2Swaps().
-     */
-    std::vector< unsigned > mCellIdsOfT2Swaps;
-
-    /**
      * Whether to restrict the vertex movement if vertex displacement is larger than
      * the cell rearrangement threshold.
      */
@@ -423,6 +411,43 @@ public:
      * @return volume via associated mesh element
      */
     virtual double GetVolumeOfCell(CellPtr pCell) override;
+
+    /**
+     * Return all locations of T2 swaps since the last sampling time step.
+     * This method is a shortcut to get the locations from mOperationRecorder object in
+     * MutableVertexMesh class
+     * @return mLocationsOfT2Swaps
+     */
+    std::vector< c_vector< double, DIM > > GetLocationsOfT2Swaps();
+
+    /**
+     * Return all IDs of cells undergoing T2 swaps since the last sampling time step.
+     * This method is a shortcut to get the IDs from mOperationRecorder object in
+     * MutableVertexMesh class
+     * @return mLocationsOfT2Swaps
+     */
+    std::vector< unsigned > GetCellIdsOfT2Swaps();
+
+    /**
+     * Add location of T2 Swap. Adds T2SwapInfo with location locationOfT2Swap and cellId 0
+     *
+     * @param locationOfT2Swap  Location of the T2 swap
+     */
+    void AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap);
+
+    /**
+     * Add ID of T2 Swap. Adds T2SwapInfo with location of zero_vector and cellId idOfT2Swap
+     *
+     * @param idOfT2Swap ID of the cell undergoing a T2 swap
+     */
+    void AddCellIdOfT2Swap(unsigned idOfT2Swap);
+
+    /**
+     * Clear the locations and IDs of cells undergoing T2 Swaps.
+     * This method is a shortcut to clear the locations and CellIds from mOperationRecorder object in
+     * MutableVertexMesh class
+     */
+    void ClearLocationsAndCellIdsOfT2Swaps();
 
     /**
      * @return mOutputCellRearrangementLocations

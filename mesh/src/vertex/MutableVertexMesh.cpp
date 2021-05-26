@@ -294,6 +294,18 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT1Swaps()
+{
+    std::vector<T1SwapInfo<SPACE_DIM> > swap_info = mOperationRecorder.GetT1SwapsInfo();
+    std::vector< c_vector<double, SPACE_DIM> > swap_locations;
+    for (unsigned int i=0; i<swap_info.size(); ++i)
+    {
+        swap_locations.push_back(swap_info[i].mLocation);
+    }
+    return swap_locations;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLastT2SwapLocation()
 {
     return mLastT2SwapLocation;
@@ -302,7 +314,13 @@ c_vector<double, SPACE_DIM> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLastT2
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT3Swaps()
 {
-    return mLocationsOfT3Swaps;
+    std::vector<T3SwapInfo<SPACE_DIM> > swap_info = mOperationRecorder.GetT3SwapsInfo();
+    std::vector< c_vector<double, SPACE_DIM> > swap_locations;
+    for (unsigned int i=0; i<swap_info.size(); ++i)
+    {
+        swap_locations.push_back(swap_info[i].mLocation);
+    }
+    return swap_locations;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -314,13 +332,13 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
 {
-    mLocationsOfT1Swaps.clear();
+    mOperationRecorder.ClearT1SwapsInfo();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT3Swaps()
 {
-    mLocationsOfT3Swaps.clear();
+    mOperationRecorder.ClearT3SwapsInfo();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -2077,10 +2095,22 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
                 mOperationRecorder.RecordEdgeMergeOperation(this->mElements[element_4_index], node_B_local_index_in_4);
         }
     }
-    this->mElements[element_1_index]->RebuildEdges();
-    this->mElements[element_2_index]->RebuildEdges();
-    this->mElements[element_3_index]->RebuildEdges();
-    this->mElements[element_4_index]->RebuildEdges();
+    if (element_1_index != UINT_MAX)
+    {
+        this->mElements[element_1_index]->RebuildEdges();
+    }
+    if (element_2_index != UINT_MAX)
+    {
+        this->mElements[element_2_index]->RebuildEdges();
+    }
+    if (element_3_index != UINT_MAX)
+    {
+        this->mElements[element_3_index]->RebuildEdges();
+    }
+    if (element_4_index != UINT_MAX)
+    {
+        this->mElements[element_4_index]->RebuildEdges();
+    }
     // Set as boundary nodes if intersecting node is a boundary node
     if (all_elements_containing_intersecting_node.size() == 2)
     {

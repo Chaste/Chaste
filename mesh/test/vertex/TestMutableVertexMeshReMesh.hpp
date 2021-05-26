@@ -308,8 +308,7 @@ public:
         // Test T1 swap information tracking
         std::vector<T1SwapInfo<2> > swap_info
                     = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
-        std::vector< c_vector<double, 2> > t1_locations;
-        t1_locations.push_back(swap_info[0].mLocation);
+        std::vector< c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
         //Check location
         TS_ASSERT_EQUALS(t1_locations.size(), 1u);
         TS_ASSERT_DELTA(t1_locations[0][0], 0.5, 1e-6);
@@ -333,7 +332,7 @@ public:
         }
 
         // Test T1 swap location clearing
-        vertex_mesh.GetOperationRecorder()->ClearT1SwapsInfo();
+        vertex_mesh.ClearLocationsOfT1Swaps();
         swap_info = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
         TS_ASSERT_EQUALS(swap_info.size(), 0u);
 
@@ -1785,9 +1784,7 @@ public:
         std::vector<T3SwapInfo<2> > swap_info
                             = mesh.GetOperationRecorder()->GetT3SwapsInfo();
         TS_ASSERT_EQUALS(swap_info.size(), 2u);
-        std::vector< c_vector<double, 2> > t3_locations;
-        t3_locations.push_back(swap_info[0].mLocation);
-        t3_locations.push_back(swap_info[1].mLocation);
+        std::vector< c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
 
         TS_ASSERT_DELTA(t3_locations[0][0], 1.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[0][1], 0.5, 1e-6);
@@ -1807,7 +1804,7 @@ public:
         }
 
         // Test T3 swap Location clearing
-        mesh.GetOperationRecorder()->ClearT3SwapsInfo();
+        mesh.ClearLocationsOfT3Swaps();
         swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();;
         TS_ASSERT_EQUALS(swap_info.size(), 0u);
 

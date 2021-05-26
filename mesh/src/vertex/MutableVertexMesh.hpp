@@ -122,12 +122,6 @@ protected:
     c_vector<double, SPACE_DIM> mLastT2SwapLocation;
 
     /**
-     * Locations of T3 swaps (the location of the intersection with the edge), stored so they can be accessed and output by the cell population.
-     * The locations are stored until they are cleared by ClearLocationsOfT3Swaps().
-     */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
-
-    /**
      * Locations of intersection swaps (the mid point of the switching nodes), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfIntersectionSwaps().
      */
@@ -522,11 +516,18 @@ public:
     bool GetCheckForInternalIntersections() const;
 
     /**
+     * This is a shortcut to get locations from mOperationRecorder
+     * @return the locations of the T3 swaps
+     */
+    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
+
+    /**
      * @return the location of the last T2 swap
      */
     c_vector<double, SPACE_DIM> GetLastT2SwapLocation();
 
     /**
+     * This is a shortcut to get locations from mOperationRecorder
      * @return the locations of the T3 swaps
      */
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();

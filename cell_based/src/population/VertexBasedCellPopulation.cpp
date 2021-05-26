@@ -360,14 +360,17 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         Validate();
     }
 
-    //First cell is representative of other cells
-    bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
-    if (EdgeModelOrNot)
+    if (this->GetNumAllCells()>0)
     {
-        // Note that SRN initialisation in daughter cell is handled through Cell::Divide() method
-        mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
-    }
+        //First cell is representative of other cells
+        bool EdgeModelOrNot = (*this->mCells.begin())->GetSrnModel()->HasEdgeModel();
 
+        if (EdgeModelOrNot)
+        {
+            // Note that SRN initialisation in daughter cell is handled through Cell::Divide() method
+            mPopulationSrn.UpdateSrnAfterBirthOrDeath(element_map);
+        }
+    }
     element_map.ResetToIdentity();
 }
 
@@ -442,28 +445,81 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
+std::vector< c_vector< double, DIM > > VertexBasedCellPopulation<DIM>::GetLocationsOfT2Swaps()
+{
+    std::vector<T2SwapInfo<DIM> > swap_info = mpMutableVertexMesh->GetOperationRecorder()->GetT2SwapsInfo();
+    std::vector< c_vector<double, DIM> > swap_locations;
+    for (unsigned int i=0; i<swap_info.size(); ++i)
+    {
+        swap_locations.push_back(swap_info[i].mLocation);
+    }
+    return swap_locations;
+}
+
+template<unsigned DIM>
+std::vector< unsigned > VertexBasedCellPopulation<DIM>::GetCellIdsOfT2Swaps()
+{
+    std::vector<T2SwapInfo<DIM> > swap_info = mpMutableVertexMesh->GetOperationRecorder()->GetT2SwapsInfo();
+    std::vector<unsigned int> swap_ids;
+    for (unsigned int i=0; i<swap_info.size(); ++i)
+    {
+        swap_ids.push_back(swap_info[i].mCellId);
+    }
+    return swap_ids;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap)
+{
+    T2SwapInfo<DIM> swap_info;
+    swap_info.mLocation = locationOfT2Swap;
+    swap_info.mCellId = 0;
+    mpMutableVertexMesh->GetOperationRecorder()->RecordT2Swap(swap_info);
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AddCellIdOfT2Swap(unsigned idOfT2Swap)
+{
+    T2SwapInfo<DIM> swap_info;
+    for (unsigned int i=0; i<DIM; ++i)
+    {
+        swap_info.mLocation(i) = 0;
+    }
+    swap_info.mCellId = idOfT2Swap;
+    mpMutableVertexMesh->GetOperationRecorder()->RecordT2Swap(swap_info);
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::ClearLocationsAndCellIdsOfT2Swaps()
+{
+    mpMutableVertexMesh->GetOperationRecorder()->ClearT2SwapsInfo();
+}
+
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-    auto cells = this->rGetCells();
-    boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
-    //If edge SRNs are specified, then write vtk results into a mesh where quantities
-    //associated with each edge are taken into account. We assume that the first cell is
-    //representative of all cells.
-    //Edge VTKs are also written if cells contain CellEdgeData
-    if (cells.size() > 0)
+    unsigned num_cells = this->GetNumAllCells();
+    if (num_cells>0)
     {
+        auto cells = this->rGetCells();
+        boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
+        //If edge SRNs are specified, then write vtk results into a mesh where quantities
+        //associated with each edge are taken into account. We assume that the first cell is
+        //representative of all cells.
+        //Edge VTKs are also written if cells contain CellEdgeData
+
         //If cells contain edge data
         if (p_cell_edge_data->GetNumItems() != 0&&mWriteEdgeVtkResults)
         {
             this->WriteCellEdgeVtkResultsToFile(rDirectory);
             return;
         }
-    }
 
-    //If cells don't contain edge data, output CellData only
-    if (p_cell_edge_data->GetNumItems() == 0&&mWriteCellVtkResults)
-    {
-        this->WriteCellVtkResultsToFile(rDirectory);
+        //If cells don't contain edge data, output CellData only
+        if (p_cell_edge_data->GetNumItems() == 0&&mWriteCellVtkResults)
+        {
+            this->WriteCellVtkResultsToFile(rDirectory);
+        }
     }
 }
 
