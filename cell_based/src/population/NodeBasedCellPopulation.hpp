@@ -232,10 +232,10 @@ private:
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
     /**
-     * Helper method to calculate the message tags between processors 
+     * Helper method to calculate the message tags between processors
      * for NonBlockingSendCellsToNeighbourProcesses method
      * Uses a Cantor pairing function
-     * 
+     *
      * @param senderI sender processor rank
      * @param receiverJ receiver processor rank
      * @return a unique tag number

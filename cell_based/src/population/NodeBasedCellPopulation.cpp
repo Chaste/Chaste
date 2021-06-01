@@ -771,7 +771,7 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetNumProcs() - 1, mCellCommunicationTag, PetscTools::GetNumProcs() - 1, mCellCommunicationTag, status);
 }
 
-    // We need to leave this to the end (rather than as an else if for AmTopMost()) 
+    // We need to leave this to the end (rather than as an else if for AmTopMost())
     // otherwise there will be a cyclic send-receive and it will stall
     if ( PetscTools::AmTopMost() && mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection() )
     {
@@ -789,7 +789,7 @@ unsigned NodeBasedCellPopulation<DIM>::CalculateMessageTag(unsigned senderI, uns
      Instead we use a Cantor pairing function which produces lower paired values
      See: https://en.wikipedia.org/wiki/Pairing_function */
     unsigned tag = 0.5*((senderI+receiverJ)*(senderI+receiverJ+1) + 2*receiverJ);
-    assert(tag < UINT_MAX); //Just make sure doesnt hit UINT_MAX as old method did. 
+    assert(tag < UINT_MAX); //Just make sure doesnt hit UINT_MAX as old method did.
     return tag;
 }
 

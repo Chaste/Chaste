@@ -171,8 +171,8 @@ public:
         std::vector<Node<2>*> nodes = GenerateMesh(num_cells_width,num_cells_depth);
 
         // Create the mesh
-	    NodesOnlyMesh<2> mesh; 
-	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -375,8 +375,8 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
      * to test periodicity.
      */
-    
-    void TestSimpleYPeriodicMonolayer() 
+
+    void TestSimpleYPeriodicMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -515,8 +515,8 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
      * to test periodicity.
      */
-    
-    void TestSimpleXYPeriodicMonolayer() 
+
+    void TestSimpleXYPeriodicMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -628,7 +628,7 @@ public:
             {
                 TS_ASSERT_DELTA(y_1-offset, y_2, 1e-6)
             }
-            
+
         }
 
     }

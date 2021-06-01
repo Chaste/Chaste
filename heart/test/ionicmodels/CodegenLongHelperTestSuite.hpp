@@ -388,7 +388,7 @@ public:
        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
        rModels.emplace_back("zhang_SAN_model_2000_all");
     }
-    
+
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)
     {

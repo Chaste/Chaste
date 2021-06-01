@@ -131,7 +131,7 @@ public:
 
         // Avoid memory leak
         delete p_mesh;
-        delete p_mesh_2;     
+        delete p_mesh_2;
     }
 
     void TestExceptions()
@@ -167,8 +167,8 @@ public:
 
         // Avoid memory leak
         delete p_mesh;
-        
-        
+
+
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -367,7 +367,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[1], 3.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(11)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(11)->rGetLocation()[1], sqrt(3.0)-1.0, 1e-6);
-        
+
         p_mesh->Translate(-2.0,1.0);
 
         //Check nodes moved periodically
@@ -385,7 +385,7 @@ public:
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
 
         double cut_off = 1.0;
-        
+
         /*
          * Nodes chosen so to test the cases that the domain width in x is
          * "divisible" by the cut_off, the y-dimension is not "divisible".
@@ -448,7 +448,7 @@ public:
             PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
             p_mesh->ConstructNodesWithoutMesh(nodes, 1.0);
 
-            // Move cells to new processors 
+            // Move cells to new processors
             if (PetscTools::AmMaster())
             {
                 c_vector<double, 2> new_location = zero_vector<double>(2);

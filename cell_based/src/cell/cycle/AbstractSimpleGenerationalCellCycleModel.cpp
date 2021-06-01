@@ -75,9 +75,9 @@ void AbstractSimpleGenerationalCellCycleModel::ResetForDivision()
     mGeneration++;
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-	/*
-	* Run this check first to allow for mMaxTransitGenerations = 0
-	*/
+    /*
+    * Run this check first to allow for mMaxTransitGenerations = 0
+    */
         mGeneration = 0;
     }
     if (mGeneration > mMaxTransitGenerations)

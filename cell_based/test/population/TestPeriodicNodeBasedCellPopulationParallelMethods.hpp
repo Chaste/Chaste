@@ -79,7 +79,7 @@ private:
     {
         AbstractCellBasedTestSuite::setUp();
 
-        
+
         if (PetscTools::GetNumProcs() > 2)
         {
             std::vector<Node<3>* > nodes;
@@ -146,7 +146,7 @@ public:
             {
                 TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
             }
-            
+
             TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
             index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
             if (PetscTools::AmMaster())
@@ -188,7 +188,7 @@ public:
             {
                 TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
             }
-            
+
             TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
             index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
             if (PetscTools::AmMaster())

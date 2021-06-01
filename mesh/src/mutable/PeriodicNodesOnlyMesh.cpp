@@ -43,7 +43,7 @@ PeriodicNodesOnlyMesh<SPACE_DIM>::PeriodicNodesOnlyMesh(c_vector<double,SPACE_DI
 {
     // Convert periodic widths into a boolean vector
     mIsDimPeriodic = zero_vector<bool>(SPACE_DIM);
-    
+
     for (unsigned i = 0; i < SPACE_DIM; i++)
     {
         if (width[i]>0.0)
@@ -66,7 +66,7 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c
     // For each periodic dimension:
 
     for (unsigned i=0; i < SPACE_DIM; i++)
-    {   
+    {
         if (mIsDimPeriodic[i])
         {
             // Ensure that the width is a multiple of cut-off length
@@ -76,10 +76,10 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c
             }
             // A width of two boxes gives different simulation results as some connections are considered twice.
             else if ( mWidth[i]/cutOffLength <= (2.0+1e-14) )
-            {   
+            {
                 EXCEPTION( "The periodic domain width cannot be less than 2*CutOffLength." );
             }
-        
+
             // We force the domain to the periodic widths
             domainSize[ i*2 ] = 0;
             domainSize[ i*2+1 ] = mWidth[i];
@@ -107,7 +107,7 @@ double PeriodicNodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) co
         // If we are not a periodic dimension, we just return the width
         width = MutableMesh<SPACE_DIM,SPACE_DIM>::GetWidth(rDimension);
     }
-    else 
+    else
     {
         width = mWidth[rDimension];
     }
@@ -126,7 +126,7 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<S
     for ( unsigned i = 0; i < SPACE_DIM; i++ )
     {
         if ( mIsDimPeriodic[i] )
-        {   
+        {
             double local_point_coord = point_coord(i);
             double local_width = mWidth[i];
             // We need to make sure that the fudge factor is greater than the one used to calculate the containing
@@ -140,15 +140,15 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<S
             }
             else if ( local_point_coord > (local_width-fudge_factor))
             {
-                // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
+                // This is to ensure that the position is never equal to mWidth, which would be outside the box domain.
                 // This is due to the fact that mWidth-1e-16=mWidth
                 point.SetCoordinate(i,local_width-fudge_factor);
             }
             else if ( local_point_coord < 0.0 )
             {
                 double new_coord = local_point_coord + local_width;
-                
-                // This is to ensure that the position is never equal to mWidth, which would be outside the box domain. 
+
+                // This is to ensure that the position is never equal to mWidth, which would be outside the box domain.
                 // This is due to the fact that mWidth-1e-16=mWidth
                 if ( new_coord > local_width-fudge_factor )
                 {
@@ -182,12 +182,12 @@ c_vector<double, SPACE_DIM> PeriodicNodesOnlyMesh<SPACE_DIM>::GetVectorFromAtoB(
 {
     c_vector<double, SPACE_DIM> vector = rLocation2 - rLocation1;
 
-    // Loop over the periodic dimensions and measure across boundaries 
+    // Loop over the periodic dimensions and measure across boundaries
     // if points are more than halfway across the width apart
     for ( unsigned i = 0; i < SPACE_DIM; i++ )
     {
         if ( mIsDimPeriodic[i] )
-        {   
+        {
             vector(i) = fmod(vector(i),mWidth[i]);
             if ( vector(i) > 0.5*mWidth[i] )
             {
@@ -207,17 +207,17 @@ c_vector<double, SPACE_DIM> PeriodicNodesOnlyMesh<SPACE_DIM>::GetVectorFromAtoB(
 template<unsigned SPACE_DIM>
 void PeriodicNodesOnlyMesh<SPACE_DIM>::RefreshMesh()
 {
-    // Loop over the periodic dimensions and if they are 
+    // Loop over the periodic dimensions and if they are
     // outside the domain, get the fmod and relocate
-    for ( typename std::vector<Node<SPACE_DIM> *>::iterator it_node = this->mNodes.begin(); 
+    for ( typename std::vector<Node<SPACE_DIM> *>::iterator it_node = this->mNodes.begin();
             it_node != this->mNodes.end(); ++it_node )
     {
         c_vector<double,SPACE_DIM> & location = (*it_node)->rGetModifiableLocation();
-        
+
         for ( unsigned i = 0; i < SPACE_DIM; i++ )
         {
             if ( mIsDimPeriodic[i] )
-            {   
+            {
                 if ( location(i) < 0.0 )
                 {
                     location(i) = fmod( location(i), mWidth[i] ) + mWidth[i];

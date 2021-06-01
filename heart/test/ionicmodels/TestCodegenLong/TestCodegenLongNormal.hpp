@@ -57,7 +57,7 @@ public:
         std::cout << "Search for 'Failure', ': ***', 'Error', or 'Failed' to find problems." << std::endl;
 
         std::string dirname("TestCodegenLongNormal");
-        std::vector<std::string> args; 
+        std::vector<std::string> args;
 
         // Models that need a very small dt
         std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});

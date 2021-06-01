@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * '''NB:''' recent improvements (available from release 2021.1) mean that
  * an ''analytic jacobian'' is automatically made available to CVODE via the
  * native `AbstractCvodeCell`, and this will provide a speed up of between 5-30% (depending on the size of
- * the ODE system). 
+ * the ODE system).
  *
  * So here we do the `#include` to import the native CVODE version of the cell model.
  */

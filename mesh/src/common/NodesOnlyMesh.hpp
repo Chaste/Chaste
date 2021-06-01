@@ -381,8 +381,8 @@ public:
 
     /**
      * Gets the periodicity across processors information from mpBoxCollection
-     * 
-     * @return whether the periodicity occurs across multipke processors 
+     *
+     * @return whether the periodicity occurs across multipke processors
      */
     bool GetIsPeriodicAcrossProcsFromBoxCollection() const;
 

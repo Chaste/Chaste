@@ -340,7 +340,7 @@ public:
 
         {
             // Backward Euler
-	    args.push_back("--backward-euler");
+        args.push_back("--backward-euler");
             OutputFileHandler handler2(dirname + "/BE");
             FileFinder copied_file2 = handler2.CopyFileTo(cellml_file);
             converter.SetOptions(args);

@@ -71,7 +71,7 @@ public:
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);       
+        RunTests(dirname + "-small-dt", small_dt_models, args, true, -1000, true);
     }
 };
 

@@ -558,7 +558,7 @@ public:
         TS_ASSERT_EQUALS(box_collection_pdc_X.GetIsPeriodicInX(),true);
         TS_ASSERT_EQUALS(box_collection_pdc_X.GetIsPeriodicInY(),false);
         TS_ASSERT_EQUALS(box_collection_pdc_X.GetIsPeriodicInZ(),false);
-        
+
         TS_ASSERT_EQUALS(box_collection_pdc_Y.GetIsPeriodicInX(),false);
         TS_ASSERT_EQUALS(box_collection_pdc_Y.GetIsPeriodicInY(),true);
         TS_ASSERT_EQUALS(box_collection_pdc_Y.GetIsPeriodicInZ(),false);
@@ -723,7 +723,7 @@ public:
         TS_ASSERT_EQUALS(box_collection_pdc_Z.GetIsPeriodicInX(),false);
         TS_ASSERT_EQUALS(box_collection_pdc_Z.GetIsPeriodicInY(),false);
         TS_ASSERT_EQUALS(box_collection_pdc_Z.GetIsPeriodicInZ(),true);
-        
+
         TS_ASSERT_EQUALS(box_collection_pdc_XZ.GetIsPeriodicInX(),true);
         TS_ASSERT_EQUALS(box_collection_pdc_XZ.GetIsPeriodicInY(),false);
         TS_ASSERT_EQUALS(box_collection_pdc_XZ.GetIsPeriodicInZ(),true);
@@ -923,13 +923,13 @@ public:
         if (PetscTools::GetNumProcs() > 3)
         {
             /*
-             * Note will run for more but the numebr of processors changes the local boxes as 
+             * Note will run for more but the numebr of processors changes the local boxes as
              * boxes not on the same processor need to be included.
-             * 
-             * With 1 processor you only have boxes above and to the left. 
+             *
+             * With 1 processor you only have boxes above and to the left.
              * With 2 processoes you have three rows on 0 and 2 row on 1.
-             * With 3 processors you have two rows on 0 two rows on 1 
-             * and the top row on processor.  
+             * With 3 processors you have two rows on 0 two rows on 1
+             * and the top row on processor.
              */
             TS_TRACE("This test is only designed for up to 3 processes");
             return;
@@ -976,36 +976,36 @@ public:
             // Now look at the periodic
             if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_0.insert(48);
                 correct_answer_0.insert(49);
                 correct_answer_0.insert(52);
                 correct_answer_0.insert(53);
             }
-	        TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(0), correct_answer_0);
-            
+            TS_ASSERT_EQUALS(box_collection_pdc_Z.rGetLocalBoxes(0), correct_answer_0);
+
             if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_0.insert(51);
                 correct_answer_0.insert(55);
             }
-	        correct_answer_0.insert(7);
+            correct_answer_0.insert(7);
             correct_answer_0.insert(15);
             correct_answer_0.insert(19);
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(0), correct_answer_0);
-            
+
             if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_0.insert(56);
                 correct_answer_0.insert(57);
                 correct_answer_0.insert(59);
             }
-	        correct_answer_0.insert(20);
+            correct_answer_0.insert(20);
             correct_answer_0.insert(21);
             correct_answer_0.insert(23);
             TS_ASSERT_EQUALS(box_collection_pdc_XYZ.rGetLocalBoxes(0), correct_answer_0);
@@ -1027,7 +1027,7 @@ public:
 
             if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_3.insert(50);
                 correct_answer_3.insert(51);
@@ -1039,7 +1039,7 @@ public:
 
             if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_3.insert(48);
                 correct_answer_3.insert(52);
@@ -1049,11 +1049,11 @@ public:
             correct_answer_3.insert(12);
             correct_answer_3.insert(16);
             TS_ASSERT_EQUALS(box_collection_pdc_XZ.rGetLocalBoxes(3), correct_answer_3);
-            
-            
+
+
             if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_3.insert(58);
                 correct_answer_3.insert(59);
@@ -1085,9 +1085,9 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_5, correct_answer_5);
 
             // Now look at the periodic
-            if (PetscTools::GetNumProcs() > 1)          
+            if (PetscTools::GetNumProcs() > 1)
             {
-                // If more than one processor then you need to include the 
+                // If more than one processor then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_5.insert(48);
                 correct_answer_5.insert(49);
@@ -1135,7 +1135,7 @@ public:
 
             if (PetscTools::GetNumProcs() > 2 )
             {
-                // If more than two processors then you need to include the 
+                // If more than two processors then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_58.insert(41);
                 correct_answer_58.insert(42);
@@ -1161,7 +1161,7 @@ public:
 
             if (PetscTools::GetNumProcs() > 2 )
             {
-                // If more than two processors then you need to include the 
+                // If more than two processors then you need to include the
                 // lower and left boxes that are on different processors
                 correct_answer_58.insert(37);
                 correct_answer_58.insert(38);
@@ -1178,10 +1178,10 @@ public:
 
     }
 
-    void TestNodesPairs2DWithPeriodicity() 
+    void TestNodesPairs2DWithPeriodicity()
     {
         // Re-implemented from TestObsoleteBoxCollection
-        
+
         // Set up a box collection
         c_vector<double, 2 * 2> domain_size;
         domain_size(0) = 0.0;
@@ -1243,18 +1243,18 @@ public:
                         std::vector< Box<2>* > boxes;
                         boxes.push_back(&box_collection.rGetBox(box_collection.CalculateContainingBox(node_a_location)));
                         boxes.push_back(&box_collection.rGetBox(box_collection.CalculateContainingBox(node_b_location)));
-                        
+
                         // Add nodes to boxes
                         boxes[0]->AddNode(nodes[0]);
                         boxes[1]->AddNode(nodes[1]);
-                        
+
                         std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
 
                         box_collection.CalculateNodePairs(nodes, pairs_returned_vector);
                         if ( pairs_returned_vector.size() != 1 )
                         {
                             printf("For node locations (%f,%f) and (%f,%f) on process %i, no pair found. Will be in boxes %i and %i\n",
-                                        node_a_location[0],node_a_location[1],node_b_location[0],node_b_location[1], (int)PetscTools::GetMyRank(), 
+                                        node_a_location[0],node_a_location[1],node_b_location[0],node_b_location[1], (int)PetscTools::GetMyRank(),
                                         box_collection.CalculateContainingBox(node_a_location), box_collection.CalculateContainingBox(node_b_location));
                         }
                         TS_ASSERT(pairs_returned_vector.size() == 1);
@@ -2527,7 +2527,7 @@ public:
         }
     }
 
-    void TestBoxGeneration3d() 
+    void TestBoxGeneration3d()
 {
         // Create a mesh
         TetrahedralMesh<3,3> mesh;

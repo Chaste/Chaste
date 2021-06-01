@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * This tests checks that the cmake process has made a virtual environment for chatse_codegen
- * 
+ *
  */
 class TestCodegenPresent : public CxxTest::TestSuite
 {
