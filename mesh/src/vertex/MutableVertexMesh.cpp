@@ -55,6 +55,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
           mProtorosetteResolutionProbabilityPerTimestep(protorosetteResolutionProbabilityPerTimestep),
           mRosetteResolutionProbabilityPerTimestep(rosetteResolutionProbabilityPerTimestep),
           mCheckForInternalIntersections(false),
+          mCheckForT3Swaps(true),
           mDistanceForT3SwapChecking(5.0)
 {
     // Threshold parameters must be strictly positive
@@ -129,6 +130,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh()
       mProtorosetteResolutionProbabilityPerTimestep(0.0),
       mRosetteResolutionProbabilityPerTimestep(0.0),
       mCheckForInternalIntersections(false),
+      mCheckForT3Swaps(true),
       mDistanceForT3SwapChecking(5.0)
 {
     // Note that the member variables initialised above will be overwritten as soon as archiving is complete
@@ -196,6 +198,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCheckForInternalIntersections() const
 {
     return mCheckForInternalIntersections;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCheckForT3Swaps() const
+{
+    return mCheckForT3Swaps;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -271,6 +279,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCheckForInternalIntersections(bool checkForInternalIntersections)
 {
     mCheckForInternalIntersections = checkForInternalIntersections;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCheckForT3Swaps(bool checkForT3Swaps)
+{
+    mCheckForT3Swaps = checkForT3Swaps;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1027,7 +1041,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 {
-    // If checking for internal intersections as well as on the boundary, then check that no nodes have overlapped any elements...
+    // If checking for internal intersections, then check that no nodes have overlapped any elements...
     if (mCheckForInternalIntersections)
     {
         // First neighbours are elements that contain the node.  Second
@@ -1098,9 +1112,10 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
             }
         }
     }
-    else
+
+    if (mCheckForT3Swaps)
     {
-        // ...otherwise, just check that no boundary nodes have overlapped any boundary elements
+        // If checking for T3 swaps, check that no boundary nodes have overlapped any boundary elements
         // First: find all boundary element and calculate their centroid only once
         std::vector<unsigned> boundary_element_indices;
         std::vector< c_vector<double, SPACE_DIM> > boundary_element_centroids;

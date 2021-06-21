@@ -94,6 +94,9 @@ protected:
     /** Whether to check for edges intersections (true) or not (false). */
     bool mCheckForInternalIntersections;
 
+    /** Whether to check for T3 swaps (true) or not (false). */
+    bool mCheckForT3Swaps;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -353,6 +356,7 @@ protected:
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
         archive & mDistanceForT3SwapChecking;
+        archive & mCheckForT3Swaps;
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
@@ -453,6 +457,13 @@ public:
     void SetCheckForInternalIntersections(bool checkForInternalIntersections);
 
     /**
+     * Set method for mCheckForT3Swaps.
+     *
+     * @param checkForT3Swaps
+     */
+    void SetCheckForT3Swaps(bool checkForT3Swaps);
+
+    /**
      * @return mCellRearrangementThreshold
      */
     double GetCellRearrangementThreshold() const;
@@ -519,6 +530,11 @@ public:
      * @return mCheckForInternalIntersections, either to check for edges intersections or not.
      */
     bool GetCheckForInternalIntersections() const;
+
+    /**
+     * @return mCheckForT3Swaps, either to check for T3 swaps or not.
+     */
+    bool GetCheckForT3Swaps() const;
 
     /**
      * @return the locations of the T1 swaps
