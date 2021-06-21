@@ -1530,6 +1530,13 @@ public:
 
         MutableVertexMesh<2,2> mesh(nodes, elements);
 
+        // Test default value of mCheckForT3Swaps, as well as setting and getting
+        TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
+        mesh.SetCheckForT3Swaps(false);
+        TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), false);
+        mesh.SetCheckForT3Swaps(true);
+        TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
+
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
 
