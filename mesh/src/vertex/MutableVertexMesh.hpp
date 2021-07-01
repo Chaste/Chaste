@@ -146,7 +146,7 @@ protected:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                            unsigned nodeAIndex,
                            unsigned nodeBIndex,
                            bool placeOriginalElementBelow=false);
@@ -233,7 +233,7 @@ protected:
      *
      * @param rElement the element to remove
      */
-    void PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement);
+    void PerformT2Swap(VertexElement<ELEMENT_DIM, SPACE_DIM>& rElement);
 
     /**
      * Helper method for ReMesh(), called by CheckForIntersections().
@@ -327,7 +327,7 @@ protected:
      *
      * @return intersection, the corrected location of where we are planning to put the merged node
      */
-    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
+    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double, 2> intersection);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -607,7 +607,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                          bool placeOriginalElementBelow=false);
 
     /**
@@ -623,7 +623,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                          c_vector<double, SPACE_DIM> axisOfDivision,
                                          bool placeOriginalElementBelow=false);
 

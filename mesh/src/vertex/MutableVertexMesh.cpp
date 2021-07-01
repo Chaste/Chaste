@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
-                                                             std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> vertexElements,
+                                                             std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
                                                              double cellRearrangementThreshold,
                                                              double t2Threshold,
                                                              double cellRearrangementRatio,
@@ -79,7 +79,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
     }
     for (unsigned elem_index=0; elem_index<vertexElements.size(); elem_index++)
     {
-        VertexElement<ELEMENT_DIM,SPACE_DIM>* p_temp_vertex_element = vertexElements[elem_index];
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_temp_vertex_element = vertexElements[elem_index];
         this->mElements.push_back(p_temp_vertex_element);
     }
 
@@ -110,7 +110,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
     // Register elements with nodes
     for (unsigned index=0; index<this->mElements.size(); index++)
     {
-        VertexElement<ELEMENT_DIM,SPACE_DIM>* p_temp_vertex_element = this->mElements[index];
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_temp_vertex_element = this->mElements[index];
         for (unsigned node_index=0; node_index<p_temp_vertex_element->GetNumNodes(); node_index++)
         {
             Node<SPACE_DIM>* p_temp_node = p_temp_vertex_element->GetNode(node_index);
@@ -227,7 +227,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetCellRearrangementRatio(double
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetProtorosetteFormationProbability(double protorosetteFormationProbability)
 {
-    // Check that the new value is in [0,1]
+    // Check that the new value is in [0, 1]
     if (protorosetteFormationProbability < 0.0)
     {
         EXCEPTION("Attempting to assign a negative probability.");
@@ -244,7 +244,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetProtorosetteFormationProbabil
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetProtorosetteResolutionProbabilityPerTimestep(double protorosetteResolutionProbabilityPerTimestep)
 {
-    // Check that the new value is in [0,1]
+    // Check that the new value is in [0, 1]
     if (protorosetteResolutionProbabilityPerTimestep < 0.0)
     {
         EXCEPTION("Attempting to assign a negative probability.");
@@ -261,7 +261,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetProtorosetteResolutionProbabi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetRosetteResolutionProbabilityPerTimestep(double rosetteResolutionProbabilityPerTimestep)
 {
-    // Check that the new value is in [0,1]
+    // Check that the new value is in [0, 1]
     if (rosetteResolutionProbabilityPerTimestep < 0.0)
     {
         EXCEPTION("Attempting to assign a negative probability.");
@@ -370,7 +370,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNe
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pNewElement)
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pNewElement)
 {
     unsigned new_element_index = pNewElement->GetIndex();
 
@@ -393,7 +393,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned nodeIndex, Chas
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                                 c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
@@ -579,7 +579,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                                 bool placeOriginalElementBelow)
 {
     assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
@@ -592,7 +592,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                   unsigned nodeAIndex,
                                                                   unsigned nodeBIndex,
                                                                   bool placeOriginalElementBelow)
@@ -629,7 +629,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
     }
 
     // Add the new element to the mesh
-    AddElement(new VertexElement<ELEMENT_DIM,SPACE_DIM>(new_element_index, nodes_elem));
+    AddElement(new VertexElement<ELEMENT_DIM, SPACE_DIM>(new_element_index, nodes_elem));
 
     /**
      * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
@@ -1134,7 +1134,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 
         // Second: Check intersections only for those nodes and elements within
         // mDistanceForT3SwapChecking within each other (node<-->element centroid)
-        for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
                 node_iter != this->GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -1245,7 +1245,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *    / \ Node B
                          *   /   \
                          */
-                         PerformT1Swap(pNodeA, pNodeB,all_indices);
+                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
                     else if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
                     {
@@ -2004,7 +2004,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement)
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEMENT_DIM, SPACE_DIM>& rElement)
 {
     // The given element must be triangular for us to be able to perform a T2 swap on it
     assert(rElement.GetNumNodes() == 3);
@@ -2055,7 +2055,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
         // For each of these elements...
         for (std::set<unsigned>::iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
         {
-            VertexElement<ELEMENT_DIM,SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
+            VertexElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
 
             // ...throw an exception if the element is triangular...
             if (p_this_elem->GetNumNodes() < 4)
@@ -2993,7 +2993,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(No
     unsigned elem_d_idx = UINT_MAX;
 
     // Get pointer to element we've chosen at random (element A)
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_a = this->GetElement(elem_a_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_a = this->GetElement(elem_a_idx);
 
     // Get all necessary info about element A and the protorosette node
     unsigned num_nodes_elem_a = p_elem_a->GetNumNodes();
@@ -3079,9 +3079,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(No
      * in a T1 swap, the new node locations will not necessarily be the full swap distance apart.
      */
 
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_b = this->GetElement(elem_b_idx);
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_c = this->GetElement(elem_c_idx);
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_d = this->GetElement(elem_d_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_b = this->GetElement(elem_b_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_c = this->GetElement(elem_c_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_d = this->GetElement(elem_d_idx);
 
     double swap_distance = (this->mCellRearrangementRatio) * (this->mCellRearrangementThreshold);
 
@@ -3188,7 +3188,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankDecrease(Node<
 
     // Get the vertex element S (which we randomly selected)
     unsigned elem_s_idx = *elem_index_iter;
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_s = this->GetElement(elem_s_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_s = this->GetElement(elem_s_idx);
 
     unsigned elem_n_idx = UINT_MAX;
     unsigned elem_p_idx = UINT_MAX;
@@ -3261,8 +3261,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankDecrease(Node<
      * elements S, N and P, and by removing the rosette node from element S.
      */
 
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_n = this->GetElement(elem_p_idx);
-    VertexElement<ELEMENT_DIM,SPACE_DIM>* p_elem_p = this->GetElement(elem_n_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_n = this->GetElement(elem_p_idx);
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_elem_p = this->GetElement(elem_n_idx);
 
     double swap_distance = (this->mCellRearrangementRatio) * (this->mCellRearrangementThreshold);
 
@@ -3382,7 +3382,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForRosettes()
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrectIntersectionLocationIfNecessary(
-        unsigned indexA, unsigned indexB, c_vector<double,2> intersection)
+        unsigned indexA, unsigned indexB, c_vector<double, 2> intersection)
 {
     /**
      * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearrangementThreshold move vertexA and vertexB
@@ -3416,7 +3416,7 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
 
     // Reset distances
     vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
-    c_vector<double,2> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
+    c_vector<double, 2> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
 
     // Reset the intersection away from vertices A and B to allow enough room for new nodes
     /**
@@ -3439,12 +3439,12 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
 }
 
 // Explicit instantiation
-template class MutableVertexMesh<1,1>;
-template class MutableVertexMesh<1,2>;
-template class MutableVertexMesh<1,3>;
-template class MutableVertexMesh<2,2>;
-template class MutableVertexMesh<2,3>;
-template class MutableVertexMesh<3,3>;
+template class MutableVertexMesh<1, 1>;
+template class MutableVertexMesh<1, 2>;
+template class MutableVertexMesh<1, 3>;
+template class MutableVertexMesh<2, 2>;
+template class MutableVertexMesh<2, 3>;
+template class MutableVertexMesh<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
