@@ -153,6 +153,18 @@ protected:
     std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
 
     /**
+     * Details of cell divisions, to be used by CellDivisionLocationsWriter
+     * The locations are stored until they are cleared by ClearDivisionsInformation().
+     */
+    std::vector< std::string > mDivisionsInformation;
+
+    /**
+     * Details of cell removals, to be used by CellRemovalLocationsWriter
+     * The locations are stored until they are cleared by ClearRemovalsInformation().
+     */
+    std::vector< std::string > mRemovalsInformation;
+
+    /**
      * Check consistency of our internal data structures.
      *
      * As this method is pure virtual, it must be overridden
@@ -647,6 +659,46 @@ public:
      * @param pCell the cell whose data are being written.
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
+
+    /**
+     * Return details of all divisions since the last sampling time step.
+     *
+     * @return mDivisionsInformation
+     */
+    std::vector< std::string > GetDivisionsInformation();
+
+    /**
+     * Add information for a division event.
+     * 
+     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.              
+     *
+     * @param divisionInformation  division information string
+     */
+    void AddDivisionInformation(std::string divisionInformation);
+
+    /**
+     * Clear the stored division information ready for the next output step.
+     */
+    void ClearDivisionsInformation();
+
+    /**
+     * Return details of all cell dremovals since the last sampling time step.
+     *
+     * @return mRemovalsInformation
+     */
+    std::vector< std::string > GetRemovalsInformation();
+
+    /**
+     * Add informations for a division event.
+     *
+     * @param removalInformation  removal information string
+     */
+    void AddRemovalInformation(std::string removalInformation);
+
+    /**
+     * Clear the stored removal information ready for the next output step.
+     */
+    void ClearRemovalsInformation();
 
     /**
      * Outputs CellPopulation used in the simulation to file and then calls OutputCellPopulationParameters to output all relevant parameters.

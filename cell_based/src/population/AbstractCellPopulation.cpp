@@ -101,6 +101,10 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor)
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
     }
+
+    // Clear stored divisions and removals information
+    ClearDivisionsInformation();
+    ClearRemovalsInformation();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -771,6 +775,42 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVi
 {
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
 }
+
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
+    {
+        return mDivisionsInformation;
+    }
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(std::string divisionInformation)
+    {
+        mDivisionsInformation.push_back(divisionInformation);
+    }
+
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearDivisionsInformation()
+    {
+        mDivisionsInformation.clear();
+    }
+
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
+    {
+        return mRemovalsInformation;
+    }
+
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(std::string removalInformation)
+    {
+        mRemovalsInformation.push_back(removalInformation);
+    }
+
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
+    {
+        mRemovalsInformation.clear();
+    }
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(CellPtr pCell)
