@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "PlaneBasedCellKiller.hpp"
-#include "CellRemovalLocationsWriter.hpp"
 
 template<unsigned DIM>
 PlaneBasedCellKiller<DIM>::PlaneBasedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
@@ -70,21 +69,8 @@ void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 
         if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
         {
-            if (this->mpCellPopulation-> template HasWriter<CellRemovalLocationsWriter>())
-            {
-                std::stringstream removal_info;
-                removal_info << SimulationTime::Instance()->GetTime() << "\t";
-                for (unsigned i=0; i<DIM; i++)
-                {
-                    removal_info << cell_location[i] << "\t";
-                }
-                removal_info << "\t" << cell_iter->GetAge() << "\t" << cell_iter->GetCellId
-                () << "\t" << "PlaneBasedCellKiller" << "\t";
-
-                this->mpCellPopulation->AddRemovalInformation(removal_info.str());
-            }
-
-            cell_iter->Kill();
+            // Mark the cell as killed and store removal information if required.
+            this->mpCellPopulation->KillCell(*cell_iter,"PlaneBasedCellKiller");
         }
     }
 }

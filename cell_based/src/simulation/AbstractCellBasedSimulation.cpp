@@ -354,15 +354,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         mrCellPopulation. template AddPopulationWriter<CellDivisionLocationsWriter>();
         mrCellPopulation. template AddPopulationWriter<CellRemovalLocationsWriter>();
-        
-
     }
     if (mOutputCellVelocities)
     {
         OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
         mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
-
-    }
+   }
 
     mrCellPopulation.OpenWritersFiles(output_file_handler);
 

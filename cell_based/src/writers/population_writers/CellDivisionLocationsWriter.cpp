@@ -88,19 +88,19 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopul
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    VisitAnyPopulation(pCellPopulation);
 }
 
 // Explicit instantiation

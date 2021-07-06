@@ -78,7 +78,9 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
             {
                 p_vertex_population->AddLocationOfT2Swap(mesh.GetLastT2SwapLocation());
                 p_vertex_population->AddCellIdOfT2Swap(p_cell->GetCellId());
-                p_cell->Kill();
+                                
+                // Mark the cell as killed and store removal information if required.
+                this->mpCellPopulation->KillCell(p_cell,"T2SwapCellKiller");
 
                 // There can't have been more than one new cell death, so leave the for loop here.
                 break;

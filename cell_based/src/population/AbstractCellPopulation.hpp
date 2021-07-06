@@ -701,6 +701,15 @@ public:
     void ClearRemovalsInformation();
 
     /**
+     * Helper method to mark a cell as killed and store information about the removal in. 
+     * mRemovalInformation
+     * 
+     * @param pCell the cell
+     * @param killerInfo addtional information the killer wants output I.e. the type of killer, defaults to nothing
+     */
+    void KillCell(CellPtr pCell, std::string killerInfo);
+
+    /**
      * Outputs CellPopulation used in the simulation to file and then calls OutputCellPopulationParameters to output all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output

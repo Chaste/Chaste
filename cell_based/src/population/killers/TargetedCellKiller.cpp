@@ -62,7 +62,8 @@ void TargetedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     {
         return;
     }
-    this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex)->Kill();
+    // Mark the cell as killed and store removal information if required.
+    this->mpCellPopulation->KillCell(this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex),"TargetedCellKiller");
     mBloodLust = false;
 }
 

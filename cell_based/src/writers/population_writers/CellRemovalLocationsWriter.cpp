@@ -89,19 +89,19 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopula
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    //VisitAnyPopulation(pCellPopulation);
+    VisitAnyPopulation(pCellPopulation);
 }
 
 // Explicit instantiation

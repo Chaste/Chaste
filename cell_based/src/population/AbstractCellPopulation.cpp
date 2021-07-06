@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryNodeWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "LegacyCellProliferativeTypesWriter.hpp"
+#include "CellRemovalLocationsWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -776,40 +777,64 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVi
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
 }
 
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
+{
+    return mDivisionsInformation;
+}
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(std::string divisionInformation)
+{
+    mDivisionsInformation.push_back(divisionInformation);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearDivisionsInformation()
+{
+    mDivisionsInformation.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
+{
+    return mRemovalsInformation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(std::string removalInformation)
+{
+    mRemovalsInformation.push_back(removalInformation);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
+{
+    mRemovalsInformation.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(CellPtr pCell, std::string killerInfo)
+{
+
+    //If necesary store the information about the cell removal
+    if (HasWriter<CellRemovalLocationsWriter>())
     {
-        return mDivisionsInformation;
-    }
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(std::string divisionInformation)
-    {
-        mDivisionsInformation.push_back(divisionInformation);
+        c_vector<double,SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
+
+        std::stringstream removal_info;
+        removal_info << SimulationTime::Instance()->GetTime() << "\t";
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            removal_info << cell_location[i] << "\t";
+        }
+        removal_info << "\t" << pCell->GetAge() << "\t" << pCell->GetCellId() << "\t" << killerInfo << "\t";
+
+        AddRemovalInformation(removal_info.str());
     }
 
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearDivisionsInformation()
-    {
-        mDivisionsInformation.clear();
-    }
-
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
-    {
-        return mRemovalsInformation;
-    }
-
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(std::string removalInformation)
-    {
-        mRemovalsInformation.push_back(removalInformation);
-    }
-
-    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-    void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
-    {
-        mRemovalsInformation.clear();
-    }
+    //Mark cell as dead 
+    pCell->Kill();
+}
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
