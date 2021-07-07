@@ -81,7 +81,8 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 
                 if (x > mSloughHeight)
                 {
-                    cell_iter->Kill();
+                     // Mark the cell as killed and store removal information if required.
+                    this->mpCellPopulation->KillCell(*cell_iter,"SloughingCellKiller");
                 }
             }
             break;
@@ -99,7 +100,8 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 
                 if ((y>mSloughHeight) || (mSloughSides && ((x<0.0) || (x>mSloughWidth))))
                 {
-                    cell_iter->Kill();
+                     // Mark the cell as killed and store removal information if required.
+                    this->mpCellPopulation->KillCell(*cell_iter,"SloughingCellKiller");
                 }
             }
             break;

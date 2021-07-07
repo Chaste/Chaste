@@ -815,28 +815,28 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(CellPtr pCell, std::string killerInfo)
 {
+    //If necesary store the information about the cell removal
     c_vector<double,SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
-
-    std::stringstream removal_info;
-    removal_info << SimulationTime::Instance()->GetTime() << "\t";
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    if (HasWriter<CellRemovalLocationsWriter>())
     {
-        removal_info << cell_location[i] << "\t";
-    }
-    removal_info << "\t" << pCell->GetAge() << "\t" << pCell->GetCellId() << "\t" << killerInfo << "\t";
+        std::stringstream removal_info;
+        removal_info << SimulationTime::Instance()->GetTime() << "\t";
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            removal_info << cell_location[i] << "\t";
+        }
+        removal_info << "\t" << pCell->GetAge() << "\t" << pCell->GetCellId() << "\t" << killerInfo << "\t";
 
-    AddRemovalInformation(removal_info.str());
+        AddRemovalInformation(removal_info.str());
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(CellPtr pCell, std::string killerInfo)
 {
     //If necesary store the information about the cell removal
-    if (HasWriter<CellRemovalLocationsWriter>())
-    {
-        GenerateRemovalInformation(pCell,killerInfo);
-    }
-
+    GenerateRemovalInformation(pCell,killerInfo);
+    
     //Mark cell as dead 
     pCell->Kill();
 }
@@ -845,10 +845,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(CellPtr pCell, std::string killerInfo)
 {
     //If necesary store the information about the cell removal
-    if (HasWriter<CellRemovalLocationsWriter>())
-    {
-        GenerateRemovalInformation(pCell,killerInfo);
-    }
+    GenerateRemovalInformation(pCell,killerInfo);
 
     //Mark cell as Apoptotic 
     pCell->StartApoptosis();
