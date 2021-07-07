@@ -135,7 +135,7 @@ public:
             {
                 /* This line marks the cell as killed and stores removal information for use by
                  * by the cell writers if the writer {{{CellRemovalLocationsWriter}}} is included.*/
-                this->mpCellPopulation->KillCell(cell_iter,"T2SwapCellKiller");
+                this->mpCellPopulation->KillCell(*cell_iter,"MyCellKiller");
             }
         }
     }
