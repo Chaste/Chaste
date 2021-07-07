@@ -84,9 +84,9 @@ public:
     virtual ~AbstractCellKiller();
 
     /**
-     * Pure method which should call StartApoptosis() on any cell
-     * which should be about to undergo programmed death, or Kill()
-     * on any cell which should die immediately.
+     * Pure virtua; method which should call StartApoptosisOnCell()on the population
+     * passing the cell which should be about to undergo programmed death, 
+     * or KillCell() on the population passing the cell which should die immediately.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
