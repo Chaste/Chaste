@@ -74,7 +74,7 @@ void RandomCellKiller<DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
         RandomNumberGenerator::Instance()->ranf() < death_prob_this_timestep)
     {
         // Mark the cell as apoptotic and store removal information if required.
-        this->mpCellPopulation->StartApoptosisOnCell(pCell,"RandomCellKiller");
+        this->mpCellPopulation->StartApoptosisOnCell(pCell, "RandomCellKiller");
     }
 }
 

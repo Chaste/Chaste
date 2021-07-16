@@ -79,21 +79,23 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
             {
                 p_vertex_population->AddLocationOfT2Swap(mesh.GetLastT2SwapLocation());
                 p_vertex_population->AddCellIdOfT2Swap(p_cell->GetCellId());
-                                
+
                 /* Mark the cell as killed and store removal information if required.
-                 * Note we cant use the KillCell() helper method here as it will fail as the
+                 * Note we can't use the KillCell() helper method here as it will fail as the
                  * element has already been deleted.
-                 * this->mpCellPopulation->KillCell(p_cell,"T2SwapCellKiller");
+                 * this->mpCellPopulation->KillCell(p_cell, "T2SwapCellKiller");
                  */
-                if (p_vertex_population-> template HasWriter<CellRemovalLocationsWriter>())
+                if (p_vertex_population->template HasWriter<CellRemovalLocationsWriter>())
                 {
                     std::stringstream removal_info;
                     removal_info << SimulationTime::Instance()->GetTime() << "\t";
-                    for (unsigned i=0; i<DIM; i++)
+                    for (unsigned i = 0; i < DIM; i++)
                     {
                         removal_info << mesh.GetLastT2SwapLocation()[i] << "\t";
                     }
-                    removal_info << "\t" << p_cell->GetAge() << "\t" << p_cell->GetCellId() << "\t" << "T2SwapCellKiller" << "\t";
+                    removal_info << "\t" << p_cell->GetAge() << "\t" << p_cell->GetCellId() << "\t"
+                                 << "T2SwapCellKiller"
+                                 << "\t";
 
                     p_vertex_population->AddRemovalInformation(removal_info.str());
                 }

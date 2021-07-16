@@ -156,13 +156,13 @@ protected:
      * Details of cell divisions, to be used by CellDivisionLocationsWriter
      * The locations are stored until they are cleared by ClearDivisionsInformation().
      */
-    std::vector< std::string > mDivisionsInformation;
+    std::vector<std::string> mDivisionsInformation;
 
     /**
      * Details of cell removals, to be used by CellRemovalLocationsWriter
      * The locations are stored until they are cleared by ClearRemovalsInformation().
      */
-    std::vector< std::string > mRemovalsInformation;
+    std::vector<std::string> mRemovalsInformation;
 
     /**
      * Check consistency of our internal data structures.
@@ -658,14 +658,14 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) = 0;
 
     /**
      * Return details of all divisions since the last sampling time step.
      *
      * @return mDivisionsInformation
      */
-    std::vector< std::string > GetDivisionsInformation();
+    std::vector<std::string> GetDivisionsInformation();
 
     /**
      * Add information for a division event.
@@ -682,14 +682,14 @@ public:
     void ClearDivisionsInformation();
 
     /**
-     * Return details of all cell dremovals since the last sampling time step.
+     * Return details of all cell removals since the last sampling time step.
      *
      * @return mRemovalsInformation
      */
-    std::vector< std::string > GetRemovalsInformation();
+    std::vector<std::string> GetRemovalsInformation();
 
     /**
-     * Add informations for a division event.
+     * Add information for a division event.
      *
      * @param removalInformation  removal information string
      */
@@ -704,7 +704,7 @@ public:
      * Helper method to store information about the removal in mRemovalInformation
      * 
      * @param pCell the cell
-     * @param killerInfo addtional information the killer wants output I.e. the type of killer.
+     * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
     void GenerateRemovalInformation(CellPtr pCell, std::string killerInfo);
 
@@ -712,7 +712,7 @@ public:
      * Helper method to mark a cell as killed and store information about the removal.
      * 
      * @param pCell the cell
-     * @param killerInfo addtional information the killer wants output I.e. the type of killer.
+     * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
     void KillCell(CellPtr pCell, std::string killerInfo);
 
@@ -720,7 +720,7 @@ public:
      * Helper method to mark a cell as starting apoptosis and store information about the removal.
      * 
      * @param pCell the cell
-     * @param killerInfo addtional information the killer wants output I.e. the type of killer.
+     * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
     void StartApoptosisOnCell(CellPtr pCell, std::string killerInfo);
 

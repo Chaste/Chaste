@@ -114,11 +114,11 @@ public:
         simulator.AddForce(p_force);
 
         // Add a cell killer to remove a cell
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point[1] = 3.5;
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal[1] = 1.0;
-        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal) ); // y>3.5
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); // y>3.5
         simulator.AddCellKiller(p_killer);
 
         // Record node velocities
@@ -151,7 +151,6 @@ public:
         std::string removal_locations_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/removals.dat";
         NumericFileComparison removal_locations(removal_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/removals.dat");
         TS_ASSERT(removal_locations.CompareFiles(1e-2));
-
 
         // Check cell velocities file
         std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";

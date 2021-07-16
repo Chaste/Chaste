@@ -58,12 +58,12 @@ unsigned TargetedCellKiller<DIM>::GetBloodLust() const
 template<unsigned DIM>
 void TargetedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    if (!mBloodLust || this->mpCellPopulation->GetNumRealCells()==0 || this->mpCellPopulation->GetNumRealCells()<mTargetIndex+1)
+    if (!mBloodLust || this->mpCellPopulation->GetNumRealCells() == 0 || this->mpCellPopulation->GetNumRealCells() < mTargetIndex + 1)
     {
         return;
     }
     // Mark the cell as killed and store removal information if required.
-    this->mpCellPopulation->KillCell(this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex),"TargetedCellKiller");
+    this->mpCellPopulation->KillCell(this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex), "TargetedCellKiller");
     mBloodLust = false;
 }
 

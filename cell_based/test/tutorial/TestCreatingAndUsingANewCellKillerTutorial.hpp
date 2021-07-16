@@ -71,7 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cell killer class will inherit. */
 #include "AbstractCellKiller.hpp"
 
-/* The next header defines a writer which ouptuts information on cells killed to the file 
+/* The next header defines a writer which outputs information on cells killed to the file
  * {{{removals.dat}}} . */
 #include "CellRemovalLocationsWriter.hpp"
 
@@ -135,7 +135,7 @@ public:
             {
                 /* This line marks the cell as killed and stores removal information for use by
                  * by the cell writers if the writer {{{CellRemovalLocationsWriter}}} is included.*/
-                this->mpCellPopulation->KillCell(*cell_iter,"MyCellKiller");
+                this->mpCellPopulation->KillCell(*cell_iter, "MyCellKiller");
             }
         }
     }

@@ -35,44 +35,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellRemovalLocationsWriter.hpp"
 #include "AbstractCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::CellRemovalLocationsWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("removals.dat")
+        : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("removals.dat")
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector< std::string > removals_information = pCellPopulation->GetRemovalsInformation();
-    
+    std::vector<std::string> removals_information = pCellPopulation->GetRemovalsInformation();
+
     *this->mpOutStream << removals_information.size() << "\t";
-    
-    for (unsigned index = 0;  index < removals_information.size(); index++)
+
+    for (unsigned index = 0; index < removals_information.size(); index++)
     {
-        *this->mpOutStream << removals_information[index] << "\t";        
+        *this->mpOutStream << removals_information[index] << "\t";
     }
-    
 
     pCellPopulation->ClearRemovalsInformation();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector< std::string > removals_information = pCellPopulation->GetRemovalsInformation();
-    
+    std::vector<std::string> removals_information = pCellPopulation->GetRemovalsInformation();
+
     *this->mpOutStream << removals_information.size() << "\t";
-    
-    for (unsigned index = 0;  index < removals_information.size(); index++)
+
+    for (unsigned index = 0; index < removals_information.size(); index++)
     {
-        *this->mpOutStream << removals_information[index] << "\t";        
+        *this->mpOutStream << removals_information[index] << "\t";
     }
 
     pCellPopulation->ClearRemovalsInformation();
@@ -80,37 +79,37 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopu
     //VisitAnyPopulation(pCellPopulation);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 // Explicit instantiation
-template class CellRemovalLocationsWriter<1,1>;
-template class CellRemovalLocationsWriter<1,2>;
-template class CellRemovalLocationsWriter<2,2>;
-template class CellRemovalLocationsWriter<1,3>;
-template class CellRemovalLocationsWriter<2,3>;
-template class CellRemovalLocationsWriter<3,3>;
+template class CellRemovalLocationsWriter<1, 1>;
+template class CellRemovalLocationsWriter<1, 2>;
+template class CellRemovalLocationsWriter<2, 2>;
+template class CellRemovalLocationsWriter<1, 3>;
+template class CellRemovalLocationsWriter<2, 3>;
+template class CellRemovalLocationsWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

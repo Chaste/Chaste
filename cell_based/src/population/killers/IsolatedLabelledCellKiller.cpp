@@ -87,7 +87,7 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
                 if (num_labelled_neighbours == 0)
                 {
                     // Mark the cell as killed and store removal information if required.
-                    this->mpCellPopulation->KillCell(*cell_iter,"IsolatedLabelledCellKiller");
+                    this->mpCellPopulation->KillCell(*cell_iter, "IsolatedLabelledCellKiller");
                 }
             }
         }

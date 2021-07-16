@@ -125,13 +125,13 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                      * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
                      * 
                      */
-                    if (mrCellPopulation. template HasWriter<CellDivisionLocationsWriter>())
+                    if (mrCellPopulation.template HasWriter<CellDivisionLocationsWriter>())
                     {
                         c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
                         std::stringstream division_info;
                         division_info << SimulationTime::Instance()->GetTime() << "\t";
-                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        for (unsigned i = 0; i < SPACE_DIM; i++)
                         {
                             division_info << cell_location[i] << "\t";
                         }
@@ -346,20 +346,18 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     // Set up simulation
 
     // Create output files for the visualizer
-    OutputFileHandler output_file_handler(results_directory+"/", true);
-
-    
+    OutputFileHandler output_file_handler(results_directory + "/", true);
 
     if (mOutputDivisionLocations)
     {
-        mrCellPopulation. template AddPopulationWriter<CellDivisionLocationsWriter>();
-        mrCellPopulation. template AddPopulationWriter<CellRemovalLocationsWriter>();
+        mrCellPopulation.template AddPopulationWriter<CellDivisionLocationsWriter>();
+        mrCellPopulation.template AddPopulationWriter<CellRemovalLocationsWriter>();
     }
     if (mOutputCellVelocities)
     {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory + "/", false);
         mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
-   }
+    }
 
     mrCellPopulation.OpenWritersFiles(output_file_handler);
 

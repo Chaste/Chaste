@@ -777,51 +777,51 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVi
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
 {
     return mDivisionsInformation;
 }
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(std::string divisionInformation)
 {
     mDivisionsInformation.push_back(divisionInformation);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearDivisionsInformation()
 {
     mDivisionsInformation.clear();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< std::string > AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
 {
     return mRemovalsInformation;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(std::string removalInformation)
 {
     mRemovalsInformation.push_back(removalInformation);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
 {
     mRemovalsInformation.clear();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(CellPtr pCell, std::string killerInfo)
 {
-    //If necesary store the information about the cell removal
-    c_vector<double,SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
+    //If necessary store the information about the cell removal
+    c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
     if (HasWriter<CellRemovalLocationsWriter>())
     {
         std::stringstream removal_info;
         removal_info << SimulationTime::Instance()->GetTime() << "\t";
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; i++)
         {
             removal_info << cell_location[i] << "\t";
         }
@@ -831,28 +831,27 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(CellPtr pCell, std::string killerInfo)
 {
-    //If necesary store the information about the cell removal
-    GenerateRemovalInformation(pCell,killerInfo);
-    
-    //Mark cell as dead 
+    //If necessary store the information about the cell removal
+    GenerateRemovalInformation(pCell, killerInfo);
+
+    //Mark cell as dead
     pCell->Kill();
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(CellPtr pCell, std::string killerInfo)
 {
-    //If necesary store the information about the cell removal
-    GenerateRemovalInformation(pCell,killerInfo);
+    //If necessary store the information about the cell removal
+    GenerateRemovalInformation(pCell, killerInfo);
 
-    //Mark cell as Apoptotic 
+    //Mark cell as Apoptotic
     pCell->StartApoptosis();
 }
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(CellPtr pCell)
 {
     return true;

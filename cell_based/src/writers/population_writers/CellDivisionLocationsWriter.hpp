@@ -36,16 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLDIVISIONLOCATIONSWRITER_HPP_
 #define CELLDIVISIONLOCATIONSWRITER_HPP_
 
+#include <boost/serialization/base_object.hpp>
 #include "AbstractCellPopulationWriter.hpp"
 #include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
 
 /**
  * A writer class to output the time, locations and cell id info of cell divisions to a file.
  *
  * The output file is called divisions.dat by default.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellDivisionLocationsWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
@@ -57,19 +57,17 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
-
     /**
      * Default constructor.
      */
     CellDivisionLocationsWriter();
-
 
     /**
      * Visit the population and write the data.

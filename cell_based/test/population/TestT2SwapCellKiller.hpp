@@ -37,23 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTT2SWAPCELLKILLER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
-#include "ArchiveOpener.hpp"
-#include "CellsGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "VertexMeshWriter.hpp"
-#include "CellRemovalLocationsWriter.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "T2SwapCellKiller.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "FileComparison.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "Warnings.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "SmartPointers.hpp"
+#include "ArchiveOpener.hpp"
+#include "CellRemovalLocationsWriter.hpp"
+#include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "T2SwapCellKiller.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "VertexMeshWriter.hpp"
+#include "Warnings.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -322,8 +322,8 @@ public:
 
         //Check the cell removal is recorded correctly.
         FileFinder generated_file("TestT2SwapCellKillerInSimulation/results_from_time_0.003/removals.dat", RelativeTo::ChasteTestOutput);
-        FileFinder reference_file("cell_based/test/data/TestT2SwapCellKillerInSimulation/removals.dat",RelativeTo::ChasteSourceRoot);
-        FileComparison files(generated_file,reference_file);
+        FileFinder reference_file("cell_based/test/data/TestT2SwapCellKillerInSimulation/removals.dat", RelativeTo::ChasteSourceRoot);
+        FileComparison files(generated_file, reference_file);
         TS_ASSERT(files.CompareFiles());
     }
 

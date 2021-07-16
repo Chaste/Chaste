@@ -64,7 +64,7 @@ void RadialSloughingCellKiller::CheckAndLabelCellsForApoptosisOrDeath()
         if (r > mRadius)
         {
             // Mark the cell as killed and store removal information if required.
-            this->mpCellPopulation->KillCell(*cell_iter,"RadialSloughingCellKiller");
+            this->mpCellPopulation->KillCell(*cell_iter, "RadialSloughingCellKiller");
         }
     }
 }

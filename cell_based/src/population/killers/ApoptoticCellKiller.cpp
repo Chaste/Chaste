@@ -48,7 +48,7 @@ void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr
     if (pCell->HasCellProperty<ApoptoticCellProperty>() && !(pCell->HasApoptosisBegun()))
     {
         // Mark the cell as apoptotic and store removal information if required.
-        this->mpCellPopulation->StartApoptosisOnCell(pCell,"RandomCellKiller");
+        this->mpCellPopulation->StartApoptosisOnCell(pCell, "RandomCellKiller");
     }
 }
 
