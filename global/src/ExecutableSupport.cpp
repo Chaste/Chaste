@@ -443,6 +443,8 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t</Libraries>\n";
 
+    output << "\t<ChasteCodegenVersion>" << ChasteBuildInfo::GetChasteCodegenVersion() <<  "</ChasteCodegenVersion>\n";
+
     output << "</ChasteBuildInfo>" << std::endl;
     rInfo = output.str();
 }
