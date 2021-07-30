@@ -59,6 +59,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
       mAreaBasedDampingConstantParameter(0.1),
       mWriteVtkAsPoints(false),
       mOutputMeshInVtk(false),
+      mBoundVoronoiTessellation(false),
       mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
@@ -845,6 +846,18 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputMeshInVtk()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetBoundVoronoiTessellation(bool boundVoronoiTessellation)
+{
+    mBoundVoronoiTessellation = boundVoronoiTessellation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundVoronoiTessellation()
+{
+    return mBoundVoronoiTessellation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh))))
@@ -958,7 +971,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     }
     else
     {
-        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
+        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
     }
 }
 

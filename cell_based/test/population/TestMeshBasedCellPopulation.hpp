@@ -844,14 +844,21 @@ public:
 
         // Test set/get methods
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
+        TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), false);
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false);
 
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
         cell_population.SetOutputMeshInVtk(true);
+        cell_population.SetBoundVoronoiTessellation(true);
 
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
         TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), true);
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
+
+        // All presaved data uses infinite VT
+        cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

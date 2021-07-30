@@ -88,6 +88,7 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mOutputMeshInVtk;
+        archive & mBoundVoronoiTessellation;
         archive & mHasVariableRestLength;
 
         this->Validate();
@@ -136,6 +137,9 @@ protected:
 
     /** Whether to output the underlying MutableMesh  in VTK. */
     bool mOutputMeshInVtk;
+
+    /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
+    bool mBoundVoronoiTessellation;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
@@ -563,6 +567,18 @@ public:
      * @return mOutputMeshInVtk.
      */
     bool GetOutputMeshInVtk();
+
+    /**
+     * Set mBoundVoronoiTessellation.
+     *
+     * @param boundVoronoiTessellation whether to bound the Voronoi Tesselation.
+     */
+    void SetBoundVoronoiTessellation(bool boundVoronoiTessellation);
+
+    /**
+     * @return mBoundVoronoiTessellation.
+     */
+    bool GetBoundVoronoiTessellation();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
