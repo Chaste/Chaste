@@ -936,7 +936,7 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         //Add a cell removal writer to output cell deaths
-        node_based_cell_population.AddPopulationWriter<CellDivisionLocationsWriter>();
+        node_based_cell_population.AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
         node_based_cell_population.AddPopulationWriter<CellRemovalLocationsWriter>();
 
         // Set up cell-based simulation

@@ -350,8 +350,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     if (mOutputDivisionLocations)
     {
-        mrCellPopulation.template AddPopulationWriter<CellDivisionLocationsWriter>();
-        mrCellPopulation.template AddPopulationWriter<CellRemovalLocationsWriter>();
+        mrCellPopulation.template AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
+        mrCellPopulation.template AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
     }
     if (mOutputCellVelocities)
     {

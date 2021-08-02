@@ -558,6 +558,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
         p_count_writer->OpenOutputFile(rOutputFileHandler);
         p_count_writer->WriteHeader(this);
     }
+
+    // Open output files and write headers for any population event writers
+    typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+    BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+    {
+        p_event_writer->OpenOutputFile(rOutputFileHandler);
+        p_event_writer->WriteHeader(this);
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -655,6 +663,34 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             {
                 p_count_writer->WriteNewline();
                 p_count_writer->CloseFile();
+            }
+        }
+
+
+        // Outside the round robin, deal with population event writers
+        typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+
+        if (PetscTools::AmMaster())
+        {
+            // Open mCellPopulationCountWriters in append mode for writing
+            BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+            {
+                p_event_writer->OpenOutputFileForAppend(output_file_handler);
+            }
+        }
+        for (typename std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator event_writer_iter = mCellPopulationEventWriters.begin();
+             event_writer_iter != mCellPopulationEventWriters.end();
+             ++event_writer_iter)
+        {
+            AcceptPopulationEventWriter(*event_writer_iter);
+        }
+
+        if (PetscTools::AmMaster())
+        {
+            // Close any output files
+            BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+            {
+                p_event_writer->CloseFile();
             }
         }
     }
