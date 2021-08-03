@@ -254,7 +254,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // Add a writer to store when cells are removed from simulation
-        cell_population.AddPopulationWriter<CellRemovalLocationsWriter>();
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 
         // make a simulator
         OffLatticeSimulation<2> simulator(cell_population);
