@@ -257,7 +257,7 @@ public:
      * @param isPeriodic a boolean that indicates whether the mesh is periodic or not
      * @param isBounded a boolean to indicate whether to bound the voronoi tesselation 
      */
-    VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false, bool isBounded = false);
+    VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false, bool isBounded = false, unsigned num_timesteps=0);
 
     /**
      * Alternative 3D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,

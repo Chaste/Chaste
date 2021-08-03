@@ -162,11 +162,11 @@ public:
         std::string results_dir = handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
@@ -228,11 +228,11 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }

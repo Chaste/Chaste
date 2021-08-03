@@ -850,7 +850,6 @@ public:
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
-        cell_population.SetOutputMeshInVtk(true);
         cell_population.SetBoundVoronoiTessellation(true);
 
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);

@@ -343,7 +343,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         time << num_timesteps;
 
         // Create mesh writer for VTK output
-        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
+        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "voronoi_results", false);
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
@@ -400,7 +400,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         mesh_writer.WriteVtkUsingMesh(*(this->mpVoronoiTessellation), time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
         *(this->mpVtkMetaFile) << num_timesteps;
-        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"voronoi_results_";
         *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }

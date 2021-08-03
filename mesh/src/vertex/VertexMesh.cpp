@@ -148,7 +148,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 template <>
-VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool isBounded)
+VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool isBounded, unsigned num_timesteps)
         : mpDelaunayMesh(&rMesh)
 {
     //Note  !isPeriodic is not used except through polymorphic calls in rMesh
@@ -190,7 +190,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
             }
         }
     }
-    else
+    else // Is Bounded 
     {
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
@@ -200,26 +200,39 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
         {
             nodes.push_back(new Node<2>(node_iter->GetIndex(), node_iter->rGetLocation(),node_iter->IsBoundaryNode()));
         }
-        // Add new nodes
+
+        // // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {   
-            // PRINT_VARIABLE(elem_iter->GetIndex());
-            // PRINT_3_VARIABLES(elem_iter->GetNodeGlobalIndex(0),
-            //                   elem_iter->GetNodeGlobalIndex(1),
-            //                   elem_iter->GetNodeGlobalIndex(2));
             for (unsigned j=0; j<3; j++)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
                 
-                c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
-                double edge_length = norm_2(edge);
+                std::set<unsigned> node_a_element_indices = p_node_a->rGetContainingElementIndices();
+                std::set<unsigned> node_b_element_indices = p_node_b->rGetContainingElementIndices();
 
-                if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
+                std::set<unsigned> shared_elements;
+                std::set_intersection(node_a_element_indices.begin(),
+                                      node_a_element_indices.end(),
+                                      node_b_element_indices.begin(),
+                                      node_b_element_indices.end(),
+                                      std::inserter(shared_elements, shared_elements.begin()));
+
+
+                /* 
+                 * Note using boundary nodes to identify the boundary egdes wont work with 
+                 * triangles which have 3 boundary nodes
+                 * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
+                 */
+             
+                if (shared_elements.size() == 1) // Its a boundary edge
                 {
+                    c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
+                    double edge_length = norm_2(edge);
                     c_vector<double,2> normal_vector;
 
                     normal_vector[0]= edge[1];
@@ -281,7 +294,6 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
         }
     }
 
-
     // Reorder mNodes anticlockwise
     for (unsigned elem_index = 0; elem_index < mElements.size(); elem_index++)
     {
@@ -321,6 +333,14 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
     }
 
     this->mMeshChangesDuringSimulation = false;
+
+/////////
+std::stringstream time;
+time << num_timesteps;
+VertexMeshWriter<2, 2> vertex_writer("boom", "extended_voronoi_results", false);
+vertex_writer.WriteVtkUsingMesh(*this, time.str());
+/////////
+
 }
 /**
  * \endcond

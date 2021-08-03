@@ -87,7 +87,6 @@ private:
         archive & mUseAreaBasedDampingConstant;
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
-        archive & mOutputMeshInVtk;
         archive & mBoundVoronoiTessellation;
         archive & mHasVariableRestLength;
 
@@ -134,9 +133,6 @@ protected:
 
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
-
-    /** Whether to output the underlying MutableMesh  in VTK. */
-    bool mOutputMeshInVtk;
 
     /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
     bool mBoundVoronoiTessellation;
@@ -555,18 +551,6 @@ public:
      * @return mWriteVtkAsPoints.
      */
     bool GetWriteVtkAsPoints();
-
-    /**
-     * Set mOutputMeshInVtk.
-     *
-     * @param outputMeshInVtk whether to write cells as points in VTK
-     */
-    void SetOutputMeshInVtk(bool outputMeshInVtk);
-
-    /**
-     * @return mOutputMeshInVtk.
-     */
-    bool GetOutputMeshInVtk();
 
     /**
      * Set mBoundVoronoiTessellation.
