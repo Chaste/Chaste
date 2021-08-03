@@ -844,7 +844,6 @@ public:
 
         // Test set/get methods
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
-        TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), false);
         TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false);
 
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
@@ -853,7 +852,6 @@ public:
         cell_population.SetBoundVoronoiTessellation(true);
 
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
-        TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), true);
         TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
 
         // All presaved data uses infinite VT
