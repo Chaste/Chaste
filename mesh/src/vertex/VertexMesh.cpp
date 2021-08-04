@@ -148,7 +148,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 template <>
-VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool isBounded, unsigned num_timesteps)
+VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool isBounded)
         : mpDelaunayMesh(&rMesh)
 {
     //Note  !isPeriodic is not used except through polymorphic calls in rMesh
@@ -333,14 +333,6 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
     }
 
     this->mMeshChangesDuringSimulation = false;
-
-/////////
-std::stringstream time;
-time << num_timesteps;
-VertexMeshWriter<2, 2> vertex_writer("boom", "extended_voronoi_results", false);
-vertex_writer.WriteVtkUsingMesh(*this, time.str());
-/////////
-
 }
 /**
  * \endcond

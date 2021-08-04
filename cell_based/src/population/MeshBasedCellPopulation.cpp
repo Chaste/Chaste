@@ -935,8 +935,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     }
     else
     {
-unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
-        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation, num_timesteps);
+        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
     }
 }
 
