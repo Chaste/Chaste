@@ -951,18 +951,12 @@ public:
         // Test that VTK writer has produced some files
 
         // Initial condition files
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file.Exists());
-
-        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_mesh_file.Exists());
+        FileFinder vtk_file1(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file1.Exists());
 
         // Final files
-        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
-
-        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_mesh_file2.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
@@ -1084,24 +1078,24 @@ public:
         // Test that VTK writer has produced some files
 
         // Initial condition files
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
-        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_mesh_file(results_dir + "mesh_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_mesh_file.Exists());
 
         // Final files
-        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 
-        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_mesh_file2(results_dir + "mesh_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_mesh_file2.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+        VtkMeshReader<2,2> vtk_reader(results_dir + "/mesh_results_0.vtu");
 
         std::vector<double> ages_data;
         vtk_reader.GetPointData("New Ages", ages_data);
