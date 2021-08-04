@@ -1036,7 +1036,6 @@ public:
 
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
-        cell_population.SetOutputMeshInVtk(true);
 
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
