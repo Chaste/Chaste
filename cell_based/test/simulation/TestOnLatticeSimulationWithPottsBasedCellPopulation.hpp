@@ -65,6 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "CellMutationStatesCountWriter.hpp"
+#include "CellDivisionLocationsWriter.hpp"
+#include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
@@ -83,7 +85,7 @@ private:
 
 public:
 
-    void TestOnLatticeSimulationExceptions()
+    void NoTestOnLatticeSimulationExceptions()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -107,7 +109,7 @@ public:
             "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");
     }
 
-    void TestMoreOnLatticeSimulationExceptions()
+    void NoTestMoreOnLatticeSimulationExceptions()
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
@@ -127,7 +129,7 @@ public:
             "OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
     }
 
-    void TestPottsMonolayerWithNoBirthOrDeath()
+    void NoTestPottsMonolayerWithNoBirthOrDeath()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -177,7 +179,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
     }
 
-    void TestPottsMonolayerWithNonRandomSweep()
+    void NoTestPottsMonolayerWithNonRandomSweep()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -210,7 +212,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
 
-    void TestPottsMonolayerWithDeath()
+    void NoTestPottsMonolayerWithDeath()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -274,6 +276,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -281,7 +284,7 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
         simulator.SetSamplingTimestepMultiple(20);
-
+        
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);
@@ -297,9 +300,15 @@ public:
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+        // Check files
+        std::string output_directory = "TestPottsMonolayerWithBirth/results_from_time_0/";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        FileComparison( results_dir + "divisions.dat", "cell_based/test/data/TestPottsMonolayerWithBirth/divisions.dat").CompareFiles();
     }
 
-    void TestPottsMonolayerCellSorting()
+    void NoTestPottsMonolayerCellSorting()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -369,7 +378,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestPottsMonolayerCellSortingPeriodic()
+    void NoTestPottsMonolayerCellSortingPeriodic()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -438,7 +447,7 @@ public:
  #endif //CHASTE_VTK
     }
 
-    void TestPottsSpheroidWithNoBirthOrDeath()
+    void NoTestPottsSpheroidWithNoBirthOrDeath()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -478,7 +487,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsChemotaxis()
+    void NoTestPottsChemotaxis()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -521,7 +530,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestRandomIterationOverUpdateRules()
+    void NoTestRandomIterationOverUpdateRules()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -563,7 +572,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
-    void TestPottsSpheroidCellSorting()
+    void NoTestPottsSpheroidCellSorting()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -652,7 +661,7 @@ public:
 
     c_vector<unsigned, 6> mNodes; // TO check after save and load.
 
-    void TestStandardResultForArchivingTestsBelow()
+    void NoTestStandardResultForArchivingTestsBelow()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -705,7 +714,7 @@ public:
         TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), mNodes[5]);
     }
 
-    void TestSave()
+    void NoTestSave()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
@@ -742,7 +751,7 @@ public:
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(&simulator);
     }
 
-    void TestLoad()
+    void NoTestLoad()
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
 
