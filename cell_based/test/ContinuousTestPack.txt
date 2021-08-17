@@ -42,6 +42,7 @@ population/TestCaUpdateRules.hpp
 population/TestCellKillers.hpp
 population/TestCellPopulationBoundaryConditions.hpp
 population/TestCellPopulationCountWriters.hpp
+population/TestCellPopulationEventWriters.hpp
 population/TestCellPopulationWriters.hpp
 population/TestCellwiseDataGradient.hpp
 population/TestCellWriters.hpp

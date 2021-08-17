@@ -33,20 +33,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLDIVISIONLOCATIONSWRITER_HPP_
-#define CELLDIVISIONLOCATIONSWRITER_HPP_
+#ifndef ABSTRACTCELLPOPULATIONEVENTWRITER_HPP_
+#define ABSTRACTCELLPOPULATIONEVENTWRITER_HPP_
 
-#include <boost/serialization/base_object.hpp>
-#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellBasedWriter.hpp"
 #include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class MeshBasedCellPopulation;
+template<unsigned SPACE_DIM> class CaBasedCellPopulation;
+template<unsigned SPACE_DIM> class NodeBasedCellPopulation;
+template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
+template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 
 /**
- * A writer class to output the time, locations and cell id info of cell divisions to a file.
+ * Abstract class for a writer that takes information from an AbstractCellPopulation and writes it to file.
  *
- * The output file is called divisions.dat by default.
+ * The key difference between this class and AbstractCellPopulationWriter is that writers inheriting
+ * from this class are NOT compatible with a RoundRobin loop, because they write information that
+ * needs to be collected from all processes, such as global counters for mutation states. These writers
+ * concentrate the information from all processes and then write it at each timestep for which output
+ * is required.
+ * 
+ * These writers also only write data when an event has occured since the last output step/
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellDivisionLocationsWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class AbstractCellPopulationEventWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -57,82 +71,76 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
-    void serialize(Archive& archive, const unsigned int version)
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
     {
-        archive& boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
+
     /**
      * Default constructor.
+     * @param rFileName the name of the file to write to.
      */
-    CellDivisionLocationsWriter();
+    AbstractCellPopulationEventWriter(const std::string& rFileName);
+
+    /**
+     * Write the header to file.
+     *
+     * @param pCellPopulation a pointer to the population to be written.
+     */
+    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
-     * Outputs a line of tab-separated values of the form:
-     * [num divisions] [Div time 0] [Div 0 x-pos] [Div 0 y-pos] [Div 0 z-pos] [Parent 0 Age] [Parent 0 ID] [Child 0 ID] [Div time 1] [Div 1 x-pos] ...
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
-     * where [num divisions] denotes the number of Divisions since the previous output step
-     * with other imformation about each division event.
-     *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
-     * 
-     * @param pCellPopulation a pointer to the population to visit.
-     */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Visit the population and write the data.
-     *
-     * Just passes through to VisitAnyPopulation
-     * 
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
-     * Just passes through to VisitAnyPopulation
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
-     * Just passes through to VisitAnyPopulation
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
-     * Just passes through to VisitAnyPopulation
-     * 
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
-     * Just passes through to VisitAnyPopulation
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 };
 
-#include "SerializationExportWrapper.hpp"
-// Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellDivisionLocationsWriter)
-
-#endif /* CELLDIVISIONLOCATIONSWRITER_HPP_ */
+#endif /*ABSTRACTCELLPOPULATIONEVENTWRITER_HPP_*/

@@ -382,6 +382,14 @@ public:
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
+     * A virtual method to accept a cell population event writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationEventWriter the population event writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+
+    /**
      * A virtual method to accept a cell writer so it can
      * write data from this object to file.
      *
