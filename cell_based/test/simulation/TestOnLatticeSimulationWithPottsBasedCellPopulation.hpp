@@ -65,6 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "CellMutationStatesCountWriter.hpp"
+#include "CellDivisionLocationsWriter.hpp"
+#include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
@@ -274,6 +276,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -281,7 +284,7 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
         simulator.SetSamplingTimestepMultiple(20);
-
+        
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);
@@ -297,6 +300,12 @@ public:
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+        // Check files
+        std::string output_directory = "TestPottsMonolayerWithBirth/results_from_time_0/";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        FileComparison( results_dir + "divisions.dat", "cell_based/test/data/TestPottsMonolayerWithBirth/divisions.dat").CompareFiles();
     }
 
     void TestPottsMonolayerCellSorting()

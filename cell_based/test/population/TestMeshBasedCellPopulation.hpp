@@ -81,6 +81,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeVelocityWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 
+// Cell Populaton Event Write
+#include "CellDivisionLocationsWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -1039,6 +1042,11 @@ public:
         p_count_writer->SetFileName("new_cellmutationstates.dat");
         cell_population.AddCellPopulationCountWriter(p_count_writer);
 
+        typedef CellDivisionLocationsWriter<2, 2> DivWriter;
+        MAKE_PTR(DivWriter, p_event_writer);
+        p_event_writer->SetFileName("new_divisions.dat");
+        cell_population.AddCellPopulationEventWriter(p_event_writer);
+
         typedef CellAgesWriter<2, 2> AgWriter;
         MAKE_PTR(AgWriter, p_ages_writer);
         p_ages_writer->SetFileName("new_cellages.dat");
@@ -1073,6 +1081,7 @@ public:
         FileComparison(results_dir + "new_voronoi.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/voronoi.dat").CompareFiles();
         FileComparison(results_dir + "new_cellmutationstates.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "new_cellages.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "new_divisions.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/divisions.dat").CompareFiles();
 
 #ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
