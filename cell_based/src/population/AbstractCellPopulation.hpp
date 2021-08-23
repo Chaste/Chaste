@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Identifiable.hpp"
+#include "AbstractCellPopulationEventWriter.hpp"
 #include "AbstractCellPopulationCountWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
@@ -151,6 +152,9 @@ protected:
 
     /** A list of cell population count writers. */
     std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
+
+    /** A list of cell population event writers. */
+    std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationEventWriters;
 
     /**
      * Details of cell divisions, to be used by CellDivisionLocationsWriter
@@ -650,6 +654,16 @@ public:
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
+     * Accept a cell population event writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pPopulationCountWriter the population count writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
+
+    /**
      * Accept a cell writer so it can write data from this object to file.
      *
      * As this method is pure virtual, it must be overridden
@@ -799,6 +813,18 @@ public:
     }
 
     /**
+     * Add a cell population event writer based on its type. Template parameters are inferred from the population.
+     * The implementation of this function must be available in the header file.
+     *
+     * @return This method returns void
+     */
+    template<template <unsigned, unsigned> class T>
+    void AddCellPopulationEventWriter()
+    {
+        mCellPopulationEventWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+    }
+
+    /**
      * Add a cell population writer through an input argument.
      * This alternative to the templated AddPopulationWriter()
      * method allows the user to, for example, add a writer
@@ -841,6 +867,20 @@ public:
     }
 
     /**
+     * Add a cell population count writer through an input argument.
+     * This alternative to the templated AddCellPopulationEventWriter()
+     * method allows the user to, for example, add a writer
+     * with a non-default value for its member mFileName.
+     *
+     * @param pCellPopulationEventWriter shared pointer to a cell population event writer
+     * @return This method returns void
+     */
+    void AddCellPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
+    {
+        mCellPopulationEventWriters.push_back(pCellPopulationEventWriter);
+    }
+
+    /**
      * Get whether the population has a writer of the specified type.
      *
      * @return whether the population has this writer
@@ -868,6 +908,14 @@ public:
         BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_count_writer.get()))
+            {
+                return true;
+            }
+        }
+        typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+        BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+        {
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_event_writer.get()))
             {
                 return true;
             }

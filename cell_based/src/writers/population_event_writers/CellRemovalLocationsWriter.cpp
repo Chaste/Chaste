@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::CellRemovalLocationsWriter()
-        : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("removals.dat")
+        : AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>("removals.dat")
 {
 }
 
@@ -52,11 +52,9 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abst
 {
     std::vector<std::string> removals_information = pCellPopulation->GetRemovalsInformation();
 
-    *this->mpOutStream << removals_information.size() << "\t";
-
     for (unsigned index = 0; index < removals_information.size(); index++)
     {
-        *this->mpOutStream << removals_information[index] << "\t";
+        *this->mpOutStream << removals_information[index] << "\n";
     }
 
     pCellPopulation->ClearRemovalsInformation();
@@ -67,11 +65,9 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopu
 {
     std::vector<std::string> removals_information = pCellPopulation->GetRemovalsInformation();
 
-    *this->mpOutStream << removals_information.size() << "\t";
-
     for (unsigned index = 0; index < removals_information.size(); index++)
     {
-        *this->mpOutStream << removals_information[index] << "\t";
+        *this->mpOutStream << removals_information[index] << "\n";
     }
 
     pCellPopulation->ClearRemovalsInformation();

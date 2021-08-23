@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLREMOVALLOCATIONSWRITER_HPP_
-#define CELLREMOVALLOCATIONSWRITER_HPP_
+#ifndef CELLDIVISIONLOCATIONSWRITER_HPP_
+#define CELLDIVISIONLOCATIONSWRITER_HPP_
 
 #include <boost/serialization/base_object.hpp>
-#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellPopulationEventWriter.hpp"
 #include "ChasteSerialization.hpp"
 
 /**
- * A writer class to output the time, locations and cell id info of cell removals to a file.
+ * A writer class to output the time, locations and cell id info of cell divisions to a file.
  *
- * The output file is called removals.dat by default.
+ * The output file is called divisions.dat by default.
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellRemovalLocationsWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class CellDivisionLocationsWriter : public AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -60,26 +60,26 @@ private:
     template <class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
-        archive& boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive& boost::serialization::base_object<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
     /**
      * Default constructor.
      */
-    CellRemovalLocationsWriter();
+    CellDivisionLocationsWriter();
 
     /**
      * Visit the population and write the data.
      *
-     * Outputs a line of tab-separated values of the form:
-     * [num divisions] [Div time 0] [Div 0 x-pos] [Div 0 y-pos] [Div 0 z-pos] [Parent 0 Age] [Parent 0 ID] [Child 0 ID] [Div time 1] [Div 1 x-pos] ...
+     * Outputs [num divisions] lines of tab-separated values of the form:
+     *  [Div time 0] [Div 0 x-pos] [Div 0 y-pos] [Div 0 z-pos] [Parent 0 Age] [Parent 0 ID] [Child 0 ID] 
+     *  [Div time 1] [Div 1 x-pos] ...
      *
      * where [num divisions] denotes the number of Divisions since the previous output step
-     * with other information about each division event.
+     * with other imformation about each division event.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedEventWriter, which is nothing.
      * 
      * @param pCellPopulation a pointer to the population to visit.
      */
@@ -133,6 +133,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellRemovalLocationsWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellDivisionLocationsWriter)
 
-#endif /* CELLREMOVALLOCATIONSWRITER_HPP_ */
+#endif /* CELLDIVISIONLOCATIONSWRITER_HPP_ */

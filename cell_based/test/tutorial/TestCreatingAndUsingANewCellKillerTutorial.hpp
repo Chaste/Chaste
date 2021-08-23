@@ -231,7 +231,7 @@ public:
 
         /* To store information about the lovations and times of the killed cells use the 
          * {{{CellRemovalLocationsWriter}}} */
-        cell_population.AddPopulationWriter<CellRemovalLocationsWriter>();
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 
         /* To test that we have implemented the cell killer correctly, we call the
          * overridden method {{{CheckAndLabelCellsForApoptosisOrDeath}}}... */

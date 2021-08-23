@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::CellDivisionLocationsWriter()
-        : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("divisions.dat")
+        : AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>("divisions.dat")
 {
 }
 
@@ -52,30 +52,26 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abs
 {
     std::vector<std::string> divisions_information = pCellPopulation->GetDivisionsInformation();
 
-    *this->mpOutStream << divisions_information.size() << "\t";
-
     for (unsigned index = 0; index < divisions_information.size(); index++)
     {
-        *this->mpOutStream << divisions_information[index] << "\t";
+        *this->mpOutStream << divisions_information[index] << "\n";
     }
 
-    pCellPopulation->ClearDivisionsInformation();
+
+    pCellPopulation->ClearDivisionsInformation();    
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<std::string> divisions_information = pCellPopulation->GetDivisionsInformation();
-
-    *this->mpOutStream << divisions_information.size() << "\t";
-
+   
     for (unsigned index = 0; index < divisions_information.size(); index++)
     {
-        *this->mpOutStream << divisions_information[index] << "\t";
+        *this->mpOutStream << divisions_information[index] << "\n";
     }
 
-    pCellPopulation->ClearDivisionsInformation();
-
+    pCellPopulation->ClearDivisionsInformation();      
     //VisitAnyPopulation(pCellPopulation);
 }
 
