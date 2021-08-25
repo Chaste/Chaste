@@ -1,9 +1,9 @@
-ionicmodels/TestCvodeCells.hpp
-ionicmodels/TestDynamicallyLoadedCellModels.hpp
-ionicmodels/TestIonicModels.hpp
 performance/Test1dMonodomainShannonCvodeBenchmarks.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
+ionicmodels/TestCvodeCells.hpp
+ionicmodels/TestDynamicallyLoadedCellModels.hpp
+ionicmodels/TestIonicModels.hpp
 ionicmodels/TestCodegen.hpp
 ionicmodels/TestCodegenLong/TestCodegenLongNormal.hpp
 ionicmodels/TestCodegenLong/TestCodegenLongNumericalCvode.hpp
@@ -20,3 +20,6 @@ ionicmodels/TestCodegenLong/TestCodegenLongRushLarsenOpt.hpp
 ionicmodels/TestCodegenLong/TestCodegenLongGeneralisedRushLarsenFirstOrderOpt.hpp
 ionicmodels/TestCodegenLong/TestCodegenLongGeneralisedRushLarsenSecondOrderOpt.hpp
 ionicmodels/TestCodegenLong/TestCodegenLongEasyModels.hpp
+convergence/TestConvergenceTester.hpp
+monodomain/TestOperatorSplittingMonodomainSolver.hpp
+

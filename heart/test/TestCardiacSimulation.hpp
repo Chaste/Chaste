@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,6 +115,7 @@ public:
 
             if (p_vector_factory->GetLocalOwnership() > 0)
             {
+                // One warning will come from the lookup table hitting an nan                
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
                 std::stringstream msg;
                 msg << "Cannot apply drug to cell at node " << p_vector_factory->GetLow() << " as it has no parameter named 'not_a_current_conductance'.";

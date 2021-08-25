@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "ContactInhibitionCellCycleModel.hpp"
-#include "Debug.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "ExponentialG1GenerationalCellCycleModel.hpp"
 #include "FileComparison.hpp"

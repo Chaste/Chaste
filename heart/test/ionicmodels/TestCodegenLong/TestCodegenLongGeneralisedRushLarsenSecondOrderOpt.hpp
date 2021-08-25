@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,57 +60,28 @@ public:
         args.push_back("--grl2");
         args.push_back("--opt");
 
-        models.erase(std::find(models.begin(), models.end(), "nygren_atrial_model_1998"));
-
         std::vector<std::string> smaller_timestep_models = spectail_streatment_models(models, {"bondarenko_model_2004_apex",
                                                                                                "courtemanche_ramirez_nattel_model_1998",
                                                                                                "demir_model_1994",
                                                                                                "dokos_model_1996",
+                                                                                               "grandi2010ss",
                                                                                                "iyer_model_2004",
                                                                                                "iyer_model_2007",
                                                                                                "jafri_rice_winslow_model_1998",
                                                                                                "livshitz_rudy_2007",
+                                                                                               "nygren_atrial_model_1998",
                                                                                                "Shannon2004",
                                                                                                "stewart_zhang_model_2008_ss",
+                                                                                               "ten_tusscher_model_2004_endo",
                                                                                                "winslow_model_1999",
                                                                                                "FaberRudy2000",
                                                                                                "li_mouse_2010"});
-
-        std::vector<std::string> very_small_timestep_models = spectail_streatment_models(models, {"nygren_atrial_model_1998"});
-
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"fink_noble_giles_model_2008",
-                                                                                                     "ten_tusscher_model_2006_epi"});
-
-        std::vector<std::string> different_lookup_table_models2 = spectail_streatment_models(models, {"decker_2009",
-                                                                                                      "ten_tusscher_model_2004_epi"});
-
-        std::vector<std::string> different_lookup_table_models3 = spectail_streatment_models(models, {"grandi2010ss"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, very_small_timestep_models, args, true, -1000, false);
-
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models,
-                 {"--opt", "--grl2", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models2,
-                 {"--opt", "--grl2", "--lookup-table", "membrane_voltage", "-250.0003", "549.9999", "0.001"},
-                 true, -1000, true);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models3,
-                 {"--opt", "--grl2", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                 true, -1000, true);
-
     }
 };
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -112,6 +112,7 @@ public:
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_monodomain_results", false,
                                                  foldername, "SimulationResults", true, 1e-4 /*tol*/));
+
 
         FileFinder file(foldername + "_checkpoints/10ms/" + foldername + "_10ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);

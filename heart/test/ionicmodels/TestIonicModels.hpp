@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -89,7 +89,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellMLLoader.hpp"
 #include "CellMLToSharedLibraryConverter.hpp"
-
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -278,8 +277,8 @@ public:
         TS_ASSERT_DELTA( n98_ode_system.GetIIonic(), 0.2462, 1e-3);
 
         //Stress the lookup table with a silly voltage
-        n98_ode_system.rGetStateVariables()[0] = 550.;
-        TS_ASSERT_EQUALS(n98_ode_system.GetVoltage(), 550.0);
+        n98_ode_system.rGetStateVariables()[0] = 550.1;
+        TS_ASSERT_EQUALS(n98_ode_system.GetVoltage(), 550.1);
         TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
                 err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
 

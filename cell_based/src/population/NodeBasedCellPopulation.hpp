@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,6 +53,7 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
 {
     friend class TestNodeBasedCellPopulation;
     friend class TestNodeBasedCellPopulationParallelMethods;
+    friend class TestPeriodicNodeBasedCellPopulationParallelMethods;
 
 protected:
 
@@ -229,6 +230,17 @@ private:
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Helper method to calculate the message tags between processors 
+     * for NonBlockingSendCellsToNeighbourProcesses method
+     * Uses a Cantor pairing function
+     * 
+     * @param senderI sender processor rank
+     * @param receiverJ receiver processor rank
+     * @return a unique tag number
+     */
+    unsigned CalculateMessageTag(unsigned senderI, unsigned receiverJ);
 
 public:
 
