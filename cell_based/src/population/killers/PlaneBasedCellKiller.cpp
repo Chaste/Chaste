@@ -65,12 +65,18 @@ void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {
-        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+   //     if (!(*cell_iter)->IsDead())
+     //   {
+            c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
-        if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
-        {
-            cell_iter->Kill();
-        }
+            if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
+            {
+                if (!(*cell_iter)->IsDead())
+                {
+                cell_iter->Kill();
+                }
+            }
+       // }
     }
 }
 

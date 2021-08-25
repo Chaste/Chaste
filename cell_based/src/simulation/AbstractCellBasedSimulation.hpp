@@ -96,7 +96,6 @@ private:
         archive & mEndTime;
         archive & mNoBirth;
         archive & mUpdateCellPopulation;
-        archive & mUpdateCellPopulationInterval;
         archive & mOutputDirectory;
         archive & mNumBirths;
         archive & mNumDeaths;
@@ -130,9 +129,6 @@ protected:
 
     /** Whether to update the topology of the cell population at each time step (defaults to true).*/
     bool mUpdateCellPopulation;
-
-    /** interval in which to update the topology of the cell population at (defaults to 1 so every timestep).*/
-    unsigned mUpdateCellPopulationInterval;
 
     /** Output directory (a subfolder of tmp/[USERNAME]/testoutput). */
     std::string mOutputDirectory;
@@ -181,7 +177,7 @@ protected:
 
     /**
      * The ratio of the number of actual timesteps to the number
-     * of timesteps at which cells are updated.
+     * of timesteps at which cells and topology are updated.
      */
     unsigned mUpdatingTimestepMultiple;
 
@@ -356,7 +352,6 @@ public:
      */
     void SetUpdatingTimestepMultiple(unsigned updatingTimestepMultiple);
 
-
     /**
      * Set the simulation to run with no birth.
      *
@@ -377,14 +372,6 @@ public:
      * @return whether to update the cell population each time step
      */
     bool GetUpdateCellPopulationRule();
-
-    /**
-     * Set the interval between updating the cell population (i.e births or rearangements)
-     * Default value is set to 1 by the constructor.
-     *
-     * @param interval the interval to use
-     */
-    void SetUpdateCellPopulationInterval(unsigned interval);
 
     /**
      * Add a cell killer to be used in this simulation.

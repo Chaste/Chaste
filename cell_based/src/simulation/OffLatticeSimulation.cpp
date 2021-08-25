@@ -131,9 +131,10 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             // If using adaptive timestep, then increase the present_time_step (by 1% for now)
             if (mpNumericalMethod->HasAdaptiveTimestep())
             {
-                ///\todo #2087 Make this a settable member variable
-                double timestep_increase = 0.01;
                 present_time_step = std::min(present_time_step, target_time_step - time_advanced_so_far);
+                ///\todo #2087 Make this a settable member variable
+                //double timestep_increase = 1.0;
+                //present_time_step = std::min((1+timestep_increase)*present_time_step, target_time_step - time_advanced_so_far);
             }
 
         }

@@ -1416,10 +1416,17 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  * This case is handled in a separate method to allow child classes to implement different
                  * functionality for junction remodelling events (see #2664).
                  */
-                if (mProtorosetteFormationProbability > RandomNumberGenerator::Instance()->ranf())
+                if (mProtorosetteFormationProbability > 0.0)
                 {
-                    this->PerformNodeMerge(pNodeA, pNodeB);
-                    this->RemoveDeletedNodes();
+                    if (mProtorosetteFormationProbability > RandomNumberGenerator::Instance()->ranf())
+                    {
+                        this->PerformNodeMerge(pNodeA, pNodeB);
+                        this->RemoveDeletedNodes();
+                    }
+                    else
+                    {
+                        this->PerformT1Swap(pNodeA, pNodeB, all_indices);
+                    }
                 }
                 else
                 {
