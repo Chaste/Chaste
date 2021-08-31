@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -306,6 +306,11 @@ public:
                     // We know this model does something that provokes one warning...
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
                 }
+                else if(rModels[i] == "courtemanche_ramirez_nattel_model_1998")
+                {
+                    // Can throw 1 lookup table warning
+                   TS_ASSERT_LESS_THAN(Warnings::Instance()->GetNumWarnings(), 2u)
+                }
                 else
                 {
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
@@ -368,6 +373,7 @@ public:
     void AddEasyModels(std::vector<std::string>& rModels)
     {
        rModels.emplace_back("beeler_reuter_model_1977");
+       rModels.emplace_back("bondarenko_szigeti_bett_kim_rasmusson_2004_apical");
        rModels.emplace_back("earm_noble_model_1990");
        rModels.emplace_back("espinosa_model_1998_normal");
        rModels.emplace_back("hilgemann_noble_model_1987");
@@ -382,7 +388,7 @@ public:
        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
        rModels.emplace_back("zhang_SAN_model_2000_all");
     }
-    
+
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)
     {

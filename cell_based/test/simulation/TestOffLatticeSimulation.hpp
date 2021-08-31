@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -113,10 +113,18 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
+        // Add a cell killer to remove a cell
+        c_vector<double, 2> point = zero_vector<double>(2);
+        point[1] = 3.5;
+        c_vector<double, 2> normal = zero_vector<double>(2);
+        normal[1] = 1.0;
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); // y>3.5
+        simulator.AddCellKiller(p_killer);
+
         // Record node velocities
         cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
-        // Record division locations
+        // Record division and removal locations
         TS_ASSERT_EQUALS(simulator.GetOutputDivisionLocations(), false);
         simulator.SetOutputDivisionLocations(true);
 
@@ -139,6 +147,11 @@ public:
         NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/divisions.dat");
         TS_ASSERT(division_locations.CompareFiles(1e-2));
 
+        // Check removal locations file
+        std::string removal_locations_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/removals.dat";
+        NumericFileComparison removal_locations(removal_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/removals.dat");
+        TS_ASSERT(removal_locations.CompareFiles(1e-2));
+
         // Check cell velocities file
         std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";
         NumericFileComparison cell_velocities(cell_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/cellvelocities.dat");
@@ -149,11 +162,11 @@ public:
         std::string results_dir = handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
@@ -215,11 +228,11 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }

@@ -42,6 +42,7 @@ population/TestCaUpdateRules.hpp
 population/TestCellKillers.hpp
 population/TestCellPopulationBoundaryConditions.hpp
 population/TestCellPopulationCountWriters.hpp
+population/TestCellPopulationEventWriters.hpp
 population/TestCellPopulationWriters.hpp
 population/TestCellwiseDataGradient.hpp
 population/TestCellWriters.hpp
@@ -54,6 +55,7 @@ population/TestNodeBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulationParallelMethods.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestNodeBasedCellPopulationWithParticles.hpp
+population/TestPeriodicNodeBasedCellPopulationParallelMethods.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp

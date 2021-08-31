@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -492,6 +492,61 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This could leave a void in the mesh.");
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
         Warnings::QuietDestroy();
+    }
+
+    void TestVertexMonolayerWithIntersectionSwap()
+    {
+        // Construct a 2D vertex mesh consisting of two rhomboid elements,
+        // where a node belonging to the right element intersects the left
+        // element
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 0.99, 0.5));
+        nodes.push_back(new Node<2>(4, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(5, true, 0.0, 1.0));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[4] = {0, 1, 4, 5};
+        unsigned node_indices_elem_1[4] = {1, 2, 3, 4};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+
+        MutableVertexMesh<2,2> mesh(nodes, vertex_elements);
+
+        /*
+         * Set check for internal intersections to allow intersection swaps to occur.
+         */
+        mesh.SetCheckForInternalIntersections(true);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestVertexMonolayerWithIntersectionSwap");
+        simulator.SetEndTime(0.5);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that intersection swap was successful
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 5);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 3);
     }
 
     /*

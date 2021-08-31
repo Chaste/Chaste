@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCellFactory.hpp"
 #include "BidomainProblem.hpp"
 #include "GeneralPlaneStimulusCellFactory.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "CuboidMeshConstructor.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
@@ -186,7 +186,7 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePEBJ");
 
-        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
+        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
 
         tester.Solve();
     }
@@ -197,7 +197,7 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("blockdiagonal");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePEBD");
 
-        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
+        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
 
         tester.Solve();
     }
@@ -208,7 +208,7 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("ldufactorisation");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainMeshIndependencePELDU");
 
-        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
+        MultiMeshSolver<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<3>, 3, 2> tester(mesh_size, num_meshes);
 
         tester.Solve();
     }

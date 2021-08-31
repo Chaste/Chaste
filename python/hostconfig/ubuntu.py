@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,11 @@ for item in whole_file.split("\n"):
 ubuntu_ver = version_line.replace('DISTRIB_RELEASE=','')
 ubuntu_ver = list(map(int, ubuntu_ver.split('.')[0:2]))
 
-if ubuntu_ver >= [18,10]:
+if ubuntu_ver >= [20,4]:
+    petsc_ver = 3.12
+    petsc_path = '/usr/lib/petscdir/'
+    petsc_build_name = '3.12'
+elif ubuntu_ver >= [18,10]:
     petsc_ver = 3.9
     petsc_path = '/usr/lib/petscdir/'
     petsc_build_name = '3.9'
@@ -140,12 +144,12 @@ else:
     hdf5_lib = 'hdf5'
 
 libs_for_petsc = ['petsccontrib', 'X11',
-                  'HYPRE', 'spooles', 'superlu',
+                  'HYPRE', 'superlu',
                   'umfpack', 'amd' # Both for Umfpack
                   ]
 
-if ubuntu_ver >= [11,4]:
-    libs_for_petsc.append(['HYPRE_utilities', 
+if ubuntu_ver >= [11,4] and ubuntu_ver < [20,4]:
+    libs_for_petsc.append(['HYPRE_utilities', 'spooles', # Spooles removed from PETSc in v3.4, removed from Ubuntu 20.04
                            'HYPRE_struct_mv', 'HYPRE_struct_ls',  
                            'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
                            'HYPRE_IJ_mv', 'HYPRE_parcsr_ls', 'dmumps'])

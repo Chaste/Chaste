@@ -7,26 +7,56 @@
 
 <h1>Chaste Release Notes</h1>
 
-<h2>Release 2020.1 (changes since Release 2019.1)</h2>
+<h2>Release 2021.1 (changes since Release 2019.1)</h2>
 
 
 <h3>Headline features</h3>
-<ul><li>Chaste has now been updated to Python3 (3.5+).
-    <ul><li>New dependancies (which most systems will already have):
-        <ul><li>python3
-        </li><li>python3-venv
-        </li><li>python3-pip</li></ul>
-    </li><li>The following Python2 dependancies are no longer required:</a>.
-        <ul><li>python-devel
-        </li><li>python-lxml
-        </li><li>python-amara
-        </li><li>python-rdflib
-        </li><li>python-dateutil</li></ul>
-    </li></ul>
+<ul><li>Chaste has now been <strong>updated to Python3 (3.5+)</strong>.
+  <ul><li>New dependencies (which most systems will already have):
+    <ul><li>python3
+    </li><li>python3-venv
+    </li><li>python3-pip
+    </li></ul></li><li>The following Python2 dependencies are no longer required:
+    <ul><li>python-devel
+    </li><li>python-lxml
+    </li><li>python-amara
+    </li><li>python-rdflib
+    </li><li>python-dateutil
+    </li></ul></li></ul></li><li>Chaste now supports Ubuntu 20.04 LTS (Focal).
 </li></ul>
 
+<h3>New dependency support</h3>
+<ul><li>Chaste now supports PETSc up to 3.12, Boost up to 1.74, SUNDIALS up to 4.1.0 and VTK up to 8.2.
+</li></ul>
+
+
 <h3>Heart</h3>
-<ul><li>This release features a new Python3 code generator for cellml files has called <em>chaste_codegen</em> fully replacing PyCml. The tast packs have been adjusted and renamed accordingly. Usage for chaste_codegen has changed from PyCml, see for more details the updated <a href="https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2020.1/ChasteGuides/CodeGenerationFromCellML.html">CodeGenerationFromCellML</a> guide.
+<ul><li>The CellML to Chaste hpp/cpp converter was <tt>PyCML</tt> (based on Python 2) this has been replaced by <tt>chaste_codegen</tt> (<a  href="https://github.com/ModellingWebLab/chaste-codegen">https://github.com/ModellingWebLab/chaste-codegen</a>, based on Python 3). See <a  href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides">ChasteGuides</a>/CodeGenerationFromCellML for info on how to use this new library at the command line, but no changes needed unless you were using PyCML manually before. There are a couple of nice new features with this:
+  <ul><li>You no longer need to manually use the proprietary software Maple to compute Analytic Jacobians for CVODE to get speed ups, we now use the free software <a  href="https://www.sympy.org/en/index.html">SymPy</a> behind the scenes to do this on the fly. <strong>N.B. these are now generated and used automatically, but are known to cause issues in a handful of models, so use the <tt>ForceUseOfNumericalJacobian()</tt> method if CVODE errors suddenly appear and you hadn't heard of using Maple or analytic Jacobians before. See <a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials/SingleCellSimulation">https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials/SingleCellSimulation</a> for more info.</strong>
+  </li><li>We now automatically analyse your model to detect singularities in <a  href="https://en.wikipedia.org/wiki/Goldman%E2%80%93Hodgkin%E2%80%93Katz_flux_equation">GHK equations</a>, and apply an interpolation fix so that they don't cause any problems at the voltages of concern (often, but not always, V=0). From now on, <strong>manual fixes for these singularities should be removed from CellML files</strong>. We'll be writing a note on how exactly we've done this, but you can examine the results of the fixes <a  href="https://github.com/ModellingWebLab/chaste-codegen/blob/assets/singularity_fixes.md">here</a> for a range of models (grey=original, red=fix, orange shaded region=voltage range where interpolation is used). As a nice side-effect, lookup tables no longer need to go from offset voltages like -150.00001mV to 100.00001mV to avoid hitting these singularities, and have been moved to nice round numbers!
+  </li></ul></li></ul>
+
+<h3>Cell Based</h3>
+<ul><li>You can now specify any dimension to have a periodic boundary condition in 3-D <tt>NodeBased</tt> simulations. This also works in parallel.  See for example <tt>TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d::TestSimple3dTissueYPeriodic</tt>
+</li></ul><ul><li>Fixed to output of cell proliferative type to stop this output being overwritten by mutations state or label id.
+</li></ul><ul><li>Bug fix on daughter cell placement in off-lattice centre-based simulations. Daughter cells are now correctly placed equal distances from the parent cell centre location.
+</li></ul><ul><li>Changes to performance and correctness of <tt>VertexBased</tt> code.
+  <ul><li>Bug in <tt>MutableVertexMesh::PerformIntersectionSwap()</tt> working at boundary of <tt>VertexMesh</tt> found and fixed. Previous code expected there to be four elements surrounding the intersection whereas, at the boundary, there are several other cases.
+  </li><li>Bug fix to <tt>MutableVertexMesh::PerformT2Swap()</tt> in the case where a small triangular element has no neighbours.
+  </li><li>Performance optimization to <tt>MutableVertexMesh::CheckForIntersections()</tt>.
+  </li></ul></li></ul>
+
+<h3>Future Plans</h3>
+<p>
+  This will be the last release of Chaste to support Ubuntu 16.04 LTS and its dependencies. The following will not be supported in future releases:
+</p>
+<ul><li>Boost &lt; 1.65.1
+</li><li>CMake &lt; 3.10.2
+</li><li>HDF5 &lt; 1.10.0
+</li><li>PETSc &lt; 3.7.7
+</li><li>VTK &lt; 6.3.0
+</li><li>Xerces &lt; 3.2.0
+</li><li>SUNDIALS &lt; 2.7.0
 </li></ul>
 
 <h2>Release 2019.1 (changes since Release 2018.1)</h2>

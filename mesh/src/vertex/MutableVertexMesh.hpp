@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,6 +94,9 @@ protected:
     /** Whether to check for edges intersections (true) or not (false). */
     bool mCheckForInternalIntersections;
 
+    /** Whether to check for T3 swaps (true) or not (false). */
+    bool mCheckForT3Swaps;
+
     /** Indices of nodes that have been deleted. These indices can be reused when adding new elements/nodes. */
     std::vector<unsigned> mDeletedNodeIndices;
 
@@ -126,6 +129,12 @@ protected:
     std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
 
     /**
+     * Locations of intersection swaps (the mid point of the switching nodes), stored so they can be accessed and output by the cell population.
+     * The locations are stored until they are cleared by ClearLocationsOfIntersectionSwaps().
+     */
+    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfIntersectionSwaps;
+
+    /**
      * Divide an element along the axis passing through two of its nodes.
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
@@ -137,7 +146,7 @@ protected:
      *
      * @return the index of the new element
      */
-    unsigned DivideElement(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                            unsigned nodeAIndex,
                            unsigned nodeBIndex,
                            bool placeOriginalElementBelow=false);
@@ -224,7 +233,7 @@ protected:
      *
      * @param rElement the element to remove
      */
-    void PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement);
+    void PerformT2Swap(VertexElement<ELEMENT_DIM, SPACE_DIM>& rElement);
 
     /**
      * Helper method for ReMesh(), called by CheckForIntersections().
@@ -318,7 +327,7 @@ protected:
      *
      * @return intersection, the corrected location of where we are planning to put the merged node
      */
-    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
+    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double, 2> intersection);
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -347,6 +356,7 @@ protected:
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
         archive & mDistanceForT3SwapChecking;
+        archive & mCheckForT3Swaps;
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
@@ -447,6 +457,13 @@ public:
     void SetCheckForInternalIntersections(bool checkForInternalIntersections);
 
     /**
+     * Set method for mCheckForT3Swaps.
+     *
+     * @param checkForT3Swaps
+     */
+    void SetCheckForT3Swaps(bool checkForT3Swaps);
+
+    /**
      * @return mCellRearrangementThreshold
      */
     double GetCellRearrangementThreshold() const;
@@ -515,6 +532,11 @@ public:
     bool GetCheckForInternalIntersections() const;
 
     /**
+     * @return mCheckForT3Swaps, either to check for T3 swaps or not.
+     */
+    bool GetCheckForT3Swaps() const;
+
+    /**
      * @return the locations of the T1 swaps
      */
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
@@ -530,6 +552,11 @@ public:
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
 
     /**
+     * @return the locations of the intersection swaps
+     */
+    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfIntersectionSwaps();
+
+    /**
      * Helper method to clear the stored T1 swaps
      */
     void ClearLocationsOfT1Swaps();
@@ -538,6 +565,11 @@ public:
      * Helper method to clear the stored T3 swaps
      */
     void ClearLocationsOfT3Swaps();
+
+    /**
+     * Helper method to clear the stored intersection swaps
+     */
+    void ClearLocationsOfIntersectionSwaps();
 
     /**
      * Add a node to the mesh.
@@ -575,7 +607,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElementAlongShortAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                          bool placeOriginalElementBelow=false);
 
     /**
@@ -591,7 +623,7 @@ public:
      *
      * @return the index of the new element
      */
-    unsigned DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    unsigned DivideElementAlongGivenAxis(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                          c_vector<double, SPACE_DIM> axisOfDivision,
                                          bool placeOriginalElementBelow=false);
 

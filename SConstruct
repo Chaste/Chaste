@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2020, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -315,7 +315,7 @@ else:
              'INTEL_LICENSE_FILE': os.environ.get('INTEL_LICENSE_FILE', '.'),
              'CHASTE_TEST_OUTPUT':
                  os.environ.get('CHASTE_TEST_OUTPUT',
-                                '/tmp/'+os.environ['USER']+'/testoutput/'),
+                               '/tmp/'+os.environ['USER']+'/testoutput/'),
              'CHASTE_DEBUG': str(debug),
              'CHASTE_LIBS': os.environ.get('CHASTE_LIBS', ''),
              'LD_LIBRARY_PATH': ':'.join(other_libpaths),

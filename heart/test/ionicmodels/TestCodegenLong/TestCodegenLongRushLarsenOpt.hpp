@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,17 +63,11 @@ public:
         std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010",
                                                                                        "courtemanche_ramirez_nattel_model_1998",
                                                                                        "demir_model_1994",
-                                                                                       "grandi2010ss"});
+                                                                                       "grandi2010ss",
+                                                                                       "Shannon2004"});
 
-        // Models with a different lookup table setting
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"DiFrancescoNoble1985"});
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
-
-        RunTests(dirname + "-different_lookup_table", different_lookup_table_models,
-                   {"--rush-larsen", "--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"},
-                   true, -1000, true);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);

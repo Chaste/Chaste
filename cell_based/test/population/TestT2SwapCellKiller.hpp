@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,22 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTT2SWAPCELLKILLER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
-#include "ArchiveOpener.hpp"
-#include "CellsGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "VertexMeshWriter.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "T2SwapCellKiller.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "FileComparison.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "Warnings.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "SmartPointers.hpp"
+#include "ArchiveOpener.hpp"
+#include "CellRemovalLocationsWriter.hpp"
+#include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "T2SwapCellKiller.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "VertexMeshWriter.hpp"
+#include "Warnings.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -201,7 +202,7 @@ public:
     {
         /**
          * This is performs a single T2 swap in a simulation and tests that the cells and vertex elements are
-         * deleted correctly.
+         * deleted correctly. Also check the cell removal is output correctly.
          */
         // Make 6 nodes to assign to four elements
         std::vector<Node<2>*> nodes;
@@ -251,6 +252,9 @@ public:
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        // Add a writer to store when cells are removed from simulation
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 
         // make a simulator
         OffLatticeSimulation<2> simulator(cell_population);
@@ -315,6 +319,12 @@ public:
 
         // We also do not have any undeleted cells
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(),3u);
+
+        //Check the cell removal is recorded correctly.
+        FileFinder generated_file("TestT2SwapCellKillerInSimulation/results_from_time_0.003/removals.dat", RelativeTo::ChasteTestOutput);
+        FileFinder reference_file("cell_based/test/data/TestT2SwapCellKillerInSimulation/removals.dat", RelativeTo::ChasteSourceRoot);
+        FileComparison files(generated_file, reference_file);
+        TS_ASSERT(files.CompareFiles());
     }
 
     void TestKillerForMultipleT2Swaps()
@@ -596,6 +606,179 @@ public:
         TS_ASSERT(!cell_population.GetCellUsingLocationIndex(1)->IsDead());
         TS_ASSERT(!cell_population.GetCellUsingLocationIndex(2)->IsDead());
         TS_ASSERT(!cell_population.GetCellUsingLocationIndex(3)->IsDead());
+    }
+
+    void TestKillerForT2SwapWithoutNeighbours()
+    {
+        /*
+         * Create a mesh comprising three nodes contained in one triangle
+         * element, as shown below. We will test that a T2 swap is performed
+         * correctly when an element has no neighbouring elements.
+         *        _
+         *       / \
+         *      /   \
+         *     /     \
+         *    /   0   \
+         *   /         \
+         *  /___________\
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.05));
+        nodes.push_back(new Node<2>(1, true, 0.9, 0.05));
+        nodes.push_back(new Node<2>(2, true, 0.5, 0.475));
+
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        vertex_mesh.SetT2Threshold(0.01);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Get a cell population
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        std::vector<CellPtr> cells;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        // The population should have 1 cell
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u)
+
+        // Give the Population to the cell killer
+        T2SwapCellKiller<2> cell_killer(&cell_population);
+
+        // Perform swaps
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
+
+        // We should not have had any T2 swaps yet
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // We move the inner vertices a bit inwards
+        c_vector<double, 2>& new_location_0 = vertex_elements[0]->GetNode(0)->rGetModifiableLocation();
+        new_location_0(0) = 0.499;
+        new_location_0(1) = 0.249;
+
+        c_vector<double, 2>& new_location_1 = vertex_elements[0]->GetNode(1)->rGetModifiableLocation();
+        new_location_1(0) = 0.501;
+        new_location_1(1) = 0.249;
+
+        c_vector<double, 2>& new_location_2 = vertex_elements[0]->GetNode(2)->rGetModifiableLocation();
+        new_location_2(0) = 0.5;
+        new_location_2(1) = 0.251;
+
+        // T2 swaps should now be able to happen
+
+        // Perform swaps
+        cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 0u);
+
+        // Test tracking of T2 swaps
+        std::vector< c_vector<double, 2> > t2_locations = cell_population.GetLocationsOfT2Swaps();
+        std::vector< unsigned > t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
+        TS_ASSERT_EQUALS(t2_locations.size(), 1u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 1u);
+        TS_ASSERT_EQUALS(t2_cell_ids[0], 0u);
+        TS_ASSERT_DELTA(t2_locations[0][0], 0.4999, 1e-3);
+        TS_ASSERT_DELTA(t2_locations[0][1], 0.2496, 1e-3);
+
+        // Test T2 swap Location clearing
+        cell_population.ClearLocationsAndCellIdsOfT2Swaps();
+        t2_locations = cell_population.GetLocationsOfT2Swaps();
+        t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
+        TS_ASSERT_EQUALS(t2_locations.size(), 0u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 0u);
+
+        // Test that the cell corresponding to element 0 has been
+        // marked as deleted and the others haven't
+        TS_ASSERT(cell_population.GetCellUsingLocationIndex(0)->IsDead());
+
+        // We shouldn't have overseen any cells
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(),1u);
+    }
+
+    void TestKillerForT2SwapWithoutNeighboursInSimulation()
+    {
+        /**
+         * We conduct the same test as before, but now within an OffLatticeSimulation. We make sure that
+         * the killed cell and the corresponding vertex element get correctly deleted.
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.05));
+        nodes.push_back(new Node<2>(1, true, 0.9, 0.05));
+        nodes.push_back(new Node<2>(2, true, 0.5, 0.475));
+
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        vertex_mesh.SetT2Threshold(0.01);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Get a cell population
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        std::vector<CellPtr> cells;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        // make a simulator
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestT2SwapCellKillerWithoutNeighboursInSimulation");
+        simulator.SetEndTime(0.003);
+
+        // Perform swaps
+        simulator.Solve();
+
+        // We should not have had any T2 swaps yet
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Move the inner vertices inwards
+        c_vector<double, 2>& new_location_0 = vertex_elements[0]->GetNode(0)->rGetModifiableLocation();
+        new_location_0(0) = 0.499;
+        new_location_0(1) = 0.249;
+
+        c_vector<double, 2>& new_location_1 = vertex_elements[0]->GetNode(1)->rGetModifiableLocation();
+        new_location_1(0) = 0.501;
+        new_location_1(1) = 0.249;
+
+        c_vector<double, 2>& new_location_2 = vertex_elements[0]->GetNode(2)->rGetModifiableLocation();
+        new_location_2(0) = 0.5;
+        new_location_2(1) = 0.251;
+
+        // T2 swaps should now happen
+        simulator.SetEndTime(0.005);
+
+        // Perform swaps
+        simulator.Solve();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 0u);
+
+        // Check that we have the right number of cells
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 0u)
+
+        // We also do not have any undeleted cells
+        TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 0u);
     }
 
     /**

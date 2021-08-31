@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1236,7 +1236,7 @@ public:
 
         // Test that the correct cell proliferative types were recorded
         std::vector<double> proliferative_types_data;
-        vtk_reader.GetPointData("Cell types", proliferative_types_data);
+        vtk_reader.GetPointData("Legacy Cell types", proliferative_types_data);
         TS_ASSERT_EQUALS(proliferative_types_data.size(), 4u);
         TS_ASSERT_DELTA(proliferative_types_data[0], 5.0, 1e-9);
         TS_ASSERT_DELTA(proliferative_types_data[1], 3.0, 1e-9);

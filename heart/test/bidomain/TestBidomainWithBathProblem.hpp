@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BidomainWithBathProblem.hpp"
 
 #include "LuoRudy1991.hpp"
-#include "TenTusscher2006EpiBackwardEuler.hpp"
+#include "TenTusscher2006EpiBackwardEulerOpt.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -817,7 +817,7 @@ public:
             HeartConfig::Instance()->SetOdeTimeStep(0.001);  // ms
 
             // need to create a cell factory but don't want any intra stim.
-            ZeroStimulusCellFactory<CellTenTusscher2006EpiFromCellMLBackwardEuler, 2> cell_factory;
+            ZeroStimulusCellFactory<CellTenTusscher2006EpiFromCellMLBackwardEulerOpt, 2> cell_factory;
 
             BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
 

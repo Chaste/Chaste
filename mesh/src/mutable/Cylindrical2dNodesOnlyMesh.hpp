@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -94,9 +94,9 @@ public:
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows of the collection that this process should own.
-     * @param isPeriodic whether the box collection should be periodic. Defaults to true.
+     * @param isPeriodic whether the box collection should be periodic. Defaults to true in x not y.
      */
-    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodic = true);
+    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows = PETSC_DECIDE, c_vector<bool,2> isDimPeriodic = unit_vector<bool>(2,0));
 
     /**
      * Overridden GetVectorFromAtoB() method.

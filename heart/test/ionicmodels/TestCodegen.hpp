@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,11 +54,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991Opt.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 
 #include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
-#include "NobleVargheseKohlNoble1998aBackwardEuler.hpp"
+#include "NobleVargheseKohlNoble1998aBackwardEulerOpt.hpp"
 
 #ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
@@ -175,7 +175,7 @@ public:
         CheckCai(opt, true, 0.0002);
 
         // Backward Euler optimised model
-        CellLuoRudy1991FromCellMLBackwardEuler be(p_solver, p_stimulus);
+        CellLuoRudy1991FromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
 
         TS_ASSERT_EQUALS(be.GetVoltageIndex(), 0u);
         CheckCai(be, true, 0.0002);
@@ -190,9 +190,9 @@ public:
         TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
         double min, max, step;
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
-        TS_ASSERT_DELTA(min, -250.0001, 1e-12);
+        TS_ASSERT_DELTA(min, -250.0, 1e-12);
         TS_ASSERT_DELTA(step, 0.001, 1e-12);
-        TS_ASSERT_DELTA(max, 549.9999, 1e-12);
+        TS_ASSERT_DELTA(max, 550.0, 1e-12);
 
         // Check set methods for coverage
         AbstractLookupTableCollection::EventHandler::Headings();
@@ -214,25 +214,25 @@ public:
         TS_ASSERT_THROWS_CONTAINS(opt.GetIIonic(), "membrane_voltage outside lookup table range");
         opt.SetVoltage(v);
 
-	// Set up for dynamic loading
-	FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
+    // Set up for dynamic loading
+    FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
 
-	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_lut("TestCodegen", true);
-       	FileFinder copied_file = handler_lut.CopyFileTo(cellml_file);
-	CellMLToSharedLibraryConverter converter(true);
-       	converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
+    // Dynamic load with different lookup table start to the default
+    OutputFileHandler handler_lut("TestCodegen", true);
+           FileFinder copied_file = handler_lut.CopyFileTo(cellml_file);
+    CellMLToSharedLibraryConverter converter(true);
+           converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_lut = converter.Convert(copied_file);
-	AbstractCardiacCell* opt_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_lut->CreateCell(p_solver, p_stimulus));
+    AbstractCardiacCell* opt_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_lut->CreateCell(p_solver, p_stimulus));
 
-	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_be_lut("TestCodegen/BE", true);
-       	copied_file = handler_be_lut.CopyFileTo(cellml_file);
-       	converter.SetOptions({"--backward-euler", "--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
+    // Dynamic load with different lookup table start to the default
+    OutputFileHandler handler_be_lut("TestCodegen/BE", true);
+           copied_file = handler_be_lut.CopyFileTo(cellml_file);
+           converter.SetOptions({"--backward-euler", "--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_be_lut = converter.Convert(copied_file);
-	AbstractCardiacCell* be_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_be_lut->CreateCell(p_solver, p_stimulus));
+    AbstractCardiacCell* be_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_be_lut->CreateCell(p_solver, p_stimulus));
 
 
         // Check tables using AbstractLookupTableCollection interface, with different lookup table options
@@ -330,9 +330,9 @@ public:
         TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("membrane_voltage"), 23u);
         TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
-        TS_ASSERT_DELTA(min, -250.0001, 1e-12);
+        TS_ASSERT_DELTA(min, -250.0, 1e-12);
         TS_ASSERT_DELTA(step, 0.001, 1e-12);
-        TS_ASSERT_DELTA(max, 549.9999, 1e-12);
+        TS_ASSERT_DELTA(max, 550.0, 1e-12);
 
         // Check that the tables really exist!
         cvode_opt.SetVoltage(-100000);
@@ -341,8 +341,8 @@ public:
 
         // Dynamic load with different lookup table start to the default
         OutputFileHandler handler_cvode_lut("TestC/CVODE", true);
-       	copied_file = handler_cvode_lut.CopyFileTo(cellml_file);
-       	converter.SetOptions({"--opt", "--cvode",
+           copied_file = handler_cvode_lut.CopyFileTo(cellml_file);
+           converter.SetOptions({"--opt", "--cvode",
                               "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_cvode_lut = converter.Convert(copied_file);
@@ -589,7 +589,7 @@ public:
         CheckCai(opt, false);
 
         // Backward Euler model
-        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler be(p_solver, p_stimulus);
+        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
         CheckCai(be, false);
     }
 };
