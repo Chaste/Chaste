@@ -61,8 +61,7 @@ private:
     double mWidth;
 
     /** The periodic height of the domain. */
-    double mDepth;
-
+    double mHeight;
 
     /** The left nodes which have been mirrored during the remesh. */
     std::vector<unsigned> mLeftOriginals;
@@ -261,7 +260,7 @@ private:
     {
         archive & boost::serialization::base_object<MutableMesh<2,2> >(*this);
         archive & mWidth;
-        archive & mDepth;
+        archive & mHeight;
     }
 
 public:

@@ -43,11 +43,12 @@ mesh_writer.WriteFilesUsingMesh(*this);
 #include "Toroidal2dMesh.hpp"
 #include "Exception.hpp"
 #include "Debug.hpp"
+#include "VtkMeshWriter.hpp"
 
 Toroidal2dMesh::Toroidal2dMesh(double width, double depth)
   : MutableMesh<2,2>(),
     mWidth(width),
-    mDepth(depth)
+    mHeight(depth)
 {
     assert(width > 0.0);
     assert(depth > 0.0);
@@ -60,7 +61,7 @@ Toroidal2dMesh::~Toroidal2dMesh()
 Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* > nodes)
   : MutableMesh<2,2>(),
     mWidth(width),
-    mDepth(depth)
+    mHeight(depth)
 {
     assert(width > 0.0);
     assert(depth > 0.0);
@@ -88,7 +89,7 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
 void Toroidal2dMesh::CreateMirrorNodes()
 {
     double x_half_way = 0.5*mWidth;
-    double y_half_way = 0.5*mDepth;
+    double y_half_way = 0.5*mHeight;
 
     mLeftOriginals.clear();
     mLeftImages.clear();
@@ -122,17 +123,17 @@ void Toroidal2dMesh::CreateMirrorNodes()
 
         // Check the mesh currently conforms to the dimensions given
         assert(0.0 <= this_node_y_location);
-        assert(this_node_y_location <= mDepth);
+        assert(this_node_y_location <= mHeight);
 
         // Put the nodes which are to be mirrored in the relevant vectors
-        if (this_node_y_location < y_half_way)
-        {
+        //if (this_node_y_location < y_half_way)
+        //{
             mBottomOriginals.push_back(this_node_index);
-        }
-        else
-        {
+        //}
+        //else
+        //{
             mTopOriginals.push_back(this_node_index);
-        }
+        //}
     }
 
     // For each Bottom original node, create an image node and record its new index
@@ -140,7 +141,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     {
         c_vector<double, 2> location;
         location = mNodes[mBottomOriginals[i]]->rGetLocation();
-        location[1] = location[1] + mDepth;
+        location[1] = location[1] + mHeight;
 
         unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
         mBottomImages.push_back(new_node_index);
@@ -152,7 +153,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     {
         c_vector<double, 2> location;
         location = mNodes[mTopOriginals[i]]->rGetLocation();
-        location[1] = location[1] - mDepth;
+        location[1] = location[1] - mHeight;
 
         unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
         mTopImages.push_back(new_node_index);
@@ -179,14 +180,14 @@ void Toroidal2dMesh::CreateMirrorNodes()
         assert(this_node_x_location<= mWidth);
 
         // Put the nodes which are to be mirrored in the relevant vectors
-        if (this_node_x_location < x_half_way)
-        {
+        //if (this_node_x_location < x_half_way)
+        //{
             mLeftOriginals.push_back(this_node_index);
-        }
-        else
-        {
+        //}
+        //else
+        //{
             mRightOriginals.push_back(this_node_index);
-        }
+        //}
     }
 
     // For each left original node, create an image node and record its new index
@@ -236,7 +237,10 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         }
     }
 
-  
+
+VtkMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
+mesh_writer.WriteFilesUsingMesh(*this);
+
     // Create mirrored nodes for the normal remesher to work with
     CreateMirrorNodes();
 
@@ -251,12 +255,92 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     NodeMap big_map(GetNumAllNodes());
     MutableMesh<2,2>::ReMesh(big_map);
 
+VtkMeshWriter<2,2> mesh_writer_2("Toroidal2dMeshDebug", "extended_mesh", false);
+mesh_writer_2.WriteFilesUsingMesh(*this);
+
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
      * altered accordingly before being passed to the user. Not sure how this all
      * works, so deal with this bridge when we get to it.
      */
     assert(big_map.IsIdentityMap());
+
+
+    /*
+     * Now remove any long edges to help stop extra edges on the boundary
+     * 
+     * We need to do this extra step in the toroidal mesh as otherwise there can be extra edges
+     * on the left or right boundary due to remeshing the convex hull. See #3043
+     */
+    double left_boundary = -0.5*mWidth;
+    double right_boundary = 1.5*mWidth;
+    double bottom_boundary = -0.5*mHeight;
+    double top_boundary = 1.5*mHeight;
+
+    for (TetrahedralMesh<2,2>::ElementIterator elem_iter = this->GetElementIteratorBegin();
+        elem_iter != this->GetElementIteratorEnd();
+        ++elem_iter)
+    { 
+        unsigned num_nodes_outside = 0;
+        for (unsigned j=0; j<3; j++)
+        {
+            Node<2>* p_node = this->GetNode(elem_iter->GetNodeGlobalIndex(j));
+            
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
+            unsigned this_node_index = p_node->GetIndex();
+            double this_node_x_location = location[0];
+            double this_node_y_location = location[1];
+
+            if ((this_node_x_location < left_boundary) ||
+                (this_node_x_location > right_boundary) ||
+                (this_node_y_location < bottom_boundary) ||
+                (this_node_y_location > top_boundary))
+            {
+                num_nodes_outside++;
+            }
+            
+            // At this point theres no periodicity so can use euclidian distance
+            if (num_nodes_outside==3)
+            {
+                // TRACE("Deleting Element");
+                // PRINT_VARIABLE(elem_iter->GetIndex());
+                //DeleteElement(elem_iter->GetIndex());
+                elem_iter->MarkAsDeleted();
+                mDeletedElementIndices.push_back(elem_iter->GetIndex());
+            }
+        }
+    }
+    for (TetrahedralMesh<2,2>::BoundaryElementIterator elem_iter = this->GetBoundaryElementIteratorBegin();
+        elem_iter != this->GetBoundaryElementIteratorEnd();
+        ++elem_iter)
+    { 
+        unsigned num_nodes_outside = 0;
+        for (unsigned j=0; j<2; j++)
+        {
+            Node<2>* p_node = this->GetNode((*elem_iter)->GetNodeGlobalIndex(j));
+            
+            c_vector<double, 2> location;
+            location = p_node->rGetLocation();
+            unsigned this_node_index = p_node->GetIndex();
+            double this_node_x_location = location[0];
+            double this_node_y_location = location[1];
+
+            if ((this_node_x_location < left_boundary) ||
+                (this_node_x_location > right_boundary) ||
+                (this_node_y_location < bottom_boundary) ||
+                (this_node_y_location > top_boundary))
+            {
+                num_nodes_outside++;
+            }
+            
+            if (num_nodes_outside==2)
+            {
+                (*elem_iter)->MarkAsDeleted();
+                mDeletedBoundaryElementIndices.push_back((*elem_iter)->GetIndex());
+            }
+        }
+    }
 
     // Re-index the vectors according to the big nodemap, and set up the maps.
     mImageToLeftOriginalNodeMap.clear();
@@ -291,34 +375,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      * a proper periodic mesh.
      */
     ReconstructCylindricalMesh();
-
-
-    // /*
-    //  * Create a random boundary element between two nodes of the first
-    //  * element if it is not deleted. This is a temporary measure to get
-    //  * around re-index crashing when there are no boundary elements.
-    //  */
-    // unsigned num_elements = GetNumAllElements();
-    // bool boundary_element_made = false;
-    // unsigned elem_index = 0;
-
-    // while (elem_index<num_elements && !boundary_element_made)
-    // {
-    //     Element<2,2>* p_element = GetElement(elem_index);
-    //     if (!p_element->IsDeleted())
-    //     {
-    //         boundary_element_made = true;
-    //         std::vector<Node<2>*> nodes;
-    //         nodes.push_back(p_element->GetNode(0));
-    //         nodes.push_back(p_element->GetNode(1));
-    //         BoundaryElement<1,2>* p_boundary_element = new BoundaryElement<1,2>(0, nodes);
-    //         p_boundary_element->RegisterWithNodes();
-    //         mBoundaryElements.push_back(p_boundary_element);
-    //         this->mBoundaryElementWeightedDirections.push_back(zero_vector<double>(2));
-    //         this->mBoundaryElementJacobianDeterminants.push_back(0.0);
-    //     }
-    //     elem_index++;
-    // }
 
     // Now call ReIndex() to remove the temporary nodes which are marked as deleted
     NodeMap reindex_map(GetNumAllNodes());
@@ -727,16 +783,16 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
 
 c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
 {
-    assert(0); //TODO Fix for both periodicity
-
     assert(mWidth > 0.0);
+    assert(mHeight > 0.0);
 
     c_vector<double, 2> vector = rLocation2 - rLocation1;
     vector[0] = fmod(vector[0], mWidth);
+    vector[1] = fmod(vector[1], mHeight);
 
     /*
      * Handle the Toroidal condition here: if the points are more
-     * than halfway around the cylinder apart, measure the other way.
+     * than halfway around the doamin apart, measure the other way.
      */
     if (vector[0] > 0.5*mWidth)
     {
@@ -746,14 +802,21 @@ c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>&
     {
         vector[0] += mWidth;
     }
+    if (vector[1] > 0.5*mHeight)
+    {
+        vector[1] -= mHeight;
+    }
+    else if (vector[1] < -0.5*mHeight)
+    {
+        vector[1] += mHeight;
+    }
     return vector;
 }
 
 void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concreteMove)
 {
-    assert(0); //TODO Fix for both periodicity
-
-    // Perform a periodic movement if necessary
+    
+    // Perform a width periodic movement if necessary
     if (point.rGetLocation()[0] >= mWidth)
     {
         // Move point to the left
@@ -763,6 +826,18 @@ void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concrete
     {
         // Move point to the right
         point.SetCoordinate(0, point.rGetLocation()[0] + mWidth);
+    }
+
+    // Perform a depth periodic movement if necessary
+    if (point.rGetLocation()[1] >= mHeight)
+    {
+        // Move point down 
+        point.SetCoordinate(1, point.rGetLocation()[1] - mHeight);
+    }
+    else if (point.rGetLocation()[1] < 0.0)
+    {
+        // Move point up
+        point.SetCoordinate(1, point.rGetLocation()[1] + mHeight);
     }
 
     // Update the node's location
@@ -779,7 +854,7 @@ double Toroidal2dMesh::GetWidth(const unsigned& rDimension) const
     }
     else
     {
-        width = mDepth;
+        width = mHeight;
     }
     return width;
 }
@@ -1249,7 +1324,27 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
 //    }
 
     // Every boundary element on the left must have a corresponding element on the right
-    assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
+    //assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
+    if(mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
+    {
+        TRACE("Left");
+        PRINT_VARIABLE(mLeftPeriodicBoundaryElementIndices.size());
+        for (std::set<unsigned>::iterator iter = mLeftPeriodicBoundaryElementIndices.begin();
+             iter != mLeftPeriodicBoundaryElementIndices.end();
+             iter++)
+        {
+            PRINT_VARIABLE(*iter);
+        }
+        TRACE("Right");
+        PRINT_VARIABLE(mRightPeriodicBoundaryElementIndices.size());
+        for (std::set<unsigned>::iterator iter = mRightPeriodicBoundaryElementIndices.begin();
+             iter != mRightPeriodicBoundaryElementIndices.end();
+             iter++)
+        {
+            PRINT_VARIABLE(*iter);
+        }
+
+    }
 }
 
 void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundaries()
@@ -1311,7 +1406,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundari
 //
 //    }
 
-    // Every boundary element on the left must have a corresponding element on the right
+    // Every boundary element on the bottom must have a corresponding element on the top
     assert(mBottomPeriodicBoundaryElementIndices.size() == mTopPeriodicBoundaryElementIndices.size());
 }
 

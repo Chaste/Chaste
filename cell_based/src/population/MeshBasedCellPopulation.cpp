@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
+#include "Toroidal2dMesh.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "CellId.hpp"
 #include "CellVolumesWriter.hpp"
@@ -834,6 +836,11 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupF
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
     }
+    if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
+    {
+        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+        *pVizSetupFile << "MeshHeight\t" << this->GetWidth(1) << "\n";
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -938,6 +945,11 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     {
         is_mesh_periodic = true;
         mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh));
+    }
+    else if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
+    {
+        is_mesh_periodic = true;
+        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh));
     }
     else
     {

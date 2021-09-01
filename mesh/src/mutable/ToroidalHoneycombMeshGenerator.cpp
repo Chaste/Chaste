@@ -73,8 +73,8 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     unsigned num_elem             = 2*num_elem_along_width*num_elem_along_depth;
     unsigned num_edges            = 3*num_elem_along_width*num_elem_along_depth + num_elem_along_width + num_elem_along_depth;
 
-    double x0 = 0;
-    double y0 = 0;
+    double x0 = 0.0;
+    double y0 = 0.0;
     
     // Write node file
     out_stream p_node_file = output_file_handler.OpenOutputFile(mMeshFilename+".node");
