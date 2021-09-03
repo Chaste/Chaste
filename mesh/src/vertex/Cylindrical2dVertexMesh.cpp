@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cylindrical2dVertexMesh.hpp"
 #include "Cylindrical2dMesh.hpp"
+#include "Debug.hpp"
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  std::vector<Node<2>*> nodes,
@@ -238,10 +239,10 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
-    std::vector<Node<2>*> temp_nodes(2*num_nodes);
+    std::vector<Node<2>*> temp_nodes(3*num_nodes);
     std::vector<VertexElement<2, 2>*> elements;
 
-    // Create four copies of each node
+    // Create three copies of each node
     for (unsigned index=0; index<num_nodes; index++)
     {
         c_vector<double, 2> location;
@@ -254,6 +255,10 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         // Node copy shifted right
         p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
         temp_nodes[num_nodes + index] = p_node;
+
+        // Node copy shifted left
+        p_node = new Node<2>(2*num_nodes + index, false, location[0] - mWidth, location[1]);
+        temp_nodes[2*num_nodes + index] = p_node;
     }
 
     // Iterate over elements
@@ -268,7 +273,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 
         // Compute whether the element straddles either periodic boundary
         bool element_straddles_left_right_boundary = false;
-
+        
         const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
         for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
         {
@@ -281,8 +286,22 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
                 element_straddles_left_right_boundary = true;
             }
         }
+        
+        /* If this is a voronoi tesselation make sure the elememts contain
+         * the original delauny node
+         */
+        bool element_centre_on_right = true;
+        if(mpDelaunayMesh)
+        {
+                unsigned dealunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+                double element_centre_x_location = this->mpDelaunayMesh->GetNode(dealunay_index)->rGetLocation()[0];
+                if (element_centre_x_location < 0.5*mWidth)
+                {
+                    element_centre_on_right = false;
+                }
+        }
 
-        // Use the above information when duplicating the element
+        // Use the above information when duplicating the element in the vtk mesh
         for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
         {
             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
@@ -292,10 +311,15 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
             {
                 // ...and this node is located to the left of the centre of the mesh...
                 bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
-                if (!node_is_right_of_centre)
+                if (!node_is_right_of_centre && element_centre_on_right)
                 {
                     // ...then choose the equivalent node to the right
                     this_node_index += num_nodes;
+                }
+                else if (node_is_right_of_centre && !element_centre_on_right)
+                {
+                    // ...then choose the equivalent node to the left
+                    this_node_index += 2*num_nodes;
                 }
             }
 

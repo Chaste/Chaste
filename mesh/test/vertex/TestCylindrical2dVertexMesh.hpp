@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "TrianglesMeshWriter.hpp"
+#include "VtkMeshWriter.hpp"
 
 #include "VertexMeshWriter.hpp"
 #include "ArchiveOpener.hpp"
@@ -370,14 +371,17 @@ public:
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
         Cylindrical2dVertexMesh voronoi_mesh(*p_delaunay_mesh);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestVertexMeshWriters", "VertexMesh", false);
+        VertexMeshWriter<2,2> vertexmesh_writer("TestVertexMeshWriters", "CylindricalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
+
+        // TODO Check this file !
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteVtkUsingMesh(voronoi_mesh,"0"));
 
         // Test the Voronoi tessellation has the correct number of nodes and elements
         TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(0), 3u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 9u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 12u);
-//
+
         // Test the location of the Voronoi nodes
         /* These are ordered from right to left from bottom to top as
          * 10 1 0 5 4 6 9 2 3 11 7 8

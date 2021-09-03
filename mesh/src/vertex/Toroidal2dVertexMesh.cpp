@@ -273,97 +273,301 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
-    std::vector<Node<2>*> temp_nodes(4*num_nodes);
+    std::vector<Node<2>*> temp_nodes;
     std::vector<VertexElement<2, 2>*> elements;
 
-    // Create four copies of each node
-    for (unsigned index=0; index<num_nodes; index++)
+    if(!mpDelaunayMesh) // No Delaunay mesh so less copies as all too top right
     {
-        c_vector<double, 2> location;
-        location = GetNode(index)->rGetLocation();
+        temp_nodes.resize(4*num_nodes);
 
-        // Node copy at original location
-        Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
-        temp_nodes[index] = p_node;
+        // Create four copies of each node. 
+        for (unsigned index=0; index<num_nodes; index++)
+        {
+            c_vector<double, 2> location;
+            location = GetNode(index)->rGetLocation();
 
-        // Node copy shifted right
-        p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
-        temp_nodes[num_nodes + index] = p_node;
+            // Node copy at original location
+            Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
+            temp_nodes[index] = p_node;
 
-        // Node copy shifted up
-        p_node = new Node<2>(2*num_nodes + index, false, location[0], location[1] + mHeight);
-        temp_nodes[2*num_nodes + index] = p_node;
+            // Node copy shifted right
+            p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
+            temp_nodes[num_nodes + index] = p_node;
 
-        // Node copy shifted right and up
-        p_node = new Node<2>(3*num_nodes + index, false, location[0] + mWidth, location[1] + mHeight);
-        temp_nodes[3*num_nodes + index] = p_node;
+            // Node copy shifted up
+            p_node = new Node<2>(2*num_nodes + index, false, location[0], location[1] + mHeight);
+            temp_nodes[2*num_nodes + index] = p_node;
+
+            // Node copy shifted right and up
+            p_node = new Node<2>(3*num_nodes + index, false, location[0] + mWidth, location[1] + mHeight);
+            temp_nodes[3*num_nodes + index] = p_node;
+        }
+
+        // Iterate over elements
+        for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+            elem_iter != GetElementIteratorEnd();
+            ++elem_iter)
+        {
+            unsigned elem_index = elem_iter->GetIndex();
+            unsigned num_nodes_in_elem = elem_iter->GetNumNodes();
+
+            std::vector<Node<2>*> elem_nodes;
+
+            // Compute whether the element straddles either periodic boundary
+            bool element_straddles_left_right_boundary = false;
+            bool element_straddles_top_bottom_boundary = false;
+
+            const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
+            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            {
+                const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
+                c_vector<double, 2> vector;
+                vector = r_next_node_location - r_this_node_location;
+
+                if (fabs(vector[0]) > 0.5*mWidth)
+                {
+                    element_straddles_left_right_boundary = true;
+                }
+                if (fabs(vector[1]) > 0.5*mHeight)
+                {
+                    element_straddles_top_bottom_boundary = true;
+                }
+            }
+            
+            // Use the above information when duplicating the element
+            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            {
+                unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
+
+                // If the element straddles the left/right periodic boundary...
+                if (element_straddles_left_right_boundary)
+                {
+                    // ...and this node is located to the left of the centre of the mesh...
+                    bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
+                    if (!node_is_right_of_centre)
+                    {
+                        // ...then choose the equivalent node to the right
+                        this_node_index += num_nodes;
+                    }
+                }
+
+                // If the element straddles the top/bottom periodic boundary...
+                if (element_straddles_top_bottom_boundary)
+                {
+                    // ...and this node is located below the centre of the mesh...
+                    bool node_is_above_centre = (elem_iter->GetNode(local_index)->rGetLocation()[1] - 0.5*mHeight > 0);
+                    if (!node_is_above_centre)
+                    {
+                        // ...then choose the equivalent node above
+                        this_node_index += 2*num_nodes;
+                    }
+                }
+
+                elem_nodes.push_back(temp_nodes[this_node_index]);
+            }
+            
+            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+            elements.push_back(p_element);
+        }
     }
-
-    // Iterate over elements
-    for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
-         elem_iter != GetElementIteratorEnd();
-         ++elem_iter)
+    else // Has Delaunay mesh so match elements to centres
     {
-        unsigned elem_index = elem_iter->GetIndex();
-        unsigned num_nodes_in_elem = elem_iter->GetNumNodes();
+        temp_nodes.resize(9*num_nodes);
 
-        std::vector<Node<2>*> elem_nodes;
-
-        // Compute whether the element straddles either periodic boundary
-        bool element_straddles_left_right_boundary = false;
-        bool element_straddles_top_bottom_boundary = false;
-
-        const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
-        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        // Create nine copies of each node. 
+        for (unsigned index=0; index<num_nodes; index++)
         {
-            const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
-            c_vector<double, 2> vector;
-            vector = r_next_node_location - r_this_node_location;
+            c_vector<double, 2> location;
+            location = GetNode(index)->rGetLocation();
 
-            if (fabs(vector[0]) > 0.5*mWidth)
-            {
-                element_straddles_left_right_boundary = true;
-            }
-            if (fabs(vector[1]) > 0.5*mHeight)
-            {
-                element_straddles_top_bottom_boundary = true;
-            }
-        }
+            // Node copy at original location
+            Node<2>* p_node = new Node<2>(index, false, location[0], location[1]);
+            temp_nodes[index] = p_node;
 
-        // Use the above information when duplicating the element
-        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            // Node copy shifted right
+            p_node = new Node<2>(num_nodes + index, false, location[0] + mWidth, location[1]);
+            temp_nodes[num_nodes + index] = p_node;
+
+            // Node copy shifted up and right
+            p_node = new Node<2>(2*num_nodes + index, false, location[0] + mWidth, location[1] + mHeight);
+            temp_nodes[2*num_nodes + index] = p_node;
+
+            // Node copy shifted up
+            p_node = new Node<2>(3*num_nodes + index, false, location[0], location[1] + mHeight);
+            temp_nodes[3*num_nodes + index] = p_node;
+
+            // Node copy shifted up and left
+            p_node = new Node<2>(4*num_nodes + index, false, location[0] - mWidth, location[1] + mHeight);
+            temp_nodes[4*num_nodes + index] = p_node;
+
+            // Node copy shifted left
+            p_node = new Node<2>(5*num_nodes + index, false, location[0] - mWidth, location[1]);
+            temp_nodes[5*num_nodes + index] = p_node;
+
+            // Node copy shifted left and down
+            p_node = new Node<2>(6*num_nodes + index, false, location[0] - mWidth, location[1] - mHeight);
+            temp_nodes[6*num_nodes + index] = p_node;
+
+            // Node copy shifted down
+            p_node = new Node<2>(7*num_nodes + index, false, location[0], location[1] - mHeight);
+            temp_nodes[7*num_nodes + index] = p_node;
+
+            // Node copy shifted down and right
+            p_node = new Node<2>(8*num_nodes + index, false, location[0] + mWidth, location[1] - mHeight);
+            temp_nodes[8*num_nodes + index] = p_node;
+        }       
+
+        // Iterate over elements
+        for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+            elem_iter != GetElementIteratorEnd();
+            ++elem_iter)
         {
-            unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
+            unsigned elem_index = elem_iter->GetIndex();
+            unsigned num_nodes_in_elem = elem_iter->GetNumNodes();
 
-            // If the element straddles the left/right periodic boundary...
-            if (element_straddles_left_right_boundary)
+            std::vector<Node<2>*> elem_nodes;
+
+            // Compute whether the element straddles either periodic boundary
+            bool element_straddles_left_right_boundary = false;
+            bool element_straddles_top_bottom_boundary = false;
+
+            const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
+            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
             {
-                // ...and this node is located to the left of the centre of the mesh...
-                bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
-                if (!node_is_right_of_centre)
+                const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
+                c_vector<double, 2> vector;
+                vector = r_next_node_location - r_this_node_location;
+
+                if (fabs(vector[0]) > 0.5*mWidth)
                 {
-                    // ...then choose the equivalent node to the right
-                    this_node_index += num_nodes;
+                    element_straddles_left_right_boundary = true;
+                }
+                if (fabs(vector[1]) > 0.5*mHeight)
+                {
+                    element_straddles_top_bottom_boundary = true;
                 }
             }
-
-            // If the element straddles the top/bottom periodic boundary...
-            if (element_straddles_top_bottom_boundary)
+            /* If this is a voronoi tesselation make sure the elememts contain
+            * the original delauny node
+            */
+            bool element_centre_on_right = true;
+            bool element_centre_on_top = true;
+            
+            unsigned dealunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+            double element_centre_x_location = this->mpDelaunayMesh->GetNode(dealunay_index)->rGetLocation()[0];
+            double element_centre_y_location = this->mpDelaunayMesh->GetNode(dealunay_index)->rGetLocation()[1];
+            
+            if (element_centre_x_location < 0.5*mWidth)
             {
-                // ...and this node is located below the centre of the mesh...
-                bool node_is_above_centre = (elem_iter->GetNode(local_index)->rGetLocation()[1] - 0.5*mHeight > 0);
-                if (!node_is_above_centre)
+                element_centre_on_right = false;
+            }
+            if (element_centre_y_location < 0.5*mHeight)
+            {
+                element_centre_on_top = false;
+            }
+            
+            // Use the above information when duplicating the element
+            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            {
+                unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
+
+                // If the element straddles the left/right periodic boundary...
+                if (element_straddles_left_right_boundary && !element_straddles_top_bottom_boundary)
                 {
-                    // ...then choose the equivalent node above
-                    this_node_index += 2*num_nodes;
+                    // ...and this node is located to the left of the centre of the mesh...
+                    bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
+                    if (!node_is_right_of_centre && element_centre_on_right)
+                    {
+                        // ...then choose the equivalent node to the right
+                        this_node_index += num_nodes;
+                    }
+                    else if (node_is_right_of_centre && !element_centre_on_right)
+                    {
+                        // ...then choose the equivalent node to the left
+                        this_node_index += 5*num_nodes;
+                    }
                 }
+                else if (!element_straddles_left_right_boundary && element_straddles_top_bottom_boundary)
+                {
+                    // ...and this node is located to the bottom of the centre of the mesh...
+                    bool node_is_top_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[1] - 0.5*mHeight > 0);
+                    if (!node_is_top_of_centre && element_centre_on_top)
+                    {
+                        // ...then choose the equivalent node to the top
+                        this_node_index += 3*num_nodes;
+                    }
+                    else if (node_is_top_of_centre && !element_centre_on_top)
+                    {
+                        // ...then choose the equivalent node to the bottom
+                        this_node_index += 7*num_nodes;
+                    }
+                }
+                else if (element_straddles_left_right_boundary && element_straddles_top_bottom_boundary)
+                {
+                    bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
+                    bool node_is_top_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[1] - 0.5*mHeight > 0);
+                    
+                    if (!node_is_top_of_centre && element_centre_on_top)
+                    {
+                        if (!node_is_right_of_centre && element_centre_on_right)
+                        {
+                            this_node_index += 2*num_nodes;
+                        }
+                        else if (node_is_right_of_centre && !element_centre_on_right)
+                        {
+                            this_node_index += 4*num_nodes;
+                        }
+                        else 
+                        {
+                            this_node_index += 3*num_nodes;
+                        }
+                    }
+                    else if (node_is_top_of_centre && !element_centre_on_top)
+                    {
+                        if (!node_is_right_of_centre && element_centre_on_right)
+                        {
+                            this_node_index += 8*num_nodes;
+                        }
+                        else if (node_is_right_of_centre && !element_centre_on_right)
+                        {
+                            this_node_index += 6*num_nodes;
+                        }
+                        else 
+                        {
+                            this_node_index += 7*num_nodes;
+                        }
+                    }
+                    else
+                    {
+                        if (!node_is_right_of_centre && element_centre_on_right)
+                        {
+                            this_node_index += num_nodes;
+                        }
+                        else if (node_is_right_of_centre && !element_centre_on_right)
+                        {
+                            this_node_index += 5*num_nodes;
+                        }
+                    }
+                }
+
+                // If the element straddles the top/bottom periodic boundary...
+                // if (element_straddles_top_bottom_boundary)
+                // {
+                //     // ...and this node is located below the centre of the mesh...
+                //     bool node_is_above_centre = (elem_iter->GetNode(local_index)->rGetLocation()[1] - 0.5*mHeight > 0);
+                //     if (!node_is_above_centre)
+                //     {
+                //         // ...then choose the equivalent node above
+                //         this_node_index += 2*num_nodes;
+                //     }
+                // }
+
+                elem_nodes.push_back(temp_nodes[this_node_index]);
             }
 
-            elem_nodes.push_back(temp_nodes[this_node_index]);
+            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+            elements.push_back(p_element);
         }
-
-        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
-        elements.push_back(p_element);
     }
 
     // Now delete any nodes from the mesh for VTK that are not contained in any elements
