@@ -88,9 +88,6 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
 
 void Toroidal2dMesh::CreateMirrorNodes()
 {
-    double x_half_way = 0.5*mWidth;
-    double y_half_way = 0.5*mHeight;
-
     mLeftOriginals.clear();
     mLeftImages.clear();
     mImageToLeftOriginalNodeMap.clear();
@@ -288,7 +285,6 @@ mesh_writer_2.WriteFilesUsingMesh(*this);
             
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
-            unsigned this_node_index = p_node->GetIndex();
             double this_node_x_location = location[0];
             double this_node_y_location = location[1];
 
@@ -300,12 +296,8 @@ mesh_writer_2.WriteFilesUsingMesh(*this);
                 num_nodes_outside++;
             }
             
-            // At this point theres no periodicity so can use euclidian distance
             if (num_nodes_outside==3)
             {
-                // TRACE("Deleting Element");
-                // PRINT_VARIABLE(elem_iter->GetIndex());
-                //DeleteElement(elem_iter->GetIndex());
                 elem_iter->MarkAsDeleted();
                 mDeletedElementIndices.push_back(elem_iter->GetIndex());
             }
@@ -322,7 +314,6 @@ mesh_writer_2.WriteFilesUsingMesh(*this);
             
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
-            unsigned this_node_index = p_node->GetIndex();
             double this_node_x_location = location[0];
             double this_node_y_location = location[1];
 
