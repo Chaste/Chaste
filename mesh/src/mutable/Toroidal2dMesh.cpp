@@ -235,8 +235,8 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     }
 
 
-VtkMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
-mesh_writer.WriteFilesUsingMesh(*this);
+// VtkMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
+// mesh_writer.WriteFilesUsingMesh(*this);
 
     // Create mirrored nodes for the normal remesher to work with
     CreateMirrorNodes();
@@ -252,8 +252,8 @@ mesh_writer.WriteFilesUsingMesh(*this);
     NodeMap big_map(GetNumAllNodes());
     MutableMesh<2,2>::ReMesh(big_map);
 
-VtkMeshWriter<2,2> mesh_writer_2("Toroidal2dMeshDebug", "extended_mesh", false);
-mesh_writer_2.WriteFilesUsingMesh(*this);
+// VtkMeshWriter<2,2> mesh_writer_2("Toroidal2dMeshDebug", "extended_mesh", false);
+// mesh_writer_2.WriteFilesUsingMesh(*this);
 
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
@@ -368,30 +368,30 @@ mesh_writer_2.WriteFilesUsingMesh(*this);
     ReconstructCylindricalMesh();
 
     // Now call ReIndex() to remove the temporary nodes which are marked as deleted
-    NodeMap reindex_map(GetNumAllNodes());
-    ReIndex(reindex_map);
-    assert(!reindex_map.IsIdentityMap());  // maybe don't need this
+    // NodeMap reindex_map(GetNumAllNodes());
+    // ReIndex(reindex_map);
+    // assert(!reindex_map.IsIdentityMap());  // maybe don't need this
 
-    /*
-     * Go through the reindex map and use it to populate the original NodeMap
-     * (the one that is returned to the user).
-     */
-    for (unsigned i=0; i<rMap.GetSize(); i++) // only going up to be size of map, not size of reindex_map
-    {
-        if (reindex_map.IsDeleted(i))
-        {
-            /*
-             * i < num_original_nodes and node is deleted, this should correspond to
-             * a node that was labelled as before the remeshing, so should have already
-             * been set as deleted in the map above.
-             */
-            assert(rMap.IsDeleted(i));
-        }
-        else
-        {
-            rMap.SetNewIndex(i, reindex_map.GetNewIndex(i));
-        }
-    }
+    // /*
+    //  * Go through the reindex map and use it to populate the original NodeMap
+    //  * (the one that is returned to the user).
+    //  */
+    // for (unsigned i=0; i<rMap.GetSize(); i++) // only going up to be size of map, not size of reindex_map
+    // {
+    //     if (reindex_map.IsDeleted(i))
+    //     {
+    //         /*
+    //          * i < num_original_nodes and node is deleted, this should correspond to
+    //          * a node that was labelled as before the remeshing, so should have already
+    //          * been set as deleted in the map above.
+    //          */
+    //         assert(rMap.IsDeleted(i));
+    //     }
+    //     else
+    //     {
+    //         rMap.SetNewIndex(i, reindex_map.GetNewIndex(i));
+    //     }
+    // }
 
     // We can now clear the index vectors and maps; they are only used for remeshing
     mLeftOriginals.clear();
@@ -440,6 +440,8 @@ mesh_writer_2.WriteFilesUsingMesh(*this);
     ReconstructToroidalMesh();
 
 
+
+
     /*
      * Create a random boundary element between two nodes of the first
      * element if it is not deleted. This is a temporary measure to get
@@ -467,10 +469,13 @@ mesh_writer_2.WriteFilesUsingMesh(*this);
         elem_index++;
     }
 
+
+    
+
     // Now call ReIndex() to remove the temporary nodes which are marked as deleted
-    NodeMap reindex_map_2(GetNumAllNodes());
-    ReIndex(reindex_map_2);
-    assert(!reindex_map_2.IsIdentityMap());  // maybe don't need this
+    NodeMap reindex_map(GetNumAllNodes());
+    ReIndex(reindex_map);
+    assert(!reindex_map.IsIdentityMap());  // maybe don't need this
 
     /*
      * Go through the reindex map and use it to populate the original NodeMap

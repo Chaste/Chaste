@@ -276,6 +276,7 @@ void Node<SPACE_DIM>::RemoveElement(unsigned index)
     unsigned count = mElementIndices.erase(index);
     if (count == 0)
     {
+        assert(0);
         EXCEPTION("Tried to remove an index which was not in the set");
     }
 }

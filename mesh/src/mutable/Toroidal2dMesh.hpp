@@ -117,7 +117,8 @@ private:
 
     /**
      * Creates a set of mirrored nodes for a Toroidal re-mesh. Updates
-     * mRightImages and mLeftImages. All mesh points should be 0 < x < mWidth.
+     * mRightImages, mLeftImages, mTopImages and mBottomImages . 
+     * All mesh points should be 0 < x < mWidth and 0 < y < mHeight
      *
      * This method should only ever be called by the public ReMesh() method.
      */
@@ -188,7 +189,7 @@ private:
      */
     void GenerateVectorsOfElementsStraddlingCylindricalPeriodicBoundaries();
 
-        /**
+    /**
      * This method should only ever be called by the public ReMesh method.
      *
      * The elements which straddle the periodic boundaries need to be
