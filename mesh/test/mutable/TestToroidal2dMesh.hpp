@@ -276,7 +276,6 @@ public:
     {
         unsigned cells_across = 6;
         unsigned cells_up = 12;
-        unsigned thickness_of_ghost_layer = 0;
 
         // Set up a mesh which can be mirrored (no scaling in this case)
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1 , 1);
