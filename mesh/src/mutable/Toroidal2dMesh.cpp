@@ -42,7 +42,6 @@ mesh_writer.WriteFilesUsingMesh(*this);
 */
 #include "Toroidal2dMesh.hpp"
 #include "Exception.hpp"
-#include "Debug.hpp"
 #include "VtkMeshWriter.hpp"
 
 Toroidal2dMesh::Toroidal2dMesh(double width, double depth)
@@ -1320,27 +1319,27 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
 //    }
 
     // Every boundary element on the left must have a corresponding element on the right
-    //assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
-    if(mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
-    {
-        TRACE("Left");
-        PRINT_VARIABLE(mLeftPeriodicBoundaryElementIndices.size());
-        for (std::set<unsigned>::iterator iter = mLeftPeriodicBoundaryElementIndices.begin();
-             iter != mLeftPeriodicBoundaryElementIndices.end();
-             iter++)
-        {
-            PRINT_VARIABLE(*iter);
-        }
-        TRACE("Right");
-        PRINT_VARIABLE(mRightPeriodicBoundaryElementIndices.size());
-        for (std::set<unsigned>::iterator iter = mRightPeriodicBoundaryElementIndices.begin();
-             iter != mRightPeriodicBoundaryElementIndices.end();
-             iter++)
-        {
-            PRINT_VARIABLE(*iter);
-        }
+    assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
+    // if(mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
+    // {
+    //     TRACE("Left");
+    //     PRINT_VARIABLE(mLeftPeriodicBoundaryElementIndices.size());
+    //     for (std::set<unsigned>::iterator iter = mLeftPeriodicBoundaryElementIndices.begin();
+    //          iter != mLeftPeriodicBoundaryElementIndices.end();
+    //          iter++)
+    //     {
+    //         PRINT_VARIABLE(*iter);
+    //     }
+    //     TRACE("Right");
+    //     PRINT_VARIABLE(mRightPeriodicBoundaryElementIndices.size());
+    //     for (std::set<unsigned>::iterator iter = mRightPeriodicBoundaryElementIndices.begin();
+    //          iter != mRightPeriodicBoundaryElementIndices.end();
+    //          iter++)
+    //     {
+    //         PRINT_VARIABLE(*iter);
+    //     }
 
-    }
+    // }
 }
 
 void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundaries()

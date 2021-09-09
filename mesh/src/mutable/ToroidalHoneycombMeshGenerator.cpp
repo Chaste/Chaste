@@ -65,7 +65,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     unsigned num_nodes_along_width = mNumCellWidth;
     unsigned num_nodes_along_depth = mNumCellLength;
     double horizontal_spacing = mDomainWidth / (double)num_nodes_along_width;
-    double vertical_spacing = (sqrt(3.0)/2)*horizontal_spacing;
+    double vertical_spacing = mDomainDepth / (double)num_nodes_along_depth;
 
     unsigned num_nodes            = num_nodes_along_width*num_nodes_along_depth;
     unsigned num_elem_along_width = num_nodes_along_width-1;
