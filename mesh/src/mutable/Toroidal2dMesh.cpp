@@ -1493,6 +1493,37 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
     return corresponding_node_index;
 }
 
+
+void Toroidal2dMesh::RefreshMesh()
+{
+    // Check if the (x,y) coordinates are in the domain, if not, get the fmod and relocate.
+    unsigned num_nodes = mNodes.size();
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        double& x_location = (mNodes[i]->rGetModifiableLocation())[0];
+        if (x_location < 0.0)
+        {
+            x_location = fmod(x_location, mWidth) + mWidth;
+        }
+        else if (x_location >= mWidth)
+        {
+            x_location = fmod(x_location, mWidth);
+        }
+        double& y_location = (mNodes[i]->rGetModifiableLocation())[1];
+        if (y_location < 0.0)
+        {
+            y_location = fmod(y_location, mHeight) + mHeight;
+        }
+        else if (y_location >= mHeight)
+        {
+            y_location = fmod(y_location, mHeight);
+        }
+    }
+
+    // Now run the base class method
+    //TetrahedralMesh<2,2>::RefreshMesh();
+}
+
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(Toroidal2dMesh)

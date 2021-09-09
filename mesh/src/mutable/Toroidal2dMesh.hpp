@@ -348,6 +348,12 @@ public:
      * @return whether you have mismatched numbers of left and right boundary nodes
      */
     bool GetInstanceOfMismatchedBoundaryNodes();
+
+    /**
+     * Overridden RefreshMesh method. This method moves node backinto domain and
+     * calls RefreshJacobianCachedData.
+     */
+    void RefreshMesh();
 };
 
 namespace boost
