@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -564,64 +564,69 @@ public:
         }
     }
 
-//     void TestConstructFromNodeList()
-//     {
-//         std::vector<Node<2>*> nodes;
+    void TestConstructFromNodeList()
+    {
+        std::vector<Node<2>*> nodes;
 
-//         nodes.push_back(new Node<2>(0, true, 0.1, 0.01));
-//         nodes.push_back(new Node<2>(1, true, 0.5, 0.0));
-//         nodes.push_back(new Node<2>(2, true, 0.9, 0.01));
-//         nodes.push_back(new Node<2>(3, true, 0.1, 0.99));
-//         nodes.push_back(new Node<2>(4, true, 0.5, 1.0));
-//         nodes.push_back(new Node<2>(5, true, 0.9, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.01));
+        nodes.push_back(new Node<2>(1, true, 0.5, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.9, 0.01));
+        nodes.push_back(new Node<2>(3, true, 0.1, 0.99));
+        nodes.push_back(new Node<2>(4, true, 0.5, 0.9));
+        nodes.push_back(new Node<2>(5, true, 0.9, 0.99));
 
-//         const double width = 1.0;
-//         const double height = 1.0;
+        const double width = 1.0;
+        const double height = 1.0;
         
-//         Toroidal2dMesh mesh(width, height, nodes);
+        Toroidal2dMesh mesh(width, height, nodes);
 
-//         TS_ASSERT_EQUALS(mesh.GetNumElements(), 6u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 12u);
 
-        // // Find the element with node indices 2,3,5 (which stradles the periodic boundary)
-        // unsigned element_index;
-        // std::set<unsigned> target_element_node_indices;
-        // for (element_index=0; element_index<mesh.GetNumElements(); element_index++)
-        // {
-        //     target_element_node_indices.clear();
-        //     target_element_node_indices.insert(2);
-        //     target_element_node_indices.insert(3);
-        //     target_element_node_indices.insert(5);
+        // Find the element with node indices 2,0,3 (which stradles both periodic boundaries)
+        unsigned element_index;
+        std::set<unsigned> target_element_node_indices;
+        for (element_index=0; element_index<mesh.GetNumElements(); element_index++)
+        {
+            target_element_node_indices.clear();
+            target_element_node_indices.insert(2);
+            target_element_node_indices.insert(0);
+            target_element_node_indices.insert(3);
 
-        //     for (unsigned node_local_index=0; node_local_index<=2; node_local_index++)
-        //     {
-        //         target_element_node_indices.erase(mesh.GetElement(element_index)->GetNodeGlobalIndex(node_local_index));
-        //     }
-        //     if (target_element_node_indices.empty())
-        //     {
-        //         break;
-        //     }
-        // }
-        // TS_ASSERT_EQUALS(target_element_node_indices.empty(), true);
+            for (unsigned node_local_index=0; node_local_index<=2; node_local_index++)
+            {
+                target_element_node_indices.erase(mesh.GetElement(element_index)->GetNodeGlobalIndex(node_local_index));
+            }
+            if (target_element_node_indices.empty())
+            {
+                break;
+            }
+        }
+        TS_ASSERT_EQUALS(target_element_node_indices.empty(), true);
 
-//         // Calculate the circumsphere of the element
-// //        c_vector<double, 3> circumsphere = mesh.GetElement(element_index)->CalculateCircumsphere();
-// //
-// //        TS_ASSERT_DELTA(circumsphere[0], 0.9509, 1e-3);
-// //        TS_ASSERT_DELTA(circumsphere[1], 0.5100, 1e-3);
-// //        TS_ASSERT_DELTA(circumsphere[2], 0.2526, 1e-3);
+        // Calculate the circumsphere of the element
+        c_matrix<double, 2, 2> jacobian;
+        c_matrix<double, 2, 2> inverse_jacobian;
+        double jacobian_det;
 
-//         /* The reason that the circumsphere is calculated correctly for a periodic boundary
-//          * stradling element is somewhat obscure.
-//          * The Jacobian of the element is calculated when the element has a mirror node
-//          * The mirror node is then replaced with the node within the periodic mesh
-//          * The circumsphere is calculated based on the Jacobian and the replaced node within the periodic mesh
-//          *
-//          * uncommenting the following line of code causes an error:
-//          * Jacobian determinant is non-positive
-//          *
-//          * mesh.GetElement(element_index)->RefreshJacobianDeterminant();
-//          */
-//     }
+        mesh.GetInverseJacobianForElement(element_index, jacobian, jacobian_det, inverse_jacobian);
+        c_vector<double, 3> circumsphere = mesh.GetElement(element_index)->CalculateCircumsphere(jacobian,inverse_jacobian);
+
+        TS_ASSERT_DELTA(circumsphere[0], 1.0, 1e-3);
+        TS_ASSERT_DELTA(circumsphere[1], 0.5, 1e-3);
+        TS_ASSERT_DELTA(circumsphere[2], 0.25, 1e-3);
+
+        /* The reason that the circumsphere is calculated correctly for a periodic boundary
+         * stradling element is somewhat obscure.
+         * The Jacobian of the element is calculated when the element has a mirror node
+         * The mirror node is then replaced with the node within the periodic mesh
+         * The circumsphere is calculated based on the Jacobian and the replaced node within the periodic mesh
+         *
+         * uncommenting the following line of code causes an error:
+         * Jacobian determinant is non-positive
+         *
+         * mesh.GetElement(element_index)->RefreshJacobianDeterminant();
+         */
+    }
 
 //     void TestGenerateVectorsOfElementsStraddlingPeriodicBoundaries()
 //     {
@@ -825,6 +830,31 @@ public:
         TS_ASSERT_DELTA(tessellation.GetVolumeOfElement(48),  0.5 * pow(3.0, 0.5), 1e-4);
         TS_ASSERT_DELTA(tessellation.GetSurfaceAreaOfElement(48), 2 * pow(3.0, 0.5), 1e-4);
     }
+
+    void TestRefreshMesh()
+    {
+        // Create a simple Toroidal2dMesh
+        unsigned cells_across = 4;
+        unsigned cells_up = 4;
+        ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
+        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u); 
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);
+
+        //Translate mesh which calls RefreshMesh()
+        p_mesh->Translate(-1,-1);
+        
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u); 
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);
+
+        //Translate mesh which calls RefreshMesh()
+        p_mesh->Translate(2,2);     
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u); 
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);
+    }
+
 };
 
 #endif /*TESTTOROIDAL2DMESH_HPP_*/

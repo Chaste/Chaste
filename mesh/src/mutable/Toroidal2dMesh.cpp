@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2020, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,6 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
     assert(width > 0.0);
     assert(depth > 0.0);
 
-//    mMismatchedBoundaryElements = false;
     for (unsigned index=0; index<nodes.size(); index++)
     {
         Node<2>* p_temp_node = nodes[index];
@@ -78,12 +77,6 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
     NodeMap node_map(nodes.size());
     ReMesh(node_map);
 }
-
-//bool Toroidal2dMesh::GetInstanceOfMismatchedBoundaryNodes()
-//{
-//    return mMismatchedBoundaryElements;
-//}
-
 
 void Toroidal2dMesh::CreateMirrorNodes()
 {
@@ -366,32 +359,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      */
     ReconstructCylindricalMesh();
 
-    // Now call ReIndex() to remove the temporary nodes which are marked as deleted
-    // NodeMap reindex_map(GetNumAllNodes());
-    // ReIndex(reindex_map);
-    // assert(!reindex_map.IsIdentityMap());  // maybe don't need this
-
-    // /*
-    //  * Go through the reindex map and use it to populate the original NodeMap
-    //  * (the one that is returned to the user).
-    //  */
-    // for (unsigned i=0; i<rMap.GetSize(); i++) // only going up to be size of map, not size of reindex_map
-    // {
-    //     if (reindex_map.IsDeleted(i))
-    //     {
-    //         /*
-    //          * i < num_original_nodes and node is deleted, this should correspond to
-    //          * a node that was labelled as before the remeshing, so should have already
-    //          * been set as deleted in the map above.
-    //          */
-    //         assert(rMap.IsDeleted(i));
-    //     }
-    //     else
-    //     {
-    //         rMap.SetNewIndex(i, reindex_map.GetNewIndex(i));
-    //     }
-    // }
-
     // We can now clear the index vectors and maps; they are only used for remeshing
     mLeftOriginals.clear();
     mLeftImages.clear();
@@ -438,9 +405,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      */
     ReconstructToroidalMesh();
 
-
-
-
     /*
      * Create a random boundary element between two nodes of the first
      * element if it is not deleted. This is a temporary measure to get
@@ -467,9 +431,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         }
         elem_index++;
     }
-
-
-    
 
     // Now call ReIndex() to remove the temporary nodes which are marked as deleted
     NodeMap reindex_map(GetNumAllNodes());
@@ -570,64 +531,67 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
         }
     }
 
-    /*
-     * Figure out which boundary elements have real nodes and image nodes in them
-     * and replace image nodes with corresponding real ones.
-     */
-    for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
-    {
-        BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
-        if (!p_boundary_element->IsDeleted())
-        {
-            unsigned number_of_image_nodes = 0;
-            for (unsigned i=0; i<2; i++)
-            {
-                unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
 
-                if (mImageToLeftOriginalNodeMap.find(this_node_index) != mImageToLeftOriginalNodeMap.end())
-                {
-                    number_of_image_nodes++;
-                }
-                else if (mImageToRightOriginalNodeMap.find(this_node_index) != mImageToRightOriginalNodeMap.end())
-                {
-                    number_of_image_nodes++;
-                }
-            }
 
-            if (number_of_image_nodes == 2)
-            {
-                p_boundary_element->MarkAsDeleted();
-                mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
-            }
+    // TODO #3043 include Boundary elements if needed
+    // /*
+    //  * Figure out which boundary elements have real nodes and image nodes in them
+    //  * and replace image nodes with corresponding real ones.
+    //  */
+    // for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
+    // {
+    //     BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
+    //     if (!p_boundary_element->IsDeleted())
+    //     {
+    //         unsigned number_of_image_nodes = 0;
+    //         for (unsigned i=0; i<2; i++)
+    //         {
+    //             unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
 
-            /*
-             * To avoid having two copies of the boundary elements on the periodic
-             * boundaries we only deal with the elements on the left image and
-             * delete the ones on the right image.
-             */
-            if (number_of_image_nodes == 1)
-            {
-                for (unsigned i=0; i<2; i++)
-                {
-                    unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-                    std::map<unsigned, unsigned>::iterator it = mImageToLeftOriginalNodeMap.find(this_node_index);
-                    if (it != mImageToLeftOriginalNodeMap.end())
-                    {
-                        p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
-                    }
-                    else
-                    {
-                        it = mImageToRightOriginalNodeMap.find(this_node_index);
-                        if (it != mImageToRightOriginalNodeMap.end())
-                        {
-                            p_boundary_element->MarkAsDeleted();
-                            mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //             if (mImageToLeftOriginalNodeMap.find(this_node_index) != mImageToLeftOriginalNodeMap.end())
+    //             {
+    //                 number_of_image_nodes++;
+    //             }
+    //             else if (mImageToRightOriginalNodeMap.find(this_node_index) != mImageToRightOriginalNodeMap.end())
+    //             {
+    //                 number_of_image_nodes++;
+    //             }
+    //         }
+
+    //         if (number_of_image_nodes == 2)
+    //         {
+    //             p_boundary_element->MarkAsDeleted();
+    //             mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
+    //         }
+
+    //         /*
+    //          * To avoid having two copies of the boundary elements on the periodic
+    //          * boundaries we only deal with the elements on the left image and
+    //          * delete the ones on the right image.
+    //          */
+    //         if (number_of_image_nodes == 1)
+    //         {
+    //             for (unsigned i=0; i<2; i++)
+    //             {
+    //                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
+    //                 std::map<unsigned, unsigned>::iterator it = mImageToLeftOriginalNodeMap.find(this_node_index);
+    //                 if (it != mImageToLeftOriginalNodeMap.end())
+    //                 {
+    //                     p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
+    //                 }
+    //                 else
+    //                 {
+    //                     it = mImageToRightOriginalNodeMap.find(this_node_index);
+    //                     if (it != mImageToRightOriginalNodeMap.end())
+    //                     {
+    //                         p_boundary_element->MarkAsDeleted();
+    //                         mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     // Delete all image nodes unless they have already gone 
     for (unsigned i=0; i<mLeftImages.size(); i++)
@@ -704,63 +668,64 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
         }
     }
 
-    /*
-     * Figure out which boundary elements have real nodes and image nodes in them
-     * and replace image nodes with corresponding real ones.
-     */
-    for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
-    {
-        BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
-        if (!p_boundary_element->IsDeleted())
-        {
-            unsigned number_of_image_nodes = 0;
-            for (unsigned i=0; i<2; i++)
-            {
-                unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-                if (mImageToBottomOriginalNodeMap.find(this_node_index) != mImageToBottomOriginalNodeMap.end())
-                {
-                    number_of_image_nodes++;
-                }
-                else if (mImageToTopOriginalNodeMap.find(this_node_index) != mImageToTopOriginalNodeMap.end())
-                {
-                    number_of_image_nodes++;
-                }
-            }
+    // TODO #3043 Deal with boundary nodes if wanted
+    // /*
+    //  * Figure out which boundary elements have real nodes and image nodes in them
+    //  * and replace image nodes with corresponding real ones.
+    //  */
+    // for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
+    // {
+    //     BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
+    //     if (!p_boundary_element->IsDeleted())
+    //     {
+    //         unsigned number_of_image_nodes = 0;
+    //         for (unsigned i=0; i<2; i++)
+    //         {
+    //             unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
+    //             if (mImageToBottomOriginalNodeMap.find(this_node_index) != mImageToBottomOriginalNodeMap.end())
+    //             {
+    //                 number_of_image_nodes++;
+    //             }
+    //             else if (mImageToTopOriginalNodeMap.find(this_node_index) != mImageToTopOriginalNodeMap.end())
+    //             {
+    //                 number_of_image_nodes++;
+    //             }
+    //         }
 
-            if (number_of_image_nodes == 2)
-            {
-                p_boundary_element->MarkAsDeleted();
-                mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
-            }
+    //         if (number_of_image_nodes == 2)
+    //         {
+    //             p_boundary_element->MarkAsDeleted();
+    //             mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
+    //         }
 
-            /*
-             * To avoid having two copies of the boundary elements on the periodic
-             * boundaries we only deal with the elements on the bottom image and
-             * delete the ones on the top image.
-             */
-            if (number_of_image_nodes == 1)
-            {
-                for (unsigned i=0; i<2; i++)
-                {
-                    unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-                    std::map<unsigned, unsigned>::iterator it = mImageToBottomOriginalNodeMap.find(this_node_index);
-                    if (it != mImageToBottomOriginalNodeMap.end())
-                    {
-                        p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
-                    }
-                    else
-                    {
-                        it = mImageToTopOriginalNodeMap.find(this_node_index);
-                        if (it != mImageToTopOriginalNodeMap.end())
-                        {
-                            p_boundary_element->MarkAsDeleted();
-                            mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //         /*
+    //          * To avoid having two copies of the boundary elements on the periodic
+    //          * boundaries we only deal with the elements on the bottom image and
+    //          * delete the ones on the top image.
+    //          */
+    //         if (number_of_image_nodes == 1)
+    //         {
+    //             for (unsigned i=0; i<2; i++)
+    //             {
+    //                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
+    //                 std::map<unsigned, unsigned>::iterator it = mImageToBottomOriginalNodeMap.find(this_node_index);
+    //                 if (it != mImageToBottomOriginalNodeMap.end())
+    //                 {
+    //                     p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
+    //                 }
+    //                 else
+    //                 {
+    //                     it = mImageToTopOriginalNodeMap.find(this_node_index);
+    //                     if (it != mImageToTopOriginalNodeMap.end())
+    //                     {
+    //                         p_boundary_element->MarkAsDeleted();
+    //                         mDeletedBoundaryElementIndices.push_back(p_boundary_element->GetIndex());
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     // Delete all image nodes unless they have already gone 
     for (unsigned i=0; i<mBottomImages.size(); i++)
@@ -960,7 +925,8 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
             if (temp_right_hand_side_elements.size() == 2)
             {
                 // Use the right hand side meshing and map to left
-                UseTheseElementsToDecideCylindricalMeshing(temp_right_hand_side_elements);
+                NEVER_REACHED;
+                //UseTheseElementsToDecideCylindricalMeshing(temp_right_hand_side_elements);
             }
             else
             {
@@ -1070,7 +1036,8 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
             if (temp_top_hand_side_elements.size() == 2)
             {
                 // Use the top hand side meshing and map to bottom
-                UseTheseElementsToDecideToroidalMeshing(temp_top_hand_side_elements);
+                NEVER_REACHED;
+                //UseTheseElementsToDecideToroidalMeshing(temp_top_hand_side_elements);
             }
             else
             {
@@ -1085,169 +1052,172 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
     }
 }
 
-void Toroidal2dMesh::UseTheseElementsToDecideCylindricalMeshing(std::set<unsigned>& rMainSideElements)
-{
-    assert(rMainSideElements.size() == 2);
 
-    // We find the four nodes surrounding the dodgy meshing, on each side.
-    std::set<unsigned> main_four_nodes;
-    for (std::set<unsigned>::iterator elem_iter = rMainSideElements.begin();
-         elem_iter != rMainSideElements.end();
-         ++elem_iter)
-    {
-        unsigned elem_index = *elem_iter;
-        Element<2,2>* p_element = GetElement(elem_index);
-        for (unsigned i=0; i<3; i++)
-        {
-            unsigned index = p_element->GetNodeGlobalIndex(i);
-            main_four_nodes.insert(index);
-        }
-    }
-    assert(main_four_nodes.size() == 4);
+// TODO #3043 include if needed
+// void Toroidal2dMesh::UseTheseElementsToDecideCylindricalMeshing(std::set<unsigned>& rMainSideElements)
+// {
+//     assert(rMainSideElements.size() == 2);
 
-    std::set<unsigned> other_four_nodes;
-    for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
-         iter != main_four_nodes.end();
-         ++iter)
-    {
-        other_four_nodes.insert(GetCorrespondingCylindricalNodeIndex(*iter));
-    }
-    assert(other_four_nodes.size() == 4);
+//     // We find the four nodes surrounding the dodgy meshing, on each side.
+//     std::set<unsigned> main_four_nodes;
+//     for (std::set<unsigned>::iterator elem_iter = rMainSideElements.begin();
+//          elem_iter != rMainSideElements.end();
+//          ++elem_iter)
+//     {
+//         unsigned elem_index = *elem_iter;
+//         Element<2,2>* p_element = GetElement(elem_index);
+//         for (unsigned i=0; i<3; i++)
+//         {
+//             unsigned index = p_element->GetNodeGlobalIndex(i);
+//             main_four_nodes.insert(index);
+//         }
+//     }
+//     assert(main_four_nodes.size() == 4);
 
-    /*
-     * Find the elements surrounded by the nodes on the right
-     * and change them to match the elements on the left.
-     */
-    std::vector<unsigned> corresponding_elements;
+//     std::set<unsigned> other_four_nodes;
+//     for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
+//          iter != main_four_nodes.end();
+//          ++iter)
+//     {
+//         other_four_nodes.insert(GetCorrespondingCylindricalNodeIndex(*iter));
+//     }
+//     assert(other_four_nodes.size() == 4);
 
-    // Loop over all elements
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
-         elem_iter != GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Loop over the nodes of the element
-        if (!(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(0))==other_four_nodes.end()) &&
-            !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(1))==other_four_nodes.end()) &&
-            !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(2))==other_four_nodes.end()) )
-        {
-            corresponding_elements.push_back(elem_iter->GetIndex());
-            elem_iter->MarkAsDeleted();
-            mDeletedElementIndices.push_back(elem_iter->GetIndex());
-        }
-    }
-    assert(corresponding_elements.size() == 2);
+//     /*
+//      * Find the elements surrounded by the nodes on the right
+//      * and change them to match the elements on the left.
+//      */
+//     std::vector<unsigned> corresponding_elements;
 
-    // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
-    unsigned num_elements = GetNumAllElements();
-    for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
-         iter != rMainSideElements.end();
-         ++iter)
-    {
-        Element<2,2>* p_main_element = GetElement(*iter);
-        std::vector<Node<2>*> nodes;
+//     // Loop over all elements
+//     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+//          elem_iter != GetElementIteratorEnd();
+//          ++elem_iter)
+//     {
+//         // Loop over the nodes of the element
+//         if (!(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(0))==other_four_nodes.end()) &&
+//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(1))==other_four_nodes.end()) &&
+//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(2))==other_four_nodes.end()) )
+//         {
+//             corresponding_elements.push_back(elem_iter->GetIndex());
+//             elem_iter->MarkAsDeleted();
+//             mDeletedElementIndices.push_back(elem_iter->GetIndex());
+//         }
+//     }
+//     assert(corresponding_elements.size() == 2);
 
-        // Put corresponding nodes into a std::vector
-        for (unsigned i=0; i<3; i++)
-        {
-            unsigned main_node = p_main_element->GetNodeGlobalIndex(i);
-            nodes.push_back(this->GetNode(GetCorrespondingCylindricalNodeIndex(main_node)));
-        }
+//     // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
+//     unsigned num_elements = GetNumAllElements();
+//     for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
+//          iter != rMainSideElements.end();
+//          ++iter)
+//     {
+//         Element<2,2>* p_main_element = GetElement(*iter);
+//         std::vector<Node<2>*> nodes;
 
-        // Make a new element
-        Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
-        this->mElements.push_back(p_new_element);
-        this->mElementJacobians.push_back(zero_matrix<double>(2,2));
-        this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
-        this->mElementJacobianDeterminants.push_back(0.0);
-        num_elements++;
-    }
+//         // Put corresponding nodes into a std::vector
+//         for (unsigned i=0; i<3; i++)
+//         {
+//             unsigned main_node = p_main_element->GetNodeGlobalIndex(i);
+//             nodes.push_back(this->GetNode(GetCorrespondingCylindricalNodeIndex(main_node)));
+//         }
 
-    // Reindex to get rid of extra elements indices
-    NodeMap map(GetNumAllNodes());
-    this->ReIndex(map);
-}
+//         // Make a new element
+//         Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
+//         this->mElements.push_back(p_new_element);
+//         this->mElementJacobians.push_back(zero_matrix<double>(2,2));
+//         this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
+//         this->mElementJacobianDeterminants.push_back(0.0);
+//         num_elements++;
+//     }
 
-void Toroidal2dMesh::UseTheseElementsToDecideToroidalMeshing(std::set<unsigned>& rMainSideElements)
-{
-    assert(rMainSideElements.size() == 2);
+//     // Reindex to get rid of extra elements indices
+//     NodeMap map(GetNumAllNodes());
+//     this->ReIndex(map);
+// }
 
-    // We find the four nodes surrounding the dodgy meshing, on each side.
-    std::set<unsigned> main_four_nodes;
-    for (std::set<unsigned>::iterator elem_iter = rMainSideElements.begin();
-         elem_iter != rMainSideElements.end();
-         ++elem_iter)
-    {
-        unsigned elem_index = *elem_iter;
-        Element<2,2>* p_element = GetElement(elem_index);
-        for (unsigned i=0; i<3; i++)
-        {
-            unsigned index = p_element->GetNodeGlobalIndex(i);
-            main_four_nodes.insert(index);
-        }
-    }
-    assert(main_four_nodes.size() == 4);
+// TODO #3043 include if needed
+// void Toroidal2dMesh::UseTheseElementsToDecideToroidalMeshing(std::set<unsigned>& rMainSideElements)
+// {
+//     assert(rMainSideElements.size() == 2);
 
-    std::set<unsigned> other_four_nodes;
-    for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
-         iter != main_four_nodes.end();
-         ++iter)
-    {
-        other_four_nodes.insert(GetCorrespondingToroidalNodeIndex(*iter));
-    }
-    assert(other_four_nodes.size() == 4);
+//     // We find the four nodes surrounding the dodgy meshing, on each side.
+//     std::set<unsigned> main_four_nodes;
+//     for (std::set<unsigned>::iterator elem_iter = rMainSideElements.begin();
+//          elem_iter != rMainSideElements.end();
+//          ++elem_iter)
+//     {
+//         unsigned elem_index = *elem_iter;
+//         Element<2,2>* p_element = GetElement(elem_index);
+//         for (unsigned i=0; i<3; i++)
+//         {
+//             unsigned index = p_element->GetNodeGlobalIndex(i);
+//             main_four_nodes.insert(index);
+//         }
+//     }
+//     assert(main_four_nodes.size() == 4);
 
-    /*
-     * Find the elements surrounded by the nodes on the right
-     * and change them to match the elements on the left.
-     */
-    std::vector<unsigned> corresponding_elements;
+//     std::set<unsigned> other_four_nodes;
+//     for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
+//          iter != main_four_nodes.end();
+//          ++iter)
+//     {
+//         other_four_nodes.insert(GetCorrespondingToroidalNodeIndex(*iter));
+//     }
+//     assert(other_four_nodes.size() == 4);
 
-    // Loop over all elements
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
-         elem_iter != GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Loop over the nodes of the element
-        if (!(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(0))==other_four_nodes.end()) &&
-            !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(1))==other_four_nodes.end()) &&
-            !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(2))==other_four_nodes.end()) )
-        {
-            corresponding_elements.push_back(elem_iter->GetIndex());
-            elem_iter->MarkAsDeleted();
-            mDeletedElementIndices.push_back(elem_iter->GetIndex());
-        }
-    }
-    assert(corresponding_elements.size() == 2);
+//     /*
+//      * Find the elements surrounded by the nodes on the right
+//      * and change them to match the elements on the left.
+//      */
+//     std::vector<unsigned> corresponding_elements;
 
-    // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
-    unsigned num_elements = GetNumAllElements();
-    for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
-         iter != rMainSideElements.end();
-         ++iter)
-    {
-        Element<2,2>* p_main_element = GetElement(*iter);
-        std::vector<Node<2>*> nodes;
+//     // Loop over all elements
+//     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+//          elem_iter != GetElementIteratorEnd();
+//          ++elem_iter)
+//     {
+//         // Loop over the nodes of the element
+//         if (!(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(0))==other_four_nodes.end()) &&
+//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(1))==other_four_nodes.end()) &&
+//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(2))==other_four_nodes.end()) )
+//         {
+//             corresponding_elements.push_back(elem_iter->GetIndex());
+//             elem_iter->MarkAsDeleted();
+//             mDeletedElementIndices.push_back(elem_iter->GetIndex());
+//         }
+//     }
+//     assert(corresponding_elements.size() == 2);
 
-        // Put corresponding nodes into a std::vector
-        for (unsigned i=0; i<3; i++)
-        {
-            unsigned main_node = p_main_element->GetNodeGlobalIndex(i);
-            nodes.push_back(this->GetNode(GetCorrespondingToroidalNodeIndex(main_node)));
-        }
+//     // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
+//     unsigned num_elements = GetNumAllElements();
+//     for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
+//          iter != rMainSideElements.end();
+//          ++iter)
+//     {
+//         Element<2,2>* p_main_element = GetElement(*iter);
+//         std::vector<Node<2>*> nodes;
 
-        // Make a new element
-        Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
-        this->mElements.push_back(p_new_element);
-        this->mElementJacobians.push_back(zero_matrix<double>(2,2));
-        this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
-        this->mElementJacobianDeterminants.push_back(0.0);
-        num_elements++;
-    }
+//         // Put corresponding nodes into a std::vector
+//         for (unsigned i=0; i<3; i++)
+//         {
+//             unsigned main_node = p_main_element->GetNodeGlobalIndex(i);
+//             nodes.push_back(this->GetNode(GetCorrespondingToroidalNodeIndex(main_node)));
+//         }
 
-    // Reindex to get rid of extra elements indices
-    NodeMap map(GetNumAllNodes());
-    this->ReIndex(map);
-}
+//         // Make a new element
+//         Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
+//         this->mElements.push_back(p_new_element);
+//         this->mElementJacobians.push_back(zero_matrix<double>(2,2));
+//         this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
+//         this->mElementJacobianDeterminants.push_back(0.0);
+//         num_elements++;
+//     }
+
+//     // Reindex to get rid of extra elements indices
+//     NodeMap map(GetNumAllNodes());
+//     this->ReIndex(map);
+// }
 
 void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBoundaries()
 {

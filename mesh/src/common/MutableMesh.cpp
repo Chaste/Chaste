@@ -663,7 +663,6 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
 
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
-
         this->mElements[i]->ResetIndex(i);
     }
 
