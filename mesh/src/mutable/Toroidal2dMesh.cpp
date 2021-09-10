@@ -894,9 +894,12 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
 
             if (is_corresponding_node)
             {
+                // If this trips then you need to deal with remesjhing where the left and right are different 
+                // See #3043 and Cylindrical2dMesh
+                NEVER_REACHED; 
                 // Remove original and corresponding element from sets
-                temp_left_hand_side_elements.erase(elem_index);
-                temp_right_hand_side_elements.erase(corresponding_elem_index);
+                // temp_left_hand_side_elements.erase(elem_index);
+                // temp_right_hand_side_elements.erase(corresponding_elem_index);
             }
         }
     }
@@ -906,8 +909,8 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
      * of how to mesh. If it does ever throw you need to be cleverer and match up the
      * elements into as many pairs as possible on the left hand and right hand sides.
      */
- //    assert(temp_left_hand_side_elements.size() <= 2);
- //    assert(temp_right_hand_side_elements.size() <= 2);
+     //assert(temp_left_hand_side_elements.size() <= 2);
+     //assert(temp_right_hand_side_elements.size() <= 2);
 
     /*
      * Now we just have to use the first pair of elements and copy their info over to the other side.
@@ -915,6 +918,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
      */
     if (temp_left_hand_side_elements.empty() || temp_right_hand_side_elements.empty())
     {
+
         assert(temp_right_hand_side_elements.empty());
         assert(temp_left_hand_side_elements.empty());
     }
@@ -922,21 +926,12 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
     {
         if (temp_right_hand_side_elements.size() == 2 && temp_left_hand_side_elements.size() == 2)
         {
-            if (temp_right_hand_side_elements.size() == 2)
-            {
-                // Use the right hand side meshing and map to left
-                NEVER_REACHED;
-                //UseTheseElementsToDecideCylindricalMeshing(temp_right_hand_side_elements);
-            }
-            else
-            {
-                /*
-                 * If you get here there are more than two mixed up elements on the periodic edge.
-                 * We need to knock the pair out and then rerun this function. This shouldn't be
-                 * too hard to do but is as yet unnecessary.
-                 */
-                NEVER_REACHED;
-            }
+           /*
+            * If you get here there are mixed up elements on the periodic edge.
+            * We need to knock the pair out and then rerun this function. This shouldn't be
+            * too hard to do but is as yet unnecessary.
+            */
+            NEVER_REACHED;
         }
     }
 }
@@ -1005,8 +1000,12 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
 
             if (is_corresponding_node)
             {
+                // If this trips then you need to deal with remesjhing where the left and right are different 
+                // See #3043 and Cylindrical2dMesh
+                NEVER_REACHED; 
+
                 // Remove original and corresponding element from sets
-                temp_bottom_hand_side_elements.erase(elem_index);
+                //temp_bottom_hand_side_elements.erase(elem_index);
                 temp_top_hand_side_elements.erase(corresponding_elem_index);
             }
         }
@@ -1017,8 +1016,8 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
      * of how to mesh. If it does ever throw you need to be cleverer and match up the
      * elements into as many pairs as possible on the left hand and right hand sides.
      */
- //    assert(temp_bottom_hand_side_elements.size() <= 2);
- //    assert(temp_top_hand_side_elements.size() <= 2);
+     //assert(temp_bottom_hand_side_elements.size() <= 2);
+     //assert(temp_top_hand_side_elements.size() <= 2);
 
     /*
      * Now we just have to use the first pair of elements and copy their info over to the other side.
@@ -1026,198 +1025,23 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
      */
     if (temp_bottom_hand_side_elements.empty() || temp_top_hand_side_elements.empty())
     {
-        assert(temp_top_hand_side_elements.empty());
-        assert(temp_bottom_hand_side_elements.empty());
+        NEVER_REACHED; 
+        //assert(temp_top_hand_side_elements.empty());
+        //assert(temp_bottom_hand_side_elements.empty());
     }
     else
     {
         if (temp_top_hand_side_elements.size() == 2 && temp_bottom_hand_side_elements.size() == 2)
         {
-            if (temp_top_hand_side_elements.size() == 2)
-            {
-                // Use the top hand side meshing and map to bottom
-                NEVER_REACHED;
-                //UseTheseElementsToDecideToroidalMeshing(temp_top_hand_side_elements);
-            }
-            else
-            {
-                /*
-                 * If you get here there are more than two mixed up elements on the periodic edge.
-                 * We need to knock the pair out and then rerun this function. This shouldn't be
-                 * too hard to do but is as yet unnecessary.
-                 */
-                NEVER_REACHED;
-            }
+            /*
+             * If you get here there are mixed up elements on the periodic edge.
+             * We need to knock the pair out and then rerun this function. This shouldn't be
+             * too hard to do but is as yet unnecessary.
+             */
+            NEVER_REACHED;
         }
     }
 }
-
-
-// TODO #3043 include if needed
-// void Toroidal2dMesh::UseTheseElementsToDecideCylindricalMeshing(std::set<unsigned>& rMainSideElements)
-// {
-//     assert(rMainSideElements.size() == 2);
-
-//     // We find the four nodes surrounding the dodgy meshing, on each side.
-//     std::set<unsigned> main_four_nodes;
-//     for (std::set<unsigned>::iterator elem_iter = rMainSideElements.begin();
-//          elem_iter != rMainSideElements.end();
-//          ++elem_iter)
-//     {
-//         unsigned elem_index = *elem_iter;
-//         Element<2,2>* p_element = GetElement(elem_index);
-//         for (unsigned i=0; i<3; i++)
-//         {
-//             unsigned index = p_element->GetNodeGlobalIndex(i);
-//             main_four_nodes.insert(index);
-//         }
-//     }
-//     assert(main_four_nodes.size() == 4);
-
-//     std::set<unsigned> other_four_nodes;
-//     for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
-//          iter != main_four_nodes.end();
-//          ++iter)
-//     {
-//         other_four_nodes.insert(GetCorrespondingCylindricalNodeIndex(*iter));
-//     }
-//     assert(other_four_nodes.size() == 4);
-
-//     /*
-//      * Find the elements surrounded by the nodes on the right
-//      * and change them to match the elements on the left.
-//      */
-//     std::vector<unsigned> corresponding_elements;
-
-//     // Loop over all elements
-//     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
-//          elem_iter != GetElementIteratorEnd();
-//          ++elem_iter)
-//     {
-//         // Loop over the nodes of the element
-//         if (!(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(0))==other_four_nodes.end()) &&
-//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(1))==other_four_nodes.end()) &&
-//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(2))==other_four_nodes.end()) )
-//         {
-//             corresponding_elements.push_back(elem_iter->GetIndex());
-//             elem_iter->MarkAsDeleted();
-//             mDeletedElementIndices.push_back(elem_iter->GetIndex());
-//         }
-//     }
-//     assert(corresponding_elements.size() == 2);
-
-//     // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
-//     unsigned num_elements = GetNumAllElements();
-//     for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
-//          iter != rMainSideElements.end();
-//          ++iter)
-//     {
-//         Element<2,2>* p_main_element = GetElement(*iter);
-//         std::vector<Node<2>*> nodes;
-
-//         // Put corresponding nodes into a std::vector
-//         for (unsigned i=0; i<3; i++)
-//         {
-//             unsigned main_node = p_main_element->GetNodeGlobalIndex(i);
-//             nodes.push_back(this->GetNode(GetCorrespondingCylindricalNodeIndex(main_node)));
-//         }
-
-//         // Make a new element
-//         Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
-//         this->mElements.push_back(p_new_element);
-//         this->mElementJacobians.push_back(zero_matrix<double>(2,2));
-//         this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
-//         this->mElementJacobianDeterminants.push_back(0.0);
-//         num_elements++;
-//     }
-
-//     // Reindex to get rid of extra elements indices
-//     NodeMap map(GetNumAllNodes());
-//     this->ReIndex(map);
-// }
-
-// TODO #3043 include if needed
-// void Toroidal2dMesh::UseTheseElementsToDecideToroidalMeshing(std::set<unsigned>& rMainSideElements)
-// {
-//     assert(rMainSideElements.size() == 2);
-
-//     // We find the four nodes surrounding the dodgy meshing, on each side.
-//     std::set<unsigned> main_four_nodes;
-//     for (std::set<unsigned>::iterator elem_iter = rMainSideElements.begin();
-//          elem_iter != rMainSideElements.end();
-//          ++elem_iter)
-//     {
-//         unsigned elem_index = *elem_iter;
-//         Element<2,2>* p_element = GetElement(elem_index);
-//         for (unsigned i=0; i<3; i++)
-//         {
-//             unsigned index = p_element->GetNodeGlobalIndex(i);
-//             main_four_nodes.insert(index);
-//         }
-//     }
-//     assert(main_four_nodes.size() == 4);
-
-//     std::set<unsigned> other_four_nodes;
-//     for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
-//          iter != main_four_nodes.end();
-//          ++iter)
-//     {
-//         other_four_nodes.insert(GetCorrespondingToroidalNodeIndex(*iter));
-//     }
-//     assert(other_four_nodes.size() == 4);
-
-//     /*
-//      * Find the elements surrounded by the nodes on the right
-//      * and change them to match the elements on the left.
-//      */
-//     std::vector<unsigned> corresponding_elements;
-
-//     // Loop over all elements
-//     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
-//          elem_iter != GetElementIteratorEnd();
-//          ++elem_iter)
-//     {
-//         // Loop over the nodes of the element
-//         if (!(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(0))==other_four_nodes.end()) &&
-//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(1))==other_four_nodes.end()) &&
-//             !(other_four_nodes.find(elem_iter->GetNodeGlobalIndex(2))==other_four_nodes.end()) )
-//         {
-//             corresponding_elements.push_back(elem_iter->GetIndex());
-//             elem_iter->MarkAsDeleted();
-//             mDeletedElementIndices.push_back(elem_iter->GetIndex());
-//         }
-//     }
-//     assert(corresponding_elements.size() == 2);
-
-//     // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
-//     unsigned num_elements = GetNumAllElements();
-//     for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
-//          iter != rMainSideElements.end();
-//          ++iter)
-//     {
-//         Element<2,2>* p_main_element = GetElement(*iter);
-//         std::vector<Node<2>*> nodes;
-
-//         // Put corresponding nodes into a std::vector
-//         for (unsigned i=0; i<3; i++)
-//         {
-//             unsigned main_node = p_main_element->GetNodeGlobalIndex(i);
-//             nodes.push_back(this->GetNode(GetCorrespondingToroidalNodeIndex(main_node)));
-//         }
-
-//         // Make a new element
-//         Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
-//         this->mElements.push_back(p_new_element);
-//         this->mElementJacobians.push_back(zero_matrix<double>(2,2));
-//         this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
-//         this->mElementJacobianDeterminants.push_back(0.0);
-//         num_elements++;
-//     }
-
-//     // Reindex to get rid of extra elements indices
-//     NodeMap map(GetNumAllNodes());
-//     this->ReIndex(map);
-// }
 
 void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBoundaries()
 {

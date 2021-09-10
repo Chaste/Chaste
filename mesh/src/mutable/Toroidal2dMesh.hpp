@@ -219,33 +219,6 @@ private:
      */
     unsigned GetCorrespondingToroidalNodeIndex(unsigned nodeIndex);
 
-
-    // TODO #3043 include if needed
-    // /**
-    //  * This method takes in two elements which are not meshed in the same way
-    //  * on the opposite boundary. It deletes the corresponding two elements
-    //  * (connecting the same four nodes) and makes two new elements which are
-    //  * connected in the same way. We should then be able to reconstruct the
-    //  * Toroidal mesh properly.
-    //  *
-    //  * @param rMainSideElements two elements (usually in a square) which have
-    //  *                          been meshed differently on the opposite boundary
-    //  */
-    // void UseTheseElementsToDecideCylindricalMeshing(std::set<unsigned>& rMainSideElements);
-
-    // TODO #3043 include if needed
-    // /**
-    //  * This method takes in two elements which are not meshed in the same way
-    //  * on the opposite boundary. It deletes the corresponding two elements
-    //  * (connecting the same four nodes) and makes two new elements which are
-    //  * connected in the same way. We should then be able to reconstruct the
-    //  * Toroidal mesh properly.
-    //  *
-    //  * @param rMainSideElements two elements (usually in a square) which have
-    //  *                          been meshed differently on the opposite boundary
-    //  */
-    // void UseTheseElementsToDecideToroidalMeshing(std::set<unsigned>& rMainSideElements);
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
