@@ -226,10 +226,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         }
     }
 
-
-// VtkMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
-// mesh_writer.WriteFilesUsingMesh(*this);
-
     // Create mirrored nodes for the normal remesher to work with
     CreateMirrorNodes();
 
@@ -244,16 +240,12 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     NodeMap big_map(GetNumAllNodes());
     MutableMesh<2,2>::ReMesh(big_map);
 
-// VtkMeshWriter<2,2> mesh_writer_2("Toroidal2dMeshDebug", "extended_mesh", false);
-// mesh_writer_2.WriteFilesUsingMesh(*this);
-
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
      * altered accordingly before being passed to the user. Not sure how this all
      * works, so deal with this bridge when we get to it.
      */
     assert(big_map.IsIdentityMap());
-
 
     /*
      * Now remove any long edges to help stop extra edges on the boundary
@@ -918,9 +910,9 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
      */
     if (temp_left_hand_side_elements.empty() || temp_right_hand_side_elements.empty())
     {
-
-        assert(temp_right_hand_side_elements.empty());
-        assert(temp_left_hand_side_elements.empty());
+        NEVER_REACHED;
+        //assert(temp_right_hand_side_elements.empty());
+        //assert(temp_left_hand_side_elements.empty());
     }
     else
     {
@@ -1000,7 +992,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
 
             if (is_corresponding_node)
             {
-                // If this trips then you need to deal with remesjhing where the left and right are different 
+                // If this trips then you need to deal with remeshing where the left and right are different 
                 // See #3043 and Cylindrical2dMesh
                 NEVER_REACHED; 
 
@@ -1219,21 +1211,26 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
         }
         else
         {
-            // If nodeIndex is a member of mLeftOriginals, then find the corresponding node index in mLeftImages
-            std::vector<unsigned>::iterator left_orig_iter = std::find(mLeftOriginals.begin(), mLeftOriginals.end(), nodeIndex);
-            if (left_orig_iter != mLeftOriginals.end())
-            {
-                corresponding_node_index = mLeftImages[left_orig_iter - mLeftOriginals.begin()];
-            }
-            else
-            {
-                // If nodeIndex is a member of mLeftImages, then find the corresponding node index in mLeftOriginals
-                std::vector<unsigned>::iterator left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
-                if (left_im_iter != mLeftImages.end())
-                {
-                    corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
-                }
-            }
+            // This isnt needed as now we copy all nodes to the left and right.
+            // If you reach here then you have probably 
+            // Changed it back to half the nodes or similar
+            NEVER_REACHED;
+
+            // // If nodeIndex is a member of mLeftOriginals, then find the corresponding node index in mLeftImages
+            // std::vector<unsigned>::iterator left_orig_iter = std::find(mLeftOriginals.begin(), mLeftOriginals.end(), nodeIndex);
+            // if (left_orig_iter != mLeftOriginals.end())
+            // {
+            //     corresponding_node_index = mLeftImages[left_orig_iter - mLeftOriginals.begin()];
+            // }
+            // else
+            // {
+            //     // If nodeIndex is a member of mLeftImages, then find the corresponding node index in mLeftOriginals
+            //     std::vector<unsigned>::iterator left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
+            //     if (left_im_iter != mLeftImages.end())
+            //     {
+            //         corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
+            //     }
+            // }
         }
     }
 
@@ -1263,21 +1260,26 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
         }
         else
         {
-            // If nodeIndex is a member of mBottomOriginals, then find the corresponding node index in mBottomImages
-            std::vector<unsigned>::iterator bottom_orig_iter = std::find(mBottomOriginals.begin(), mBottomOriginals.end(), nodeIndex);
-            if (bottom_orig_iter != mBottomOriginals.end())
-            {
-                corresponding_node_index = mBottomImages[bottom_orig_iter - mBottomOriginals.begin()];
-            }
-            else
-            {
-                // If nodeIndex is a member of mBottomImages, then find the corresponding node index in mBottomOriginals
-                std::vector<unsigned>::iterator bottom_im_iter = std::find(mBottomImages.begin(), mBottomImages.end(), nodeIndex);
-                if (bottom_im_iter != mBottomImages.end())
-                {
-                    corresponding_node_index = mBottomOriginals[bottom_im_iter - mBottomImages.begin()];
-                }
-            }
+            // This isnt needed as now we copy all nodes to the top and bottom.
+            // If you reach here then you have probably 
+            // Changed it back to half the nodes or similar
+            NEVER_REACHED;
+
+            // // If nodeIndex is a member of mBottomOriginals, then find the corresponding node index in mBottomImages
+            // std::vector<unsigned>::iterator bottom_orig_iter = std::find(mBottomOriginals.begin(), mBottomOriginals.end(), nodeIndex);
+            // if (bottom_orig_iter != mBottomOriginals.end())
+            // {
+            //     corresponding_node_index = mBottomImages[bottom_orig_iter - mBottomOriginals.begin()];
+            // }
+            // else
+            // {
+            //     // If nodeIndex is a member of mBottomImages, then find the corresponding node index in mBottomOriginals
+            //     std::vector<unsigned>::iterator bottom_im_iter = std::find(mBottomImages.begin(), mBottomImages.end(), nodeIndex);
+            //     if (bottom_im_iter != mBottomImages.end())
+            //     {
+            //         corresponding_node_index = mBottomOriginals[bottom_im_iter - mBottomImages.begin()];
+            //     }
+            // }
         }
     }
 

@@ -843,13 +843,6 @@ public:
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
         Toroidal2dMesh* p_delaunay_mesh = generator.GetToroidalMesh();
 
-// VtkMeshWriter<2,2> mesh_writer("TestGetMeshForVtkForVoroniTesselation", "DelaunayMesh_0", false);
-// TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
-
-// TrianglesMeshWriter<2,2> mesh_writer_1("TestGetMeshForVtkForVoroniTesselation", "DelaunayMesh_0", false);
-// TS_ASSERT_THROWS_NOTHING(mesh_writer_1.WriteFilesUsingMesh(*p_delaunay_mesh));
-
-
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
         Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 32u); // 2*4*4
@@ -857,9 +850,6 @@ public:
 
         // Test GetMeshForVtk() method
         VertexMesh<2, 2>* p_mesh_for_vtk = voronoi_mesh.GetMeshForVtk();
-
-VertexMeshWriter<2,2> vertexmesh_writer("TestGetMeshForVtkForVoroniTesselation", "ToroidalVertexMesh_0", false);  
-vertexmesh_writer.WriteVtkUsingMesh(*p_mesh_for_vtk,""); 
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
@@ -880,9 +870,6 @@ vertexmesh_writer.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
 
         p_mesh_for_vtk = voronoi_mesh_1.GetMeshForVtk();
 
-VertexMeshWriter<2,2> vertexmesh_writer_1("TestGetMeshForVtkForVoroniTesselation", "ToroidalVertexMesh_1", false); 
-vertexmesh_writer_1.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
-
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
@@ -895,9 +882,6 @@ vertexmesh_writer_1.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
         TS_ASSERT_EQUALS(voronoi_mesh_2.GetNumElements(), 16u); // 4*4
 
         p_mesh_for_vtk = voronoi_mesh_2.GetMeshForVtk();
-
-VertexMeshWriter<2,2> vertexmesh_writer_2("TestGetMeshForVtkForVoroniTesselation", "ToroidalVertexMesh_2", false); 
-vertexmesh_writer_2.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
@@ -912,9 +896,6 @@ vertexmesh_writer_2.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
 
         p_mesh_for_vtk = voronoi_mesh_3.GetMeshForVtk();
 
-VertexMeshWriter<2,2> vertexmesh_writer_3("TestGetMeshForVtkForVoroniTesselation", "ToroidalVertexMesh_3", false); 
-vertexmesh_writer_3.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
-
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
@@ -926,9 +907,6 @@ vertexmesh_writer_3.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
         TS_ASSERT_EQUALS(voronoi_mesh_4.GetNumElements(), 16u); // 4*4
 
         p_mesh_for_vtk = voronoi_mesh_4.GetMeshForVtk();
-
-VertexMeshWriter<2,2> vertexmesh_writer_4("TestGetMeshForVtkForVoroniTesselation", "ToroidalVertexMesh_4", false); 
-vertexmesh_writer_4.WriteVtkUsingMesh(*p_mesh_for_vtk,"");
 
         // The mesh for VTK should have the same number of elements, but 16 extra nodes
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumElements(), 16u);
