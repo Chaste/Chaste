@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<VTKFile type="Collection" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+    <Collection>
+        <DataSet timestep="0" group="" part="0" file="mesh_results_0.vtu"/>
+        <DataSet timestep="0" group="" part="0" file="voronoi_results_0.vtu"/>
+        <DataSet timestep="1" group="" part="0" file="mesh_results_1.vtu"/>
+        <DataSet timestep="1" group="" part="0" file="voronoi_results_1.vtu"/>
+    </Collection>
+</VTKFile>

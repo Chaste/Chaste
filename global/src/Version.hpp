@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <map>
+#include "FileFinder.hpp"
+#include <boost/algorithm/string/trim.hpp>
 
 /**
  * A class with static methods providing various information about this build of Chaste.
@@ -155,6 +157,12 @@ public:
      * when it was built, and the current date and time.
      */
     static std::string GetProvenanceString();
+
+    /**
+     * @return  A single-line string representation the version of chaste_codegen being used.
+     */
+    static std::string GetChasteCodegenVersion();
+
 };
 
 #endif // VERSION_HPP_
