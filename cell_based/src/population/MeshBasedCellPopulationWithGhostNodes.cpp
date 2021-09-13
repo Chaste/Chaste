@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellLocationIndexWriter.hpp"
+#include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(
@@ -336,12 +337,75 @@ template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
+    // Store the present time as a string
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    std::stringstream time;
+    time << num_timesteps;
+    
+    if (this->mWriteVtkAsPoints)
+    {
+        // Create mesh writer for VTK output
+        VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "mesh_results_"+time.str(), false);
+
+        // Iterate over any cell writers that are present
+        unsigned num_vtk_cells = this->rGetMesh().GetNumNodes();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+             cell_writer_iter != this->mCellWriters.end();
+             ++cell_writer_iter)
+        {
+            // Create vector to store VTK cell data
+            std::vector<double> vtk_cell_data(num_vtk_cells);
+
+            // Loop over nodes of mesh 
+            for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+                node_iter != this->rGetMesh().GetNodeIteratorEnd();
+                ++node_iter)
+            {     
+                // Get the indices of this node 
+                unsigned node_index = node_iter->GetIndex();
+                
+                // If this node corresponds to a ghost node, set any "cell" data to be -1.0
+                if (this->IsGhostNode(node_index))
+                {
+                    // Populate the vector of VTK cell data
+                    vtk_cell_data[node_index] = -1.0;
+                }
+                else
+                {
+                    // Get the cell corresponding to this node
+                    CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+
+                    // Populate the vector of VTK cell data
+                    vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                }
+            }
+
+            mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        }
+
+        // Next, record which nodes are ghost nodes
+        // Note that the cell writer hierarchy can not be used to do this as ghost nodes don't have corresponding cells.
+        std::vector<double> ghosts(num_vtk_cells);
+        for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+            node_iter != this->rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+            ghosts[node_index]  = (double) (this->IsGhostNode(node_index));
+        }
+        mesh_writer.AddPointData("Non-ghosts", ghosts);
+
+        ///\todo #1975 - deal with possibility of information stored in CellData
+
+        mesh_writer.WriteFilesUsingMesh(this->rGetMesh());
+        *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+        *(this->mpVtkMetaFile) << num_timesteps;
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"mesh_results_";
+        *(this->mpVtkMetaFile) << num_timesteps;
+        *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    }
     if (this->mpVoronoiTessellation != nullptr)
     {
-        unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::stringstream time;
-        time << num_timesteps;
-
         // Create mesh writer for VTK output
         VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "voronoi_results", false);
 

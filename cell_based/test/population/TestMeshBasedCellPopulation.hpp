@@ -957,9 +957,15 @@ public:
         FileFinder vtk_file1(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file1.Exists());
 
-        // Final files
-        FileFinder vtk_file2(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "mesh_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
+
+        // Final files
+        FileFinder vtk_file3(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file3.Exists());
+
+        FileFinder vtk_file4(results_dir + "mesh_results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file4.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();

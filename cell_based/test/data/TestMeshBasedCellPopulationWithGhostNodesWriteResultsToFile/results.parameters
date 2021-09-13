@@ -1,0 +1,10 @@
+		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
+		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
+		<WriteVtkAsPoints>1</WriteVtkAsPoints>
+		<OutputMeshInVtk>1</OutputMeshInVtk>
+		<HasVariableRestLength>0</HasVariableRestLength>
+		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
+		<DampingConstantNormal>1</DampingConstantNormal>
+		<DampingConstantMutant>1</DampingConstantMutant>
+		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
+
