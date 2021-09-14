@@ -68,6 +68,11 @@ private:
      */
     double mGhostSpringStiffness;
 
+    /**
+     * Rest length for springs between ghost nodes.
+     */
+    double mGhostSpringRestLength;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -87,6 +92,7 @@ private:
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
         archive & mIsGhostNode;
         archive & mGhostSpringStiffness;
+        archive & mGhostSpringRestLength;
         archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM, DIM> >(*this);
     }
 
@@ -131,21 +137,25 @@ public:
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      * @param ghostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
+     * @param ghostSpringRestLength spring rest length used to move the ghost nodes defaults to 1.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
                                           std::vector<CellPtr>& rCells,
                                           const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                                           bool deleteMesh=false,
-                                          double ghostSpringStiffness=15.0);
+                                          double ghostSpringStiffness=15.0,
+                                          double ghostSpringRestLength=1.0);
 
     /**
      * Constructor for use by the de-serializer.
      *
      * @param rMesh a mutable tetrahedral mesh.
      * @param ghostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
+     * @param ghostSpringRestLength spring rest length used to move the ghost nodes defaults to 1.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                          double ghostSpringStiffness=15.0);
+                                          double ghostSpringStiffness=15.0,
+                                          double ghostSpringRestLength=1.0);
 
     /**
      * Empty destructor so archiving works with static libraries.

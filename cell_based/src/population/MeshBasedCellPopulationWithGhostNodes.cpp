@@ -43,9 +43,11 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
      std::vector<CellPtr>& rCells,
      const std::vector<unsigned> locationIndices,
      bool deleteMesh,
-     double ghostSpringStiffness)
+     double ghostSpringStiffness,
+     double ghostSpringRestLength)
              : MeshBasedCellPopulation<DIM,DIM>(rMesh, rCells, locationIndices, deleteMesh, false), // do not call the base class Validate()
-               mGhostSpringStiffness(ghostSpringStiffness)
+               mGhostSpringStiffness(ghostSpringStiffness),
+               mGhostSpringRestLength(ghostSpringRestLength)
 {
     if (!locationIndices.empty())
     {
@@ -79,9 +81,11 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                                                                  double ghostSpringStiffness)
+                                                                                  double ghostSpringStiffness,
+                                                                                  double ghostSpringRestLength)
     : MeshBasedCellPopulation<DIM,DIM>(rMesh),
-      mGhostSpringStiffness(ghostSpringStiffness)
+      mGhostSpringStiffness(ghostSpringStiffness),
+      mGhostSpringRestLength(ghostSpringRestLength)
 {
 }
 
@@ -153,8 +157,14 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
     unit_difference /= distance_between_nodes;
 
     double rest_length = 1.0;
+    double spring_stiffness = 15.0; //mGhostCellSpringStiffness;
+    if (this->mIsGhostNode[rNodeAGlobalIndex] && this->mIsGhostNode[rNodeBGlobalIndex]) 
+    {
+        rest_length = mGhostSpringRestLength;
+        spring_stiffness  = mGhostSpringStiffness;
+    }
 
-    return mGhostSpringStiffness * unit_difference * (distance_between_nodes - rest_length);
+    return spring_stiffness * unit_difference * (distance_between_nodes - rest_length);
 }
 
 template<unsigned DIM>
@@ -475,6 +485,7 @@ template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<GhostSpringStiffness>" << mGhostSpringStiffness << "</GhostSpringStiffness>\n";
+    *rParamsFile << "\t\t<GhostSpringRestLength>" << mGhostSpringRestLength << "</GhostSpringRestLength>\n";
 
     // Call method on direct parent class
     MeshBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

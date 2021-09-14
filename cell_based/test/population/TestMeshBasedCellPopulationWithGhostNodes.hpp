@@ -71,6 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "VoronoiDataWriter.hpp"
 
 // Cell population writers
 #include "CellPopulationAreaWriter.hpp"
@@ -80,6 +81,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiDataWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
+
+#include "VtkMeshWriter.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -372,8 +375,6 @@ public:
         }
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
-
-        GeneralisedLinearSpringForce<2> linear_force;
 
         // It seems quite difficult to test this on a periodic mesh,
         // so just check the areas of all the cells are correct.
@@ -1202,6 +1203,132 @@ public:
 
         TS_ASSERT_THROWS_THIS(cell_population.GetTetrahedralMeshForPdeModifier(),
             "Currently can't solve PDEs on meshes with ghost nodes");
+    }
+
+     void TestApplyGhostForces()
+    {
+        unsigned num_cells_depth = 7;
+        unsigned num_cells_width = 3;
+        unsigned num_ghost_nodes = 0;
+        
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, num_ghost_nodes);
+    
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        p_mesh->Scale(0.9,0.9);
+
+VtkMeshWriter<2,2> writer("Temp", "mesh", false);
+writer.WriteFilesUsingMesh(*p_mesh);
+
+        std::vector<unsigned> location_indices;
+
+        for (unsigned i=0u; i<9u; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        for (unsigned i=18u; i<21u; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        // Set up cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
+
+        // Create a cell population
+        double ghost_spring_stiffness = 1.0;
+        double ghost_spring_rest_length = 1.0; 
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices, false, ghost_spring_stiffness, ghost_spring_rest_length);
+
+        GeneralisedLinearSpringForce<2> linear_force;
+
+        //Check all node forces are zero 
+        for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            TS_ASSERT_DELTA(node_iter->rGetAppliedForce()[0],0.0,1e-5);
+            TS_ASSERT_DELTA(node_iter->rGetAppliedForce()[1],0.0,1e-5);
+        }
+
+
+        linear_force.AddForceContribution(cell_population);
+
+        // Check all forces as expected
+        for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            unsigned node_index =  node_iter->GetIndex();
+            double force_magnitude = norm_2(node_iter->rGetAppliedForce());
+            
+            if (cell_population.IsGhostNode(node_index))
+            {
+                TS_ASSERT_DELTA(force_magnitude, 0.0, 1e-5);
+            }
+
+            // Normal Nodes
+            if (node_index==4||node_index==19)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 0.0, 1e-5);
+            }
+            if (node_index==0||node_index==1||node_index==6||node_index==7)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 2.5980, 1e-4);
+            }
+            if (node_index==2||node_index==5||node_index==8)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 3.0, 1e-4);
+            }
+            if (node_index==3||node_index==18||node_index==20)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 1.4999, 1e-4);
+            }
+        }
+
+        // Apply the ghost forces and check they're as expected
+        cell_population.ApplyGhostForces();
+
+        for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            unsigned node_index =  node_iter->GetIndex();
+            double force_magnitude = norm_2(node_iter->rGetAppliedForce());
+            
+            // Normal Nodes
+            if (node_index==4||node_index==19)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 0.0, 1e-5);
+            }
+            if (node_index==0||node_index==1||node_index==6||node_index==7)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 2.5980, 1e-4);
+            }
+            if (node_index==2||node_index==5||node_index==8)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 3.0, 1e-4);
+            }
+            if (node_index==3||node_index==18||node_index==20)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 1.4999, 1e-4);
+            }
+            
+            // Ghost Nodes
+            if (node_index==10||node_index==13||node_index==16)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 0.0, 1e-5);
+            }
+            if (node_index==9||node_index==14||node_index==15)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 0.8, 1e-4);
+            }
+            if (node_index==11||node_index==12||node_index==17)
+            {
+                TS_ASSERT_DELTA(force_magnitude, 1.6, 1e-4);
+            }
+        }
     }
 };
 
