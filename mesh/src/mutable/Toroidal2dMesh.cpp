@@ -152,9 +152,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
          ++node_iter)
     {
         c_vector<double, 2> location;
-        location = node_iter->rGetLocation();
         unsigned this_node_index = node_iter->GetIndex();
-        double this_node_x_location = location[0];
 
         // Check the mesh currently conforms to the dimensions given
         assert(0.0 <= node_iter->rGetLocation()[0]);
