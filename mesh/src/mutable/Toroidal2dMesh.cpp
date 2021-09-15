@@ -106,23 +106,15 @@ void Toroidal2dMesh::CreateMirrorNodes()
          ++node_iter)
     {
         c_vector<double, 2> location;
-        location = node_iter->rGetLocation();
         unsigned this_node_index = node_iter->GetIndex();
-        double this_node_y_location = location[1];
-
+        
         // Check the mesh currently conforms to the dimensions given
-        assert(0.0 <= this_node_y_location);
-        assert(this_node_y_location <= mHeight);
+        assert(0.0 <= node_iter->rGetLocation()[1]);
+        assert(node_iter->rGetLocation()[1] <= mHeight);
 
         // Put the nodes which are to be mirrored in the relevant vectors
-        //if (this_node_y_location < y_half_way)
-        //{
-            mBottomOriginals.push_back(this_node_index);
-        //}
-        //else
-        //{
-            mTopOriginals.push_back(this_node_index);
-        //}
+        mBottomOriginals.push_back(this_node_index);
+        mTopOriginals.push_back(this_node_index);
     }
 
     // For each Bottom original node, create an image node and record its new index
@@ -160,23 +152,14 @@ void Toroidal2dMesh::CreateMirrorNodes()
          ++node_iter)
     {
         c_vector<double, 2> location;
-        location = node_iter->rGetLocation();
         unsigned this_node_index = node_iter->GetIndex();
-        double this_node_x_location = location[0];
 
         // Check the mesh currently conforms to the dimensions given
-        assert(0.0 <= this_node_x_location);
-        assert(this_node_x_location<= mWidth);
+        assert(0.0 <= node_iter->rGetLocation()[0]);
+        assert(node_iter->rGetLocation()[0] <= mWidth);
 
-        // Put the nodes which are to be mirrored in the relevant vectors
-        //if (this_node_x_location < x_half_way)
-        //{
-            mLeftOriginals.push_back(this_node_index);
-        //}
-        //else
-        //{
-            mRightOriginals.push_back(this_node_index);
-        //}
+        mLeftOriginals.push_back(this_node_index);
+        mRightOriginals.push_back(this_node_index);
     }
 
     // For each left original node, create an image node and record its new index
