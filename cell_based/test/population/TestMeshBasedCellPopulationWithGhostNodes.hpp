@@ -82,8 +82,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 
-#include "VtkMeshWriter.hpp"
-
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -554,6 +552,22 @@ public:
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
+
+        // Test RemoveGhostNode()
+        cell_population.RemoveGhostNode(0u); // as nodes 0-9 and 80 are ghosts 
+    
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 82u);
+
+        // This doenst work before the Update as the cells arent updated yet
+        //TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
+
+        cell_population.Update();
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 81u); // Update deletes the node
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
+
     }
 
     void TestSpringIterator2d()
@@ -1216,9 +1230,6 @@ public:
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->Scale(0.9,0.9);
 
-VtkMeshWriter<2,2> writer("Temp", "mesh", false);
-writer.WriteFilesUsingMesh(*p_mesh);
-
         std::vector<unsigned> location_indices;
 
         for (unsigned i=0u; i<9u; i++)
@@ -1237,9 +1248,16 @@ writer.WriteFilesUsingMesh(*p_mesh);
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
-        double ghost_spring_stiffness = 1.0;
+        double ghost_cell_spring_stiffness = 1.0;
+        double ghost_ghost_spring_stiffness = 1.0;
         double ghost_spring_rest_length = 1.0; 
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices, false, ghost_spring_stiffness, ghost_spring_rest_length);
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, 
+                                                                 cells, 
+                                                                 location_indices, 
+                                                                 false, 
+                                                                 ghost_cell_spring_stiffness, 
+                                                                 ghost_ghost_spring_stiffness, 
+                                                                 ghost_spring_rest_length);
 
         GeneralisedLinearSpringForce<2> linear_force;
 
@@ -1322,11 +1340,11 @@ writer.WriteFilesUsingMesh(*p_mesh);
             }
             if (node_index==9||node_index==14||node_index==15)
             {
-                TS_ASSERT_DELTA(force_magnitude, 0.8, 1e-4);
+                TS_ASSERT_DELTA(force_magnitude, 0.1, 1e-4);
             }
             if (node_index==11||node_index==12||node_index==17)
             {
-                TS_ASSERT_DELTA(force_magnitude, 1.6, 1e-4);
+                TS_ASSERT_DELTA(force_magnitude, 0.2, 1e-4);
             }
         }
     }
