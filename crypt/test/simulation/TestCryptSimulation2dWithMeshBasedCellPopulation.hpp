@@ -1894,7 +1894,7 @@ public:
         }
 
         // Set up crypt
-        MeshBasedCellPopulationWithGhostNodes<2>* p_crypt = new MeshBasedCellPopulationWithGhostNodes<2>(*p_mesh, cells, location_indices, false, 30.0, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
+        MeshBasedCellPopulationWithGhostNodes<2>* p_crypt = new MeshBasedCellPopulationWithGhostNodes<2>(*p_mesh, cells, location_indices, false, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
 
         // Set simulation to output cell types and cell ancestors
         p_crypt->AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
