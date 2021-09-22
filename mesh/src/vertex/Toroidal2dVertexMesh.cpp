@@ -183,7 +183,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
 
                         // Now add extra end nodes if appropriate.
                         unsigned num_sections = 1; // I.e only at ends.
-                        for (int section=0; section <= num_sections; section++)
+                        for (unsigned section=0; section <= num_sections; section++)
                         {
                             double ratio = (double)section/(double)num_sections;
                             c_vector<double,2> new_node_location = -normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
