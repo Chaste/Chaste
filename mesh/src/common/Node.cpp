@@ -143,7 +143,7 @@ const c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetLocation() const
     // guarantee that the node has not been overwritten already. Hence, when implementing new functionality we need to make sure
     // that this functionality does not rely on being able to interrogate deleted nodes for their location.
     // \todo #2401: make this an exception.
-    assert(!mIsDeleted);
+    //assert(!mIsDeleted);
     return mLocation;
 }
 

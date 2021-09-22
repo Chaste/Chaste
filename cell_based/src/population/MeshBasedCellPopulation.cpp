@@ -949,7 +949,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     else if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
     {
         is_mesh_periodic = true;
-        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh));
+        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
     }
     else
     {

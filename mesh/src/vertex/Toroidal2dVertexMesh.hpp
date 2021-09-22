@@ -119,8 +119,9 @@ public:
      * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
      *
      * @param rMesh a Toroidal2dMesh
+     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
      */
-    Toroidal2dVertexMesh(Toroidal2dMesh& rMesh);
+    Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded = false);
 
     /**
      * Destructor.

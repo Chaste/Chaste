@@ -71,6 +71,9 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
         double x = p_temp_node->rGetLocation()[0];
         UNUSED_OPT(x); // Fix optimised build
         assert( 0 <= x && x < width);
+        double y = p_temp_node->rGetLocation()[1];
+        UNUSED_OPT(y); // Fix optimised build
+        assert( 0 <= y && y < depth);
         mNodes.push_back(p_temp_node);
     }
 

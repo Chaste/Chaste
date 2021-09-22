@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Toroidal2dVertexMesh.hpp"
 #include "Toroidal2dMesh.hpp"
+#include "Debug.hpp"
+#include "VtkMeshWriter.hpp"
 
 Toroidal2dVertexMesh::Toroidal2dVertexMesh(double width,
                                            double height,
@@ -51,7 +53,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(double width,
     ReMesh();
 }
 
-Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh)
+Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded)
     : mWidth(rMesh.GetWidth(0)),
       mHeight(rMesh.GetWidth(1)),
       mpMeshForVtk(nullptr)
@@ -61,59 +63,245 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh)
     // Reset member variables and clear mNodes, mFaces and mElements
     Clear();
 
-    unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
-    unsigned num_nodes = mpDelaunayMesh->GetNumAllElements();
+    if (!isBounded)
+    {   
+        unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
+        unsigned num_nodes = mpDelaunayMesh->GetNumAllElements();
 
-    // Allocate memory for mNodes and mElements
-    this->mNodes.reserve(num_nodes);
+        // Allocate memory for mNodes and mElements
+        this->mNodes.reserve(num_nodes);
 
-    // Create as many elements as there are nodes in the mesh
-    mElements.reserve(num_elements);
+        // Create as many elements as there are nodes in the mesh
+        mElements.reserve(num_elements);
 
-    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
-    {
-        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
-        mElements.push_back(p_element);
+        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        {
+            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
+            mElements.push_back(p_element);
+        }
+
+        // Populate mNodes
+        GenerateVerticesFromElementCircumcentres(rMesh);
+
+        // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            double x_location = mNodes[i]->rGetLocation()[0];
+            if (x_location < 0)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            }
+            else if (x_location > mWidth)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+            }
+            double y_location = mNodes[i]->rGetLocation()[1];
+            if (y_location < 0)
+            {
+                mNodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
+            }
+            else if (y_location > mHeight)
+            {
+                mNodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
+            }
+        }
+
+        // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            // Loop over nodes owned by this triangular element in the Delaunay mesh
+            // Add this node/vertex to each of the 3 vertex elements
+            for (unsigned local_index=0; local_index<3; local_index++)
+            {
+                unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
+                unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
+                unsigned end_index = num_nodes_in_elem>0 ? num_nodes_in_elem-1 : 0;
+
+                mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+            }
+        }
     }
-
-    // Populate mNodes
-    GenerateVerticesFromElementCircumcentres(rMesh);
-
-    // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
-    for (unsigned i=0; i<num_nodes; i++)
+    else // Is Bounded 
     {
-        double x_location = mNodes[i]->rGetLocation()[0];
-        if (x_location < 0)
+        // First create an extended mesh to include points extended from the boundary
+        std::vector<Node<2> *> nodes;
+        for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
+            node_iter != mpDelaunayMesh->GetNodeIteratorEnd();
+            ++node_iter)
         {
-            mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            nodes.push_back(new Node<2>(node_iter->GetIndex(), node_iter->rGetLocation(),node_iter->IsBoundaryNode()));
         }
-        else if (x_location > mWidth)
-        {
-            mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-        }
-        double y_location = mNodes[i]->rGetLocation()[1];
-        if (y_location < 0)
-        {
-            mNodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
-        }
-        else if (y_location > mHeight)
-        {
-            mNodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
-        }
-    }
 
-    // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        // Loop over nodes owned by this triangular element in the Delaunay mesh
-        // Add this node/vertex to each of the 3 vertex elements
-        for (unsigned local_index=0; local_index<3; local_index++)
-        {
-            unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
-            unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
-            unsigned end_index = num_nodes_in_elem>0 ? num_nodes_in_elem-1 : 0;
+        // // Add new nodes
+        unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
+        for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
+            elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
+            ++elem_iter)
+        {   
+            bool bad_element = false;
+            double edge_threshold = 1.5; //TODO Make setable variable!
 
-            mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+            for (unsigned j=0; j<3; j++)
+            {
+                Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
+                Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
+                if (norm_2(mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation()))>edge_threshold)
+                {
+                    bad_element = true;
+                    break;
+                }
+            }
+
+            if (bad_element)
+            {
+                for (unsigned j=0; j<3; j++)
+                {
+                    Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
+                    Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
+                    
+                    c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+                    double edge_length = norm_2(edge);
+                    
+                    if (edge_length<edge_threshold)
+                    {           
+                        // Short Edge so add new node
+                        c_vector<double,2> normal_vector;
+
+                        // Outward Normal
+                        normal_vector[0]= edge[1];
+                        normal_vector[1]= -edge[0];
+                        
+                        double dij = norm_2(normal_vector);
+                        assert(dij>1e-5); //Sanity check
+                        normal_vector /= dij;
+
+                        double bound_offset = 0.5; //TODO Make setable variable!
+                        c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5*edge;
+                
+                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                        new_node_index++;
+
+                        // Now add extra end nodes if appropriate.
+                        unsigned num_sections = 1; // I.e only at ends.
+                        for (int section=0; section <= num_sections; section++)
+                        {
+                            double ratio = (double)section/(double)num_sections;
+                            c_vector<double,2> new_node_location = -normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
+                            
+                            //Check if near other nodes (could be ineficient)
+                            bool node_clear = true;
+                            double node_clearance = 0.3; // Make setable variable??
+
+                            for (unsigned i=0; i<nodes.size(); i++)
+                            {   
+                                double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
+                                if (distance < node_clearance)
+                                {
+                                    node_clear = false;
+                                    //break;
+                                }
+                            }
+
+                            if (node_clear)
+                            {
+                                nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                                new_node_index++;
+                            }
+                        }
+                    }
+                }
+            }   
+        }
+
+        // Loop over all nodes and check they're not outside [0,mWidth]x[0,mHeight]
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            double x_location = nodes[i]->rGetLocation()[0];
+            if (x_location < 0)
+            {
+                nodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            }
+            else if (x_location >= mWidth)
+            {
+                nodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+            }
+            double y_location = nodes[i]->rGetLocation()[1];
+            if (y_location < 0)
+            {
+                nodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
+            }
+            else if (y_location >= mHeight)
+            {
+                nodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
+            }
+        }
+
+
+        Toroidal2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),mpDelaunayMesh->GetWidth(1), nodes);
+
+
+VtkMeshWriter<2,2> writer("TMP", "extended_mesh", false);
+writer.WriteFilesUsingMesh(extended_mesh);
+
+
+        unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
+        unsigned num_nodes = extended_mesh.GetNumAllElements();
+
+        // Allocate memory for mNodes and mElements
+        this->mNodes.reserve(num_nodes);
+
+        // Create as many elements as there are nodes in the mesh
+        mElements.reserve(num_elements);
+        for (unsigned elem_index = 0; elem_index < num_elements; elem_index++)
+        {
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index);
+            mElements.push_back(p_element);
+        }
+
+        // Populate mNodes
+        GenerateVerticesFromElementCircumcentres(extended_mesh);
+
+        // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            double x_location = mNodes[i]->rGetLocation()[0];
+            if (x_location < 0)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            }
+            else if (x_location > mWidth)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+            }
+            double y_location = mNodes[i]->rGetLocation()[1];
+            if (y_location < 0)
+            {
+                mNodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
+            }
+            else if (y_location > mHeight)
+            {
+                mNodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
+            }
+        }
+
+
+        // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
+        for (unsigned i = 0; i < num_nodes; i++)
+        {
+            // Loop over nodes owned by this triangular element in the Delaunay mesh
+            // Add this node/vertex to each of the 3 vertex elements
+            for (unsigned local_index = 0; local_index < 3; local_index++)
+            {   
+                unsigned elem_index = extended_mesh.GetElement(i)->GetNodeGlobalIndex(local_index);
+                
+                if (elem_index < num_elements)
+                {
+                    unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
+                    unsigned end_index = num_nodes_in_elem > 0 ? num_nodes_in_elem - 1 : 0;
+
+                    mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+                }
+            }
         }
     }
 
