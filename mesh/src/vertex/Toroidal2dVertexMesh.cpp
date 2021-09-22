@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Toroidal2dVertexMesh.hpp"
 #include "Toroidal2dMesh.hpp"
-#include "Debug.hpp"
-#include "VtkMeshWriter.hpp"
 
 Toroidal2dVertexMesh::Toroidal2dVertexMesh(double width,
                                            double height,
@@ -236,13 +234,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
             }
         }
 
-
         Toroidal2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),mpDelaunayMesh->GetWidth(1), nodes);
-
-
-VtkMeshWriter<2,2> writer("TMP", "extended_mesh", false);
-writer.WriteFilesUsingMesh(extended_mesh);
-
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
         unsigned num_nodes = extended_mesh.GetNumAllElements();

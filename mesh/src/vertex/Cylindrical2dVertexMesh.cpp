@@ -49,7 +49,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
     ReMesh();
 }
 
-Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
+Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool isBounded)
     : mWidth(rMesh.GetWidth(0)),
       mpMeshForVtk(nullptr)
 {
@@ -58,51 +58,189 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
     // Reset member variables and clear mNodes, mFaces and mElements
     Clear();
 
-    unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
-    unsigned num_nodes = mpDelaunayMesh->GetNumAllElements();
-
-    // Allocate memory for mNodes and mElements
-    this->mNodes.reserve(num_nodes);
-
-    // Create as many elements as there are nodes in the mesh
-    mElements.reserve(num_elements);
-
-    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+    if (!isBounded)
     {
-        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
-        mElements.push_back(p_element);
+        unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
+        unsigned num_nodes = mpDelaunayMesh->GetNumAllElements();
+
+        // Allocate memory for mNodes and mElements
+        this->mNodes.reserve(num_nodes);
+
+        // Create as many elements as there are nodes in the mesh
+        mElements.reserve(num_elements);
+
+        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        {
+            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
+            mElements.push_back(p_element);
+        }
+
+        // Populate mNodes
+        GenerateVerticesFromElementCircumcentres(rMesh);
+
+        // Loop over all generated nodes and check they're not outside [0,mWidth]
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            double x_location = mNodes[i]->rGetLocation()[0];
+            if (x_location < 0)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            }
+            else if (x_location > mWidth)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+            }
+        }
+
+        // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            // Loop over nodes owned by this triangular element in the Delaunay mesh
+            // Add this node/vertex to each of the 3 vertex elements
+            for (unsigned local_index=0; local_index<3; local_index++)
+            {
+                unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
+                unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
+                unsigned end_index = num_nodes_in_elem>0 ? num_nodes_in_elem-1 : 0;
+
+                mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+            }
+        }
     }
-
-    // Populate mNodes
-    GenerateVerticesFromElementCircumcentres(rMesh);
-
-    // Loop over all generated nodes and check they're not outside [0,mWidth]
-    for (unsigned i=0; i<num_nodes; i++)
+    else // Is Bounded 
     {
-        double x_location = mNodes[i]->rGetLocation()[0];
-        if (x_location < 0)
+        // First create an extended mesh to include points extended from the boundary
+        std::vector<Node<2> *> nodes;
+        for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
+            node_iter != mpDelaunayMesh->GetNodeIteratorEnd();
+            ++node_iter)
         {
-            mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            nodes.push_back(new Node<2>(node_iter->GetIndex(), node_iter->rGetLocation(),node_iter->IsBoundaryNode()));
         }
-        else if (x_location > mWidth)
-        {
-            mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-        }
-    }
 
-    // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-    for (unsigned i=0; i<num_nodes; i++)
-    {
-        // Loop over nodes owned by this triangular element in the Delaunay mesh
-        // Add this node/vertex to each of the 3 vertex elements
-        for (unsigned local_index=0; local_index<3; local_index++)
-        {
-            unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
-            unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
-            unsigned end_index = num_nodes_in_elem>0 ? num_nodes_in_elem-1 : 0;
+        // Add new nodes
+        unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
+        for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
+            elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
+            ++elem_iter)
+        {   
+            for (unsigned j=0; j<3; j++)
+            {
+                Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
+                Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
+                
+                std::set<unsigned> node_a_element_indices = p_node_a->rGetContainingElementIndices();
+                std::set<unsigned> node_b_element_indices = p_node_b->rGetContainingElementIndices();
 
-            mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+                std::set<unsigned> shared_elements;
+                std::set_intersection(node_a_element_indices.begin(),
+                                      node_a_element_indices.end(),
+                                      node_b_element_indices.begin(),
+                                      node_b_element_indices.end(),
+                                      std::inserter(shared_elements, shared_elements.begin()));
+
+
+                /* 
+                 * Note using boundary nodes to identify the boundary egdes wont work with 
+                 * triangles which have 3 boundary nodes
+                 * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
+                 */
+             
+                if (shared_elements.size() == 1) // Its a boundary edge
+                {
+                    c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+                    double edge_length = norm_2(edge);
+                    c_vector<double,2> normal_vector;
+
+                    normal_vector[0]= edge[1];
+                    normal_vector[1]= -edge[0];
+                    
+                    double dij = norm_2(normal_vector);
+                    assert(dij>1e-5); //Sanity check
+                    normal_vector /= dij;
+
+                    double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells) 
+
+                    int num_sections = ceil(edge_length*extra_node_scaling);
+                    for (int section=0; section<=num_sections; section++)
+                    {
+                        double ratio = (double)section/(double)num_sections;
+                        c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio*edge;
+                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                        new_node_index++;
+                    }
+                }
+            }
         }
+        
+        // Loop over all nodes and check they're not outside [0,mWidth]
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            double x_location = nodes[i]->rGetLocation()[0];
+            if (x_location < 0)
+            {
+                nodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            }
+            else if (x_location >= mWidth)
+            {
+                nodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+            }
+        }
+
+        Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
+
+        unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
+        unsigned num_nodes = extended_mesh.GetNumAllElements();
+
+        // Allocate memory for mNodes and mElements
+        this->mNodes.reserve(num_nodes);
+
+        // Create as many elements as there are nodes in the mesh
+        mElements.reserve(num_elements);
+        for (unsigned elem_index = 0; elem_index < num_elements; elem_index++)
+        {
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index);
+            mElements.push_back(p_element);
+        }
+
+        // Populate mNodes
+        GenerateVerticesFromElementCircumcentres(extended_mesh);
+
+        // Loop over all generated nodes and check they're not outside [0,mWidth]
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            double x_location = mNodes[i]->rGetLocation()[0];
+            if (x_location < 0)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+            }
+            else if (x_location > mWidth)
+            {
+                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+            }
+        }
+
+        // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
+        for (unsigned i = 0; i < num_nodes; i++)
+        {
+            // Loop over nodes owned by this triangular element in the Delaunay mesh
+            // Add this node/vertex to each of the 3 vertex elements
+            for (unsigned local_index = 0; local_index < 3; local_index++)
+            {   
+                unsigned elem_index = extended_mesh.GetElement(i)->GetNodeGlobalIndex(local_index);
+                
+                if (elem_index < num_elements)
+                {
+                    unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
+                    unsigned end_index = num_nodes_in_elem > 0 ? num_nodes_in_elem - 1 : 0;
+
+                    mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+                }
+            }
+        }
+
+
+
     }
 
     // Reorder mNodes anticlockwise

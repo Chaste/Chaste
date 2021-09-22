@@ -111,8 +111,8 @@ public:
      * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
      *
      * @param rMesh a Cylindrical2dMesh
-     */
-    Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh);
+     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
+     */    Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool isBounded = false);
 
     /**
      * Destructor.
