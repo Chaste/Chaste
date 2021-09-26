@@ -214,7 +214,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             {
                 mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
             }
-            else if (x_location > mWidth)
+            else if (x_location >= mWidth)
             {
                 mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
             }

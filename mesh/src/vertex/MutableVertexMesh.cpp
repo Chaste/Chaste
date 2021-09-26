@@ -1276,23 +1276,164 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     }
                 }// from [if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)]
                 else
-                {
-                    /*
-                     * The node configuration looks like that shown below. In this case, we merge the nodes
-                     * and tidy up node indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
-                     *
-                     * Outside
-                     *         /
-                     *   --o--o (2)
-                     *     (1) \
-                     *
-                     * ///\todo this should be a T1 swap (see #1263 and #2401)
-                     * Referring to the todo: this should probably stay a node-merge. If this is a T1 swap then
-                     * the single boundary node will travel from element 1 to element 2, but still remain a single node.
-                     * I.e. we would not reduce the total number of nodes in this situation.
-                     */
-                    PerformNodeMerge(pNodeA, pNodeB);
-                    RemoveDeletedNodes();
+                {   
+                    assert( (nodeA_elem_indices.size()==1 && nodeB_elem_indices.size()==2)
+                           || (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==1) );
+
+                    // Node one is the potential convex node Node 2 is the one in both elements.
+                    Node<SPACE_DIM>* p_node_1 = pNodeA;
+                    Node<SPACE_DIM>* p_node_2 = pNodeB;
+                    std::set<unsigned> node1_elem_indices = nodeA_elem_indices;
+                    std::set<unsigned> node2_elem_indices = nodeB_elem_indices;
+
+                    if (nodeB_elem_indices.size()==1)
+                    {  
+                        p_node_1 = pNodeB;
+                        node1_elem_indices = nodeB_elem_indices;
+                        p_node_2 = pNodeA;
+                        node2_elem_indices = nodeA_elem_indices;
+                    }
+                    assert(node1_elem_indices.size()==1);
+                    unsigned unique_element_index = *node1_elem_indices.begin();
+                    
+                    node2_elem_indices.erase(unique_element_index);
+                    assert(node2_elem_indices.size()==1);
+                    unsigned common_element_index = *node2_elem_indices.begin();
+                    
+                    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_uniqiue_element = this->mElements[unique_element_index];
+                    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_common_element = this->mElements[common_element_index];
+
+                    unsigned local_index_1 = p_uniqiue_element->GetNodeLocalIndex(p_node_1->GetIndex());
+                    unsigned next_node_1 = p_uniqiue_element->GetNodeGlobalIndex((local_index_1 + 1)%(p_uniqiue_element->GetNumNodes()));
+                    unsigned next_next_node_1 = p_uniqiue_element->GetNodeGlobalIndex((local_index_1 + 2)%(p_uniqiue_element->GetNumNodes()));
+                    unsigned previous_node_1 = p_uniqiue_element->GetNodeGlobalIndex(
+                            (local_index_1 + p_uniqiue_element->GetNumNodes() - 1)%(p_uniqiue_element->GetNumNodes()));
+                    unsigned previous_previous_node_1 = p_uniqiue_element->GetNodeGlobalIndex(
+                            (local_index_1 + p_uniqiue_element->GetNumNodes() - 2)%(p_uniqiue_element->GetNumNodes()));
+                    unsigned local_index_2 = p_common_element->GetNodeLocalIndex(p_node_2->GetIndex());
+                    unsigned next_node_2 = p_common_element->GetNodeGlobalIndex(
+                            (local_index_2 + 1)%(p_common_element->GetNumNodes()));
+                    unsigned previous_node_2 = p_common_element->GetNodeGlobalIndex(
+                            (local_index_2 + p_common_element->GetNumNodes() - 1)%(p_common_element->GetNumNodes()));
+
+                    if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
+                    {
+                        /*
+                        * Here we have an internal triangular void on an internal edge. Can happen when a void is shrinking. 
+                        *     
+                        *     x
+                        *     |
+                        *     o-o
+                        *     |/    Where the area inside the triangle is a void and the horizontal edge
+                        *     o     is the short edge all the nodes are therefore boundary nodes. 
+                        *     |     Here we remove the void and merge all the nodes with one of the nodes at 
+                        *     x     the adjoining edges (x's)  
+                        *     
+                        * 
+                        */ 
+                        
+                        // First remove void                        
+                        // Find all three nodes in void     
+                        Node<SPACE_DIM>* p_node_C = this->mNodes[next_node_2]; // The other node in the triangular void
+                        if (next_node_1 == previous_node_2)
+                        {
+                            p_node_C = this->mNodes[next_node_1];
+                        }
+                    
+                       /*
+                        * In two steps, merge nodes A, B and C into a single node.  This is implemented in such a way that
+                        * the ordering of their indices does not matter.
+                        */
+                       
+                        PerformNodeMerge(pNodeA, pNodeB);
+
+                        Node<SPACE_DIM>* p_merged_node = pNodeB;
+
+                        if (pNodeB->IsDeleted())
+                        {
+                            p_merged_node = pNodeA;
+                        }
+
+                        PerformNodeMerge(p_node_C, p_merged_node);
+
+                        if (p_merged_node->IsDeleted())
+                        {
+                            p_merged_node = p_node_C;
+                        }
+
+                        // Tag remaining node as non-boundary
+                        p_merged_node->SetAsBoundaryNode(false);
+                        
+                        // Now merge this node with one of the nearest vertices keping that vertices location.
+                        Node<SPACE_DIM>* p_end_node; // The neighbouring vertex to merge to
+
+                        std::set<unsigned> previous_previous_elem_indices = this->mNodes[previous_previous_node_1]->rGetContainingElementIndices();
+    
+                        std::set<unsigned> shared_elements;
+                        std::set_intersection(all_indices.begin(),
+                              all_indices.end(),
+                              previous_previous_elem_indices.begin(),
+                              previous_previous_elem_indices.end(),
+                              std::inserter(shared_elements, shared_elements.begin()));
+
+                        assert(shared_elements.size()<3);
+                        
+                        if (shared_elements.size()==2)
+                        {
+                            //This neighbouring node is in the same 2 elements so terat this as end node
+                            p_end_node = this->mNodes[previous_previous_node_1];
+                        }
+                        else
+                        {
+                            shared_elements.clear();
+                            // Try other neighbourng vertex
+                            std::set<unsigned> next_next_elem_indices = this->mNodes[next_next_node_1]->rGetContainingElementIndices();
+    
+                            std::set_intersection(all_indices.begin(),
+                              all_indices.end(),
+                              next_next_elem_indices.begin(),
+                              next_next_elem_indices.end(),
+                              std::inserter(shared_elements, shared_elements.begin()));
+
+                            assert(shared_elements.size()<3);
+
+                            if (shared_elements.size()==2)
+                            {
+                                // This neighbouring node is in the same 2 elements so terat this as end node
+                                p_end_node = this->mNodes[next_next_node_1];
+                            }
+                            else 
+                            {
+                                // Here there are no neighbouring nodes. This is covered in other t1 swaps. So shouldnt ever reach
+                                NEVER_REACHED;
+                            }
+                        }                  
+                        
+                        p_merged_node->rGetModifiableLocation() = p_end_node->rGetLocation();
+                        PerformNodeMerge(p_end_node,p_merged_node);  // This order as forst node is kept and this has correcrt boundary information.
+                        
+                        // Remove the deleted nodes and re-index
+                        RemoveDeletedNodes();
+                    }
+                    else
+                    {
+                        /*
+                        * The node configuration looks like that shown below. In this case, we merge the nodes
+                        * and tidy up node indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
+                        *
+                        * Outside
+                        *         /
+                        *   --o--o (2)
+                        *     (1) \
+                        *
+                        * ///\todo this should be a T1 swap (see #1263 and #2401)
+                        * Referring to the todo: this should probably stay a node-merge. If this is a T1 swap then
+                        * the single boundary node will travel from element 1 to element 2, but still remain a single node.
+                        * I.e. we would not reduce the total number of nodes in this situation.
+                        */
+                        PerformNodeMerge(pNodeA, pNodeB);
+                        RemoveDeletedNodes();
+                    }
                 }
                 break;
             }
@@ -1425,7 +1566,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          */
                         assert(pNodeA->IsBoundaryNode());
                         assert(pNodeB->IsBoundaryNode());
-
                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
                 } // from else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
@@ -1660,7 +1800,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             }
         }
     }
-
     // Sort out boundary nodes
     if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
     {
@@ -2096,19 +2235,42 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     assert(pNode->IsBoundaryNode());
 
+    // Get element
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
+    unsigned num_nodes = p_element->GetNumNodes();
+
     // Store the index of the elements containing the intersecting node
     std::set<unsigned> elements_containing_intersecting_node = pNode->rGetContainingElementIndices();
 
     // Get the local index of the node in the intersected element after which the new node is to be added
     unsigned node_A_local_index = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
 
+// // Check to see if the node is connected to the containg element.
+// if (pNode->GetNumContainingElements() == 1)
+// {
+//     unsigned intersecting_element_index = *elements_containing_intersecting_node.begin();
+
+//     // Get element
+//     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_intersecting_element = this->GetElement(intersecting_element_index);
+
+//     unsigned local_index = p_intersecting_element->GetNodeLocalIndex(pNode->GetIndex());
+//     unsigned next_node_index = p_intersecting_element->GetNodeGlobalIndex((local_index + 1)%(p_intersecting_element->GetNumNodes()));
+//     unsigned previous_node_index = p_intersecting_element->GetNodeGlobalIndex((local_index + p_intersecting_element->GetNumNodes() - 1)%(p_intersecting_element->GetNumNodes()));
+
+//     unsigned next_node_local_index = p_element->GetNodeLocalIndex(next_node_index);
+//     unsigned previous_node_local_index = p_element->GetNodeLocalIndex(previous_node_index);
+
+//     if (next_node_local_index!=UINT_MAX && next_node_local_index!=UINT_MAX)
+//     {
+//         assert(previous_node_local_index = (next_node_local_index+1)%p_element->GetNumNodes());
+//         node_A_local_index = next_node_local_index;
+//     }
+
+// }
+
     // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
     c_vector<double, SPACE_DIM> node_location;
     node_location = pNode->rGetModifiableLocation();
-
-    // Get element
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
-    unsigned num_nodes = p_element->GetNumNodes();
 
     // Get the nodes at either end of the edge to be divided
     unsigned vertexA_index = p_element->GetNodeGlobalIndex(node_A_local_index);
