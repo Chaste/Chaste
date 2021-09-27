@@ -109,6 +109,10 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
     }
     else // Is Bounded 
     {
+
+// VtkMeshWriter<2, 2> mesh_writer1("TMP", "delaunay_mesh", false);
+// mesh_writer1.WriteFilesUsingMesh(*(mpDelaunayMesh));
+
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
         for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
@@ -159,15 +163,40 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     assert(dij>1e-5); //Sanity check
                     normal_vector /= dij;
 
-                    double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells) 
-
-                    int num_sections = ceil(edge_length*extra_node_scaling);
-                    for (int section=0; section<=num_sections; section++)
+                    /*  
+                     * Here all extra edges are split in two so always have unique triangulation.
+                     *  
+                     *   ____  three nodes 
+                     *  | /\ | 
+                     *  |/__\|. edge of mesh 
+                     * 
+                     * Changing this causes issues with stitching the left and right back together.
+                     */
+                    unsigned num_sections = 2;
+                    for (unsigned section=0; section<=num_sections; section++)
                     {
-                        double ratio = (double)section/(double)num_sections;
+                        double ratio = ((double)section)/(double)num_sections;
                         c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio*edge;
-                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
-                        new_node_index++;
+
+                        //Check if near other nodes (could be ineficient)
+                        bool node_clear = true;
+                        double node_clearance = 0.05; 
+
+                        for (unsigned i=0; i<nodes.size(); i++)
+                        {   
+                            double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
+                            if (distance < node_clearance)
+                            {
+                                node_clear = false;
+                                //break;
+                            }
+                        }
+
+                        if (node_clear)
+                        {
+                            nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                            new_node_index++;
+                        }
                     }
                 }
             }
@@ -188,6 +217,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         }
 
         Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
+
+// VtkMeshWriter<2, 2> mesh_writer2("TMP", "extended_delaunay_mesh", false);
+// mesh_writer2.WriteFilesUsingMesh(extended_mesh);
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
         unsigned num_nodes = extended_mesh.GetNumAllElements();
