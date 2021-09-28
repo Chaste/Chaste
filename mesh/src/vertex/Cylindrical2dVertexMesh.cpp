@@ -153,7 +153,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                 if (shared_elements.size() == 1) // Its a boundary edge
                 {
                     c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-                    double edge_length = norm_2(edge);
                     c_vector<double,2> normal_vector;
 
                     normal_vector[0]= edge[1];
