@@ -187,6 +187,14 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
+     * Helper method to check if a node is within [0,mWidth]x[0,mHeight]
+     * and move back into the domain if needed.
+     * 
+     * @param pNewNode the node to be checked 
+     */
+    void CheckNodeLocation(Node<2>* pNode);
+
+    /**
      * Overridden GetMeshForVtk() method.
      *
      * Return a pointer to an extended mesh that is a 'non-periodic'

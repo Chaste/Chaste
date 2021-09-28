@@ -1305,7 +1305,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                     unsigned local_index_1 = p_uniqiue_element->GetNodeLocalIndex(p_node_1->GetIndex());
                     unsigned next_node_1 = p_uniqiue_element->GetNodeGlobalIndex((local_index_1 + 1)%(p_uniqiue_element->GetNumNodes()));
-                    unsigned next_next_node_1 = p_uniqiue_element->GetNodeGlobalIndex((local_index_1 + 2)%(p_uniqiue_element->GetNumNodes()));
                     unsigned previous_node_1 = p_uniqiue_element->GetNodeGlobalIndex(
                             (local_index_1 + p_uniqiue_element->GetNumNodes() - 1)%(p_uniqiue_element->GetNumNodes()));
                     unsigned previous_previous_node_1 = p_uniqiue_element->GetNodeGlobalIndex(
@@ -1380,33 +1379,40 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         
                         if (shared_elements.size()==2)
                         {
-                            //This neighbouring node is in the same 2 elements so terat this as end node
+                            //This neighbouring node is in the same 2 elements so treat this as end node
                             p_end_node = this->mNodes[previous_previous_node_1];
                         }
                         else
                         {
-                            shared_elements.clear();
-                            // Try other neighbourng vertex
-                            std::set<unsigned> next_next_elem_indices = this->mNodes[next_next_node_1]->rGetContainingElementIndices();
+                            /*
+                             * If this trips then the adjacent node isnt in both elements.
+                             * So check the other adjacent node by uncommenting the code blow and adding a new test
+                             * See #3080
+                             */
+                            NEVER_REACHED; 
+
+                            // shared_elements.clear();
+                            // // Try other neighbourng vertex
+                            // std::set<unsigned> next_next_elem_indices = this->mNodes[next_next_node_1]->rGetContainingElementIndices();
     
-                            std::set_intersection(all_indices.begin(),
-                              all_indices.end(),
-                              next_next_elem_indices.begin(),
-                              next_next_elem_indices.end(),
-                              std::inserter(shared_elements, shared_elements.begin()));
+                            // std::set_intersection(all_indices.begin(),
+                            //   all_indices.end(),
+                            //   next_next_elem_indices.begin(),
+                            //   next_next_elem_indices.end(),
+                            //   std::inserter(shared_elements, shared_elements.begin()));
 
-                            assert(shared_elements.size()<3);
+                            // assert(shared_elements.size()<3);
 
-                            if (shared_elements.size()==2)
-                            {
-                                // This neighbouring node is in the same 2 elements so terat this as end node
-                                p_end_node = this->mNodes[next_next_node_1];
-                            }
-                            else 
-                            {
-                                // Here there are no neighbouring nodes. This is covered in other t1 swaps. So shouldnt ever reach
-                                NEVER_REACHED;
-                            }
+                            // if (shared_elements.size()==2)
+                            // {
+                            //     // This neighbouring node is in the same 2 elements so treat this as end node
+                            //     p_end_node = this->mNodes[next_next_node_1];
+                            // }
+                            // else 
+                            // {
+                            //     // Here there are no neighbouring nodes. This is covered in other t1 swaps. So shouldnt ever reach
+                            //     NEVER_REACHED;
+                            // }
                         }                  
                         
                         p_merged_node->rGetModifiableLocation() = p_end_node->rGetLocation();

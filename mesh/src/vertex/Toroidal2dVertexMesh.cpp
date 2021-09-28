@@ -84,24 +84,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double x_location = mNodes[i]->rGetLocation()[0];
-            if (x_location < 0)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
-            }
-            else if (x_location > mWidth)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-            }
-            double y_location = mNodes[i]->rGetLocation()[1];
-            if (y_location < 0)
-            {
-                mNodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
-            }
-            else if (y_location > mHeight)
-            {
-                mNodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
-            }
+            CheckNodeLocation(mNodes[i]);
         }
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
@@ -214,24 +197,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         // Loop over all nodes and check they're not outside [0,mWidth]x[0,mHeight]
         for (unsigned i=0; i<nodes.size(); i++)
         {
-            double x_location = nodes[i]->rGetLocation()[0];
-            if (x_location < 0)
-            {
-                nodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
-            }
-            else if (x_location >= mWidth)
-            {
-                nodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-            }
-            double y_location = nodes[i]->rGetLocation()[1];
-            if (y_location < 0)
-            {
-                nodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
-            }
-            else if (y_location >= mHeight)
-            {
-                nodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
-            }
+            CheckNodeLocation(nodes[i]);
         }
 
         Toroidal2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),mpDelaunayMesh->GetWidth(1), nodes);
@@ -440,13 +406,34 @@ void Toroidal2dVertexMesh::SetWidth(double width)
 
 unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
+    // If necessary move it to be back onto the torus
+    CheckNodeLocation(pNewNode);
+
     unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
 
-    // If necessary move it to be back onto the torus
-    ChastePoint<2> new_node_point = pNewNode->GetPoint();
-    SetNode(node_index, new_node_point);
-
     return node_index;
+}
+
+void Toroidal2dVertexMesh::CheckNodeLocation(Node<2>* pNode)
+{
+    double x_location = pNode->rGetLocation()[0];
+    if (x_location < 0)
+    {
+        pNode->rGetModifiableLocation()[0] = x_location + mWidth;
+    }
+    else if (x_location > mWidth)
+    {
+        pNode->rGetModifiableLocation()[0] = x_location - mWidth;
+    }
+    double y_location = pNode->rGetLocation()[1];
+    if (y_location < 0)
+    {
+        pNode->rGetModifiableLocation()[1] = y_location + mHeight;
+    }
+    else if (y_location > mHeight)
+    {
+        pNode->rGetModifiableLocation()[1] = y_location - mHeight;
+    }
 }
 
 VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
