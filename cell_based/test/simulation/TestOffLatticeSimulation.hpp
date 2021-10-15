@@ -987,6 +987,17 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetEndTime(0.5);
 
+
+        // Test SetSamplingTimestepMultiple method
+        TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 1u);
+        simulator.SetSamplingTimestepMultiple(2);
+        TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 2u);
+
+        // Test SetUpdatingTimestepMultiple method
+        TS_ASSERT_EQUALS(simulator.mUpdatingTimestepMultiple, 1u);
+        simulator.SetUpdatingTimestepMultiple(2);
+        TS_ASSERT_EQUALS(simulator.mUpdatingTimestepMultiple, 2u);
+
         // We call SetupSolve() here to set up the default numerical method, which is otherwise NULL
         simulator.SetupSolve();
 

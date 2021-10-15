@@ -104,6 +104,7 @@ private:
         archive & mCellKillers;
         archive & mSimulationModifiers;
         archive & mSamplingTimestepMultiple;
+        archive & mUpdatingTimestepMultiple;
     }
 
 protected:
@@ -170,6 +171,12 @@ protected:
      * of timesteps at which results are written to file.
      */
     unsigned mSamplingTimestepMultiple;
+
+    /**
+     * The ratio of the number of actual timesteps to the number
+     * of timesteps at which cells and topology are updated.
+     */
+    unsigned mUpdatingTimestepMultiple;
 
     /**
      * Writes out special information about the mesh to the visualizer.
@@ -333,6 +340,14 @@ public:
      * @param samplingTimestepMultiple the ratio to use
      */
     void SetSamplingTimestepMultiple(unsigned samplingTimestepMultiple);
+
+    /**
+     * Set the ratio of the number of actual timesteps to the number of timesteps
+     * at which the cells are updated. Default value is set to 1 by the constructor.
+     *
+     * @param updatingTimestepMultiple the ratio to use
+     */
+    void SetUpdatingTimestepMultiple(unsigned updatingTimestepMultiple);
 
     /**
      * Set the simulation to run with no birth.
