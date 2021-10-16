@@ -92,54 +92,53 @@ public:
      */
     void TestLoadArchive()
     {
-        TS_ASSERT(true);
-//         // Set start time
-//         SimulationTime::Instance()->SetStartTime(0.0);
+        // Set start time
+        SimulationTime::Instance()->SetStartTime(0.0);
 
-//         {
-//             // Horrendous hack to get this test to pass when using static libraries!
-//             Cylindrical2dMesh* p_mesh = new Cylindrical2dMesh(1.0);
-//             // Each of the following classes gives an 'unregistered class' error if not instantiated here...
-//             MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh);
-//             StochasticWntCellCycleModel ccm;
-//             SloughingCellKiller<2> killer(&crypt, 1.0);
-//             GeneralisedLinearSpringForce<2> force;
-//             crypt.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
-//         }
+        {
+            // Horrendous hack to get this test to pass when using static libraries!
+            Cylindrical2dMesh* p_mesh = new Cylindrical2dMesh(1.0);
+            // Each of the following classes gives an 'unregistered class' error if not instantiated here...
+            MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh);
+            StochasticWntCellCycleModel ccm;
+            SloughingCellKiller<2> killer(&crypt, 1.0);
+            GeneralisedLinearSpringForce<2> force;
+            crypt.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        }
 
-//         // Directory in which the stored results were archived
-//         std::string test_to_profile = "SteadyStateCrypt";
+        // Directory in which the stored results were archived
+        std::string test_to_profile = "SteadyStateCrypt";
 
-//         // Simulation time at which the stored results were archived
-//         double t = 150;
+        // Simulation time at which the stored results were archived
+        double t = 150;
 
-//         // The archive must be copied from crypt/test/data/<test_to_profile>
-//         FileFinder test_data_directory("crypt/test/data/" + test_to_profile + "/archive", RelativeTo::ChasteSourceRoot);
-//         TS_ASSERT(test_data_directory.IsDir());
+        // The archive must be copied from crypt/test/data/<test_to_profile>
+        FileFinder test_data_directory("crypt/test/data/" + test_to_profile + "/archive", RelativeTo::ChasteSourceRoot);
+        TS_ASSERT(test_data_directory.IsDir());
 
-//         // to the testoutput/archive directory to continue running the simulation
-//         OutputFileHandler archive_handler(test_to_profile + "/archive");
+        // to the testoutput/archive directory to continue running the simulation
+        OutputFileHandler archive_handler(test_to_profile + "/archive");
 
-//         // Following is done in two lines to avoid a bug in Intel compiler v12.0
-//         std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
-//         BOOST_FOREACH(FileFinder temp_file, temp_files)
-//         {
-//             archive_handler.CopyFileTo(temp_file);
-//         }
-// #ifndef CHASTE_CVODE
-//         std::cout << "Warning: CVODE is off.  If this configuration of the test suite fails, but none of the others, then the archive was built with CVODE on.  If should be built with CVODE off." << std::endl;
-// #endif //CHASTE_CVODE
+        // Following is done in two lines to avoid a bug in Intel compiler v12.0
+        std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
+        BOOST_FOREACH(FileFinder temp_file, temp_files)
+        {
+            archive_handler.CopyFileTo(temp_file);
+        }
+#ifndef CHASTE_CVODE
+        std::cout << "Warning: CVODE is off.  If this configuration of the test suite fails, but none of the others, then the archive was built with CVODE on.  If should be built with CVODE off." << std::endl;
+#endif //CHASTE_CVODE
 
-//         // Load and run crypt simulation
-//         CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile, t);
-//         p_simulator->SetEndTime(t + 1);
+        // Load and run crypt simulation
+        CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile, t);
+        p_simulator->SetEndTime(t + 1);
 
-//         ///\todo we should also test the rest of the simulation setup
+        ///\todo we should also test the rest of the simulation setup
 
-//         // Tidy up
-//         delete p_simulator;
-//         SimulationTime::Destroy();
-//         RandomNumberGenerator::Destroy();
+        // Tidy up
+        delete p_simulator;
+        SimulationTime::Destroy();
+        RandomNumberGenerator::Destroy();
     }
 };
 
