@@ -78,18 +78,10 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         // Populate mNodes
         GenerateVerticesFromElementCircumcentres(rMesh);
 
-        // Loop over all generated nodes and check they're not outside [0,mWidth]
-        for (unsigned i=0; i<num_nodes; i++)
+        // Loop over all nodes and check the x locations not outside [0,mWidth]
+        for (unsigned i=0; i<mNodes.size(); i++)
         {
-            double x_location = mNodes[i]->rGetLocation()[0];
-            if (x_location < 0)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
-            }
-            else if (x_location > mWidth)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-            }
+            CheckNodeLocation(mNodes[i]);
         }
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
@@ -204,17 +196,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         // Loop over all nodes and check they're not outside [0,mWidth]
         for (unsigned i=0; i<nodes.size(); i++)
         {
-            double x_location = nodes[i]->rGetLocation()[0];
-            if (x_location < 0)
-            {
-                nodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
-            }
-            else if (x_location >= mWidth)
-            {
-                nodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-            }
+            CheckNodeLocation(nodes[i]);
         }
-
+            
         Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
 
 // VtkMeshWriter<2, 2> mesh_writer2("TMP", "extended_delaunay_mesh", false);
@@ -237,18 +221,10 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         // Populate mNodes
         GenerateVerticesFromElementCircumcentres(extended_mesh);
 
-        // Loop over all generated nodes and check they're not outside [0,mWidth]
-        for (unsigned i=0; i<num_nodes; i++)
+        // Loop over all nodes and check the x locations not outside [0,mWidth]
+        for (unsigned i=0; i<mNodes.size(); i++)
         {
-            double x_location = mNodes[i]->rGetLocation()[0];
-            if (x_location < 0)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
-            }
-            else if (x_location >= mWidth)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-            }
+            CheckNodeLocation(mNodes[i]);
         }
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
@@ -269,9 +245,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                 }
             }
         }
-
-
-
     }
 
     // Reorder mNodes anticlockwise
@@ -384,13 +357,24 @@ double Cylindrical2dVertexMesh::GetWidth(const unsigned& rDimension) const
 
 unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
+    CheckNodeLocation(pNewNode);
+
     unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
 
-    // If necessary move it to be back on the cylinder
-    ChastePoint<2> new_node_point = pNewNode->GetPoint();
-    SetNode(node_index, new_node_point);
-
     return node_index;
+}
+
+void Cylindrical2dVertexMesh::CheckNodeLocation(Node<2>* pNode)
+{
+    double x_location = pNode->rGetLocation()[0];
+    if (x_location < 0)
+    {
+        pNode->rGetModifiableLocation()[0] = x_location + mWidth;
+    }
+    else if (x_location > mWidth)
+    {
+        pNode->rGetModifiableLocation()[0] = x_location - mWidth;
+    }
 }
 
 void Cylindrical2dVertexMesh::Scale(const double xScale, const double yScale, const double zScale)

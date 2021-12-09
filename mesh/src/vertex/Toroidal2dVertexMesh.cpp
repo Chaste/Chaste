@@ -222,24 +222,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double x_location = mNodes[i]->rGetLocation()[0];
-            if (x_location < 0)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
-            }
-            else if (x_location > mWidth)
-            {
-                mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
-            }
-            double y_location = mNodes[i]->rGetLocation()[1];
-            if (y_location < 0)
-            {
-                mNodes[i]->rGetModifiableLocation()[1] = y_location + mHeight;
-            }
-            else if (y_location > mHeight)
-            {
-                mNodes[i]->rGetModifiableLocation()[1] = y_location - mHeight;
-            }
+            CheckNodeLocation(mNodes[i]);
         }
 
 

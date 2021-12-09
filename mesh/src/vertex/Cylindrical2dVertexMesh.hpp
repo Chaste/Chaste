@@ -162,6 +162,15 @@ public:
      */
     unsigned AddNode(Node<2>* pNewNode);
 
+
+    /**
+     * Helper method to check if a node is within, x in [0,mWidth]
+     * and move back into the domain if needed.
+     * 
+     * @param pNewNode the node to be checked 
+     */
+    void CheckNodeLocation(Node<2>* pNode);
+
     /**
      * Overridden Scale method to also scale the width (mWidth) of the mesh
      *
