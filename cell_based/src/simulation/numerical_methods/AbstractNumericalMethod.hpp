@@ -111,7 +111,7 @@ protected:
     bool mGhostNodeForcesEnabled;
 
     /**
-     * Helper method to store the node locations iudes in applying the boundary conditions.
+     * Helper method to store the node locations used when applying the boundary conditions in higher order methods.
      * @return the current node locations.
      */
     std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > SaveCurrentNodeLocations();
