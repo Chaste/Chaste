@@ -30,6 +30,8 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 
+# Fergus's comment take 4
+
 cmake_minimum_required (VERSION 3.5.1)
 
 # Set standard to C++14. Note that CMake < 3.6 does not know how to set the standard flag for the Intel compiler, so
