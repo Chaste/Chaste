@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2019, University of Oxford.
+# Copyright (c) 2005-2021, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,9 +36,30 @@ add_definitions(-DTETLIBRARY)
 add_definitions(-DANSI_DECLARATORS -DTRILIBRARY)
 
 chaste_do_component(mesh)
-set_source_files_properties(src/3rdparty/tetgen1.4.2/predicates.cpp 
-    PROPERTIES COMPILE_FLAGS "-Wno-error -O0")
-set_source_files_properties(src/3rdparty/tetgen1.4.2/tetgen.cpp 
-    PROPERTIES COMPILE_FLAGS "-Wno-error -O0")
-set_source_files_properties(src/3rdparty/triangle/triangle.cpp
-        PROPERTIES COMPILE_FLAGS "-Wno-error")
+
+# Set compiler flags for specific third party source files
+set(PREDICATES_FLAGS "")
+set(TETGEN_FLAGS "")
+set(TRIANGLE_FLAGS "")
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Cray")
+    set(PREDICATES_FLAGS "-Wno-error -O0")
+    set(TETGEN_FLAGS "-Wno-error -O0")
+    set(TRIANGLE_FLAGS "-Wno-error -Wno-strict-overflow")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    set(PREDICATES_FLAGS "-Wno-error -O0")
+    set(TETGEN_FLAGS "-Wno-error -O0")
+    set(TRIANGLE_FLAGS "-Wno-error -Wno-strict-overflow")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+    set(PREDICATES_FLAGS "-Wno-error -O0")
+    set(TETGEN_FLAGS "-Wno-error -O0")
+    set(TRIANGLE_FLAGS "-Wno-error -Wno-strict-overflow")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    set(PREDICATES_FLAGS "-Wno-error -O0")
+    set(TETGEN_FLAGS "-Wno-error -O0")
+    set(TRIANGLE_FLAGS "-Wno-error")
+endif()
+
+set_source_files_properties(src/3rdparty/tetgen1.4.2/predicates.cpp PROPERTIES COMPILE_FLAGS "${PREDICATES_FLAGS}")
+set_source_files_properties(src/3rdparty/tetgen1.4.2/tetgen.cpp PROPERTIES COMPILE_FLAGS "${TETGEN_FLAGS}")
+set_source_files_properties(src/3rdparty/triangle/triangle.cpp PROPERTIES COMPILE_FLAGS "${TRIANGLE_FLAGS}")

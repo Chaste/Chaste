@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ class TestRushLarsen : public CxxTest::TestSuite
             FileFinder copied_file = handler.CopyFileTo(cellml_file);
 
             // Create options file & convert
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }
@@ -97,9 +97,7 @@ class TestRushLarsen : public CxxTest::TestSuite
 
             // Create options file & convert
             args.push_back("--opt");
-            FileFinder conf_file("heart/src/odes/cellml/" + model + "-conf.xml", RelativeTo::ChasteSourceRoot);
-            args.push_back("--conf=" + conf_file.GetAbsolutePath());
-            converter.CreateOptionsFile(handler, model, args);
+            converter.SetOptions(args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpRushLarsenCellOpt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }

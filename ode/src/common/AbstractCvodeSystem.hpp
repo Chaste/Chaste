@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,8 +103,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * multiple calls to  EvaluateYDerivatives() to make an approximation to it.
  * This generally provides extra accuracy and better convergence, and so
  * gives a speed up for a given tolerance. Cardiac action potential
- * model Jacobians are calculated automatically by PyCML (see python/pycml)
- * via Maple for symbolic differentiation.
+ * model Jacobians are calculated automatically by chaste_codegen.
  *
  * Instances can store their state internally in the mStateVariables vector
  * in our base class AbstractParameterisedSystem (see also

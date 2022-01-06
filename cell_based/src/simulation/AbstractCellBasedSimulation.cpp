@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,6 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "ExecutableSupport.hpp"
 #include "AbstractPdeModifier.hpp"
+#include "CellDivisionLocationsWriter.hpp"
+#include "CellRemovalLocationsWriter.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
@@ -120,32 +122,23 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 
                     /**
                      * If required, output this location to file
-                     *
-                     * \todo (#2578)
-                     *
-                     * For consistency with the rest of the output code, consider removing the
-                     * AbstractCellBasedSimulation member mOutputDivisionLocations, adding a new
-                     * member mAgesAndLocationsOfDividingCells to AbstractCellPopulation, adding
-                     * a new class CellDivisionLocationsWriter to the CellPopulationWriter hierarchy
-                     * to output the content of mAgesAndLocationsOfDividingCells to file (remembering
-                     * to clear mAgesAndLocationsOfDividingCells at each timestep), and replacing the
-                     * following conditional statement with something like
-                     *
-                     * if (mrCellPopulation.HasWriter<CellDivisionLocationsWriter>())
-                     * {
-                     *     mCellDivisionLocations.push_back(new_location);
-                     * }
+                     *  
+                     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
+                     * 
                      */
-                    if (mOutputDivisionLocations)
+                    if (mrCellPopulation.template HasWriter<CellDivisionLocationsWriter>())
                     {
                         c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-                        *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
-                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        std::stringstream division_info;
+                        division_info << SimulationTime::Instance()->GetTime() << "\t";
+                        for (unsigned i = 0; i < SPACE_DIM; i++)
                         {
-                            *mpDivisionLocationFile << cell_location[i] << "\t";
+                            division_info << cell_location[i] << "\t";
                         }
-                        *mpDivisionLocationFile << "\t" << cell_age << "\t" << parent_cell_id << "\t" << cell_iter->GetCellId() << "\t" << p_new_cell->GetCellId() << "\n";
+                        division_info << "\t" << cell_age << "\t" << parent_cell_id << "\t" << cell_iter->GetCellId() << "\t" << p_new_cell->GetCellId() << "\t";
+
+                        mrCellPopulation.AddDivisionInformation(division_info.str());
                     }
 
                     // Add the new cell to the cell population
@@ -354,19 +347,20 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     // Set up simulation
 
     // Create output files for the visualizer
-    OutputFileHandler output_file_handler(results_directory+"/", true);
-
-    mrCellPopulation.OpenWritersFiles(output_file_handler);
+    OutputFileHandler output_file_handler(results_directory + "/", true);
 
     if (mOutputDivisionLocations)
     {
-        mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
+        mrCellPopulation.template AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
+        mrCellPopulation.template AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
     }
     if (mOutputCellVelocities)
     {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory + "/", false);
         mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
     }
+
+    mrCellPopulation.OpenWritersFiles(output_file_handler);
 
     if (PetscTools::AmMaster())
     {
@@ -546,10 +540,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     mrCellPopulation.CloseWritersFiles();
 
-    if (mOutputDivisionLocations)
-    {
-        mpDivisionLocationFile->close();
-    }
     if (mOutputCellVelocities)
     {
         mpCellVelocitiesFile->close();

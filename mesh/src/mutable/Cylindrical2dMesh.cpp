@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -612,8 +612,8 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
      * of how to mesh. If it does ever throw you need to be cleverer and match up the
      * elements into as many pairs as possible on the left hand and right hand sides.
      */
-//    assert(temp_left_hand_side_elements.size() <= 2);
-//    assert(temp_right_hand_side_elements.size() <= 2);
+ //    assert(temp_left_hand_side_elements.size() <= 2);
+ //    assert(temp_right_hand_side_elements.size() <= 2);
 
     /*
      * Now we just have to use the first pair of elements and copy their info over to the other side.

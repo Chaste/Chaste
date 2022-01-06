@@ -1,4 +1,6 @@
-# Welcome to Chaste 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01848/status.svg)](https://doi.org/10.21105/joss.01848)
+
+# Welcome to Chaste
 
 If you are new to Chaste please see [our Getting Started wiki page](https://chaste.cs.ox.ac.uk/trac/wiki/GettingStarted).
 
@@ -29,10 +31,10 @@ Information on changes in this release can be found in the file
 [ReleaseNotes.html](docs/ReleaseNotes.html).
 
 Tutorial examples for this release are available at:
-https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2019.1
+https://chaste.cs.ox.ac.uk/chaste/tutorials/release_2021.1
 
 API documentation generated from the code by Doxygen is available at:
-https://chaste.cs.ox.ac.uk/chaste/docs/release_2019.1
+https://chaste.cs.ox.ac.uk/chaste/docs/release_2021.1
 
 Chaste welcomes contributions from the community.
 For information on how to contribute to Chaste, and for support and bug reports, please see the file [CONTRIBUTING.md](docs/CONTRIBUTING.md).

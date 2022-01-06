@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -379,10 +379,13 @@ public:
             }
        }
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         // Lock the vector so that modern PETSc (3.6) won't want to change it
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 11) //PETSc 3.11 or later
+        EXCEPT_IF_NOT(VecLockReadPush(petsc_vec) == 0);
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         EXCEPT_IF_NOT(VecLockPush(petsc_vec) == 0);
 #endif
+
         {
             DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec, true);
 
@@ -394,8 +397,11 @@ public:
                 distributed_vector_read[index] = 2.0;
             }
         }
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
+
         // Take the lock back
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 11) //PETSc 3.11 or later
+        EXCEPT_IF_NOT(VecLockReadPop(petsc_vec) == 0);
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
         EXCEPT_IF_NOT(VecLockPop(petsc_vec) == 0);
 #endif
 

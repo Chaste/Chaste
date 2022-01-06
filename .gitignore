@@ -10,6 +10,7 @@ build/*
 
 # Backups, SCons databases, core dumps, and temporary 'stuff'
 *~
+*.DS_Store
 .sconsign*
 core.*
 *.avi
@@ -24,6 +25,7 @@ _local/
 # Temporary build folders for dynamically loaded models
 /heart/dynamic/tmp_*_*
 /heart/dynamic/luo_rudy_1991_dyn.*
+/codegen_python3_venv
 
 # Local hostconfig
 /python/hostconfig/local.py
@@ -58,3 +60,4 @@ _local/
 /apps/src/MeshConvert
 
 \.vscode/
+appredict_lookup_table_manifest.txt

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MutableMesh.hpp"
 #include "OutputFileHandler.hpp"
+#include "Debug.hpp"
 
 //Jonathan Shewchuk's triangle and Hang Si's tetgen
 #define REAL double
@@ -662,7 +663,6 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
 
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
-
         this->mElements[i]->ResetIndex(i);
     }
 

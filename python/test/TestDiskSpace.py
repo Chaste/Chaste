@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2019, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,7 +51,7 @@ class TestDiskSpace(unittest.TestCase):
         gb = 1024*1024*1024
         
         source_free_gb = du(__file__).free / gb
-        print "Free space on Chaste source partition: %dGB" % source_free_gb
+        print("Free space on Chaste source partition: %sGB" % source_free_gb)
         self.failIf(source_free_gb < 10,
                     "The disk containing the Chaste source tree has less than 10GB of space left.")
 
@@ -63,6 +63,6 @@ class TestDiskSpace(unittest.TestCase):
                 self.fail("Unable to create test output folder '%s'" % test_output_dir)
                 return
         test_free_gb = du(test_output_dir).free / gb
-        print "Free space on Chaste test output partition: %dGB" % test_free_gb 
+        print("Free space on Chaste test output partition: %sGB" % test_free_gb)
         self.failIf(test_free_gb < 10,
                     "The disk containing the Chaste test output has less than 10GB of space left.")

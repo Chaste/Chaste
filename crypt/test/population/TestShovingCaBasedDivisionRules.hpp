@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -208,6 +208,7 @@ public:
             // Serialize via pointer to most abstract class possible
             AbstractCaBasedDivisionRule<2>* const p_division_rule = &division_rule;
             output_arch << p_division_rule;
+            ofs.close();
         }
 
         {
@@ -219,6 +220,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_division_rule;
+            ifs.close();
 
             TS_ASSERT(p_division_rule != NULL);
 
@@ -398,6 +400,7 @@ public:
             // Serialize via pointer to most abstract class possible
             AbstractCaBasedDivisionRule<2>* const p_division_rule = &division_rule;
             output_arch << p_division_rule;
+            ofs.close();
         }
 
         {
@@ -409,6 +412,7 @@ public:
 
             // Restore from the archive
             input_arch >> p_division_rule;
+            ifs.close();
 
             TS_ASSERT(p_division_rule != NULL);
 

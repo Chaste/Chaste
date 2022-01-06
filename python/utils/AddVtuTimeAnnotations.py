@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Copyright (C) Victor Chang Cardiac Research Institute, 2012. (Original author A.Sadrieh)."""
 
-"""Copyright (c) 2005-2019, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,10 +90,10 @@ nameTimePair is a regular expression
 lastTimeStep is calculated during an earlier pass (QueryVtuFile)
 """
 def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep, expectedVariableNames):
-    #print'--Reading from', inputFileName, 'and writing to', outputFileName
+    #print('--Reading from %s and writing to %s' % (inputFileName outputFileName))
     timevalues = range(0, lastTimeStep+1, 1)
     header_mode = True
-    out_fp = file(outputFileName, 'w')
+    out_fp = open(outputFileName, 'w')
     for line in fileinput.input(inputFileName):
         if (header_mode):
            # <UnstructuredGrid> ... or <PUnstructuredGrid>
@@ -126,21 +126,21 @@ Return the number of chunks (processes used in the original simulation)
 def RenameChunks(fileName, inBase, outBase):
     text = open(fileName).read()
     (new_text, num_chunks) = re.subn(inBase, outBase, text)
-    out_fp = file(fileName, 'w')
+    out_fp = open(fileName, 'w')
     out_fp.write(new_text)
     return num_chunks
 
 if __name__ == "__main__":
     #Checking command line arguments
     if len(sys.argv) != 3:
-        print >> sys.stderr, "Usage:", sys.argv[0], "<input_vtu_file> <output_vtu_file>"
+        print("Usage: %s <input_vtu_file> <output_vtu_file>" %sys.argv[0], file=sys.stderr)
         sys.exit(1)
     #Reading in command line arguments
     input_name = sys.argv[1]
     output_name = sys.argv[2]
     
     if input_name == output_name:
-        print >> sys.stderr, "Error: input and output files should be different."
+        print("Error: input and output files should be different.", file=sys.stderr)
         sys.exit(1)
     
     pvtu_mode = False

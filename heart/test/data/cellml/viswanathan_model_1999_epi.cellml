@@ -91,7 +91,13 @@ http://www.CellML.org/
       <variable name="R" units="joule_per_kilomole_kelvin" initial_value="8314" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="310" public_interface="out"/>
       <variable name="F" units="coulomb_per_mole" initial_value="96485" public_interface="out"/>
-      <variable name="Cm" units="microF" initial_value="0.001"/>
+      <variable name="Cm" units="microF" initial_value="0.001" cmeta:id="membrane_capacitance">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_capacitance">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="I_st" units="microA_per_microF" public_interface="out" cmeta:id="membrane_stimulus_current">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_stimulus_current">
@@ -3438,7 +3444,13 @@ http://www.CellML.org/
       <variable name="Ca_NSR_max" units="millimolar" initial_value="15"/>
       <variable name="time" units="second" public_interface="in"/>
       <variable name="F" units="coulomb_per_mole" public_interface="in"/>
-      <variable name="Cai" units="millimolar" initial_value="0.00035237" public_interface="out"/>
+      <variable name="Cai" units="millimolar" initial_value="0.00035237" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="Cao" units="millimolar" initial_value="1.8" public_interface="out"/>
       <variable name="Ca_JSR" units="millimolar" initial_value="0.817895" public_interface="out"/>
       <variable name="Ca_NSR" units="millimolar" initial_value="2.797668" public_interface="out"/>

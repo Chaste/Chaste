@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2019, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,11 +52,11 @@ for test_dir in glob.glob('*/test') + glob.glob('projects/*/test'):
 
 # Display results
 if failing_tests:
-    print "Failing tests found:"
+    print("Failing tests found:")
     for test in sorted(failing_tests):
-        print "   ", test
-    print "The next line is for the benefit of the test summary scripts."
-    print "Failed", len(failing_tests), "of", len(failing_tests), "tests"
+        print("   %s" % test)
+    print("The next line is for the benefit of the test summary scripts.")
+    print("Failed %s of %s tests" % (len(failing_tests), len(failing_tests)))
     sys.exit(len(failing_tests))
 else:
-    print "Infrastructure test passed ok."
+    print("Infrastructure test passed ok.")

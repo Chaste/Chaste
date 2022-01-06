@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,6 +86,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if BOOST_VERSION == 105700
 #include <boost/serialization/type_info_implementation.hpp>
+#endif
+
+/**
+ * Add a missing #include for boost 1.74, which is needed
+ * to work around a big in that boost version.
+ *
+ * See #3038
+ */
+#if BOOST_VERSION == 107400
+#include <boost/serialization/library_version_type.hpp>
 #endif
 
 #endif // CHASTESERIALIZATION_HPP_

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,17 +81,11 @@ public:
                                       bool isCollective=true);
 
     /**
-     * Create a PyCml options file for the given model.
+     * Set the options to be passed to chaste_codegen for the given model.
      *
-     * @param rHandler  where to create the file
-     * @param rModelName  base name of the model file (which will be "rModelName.cellml")
      * @param rArgs  extra command-line arguments for the model conversion
-     * @param rExtraXml  any extra XML to go in the config file (e.g. LT settings)
      */
-    static void CreateOptionsFile(const OutputFileHandler& rHandler,
-                                  const std::string& rModelName,
-                                  const std::vector<std::string>& rArgs,
-                                  const std::string& rExtraXml="");
+    void SetOptions(const std::vector<std::string>& rArgs);
 
 private:
     /**
@@ -113,6 +107,10 @@ private:
 
     /** The .so suffix is nearly always "so" (as you might expect).  On Mac OSX this is redefined to "dylib" */
     static const std::string msSoSuffix;
+
+    /** The options to pass to codegen */
+    std::string codegen_args;
+
 };
 
 #endif /*CELLMLTOSHAREDLIBRARYCONVERTER_HPP_*/

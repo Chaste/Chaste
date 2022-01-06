@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTIONICMODELS_HPP_
 #define _TESTIONICMODELS_HPP_
 
+#include <memory>
 #include <cxxtest/TestSuite.h>
 #include <cmath>
 #include <iostream>
@@ -62,13 +63,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProperties.hpp"
 
 #include "HodgkinHuxley1952.hpp"
-#include "HodgkinHuxley1952BackwardEuler.hpp"
+#include "HodgkinHuxley1952BackwardEulerOpt.hpp"
 #include "FitzHughNagumo1961OdeSystem.hpp"
 #include "LuoRudy1991.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 
 #include "FoxModel2002.hpp"
-#include "FoxModel2002BackwardEuler.hpp"
+#include "FoxModel2002BackwardEulerOpt.hpp"
 
 #include "FaberRudy2000.hpp"
 #include "FaberRudy2000Opt.hpp"
@@ -76,15 +77,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
-#include "NobleVargheseKohlNoble1998aBackwardEuler.hpp"
+#include "NobleVargheseKohlNoble1998aBackwardEulerOpt.hpp"
 #include "Mahajan2008.hpp"
-#include "Mahajan2008BackwardEuler.hpp"
+#include "Mahajan2008BackwardEulerOpt.hpp"
 #include "TenTusscher2006Epi.hpp"
-#include "TenTusscher2006EpiBackwardEuler.hpp"
+#include "TenTusscher2006EpiBackwardEulerOpt.hpp"
 #include "DiFrancescoNoble1985.hpp"
 #include "Maleckar2008.hpp"
 
 #include "ArchiveLocationInfo.hpp"
+
+#include "CellMLLoader.hpp"
+#include "CellMLToSharedLibraryConverter.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -273,23 +277,26 @@ public:
         TS_ASSERT_DELTA( n98_ode_system.GetIIonic(), 0.2462, 1e-3);
 
         //Stress the lookup table with a silly voltage
-        n98_ode_system.rGetStateVariables()[0] = 100.0;
-        TS_ASSERT_EQUALS(n98_ode_system.GetVoltage(), 100.0);
+        n98_ode_system.rGetStateVariables()[0] = 550.1;
+        TS_ASSERT_EQUALS(n98_ode_system.GetVoltage(), 550.1);
         TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
                 err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
-        n98_ode_system.rGetStateVariables()[0] = 101.0;
+
+        n98_ode_system.rGetStateVariables()[0] = 551.0;
         TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
                 err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
-        n98_ode_system.rGetStateVariables()[0] = 99.0;
-        TS_ASSERT_THROWS_NOTHING( n98_ode_system.GetIIonic());
-        n98_ode_system.rGetStateVariables()[0] = -100.1;
-        TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
-                err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
-        n98_ode_system.rGetStateVariables()[0] = -100.0;
+
+        n98_ode_system.rGetStateVariables()[0] = 549.9;
         TS_ASSERT_THROWS_NOTHING( n98_ode_system.GetIIonic());
 
-        n98_ode_system.rGetStateVariables()[0] = -100.1;
+        n98_ode_system.rGetStateVariables()[0] = -250.1;
+        TS_ASSERT_THROWS_EQUALS( n98_ode_system.GetIIonic(), const Exception &err,
+                err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
 
+        n98_ode_system.rGetStateVariables()[0] = -250.0;
+        TS_ASSERT_THROWS_NOTHING( n98_ode_system.GetIIonic());
+
+        n98_ode_system.rGetStateVariables()[0] = -250.1;
         TS_ASSERT_THROWS_EQUALS( RunOdeSolverWithIonicModel(&n98_ode_system, 150.0, "DoNotRun"),
                 const Exception &err, err.GetShortMessage().find("membrane_voltage outside lookup table range",0), 0u);
     }
@@ -328,7 +335,7 @@ public:
 
         // For coverage of the case where a cell model has no non-linear ODEs, we also test the backward Euler
         // version of this model.
-        CellHodgkinHuxley1952FromCellMLBackwardEuler hh52_be(p_solver, p_stimulus);
+        CellHodgkinHuxley1952FromCellMLBackwardEulerOpt hh52_be(p_solver, p_stimulus);
         RunOdeSolverWithIonicModel(&hh52_be, end_time, "HH52BackwardEuler", 1, true /* check ComputeExceptVoltage too */);
         // Compare end result against using SolveAndUpdateState
         std::vector<double> state_variables_copy = hh52_be.GetStdVecStateVariables();
@@ -508,7 +515,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
         // Solve using backward euler (and lookup tables)
-        CellLuoRudy1991FromCellMLBackwardEuler lr91_backward_euler(p_solver, p_stimulus);
+        CellLuoRudy1991FromCellMLBackwardEulerOpt lr91_backward_euler(p_solver, p_stimulus);
 
         // Some models have this implemented so they can be used in mechanics simulations
         TS_ASSERT_DELTA(lr91_backward_euler.GetIntracellularCalciumConcentration(), 0.0002, 1e-5);
@@ -545,7 +552,7 @@ public:
         // We can't use a larger time step than 0.01 for forward Euler - the gating
         // variables go out of range.
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1, 0.1, 0.1);
-        CellLuoRudy1991FromCellMLBackwardEuler lr91_backward_euler2(p_solver, p_stimulus);
+        CellLuoRudy1991FromCellMLBackwardEulerOpt lr91_backward_euler2(p_solver, p_stimulus);
         ck_start = clock();
         RunOdeSolverWithIonicModel(&lr91_backward_euler2,
                                    end_time,
@@ -562,7 +569,7 @@ public:
         // cover and check GetIIonic() match for normal and backward euler lr91
         // calc IIonic using initial conditions
         CellLuoRudy1991FromCellML lr91(p_solver, p_stimulus);
-        CellLuoRudy1991FromCellMLBackwardEuler backward_lr91(p_solver, p_stimulus);
+        CellLuoRudy1991FromCellMLBackwardEulerOpt backward_lr91(p_solver, p_stimulus);
         TS_ASSERT_DELTA(lr91.GetIIonic(), backward_lr91.GetIIonic(), 1e-3);
 
         // Reset for next test
@@ -584,7 +591,16 @@ public:
 
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
-        CellFaberRudy2000FromCellMLOpt fr2000_ode_system_opt(p_solver, p_stimulus);
+    // Dynamic load fr2000_ode_system_opt as we need a different lookup table start to the default
+    FileFinder cellml_file("heart/src/odes/cellml/FaberRudy2000.cellml", RelativeTo::ChasteSourceRoot);
+    OutputFileHandler handler("TestIonicModels", true);
+           handler.CopyFileTo(cellml_file);
+           CellMLToSharedLibraryConverter converter(true);
+           converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"});
+           FileFinder copied_file("TestIonicModels/FaberRudy2000.cellml", RelativeTo::ChasteTestOutput);
+        DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
+
+        AbstractCardiacCell* fr2000_ode_system_opt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         CellFaberRudy2000FromCellML fr2000_ode_system(p_solver, p_stimulus);
 
         // Solve and write to file
@@ -597,7 +613,7 @@ public:
         double forward = (double)(ck_end - ck_start)/CLOCKS_PER_SEC;
 
         ck_start = clock();
-        RunOdeSolverWithIonicModel(&fr2000_ode_system_opt,
+        RunOdeSolverWithIonicModel(fr2000_ode_system_opt,
                                    end_time,
                                    "FR2000DelayedStimOpt",
                                    500, false);
@@ -615,16 +631,17 @@ public:
         // that GetIionic has no errors, therefore we can test here against
         // a hardcoded result
         TS_ASSERT_DELTA(fr2000_ode_system.GetIIonic(), 0.0002, 1e-4);
-        TS_ASSERT_DELTA(fr2000_ode_system_opt.GetIIonic(), 0.0002, 1e-4);
+        TS_ASSERT_DELTA(fr2000_ode_system_opt->GetIIonic(), 0.0002, 1e-4);
 
         // Check that ComputeExceptVoltage does the correct thing (doesn't change the voltage)
         double voltage = fr2000_ode_system.GetVoltage();
         fr2000_ode_system.ComputeExceptVoltage(end_time, end_time+0.001);
         TS_ASSERT_DELTA(fr2000_ode_system.GetVoltage(), voltage, 1e-10);
-        voltage = fr2000_ode_system_opt.GetVoltage();
-        fr2000_ode_system_opt.ComputeExceptVoltage(end_time, end_time+0.001);
-        TS_ASSERT_DELTA(fr2000_ode_system_opt.GetVoltage(), voltage, 1e-10);
+        voltage = fr2000_ode_system_opt->GetVoltage();
+        fr2000_ode_system_opt->ComputeExceptVoltage(end_time, end_time+0.001);
+        TS_ASSERT_DELTA(fr2000_ode_system_opt->GetVoltage(), voltage, 1e-10);
 
+        delete fr2000_ode_system_opt;
     }
 
 
@@ -699,7 +716,7 @@ public:
         CellFoxModel2002FromCellML fox_ode_system(p_solver, p_stimulus);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
-        CellFoxModel2002FromCellMLBackwardEuler backward_system(p_solver, p_stimulus); // solver ignored
+        CellFoxModel2002FromCellMLBackwardEulerOpt backward_system(p_solver, p_stimulus); // solver ignored
 
         // Mainly for coverage, and to test consistency of GetIIonic
         TS_ASSERT_DELTA(fox_ode_system.GetIIonic(), backward_system.GetIIonic(), 1e-4);
@@ -753,7 +770,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
         boost::shared_ptr<AbstractIvpOdeSolver> p_no_solver;
-        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler n98_backward_system(p_no_solver, p_multi_stim);
+        CellNobleVargheseKohlNoble1998aFromCellMLBackwardEulerOpt n98_backward_system(p_no_solver, p_multi_stim);
 
         // Solve and write to file
         ck_start = clock();
@@ -805,7 +822,7 @@ public:
                                    true);
         //Check against validated data
         //These data are considered valid after (visually) checking against output from  CellML code of the model for an epicardial cell
-        // and also numerically compared against pycml automatically generated code.
+        // and also numerically compared against chaste_codegen automatically generated code.
         CheckCellModelResults("TenTusscher");
 
         //Test the GetIIonic method against one hardcoded value.
@@ -834,7 +851,7 @@ public:
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Solve using backward euler
-        CellTenTusscher2006EpiFromCellMLBackwardEuler tt06_backward_euler(p_solver, p_stimulus);
+        CellTenTusscher2006EpiFromCellMLBackwardEulerOpt tt06_backward_euler(p_solver, p_stimulus);
 
         ck_start = clock();
         RunOdeSolverWithIonicModel(&tt06_backward_euler,
@@ -938,7 +955,7 @@ public:
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Solve using backward euler
-        CellMahajan2008FromCellMLBackwardEuler mahajan_backward_euler(p_solver, p_stimulus);
+        CellMahajan2008FromCellMLBackwardEulerOpt mahajan_backward_euler(p_solver, p_stimulus);
 
         ck_start = clock();
         RunOdeSolverWithIonicModel(&mahajan_backward_euler,
@@ -1217,11 +1234,11 @@ public:
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-            AbstractCardiacCellInterface* const p_backward_cell1 = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, p_stimulus);
-            AbstractCardiacCellInterface* const p_backward_cell2 = new CellFoxModel2002FromCellMLBackwardEuler(p_solver, p_stimulus);
-            AbstractCardiacCellInterface* const p_backward_cell3 = new CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler(p_solver, p_noble_stimulus);
-            AbstractCardiacCellInterface* const p_backward_cell4 = new CellMahajan2008FromCellMLBackwardEuler(p_solver, p_stimulus);
-            AbstractCardiacCellInterface* const p_backward_cell5 = new CellTenTusscher2006EpiFromCellMLBackwardEuler(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell1 = new CellLuoRudy1991FromCellMLBackwardEulerOpt(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell2 = new CellFoxModel2002FromCellMLBackwardEulerOpt(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell3 = new CellNobleVargheseKohlNoble1998aFromCellMLBackwardEulerOpt(p_solver, p_noble_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell4 = new CellMahajan2008FromCellMLBackwardEulerOpt(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_backward_cell5 = new CellTenTusscher2006EpiFromCellMLBackwardEulerOpt(p_solver, p_stimulus);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1295,7 +1312,7 @@ public:
 
             CheckCellModelResults("Backward1AfterArchive", "", 2e-3);
             CheckCellModelResults("Backward2AfterArchive");
-            CheckCellModelResults("Backward3AfterArchive");
+            CheckCellModelResults("Backward3AfterArchive", "", 2e-3);
             CheckCellModelResults("Backward4AfterArchive");
             CheckCellModelResults("Backward5AfterArchive");
 
@@ -1307,7 +1324,7 @@ public:
         }
      }
 
-    void TestPyCMLArchiving(void)
+    void TestCodegenArchiving(void)
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1333,7 +1350,7 @@ public:
             // and SAC
             AbstractCardiacCellInterface* const p_n98_sac = new CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);
             // and "0d" backward Euler
-            AbstractCardiacCellInterface* const p_hh52_be = new CellHodgkinHuxley1952FromCellMLBackwardEuler(p_solver, p_stimulus);
+            AbstractCardiacCellInterface* const p_hh52_be = new CellHodgkinHuxley1952FromCellMLBackwardEulerOpt(p_solver, p_stimulus);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1375,7 +1392,7 @@ public:
             AbstractCardiacCellInterface* p_hh52_be;
             input_arch >> p_hh52_be;
             TS_ASSERT_EQUALS(p_hh52_be->GetNumberOfStateVariables(), 4u);
-            TS_ASSERT(dynamic_cast<CellHodgkinHuxley1952FromCellMLBackwardEuler*>(p_hh52_be));
+            TS_ASSERT(dynamic_cast<CellHodgkinHuxley1952FromCellMLBackwardEulerOpt*>(p_hh52_be));
 
             delete p_n98_cell;
             delete p_n98_cell_sac;
@@ -1397,7 +1414,7 @@ public:
 
         boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus);
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-        CellTenTusscher2006EpiFromCellMLBackwardEuler tt06_backward_euler(p_solver, p_stimulus);
+        CellTenTusscher2006EpiFromCellMLBackwardEulerOpt tt06_backward_euler(p_solver, p_stimulus);
 
         tt06_backward_euler.rGetStateVariables() = dodgy_state_vars;
         tt06_backward_euler.ComputeExceptVoltage(0.0, 3*step);

@@ -79,11 +79,23 @@ http://www.CellML.org/
       <variable name="time" units="millisecond" public_interface="out"/>
    </component>
    <component name="membrane">
-      <variable name="V" units="millivolt" initial_value="-85.23" public_interface="out"/>
+      <variable name="V" units="millivolt" initial_value="-85.23" public_interface="out" cmeta:id="membrane_voltage">
+      	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_voltage">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
       <variable name="R" units="joule_per_mole_kelvin" initial_value="8314.472" public_interface="out"/>
       <variable name="T" units="kelvin" initial_value="310" public_interface="out"/>
       <variable name="F" units="coulomb_per_millimole" initial_value="96485.3415" public_interface="out"/>
-      <variable name="Cm" units="microF_per_cm2" initial_value="0.185" public_interface="out"/>
+      <variable name="Cm" units="microF_per_cm2" initial_value="0.185" public_interface="out" cmeta:id="Cm">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+          <rdf:Description rdf:about="#Cm">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_capacitance"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="V_c" units="micrometre3" initial_value="0.016404" public_interface="out"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="i_K1" units="picoA_per_picoF" public_interface="in"/>
@@ -98,12 +110,48 @@ http://www.CellML.org/
       <variable name="i_b_Ca" units="picoA_per_picoF" public_interface="in"/>
       <variable name="i_p_K" units="picoA_per_picoF" public_interface="in"/>
       <variable name="i_p_Ca" units="picoA_per_picoF" public_interface="in"/>
-      <variable name="i_Stim" units="picoA_per_picoF" public_interface="out"/>
-      <variable name="stim_start" units="millisecond" initial_value="50"/>
-      <variable name="stim_end" units="millisecond" initial_value="9000"/>
-      <variable name="stim_period" units="millisecond" initial_value="1000" cmeta:id="stim_period"/>
-      <variable name="stim_duration" units="millisecond" initial_value="1" cmeta:id="stim_duration"/>
-      <variable name="stim_amplitude" units="picoA_per_picoF" initial_value="-52" cmeta:id="stim_amplitude"/>
+      <variable name="i_Stim" units="picoA_per_picoF" public_interface="out" cmeta:id="membrane_stimulus_current">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
+      <variable name="stim_start" units="millisecond" initial_value="50" cmeta:id="membrane_stimulus_current_offset">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current_offset">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_offset"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
+      <variable name="stim_end" units="millisecond" initial_value="9000" cmeta:id="membrane_stimulus_current_end">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current_end">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_end"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
+      <variable name="stim_period" units="millisecond" initial_value="1000" cmeta:id="membrane_stimulus_current_period">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current_period">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_period"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
+      <variable name="stim_duration" units="millisecond" initial_value="1" cmeta:id="membrane_stimulus_current_duration">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current_duration">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_duration"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
+      <variable name="stim_amplitude" units="picoA_per_picoF" initial_value="-52" cmeta:id="membrane_stimulus_current_amplitude">
+	  	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+			<rdf:Description rdf:about="#membrane_stimulus_current_amplitude">
+				<bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
+			</rdf:Description>
+		</rdf:RDF>
+	  </variable>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>
             <eq/>
@@ -3657,15 +3705,6 @@ http://www.CellML.org/
       </rdf:Description>
       <rdf:Description rdf:about="#K_F">
          <pycml:derived-quantity>yes</pycml:derived-quantity>
-      </rdf:Description>
-      <rdf:Description rdf:about="#stim_period">
-         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_period"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="#stim_amplitude">
-         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="#stim_duration">
-         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_duration"/>
       </rdf:Description>
    </rdf:RDF>
 </model>

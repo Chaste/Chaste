@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
+#include "ToroidalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -113,10 +114,18 @@ public:
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
+        // Add a cell killer to remove a cell
+        c_vector<double, 2> point = zero_vector<double>(2);
+        point[1] = 3.5;
+        c_vector<double, 2> normal = zero_vector<double>(2);
+        normal[1] = 1.0;
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); // y>3.5
+        simulator.AddCellKiller(p_killer);
+
         // Record node velocities
         cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
-        // Record division locations
+        // Record division and removal locations
         TS_ASSERT_EQUALS(simulator.GetOutputDivisionLocations(), false);
         simulator.SetOutputDivisionLocations(true);
 
@@ -139,6 +148,11 @@ public:
         NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/divisions.dat");
         TS_ASSERT(division_locations.CompareFiles(1e-2));
 
+        // Check removal locations file
+        std::string removal_locations_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/removals.dat";
+        NumericFileComparison removal_locations(removal_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/removals.dat");
+        TS_ASSERT(removal_locations.CompareFiles(1e-2));
+
         // Check cell velocities file
         std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";
         NumericFileComparison cell_velocities(cell_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/cellvelocities.dat");
@@ -149,11 +163,11 @@ public:
         std::string results_dir = handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
@@ -215,11 +229,11 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "results_from_time_0/voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_60.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "results_from_time_0/voronoi_results_60.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 #endif //CHASTE_VTK
     }
@@ -595,9 +609,9 @@ public:
     }
 
     /**
-     * Test a cell-based simulation with a periodic mesh.
+     * Test a cell-based simulation with a cylindrical mesh.
      */
-    void TestOffLatticeSimulationWithPeriodicMesh()
+    void TestOffLatticeSimulationWithCylindricalMesh()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -616,9 +630,13 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
+        // Output Voroni for visualisation
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.SetWriteVtkAsPoints(true);
+
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithPeriodicMesh");
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithCylindricalMesh");
         simulator.SetEndTime(0.5);
 
         // Create some force laws and pass them to the simulation
@@ -631,11 +649,59 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         // Check that the setup file is written correctly
-        std::string output_directory = "TestOffLatticeSimulationWithPeriodicMesh/results_from_time_0/";
+        std::string output_directory = "TestOffLatticeSimulationWithCylindricalMesh/results_from_time_0/";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithPeriodicMesh/results.vizsetup").CompareFiles();
+        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithCylindricalMesh/results.vizsetup").CompareFiles();
     }
+
+    /**
+     * Test a cell-based simulation with a Toroidal mesh.
+     */
+    void TestOffLatticeSimulationWithToroidalMesh()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
+        // Create a simple mesh
+        int cells_up = 6;
+        int cells_across = 6; 
+
+        ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
+        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Output Voroni for visualisation
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.SetWriteVtkAsPoints(true);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithToroidalMesh");
+        simulator.SetEndTime(0.5);
+        
+        // Create some force laws and pass them to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        // Check that the number of nodes is equal to the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+
+        // Check that the setup file is written correctly
+        std::string output_directory = "TestOffLatticeSimulationWithToroidalMesh/results_from_time_0/";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        FileComparison( results_dir + "results.vizsetup", "cell_based/test/data/TestOffLatticeSimulationWithToroidalMesh/results.vizsetup").CompareFiles();
+    }
+
 
     /**
      * Test a cell-based simulation with multiple boundary conditions. y<2 and y>0
@@ -1266,8 +1332,8 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 14u);
 
         // Check cells have moved to the correct location
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3906,1e-4);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], -0.1782,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3169,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], 0.0592,1e-4);
     }
 };
 

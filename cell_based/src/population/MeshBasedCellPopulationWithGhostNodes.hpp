@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -90,12 +90,16 @@ private:
         archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM, DIM> >(*this);
     }
 
+public:
+
     /**
      * Set the ghost nodes by taking in a set of which nodes indices are ghost nodes.
      *
      * @param rGhostNodeIndices set of node indices corresponding to ghost nodes
      */
     void SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices);
+
+private:
 
     /**
      * This is called after a cell population has been constructed to check the

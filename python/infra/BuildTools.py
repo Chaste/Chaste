@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2019, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,7 +41,7 @@ run externally to an SConscript.
 
 import os
 
-# Compatability with Python 2.3
+# Compatability with Python 3.5+
 try:
     set = set
 except NameError:
@@ -90,7 +90,7 @@ def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False, subfo
                 if not packNames or pack_name in packNames:
                     # Process this test pack file
                     try:
-                        pack_file = file(os.path.join(dirpath, filename), 'r')
+                        pack_file = open(os.path.join(dirpath, filename), 'r')
                         for rel_testfile in pack_file:
                             # Ignore empty lines and duplicates
                             rel_testfile = rel_testfile.strip()

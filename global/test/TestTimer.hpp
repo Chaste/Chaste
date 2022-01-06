@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -60,10 +60,20 @@ public:
         double elapsed_time = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
 
+        // Small amount of work in a loop that can't be optimized by unrolling
+        for (unsigned i=2; i<1000; )
+        {
+            i += (int) floor(sqrt(i));
+        }
+        double elapsed_time2 = Timer::GetElapsedTime();
+        TS_ASSERT_LESS_THAN(elapsed_time, elapsed_time2);
+
         double current_time = Timer::GetWallTime();
         // Note: on some systems this is seconds since the epoch, on others
         // it is seconds since last reboot!  So it might be quite small...
-        TS_ASSERT_LESS_THAN(10.0, current_time);
+        // On OpenMPI version 4 it appears to be seconds since the time of the first call
+        // i.e. a very small number
+        TS_ASSERT_LESS_THAN(elapsed_time, current_time);
     }
 };
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,15 +66,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Cell models can be solved using a specialised (for cardiac cell models) Backward Euler
  * implementation, with again the code being automatically generated from the cellml files.
- * Backward Euler allows much greater ODE timesteps to be used. For cellml models provided with Chaste,
+ * Backward Euler allows greater ODE timesteps to be used. For cellml models provided with Chaste,
  * using Backward Euler is trivial: just change the .hpp included as follows, and the class name as below.
- *
- * If you want to use Backward Euler for your own CellML file, there is an intermediate step - see
- * https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#GeneratingBackwardEulercellmodels
- * (note: requires Maple). (This step creates the .out files that are already present in heart/src/odes/cellml)
- *
  */
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "PetscSetupAndFinalize.hpp"
 /* This test will show how to load a mesh in the test and pass it into the problem,
  * for which the following includes are needed */
@@ -106,7 +101,7 @@ public: // Tests should be public!
          * of Luo-Rudy cells. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEuler,2> cell_factory(0.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,2> cell_factory(0.0);
 
         /*
          * Now, we load up a rectangular mesh (in triangle/tetgen format), done as follows,

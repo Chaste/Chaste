@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "MutableVertexMesh.hpp"
+#include "Toroidal2dMesh.hpp"
 
 /**
  * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
@@ -112,6 +113,14 @@ public:
      * Constructor.
      */
     Toroidal2dVertexMesh();
+
+    /**
+     * Alternative constructor. Creates a Voronoi tessellation of a given Toroidal2dMesh,
+     * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
+     *
+     * @param rMesh a Toroidal2dMesh
+     */
+    Toroidal2dVertexMesh(Toroidal2dMesh& rMesh);
 
     /**
      * Destructor.

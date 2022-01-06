@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -442,6 +442,8 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t</Optional>\n";
 
     output << "\t</Libraries>\n";
+
+    output << "\t<ChasteCodegenVersion>" << ChasteBuildInfo::GetChasteCodegenVersion() <<  "</ChasteCodegenVersion>\n";
 
     output << "</ChasteBuildInfo>" << std::endl;
     rInfo = output.str();

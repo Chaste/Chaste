@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "ZeroStimulus.hpp"
-#include "Shannon2004.hpp"
+
+#include "CellMLToSharedLibraryConverter.hpp"
+#include "AbstractCardiacCell.hpp"
+#include "AbstractCardiacCellWithModifiers.hpp"
+#include "AbstractModifier.hpp"
+
 
 #include "OutputFileHandler.hpp"
 #include "CheckpointArchiveTypes.hpp"
@@ -58,28 +63,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestModifiers : public CxxTest::TestSuite
 {
+private:
+    AbstractCardiacCellWithModifiers<AbstractCardiacCell >* p_shannon;
+
+    void setUp()
+    {
+           if(!p_shannon){
+                      boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
+                   boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+                      OutputFileHandler handler("TestModifiers", true);
+
+                   FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
+                      handler.CopyFileTo(cellml_file);
+
+               CellMLToSharedLibraryConverter converter(true);
+               converter.SetOptions({"-m", "--normal", "--expose-annotated-variables"});
+
+                   // Do the conversion
+                      FileFinder copied_file("TestModifiers/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+                   DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
+
+               p_shannon = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCardiacCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
+           }
+    }
+
 public:
+
+    ~TestModifiers()
+    {
+        delete p_shannon;
+    }
+
     void TestAccessingParametersWithoutModifiers()
     {
-        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-        CellShannon2004FromCellML* p_shannon = new CellShannon2004FromCellML(p_solver, p_stimulus);
-
         // We should now have all of the following methods available as an alternative to using 'modifiers'
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_fast_sodium_current_conductance"),16.0,1e-5);
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_L_type_calcium_current_conductance"),5.4e-4,1e-5);
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"),0.03,1e-5);
         TS_ASSERT_DELTA(p_shannon->GetParameter("membrane_slow_delayed_rectifier_potassium_current_conductance"),0.07,1e-5);
-
-        delete p_shannon;
      }
 
     void TestAssigningModifiersToACellModel()
     {
-        boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-        CellShannon2004FromCellML* p_shannon = new CellShannon2004FromCellML(p_solver, p_stimulus);
-
         TS_ASSERT_EQUALS(p_shannon->HasModifier("Alan"), false);
         TS_ASSERT_THROWS_THIS(p_shannon->GetModifier("Alan"), "There is no modifier called Alan in this model.");
 
@@ -98,8 +123,6 @@ public:
 
         // We should now get a new answer to this.
         TS_ASSERT_DELTA(p_shannon->GetModifier("membrane_rapid_delayed_rectifier_potassium_current_conductance")->Calc(0,0),-90,1e-9);
-
-        delete p_shannon;
     }
 
     void TestDummyModifiers(void)

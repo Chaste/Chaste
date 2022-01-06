@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -255,8 +255,9 @@ public:
      *
      * @param rMesh a tetrahedral mesh
      * @param isPeriodic a boolean that indicates whether the mesh is periodic or not
+     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation 
      */
-    VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false);
+    VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false, bool isBounded = false);
 
     /**
      * Alternative 3D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,

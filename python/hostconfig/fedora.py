@@ -1,6 +1,6 @@
 # Configuration
 
-"""Copyright (c) 2005-2019, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -147,8 +147,8 @@ def Configure(prefs, build):
 
     # Extra libraries for VTK output
     vtk_base = '/usr/include/vtk-'
-    vtk5_include_path = filter(os.path.isdir, glob.glob(vtk_base + '5*'))
-    vtk6_include_path = filter(os.path.isdir, glob.glob(vtk_base + '6*'))
+    vtk5_include_path = list(filter(os.path.isdir, glob.glob(vtk_base + '5*')))
+    vtk6_include_path = list(filter(os.path.isdir, glob.glob(vtk_base + '6*')))
     if vtk5_include_path:
         vtk_include_path = vtk5_include_path[0]
     elif vtk6_include_path:
@@ -163,10 +163,10 @@ def Configure(prefs, build):
         vtk_version = vtk_include_path[len(vtk_base):]
         other_includepaths.append(vtk_include_path)
         vtk_libs = ['CommonCore','CommonDataModel','IOXML','IOGeometry','CommonExecutionModel','FiltersCore','FiltersGeometry','FiltersModeling','FiltersSources']
-        vtk_ver = map(int, vtk_version.split('.')[:2])
+        vtk_ver = list(map(int, vtk_version.split('.')[:2]))
         if vtk_ver >= [6,2]:
             vtk_libs[2:2] = ['IOParallelXML']
-        vtk_libs = map(lambda l: 'vtk' + l + '-' + vtk_version, vtk_libs)
+        vtk_libs = list(map(lambda l: 'vtk' + l + '-' + vtk_version, vtk_libs))
         other_libraries.extend(vtk_libs)
 
     # Is CVODE installed?

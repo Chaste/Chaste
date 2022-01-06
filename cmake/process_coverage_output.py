@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2019, University of Oxford.
+"""Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     table_cell_counter=0
     match_counter=0;
     for line in genhtml_output:
-        #print line
+        #print(line)
         if table_cell_counter > 0:
             table_cell_counter = table_cell_counter + 1
         if re.match('(.*)headerItem(.*)Lines(.*)',line):

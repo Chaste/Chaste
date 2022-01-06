@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -383,8 +383,8 @@ public:
 
         // A few hardcoded tests to check nothing has changed
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
-        TS_ASSERT_DELTA(node_5_location[0], 0.6605, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 1.1422, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[0], 0.6570, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 1.1383, 1e-4);
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
     }
 
@@ -462,8 +462,8 @@ public:
 
         // A few hardcoded tests to check nothing has changed
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
-        TS_ASSERT_DELTA(node_5_location[0], 0.6605, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 1.1422, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[0], 0.6570, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 1.1383, 1e-4);
         CellPtr p_cell_at_5 = simulator.rGetCellPopulation().GetCellUsingLocationIndex(5);
         TS_ASSERT_DELTA(p_cell_at_5->GetCellData()->GetItem("oxygen"), 0.9704, 1e-4);
     }
@@ -860,16 +860,16 @@ public:
 
         // These results are from time 0.5 in TestWithOxygen.
         std::vector<double> node_5_location = p_simulator->GetNodeLocation(5);
-        TS_ASSERT_DELTA(node_5_location[0], 0.4987, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 0.8694, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[0], 0.4956, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 0.8658, 1e-4);
 
         std::vector<double> node_15_location = p_simulator->GetNodeLocation(15);
-        TS_ASSERT_DELTA(node_15_location[0], 0.5106, 1e-4);
-        TS_ASSERT_DELTA(node_15_location[1], 2.6052, 1e-4);
+        TS_ASSERT_DELTA(node_15_location[0], 0.5014, 1e-4);
+        TS_ASSERT_DELTA(node_15_location[1], 2.6011, 1e-4);
 
         // Test the CellData result
         TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9605, 1e-4);
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9582, 1e-4);
+        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9586, 1e-4);
 
         // Tidy up
         delete p_simulator;

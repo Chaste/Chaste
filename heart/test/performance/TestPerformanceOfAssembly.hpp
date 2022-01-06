@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <math.h>
 
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "LuoRudy1991.hpp"
 #include "PerformanceTester.hpp"
 
@@ -57,11 +57,11 @@ public:
     void TestPerfAssembly()
     {
         // Write headings
-        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2>::DisplayHeadings();
+        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2>::DisplayHeadings();
         HeartEventHandler::Headings();
 
         // Base line
-        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2> tester("TestPerAssembly");
+        PerformanceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2> tester("TestPerAssembly");
         tester.SimTime=0.0025;
 
         for (unsigned mesh_num=0; mesh_num<3; mesh_num++)

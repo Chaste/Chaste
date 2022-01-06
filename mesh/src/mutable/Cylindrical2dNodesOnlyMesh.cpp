@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
     assert(width > 0.0);
 }
 
-void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, bool isPeriodic)
+void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, c_vector<bool,2> isDimPeriodic)
 {
     // Ensure that the width is a multiple of cut-off length
     if (fmod( mWidth,cutOffLength ) > 1e-14)
@@ -60,7 +60,12 @@ void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vecto
     domainSize[0] = 0;
     domainSize[1] = mWidth;
 
-    NodesOnlyMesh<2>::SetUpBoxCollection(cutOffLength, domainSize, PETSC_DECIDE, true);    // Only difference is that this "true" makes the boxes periodic.
+    // Forcde the periodicity to periodic only in x
+    isDimPeriodic  = zero_vector<bool>(2);
+    isDimPeriodic[0]  = true;
+
+
+    NodesOnlyMesh<2>::SetUpBoxCollection(cutOffLength, domainSize, PETSC_DECIDE, isDimPeriodic);    // Only difference is that this "true" makes the boxes periodic.
 
     this->AddNodesToBoxes();
 }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,9 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include "VertexMeshWriter.hpp"
-#include "MutableVertexMesh.hpp"
 #include "FileComparison.hpp"
+#include "MutableVertexMesh.hpp"
+#include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -49,7 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {
 public:
-
     void TestPerformNodeMerge()
     {
         /*
@@ -70,17 +69,17 @@ public:
         nodes.push_back(new Node<2>(3, true, 0.4, 0.0));
         nodes.push_back(new Node<2>(4, true, 0.6, 0.0));
 
-        unsigned node_indices_elem_0[5] = {0, 3, 4, 1, 2};
+        unsigned node_indices_elem_0[5] = { 0, 3, 4, 1, 2 };
         std::vector<Node<2>*> nodes_elem_0;
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Merge nodes 3 and 4
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
@@ -90,7 +89,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
         // Test the correct nodes are boundary nodes
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -108,7 +107,7 @@ public:
 
         // Test the element's area and perimeter are computed correctly
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.5, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2+sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2 + sqrt(2.0), 1e-6);
     }
 
     void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement()
@@ -137,9 +136,9 @@ public:
         nodes.push_back(new Node<2>(6, true, 0.00, 2.00));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
-        unsigned node_indices_elem_0[4] = {0, 1, 5, 6};
-        unsigned node_indices_elem_1[5] = {1, 2, 3, 4, 5};
-        for (unsigned i=0; i<5; i++)
+        unsigned node_indices_elem_0[4] = { 0, 1, 5, 6 };
+        unsigned node_indices_elem_1[5] = { 1, 2, 3, 4, 5 };
+        for (unsigned i = 0; i < 5; i++)
         {
             if (i < 4)
             {
@@ -148,11 +147,11 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Merge nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
@@ -162,7 +161,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Test the correct nodes are boundary nodes
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -174,9 +173,9 @@ public:
         // Test the elements own the correct nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
-        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
-        unsigned node_indices_element_1[4] = {1, 2, 3, 4};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 4, 5 };
+        unsigned node_indices_element_1[4] = { 1, 2, 3, 4 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -196,19 +195,19 @@ public:
          * |/___\|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
         nodes.push_back(new Node<2>(5, false, 0.5, 0.6));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
-        unsigned node_indices_elem_2[3] = {1, 4, 0};
-        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -219,16 +218,16 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
@@ -240,11 +239,11 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
-        unsigned node_indices_element_1[3] = {2, 4, 1};
-        unsigned node_indices_element_2[4] = {1, 4, 5, 0};
-        unsigned node_indices_element_3[3] = {0, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 2, 3, 5, 4 };
+        unsigned node_indices_element_1[3] = { 2, 4, 1 };
+        unsigned node_indices_element_2[4] = { 1, 4, 5, 0 };
+        unsigned node_indices_element_3[3] = { 0, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -257,16 +256,16 @@ public:
 
         // Test that each element has the correct area and perimeter following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.3, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.2,1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.2, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.3, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(3), 0.2, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.2+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.0+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.2+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.0+0.2*sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.2 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.0 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.2 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test T1 swap location tracking
-        std::vector< c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
+        std::vector<c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
         TS_ASSERT_EQUALS(t1_locations.size(), 1u);
         TS_ASSERT_DELTA(t1_locations[0][0], 0.5, 1e-6);
         TS_ASSERT_DELTA(t1_locations[0][1], 0.5, 1e-6);
@@ -298,10 +297,10 @@ public:
         nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[3] = {1, 4, 0};
-        unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_2[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -311,15 +310,15 @@ public:
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
@@ -336,10 +335,10 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
-        unsigned node_indices_element_1[4] = {1, 4, 5, 0};
-        unsigned node_indices_element_2[4] = {0, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 2, 3, 5, 4 };
+        unsigned node_indices_element_1[4] = { 1, 4, 5, 0 };
+        unsigned node_indices_element_2[4] = { 0, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -353,14 +352,14 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.3, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.3, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.2, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.2+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0+0.2*sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.2 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test that the correct nodes are labelled as boundary nodes following the rearrangement
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=5);
+            bool expected_boundary_node = (i != 5);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
@@ -378,18 +377,18 @@ public:
          * |/___\|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
-        nodes.push_back(new Node<2>(5, true,  0.5, 0.6));
+        nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[4] = {1, 2, 5, 4};
-        unsigned node_indices_elem_1[3] = {1, 4, 0};
-        unsigned node_indices_elem_2[4] = {0, 4, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[4] = { 1, 2, 5, 4 };
+        unsigned node_indices_elem_1[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_2[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -399,15 +398,15 @@ public:
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -427,10 +426,10 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[3] = {1, 2, 4};
-        unsigned node_indices_element_1[4] = {1, 4, 5, 0};
-        unsigned node_indices_element_2[3] = {0, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[3] = { 1, 2, 4 };
+        unsigned node_indices_element_1[4] = { 1, 4, 5, 0 };
+        unsigned node_indices_element_2[3] = { 0, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
             if (i < 3)
@@ -444,12 +443,12 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.3, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.2, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0+0.2*sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.2 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test that the correct nodes are labelled as boundary nodes following the rearrangement
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -477,22 +476,22 @@ public:
         nodes.push_back(new Node<2>(5, true, 0.5, 0.6));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
-        unsigned node_indices_elem_0[4] = {0, 4, 5, 3};
-        unsigned node_indices_elem_1[4] = {4, 1, 2, 5};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[4] = { 0, 4, 5, 3 };
+        unsigned node_indices_elem_1[4] = { 4, 1, 2, 5 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Perform a T1 swap on nodes 5 and 4.
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
@@ -508,9 +507,9 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[3] = {0, 5, 3};
-        unsigned node_indices_element_1[3] = {4, 1, 2};
-        for (unsigned i=0; i<3; i++)
+        unsigned node_indices_element_0[3] = { 0, 5, 3 };
+        unsigned node_indices_element_1[3] = { 4, 1, 2 };
+        for (unsigned i = 0; i < 3; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -519,11 +518,11 @@ public:
         // Test that each element has the correct area and perimeter following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.2, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.2, 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0+0.2*sqrt(41.0), 1e-6);
-        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.0+0.2*sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 1.0 + 0.2 * sqrt(41.0), 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test that the correct nodes are labelled as boundary nodes following the rearrangement
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -545,11 +544,11 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.5));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
-        unsigned node_indices_elem_2[3] = {1, 4, 0};
-        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -560,16 +559,16 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Test that trying to perform a T1 swap on nodes 4 and 5 throws the correct exception
         TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes are too close together, this shouldn't happen");
@@ -588,19 +587,19 @@ public:
          * |/___\|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
         nodes.push_back(new Node<2>(5, false, 0.5, 0.6));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
-        unsigned node_indices_elem_2[3] = {1, 4, 0};
-        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -611,13 +610,13 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Ensure that the inner node will swap
         vertex_mesh.SetCellRearrangementThreshold(0.21);
@@ -626,12 +625,12 @@ public:
         vertex_mesh.CheckForSwapsFromShortEdges();
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
-        unsigned node_indices_element_1[3] = {2, 4, 1};
-        unsigned node_indices_element_2[4] = {1, 4, 5, 0};
-        unsigned node_indices_element_3[3] = {0, 5, 3};
+        unsigned node_indices_element_0[4] = { 2, 3, 5, 4 };
+        unsigned node_indices_element_1[3] = { 2, 4, 1 };
+        unsigned node_indices_element_2[4] = { 1, 4, 5, 0 };
+        unsigned node_indices_element_3[3] = { 0, 5, 3 };
 
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -658,20 +657,20 @@ public:
          *      |/_____________|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  2.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  2.0, 2.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 2.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 2.0));
         nodes.push_back(new Node<2>(4, false, 0.2, 0.95));
         nodes.push_back(new Node<2>(5, true, 2.0, 1.0));
         nodes.push_back(new Node<2>(6, false, 0.2, 1.05));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[4] = {0, 1, 5, 4};
-        unsigned node_indices_elem_1[4] = {5, 2, 3, 6};
-        unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
-        unsigned node_indices_elem_3[3] = { 4, 5, 6};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[4] = { 0, 1, 5, 4 };
+        unsigned node_indices_elem_1[4] = { 5, 2, 3, 6 };
+        unsigned node_indices_elem_2[4] = { 0, 4, 6, 3 };
+        unsigned node_indices_elem_3[3] = { 4, 5, 6 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -682,13 +681,13 @@ public:
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
@@ -699,7 +698,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
 
         // Test that each element still contains the correct nodes following the rearrangement
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_elem_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_elem_1[i]);
@@ -727,18 +726,18 @@ public:
          *      |/_____________|.This corner is not a node either.
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  0.0, 2.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.0, 2.0));
         nodes.push_back(new Node<2>(2, true, 0.2, 0.95));
         nodes.push_back(new Node<2>(3, true, 2.0, 1.0));
         nodes.push_back(new Node<2>(4, true, 0.2, 1.05));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[4] = {0, 2, 4, 1};
-        unsigned node_indices_elem_1[3] = {1, 4, 3};
-        unsigned node_indices_elem_2[3] = {0, 3, 2};
+        unsigned node_indices_elem_0[4] = { 0, 2, 4, 1 };
+        unsigned node_indices_elem_1[3] = { 1, 4, 3 };
+        unsigned node_indices_elem_2[3] = { 0, 3, 2 };
 
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -748,12 +747,12 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
@@ -787,11 +786,11 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {3, 4, 5};
-        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
-        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
-        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 3, 4, 5 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 5, 4 };
+        unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
+        unsigned node_indices_elem_3[4] = { 0, 1, 4, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -802,16 +801,16 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Perform a T2 swap on the central triangle element
-        VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+        VertexElement<2, 2>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
 
@@ -821,18 +820,18 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
-        for (unsigned j=1; j<4; j++)
+        for (unsigned j = 1; j < 4; j++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j+1)%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j % 3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j + 1) % 3);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(2), 6u);
         }
 
         // Test boundary property of nodes. All are boundary nodes except node 3.
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=3);
+            bool expected_boundary_node = (i != 3);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 
@@ -868,10 +867,10 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[3] = {3, 4, 5};
-        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
-        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 3, 4, 5 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 5, 4 };
+        unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -881,18 +880,18 @@ public:
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Perform a T2 swap on the central triangle element
-        VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+        VertexElement<2, 2>* p_element_0 = vertex_mesh.GetElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
@@ -901,16 +900,16 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
-        for (unsigned j=1; j<3; j++)
+        for (unsigned j = 1; j < 3; j++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j+1)%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j % 3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j + 1) % 3);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(2), 6u);
         }
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -948,12 +947,12 @@ public:
         nodes2_elem_1.push_back(nodes2[4]);
         nodes2_elem_1.push_back(nodes2[3]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements2;
-        vertex_elements2.push_back(new VertexElement<2,2>(0, nodes2_elem_0));
-        vertex_elements2.push_back(new VertexElement<2,2>(1, nodes2_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements2;
+        vertex_elements2.push_back(new VertexElement<2, 2>(0, nodes2_elem_0));
+        vertex_elements2.push_back(new VertexElement<2, 2>(1, nodes2_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh2(nodes2, vertex_elements2);
+        MutableVertexMesh<2, 2> vertex_mesh2(nodes2, vertex_elements2);
 
         TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 5u);
@@ -974,7 +973,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i=0; i<vertex_mesh2.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh2.GetNumNodes(); i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -993,11 +992,11 @@ public:
 
         // Make two triangles and two trapezium elements out of these nodes
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {3, 4, 5};
-        unsigned node_indices_elem_1[3] = {2, 5, 4};
-        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
-        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[3] = { 3, 4, 5 };
+        unsigned node_indices_elem_1[3] = { 2, 5, 4 };
+        unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
+        unsigned node_indices_elem_3[4] = { 0, 1, 4, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             if (i < 3)
             {
@@ -1008,13 +1007,13 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements, 0.1);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements, 0.1);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1);
@@ -1022,10 +1021,10 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
 
         // Attempt to perform a T2 swap on the middle triangle element
-        VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
-        TS_ASSERT_THROWS_THIS( vertex_mesh.PerformT2Swap(*p_element_0),
-                "One of the neighbours of a small triangular element is also a triangle - "
-                "dealing with this has not been implemented yet" );
+        VertexElement<2, 2>* p_element_0 = vertex_mesh.GetElement(0);
+        TS_ASSERT_THROWS_THIS(vertex_mesh.PerformT2Swap(*p_element_0),
+                              "One of the neighbours of a small triangular element is also a triangle - "
+                              "dealing with this has not been implemented yet");
     }
 
     void TestPerformT2SwapWithRosettes()
@@ -1042,15 +1041,15 @@ public:
          */
 
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0,  0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0,  0.0));
-        nodes.push_back(new Node<2>(2, true,  2.0,  0.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 0.0));
         nodes.push_back(new Node<2>(3, false, 0.99, 1.0));
-        nodes.push_back(new Node<2>(4, false, 1.0,  1.0));
-        nodes.push_back(new Node<2>(5, false, 2.0,  1.0));
+        nodes.push_back(new Node<2>(4, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(5, false, 2.0, 1.0));
         nodes.push_back(new Node<2>(6, false, 0.99, 1.01));
-        nodes.push_back(new Node<2>(7, false, 0.0,  2.0));
-        nodes.push_back(new Node<2>(8, false, 2.0,  2.0));
+        nodes.push_back(new Node<2>(7, false, 0.0, 2.0));
+        nodes.push_back(new Node<2>(8, false, 2.0, 2.0));
 
         std::vector<Node<2>*> nodes_elem_0;
         nodes_elem_0.push_back(nodes[0]);
@@ -1082,17 +1081,17 @@ public:
         nodes_elem_4.push_back(nodes[7]);
         nodes_elem_4.push_back(nodes[6]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_4));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Perform a T2 swap on the central triangle element
-        VertexElement<2,2>* p_element_3 = vertex_mesh.GetElement(3);
+        VertexElement<2, 2>* p_element_3 = vertex_mesh.GetElement(3);
         c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(3);
         vertex_mesh.PerformT2Swap(*p_element_3);
 
@@ -1130,6 +1129,119 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(4)->GetNodeGlobalIndex(3), 7u);
     }
 
+    void TestPerformT2SwapWithoutNeighbours()
+    {
+        /*
+         * Create a mesh comprising three nodes contained in one triangle
+         * element, as shown below. We will test that a T2 swap is performed
+         * correctly when an element has no neighbouring elements.
+         *        _
+         *       / \
+         *      /   \
+         *     /     \
+         *    /   0   \
+         *   /         \
+         *  /___________\
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.2, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.05));
+
+        std::vector<Node<2>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 3u);
+
+        // Perform a T2 swap on the central triangle element
+        auto p_element_0 = vertex_mesh.GetElement(0);
+        vertex_mesh.PerformT2Swap(*p_element_0);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 0u);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 3u);
+
+        /*
+         *  Make two disconnected triangular elements
+         *        _
+         *       / \                 / \
+         *      /   \               /   \
+         *     /     \             /     \
+         *    /   0   \           /   1   \
+         *   /         \         /         \
+         *  /___________\       /___________\
+         *
+         */
+        std::vector<Node<2>*> nodes2;
+        nodes2.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes2.push_back(new Node<2>(1, true, 0.2, 0.0));
+        nodes2.push_back(new Node<2>(2, true, 0.1, 0.05));
+        nodes2.push_back(new Node<2>(3, true, 1.0, 0.0));
+        nodes2.push_back(new Node<2>(4, true, 1.2, 0.0));
+        nodes2.push_back(new Node<2>(5, true, 1.1, 0.05));
+
+        std::vector<Node<2>*> nodes2_elem_0;
+        nodes2_elem_0.push_back(nodes2[0]);
+        nodes2_elem_0.push_back(nodes2[1]);
+        nodes2_elem_0.push_back(nodes2[2]);
+
+        std::vector<Node<2>*> nodes2_elem_1;
+        nodes2_elem_1.push_back(nodes2[3]);
+        nodes2_elem_1.push_back(nodes2[4]);
+        nodes2_elem_1.push_back(nodes2[5]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements2;
+        vertex_elements2.push_back(new VertexElement<2, 2>(0, nodes2_elem_0));
+        vertex_elements2.push_back(new VertexElement<2, 2>(1, nodes2_elem_1));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2, 2> vertex_mesh2(nodes2, vertex_elements2);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 6u);
+
+        // Perform a T2 swap on the left triangle element
+        p_element_0 = vertex_mesh2.GetElement(0);
+        vertex_mesh2.PerformT2Swap(*p_element_0);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 3u);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllNodes(), 6u);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(1), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
+
+        // Test boundary property of nodes. All are boundary nodes.
+        for (unsigned i = 0; i < vertex_mesh2.GetNumNodes(); i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
+        }
+
+        // Perform a T2 swap on the remaining triangle element
+        auto p_element_1 = vertex_mesh2.GetElement(1);
+        vertex_mesh2.PerformT2Swap(*p_element_1);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumNodes(), 0u);
+
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh2.GetNumAllNodes(), 6u);
+    }
+
     void TestReMeshForT1Swaps()
     {
         /*
@@ -1148,8 +1260,8 @@ public:
          *     \  /  \  /
          *      \/    \/
          */
-        VertexMeshReader<2,2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");
-        MutableVertexMesh<2,2> vertex_mesh;
+        VertexMeshReader<2, 2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");
+        MutableVertexMesh<2, 2> vertex_mesh;
 
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
         vertex_mesh.SetCellRearrangementThreshold(0.1);
@@ -1167,7 +1279,7 @@ public:
         std::string mesh_filename = "vertex_remesh_T1";
 
         // Save the mesh data using mesh writers
-        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
+        VertexMeshWriter<2, 2> mesh_writer(dirname, mesh_filename, false);
         mesh_writer.WriteFilesUsingMesh(vertex_mesh);
 
         // Check the positions are updated correctly
@@ -1195,27 +1307,27 @@ public:
          *  |/_____|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.00, 0.00));
-        nodes.push_back(new Node<2>(1, true,  1.00, 0.00));
-        nodes.push_back(new Node<2>(2, true,  1.00, 1.00));
-        nodes.push_back(new Node<2>(3, true,  0.00, 1.00));
+        nodes.push_back(new Node<2>(0, true, 0.00, 0.00));
+        nodes.push_back(new Node<2>(1, true, 1.00, 0.00));
+        nodes.push_back(new Node<2>(2, true, 1.00, 1.00));
+        nodes.push_back(new Node<2>(3, true, 0.00, 1.00));
         nodes.push_back(new Node<2>(4, false, 0.49, 0.49));
         nodes.push_back(new Node<2>(5, false, 0.51, 0.51));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
-        unsigned node_indices_elem_0[5] = {0, 1, 2, 5, 4};
-        unsigned node_indices_elem_1[5] = {0, 4, 5, 2, 3};
-        for (unsigned i=0; i<5; i++)
+        unsigned node_indices_elem_0[5] = { 0, 1, 2, 5, 4 };
+        unsigned node_indices_elem_1[5] = { 0, 4, 5, 2, 3 };
+        for (unsigned i = 0; i < 5; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non-boundary nodes contained only in two elements; something has gone wrong.");
@@ -1245,10 +1357,10 @@ public:
         nodes.push_back(new Node<2>(8, true, 0.00, 1.0));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[5] = {0, 1, 6, 7, 8};
-        unsigned node_indices_elem_1[4] = {1, 2, 3, 6};
-        unsigned node_indices_elem_2[4] = {3, 4, 5, 6};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[5] = { 0, 1, 6, 7, 8 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 3, 6 };
+        unsigned node_indices_elem_2[4] = { 3, 4, 5, 6 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1256,12 +1368,12 @@ public:
         }
         nodes_elem_0.push_back(nodes[node_indices_elem_0[4]]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
@@ -1292,19 +1404,19 @@ public:
         nodes.push_back(new Node<2>(6, true, 0.5, 0.0));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
-        unsigned node_indices_elem_0[5] = {1, 2, 5, 4, 6};
-        unsigned node_indices_elem_1[5] = {0, 6, 4, 5, 3};
-        for (unsigned i=0; i<5; i++)
+        unsigned node_indices_elem_0[5] = { 1, 2, 5, 4, 6 };
+        unsigned node_indices_elem_1[5] = { 0, 6, 4, 5, 3 };
+        for (unsigned i = 0; i < 5; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There is a non-boundary node contained only in two elements; something has gone wrong.");
@@ -1326,20 +1438,20 @@ public:
          * |__|__|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.00));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.00));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.00));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.00));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.00));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.00));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.00));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.00));
         nodes.push_back(new Node<2>(4, false, 0.5, 0.49));
         nodes.push_back(new Node<2>(5, false, 0.5, 0.51));
-        nodes.push_back(new Node<2>(6, true,  0.5, 0.00));
-        nodes.push_back(new Node<2>(7, true,  0.5, 1.00));
+        nodes.push_back(new Node<2>(6, true, 0.5, 0.00));
+        nodes.push_back(new Node<2>(7, true, 0.5, 1.00));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[5] = {1, 2, 5, 4, 6};
-        unsigned node_indices_elem_1[5] = {0, 6, 4, 5, 3};
-        unsigned node_indices_elem_2[4] = {2, 3, 5, 7};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_elem_0[5] = { 1, 2, 5, 4, 6 };
+        unsigned node_indices_elem_1[5] = { 0, 6, 4, 5, 3 };
+        unsigned node_indices_elem_2[4] = { 2, 3, 5, 7 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1348,12 +1460,12 @@ public:
         nodes_elem_0.push_back(nodes[node_indices_elem_0[4]]);
         nodes_elem_1.push_back(nodes[node_indices_elem_1[4]]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non-boundary nodes contained only in two elements; something has gone wrong.");
@@ -1373,27 +1485,27 @@ public:
          *    |_____________|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,   0.0,  0.0));
-        nodes.push_back(new Node<2>(1, true,   1.0,  0.0));
-        nodes.push_back(new Node<2>(2, true,   1.0,  1.0));
-        nodes.push_back(new Node<2>(3, true,   0.0,  1.0));
-        nodes.push_back(new Node<2>(4, true,   2.0,  0.0));
-        nodes.push_back(new Node<2>(5, true,   2.0,  1.0));
-        nodes.push_back(new Node<2>(6, true,   1.1,  0.5));
-        nodes.push_back(new Node<2>(7, true,  -1.0,  0.0));
-        nodes.push_back(new Node<2>(8, true,  -0.1,  0.5));
-        nodes.push_back(new Node<2>(9, true,  -1.0,  1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(5, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(6, true, 1.1, 0.5));
+        nodes.push_back(new Node<2>(7, true, -1.0, 0.0));
+        nodes.push_back(new Node<2>(8, true, -0.1, 0.5));
+        nodes.push_back(new Node<2>(9, true, -1.0, 1.0));
         nodes.push_back(new Node<2>(10, true, -1.0, -1.0));
-        nodes.push_back(new Node<2>(11, true,  2.0, -1.0));
-        nodes.push_back(new Node<2>(12, true,  2.0,  0.5));
+        nodes.push_back(new Node<2>(11, true, 2.0, -1.0));
+        nodes.push_back(new Node<2>(12, true, 2.0, 0.5));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3, nodes_in_element4;
-        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
-        unsigned node_indices_element_1[3] = {4, 12, 6};
-        unsigned node_indices_element_2[3] = {12, 5, 6};
-        unsigned node_indices_element_3[3] = {7, 8, 9};
-        unsigned node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
-        for (unsigned i=0; i<6; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
+        unsigned node_indices_element_1[3] = { 4, 12, 6 };
+        unsigned node_indices_element_2[3] = { 12, 5, 6 };
+        unsigned node_indices_element_3[3] = { 7, 8, 9 };
+        unsigned node_indices_element_4[6] = { 10, 11, 4, 1, 0, 7 };
+        for (unsigned i = 0; i < 6; i++)
         {
             if (i < 4)
             {
@@ -1408,17 +1520,24 @@ public:
             nodes_in_element4.push_back(nodes[node_indices_element_4[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
-        elements.push_back(new VertexElement<2,2>(4, nodes_in_element4));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
+        elements.push_back(new VertexElement<2, 2>(4, nodes_in_element4));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
+
+        // Test default value of mCheckForT3Swaps, as well as setting and getting
+        TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
+        mesh.SetCheckForT3Swaps(false);
+        TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), false);
+        mesh.SetCheckForT3Swaps(true);
+        TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
+        mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
 
         // Node 6 is close to, but not overlapping, an edge of element 0
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), false);
@@ -1447,7 +1566,7 @@ public:
         // Save the mesh data using mesh writers
         std::string dirname = "TempyTempy";
         std::string mesh_filename = "vertex_remesh_T3";
-        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
+        VertexMeshWriter<2, 2> mesh_writer(dirname, mesh_filename, false);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 amd 1
@@ -1476,12 +1595,12 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNumNodes(), 6u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned new_node_indices_element_0[9] = {0, 1, 13, 6, 14, 2, 3, 15, 8};
-        unsigned new_node_indices_element_1[4] = {4, 12, 6, 13};
-        unsigned new_node_indices_element_2[4] = {12, 5, 14, 6};
-        unsigned new_node_indices_element_3[4] = {7, 8, 15, 9};
-        unsigned new_node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
-        for (unsigned i=0; i<9; i++)
+        unsigned new_node_indices_element_0[9] = { 0, 1, 13, 6, 14, 2, 3, 15, 8 };
+        unsigned new_node_indices_element_1[4] = { 4, 12, 6, 13 };
+        unsigned new_node_indices_element_2[4] = { 12, 5, 14, 6 };
+        unsigned new_node_indices_element_3[4] = { 7, 8, 15, 9 };
+        unsigned new_node_indices_element_4[6] = { 10, 11, 4, 1, 0, 7 };
+        for (unsigned i = 0; i < 9; i++)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 4)
@@ -1498,14 +1617,14 @@ public:
         }
 
         // Test boundary property of nodes (all are boundary nodes except node 6)
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=6);
+            bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 
         // Test T3 swap Location tracking
-        std::vector< c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
+        std::vector<c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
         TS_ASSERT_EQUALS(t3_locations.size(), 2u);
         TS_ASSERT_DELTA(t3_locations[0][0], 1.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[0][1], 0.5, 1e-6);
@@ -1544,11 +1663,11 @@ public:
         nodes.push_back(new Node<2>(8, true, 2.0, 1.0));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
-        unsigned node_indices_element_0[3] = {1, 2, 3};
-        unsigned node_indices_element_1[3] = {5, 6, 4};
-        unsigned node_indices_element_2[3] = {6, 7, 4};
-        unsigned node_indices_element_3[3] = {7, 8, 4};
-        for (unsigned i=0; i<3; i++)
+        unsigned node_indices_element_0[3] = { 1, 2, 3 };
+        unsigned node_indices_element_1[3] = { 5, 6, 4 };
+        unsigned node_indices_element_2[3] = { 6, 7, 4 };
+        unsigned node_indices_element_3[3] = { 7, 8, 4 };
+        for (unsigned i = 0; i < 3; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
@@ -1556,13 +1675,13 @@ public:
             nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
@@ -1583,18 +1702,18 @@ public:
          *    \|/
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0,  0.0));
-        nodes.push_back(new Node<2>(1, false, 1.0,  0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0,  1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0,  1.0));
-        nodes.push_back(new Node<2>(4, true,  1.0, -1.0));
-        nodes.push_back(new Node<2>(5, true,  2.0,  0.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 1.0, -1.0));
+        nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2;
-        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
-        unsigned node_indices_element_1[3] = {4, 5, 2};
-        unsigned node_indices_element_2[3] = {0, 4, 1};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
+        unsigned node_indices_element_1[3] = { 4, 5, 2 };
+        unsigned node_indices_element_2[3] = { 0, 4, 1 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             if (i < 3)
@@ -1604,12 +1723,12 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         // Move node 3  so that it overlaps element 2 across an internal edge
         ChastePoint<2> point = mesh.GetNode(3)->GetPoint();
@@ -1649,10 +1768,10 @@ public:
         nodes.push_back(new Node<2>(7, true, 2.0, 0.0));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2;
-        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
-        unsigned node_indices_element_1[3] = {5, 6, 4};
-        unsigned node_indices_element_2[3] = {7, 4, 6};
-        for (unsigned i=0; i<3; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
+        unsigned node_indices_element_1[3] = { 5, 6, 4 };
+        unsigned node_indices_element_2[3] = { 7, 4, 6 };
+        for (unsigned i = 0; i < 3; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
@@ -1660,20 +1779,20 @@ public:
         }
         nodes_in_element0.push_back(nodes[node_indices_element_0[3]]);
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 / 1.5);
 
         // Call PerformT3Swap(); note that we don't call ReMesh(), since this would also perform T1 swaps
         vertex_mesh.PerformT3Swap(vertex_mesh.GetNode(4), 0u);
 
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Trying to merge a node onto an edge which is too small.");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Trying to merge a node onto an edge which is too small.");
         Warnings::QuietDestroy();
 
         // Check that node 4 has been moved onto the edge and a new node has been created and both added to elements 0 and 1
@@ -1681,18 +1800,18 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
         // Test locations of moved and new nodes
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0],  1.00, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1],  0.05, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[0],  1.00, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 1.00, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.05, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[0], 1.00, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(8)->rGetLocation()[1], -0.05, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(9)->rGetLocation()[0],  1.00, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(9)->rGetLocation()[1],  0.15, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(9)->rGetLocation()[0], 1.00, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(9)->rGetLocation()[1], 0.15, 1e-8);
 
         // Test locations of edges of intersected edge
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[0],  1.00, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[0], 1.00, 1e-8);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[1], -0.15, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[0],  1.00, 1e-8);
-        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[1],  0.25, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[0], 1.00, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[1], 0.25, 1e-8);
 
         // Test that each element contains the correct number of nodes following the rearrangement
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
@@ -1700,10 +1819,10 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned new_node_indices_element_0[7] = {0, 1, 8, 4, 9, 2, 3};
-        unsigned new_node_indices_element_1[4] = {5, 6, 4, 8};
-        unsigned new_node_indices_element_2[4] = {7, 9, 4, 6};
-        for (unsigned i=0; i<7; i++)
+        unsigned new_node_indices_element_0[7] = { 0, 1, 8, 4, 9, 2, 3 };
+        unsigned new_node_indices_element_1[4] = { 5, 6, 4, 8 };
+        unsigned new_node_indices_element_2[4] = { 7, 9, 4, 6 };
+        for (unsigned i = 0; i < 7; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 4)
@@ -1714,9 +1833,9 @@ public:
         }
 
         // Test boundary property of nodes
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=4);
+            bool expected_boundary_node = (i != 4);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
@@ -1769,19 +1888,19 @@ public:
         nodes.push_back(new Node<2>(7, true, 0.5, 0.01));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1;
-        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
-        unsigned node_indices_element_1[4] = {4, 5, 6, 7};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
+        unsigned node_indices_element_1[4] = { 4, 5, 6, 7 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations.
         vertex_mesh.SetCellRearrangementThreshold(0.2);
@@ -1810,14 +1929,13 @@ public:
 
         // Node 8 should be the starting point of the edge that 7 is closest to. This means that the point would be merged
         // back onto the freshly created edge from the previous swap if the ReMesh method doesn't check whether this is happening.
-        unsigned edge_closest_to_7_local_index =
-                vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0);
+        unsigned edge_closest_to_7_local_index = vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0);
         unsigned edge_closest_to_7_global_index = vertex_mesh.GetElement(0)->GetNode(edge_closest_to_7_local_index)->GetIndex();
         TS_ASSERT_EQUALS(edge_closest_to_7_global_index, 8u);
 
-        c_vector<double,2> location_node_6_before_swap;
+        c_vector<double, 2> location_node_6_before_swap;
         location_node_6_before_swap = vertex_mesh.GetNode(6)->rGetLocation();
-        c_vector<double,2> location_node_8_before_swap;
+        c_vector<double, 2> location_node_8_before_swap;
         location_node_8_before_swap = vertex_mesh.GetNode(8)->rGetLocation();
 
         // We perform the next swap:
@@ -1832,16 +1950,16 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
 
         // The locations of node 6 and 8 should not be changed!
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetLocation()[0],location_node_6_before_swap[0]);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetLocation()[1],location_node_6_before_swap[1]);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(8)->rGetLocation()[0],location_node_8_before_swap[0]);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNode(8)->rGetLocation()[1],location_node_8_before_swap[1]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetLocation()[0], location_node_6_before_swap[0]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetLocation()[1], location_node_6_before_swap[1]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(8)->rGetLocation()[0], location_node_8_before_swap[0]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(8)->rGetLocation()[1], location_node_8_before_swap[1]);
 
         // The two elements should have 2 nodes in common and they should both be boundary nodes
         unsigned num_common_vertices = 0;
-        for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); i++)
         {
-            for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); j++)
             {
                 if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
@@ -1864,22 +1982,22 @@ public:
          *    /__\|_____|/_|_\
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
-        nodes.push_back(new Node<2>(4, true,  1.5, 0.0));
-        nodes.push_back(new Node<2>(5, true,  2.0, 0.0));
-        nodes.push_back(new Node<2>(6, true,  1.5, 0.5));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 1.5, 0.0));
+        nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(6, true, 1.5, 0.5));
         nodes.push_back(new Node<2>(7, true, -1.0, 0.0));
         nodes.push_back(new Node<2>(8, true, -0.5, 0.5));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
-        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
-        unsigned node_indices_element_1[3] = {1, 4, 6};
-        unsigned node_indices_element_2[3] = {4, 5, 6};
-        unsigned node_indices_element_3[3] = {7, 0, 8};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
+        unsigned node_indices_element_1[3] = { 1, 4, 6 };
+        unsigned node_indices_element_2[3] = { 4, 5, 6 };
+        unsigned node_indices_element_3[3] = { 7, 0, 8 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             if (i < 3)
@@ -1890,16 +2008,16 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
 
         // Node 6 and 8 are close to, but not overlapping, an edge of element 0
         TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(6)->rGetLocation(), 0), false);
@@ -1927,7 +2045,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(8)->rGetLocation(), 0), 3u);
 
         // Call method to update vertex_mesh in this situation
-        vertex_mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(vertex_mesh.GetNode(6), 0);
+        vertex_mesh.ReMesh(); //MoveOverlappingNodeOntoEdgeOfElement(vertex_mesh.GetNode(6), 0);
 
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 amd 1
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
@@ -1948,11 +2066,11 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned new_node_indices_element_0[7] = {0, 1, 6, 9, 2, 3, 8};
-        unsigned new_node_indices_element_1[3] = {1, 4, 6};
-        unsigned new_node_indices_element_2[4] = {4, 5, 9, 6};
-        unsigned new_node_indices_element_3[3] = {7, 0, 8};
-        for (unsigned i=0; i<7; i++)
+        unsigned new_node_indices_element_0[7] = { 0, 1, 6, 9, 2, 3, 8 };
+        unsigned new_node_indices_element_1[3] = { 1, 4, 6 };
+        unsigned new_node_indices_element_2[4] = { 4, 5, 9, 6 };
+        unsigned new_node_indices_element_3[3] = { 7, 0, 8 };
+        for (unsigned i = 0; i < 7; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 3)
@@ -1967,9 +2085,9 @@ public:
         }
 
         // Test boundary property of nodes. All are boundary nodes except node 6.
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=6);
+            bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
@@ -2008,19 +2126,19 @@ public:
         nodes.push_back(new Node<2>(7, true, 0.0, 0.0));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1;
-        unsigned node_indices_element_0[4] = {0, 3, 2, 1};
-        unsigned node_indices_element_1[4] = {7, 6, 5, 4};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 3, 2, 1 };
+        unsigned node_indices_element_1[4] = { 7, 6, 5, 4 };
+        for (unsigned i = 0; i < 4; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.15);
@@ -2055,9 +2173,9 @@ public:
 
         // The two elements should have 4 nodes in common and all the common nodes are boundary nodes
         unsigned num_common_vertices = 0;
-        for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); i++)
         {
-            for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); j++)
             {
                 if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
@@ -2077,9 +2195,9 @@ public:
 
         // The two elements should now only have 2 nodes in common and all the common nodes are boundary nodes
         num_common_vertices = 0;
-        for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); i++)
         {
-            for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); j++)
             {
                 if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
@@ -2101,24 +2219,24 @@ public:
          *    /__|_____|_|_\
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.00));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.00));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.00));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.00));
-        nodes.push_back(new Node<2>(4, true,  1.5, 0.00));
-        nodes.push_back(new Node<2>(5, true,  2.0, 0.00));
-        nodes.push_back(new Node<2>(6, true,  1.5, 0.50));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.00));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.00));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.00));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.00));
+        nodes.push_back(new Node<2>(4, true, 1.5, 0.00));
+        nodes.push_back(new Node<2>(5, true, 2.0, 0.00));
+        nodes.push_back(new Node<2>(6, true, 1.5, 0.50));
         nodes.push_back(new Node<2>(7, true, -1.0, 0.00));
         nodes.push_back(new Node<2>(8, true, -0.5, 0.50));
-        nodes.push_back(new Node<2>(9, true,  1.0, 0.25));
+        nodes.push_back(new Node<2>(9, true, 1.0, 0.25));
         nodes.push_back(new Node<2>(10, true, 0.0, 0.25));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
-        unsigned node_indices_element_0[6] = {0, 1, 9, 2, 3, 10};
-        unsigned node_indices_element_1[4] = {1, 4, 6, 9};
-        unsigned node_indices_element_2[3] = {4, 5, 6};
-        unsigned node_indices_element_3[4] = {7, 0, 10, 8};
-        for (unsigned i=0; i<6; i++)
+        unsigned node_indices_element_0[6] = { 0, 1, 9, 2, 3, 10 };
+        unsigned node_indices_element_1[4] = { 1, 4, 6, 9 };
+        unsigned node_indices_element_2[3] = { 4, 5, 6 };
+        unsigned node_indices_element_3[4] = { 7, 0, 10, 8 };
+        for (unsigned i = 0; i < 6; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             if (i < 4)
@@ -2132,16 +2250,16 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
 
         // Node 6 and 8 are close to, but not overlapping, an edge of element 0
         TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(6)->rGetLocation(), 0), false);
@@ -2169,7 +2287,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(8)->rGetLocation(), 0), 4u);
 
         // Call method to update vertex_mesh in this situation
-        vertex_mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(vertex_mesh.GetNode(6), 0);
+        vertex_mesh.ReMesh(); //MoveOverlappingNodeOntoEdgeOfElement(vertex_mesh.GetNode(6), 0);
 
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 and 1
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
@@ -2190,11 +2308,11 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned new_node_indices_element_0[7] = {0, 1, 6, 9, 2, 3, 8};
-        unsigned new_node_indices_element_1[3] = {1, 4, 6};
-        unsigned new_node_indices_element_2[4] = {4, 5, 9, 6};
-        unsigned new_node_indices_element_3[3] = {7, 0, 8};
-        for (unsigned i=0; i<7; i++)
+        unsigned new_node_indices_element_0[7] = { 0, 1, 6, 9, 2, 3, 8 };
+        unsigned new_node_indices_element_1[3] = { 1, 4, 6 };
+        unsigned new_node_indices_element_2[4] = { 4, 5, 9, 6 };
+        unsigned new_node_indices_element_3[3] = { 7, 0, 8 };
+        for (unsigned i = 0; i < 7; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 3)
@@ -2209,9 +2327,9 @@ public:
         }
 
         // Test boundary property of nodes (all are boundary nodes except node 6)
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=6);
+            bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
@@ -2255,13 +2373,13 @@ public:
          *      | / ^         ^  \ |
          *      |/  |         |   \|
          */
-        VertexMeshReader<2,2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3");
-        MutableVertexMesh<2,2> vertex_mesh;
+        VertexMeshReader<2, 2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T3");
+        MutableVertexMesh<2, 2> vertex_mesh;
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
         vertex_mesh.SetDistanceForT3SwapChecking(100.0);
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 29u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 64u);
@@ -2275,7 +2393,7 @@ public:
         // Save the mesh data using mesh writers
         std::string dirname = "TestVertexMeshReMesh";
         std::string mesh_filename = "vertex_remesh_T3";
-        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
+        VertexMeshWriter<2, 2> mesh_writer(dirname, mesh_filename, false);
         mesh_writer.WriteFilesUsingMesh(vertex_mesh);
 
         // Check the positions are updated correctly
@@ -2311,10 +2429,10 @@ public:
         nodes.push_back(new Node<2>(7, true, 0.00, 0.5));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[5] = {0, 1, 5, 4, 7};
-        unsigned node_indices_elem_1[4] = {1, 2, 6, 5};
-        unsigned node_indices_elem_2[5] = {7, 4, 6 ,2, 3};
-        for (unsigned i=0; i<5; i++)
+        unsigned node_indices_elem_0[5] = { 0, 1, 5, 4, 7 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 6, 5 };
+        unsigned node_indices_elem_2[5] = { 7, 4, 6, 2, 3 };
+        for (unsigned i = 0; i < 5; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 4)
@@ -2324,12 +2442,12 @@ public:
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
@@ -2369,10 +2487,10 @@ public:
 
         // Test that each element contains the correct nodes following the rearrangement
         // (note that the node indices were reset since the void was removed)
-        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
-        unsigned node_indices_element_1[3] = {1, 2, 4};
-        unsigned node_indices_element_2[4] = {5, 4, 2, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 4, 5 };
+        unsigned node_indices_element_1[3] = { 1, 2, 4 };
+        unsigned node_indices_element_2[4] = { 5, 4, 2, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -2396,26 +2514,26 @@ public:
          *   |________\|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.00, 0.00));
-        nodes.push_back(new Node<2>(1, true,  1.00, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.00, 1.00));
-        nodes.push_back(new Node<2>(3, true,  0.00, 1.00));
-        nodes.push_back(new Node<2>(4, true,  0.45, 0.49));
-        nodes.push_back(new Node<2>(5, true,  0.60, 0.50));
-        nodes.push_back(new Node<2>(6, true,  0.45, 0.51));
-        nodes.push_back(new Node<2>(7, true,  0.80, 0.50));
-        nodes.push_back(new Node<2>(8, true,  0.90, 0.51));
-        nodes.push_back(new Node<2>(9, true,  0.90, 0.49));
+        nodes.push_back(new Node<2>(0, true, 0.00, 0.00));
+        nodes.push_back(new Node<2>(1, true, 1.00, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.00, 1.00));
+        nodes.push_back(new Node<2>(3, true, 0.00, 1.00));
+        nodes.push_back(new Node<2>(4, true, 0.45, 0.49));
+        nodes.push_back(new Node<2>(5, true, 0.60, 0.50));
+        nodes.push_back(new Node<2>(6, true, 0.45, 0.51));
+        nodes.push_back(new Node<2>(7, true, 0.80, 0.50));
+        nodes.push_back(new Node<2>(8, true, 0.90, 0.51));
+        nodes.push_back(new Node<2>(9, true, 0.90, 0.49));
         nodes.push_back(new Node<2>(10, true, 1.00, 0.50));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
 
-        unsigned node_indices_elem_0[7] = {0, 1, 10, 9, 7, 5, 4};
-        unsigned node_indices_elem_1[4] = {0, 4, 6, 3};
-        unsigned node_indices_elem_2[7] = {7, 8, 10, 2, 3, 6, 5};
-        unsigned node_indices_elem_3[3] = {10, 8, 9};
+        unsigned node_indices_elem_0[7] = { 0, 1, 10, 9, 7, 5, 4 };
+        unsigned node_indices_elem_1[4] = { 0, 4, 6, 3 };
+        unsigned node_indices_elem_2[7] = { 7, 8, 10, 2, 3, 6, 5 };
+        unsigned node_indices_elem_3[3] = { 10, 8, 9 };
 
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i < 7; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -2429,18 +2547,18 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         // Call IdentifySwapType on nodes 6 and 4 (ordering for coverage)
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6),vertex_mesh.GetNode(4));
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(4));
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
@@ -2485,10 +2603,10 @@ public:
         nodes.push_back(new Node<2>(7, true, 0.0, 0.5));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
-        unsigned node_indices_elem_0[5] = {0, 1, 5, 4, 7};
-        unsigned node_indices_elem_1[4] = {1, 2, 6, 5};
-        unsigned node_indices_elem_2[5] = {7, 4, 6 ,2, 3};
-        for (unsigned i=0; i<5; i++)
+        unsigned node_indices_elem_0[5] = { 0, 1, 5, 4, 7 };
+        unsigned node_indices_elem_1[4] = { 1, 2, 6, 5 };
+        unsigned node_indices_elem_2[5] = { 7, 4, 6, 2, 3 };
+        for (unsigned i = 0; i < 5; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 4)
@@ -2498,12 +2616,12 @@ public:
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.ReMesh(); // Edges too long so nothing happens
 
@@ -2542,10 +2660,10 @@ public:
 
         // Test that each element contains the correct nodes following the rearrangement
         // (note that the node indices have been reset since the void was removed)
-        unsigned node_indices_element_0[4] = {0, 1, 4, 5};
-        unsigned node_indices_element_1[3] = {1, 2, 4};
-        unsigned node_indices_element_2[4] = {5, 4, 2, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 0, 1, 4, 5 };
+        unsigned node_indices_element_1[3] = { 1, 2, 4 };
+        unsigned node_indices_element_2[4] = { 5, 4, 2, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -2580,10 +2698,10 @@ public:
         nodes.push_back(new Node<2>(9, true, 3.0, 3.0));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2;
-        unsigned node_indices_in_element0[6] = {0, 1, 2, 3, 4, 5};
-        unsigned node_indices_in_element1[5] = {5, 4, 6, 7, 8};
-        unsigned node_indices_in_element2[3] = {7, 6 ,9};
-        for (unsigned i=0; i<6; i++)
+        unsigned node_indices_in_element0[6] = { 0, 1, 2, 3, 4, 5 };
+        unsigned node_indices_in_element1[5] = { 5, 4, 6, 7, 8 };
+        unsigned node_indices_in_element2[3] = { 7, 6, 9 };
+        for (unsigned i = 0; i < 6; i++)
         {
             nodes_in_element0.push_back(nodes[node_indices_in_element0[i]]);
             if (i < 5)
@@ -2596,15 +2714,15 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
+        mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
 
         // Move node 6  so that it overlaps element 0
         ChastePoint<2> point = mesh.GetNode(6)->GetPoint();
@@ -2619,15 +2737,15 @@ public:
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(mesh.GetNode(6)->rGetLocation(), 0), 2u);
 
         // Call method to update mesh in this situation
-        mesh.ReMesh();//MoveOverlappingNodeOntoEdgeOfElement(mesh.GetNode(6), 0);
+        mesh.ReMesh(); //MoveOverlappingNodeOntoEdgeOfElement(mesh.GetNode(6), 0);
 
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 and 1
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 12u);
 
         // Test locations of moved and new nodes (10 and 11 are the next free node when 6 is merged)
-        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0],  1.5, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1],  1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 1.5, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 1.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[0], 1.6, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[1], 1.0, 1e-4);
         TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 1.4, 1e-4);
@@ -2639,10 +2757,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNumNodes(), 4u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[9] = {0, 1, 2, 10, 6, 11, 3, 4, 5};
-        unsigned node_indices_element_1[6] = {5, 4, 11, 6, 7, 8};
-        unsigned node_indices_element_2[4] = {7, 6, 10, 9};
-        for (unsigned i=0; i<9; i++)
+        unsigned node_indices_element_0[9] = { 0, 1, 2, 10, 6, 11, 3, 4, 5 };
+        unsigned node_indices_element_1[6] = { 5, 4, 11, 6, 7, 8 };
+        unsigned node_indices_element_2[4] = { 7, 6, 10, 9 };
+        for (unsigned i = 0; i < 9; i++)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 6)
@@ -2656,9 +2774,9 @@ public:
         }
 
         // Test that the correct nodes are boundary nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i!=6);
+            bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
@@ -2666,24 +2784,37 @@ public:
     void TestPerformIntersectionSwap()
     {
         /*
-         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements.
+         * Create a mesh comprising six nodes contained in two triangle and two
+         * rhomboid elements, as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  |  \    0   / |
+         *  |    \     /  |
+         *  |      \  /   |
+         *  | 3   ---   1 |
+         *  |   /  \      |
+         *  |  /     \    |
+         *  | /   2    \  |
+         *  |/___________\|
+         *
          * We will test that when a node is moved to overlap with an element, it is correctly
          * found and dealt with by the CheckForIntersections() method.
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.4, 0.5));
         nodes.push_back(new Node<2>(5, false, 0.6, 0.5));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {2, 3, 5};
-        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
-        unsigned node_indices_elem_2[3] = {1, 4, 0};
-        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
-        for (unsigned i=0; i<3; i++)
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 3; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -2693,13 +2824,13 @@ public:
         nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
         nodes_elem_3.push_back(nodes[node_indices_elem_3[3]]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Move node 4 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
@@ -2718,11 +2849,11 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned node_indices_element_0[4] = {2, 3, 4, 5};
-        unsigned node_indices_element_1[3] = {2, 5, 1};
-        unsigned node_indices_element_2[4] = {1, 5, 4, 0};
-        unsigned node_indices_element_3[3] = {0, 4, 3};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 2, 5, 1 };
+        unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
+        unsigned node_indices_element_3[3] = { 0, 4, 3 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -2749,21 +2880,34 @@ public:
         /*
          * This test is very similar to TestPerformIntersectionSwap() but with a different ordering
          * of nodes and elements, to ensure full coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  | \    0   /  |
+         *  |  \     /    |
+         *  |   \  /      |
+         *  | 1   ---   3 |
+         *  |      /  \   |
+         *  |    /     \  |
+         *  |  /   2    \ |
+         *  |/___________\|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes.push_back(new Node<2>(4, false, 0.4, 0.5));
         nodes.push_back(new Node<2>(5, false, 0.6, 0.5));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = {2, 3, 4};
-        unsigned node_indices_elem_1[4] = {0, 5, 4, 3};
-        unsigned node_indices_elem_2[3] = {1, 5, 0};
-        unsigned node_indices_elem_3[4] = {2, 4, 5, 1};
-        for (unsigned i=0; i<3; i++)
+        unsigned node_indices_elem_0[3] = { 2, 3, 4 };
+        unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
+        unsigned node_indices_elem_2[3] = { 1, 5, 0 };
+        unsigned node_indices_elem_3[4] = { 2, 4, 5, 1 };
+        for (unsigned i = 0; i < 3; i++)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -2773,13 +2917,13 @@ public:
         nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
         nodes_elem_3.push_back(nodes[node_indices_elem_3[3]]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Move node 5 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
@@ -2796,11 +2940,11 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
         TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.7, 1e-3);
 
-        unsigned node_indices_element_0[4] = {2, 3, 4, 5};
-        unsigned node_indices_element_1[3] = {0, 4, 3};
-        unsigned node_indices_element_2[4] = {1, 5, 4, 0};
-        unsigned node_indices_element_3[3] = {2, 5, 1};
-        for (unsigned i=0; i<4; i++)
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 0, 4, 3 };
+        unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
+        unsigned node_indices_element_3[3] = { 2, 5, 1 };
+        for (unsigned i = 0; i < 4; i++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -2819,6 +2963,1174 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.7294, 1e-4);
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 2.3062, 1e-4);
+    }
+
+    void TestPerformIntersectionSwapOtherIndexing()
+    {
+        /*
+         * This test is very similar to TestPerformIntersectionSwap() but with a different indexing
+         * of nodes, to ensure that any problems with local indexing are caught.
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, false, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = { 5, 2, 3 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 4, 0, 1 };
+        unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+        nodes_elem_3.push_back(nodes[node_indices_elem_3[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(4, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.7, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 5, 2, 3, 4 };
+        unsigned node_indices_element_1[3] = { 2, 5, 1 };
+        unsigned node_indices_element_2[4] = { 4, 0, 1, 5 };
+        unsigned node_indices_element_3[3] = { 0, 4, 3 };
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.36, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(3), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.7294, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 2.3062, 1e-4);
+    }
+
+    void TestPerformIntersectionSwapTriangle()
+    {
+        /*
+         * This test is very similar to TestPerformIntersectionSwap() but the intersected
+         * element is a triangle element, to ensure that this exception is caught.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *    \\    0   / |
+         *     \3\     /  |
+         *      \  \  /   |
+         *        ---   1 |
+         *      /  \      |
+         *     /     \    |
+         *    /   2    \  |
+         *   /___________\|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, false, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        unsigned node_indices_elem_3[4] = { 4, 5, 3 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(4, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForIntersections(), "A triangular element has become concave. "
+                                                                   "You need to rerun the simulation with a smaller time step to prevent this.");
+    }
+
+    void TestPerformIntersectionSwapTriangleOtherWayRound()
+    {
+        /*
+         * This test is very similar to TestPerformIntersectionSwapTriangle() but the intersected
+         * element is a triangle element, to ensure that this exception is caught.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  | \    0   //
+         *  |  \     /3/
+         *  |   \  /  /
+         *  | 1   ---
+         *  |      /  \
+         *  |    /     \
+         *  |  /   2    \
+         *  |/___________\
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = { 2, 3, 4 };
+        unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
+        unsigned node_indices_elem_2[3] = { 1, 5, 0 };
+        unsigned node_indices_elem_3[4] = { 2, 4, 5 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 5 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(5, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForIntersections(), "A triangular element has become concave. "
+                                                                   "You need to rerun the simulation with a smaller time step to prevent this.");
+    }
+
+    void TestPerformIntersectionSwapSplitting()
+    {
+        /*
+         * Create a mesh comprising eight nodes contained in two triangle, two rhomboid elements,
+         * and one pentagonal element.  We will test that an exception is raised when an intersection
+         * splits the element into two new elements.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\          //|
+         *  |   \   0 / / |
+         *  |      \/ 1/  |
+         *  |       | /   |
+         *  | 4   ---   2 |
+         *  |   /  \      |
+         *  |  /     \    |
+         *  | /   3    \  |
+         *  |/___________\|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.8, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(5, false, 0.4, 0.5));
+        nodes.push_back(new Node<2>(6, false, 0.6, 0.5));
+        nodes.push_back(new Node<2>(7, false, 0.6, 0.6));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3, nodes_elem_4;
+        unsigned node_indices_elem_0[3] = { 3, 4, 7 };
+        unsigned node_indices_elem_1[4] = { 2, 3, 7, 6 };
+        unsigned node_indices_elem_2[4] = { 1, 2, 6, 5 };
+        unsigned node_indices_elem_3[3] = { 0, 1, 5 };
+        unsigned node_indices_elem_4[5] = { 0, 5, 6, 7, 4 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
+        for (unsigned i = 0; i < 4; i++)
+        {
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
+        for (unsigned i = 0; i < 5; i++)
+        {
+            nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
+        }
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_4));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 5 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
+        point.SetCoordinate(1u, 0.8);
+        vertex_mesh.SetNode(5, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForIntersections(), "Intersection cannot be resolved "
+                                                                   "without splitting the element into two new elements.");
+    }
+
+    void TestPerformBoundaryIntersectionSwap1()
+    {
+        /*
+         * This test is similar to TestPerformIntersectionSwap, but with the
+         * bottom triangle element missing, such that the intersecting node is
+         * a boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  |  \    0   / |
+         *  |    \     /  |
+         *  |      \  /   |
+         *  | 2   ---   1 |
+         *  |   /  \      |
+         *  |  /     \    |
+         *  | /        \  |
+         *  |/           \|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, false, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[4] = { 0, 4, 5, 3 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+        nodes_elem_2.push_back(nodes[node_indices_elem_2[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(4, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.7, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 2, 5, 1 };
+        unsigned node_indices_element_2[3] = { 0, 4, 3 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.3062, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwapOtherWayRound1()
+    {
+        /*
+         * This test is similar to TestPerformBoundaryIntersectionSwap1, but
+         * with a different ordering of nodes and elements, to ensure full
+         * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /|
+         *  | \    0   /  |
+         *  |  \     /    |
+         *  |   \  /      |
+         *  | 1   ---   2 |
+         *  |      /  \   |
+         *  |    /     \  |
+         *  |  /        \ |
+         *  |/           \|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = { 2, 3, 4 };
+        unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
+        unsigned node_indices_elem_2[4] = { 2, 4, 5, 1 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+        nodes_elem_2.push_back(nodes[node_indices_elem_2[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(5, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.7, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT(vertex_mesh.GetNode(4)->IsBoundaryNode());
+        TS_ASSERT(vertex_mesh.GetNode(5)->IsBoundaryNode());
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 0, 4, 3 };
+        unsigned node_indices_element_2[3] = { 2, 5, 1 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.3062, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwap2()
+    {
+        /*
+         * This test is similar to TestPerformIntersectionSwap, but with the
+         * right rhomboid element missing, such that the intersecting node is a
+         * boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  |  \    0   /
+         *  |    \     /
+         *  |      \  /
+         *  | 1   ---
+         *  |   /  \
+         *  |  /     \
+         *  | /   2    \
+         *  |/___________\
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 0, 4, 5, 3 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(4, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.7, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 0, 4, 3 };
+        unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.36, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.3062, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.7294, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwapOtherWayRound2()
+    {
+        /*
+         * This test is similar to TestPerformBoundaryIntersectionSwap2, but
+         * with a different ordering of nodes and elements, to ensure full
+         * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  | \    0   /
+         *  |  \     /
+         *  |   \  /
+         *  | 1   ---
+         *  |      /  \
+         *  |    /     \
+         *  |  /   2    \
+         *  |/___________\
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = { 2, 3, 4 };
+        unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
+        unsigned node_indices_elem_2[3] = { 1, 5, 0 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(5, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.7, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), false);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 0, 4, 3 };
+        unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.36, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.7294, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwap3()
+    {
+        /*
+         * This test is similar to TestPerformIntersectionSwap, but with the
+         * left rhomboid element missing, such that the intersecting node is a
+         * boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *     \    0   / |
+         *       \     /  |
+         *         \  /   |
+         *        ---   1 |
+         *      /  \      |
+         *     /     \    |
+         *    /   2    \  |
+         *   /___________\|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = { 2, 3, 5 };
+        unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 4, 0 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(4, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.7, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), false);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 2, 5, 1 };
+        unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.36, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.7294, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwapOtherWayRound3()
+    {
+        /*
+         * This test is similar to TestPerformBoundaryIntersectionSwap3, but
+         * with a different ordering of nodes and elements, to ensure full
+         * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *    \    0   /  |
+         *     \     /    |
+         *      \  /      |
+         *        ---   1 |
+         *         /  \   |
+         *       /     \  |
+         *     /   2    \ |
+         *   /___________\|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(5, true, 0.6, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[3] = { 2, 3, 4 };
+        unsigned node_indices_elem_1[4] = { 2, 4, 5, 1 };
+        unsigned node_indices_elem_2[3] = { 1, 5, 0 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(5, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.7, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(5)->IsBoundaryNode(), false);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 2, 3, 4, 5 };
+        unsigned node_indices_element_1[3] = { 2, 5, 1 };
+        unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.36, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.3062, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.7294, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwap4()
+    {
+        /*
+         * This test is similar to TestPerformIntersectionSwap, but with the
+         * bottom triangle and right rhomboid element missing, such that the
+         * intersecting node is a boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  |  \    0   /
+         *  |    \     /
+         *  |      \  /
+         *  | 1   ---
+         *  |   /
+         *  |  /
+         *  | /
+         *  |/
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(2, true, 0.6, 0.5));
+        nodes.push_back(new Node<2>(3, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 1.0));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[3] = { 3, 4, 2 };
+        unsigned node_indices_elem_1[4] = { 0, 1, 2, 4 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 1 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(1)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(1, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[1], 0.7, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[1], 0.5, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 3, 4, 1, 2 };
+        unsigned node_indices_element_1[3] = { 0, 1, 4 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.3062, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwapOtherWayRound4()
+    {
+        /*
+         * This test is similar to TestPerformBoundaryIntersectionSwap4, but
+         * with a different ordering of nodes and elements, to ensure full
+         * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *  |\           /
+         *  | \    0   /
+         *  |  \     /
+         *  |   \  /
+         *  | 1   ---
+         *  |      /
+         *  |    /
+         *  |  /
+         *  |/
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.4, 0.5));
+        nodes.push_back(new Node<2>(2, true, 0.6, 0.5));
+        nodes.push_back(new Node<2>(3, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 1.0));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[3] = { 3, 4, 1 };
+        unsigned node_indices_elem_1[4] = { 0, 2, 1, 4 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 1 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(2)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(2, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(1)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(2)->rGetLocation()[1], 0.7, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(2)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 3, 4, 1, 2 };
+        unsigned node_indices_element_1[3] = { 0, 1, 4 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwap5()
+    {
+        /*
+         * This test is similar to TestPerformIntersectionSwap, but with the
+         * bottom triangle and left rhomboid element missing, such that the
+         * intersecting node is a boundary node.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *     \    0   / |
+         *       \     /  |
+         *         \  /   |
+         *        ---   1 |
+         *         \      |
+         *           \    |
+         *             \  |
+         *               \|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.6, 0.5));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[3] = { 1, 2, 3 };
+        unsigned node_indices_elem_1[4] = { 0, 1, 3, 4 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 4 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(4, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.7, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.5, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 1, 2, 4, 3 };
+        unsigned node_indices_element_1[3] = { 0, 1, 3 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.2806, 1e-4);
+    }
+
+    void TestPerformBoundaryIntersectionSwapOtherWayRound5()
+    {
+        /*
+         * This test is similar to TestPerformBoundaryIntersectionSwap5, but
+         * with a different ordering of nodes and elements, to ensure full
+         * coverage of the CheckForIntersections() method.
+         *
+         * The mesh is as follows:
+         *
+         *   _____________
+         *   \           /|
+         *    \    0   /  |
+         *     \     /    |
+         *      \  /      |
+         *        ---   1 |
+         *            \   |
+         *             \  |
+         *              \ |
+         *               \|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.6, 0.5));
+        nodes.push_back(new Node<2>(4, true, 0.4, 0.5));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
+        unsigned node_indices_elem_0[3] = { 1, 2, 4 };
+        unsigned node_indices_elem_1[4] = { 0, 1, 4, 3 };
+        for (unsigned i = 0; i < 3; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+        }
+        nodes_elem_1.push_back(nodes[node_indices_elem_1[3]]);
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Move node 3 so that it overlaps element 0
+        ChastePoint<2> point = vertex_mesh.GetNode(3)->GetPoint();
+        point.SetCoordinate(1u, 0.7);
+        vertex_mesh.SetNode(3, point);
+
+        // Merge intersection to maintain non-overlapping elements
+        vertex_mesh.SetCheckForInternalIntersections(true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetCheckForInternalIntersections(), true);
+        vertex_mesh.CheckForIntersections();
+
+        // Test that each moved node has the correct location following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-8);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[0], 0.6, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(3)->rGetLocation()[1], 0.7, 1e-3);
+
+        // Test that each moved node is boundary node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->IsBoundaryNode(), true);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(3)->IsBoundaryNode(), true);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = { 1, 2, 4, 3 };
+        unsigned node_indices_element_1[3] = { 0, 1, 3 };
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
+        for (unsigned i = 0; i < 4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            }
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 0.24, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 0.20, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 2.4232, 1e-4);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 2.3062, 1e-4);
     }
 };
 

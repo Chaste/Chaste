@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,8 +101,17 @@ private:
     /** The largest index of the boxes owned by this process. */
     unsigned mMaxBoxIndex;
 
-    /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
+    /** Whether the domain is periodic in the X dimension.*/
     bool mIsPeriodicInX;
+
+    /** Whether the domain is periodic in the Y dimension.*/
+    bool mIsPeriodicInY;
+
+    /** Whether the domain is periodic in the Z dimension.*/
+    bool mIsPeriodicInZ;
+
+    /** Whether the domain is periodic across different processors (i.e. in parallel if DIM==3 and periodic in z, or DIM==2 and periodic in Y)*/
+    bool mIsPeriodicAcrossProcs;
 
     /** Whether the local boxes have been setup or not. */
     bool mAreLocalBoxesSet;
@@ -144,7 +153,9 @@ public:
     /**
      * @param boxWidth the width of each box (cut-off length in NodeBasedCellPopulation simulations)
      * @param domainSize the size of the domain, in the form (xmin, xmax, ymin, ymax) (etc)
-     * @param isPeriodicInX whether the domain is periodic in the x direction
+     * @param isPeriodicInX whether the domain is periodic in the x direction (defaults to false)
+     * @param isPeriodicInY whether the domain is periodic in the y direction (defaults to true)
+     * @param isPeriodicInZ whether the domain is periodic in the z direction (defaults to true)
      * @param localRows the number of local rows in a parallel DistributedBoxCollection.
      *
      * Note that the domain size may be increased because each process should have at least one slice of boxes
@@ -152,8 +163,7 @@ public:
      * if there are more than 3 processes the domain will be swollen to [(0,0,0), (3,3,num_procs)].  The
      * user is warned when this happens.
      */
-    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, int localRows = PETSC_DECIDE);
-
+    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool mIsPeriodicInY=false, bool mIsPeriodicInZ=false, int localRows = PETSC_DECIDE);
 
     /**
      * Destructor - frees memory allocated to distributed vector.
@@ -269,6 +279,27 @@ public:
      * @return Whether the domain is periodic in x
      */
     bool GetIsPeriodicInX() const;
+
+        /**
+     * @return Whether the domain is periodic in y
+     */
+    bool GetIsPeriodicInY() const;
+
+        /**
+     * @return Whether the domain is periodic in z
+     */
+    bool GetIsPeriodicInZ() const;
+
+    /**
+    * @return Whether the domain is periodic across processors
+    */
+    bool GetIsPeriodicAcrossProcs() const;
+
+    /**
+     * A function to get whether each dimension is periodic
+     * @return A vector containing booleans of the periodicity
+     */
+    c_vector<bool,DIM> GetIsPeriodicAllDims() const;
 
     /**
      * @return the number of rows in the DIM-1th direction on this process.
@@ -467,7 +498,7 @@ inline void load_construct_data(
     }
 
     // Invoke inplace constructor to initialise instance. Assume non-periodic
-    ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, false, num_rows);
+    ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, false, false, false, num_rows);
 
     if (are_boxes_set)
     {

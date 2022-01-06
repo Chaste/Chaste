@@ -144,6 +144,21 @@ if(NOT DEFINED PETSC_DIR)
       set(PETSC_DIR "/usr/lib/petscdir/petsc3.10" CACHE FILEPATH "PETSc install directory")
       set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
       message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 19.10
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.11/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.11" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 20.04
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.12" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 20.10
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.13/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.13" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Anything else with dir /usr/lib/petscdir
     elseif(IS_DIRECTORY "/usr/lib/petscdir")
       # Find a petsc dir that ends in a.b.c

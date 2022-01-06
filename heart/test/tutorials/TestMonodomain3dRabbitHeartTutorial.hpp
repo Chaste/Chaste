@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2019, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
-#include "LuoRudy1991BackwardEuler.hpp"
+#include "LuoRudy1991BackwardEulerOpt.hpp"
 #include "GenericMeshReader.hpp"
 #include "SimpleStimulus.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -87,11 +87,11 @@ public:
 
         if (z <= 0.05)
         {
-            return new CellLuoRudy1991FromCellMLBackwardEuler(mpSolver, mpStimulus);
+            return new CellLuoRudy1991FromCellMLBackwardEulerOpt(mpSolver, mpStimulus);
         }
         else
         {
-            return new CellLuoRudy1991FromCellMLBackwardEuler(mpSolver, mpZeroStimulus);
+            return new CellLuoRudy1991FromCellMLBackwardEulerOpt(mpSolver, mpZeroStimulus);
         }
     }
 };
