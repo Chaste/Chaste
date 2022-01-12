@@ -63,6 +63,11 @@ void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBa
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }

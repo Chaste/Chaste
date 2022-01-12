@@ -533,6 +533,12 @@ void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_p
 }
 
 template <unsigned DIM>
+void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+{
+    //pPopulationWriter->Visit(this);
+}
+
+template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
 //    pPopulationCountWriter->Visit(this);

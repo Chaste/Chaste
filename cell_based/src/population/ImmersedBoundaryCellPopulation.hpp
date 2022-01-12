@@ -378,6 +378,13 @@ public:
     virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
+     * Overridden AcceptPopulationWriter() method.
+     *
+     * @param pPopulationWriter the population writer.
+     */
+
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    /**
      * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
