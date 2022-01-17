@@ -50,42 +50,8 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
       mpOutputArray(pOut)
 {
     /*
-     * Set up fftw routines
+     * Set up kissfft routines
      */
-
-    // Forget all wisdom; the correct wisdom will be loaded from file
-    void fftw_forget_wisdom();
-
-    // Load wisdom from file
-    std::string wisdom_filename = "fftw.wisdom";
-    FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
-
-    std::string wisdom_path = file_finder.GetAbsolutePath();
-    int wisdom_flag;
-
-    if (file_finder.IsFile())
-    {
-        wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
-
-        // 1 means success, 0 indicates a failure
-        if (wisdom_flag != 1)
-        {
-            WARNING("fftw wisdom not imported correctly from " + wisdom_path);
-        }
-    }
-    else // file in test output folder not found
-    {
-        WARNING("Cannot find fftw wisdom file at " + wisdom_path +
-                ". It is strongly recommended to run TestGenerateFftwWisdom.hpp.");
-
-        wisdom_flag = fftw_import_system_wisdom();
-
-        // 1 means success, 0 indicates a failure
-        if (wisdom_flag != 1)
-        {
-            WARNING("fftw system wisdom not imported correctly");
-        }
-    }
 
     int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();
     int num_gridpts_y = (int)mpMesh->GetNumGridPtsY();
@@ -132,6 +98,15 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               mpOutputArray,  real_nembed, real_stride, real_sep,
                                               FFTW_PATIENT);
+
+    mKissfftForwardState = kiss_fftndr_alloc(real_dims, rank, false, 0, 0);
+    mKissfftInverseState = kiss_fftndr_alloc(real_dims, rank, true, 0, 0);
+
+    // Additional member variables required for kiss_fft implementation TODO: Refactor old ones out
+    mHowManyForward = how_many_forward;
+    mHowManyInverse = how_many_inverse;
+    mRealSep = real_sep;
+    mComplexSep = comp_sep;
 }
 
 template<unsigned DIM>
@@ -144,13 +119,26 @@ ImmersedBoundaryFftInterface<DIM>::~ImmersedBoundaryFftInterface()
 template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
 {
+#ifdef USE_FFTW
     fftw_execute(mFftwForwardPlan);
+#else
+    // Compute the forward transform for each array
+    for (int i = 0; i < mHowManyForward; i++) {
+      kiss_fftndr(mKissfftForwardState, (kiss_fft_scalar*)mpInputArray + (mRealSep * i), (kiss_fft_cpx*)mpComplexArray + (mComplexSep * i));
+    }
+#endif
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteInverse()
 {
+#ifdef USE_FFTW
     fftw_execute(mFftwInversePlan);
+#else
+    for (int i = 0; i < mHowManyInverse; i++) {
+      kiss_fftndri(mKissfftInverseState, (kiss_fft_cpx*)mpComplexArray + (mComplexSep * i), (kiss_fft_scalar*)mpOutputArray + (mRealSep * i));
+    }
+#endif
 }
 
 // Explicit instantiation

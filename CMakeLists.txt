@@ -519,12 +519,23 @@ list(APPEND Chaste_INCLUDES "${FFTW_INCLUDES}")
 list(APPEND Chaste_LINK_LIBRARIES "${FFTW_LIBRARIES}")
 
 ################################
+####  Find kissfft
+################################
+set (KISSFFT_DATATYPE double)
+add_subdirectory(kissfft)
+list(APPEND Chaste_LINK_LIBRARIES "kissfft::kissfft")
+
+################################
 ####  Find Eigen and Spectra
 ################################
 find_package(Eigen REQUIRED)
 list(APPEND Chaste_INCLUDES "${EIGEN_INCLUDES}")
 
-find_package(Spectra REQUIRED)
+if(${SPECTRA_INCLUDES})
+    message("Using preset spectra includes: ${SPECTRA_INCLUDES}")
+else()
+    find_package(Spectra REQUIRED)
+endif()
 list(APPEND Chaste_INCLUDES "${SPECTRA_INCLUDES}")
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)

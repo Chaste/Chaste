@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <complex>
 #include <fftw3.h>
+#include <kissfft/kiss_fft.h>
+#include <kissfft/kiss_fftndr.h>
 #include "ImmersedBoundaryMesh.hpp"
 
 /**
@@ -57,6 +59,24 @@ protected:
 
     /** The fftw plan for the forward transforms. */
     fftw_plan mFftwInversePlan;
+
+    /** The kiss_fft configuration for the forward transforms */
+    kiss_fftndr_cfg mKissfftForwardState;
+
+    /** The kiss_fft configuration for the inverse transforms */
+    kiss_fftndr_cfg mKissfftInverseState;
+
+    /** How many forward transforms to compute */
+    int mHowManyForward;
+
+    /** How many inverse transforms to compute */
+    int mHowManyInverse;
+
+    /** The number of doubles between each real array */
+    int mRealSep;
+
+    /** The number of doubles between each complex array */
+    int mComplexSep;
 
     /** Pointer to the start of the input arrays. */
     double* mpInputArray;

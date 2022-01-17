@@ -131,7 +131,7 @@ public:
         simulator.SetOutputDirectory("TestImmersedBoundaryDemoTutorial");
         simulator.SetDt(dt);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(100.0 * dt);
+        simulator.SetEndTime(1000.0 * dt);
 
         /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
          * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
