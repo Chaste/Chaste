@@ -113,7 +113,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
             nodes.push_back(new Node<2>(node_iter->GetIndex(), node_iter->rGetLocation(),node_iter->IsBoundaryNode()));
         }
 
-        // // Add new nodes
+        // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
@@ -179,7 +179,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                                 if (distance < node_clearance)
                                 {
                                     node_clear = false;
-                                    //break;
+                                    break;
                                 }
                             }
 

@@ -558,9 +558,8 @@ public:
     
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 82u);
-
-        // This doenst work before the Update as the cells arent updated yet
-        //TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
+        // Cant call cell_population.GetNumRealCells yet as doenst work before 
+        // the Update as the cells aren't updated yet
 
         cell_population.Update();
 

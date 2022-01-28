@@ -1277,6 +1277,29 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                 }// from [if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)]
                 else
                 {   
+                    /*
+                     * The node configuration eithr looks like that shown below. In this case, we merge the nodes
+                     * and tidy up node indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
+                     *
+                     * Outside
+                     *         /
+                     *   --o--o (2)
+                     *     (1) \
+                     *
+                     * Or its an interal triangular void near the bounadry. Like this 
+                     * 
+                     *     x
+                     *     |
+                     *     o-o
+                     *     |/    Where the area inside the triangle is a void and the horizontal edge
+                     *     o     is the short edge all the nodes are therefore boundary nodes. 
+                     *     |     Here we remove the void and merge all the nodes with one of the nodes at the ends 
+                     *     x
+                     * 
+                     *  Or its a more copmplicated situatio thats currently not identified.
+                     * 
+                     *  So we search to differentiate these cases
+                     */
                     assert( (nodeA_elem_indices.size()==1 && nodeB_elem_indices.size()==2)
                            || (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==1) );
 
@@ -1390,29 +1413,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                              * See #3080
                              */
                             NEVER_REACHED; 
-
-                            // shared_elements.clear();
-                            // // Try other neighbourng vertex
-                            // std::set<unsigned> next_next_elem_indices = this->mNodes[next_next_node_1]->rGetContainingElementIndices();
-    
-                            // std::set_intersection(all_indices.begin(),
-                            //   all_indices.end(),
-                            //   next_next_elem_indices.begin(),
-                            //   next_next_elem_indices.end(),
-                            //   std::inserter(shared_elements, shared_elements.begin()));
-
-                            // assert(shared_elements.size()<3);
-
-                            // if (shared_elements.size()==2)
-                            // {
-                            //     // This neighbouring node is in the same 2 elements so treat this as end node
-                            //     p_end_node = this->mNodes[next_next_node_1];
-                            // }
-                            // else 
-                            // {
-                            //     // Here there are no neighbouring nodes. This is covered in other t1 swaps. So shouldnt ever reach
-                            //     NEVER_REACHED;
-                            // }
                         }                  
                         
                         p_merged_node->rGetModifiableLocation() = p_end_node->rGetLocation();
@@ -1431,11 +1431,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         *         /
                         *   --o--o (2)
                         *     (1) \
-                        *
-                        * ///\todo this should be a T1 swap (see #1263 and #2401)
-                        * Referring to the todo: this should probably stay a node-merge. If this is a T1 swap then
-                        * the single boundary node will travel from element 1 to element 2, but still remain a single node.
-                        * I.e. we would not reduce the total number of nodes in this situation.
                         */
                         PerformNodeMerge(pNodeA, pNodeB);
                         RemoveDeletedNodes();
@@ -2250,29 +2245,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     // Get the local index of the node in the intersected element after which the new node is to be added
     unsigned node_A_local_index = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
-
-// // Check to see if the node is connected to the containg element.
-// if (pNode->GetNumContainingElements() == 1)
-// {
-//     unsigned intersecting_element_index = *elements_containing_intersecting_node.begin();
-
-//     // Get element
-//     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_intersecting_element = this->GetElement(intersecting_element_index);
-
-//     unsigned local_index = p_intersecting_element->GetNodeLocalIndex(pNode->GetIndex());
-//     unsigned next_node_index = p_intersecting_element->GetNodeGlobalIndex((local_index + 1)%(p_intersecting_element->GetNumNodes()));
-//     unsigned previous_node_index = p_intersecting_element->GetNodeGlobalIndex((local_index + p_intersecting_element->GetNumNodes() - 1)%(p_intersecting_element->GetNumNodes()));
-
-//     unsigned next_node_local_index = p_element->GetNodeLocalIndex(next_node_index);
-//     unsigned previous_node_local_index = p_element->GetNodeLocalIndex(previous_node_index);
-
-//     if (next_node_local_index!=UINT_MAX && next_node_local_index!=UINT_MAX)
-//     {
-//         assert(previous_node_local_index = (next_node_local_index+1)%p_element->GetNumNodes());
-//         node_A_local_index = next_node_local_index;
-//     }
-
-// }
 
     // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
     c_vector<double, SPACE_DIM> node_location;
