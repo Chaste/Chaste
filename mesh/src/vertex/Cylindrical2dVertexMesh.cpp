@@ -101,10 +101,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
     }
     else // Is Bounded 
     {
-
-// VtkMeshWriter<2, 2> mesh_writer1("TMP", "delaunay_mesh", false);
-// mesh_writer1.WriteFilesUsingMesh(*(mpDelaunayMesh));
-
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
         for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
@@ -200,9 +196,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         }
             
         Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
-
-// VtkMeshWriter<2, 2> mesh_writer2("TMP", "extended_delaunay_mesh", false);
-// mesh_writer2.WriteFilesUsingMesh(extended_mesh);
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
         unsigned num_nodes = extended_mesh.GetNumAllElements();

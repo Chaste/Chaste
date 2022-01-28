@@ -290,7 +290,7 @@ public:
     }
 
 
-  /**
+    /**
      * Test some cell-based simulation exceptions.
      *
      * In this test, we attempt to solve a cell-based simulation without ghost nodes and
