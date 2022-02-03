@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <complex>
 #include <fftw3.h>
 #include "ImmersedBoundaryMesh.hpp"
+#include <pocketfft_hdronly.h>
 
 /**
  * A class to interface with discrete Fourier transform libraries and perform

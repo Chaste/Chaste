@@ -44,6 +44,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 include (EnsureOutOfSourceBuild)
 ensure_out_of_source_build ()
 include (CheckIncludeFile)
+include (FetchContent)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 
@@ -517,6 +518,24 @@ endif ()
 find_package(FFTW REQUIRED)
 list(APPEND Chaste_INCLUDES "${FFTW_INCLUDES}")
 list(APPEND Chaste_LINK_LIBRARIES "${FFTW_LIBRARIES}")
+
+################################
+####  Find pocketfft
+################################
+FetchContent_Declare(
+    pocketfft
+    GIT_REPOSITORY https://gitlab.mpcdf.mpg.de/mtr/pocketfft.git
+    GIT_TAG cpp
+)
+
+FetchContent_GetProperties(pocketfft)
+if(NOT pocketfft_POPULATED)
+    FetchContent_Populate(pocketfft)
+    add_library(pocketfft INTERFACE)
+    target_include_directories(pocketfft INTERFACE ${pocketfft_SOURCE_DIR})
+    list (APPEND Chaste_INCLUDES "${pocketfft_SOURCE_DIR}")
+endif()
+
 
 ################################
 ####  Find Eigen and Spectra
