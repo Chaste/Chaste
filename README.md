@@ -42,4 +42,5 @@ For information on how to contribute to Chaste, and for support and bug reports,
 A number of external libraries have been created that build on the Chaste trunk code. These include the following:
  * Microvessel Chaste (https://jmsgrogan.github.io/MicrovesselChaste/)
  * ChemChaste (https://github.com/OSS-Lab/ChemChaste)
+
 Note that, while Chaste developers may have been contributed to the development of these external libraries, we are unable to offer any support in their maintenance, testing or usage. If you have any questions about one of these external libraries, please contact that library's lead developer directly.
