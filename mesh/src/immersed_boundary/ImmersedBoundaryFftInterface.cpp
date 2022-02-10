@@ -46,47 +46,9 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
                                                                 bool activeSources)
     : mpMesh(pMesh),
       mpInputArray(pIn),
-      mpComplexArray(reinterpret_cast<fftw_complex*>(pComplex)),
+      mpComplexArray(pComplex),
       mpOutputArray(pOut)
 {
-    /*
-     * Set up fftw routines
-     */
-
-    // Forget all wisdom; the correct wisdom will be loaded from file
-    void fftw_forget_wisdom();
-
-    // Load wisdom from file
-    std::string wisdom_filename = "fftw.wisdom";
-    FileFinder file_finder(wisdom_filename, RelativeTo::ChasteTestOutput);
-
-    std::string wisdom_path = file_finder.GetAbsolutePath();
-    int wisdom_flag;
-
-    if (file_finder.IsFile())
-    {
-        wisdom_flag = fftw_import_wisdom_from_filename(wisdom_path.c_str());
-
-        // 1 means success, 0 indicates a failure
-        if (wisdom_flag != 1)
-        {
-            WARNING("fftw wisdom not imported correctly from " + wisdom_path);
-        }
-    }
-    else // file in test output folder not found
-    {
-        WARNING("Cannot find fftw wisdom file at " + wisdom_path +
-                ". It is strongly recommended to run TestGenerateFftwWisdom.hpp.");
-
-        wisdom_flag = fftw_import_system_wisdom();
-
-        // 1 means success, 0 indicates a failure
-        if (wisdom_flag != 1)
-        {
-            WARNING("fftw system wisdom not imported correctly");
-        }
-    }
-
     int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();
     int num_gridpts_y = (int)mpMesh->GetNumGridPtsY();
 
@@ -111,46 +73,61 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
      */
 
     // Plan variables
-    int rank = 2;                                       // Number of dimensions for each array
-    int real_dims[] = {num_gridpts_x, num_gridpts_y};   // Dimensions of each real array
-    int comp_dims[] = {num_gridpts_x, reduced_y};       // Dimensions of each complex array
-    int how_many_forward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
-    int how_many_inverse = 2;                           // Number of inverse transforms (always 2)
-    int real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
-    int comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
-    int real_stride = 1;                                // Each real array is contiguous in memory
-    int comp_stride = 1;                                // Each complex array is contiguous in memory
-    int* real_nembed = real_dims;
-    int* comp_nembed = comp_dims;
+    rank = 2;                                       // Number of dimensions for each array
+    //int real_dims[] = {num_gridpts_x, num_gridpts_y};   // Dimensions of each real array
+    real_dims = {(long unsigned int)num_gridpts_x, (long unsigned int)num_gridpts_y};   // Dimensions of each real array
+    //int comp_dims[] = {num_gridpts_x, reduced_y};       // Dimensions of each complex array
+    comp_dims = {(long unsigned int)num_gridpts_x, (long unsigned int)reduced_y};       // Dimensions of each complex array
 
-    mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
+    how_many_forward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
+    how_many_inverse = 2;                           // Number of inverse transforms (always 2)
+    real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
+    comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
+    real_stride = 1;                                // Each real array is contiguous in memory
+    comp_stride = 1;                                // Each complex array is contiguous in memory
+
+/*
+   // mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
                                               mpInputArray,   real_nembed, real_stride, real_sep,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               FFTW_PATIENT);
 
-    mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many_inverse,
+    //mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many_inverse,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
                                               mpOutputArray,  real_nembed, real_stride, real_sep,
                                               FFTW_PATIENT);
+                                              */
 }
 
 template<unsigned DIM>
 ImmersedBoundaryFftInterface<DIM>::~ImmersedBoundaryFftInterface()
 {
-    fftw_destroy_plan(mFftwForwardPlan);
-    fftw_destroy_plan(mFftwInversePlan);
+    //fftw_destroy_plan(mFftwForwardPlan);
+    //fftw_destroy_plan(mFftwInversePlan);
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
 {
-    fftw_execute(mFftwForwardPlan);
+    //fftw_execute(mFftwForwardPlan);
+
+    // Real to complex
+    pocketfft::stride_t r_stride = {real_stride, real_stride};
+    pocketfft::stride_t c_stride = {comp_stride, comp_stride};
+    pocketfft::r2c<double>(real_dims, r_stride, c_stride, 0, true, mpInputArray, mpComplexArray, 1.0, 1);
+    pocketfft::r2c<double>(real_dims, r_stride, c_stride, 0, true, mpInputArray, mpComplexArray, 1.0, 1);
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteInverse()
 {
-    fftw_execute(mFftwInversePlan);
+    //fftw_execute(mFftwInversePlan);
+
+    // Complex to real
+    pocketfft::stride_t r_stride = {real_stride, real_stride};
+    pocketfft::stride_t c_stride = {comp_stride, comp_stride};
+    pocketfft::c2r(real_dims, r_stride, c_stride, 0, false, mpComplexArray, mpOutputArray, 1.0);
+    pocketfft::c2r(real_dims, r_stride, c_stride, 0, false, mpComplexArray, mpOutputArray, 1.0);
 }
 
 // Explicit instantiation

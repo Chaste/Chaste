@@ -63,10 +63,21 @@ protected:
     double* mpInputArray;
 
     /** Pointer to the start of Fourier domain. */
-    fftw_complex* mpComplexArray;
+    std::complex<double>* mpComplexArray;
 
     /** Pointer to the start output array. */
     double* mpOutputArray;
+
+    pocketfft::shape_t real_dims;
+    pocketfft::shape_t comp_dims;
+
+    int how_many_forward;
+    int how_many_inverse;
+    int real_sep;
+    int comp_sep;
+    int real_stride;
+    int comp_stride;
+    int rank;
 
 public:
 
