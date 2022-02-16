@@ -83,10 +83,18 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     how_many_inverse = 2;                           // Number of inverse transforms (always 2)
     real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
     comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
-    real_stride = 1;                                // Each real array is contiguous in memory
-    comp_stride = 1;                                // Each complex array is contiguous in memory
+    real_stride = sizeof(double);                                // Each real array is contiguous in memory
+    comp_stride = sizeof(std::complex<double>);                                // Each complex array is contiguous in memory
 
 /*
+
+ multi-dimensional arrays are stored row-major
+ Rank = rank of matrix
+ real_dims = dimensions of matrix
+ real_sep = pointer offset between matrices
+ how_many_forward = number of matrices to operate on
+ 
+ stride = 1 => matrices are continguously stored one after the other
    // mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
                                               mpInputArray,   real_nembed, real_stride, real_sep,
                                               mpComplexArray, comp_nembed, comp_stride, comp_sep,
@@ -111,11 +119,13 @@ void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
 {
     //fftw_execute(mFftwForwardPlan);
 
-    // Real to complex
-    pocketfft::stride_t r_stride = {real_stride, real_stride};
-    pocketfft::stride_t c_stride = {comp_stride, comp_stride};
-    pocketfft::r2c<double>(real_dims, r_stride, c_stride, 0, true, mpInputArray, mpComplexArray, 1.0, 1);
-    pocketfft::r2c<double>(real_dims, r_stride, c_stride, 0, true, mpInputArray, mpComplexArray, 1.0, 1);
+    // Real to complex - TODO: remove hardcoded values
+    pocketfft::stride_t r_stride = {real_stride*128, real_stride};
+    pocketfft::stride_t c_stride = {comp_stride*65, comp_stride};
+    pocketfft::shape_t axes = {0, 1};
+    for (int i = 0; i < how_many_forward; i++) {
+      pocketfft::r2c<double>(real_dims, r_stride, c_stride, axes, true, mpInputArray + i*real_sep, mpComplexArray + i*comp_sep, 1.0, 1);
+    }
 }
 
 template<unsigned DIM>
@@ -124,10 +134,13 @@ void ImmersedBoundaryFftInterface<DIM>::FftExecuteInverse()
     //fftw_execute(mFftwInversePlan);
 
     // Complex to real
-    pocketfft::stride_t r_stride = {real_stride, real_stride};
-    pocketfft::stride_t c_stride = {comp_stride, comp_stride};
-    pocketfft::c2r(real_dims, r_stride, c_stride, 0, false, mpComplexArray, mpOutputArray, 1.0);
-    pocketfft::c2r(real_dims, r_stride, c_stride, 0, false, mpComplexArray, mpOutputArray, 1.0);
+    pocketfft::stride_t r_stride = {real_stride*128, real_stride};
+    pocketfft::stride_t c_stride = {comp_stride*65, comp_stride};
+    pocketfft::shape_t axes = {0, 1};
+    for (int i = 0; i < how_many_inverse; i++) {
+      // For c2r, output array dims are supplied
+      pocketfft::c2r(real_dims, c_stride, r_stride, axes, false, mpComplexArray + i*comp_sep, mpOutputArray + i*real_sep, 1.0, 1);
+    }
 }
 
 // Explicit instantiation
