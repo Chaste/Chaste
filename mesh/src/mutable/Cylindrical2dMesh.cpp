@@ -43,10 +43,13 @@ mesh_writer.WriteFilesUsingMesh(*this);
 #include "Cylindrical2dMesh.hpp"
 #include "Exception.hpp"
 #include "VtkMeshWriter.hpp"
+#include "NodesOnlyMesh.hpp"
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width)
   : MutableMesh<2,2>(),
-    mWidth(width)
+    mWidth(width),
+    mHaloScalingFactor(2.0), // Default value
+    mHaloOffset(1.0) // Default value
 {
     assert(width > 0.0);
 }
@@ -57,7 +60,9 @@ Cylindrical2dMesh::~Cylindrical2dMesh()
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
   : MutableMesh<2,2>(),
-    mWidth(width)
+    mWidth(width),    
+    mHaloScalingFactor(2.0), // Default value
+    mHaloOffset(1.0) // Default value
 {
     assert(width > 0.0);
 //    mMismatchedBoundaryElements = false;
@@ -69,7 +74,6 @@ Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
         assert( 0 <= x && x < width);
         mNodes.push_back(p_temp_node);
     }
-
     NodeMap node_map(nodes.size());
     ReMesh(node_map);
 }
@@ -160,10 +164,10 @@ void Cylindrical2dMesh::CreateHaloNodes()
     mTopHaloNodes.clear();
     mBottomHaloNodes.clear();
 
-    unsigned num_halo_nodes = (unsigned)(floor(mWidth*2.0));
+    unsigned num_halo_nodes = (unsigned)(floor(mWidth*mHaloScalingFactor));
     double halo_node_separation = mWidth/((double)(num_halo_nodes));
-    double y_top_coordinate = mTop + halo_node_separation;
-    double y_bottom_coordinate = mBottom - halo_node_separation;
+    double y_top_coordinate = mTop + mHaloOffset*halo_node_separation;
+    double y_bottom_coordinate = mBottom - mHaloOffset*halo_node_separation;
 
     c_vector<double, 2> location;
     for (unsigned i=0; i<num_halo_nodes; i++)
@@ -198,10 +202,28 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
         }
     }
 
+// VtkMeshWriter<2,2> mesh_writer_1("Cylindrical2dMeshDebug", "mesh", false);
+// NodesOnlyMesh<2> mesh_1;
+// mesh_1.ConstructNodesWithoutMesh(*this, 20.0);
+// mesh_writer_1.WriteFilesUsingMesh(mesh_1);
+
     CreateHaloNodes();
+
+// VtkMeshWriter<2,2> mesh_writer_2("Cylindrical2dMeshDebug", "mesh_halo", false);
+// NodesOnlyMesh<2> mesh_2;
+// mesh_2.ConstructNodesWithoutMesh(*this, 20.0);
+// mesh_writer_2.WriteFilesUsingMesh(mesh_2);
 
     // Create mirrored nodes for the normal remesher to work with
     CreateMirrorNodes();
+
+// VtkMeshWriter<2,2> mesh_writer_3("Cylindrical2dMeshDebug", "mesh_mirror", false);
+// NodesOnlyMesh<2> mesh_3;
+// mesh_3.ConstructNodesWithoutMesh(*this, 20.0);
+// mesh_writer_3.WriteFilesUsingMesh(mesh_3);
+
+// TrianglesMeshWriter<2,2> mesh_writer_5("Cylindrical2dMeshDebug", "mesh_mirror", false);
+// mesh_writer_5.WriteFilesUsingMesh(mesh_3);
 
     /*
      * The mesh now has messed up boundary elements, but this
@@ -213,6 +235,10 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
      */
     NodeMap big_map(GetNumAllNodes());
     MutableMesh<2,2>::ReMesh(big_map);
+
+// VtkMeshWriter<2,2> mesh_writer_4("Cylindrical2dMeshDebug", "full_mesh", false);
+// mesh_writer_4.WriteFilesUsingMesh(*this);
+
 
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
@@ -842,6 +868,28 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
     // We must have found the corresponding node index
     assert(corresponding_node_index != UINT_MAX);
     return corresponding_node_index;
+}
+
+double Cylindrical2dMesh::GetHaloScalingFactor()
+{
+    return mHaloScalingFactor;
+}
+
+void Cylindrical2dMesh::SetHaloScalingFactor(double haloScalingFactor)
+{
+    assert(haloScalingFactor >= 0.0);
+    mHaloScalingFactor = haloScalingFactor;
+}
+
+double Cylindrical2dMesh::GetHaloOffset()
+{
+    return mHaloOffset;
+}
+
+void Cylindrical2dMesh::SetHaloOffset(double haloOffset)
+{
+    assert(haloOffset >= 0.0);
+    mHaloOffset = haloOffset;
 }
 
 // Serialization for Boost >= 1.36

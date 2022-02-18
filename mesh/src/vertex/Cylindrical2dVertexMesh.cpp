@@ -131,13 +131,12 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                                       node_b_element_indices.end(),
                                       std::inserter(shared_elements, shared_elements.begin()));
 
-
                 /* 
-                 * Note using boundary nodes to identify the boundary egdes wont work with 
-                 * triangles which have 3 boundary nodes
+                 * Note using boundary nodes to identify the boundary egdes like this 
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
+                 * wont work with triangles which have 3 boundary nodes so we use a more 
+                 * general method.
                  */
-             
                 if (shared_elements.size() == 1) // Its a boundary edge
                 {
                     c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
@@ -151,50 +150,46 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     normal_vector /= dij;
 
                     /*  
-                     * Here all extra edges are split in two so always have unique triangulation.
+                     * Here we only add one extra node.
                      *  
-                     *   ____  three nodes 
-                     *  | /\ | 
-                     *  |/__\|. edge of mesh 
+                     *  ____  one extra image node 
+                     *   /\  
+                     *  /__\ edge of mesh 
                      * 
-                     * Changing this causes issues with stitching the left and right back together.
+                     * Changing this can cause issues with stitching the left and right back together.
                      */
-                    unsigned num_sections = 2;
-                    for (unsigned section=0; section<=num_sections; section++)
-                    {
-                        double ratio = ((double)section)/(double)num_sections;
-                        c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio*edge;
+                    
+                    double ratio = 0.5;
+                    c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio*edge;
+                    
+                    // Check if near other nodes (TODO look at this as could be ineficient)
+                    bool node_clear = true;
+                    double node_clearance = 0.01; 
 
-                        //Check if near other nodes (could be ineficient)
-                        bool node_clear = true;
-                        double node_clearance = 0.05; 
-
-                        for (unsigned i=0; i<nodes.size(); i++)
-                        {   
-                            double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
-                            if (distance < node_clearance)
-                            {
-                                node_clear = false;
-                                //break;
-                            }
-                        }
-
-                        if (node_clear)
+                    for (unsigned i=0; i<nodes.size(); i++)
+                    {   
+                        double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
+                        if (distance < node_clearance)
                         {
-                            nodes.push_back(new Node<2>(new_node_index, new_node_location));
-                            new_node_index++;
+                            node_clear = false;
+                            //break;
                         }
+                    }
+                
+                    if (node_clear)
+                    {
+                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                        new_node_index++;
                     }
                 }
             }
         }
-        
+
         // Loop over all nodes and check they're not outside [0,mWidth]
         for (unsigned i=0; i<nodes.size(); i++)
         {
             CheckNodeLocation(nodes[i]);
         }
-            
         Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
@@ -219,7 +214,6 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         {
             CheckNodeLocation(mNodes[i]);
         }
-
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
         for (unsigned i = 0; i < num_nodes; i++)
         {
@@ -364,7 +358,7 @@ void Cylindrical2dVertexMesh::CheckNodeLocation(Node<2>* pNode)
     {
         pNode->rGetModifiableLocation()[0] = x_location + mWidth;
     }
-    else if (x_location > mWidth)
+    else if (x_location >= mWidth)
     {
         pNode->rGetModifiableLocation()[0] = x_location - mWidth;
     }
