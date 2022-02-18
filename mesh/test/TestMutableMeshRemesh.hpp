@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
-#include "Debug.hpp"
-#include "VtkMeshWriter.hpp"
 
 //Jonathan Shewchuk's triangle
 #define REAL double
@@ -374,63 +372,6 @@ public:
             // These have shuffled down
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i-1);
         }
-
-        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), mesh.GetNumElements());
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(),mesh.GetNumNodes());
-        TS_ASSERT_EQUALS(mesh.GetNumAllBoundaryElements(), mesh.GetNumBoundaryElements());
-
-        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), num_elements_before-2);
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_nodes_before-1);
-        TS_ASSERT_EQUALS(mesh.GetNumAllBoundaryElements(), num_boundary_elements_before);
-        TS_ASSERT_DELTA(mesh.GetVolume(), area, 1e-6);
-    }
-
-    void TestRemeshWithBadCylindricalMesh()
-    {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/BadCylindricalMesh/mesh_mirror");
-        MutableMesh<2,2> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        double area = mesh.GetVolume();
-        const int node_index = 432;
-        const int target_index = 206;
-
-        unsigned num_nodes_before = mesh.GetNumNodes();
-        unsigned num_elements_before = mesh.GetNumElements();
-        unsigned num_boundary_elements_before = mesh.GetNumBoundaryElements();
-
-        for (AbstractMesh<2,2>::NodeIterator node_iter_1 = mesh.GetNodeIteratorBegin();
-            node_iter_1 != mesh.GetNodeIteratorEnd();
-            ++node_iter_1)
-        {
-            c_vector<double, 2> location_1;
-            location_1 = node_iter_1->rGetLocation();
-            unsigned node_1_index = node_iter_1->GetIndex();
-
-            for (AbstractMesh<2,2>::NodeIterator node_iter_2 = mesh.GetNodeIteratorBegin();
-                node_iter_2 != mesh.GetNodeIteratorEnd();
-                ++node_iter_2)
-            {
-                c_vector<double, 2> location_2;
-                location_2 = node_iter_2->rGetLocation();
-                unsigned node_2_index = node_iter_2->GetIndex();
-
-                if (node_1_index != node_2_index)
-                {
-                    double node_clearance = 0.11;
-                    double distance = norm_2(mesh.GetVectorFromAtoB(location_1, location_2));
-                    if (distance < node_clearance)
-                    {
-                        PRINT_3_VARIABLES(node_1_index,node_2_index,distance); 
-                    }
-                }
-            }
-        }
-
-       // mesh.ReMesh();
-
-VtkMeshWriter<2,2> mesh_writer("Cylindrical2dMeshDebug", "final_mesh", false);
-mesh_writer.WriteFilesUsingMesh(mesh);
 
         TS_ASSERT_EQUALS(mesh.GetNumAllElements(), mesh.GetNumElements());
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(),mesh.GetNumNodes());

@@ -43,7 +43,6 @@ mesh_writer.WriteFilesUsingMesh(*this);
 #include "Cylindrical2dMesh.hpp"
 #include "Exception.hpp"
 #include "VtkMeshWriter.hpp"
-#include "NodesOnlyMesh.hpp"
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width)
   : MutableMesh<2,2>(),
@@ -202,28 +201,10 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
         }
     }
 
-// VtkMeshWriter<2,2> mesh_writer_1("Cylindrical2dMeshDebug", "mesh", false);
-// NodesOnlyMesh<2> mesh_1;
-// mesh_1.ConstructNodesWithoutMesh(*this, 20.0);
-// mesh_writer_1.WriteFilesUsingMesh(mesh_1);
-
     CreateHaloNodes();
-
-// VtkMeshWriter<2,2> mesh_writer_2("Cylindrical2dMeshDebug", "mesh_halo", false);
-// NodesOnlyMesh<2> mesh_2;
-// mesh_2.ConstructNodesWithoutMesh(*this, 20.0);
-// mesh_writer_2.WriteFilesUsingMesh(mesh_2);
 
     // Create mirrored nodes for the normal remesher to work with
     CreateMirrorNodes();
-
-// VtkMeshWriter<2,2> mesh_writer_3("Cylindrical2dMeshDebug", "mesh_mirror", false);
-// NodesOnlyMesh<2> mesh_3;
-// mesh_3.ConstructNodesWithoutMesh(*this, 20.0);
-// mesh_writer_3.WriteFilesUsingMesh(mesh_3);
-
-// TrianglesMeshWriter<2,2> mesh_writer_5("Cylindrical2dMeshDebug", "mesh_mirror", false);
-// mesh_writer_5.WriteFilesUsingMesh(mesh_3);
 
     /*
      * The mesh now has messed up boundary elements, but this
@@ -235,10 +216,6 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
      */
     NodeMap big_map(GetNumAllNodes());
     MutableMesh<2,2>::ReMesh(big_map);
-
-// VtkMeshWriter<2,2> mesh_writer_4("Cylindrical2dMeshDebug", "full_mesh", false);
-// mesh_writer_4.WriteFilesUsingMesh(*this);
-
 
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
