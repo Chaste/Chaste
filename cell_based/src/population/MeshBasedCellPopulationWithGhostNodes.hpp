@@ -182,6 +182,13 @@ public:
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
+     * Set the ghost nodes by taking in a set of which nodes indices are ghost nodes.
+     *
+     * @param rGhostNodeIndices set of node indices corresponding to ghost nodes
+     */
+    void SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices);
+
+    /**
      * Applies the appropriate force to each ghost node in the population.
      * Called by AbstractNumericalMethod.
      */
