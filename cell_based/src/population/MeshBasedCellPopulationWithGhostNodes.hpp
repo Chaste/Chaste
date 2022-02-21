@@ -102,6 +102,7 @@ private:
         archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM, DIM> >(*this);
     }
 
+private:
     /**
      * This is called after a cell population has been constructed to check the
      * user gave consistent instructions. Check consistency of our
@@ -179,13 +180,6 @@ public:
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
-
-    /**
-     * Set the ghost nodes by taking in a set of which nodes indices are ghost nodes.
-     *
-     * @param rGhostNodeIndices set of node indices corresponding to ghost nodes
-     */
-    void SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices);
 
     /**
      * Applies the appropriate force to each ghost node in the population.
