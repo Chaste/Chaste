@@ -1276,7 +1276,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     }
                 }// from [if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)]
                 else
-                {   
+                {
                     /*
                      * The node configuration eithr looks like that shown below. In this case, we merge the nodes
                      * and tidy up node indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
@@ -1286,18 +1286,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *   --o--o (2)
                      *     (1) \
                      *
-                     * Or its an interal triangular void near the bounadry. Like this 
-                     * 
+                     * Or its an interal triangular void near the bounadry. Like this
+                     *
                      *     x
                      *     |
                      *     o-o
                      *     |/    Where the area inside the triangle is a void and the horizontal edge
-                     *     o     is the short edge all the nodes are therefore boundary nodes. 
-                     *     |     Here we remove the void and merge all the nodes with one of the nodes at the ends 
+                     *     o     is the short edge all the nodes are therefore boundary nodes.
+                     *     |     Here we remove the void and merge all the nodes with one of the nodes at the ends
                      *     x
-                     * 
+                     *
                      *  Or its a more copmplicated situatio thats currently not identified.
-                     * 
+                     *
                      *  So we search to differentiate these cases
                      */
                     assert( (nodeA_elem_indices.size()==1 && nodeB_elem_indices.size()==2)
@@ -1310,7 +1310,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     std::set<unsigned> node2_elem_indices = nodeB_elem_indices;
 
                     if (nodeB_elem_indices.size()==1)
-                    {  
+                    {
                         p_node_1 = pNodeB;
                         node1_elem_indices = nodeB_elem_indices;
                         p_node_2 = pNodeA;
@@ -1318,11 +1318,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     }
                     assert(node1_elem_indices.size()==1);
                     unsigned unique_element_index = *node1_elem_indices.begin();
-                    
+
                     node2_elem_indices.erase(unique_element_index);
                     assert(node2_elem_indices.size()==1);
                     unsigned common_element_index = *node2_elem_indices.begin();
-                    
+
                     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_uniqiue_element = this->mElements[unique_element_index];
                     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_common_element = this->mElements[common_element_index];
 
@@ -1341,32 +1341,32 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
                     {
                         /*
-                        * Here we have an internal triangular void on an internal edge. Can happen when a void is shrinking. 
-                        *     
+                        * Here we have an internal triangular void on an internal edge. Can happen when a void is shrinking.
+                        *
                         *     x
                         *     |
                         *     o-o
                         *     |/    Where the area inside the triangle is a void and the horizontal edge
-                        *     o     is the short edge all the nodes are therefore boundary nodes. 
-                        *     |     Here we remove the void and merge all the nodes with one of the nodes at 
-                        *     x     the adjoining edges (x's)  
-                        *     
-                        * 
-                        */ 
-                        
-                        // First remove void                        
-                        // Find all three nodes in void     
+                        *     o     is the short edge all the nodes are therefore boundary nodes.
+                        *     |     Here we remove the void and merge all the nodes with one of the nodes at
+                        *     x     the adjoining edges (x's)
+                        *
+                        *
+                        */
+
+                        // First remove void
+                        // Find all three nodes in void
                         Node<SPACE_DIM>* p_node_C = this->mNodes[next_node_2]; // The other node in the triangular void
                         if (next_node_1 == previous_node_2)
                         {
                             p_node_C = this->mNodes[next_node_1];
                         }
-                    
+
                        /*
                         * In two steps, merge nodes A, B and C into a single node.  This is implemented in such a way that
                         * the ordering of their indices does not matter.
                         */
-                       
+
                         PerformNodeMerge(pNodeA, pNodeB);
 
                         Node<SPACE_DIM>* p_merged_node = pNodeB;
@@ -1385,12 +1385,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                         // Tag remaining node as non-boundary
                         p_merged_node->SetAsBoundaryNode(false);
-                        
+
                         // Now merge this node with one of the nearest vertices keping that vertices location.
                         Node<SPACE_DIM>* p_end_node; // The neighbouring vertex to merge to
 
                         std::set<unsigned> previous_previous_elem_indices = this->mNodes[previous_previous_node_1]->rGetContainingElementIndices();
-    
+
                         std::set<unsigned> shared_elements;
                         std::set_intersection(all_indices.begin(),
                               all_indices.end(),
@@ -1399,7 +1399,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                               std::inserter(shared_elements, shared_elements.begin()));
 
                         assert(shared_elements.size()<3);
-                        
+
                         if (shared_elements.size()==2)
                         {
                             //This neighbouring node is in the same 2 elements so treat this as end node
@@ -1412,12 +1412,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                              * So check the other adjacent node by uncommenting the code blow and adding a new test
                              * See #3080
                              */
-                            NEVER_REACHED; 
-                        }                  
-                        
+                            NEVER_REACHED;
+                        }
+
                         p_merged_node->rGetModifiableLocation() = p_end_node->rGetLocation();
                         PerformNodeMerge(p_end_node,p_merged_node);  // This order as forst node is kept and this has correcrt boundary information.
-                        
+
                         // Remove the deleted nodes and re-index
                         RemoveDeletedNodes();
                     }

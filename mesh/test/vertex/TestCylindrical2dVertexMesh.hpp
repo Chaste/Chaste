@@ -468,10 +468,10 @@ public:
         // Test the location of some Voronoi nodes
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], -0.375, 1e-6);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[1], 0.2886, 1e-3);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 2.1070, 1e-4);
 
@@ -480,8 +480,8 @@ public:
 
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[0], 1.75, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], 2.232, 1e-4);
-        
-        // Test the number of nodes owned by each Voronoi element 
+
+        // Test the number of nodes owned by each Voronoi element
         TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 7u);

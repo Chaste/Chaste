@@ -217,7 +217,7 @@ public:
     std::set<unsigned> GetGhostNodeIndices();
 
     /**
-     * @param nodeIndex the index of the node to be removed. 
+     * @param nodeIndex the index of the node to be removed.
      */
     void RemoveGhostNode(unsigned nodeIndex);
 

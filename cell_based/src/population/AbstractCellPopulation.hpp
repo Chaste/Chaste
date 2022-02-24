@@ -683,8 +683,8 @@ public:
 
     /**
      * Add information for a division event.
-     * 
-     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.              
+     *
+     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
      *
      * @param divisionInformation  division information string
      */
@@ -716,7 +716,7 @@ public:
 
     /**
      * Helper method to store information about the removal in mRemovalInformation
-     * 
+     *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
@@ -724,7 +724,7 @@ public:
 
     /**
      * Helper method to mark a cell as killed and store information about the removal.
-     * 
+     *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
@@ -732,7 +732,7 @@ public:
 
     /**
      * Helper method to mark a cell as starting apoptosis and store information about the removal.
-     * 
+     *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */

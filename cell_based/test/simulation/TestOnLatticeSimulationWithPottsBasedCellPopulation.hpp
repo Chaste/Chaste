@@ -284,7 +284,7 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
         simulator.SetSamplingTimestepMultiple(20);
-        
+
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);

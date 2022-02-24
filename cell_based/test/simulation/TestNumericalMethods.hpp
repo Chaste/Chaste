@@ -192,7 +192,7 @@ public:
 
         numerical_method.ImposeBoundaryConditions(saved_locations);
 
-        std::map<Node<2>*, c_vector<double, 2> > new_locations;  
+        std::map<Node<2>*, c_vector<double, 2> > new_locations;
         new_locations = numerical_method.SaveCurrentNodeLocations();
         TS_ASSERT_EQUALS(new_locations.size(), saved_locations.size());
 
@@ -200,7 +200,7 @@ public:
         for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
         {
             TS_ASSERT_DELTA(new_locations[cell_population.GetNode(node_index)](0), saved_locations[cell_population.GetNode(node_index)](0), 1e-3);
-            
+
             if (node_index<7) // These nodes moved by BCS
             {
                 TS_ASSERT_DELTA(new_locations[cell_population.GetNode(node_index)](1), 0.5, 1e-3);

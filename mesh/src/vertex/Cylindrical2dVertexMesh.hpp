@@ -112,7 +112,7 @@ public:
      *
      * @param rMesh a Cylindrical2dMesh
      * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
-     */    
+     */
     Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool isBounded = false);
 
     /**
@@ -166,8 +166,8 @@ public:
     /**
      * Helper method to check if a node is within, x in [0,mWidth]
      * and move back into the domain if needed.
-     * 
-     * @param pNewNode the node to be checked 
+     *
+     * @param pNewNode the node to be checked
      */
     void CheckNodeLocation(Node<2>* pNode);
 

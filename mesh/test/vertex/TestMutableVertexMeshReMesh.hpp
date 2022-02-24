@@ -649,7 +649,7 @@ public:
          *
          *       ____________
          *      |            |\
-         *      |____________| \  Where the small triangles are voids so the bottom 
+         *      |____________| \  Where the small triangles are voids so the bottom
          *      |  |/   \|   | /  Element is (slightly) convex
          *      |____________|/
          */
@@ -672,7 +672,7 @@ public:
         unsigned node_indices_elem_0[10] = {0, 1, 9, 8, 12, 7, 6, 11, 5, 4};
         unsigned node_indices_elem_1[8] = {4, 5, 6, 7, 8, 9, 2, 3};
         unsigned node_indices_elem_2[4] = {1, 10, 2, 9};
-        
+
 
         for (unsigned i=0; i<10; i++)
         {
@@ -726,7 +726,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 6.0, 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.0+sqrt(5.0), 1e-6);
     }
-        
+
         void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement()
     {
         /**

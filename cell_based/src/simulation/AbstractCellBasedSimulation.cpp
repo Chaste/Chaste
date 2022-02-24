@@ -122,9 +122,9 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 
                     /**
                      * If required, output this location to file
-                     *  
+                     *
                      * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
-                     * 
+                     *
                      */
                     if (mrCellPopulation.template HasWriter<CellDivisionLocationsWriter>())
                     {
@@ -431,13 +431,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
 
-        
+
         if (p_simulation_time->GetTimeStepsElapsed()%mUpdatingTimestepMultiple == 0)
         {
             // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
             UpdateCellPopulation();
         }
-        
+
         // Store whether we are sampling results at the current timestep
         SimulationTime* p_time = SimulationTime::Instance();
         bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
@@ -609,7 +609,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
         {
             EXCEPTION("CellPopulation has had births or deaths but you were on a non update step, make sure your cell cylce model and killer only operate on update steps.");
         }
-        else 
+        else
         {
             NEVER_REACHED;
         }

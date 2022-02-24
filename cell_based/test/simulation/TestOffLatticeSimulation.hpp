@@ -335,7 +335,7 @@ public:
 
         simulator.SetUpdatingTimestepMultiple(60); // Son only look for births and deaths at start and end
         TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but you were on a non update step, make sure your cell cylce model and killer only operate on update steps.");
-        
+
         // Note that this test used to take an extra time step
         TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
     }
@@ -710,7 +710,7 @@ public:
 
         // Create a simple mesh
         int cells_up = 6;
-        int cells_across = 6; 
+        int cells_across = 6;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
@@ -731,7 +731,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithToroidalMesh");
         simulator.SetEndTime(0.5);
-        
+
         // Create some force laws and pass them to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);

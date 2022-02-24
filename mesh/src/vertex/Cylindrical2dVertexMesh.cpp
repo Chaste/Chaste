@@ -99,7 +99,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             }
         }
     }
-    else // Is Bounded 
+    else // Is Bounded
     {
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
@@ -115,12 +115,12 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
-        {   
+        {
             for (unsigned j=0; j<3; j++)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
-                
+
                 std::set<unsigned> node_a_element_indices = p_node_a->rGetContainingElementIndices();
                 std::set<unsigned> node_b_element_indices = p_node_b->rGetContainingElementIndices();
 
@@ -132,12 +132,12 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                                       std::inserter(shared_elements, shared_elements.begin()));
 
 
-                /* 
-                 * Note using boundary nodes to identify the boundary egdes wont work with 
+                /*
+                 * Note using boundary nodes to identify the boundary egdes wont work with
                  * triangles which have 3 boundary nodes
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
                  */
-             
+
                 if (shared_elements.size() == 1) // Its a boundary edge
                 {
                     c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
@@ -145,18 +145,18 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
                     normal_vector[0]= edge[1];
                     normal_vector[1]= -edge[0];
-                    
+
                     double dij = norm_2(normal_vector);
                     assert(dij>1e-5); //Sanity check
                     normal_vector /= dij;
 
-                    /*  
+                    /*
                      * Here all extra edges are split in two so always have unique triangulation.
-                     *  
-                     *   ____  three nodes 
-                     *  | /\ | 
-                     *  |/__\|. edge of mesh 
-                     * 
+                     *
+                     *   ____  three nodes
+                     *  | /\ |
+                     *  |/__\|. edge of mesh
+                     *
                      * Changing this causes issues with stitching the left and right back together.
                      */
                     unsigned num_sections = 2;
@@ -167,10 +167,10 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
                         //Check if near other nodes (could be ineficient)
                         bool node_clear = true;
-                        double node_clearance = 0.05; 
+                        double node_clearance = 0.05;
 
                         for (unsigned i=0; i<nodes.size(); i++)
-                        {   
+                        {
                             double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
                             if (distance < node_clearance)
                             {
@@ -188,13 +188,13 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                 }
             }
         }
-        
+
         // Loop over all nodes and check they're not outside [0,mWidth]
         for (unsigned i=0; i<nodes.size(); i++)
         {
             CheckNodeLocation(nodes[i]);
         }
-            
+
         Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
@@ -226,9 +226,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
             for (unsigned local_index = 0; local_index < 3; local_index++)
-            {   
+            {
                 unsigned elem_index = extended_mesh.GetElement(i)->GetNodeGlobalIndex(local_index);
-                
+
                 if (elem_index < num_elements)
                 {
                     unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
@@ -418,7 +418,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 
         // Compute whether the element straddles either periodic boundary
         bool element_straddles_left_right_boundary = false;
-        
+
         const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
         for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
         {
@@ -431,7 +431,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
                 element_straddles_left_right_boundary = true;
             }
         }
-        
+
         /* If this is a voronoi tesselation make sure the elememts contain
          * the original delauny node
          */

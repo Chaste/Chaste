@@ -390,7 +390,7 @@ public:
         // Attributes
         CheckAttributes(cvode_cell);
         CheckAttributes(cvode_opt);
-        
+
         delete cvode_lut;
 #endif // CHASTE_CVODE
 

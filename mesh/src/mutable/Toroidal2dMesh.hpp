@@ -117,7 +117,7 @@ private:
 
     /**
      * Creates a set of mirrored nodes for a Toroidal re-mesh. Updates
-     * mRightImages, mLeftImages, mTopImages and mBottomImages . 
+     * mRightImages, mLeftImages, mTopImages and mBottomImages .
      * All mesh points should be 0 < x < mWidth and 0 < y < mHeight
      *
      * This method should only ever be called by the public ReMesh() method.
@@ -245,8 +245,8 @@ public:
     /**
      * Con+structor.
      *
-     * @param width the periodic width of the mesh 
-     * @param depth the periodic depth of the mesh 
+     * @param width the periodic width of the mesh
+     * @param depth the periodic depth of the mesh
      */
     Toroidal2dMesh(double width, double depth);
 
@@ -255,7 +255,7 @@ public:
      * calls a ReMesh() command to create the elements of the mesh.
      *
      * @param width the periodic width of the mesh
-     * @param depth the periodic depth of the mesh 
+     * @param depth the periodic depth of the mesh
      * @param nodes a collection of nodes to construct the mesh with
      */
     Toroidal2dMesh(double width, double depth, std::vector<Node<2>*> nodes);

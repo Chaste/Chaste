@@ -229,7 +229,7 @@ public:
         /* We now use the cell population to construct a cell killer object. */
         MyCellKiller my_cell_killer(&cell_population);
 
-        /* To store information about the lovations and times of the killed cells use the 
+        /* To store information about the lovations and times of the killed cells use the
          * {{{CellRemovalLocationsWriter}}} */
         cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 
