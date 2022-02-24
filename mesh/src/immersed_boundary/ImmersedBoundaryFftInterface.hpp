@@ -53,12 +53,6 @@ protected:
     /** The immersed boundary mesh. */
     ImmersedBoundaryMesh<DIM,DIM>* mpMesh;
 
-    /** The fftw plan for the forward transforms. */
-    fftw_plan mFftwForwardPlan;
-
-    /** The fftw plan for the forward transforms. */
-    fftw_plan mFftwInversePlan;
-
     /** Pointer to the start of the input arrays. */
     double* mpInputArray;
 
@@ -68,16 +62,16 @@ protected:
     /** Pointer to the start output array. */
     double* mpOutputArray;
 
-    pocketfft::shape_t real_dims;
-    pocketfft::shape_t comp_dims;
+    pocketfft::shape_t mRealDims;
+    pocketfft::shape_t mCompDims;
 
-    int how_many_forward;
-    int how_many_inverse;
-    int real_sep;
-    int comp_sep;
-    int real_stride;
-    int comp_stride;
-    int rank;
+    int mNumGridPointsForward
+    int mHowManyForward;
+    int mHowManyInverse;
+    int mRealSep;
+    int mCompSep;
+    int mRealStride;
+    int mCompStride;
 
 public:
 

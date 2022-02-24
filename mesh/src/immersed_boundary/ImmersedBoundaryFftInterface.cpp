@@ -61,85 +61,61 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
      */
     int reduced_y = 1 + (num_gridpts_y/2);
 
-    /*
-     * Plan the discrete Fourier transforms:
-     *
-     *  * Forward are real-to-complex and out-of-place
-     *  * Backward are complex-to-real and out-of-place
-     *
-     * Because the above arrays are created once and stay in the same place in memory throughout the simulation, we may
-     * plan the transforms with references to locations in these arrays, and execute the plans as necessary each
-     * timestep of the simulation.
-     */
-
     // Plan variables
-    rank = 2;                                       // Number of dimensions for each array
-    //int real_dims[] = {num_gridpts_x, num_gridpts_y};   // Dimensions of each real array
-    real_dims = {(long unsigned int)num_gridpts_x, (long unsigned int)num_gridpts_y};   // Dimensions of each real array
-    //int comp_dims[] = {num_gridpts_x, reduced_y};       // Dimensions of each complex array
-    comp_dims = {(long unsigned int)num_gridpts_x, (long unsigned int)reduced_y};       // Dimensions of each complex array
+    // Dimensions of each real array
+    mRealDims = {(long unsigned int)num_gridpts_x, (long unsigned int)num_gridpts_y};   // Dimensions of each real array
+    
+    // Dimensions of each complex array
+    mCompDims = {(long unsigned int)num_gridpts_x, (long unsigned int)reduced_y};       // Dimensions of each complex array
 
-    how_many_forward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
-    how_many_inverse = 2;                           // Number of inverse transforms (always 2)
-    real_sep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
-    comp_sep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
-    real_stride = sizeof(double);                                // Each real array is contiguous in memory
-    comp_stride = sizeof(std::complex<double>);                                // Each complex array is contiguous in memory
+    mHowManyForward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
+    mHowManyInverse = 2;                           // Number of inverse transforms (always 2)
+
+    mRealSep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
+    mCompSep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
+
+    mRealStride = sizeof(double);                                // Each real array is contiguous in memory
+    mCompStride = sizeof(std::complex<double>);                                // Each complex array is contiguous in memory
 
 /*
 
  multi-dimensional arrays are stored row-major
- Rank = rank of matrix
  real_dims = dimensions of matrix
  real_sep = pointer offset between matrices
  how_many_forward = number of matrices to operate on
- 
  stride = 1 => matrices are continguously stored one after the other
-   // mFftwForwardPlan = fftw_plan_many_dft_r2c(rank, real_dims, how_many_forward,
-                                              mpInputArray,   real_nembed, real_stride, real_sep,
-                                              mpComplexArray, comp_nembed, comp_stride, comp_sep,
-                                              FFTW_PATIENT);
-
-    //mFftwInversePlan = fftw_plan_many_dft_c2r(rank, real_dims, how_many_inverse,
-                                              mpComplexArray, comp_nembed, comp_stride, comp_sep,
-                                              mpOutputArray,  real_nembed, real_stride, real_sep,
-                                              FFTW_PATIENT);
-                                              */
+ */
 }
 
 template<unsigned DIM>
 ImmersedBoundaryFftInterface<DIM>::~ImmersedBoundaryFftInterface()
 {
-    //fftw_destroy_plan(mFftwForwardPlan);
-    //fftw_destroy_plan(mFftwInversePlan);
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
 {
-    //fftw_execute(mFftwForwardPlan);
-
     // Real to complex - TODO: remove hardcoded values
-    pocketfft::stride_t r_stride = {real_stride*128, real_stride};
-    pocketfft::stride_t c_stride = {comp_stride*65, comp_stride};
+    pocketfft::stride_t rStride = {mRealStride*mRealDims[1], mRealStride};
+    pocketfft::stride_t cStride = {mCompStride*mCompDims[1], mCompStride};
     pocketfft::shape_t axes = {0, 1};
-    for (int i = 0; i < how_many_forward; i++) {
-      pocketfft::r2c<double>(real_dims, r_stride, c_stride, axes, true, mpInputArray + i*real_sep, mpComplexArray + i*comp_sep, 1.0, 1);
+
+    for (int i = 0; i < mHowManyForward; i++) {
+      pocketfft::r2c<double>(mRealDims, rStride, cStride, axes, true, mpInputArray + i*mRealSep, mpComplexArray + i*mCompSep, 1.0, 1);
     }
 }
 
 template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteInverse()
 {
-    //fftw_execute(mFftwInversePlan);
-
     // Complex to real
-    pocketfft::stride_t r_stride = {real_stride*128, real_stride};
-    pocketfft::stride_t c_stride = {comp_stride*65, comp_stride};
+    pocketfft::stride_t rStride = {mRealStride*mRealDims[1], mRealStride};
+    pocketfft::stride_t cStride = {mCompStride*mCompDims[1], mCompStride};
     pocketfft::shape_t axes = {0, 1};
-    for (int i = 0; i < how_many_inverse; i++) {
+
+    for (int i = 0; i < mHowManyInverse; i++) {
       // For c2r, output array dims are supplied
-      pocketfft::c2r(real_dims, c_stride, r_stride, axes, false, mpComplexArray + i*comp_sep, mpOutputArray + i*real_sep, 1.0, 1);
+      pocketfft::c2r(mRealDims, cStride, rStride, axes, false, mpComplexArray + i*mCompSep, mpOutputArray + i*mRealSep, 1.0, 1);
     }
 }
 
