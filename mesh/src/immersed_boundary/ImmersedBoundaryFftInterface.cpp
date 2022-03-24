@@ -49,30 +49,27 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
       mpComplexArray(pComplex),
       mpOutputArray(pOut)
 {
-    int num_gridpts_x = (int)mpMesh->GetNumGridPtsX();
-    int num_gridpts_y = (int)mpMesh->GetNumGridPtsY();
+    int numGridPtsX = (int)mpMesh->GetNumGridPtsX();
+    int numGridPtsY = (int)mpMesh->GetNumGridPtsY();
 
     // We require an even number of grid points
-    assert(num_gridpts_y % 2 == 0);
+    assert(numGridPtsY % 2 == 0);
 
     /*
      * Resize the grids.  All complex grids are half-sized in the y-coordinate due to redundancy inherent in the
      * fast-Fourier method for solving Navier-Stokes.
      */
-    int reduced_y = 1 + (num_gridpts_y/2);
+    int reducedY = 1 + (numGridPtsY/2);
 
     // Plan variables
-    // Dimensions of each real array
-    mRealDims = {(long unsigned int)num_gridpts_x, (long unsigned int)num_gridpts_y};   // Dimensions of each real array
-    
-    // Dimensions of each complex array
-    mCompDims = {(long unsigned int)num_gridpts_x, (long unsigned int)reduced_y};       // Dimensions of each complex array
+    mRealDims = {(long unsigned int)numGridPtsX, (long unsigned int)numGridPtsY};   // Dimensions of each real array
+    mCompDims = {(long unsigned int)numGridPtsX, (long unsigned int)reducedY};       // Dimensions of each complex array
 
     mHowManyForward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
     mHowManyInverse = 2;                           // Number of inverse transforms (always 2)
 
-    mRealSep = num_gridpts_x * num_gridpts_y;       // How many doubles between start of first array and start of second
-    mCompSep = num_gridpts_x * reduced_y;           // How many fftw_complex between start of first array and start of second
+    mRealSep = numGridPtsX * numGridPtsY;       // How many doubles between start of first array and start of second
+    mCompSep = numGridPtsX * reducedY;           // How many fftw_complex between start of first array and start of second
 
     mRealStride = sizeof(double);                                // Each real array is contiguous in memory
     mCompStride = sizeof(std::complex<double>);                                // Each complex array is contiguous in memory
