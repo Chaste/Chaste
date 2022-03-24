@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     // Get necessary things from stimulus current
     boost::shared_ptr<RegularStimulus> p_reg_stim = boost::static_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction());
     boost::shared_ptr<ZeroStimulus> p_zero_stim(new ZeroStimulus);
-    const double pacing_cycle_length = p_reg_stim->GetPeriod(); //ms
+    const double pacing_cycle_length = p_reg_stim->GetPeriod(); // ms
     double stimulus_duration = p_reg_stim->GetDuration(); // ms
     double stimulus_start_time = p_reg_stim->GetStartTime(); // ms
     double stimulus_end_time = stimulus_start_time + stimulus_duration;
@@ -52,7 +52,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     bool force_reset_setting = mpModel->GetForceReset();
     bool minimal_reset_setting = mpModel->GetMinimalReset();
 
-    mpModel->SetMaxSteps(1e5); // Per pace.
+    mpModel->SetMaxSteps(1e5); // Per pace (or part of pace with stimulus start/stop).
     mpModel->SetForceReset(true); // Best way to deal with discontinuities in the RHS according to CVODE
 
     // Set up vectors to monitor progress

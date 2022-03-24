@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2021, University of Oxford.
+# Copyright (c) 2005-2022, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -331,17 +331,27 @@ if (Chaste_USE_VTK)
 
     # Depending on the VTK version, we need different components. 5.x require the following
     if (VTK_MAJOR_VERSION EQUAL 5)
-        find_package (VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
+        find_package(VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
         # 6.0 and 6.1 require the following
     elseif ((VTK_MAJOR_VERSION EQUAL 6) AND (VTK_MINOR_VERSION LESS 2))
-        find_package (VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                      vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
-                      vtkIOLegacy vtkIOXML REQUIRED)
-        # 6.2 and up, up to and including 7.1, require the following
+        find_package(
+                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy vtkIOXML
+                REQUIRED
+        )
+        # 6.2 and up, up to and including 8.x, require the following
+    elseif (VTK_MAJOR_VERSION LESS 9)
+        find_package(
+                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy
+                vtkIOParallelXML vtkIOXML REQUIRED
+        )
+        # VTK 9.0 and above require the following
     else ()
-        find_package (VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                      vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
-                      vtkIOLegacy vtkIOParallelXML vtkIOXML REQUIRED)
+        find_package(
+                VTK COMPONENTS CommonCore CommonDataModel FiltersCore FiltersGeneral FiltersGeneric FiltersGeometry
+                FiltersModeling FiltersSources IOCore IOGeometry IOLegacy IOParallelXML IOXML REQUIRED
+        )
     endif ()
 
     add_definitions (-DCHASTE_VTK)
