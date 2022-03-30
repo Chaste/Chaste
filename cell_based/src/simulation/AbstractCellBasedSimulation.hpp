@@ -414,7 +414,7 @@ public:
      *
      * Next, we set up each cell by calling ReadyToDivide() on it, which updates the cell's age and
      * cell cycle model. Finally, we call WriteVisualizerSetupFile() and OutputSimulationSetup(),
-     * as well as WriteResultsToFiles() on the cell population, to record the initial configration.
+     * as well as WriteResultsToFiles() on the cell population, to record the initial configuration.
      * This completes the set up process.
      *
      * The main time loop:

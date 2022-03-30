@@ -224,12 +224,12 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
 
 
                 /*
-                 * Note using boundary nodes to identify the boundary egdes wont work with
+                 * Note using boundary nodes to identify the boundary edges won't work with
                  * triangles which have 3 boundary nodes
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
                  */
 
-                if (shared_elements.size() == 1) // Its a boundary edge
+                if (shared_elements.size() == 1) // It's a boundary edge
                 {
                     c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
                     double edge_length = norm_2(edge);

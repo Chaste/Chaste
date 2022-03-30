@@ -1035,7 +1035,7 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
 
     this_circum_centre = pElement->CalculateCircumsphere(this->mElementJacobians[pElement->GetIndex()], this->mElementInverseJacobians[pElement->GetIndex()]);
 
-    // Copy the actualy circumcentre into a smaller vector
+    // Copy the actually circumcentre into a smaller vector
     c_vector<double, ELEMENT_DIM> circum_centre;
     for (unsigned i=0; i<ELEMENT_DIM; i++)
     {
@@ -1052,10 +1052,10 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
         // Calculate vector from circumcenter to node
         node_location -= circum_centre;
 
-        // This is to calculate the squared distance betweeen them
+        // This is to calculate the squared distance between them
         double squared_distance = inner_prod(node_location, node_location);
 
-        // If the squared idstance is less than the elements circum-radius(squared),
+        // If the squared distance is less than the elements circum-radius(squared),
         // then the Voronoi property is violated.
         if (squared_distance < this_circum_centre[ELEMENT_DIM])
         {

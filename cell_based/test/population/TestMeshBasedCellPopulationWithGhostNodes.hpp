@@ -453,14 +453,14 @@ public:
         TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.rGetGhostNodes().size(), mesh.GetNumNodes());
 
         // Nodes 0-9 should not been renumbered so are still ghost nodes.
-        // the ghost node at node 80 is now at 79 as node 27 was deleted..
+        // the ghost node at node 80 is now at 79 as node 27 was deleted.
         for (unsigned i=0; i<mesh.GetNumAllNodes(); i++)
         {
             // True (ie should be a ghost) if i<10 or i==79, else false
             TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.IsGhostNode(i), ((i<10)||(i==79)));
         }
 
-        // Finally, check the cells node indices have updated
+        // Finally, check the cell node indices have updated
 
         // We expect the cell node indices to be {10,11,...,79}
         std::set<unsigned> expected_node_indices;
@@ -558,7 +558,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 82u);
-        // Cant call cell_population.GetNumRealCells yet as doenst work before
+        // Can't call cell_population.GetNumRealCells yet as doesn't work before
         // the Update as the cells aren't updated yet
 
         cell_population.Update();
@@ -899,7 +899,7 @@ public:
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Resetting the Maximum cell Id to zero (to account for previous tests)
+        // Resetting the Maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
         // Create a simple 3D mesh with some ghost nodes

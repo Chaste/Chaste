@@ -1278,7 +1278,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                 else
                 {
                     /*
-                     * The node configuration eithr looks like that shown below. In this case, we merge the nodes
+                     * The node configuration either looks like that shown below. In this case, we merge the nodes
                      * and tidy up node indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
                      *
                      * Outside
@@ -1286,7 +1286,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *   --o--o (2)
                      *     (1) \
                      *
-                     * Or its an interal triangular void near the bounadry. Like this
+                     * Or its an internal triangular void near the boundary. Like this
                      *
                      *     x
                      *     |
@@ -1296,14 +1296,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *     |     Here we remove the void and merge all the nodes with one of the nodes at the ends
                      *     x
                      *
-                     *  Or its a more copmplicated situatio thats currently not identified.
+                     *  Or it's a more complicated situation that's currently not identified.
                      *
                      *  So we search to differentiate these cases
                      */
                     assert( (nodeA_elem_indices.size()==1 && nodeB_elem_indices.size()==2)
                            || (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==1) );
 
-                    // Node one is the potential convex node Node 2 is the one in both elements.
+                    // Node one is the potential convex node. Node 2 is the one in both elements.
                     Node<SPACE_DIM>* p_node_1 = pNodeA;
                     Node<SPACE_DIM>* p_node_2 = pNodeB;
                     std::set<unsigned> node1_elem_indices = nodeA_elem_indices;
@@ -1386,7 +1386,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         // Tag remaining node as non-boundary
                         p_merged_node->SetAsBoundaryNode(false);
 
-                        // Now merge this node with one of the nearest vertices keping that vertices location.
+                        // Now merge this node with one of the nearest vertices keeping that vertices location.
                         Node<SPACE_DIM>* p_end_node; // The neighbouring vertex to merge to
 
                         std::set<unsigned> previous_previous_elem_indices = this->mNodes[previous_previous_node_1]->rGetContainingElementIndices();
@@ -1408,7 +1408,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         else
                         {
                             /*
-                             * If this trips then the adjacent node isnt in both elements.
+                             * If this trips then the adjacent node isn't in both elements.
                              * So check the other adjacent node by uncommenting the code blow and adding a new test
                              * See #3080
                              */
@@ -1416,7 +1416,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         }
 
                         p_merged_node->rGetModifiableLocation() = p_end_node->rGetLocation();
-                        PerformNodeMerge(p_end_node,p_merged_node);  // This order as forst node is kept and this has correcrt boundary information.
+                        PerformNodeMerge(p_end_node,p_merged_node);  // This order as first node is kept and this has correct boundary information.
 
                         // Remove the deleted nodes and re-index
                         RemoveDeletedNodes();
@@ -2408,7 +2408,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     // Move original node
                     pNode->rGetModifiableLocation() = intersection;
 
-                    // Replace common_vertex with the the moved node (this also updates the nodes)
+                    // Replace common_vertex with the moved node (this also updates the nodes)
                     this->GetElement(elementIndex)->ReplaceNode(this->mNodes[common_vertex_index], pNode);
 
                     // Remove common_vertex

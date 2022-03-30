@@ -931,7 +931,7 @@ public:
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
     }
 
-    void TestGetMeshForVtkForVoroniTesselation()
+    void TestGetMeshForVtkForVoronoiTesselation()
     {
         // Create a simple Toroidal2dMesh, the Delaunay triangulation
         unsigned cells_across = 4;

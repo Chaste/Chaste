@@ -607,7 +607,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
         }
         else if ((p_time->GetTimeStepsElapsed() % mUpdatingTimestepMultiple != 0))
         {
-            EXCEPTION("CellPopulation has had births or deaths but you were on a non update step, make sure your cell cylce model and killer only operate on update steps.");
+            EXCEPTION("CellPopulation has had births or deaths but you were on a non update step, make sure your cell cycle model and killer only operate on update steps.");
         }
         else
         {

@@ -730,7 +730,7 @@ c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>&
 
     /*
      * Handle the Toroidal condition here: if the points are more
-     * than halfway around the doamin apart, measure the other way.
+     * than halfway around the domain apart, measure the other way.
      */
     if (vector[0] > 0.5*mWidth)
     {
@@ -872,7 +872,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
 
             if (is_corresponding_node)
             {
-                // If this trips then you need to deal with remesjhing where the left and right are different
+                // If this trips then you need to deal with remeshing where the left and right are different
                 // See #3043 and Cylindrical2dMesh
                 NEVER_REACHED;
                 // Remove original and corresponding element from sets
@@ -1197,7 +1197,7 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
         }
         else
         {
-            // This isnt needed as now we copy all nodes to the left and right.
+            // This isn't needed as now we copy all nodes to the left and right.
             // If you reach here then you have probably
             // Changed it back to half the nodes or similar
             NEVER_REACHED;
@@ -1246,7 +1246,7 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
         }
         else
         {
-            // This isnt needed as now we copy all nodes to the top and bottom.
+            // This isn't needed as now we copy all nodes to the top and bottom.
             // If you reach here then you have probably
             // Changed it back to half the nodes or similar
             NEVER_REACHED;

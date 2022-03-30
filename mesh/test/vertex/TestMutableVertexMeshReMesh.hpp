@@ -186,7 +186,7 @@ public:
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
-         * We will test that that a T1 swap of the two central nodes is correctly implemented.
+         * We will test that a T1 swap of the two central nodes is correctly implemented.
          *  _____
          * |\   /|
          * | \ / |
@@ -280,7 +280,7 @@ public:
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all nodes are
-         * boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
+         * boundary nodes, as shown below. We will test that a T1 swap is correctly implemented.
          *  _____
          * |\   /
          * | \ /
@@ -368,7 +368,7 @@ public:
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all but one node
-         * are boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
+         * are boundary nodes, as shown below. We will test that a T1 swap is correctly implemented.
          *
          * |\   /|
          * | \ / |
@@ -727,7 +727,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.0+sqrt(5.0), 1e-6);
     }
 
-        void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement()
+    void TestDoNotPerformT1SwapWithRemovingEdgeFromTriangularElement()
     {
         /**
          * In this test we check that a T1 swap does not occur if one of the elements is triangular

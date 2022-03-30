@@ -120,7 +120,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
             ++elem_iter)
         {
             bool bad_element = false;
-            double edge_threshold = 1.5; //TODO Make setable variable!
+            double edge_threshold = 1.5; //TODO Make settable variable!
 
             for (unsigned j=0; j<3; j++)
             {
@@ -156,22 +156,22 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                         assert(dij>1e-5); //Sanity check
                         normal_vector /= dij;
 
-                        double bound_offset = 0.5; //TODO Make setable variable!
+                        double bound_offset = 0.5; //TODO Make settable variable!
                         c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5*edge;
 
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
                         new_node_index++;
 
                         // Now add extra end nodes if appropriate.
-                        unsigned num_sections = 1; // I.e only at ends.
+                        unsigned num_sections = 1; // I.e. only at ends.
                         for (unsigned section=0; section <= num_sections; section++)
                         {
                             double ratio = (double)section/(double)num_sections;
                             c_vector<double,2> new_node_location = -normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
 
-                            //Check if near other nodes (could be ineficient)
+                            //Check if near other nodes (could be inefficient)
                             bool node_clear = true;
-                            double node_clearance = 0.3; // Make setable variable??
+                            double node_clearance = 0.3; // Make settable variable??
 
                             for (unsigned i=0; i<nodes.size(); i++)
                             {
@@ -428,10 +428,10 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
 
     if(!mpDelaunayMesh) // No Delaunay mesh so less copies as all too top right
     {
-        temp_nodes.resize(4*num_nodes);
+        temp_nodes.resize(4 * num_nodes);
 
         // Create four copies of each node.
-        for (unsigned index=0; index<num_nodes; index++)
+        for (unsigned index = 0; index < num_nodes; index++)
         {
             c_vector<double, 2> location;
             location = GetNode(index)->rGetLocation();
@@ -597,15 +597,15 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
                     element_straddles_top_bottom_boundary = true;
                 }
             }
-            /* If this is a voronoi tesselation make sure the elememts contain
-            * the original delauny node
+            /* If this is a voronoi tesselation make sure the elements contain
+            * the original Delaunay node
             */
             bool element_centre_on_right = true;
             bool element_centre_on_top = true;
 
-            unsigned dealunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-            double element_centre_x_location = this->mpDelaunayMesh->GetNode(dealunay_index)->rGetLocation()[0];
-            double element_centre_y_location = this->mpDelaunayMesh->GetNode(dealunay_index)->rGetLocation()[1];
+            unsigned delaunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+            double element_centre_x_location = this->mpDelaunayMesh->GetNode(delaunay_index)->rGetLocation()[0];
+            double element_centre_y_location = this->mpDelaunayMesh->GetNode(delaunay_index)->rGetLocation()[1];
 
             if (element_centre_x_location < 0.5*mWidth)
             {

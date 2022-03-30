@@ -133,12 +133,12 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
 
                 /*
-                 * Note using boundary nodes to identify the boundary egdes wont work with
+                 * Note using boundary nodes to identify the boundary edges won't work with
                  * triangles which have 3 boundary nodes
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
                  */
 
-                if (shared_elements.size() == 1) // Its a boundary edge
+                if (shared_elements.size() == 1) // It's a boundary edge
                 {
                     c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
                     c_vector<double,2> normal_vector;
@@ -165,7 +165,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                         double ratio = ((double)section)/(double)num_sections;
                         c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio*edge;
 
-                        //Check if near other nodes (could be ineficient)
+                        //Check if near other nodes (could be inefficient)
                         bool node_clear = true;
                         double node_clearance = 0.05;
 
@@ -432,14 +432,14 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
             }
         }
 
-        /* If this is a voronoi tesselation make sure the elememts contain
-         * the original delauny node
+        /* If this is a voronoi tesselation make sure the elements contain
+         * the original Delaunay node
          */
         bool element_centre_on_right = true;
         if(mpDelaunayMesh)
         {
-                unsigned dealunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-                double element_centre_x_location = this->mpDelaunayMesh->GetNode(dealunay_index)->rGetLocation()[0];
+                unsigned delaunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+                double element_centre_x_location = this->mpDelaunayMesh->GetNode(delaunay_index)->rGetLocation()[0];
                 if (element_centre_x_location < 0.5*mWidth)
                 {
                     element_centre_on_right = false;
