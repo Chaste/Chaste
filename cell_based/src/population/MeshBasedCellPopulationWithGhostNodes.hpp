@@ -102,7 +102,6 @@ private:
         archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM, DIM> >(*this);
     }
 
-private:
     /**
      * This is called after a cell population has been constructed to check the
      * user gave consistent instructions. Check consistency of our
