@@ -1408,16 +1408,16 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         else
                         {
                             /*
-                             * If this trips then the adjacent node isn't in both elements.
-                             * So check the other adjacent node by uncommenting the code blow and adding a new test
+                             * If this trips then the adjacent node isn't in both elements and we currently dont deal with this.
                              * See #3080
                              */
                             NEVER_REACHED;
                         }
 
                         p_merged_node->rGetModifiableLocation() = p_end_node->rGetLocation();
-                        PerformNodeMerge(p_end_node,p_merged_node);  // This order as first node is kept and this has correct boundary information.
-
+                        // We perform the merge in this order so the first node is kept as this has correct boundary information.
+                        PerformNodeMerge(p_end_node,p_merged_node); 
+                        
                         // Remove the deleted nodes and re-index
                         RemoveDeletedNodes();
                     }
