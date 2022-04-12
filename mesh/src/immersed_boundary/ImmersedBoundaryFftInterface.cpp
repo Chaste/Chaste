@@ -93,8 +93,8 @@ template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
 {
     // Real to complex - TODO: remove hardcoded values
-    pocketfft::stride_t rStride = {mRealStride*mRealDims[1], mRealStride};
-    pocketfft::stride_t cStride = {mCompStride*mCompDims[1], mCompStride};
+    pocketfft::stride_t rStride = {mRealStride*static_cast<long int>(mRealDims[1]), mRealStride};
+    pocketfft::stride_t cStride = {mCompStride*static_cast<long int>(mCompDims[1]), mCompStride};
     pocketfft::shape_t axes = {0, 1};
 
     for (int i = 0; i < mHowManyForward; i++) {
@@ -106,8 +106,8 @@ template<unsigned DIM>
 void ImmersedBoundaryFftInterface<DIM>::FftExecuteInverse()
 {
     // Complex to real
-    pocketfft::stride_t rStride = {mRealStride*mRealDims[1], mRealStride};
-    pocketfft::stride_t cStride = {mCompStride*mCompDims[1], mCompStride};
+    pocketfft::stride_t rStride = {mRealStride*static_cast<long int>(mRealDims[1]), mRealStride};
+    pocketfft::stride_t cStride = {mCompStride*static_cast<long int>(mCompDims[1]), mCompStride};
     pocketfft::shape_t axes = {0, 1};
 
     for (int i = 0; i < mHowManyInverse; i++) {
