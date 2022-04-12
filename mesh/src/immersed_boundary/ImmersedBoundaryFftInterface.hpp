@@ -93,9 +93,7 @@ public:
     /**
      * Empty constructor.
      */
-    ImmersedBoundaryFftInterface()
-    {
-    }
+    ImmersedBoundaryFftInterface() = delete;
 
     /**
      * Destructor.
