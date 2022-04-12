@@ -99,9 +99,7 @@ public:
     /**
      * Empty constructor.
      */
-    ImmersedBoundary2dArrays()
-    {
-    }
+    ImmersedBoundary2dArrays() = delete;
 
     /**
      * Destructor.
