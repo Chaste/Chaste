@@ -264,7 +264,7 @@ endif ()
 ################################
 find_package(PythonInterp 3.5)
 if (PYTHON_VERSION_STRING VERSION_LESS 3.5.0)
-    message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
+    message(FATAL_ERROR "Python 3.5 or higher is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
