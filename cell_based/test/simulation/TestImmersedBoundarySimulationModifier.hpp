@@ -290,6 +290,36 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[0], -2.32831e-10, 1e-3);
         TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-3);
     }
+    
+    void TestAdditiveNormalNoiseGettersAndSetters()
+    {
+        ImmersedBoundarySimulationModifier<2> modifier;
+
+        // Noise enabled
+        TS_ASSERT_EQUALS(modifier.GetAdditiveNormalNoise(), false);
+        modifier.SetAdditiveNormalNoise(true);
+        TS_ASSERT_EQUALS(modifier.GetAdditiveNormalNoise(), true);
+        
+        // Noise strength
+        TS_ASSERT_EQUALS(modifier.GetNoiseStrength(), 0.0);
+        modifier.SetNoiseStrength(1.0);
+        TS_ASSERT_EQUALS(modifier.GetNoiseStrength(), 1.0);
+        
+        // Noise skip
+        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 0);
+        modifier.SetNoiseSkip(4);
+        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 4);
+        
+        // Noise length scale
+        TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 0);
+        modifier.SetNoiseLengthScale(4);
+        TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 4);
+
+        // Noise zero field sums
+        TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), 0);
+        modifier.SetZeroFieldSums(4);
+        TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), 4);
+    }
 };
 
 #endif /*TESTIMMERSEDBOUNDARYSIMULATIONMODIFIER_HPP_*/

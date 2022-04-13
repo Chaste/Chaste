@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef TESTIMMERSEDBOUNDARYMESH_HPP_
 #define TESTIMMERSEDBOUNDARYMESH_HPP_
-
+#define CXXTEST_HAVE_EH
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
@@ -65,6 +65,12 @@ public:
 
     void TestArchiving()
     {
+    }
+    
+    void Test3DNotYetImplementedException() {
+        // Type alias avoids comma between template params causing issue with macro expansion
+        using MeshType3D = ImmersedBoundaryMesh<3, 3>;
+        TS_ASSERT_THROWS_ANYTHING(MeshType3D ib_mesh(std::vector<Node<3>*>(), std::vector<ImmersedBoundaryElement<3, 3>*>(), std::vector<ImmersedBoundaryElement<2, 3>*>(), 0, 0));
     }
 
     void TestImmersedBoundaryElementAndLaminaIterators()

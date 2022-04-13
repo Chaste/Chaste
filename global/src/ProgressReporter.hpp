@@ -35,11 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PROGRESSREPORTER_HPP_
 #define PROGRESSREPORTER_HPP_
 
-#include <iostream>
-#include <ctime>
-#include <limits.h>
-
-#include "Timer.hpp"
 #include "OutputFileHandler.hpp"
 
 /**
@@ -55,80 +50,21 @@ class ProgressReporter
 {
 private:
 
-    /** Allow testing of private member functions */
-    friend class TestProgressReporter;
-
-    /** Start time of the simulation */
-    double mStartTime;
-
-    /** End time of the simulation */
-    double mEndTime;
-
-    /** Time step length */
-    double mDt;
-
-    /** Percentage increment after which to report change */
-    unsigned mPercentageIncrement;
-
-    /** Time step increment after which to report change */
-    unsigned mTimestepIncrement;
-
-    /** Time increment (in seconds) after which to report change */
-    unsigned mSecondsIncrement;
-
-    /** The most recent percentage that was written */
-    unsigned mLastPercentage;
-
-    /** Duration of the simulation in number of time steps */
-    unsigned mNumTimesteps;
-
-    /** Max number of digits needed to represent the number of time steps */
-    unsigned mNumDigits;
-
-    /** The wall set in the main constructor */
-    double mWallTimeAtStart;
-
-    /** Whether to output to console */
-    bool mOutputToConsole;
-
-    /** Whether to output to file */
-    bool mOutputToFile;
-
-    /** The timer */
-    Timer mTimer;
-
-    /** The file to write to */
-    out_stream mpFile;
-
-    /**
-     * Send message either to the file stream or the console (or both), depending on the values of
-     * mOutputToConsole and mOutputToFile
-     *
-     * @param message the message to print
-     */
-    void SendMessage(std::string message);
-
-    /**
-     * Given a strictly non-negative elapsed time, return a string formatted as (dd:hh:mm:ss)
-     *
-     * @param timeElapsed a non-negative elapsed time
-     * @return a string representing the elapsed time
-     */
-    std::string GetTimeString(double timeElapsed);
+    double mStartTime;        /**< Start time of the simulation */
+    double mEndTime;          /**< End time of the simulation */
+    out_stream mpFile;        /**< Progress status file */
+    unsigned mLastPercentage; /**< Last percentage that was written */
 
 public:
 
     /**
-     * Constructor saves times and opens output file ('progress_status.txt').
+     * Constuctor saves times and opens output file ('progress_status.txt').
      *
      * @param outputDirectory where to open the output file
      * @param startTime the start time
      * @param endTime the end time
      */
-    ProgressReporter(std::string outputDirectory, double startTime, double endTime, double dt);
-
-    /** Default constructor */
-    ProgressReporter() = default;
+    ProgressReporter(std::string outputDirectory, double startTime, double endTime);
 
     /**
      * Destructor.
@@ -143,14 +79,15 @@ public:
      */
     void Update(double currentTime);
 
-    /** Print finalising message to file */
+    /**
+     * Print finalising message to file.
+     */
     void PrintFinalising();
 
-    /** Print initialising message to file */
+    /**
+     * Print initialising message to file.
+     */
     void PrintInitialising();
-
-    /** Set whether to output to console */
-    void SetOutputToConsole(bool outputToConsole=true);
 };
 
 #endif /*PROGRESSREPORTER_HPP_*/
