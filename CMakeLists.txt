@@ -28,11 +28,10 @@
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
-# Fergus's comment take 4
-
-cmake_minimum_required (VERSION 3.5.1)
+# The version that ships with Ubuntu 18.04
+cmake_minimum_required (VERSION 3.10.2)
 
 # Set standard to C++14. Note that CMake < 3.6 does not know how to set the standard flag for the Intel compiler, so
 # the ChasteCompilerFlags.cmake also sets the --std=c++14 flag, too.
