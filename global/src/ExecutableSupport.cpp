@@ -306,7 +306,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 #else
     //GNU
     *out_file << "\nInformation on number and type of processors:\n";
@@ -315,7 +315,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 
     *out_file << "\nInformation on processor caches, in the same order as above:\n";
     system_info = popen("grep ^cache.size /proc/cpuinfo", "r");
@@ -323,7 +323,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 
     *out_file << "\nInformation on system memory:\n";
     system_info = popen("grep ^MemTotal /proc/meminfo", "r");
@@ -331,7 +331,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 #endif //end of __APPLE__ not defined
 #endif //end of _MSC_VER not defined
 

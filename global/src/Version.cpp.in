@@ -189,7 +189,7 @@ std::string ChasteBuildInfo::GetChasteCodegenVersion(){
     {
         results +=  buffer;
     }
-    fclose(codegen_version);
+    pclose(codegen_version);
 
     boost::algorithm::trim(results);
     return results;

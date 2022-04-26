@@ -225,11 +225,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            NodeAttributes<3>* const p_node_attributes = NULL;
+            NodeAttributes<3>* const p_node_attributes = nullptr;
 
             output_arch << p_node_attributes;
 
-            delete p_node_attributes;
+            // This is an unnecessary delete and GCC 11 does not like it
+            // delete p_node_attributes;
         }
 
         {
