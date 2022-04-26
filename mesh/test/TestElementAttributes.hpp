@@ -128,11 +128,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            ElementAttributes<2,2>* const p_element_attributes = NULL;
+            ElementAttributes<2,2>* const p_element_attributes = nullptr;
 
             output_arch << p_element_attributes;
 
-            delete p_element_attributes;
+            // This is an unnecessary delete and GCC 11 does not like it
+            // delete p_element_attributes;
         }
 
         {
