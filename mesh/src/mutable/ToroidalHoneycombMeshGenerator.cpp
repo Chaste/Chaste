@@ -75,7 +75,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
 
     double x0 = 0.0;
     double y0 = 0.0;
-    
+
     // Write node file
     out_stream p_node_file = output_file_handler.OpenOutputFile(mMeshFilename+".node");
     (*p_node_file) << std::scientific;

@@ -71,6 +71,9 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
         double x = p_temp_node->rGetLocation()[0];
         UNUSED_OPT(x); // Fix optimised build
         assert( 0 <= x && x < width);
+        double y = p_temp_node->rGetLocation()[1];
+        UNUSED_OPT(y); // Fix optimised build
+        assert( 0 <= y && y < depth);
         mNodes.push_back(p_temp_node);
     }
 
@@ -84,7 +87,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     mLeftImages.clear();
     mImageToLeftOriginalNodeMap.clear();
     mLeftPeriodicBoundaryElementIndices.clear();
-    
+
     mRightOriginals.clear();
     mRightImages.clear();
     mImageToRightOriginalNodeMap.clear();
@@ -107,7 +110,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     {
         c_vector<double, 2> location;
         unsigned this_node_index = node_iter->GetIndex();
-        
+
         // Check the mesh currently conforms to the dimensions given
         assert(0.0 <= node_iter->rGetLocation()[1]);
         assert(node_iter->rGetLocation()[1] <= mHeight);
@@ -232,7 +235,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
 
     /*
      * Now remove any long edges to help stop extra edges on the boundary
-     * 
+     *
      * We need to do this extra step in the toroidal mesh as otherwise there can be extra edges
      * on the left or right boundary due to remeshing the convex hull. See #3043
      */
@@ -244,12 +247,12 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     for (TetrahedralMesh<2,2>::ElementIterator elem_iter = this->GetElementIteratorBegin();
         elem_iter != this->GetElementIteratorEnd();
         ++elem_iter)
-    { 
+    {
         unsigned num_nodes_outside = 0;
         for (unsigned j=0; j<3; j++)
         {
             Node<2>* p_node = this->GetNode(elem_iter->GetNodeGlobalIndex(j));
-            
+
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
             double this_node_x_location = location[0];
@@ -262,7 +265,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
             {
                 num_nodes_outside++;
             }
-            
+
             if (num_nodes_outside==3)
             {
                 elem_iter->MarkAsDeleted();
@@ -273,12 +276,12 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     for (TetrahedralMesh<2,2>::BoundaryElementIterator elem_iter = this->GetBoundaryElementIteratorBegin();
         elem_iter != this->GetBoundaryElementIteratorEnd();
         ++elem_iter)
-    { 
+    {
         unsigned num_nodes_outside = 0;
         for (unsigned j=0; j<2; j++)
         {
             Node<2>* p_node = this->GetNode((*elem_iter)->GetNodeGlobalIndex(j));
-            
+
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
             double this_node_x_location = location[0];
@@ -291,7 +294,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
             {
                 num_nodes_outside++;
             }
-            
+
             if (num_nodes_outside==2)
             {
                 (*elem_iter)->MarkAsDeleted();
@@ -345,7 +348,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     mRightPeriodicBoundaryElementIndices.clear();
 
     // At this point we have an extended cylindrical mesh now we need to stitch the top and bottom together
-    
+
     // Re-index the vectors according to the big nodemap, and set up the maps.
     mImageToBottomOriginalNodeMap.clear();
     mImageToTopOriginalNodeMap.clear();
@@ -568,7 +571,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     //     }
     // }
 
-    // Delete all image nodes unless they have already gone 
+    // Delete all image nodes unless they have already gone
     for (unsigned i=0; i<mLeftImages.size(); i++)
     {
         mNodes[mLeftImages[i]]->MarkAsDeleted();
@@ -702,7 +705,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     //     }
     // }
 
-    // Delete all image nodes unless they have already gone 
+    // Delete all image nodes unless they have already gone
     for (unsigned i=0; i<mBottomImages.size(); i++)
     {
         mNodes[mBottomImages[i]]->MarkAsDeleted();
@@ -727,7 +730,7 @@ c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>&
 
     /*
      * Handle the Toroidal condition here: if the points are more
-     * than halfway around the doamin apart, measure the other way.
+     * than halfway around the domain apart, measure the other way.
      */
     if (vector[0] > 0.5*mWidth)
     {
@@ -750,7 +753,7 @@ c_vector<double, 2> Toroidal2dMesh::GetVectorFromAtoB(const c_vector<double, 2>&
 
 void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concreteMove)
 {
-    
+
     // Perform a width periodic movement if necessary
     if (point.rGetLocation()[0] >= mWidth)
     {
@@ -766,7 +769,7 @@ void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concrete
     // Perform a depth periodic movement if necessary
     if (point.rGetLocation()[1] >= mHeight)
     {
-        // Move point down 
+        // Move point down
         point.SetCoordinate(1, point.rGetLocation()[1] - mHeight);
     }
     else if (point.rGetLocation()[1] < 0.0)
@@ -869,9 +872,9 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
 
             if (is_corresponding_node)
             {
-                // If this trips then you need to deal with remesjhing where the left and right are different 
+                // If this trips then you need to deal with remeshing where the left and right are different
                 // See #3043 and Cylindrical2dMesh
-                NEVER_REACHED; 
+                NEVER_REACHED;
                 // Remove original and corresponding element from sets
                 // temp_left_hand_side_elements.erase(elem_index);
                 // temp_right_hand_side_elements.erase(corresponding_elem_index);
@@ -975,9 +978,9 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
 
             if (is_corresponding_node)
             {
-                // If this trips then you need to deal with remeshing where the left and right are different 
+                // If this trips then you need to deal with remeshing where the left and right are different
                 // See #3043 and Cylindrical2dMesh
-                NEVER_REACHED; 
+                NEVER_REACHED;
 
                 // Remove original and corresponding element from sets
                 //temp_bottom_hand_side_elements.erase(elem_index);
@@ -1000,7 +1003,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
      */
     if (temp_bottom_hand_side_elements.empty() || temp_top_hand_side_elements.empty())
     {
-        NEVER_REACHED; 
+        NEVER_REACHED;
         //assert(temp_top_hand_side_elements.empty());
         //assert(temp_bottom_hand_side_elements.empty());
     }
@@ -1149,7 +1152,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundari
         {
             incidences_of_zero_top_image_nodes++;
         }
-        
+
         // Elements on the bottom hand side (images of top nodes)
         if (number_of_top_image_nodes == 1 || number_of_top_image_nodes == 2)
         {
@@ -1194,8 +1197,8 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
         }
         else
         {
-            // This isnt needed as now we copy all nodes to the left and right.
-            // If you reach here then you have probably 
+            // This isn't needed as now we copy all nodes to the left and right.
+            // If you reach here then you have probably
             // Changed it back to half the nodes or similar
             NEVER_REACHED;
 
@@ -1243,8 +1246,8 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
         }
         else
         {
-            // This isnt needed as now we copy all nodes to the top and bottom.
-            // If you reach here then you have probably 
+            // This isn't needed as now we copy all nodes to the top and bottom.
+            // If you reach here then you have probably
             // Changed it back to half the nodes or similar
             NEVER_REACHED;
 

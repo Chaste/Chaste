@@ -302,7 +302,7 @@ public:
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
-    
+
     /**
      * A virtual method to accept a cell population event writer so it can
      * write data from this object to file.

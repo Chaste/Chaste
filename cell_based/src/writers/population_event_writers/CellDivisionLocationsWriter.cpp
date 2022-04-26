@@ -58,20 +58,20 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abs
     }
 
 
-    pCellPopulation->ClearDivisionsInformation();    
+    pCellPopulation->ClearDivisionsInformation();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<std::string> divisions_information = pCellPopulation->GetDivisionsInformation();
-   
+
     for (unsigned index = 0; index < divisions_information.size(); index++)
     {
         *this->mpOutStream << divisions_information[index] << "\n";
     }
 
-    pCellPopulation->ClearDivisionsInformation();      
+    pCellPopulation->ClearDivisionsInformation();
     //VisitAnyPopulation(pCellPopulation);
 }
 

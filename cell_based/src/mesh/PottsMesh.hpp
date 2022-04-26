@@ -285,7 +285,7 @@ public:
     std::set<unsigned> GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
-     * Mark a node as deleted. Note that in a Potts mesh this requires the elements and connectivity to be updated accordingley.
+     * Mark a node as deleted. Note that in a Potts mesh this requires the elements and connectivity to be updated accordingly.
      *
      * @param index  the global index of a specified node
      */

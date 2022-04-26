@@ -63,7 +63,8 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mNumDeaths(0),
       mOutputDivisionLocations(false),
       mOutputCellVelocities(false),
-      mSamplingTimestepMultiple(1)
+      mSamplingTimestepMultiple(1),
+      mUpdatingTimestepMultiple(1)
 {
     // Set a random seed of 0 if it wasn't specified earlier
     RandomNumberGenerator::Instance();
@@ -121,9 +122,9 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 
                     /**
                      * If required, output this location to file
-                     *  
+                     *
                      * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
-                     * 
+                     *
                      */
                     if (mrCellPopulation.template HasWriter<CellDivisionLocationsWriter>())
                     {
@@ -223,6 +224,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetSamplingTimestepMult
 {
     assert(samplingTimestepMultiple > 0);
     mSamplingTimestepMultiple = samplingTimestepMultiple;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetUpdatingTimestepMultiple(unsigned updatingTimestepMultiple)
+{
+    assert(updatingTimestepMultiple > 0);
+    mUpdatingTimestepMultiple = updatingTimestepMultiple;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -423,8 +431,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
 
-        // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
-        UpdateCellPopulation();
+
+        if (p_simulation_time->GetTimeStepsElapsed()%mUpdatingTimestepMultiple == 0)
+        {
+            // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
+            UpdateCellPopulation();
+        }
 
         // Store whether we are sampling results at the current timestep
         SimulationTime* p_time = SimulationTime::Instance();
@@ -580,7 +592,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
 
     // Update topology of cell population
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
-    if (mUpdateCellPopulation)
+    SimulationTime* p_time = SimulationTime::Instance();
+    if (mUpdateCellPopulation && (p_time->GetTimeStepsElapsed() % mUpdatingTimestepMultiple == 0) )
     {
         LOG(1, "\tUpdating cell population...");
         mrCellPopulation.Update(births_or_death_occurred);
@@ -588,7 +601,18 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
     }
     else if (births_or_death_occurred)
     {
-        EXCEPTION("CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
+        if (!mUpdateCellPopulation)
+        {
+            EXCEPTION("CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
+        }
+        else if ((p_time->GetTimeStepsElapsed() % mUpdatingTimestepMultiple != 0))
+        {
+            EXCEPTION("CellPopulation has had births or deaths but you were on a non update step, make sure your cell cycle model and killer only operate on update steps.");
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
     }
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
 }
@@ -685,7 +709,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
 {
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
+    *rParamsFile << "\t\t<UpdateCellPopulation>" << mUpdateCellPopulation << "</UpdateCellPopulation>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
+    *rParamsFile << "\t\t<UpdatingTimestepMultiple>" << mUpdatingTimestepMultiple << "</UpdatingTimestepMultiple>\n";
     *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
     *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
 }

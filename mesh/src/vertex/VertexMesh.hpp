@@ -254,8 +254,8 @@ public:
      * \todo Merge with 3D Voronoi constructor? (see #1075)
      *
      * @param rMesh a tetrahedral mesh
-     * @param isPeriodic a boolean that indicates whether the mesh is periodic or not
-     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation 
+     * @param isPeriodic a boolean that indicates whether the mesh is periodic or not. Defaults to false.
+     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
      */
     VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false, bool isBounded = false);
 

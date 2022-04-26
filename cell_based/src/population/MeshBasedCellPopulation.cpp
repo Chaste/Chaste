@@ -607,7 +607,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
     // Store the number of cells for which to output data to VTK
     unsigned num_cells_from_mesh = GetNumNodes();
-    
+
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
@@ -666,7 +666,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             cells_writer.AddPointData(cell_data_names[var], cell_data[var]);
         }
 
-        // Write data using the mesh 
+        // Write data using the mesh
         cells_writer.WriteFilesUsingMesh(rGetMesh());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
         *(this->mpVtkMetaFile) << num_timesteps;
@@ -944,12 +944,12 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&mrMesh)))
     {
         is_mesh_periodic = true;
-        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh));
+        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
     }
     else if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
     {
         is_mesh_periodic = true;
-        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh));
+        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
     }
     else
     {
