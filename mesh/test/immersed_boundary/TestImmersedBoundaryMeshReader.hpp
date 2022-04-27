@@ -49,13 +49,80 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
+using Reader2D = ImmersedBoundaryMeshReader<2, 2>;
+
 class TestImmersedBoundaryMeshReader : public CxxTest::TestSuite
 {
 public:
 
-    ///\todo Improve testing
-    void TestNothingMuch()
+    void TestNonExistentFile()
     {
+      TS_ASSERT_THROWS_ANYTHING(Reader2D ibReader("NONEXISTENT_FILE"));
+    }
+    
+    void TestReadingFileHeaders2D()
+    {
+      Reader2D reader("mesh/test/data/ib_mesh_2d");
+      TS_ASSERT_EQUALS(reader.GetNumNodes(), 22);
+      TS_ASSERT_EQUALS(reader.GetNumElements(), 3);
+      TS_ASSERT_EQUALS(reader.GetNumLaminas(), 2);
+      TS_ASSERT_EQUALS(reader.GetNumGridPtsX(), 8);
+      TS_ASSERT_EQUALS(reader.GetNumGridPtsY(), 8);
+      TS_ASSERT_EQUALS(reader.GetNumElementAttributes(), 1);
+      TS_ASSERT_EQUALS(reader.GetNumLaminaAttributes(), 1);
+      TS_ASSERT_EQUALS(reader.GetCharacteristicNodeSpacing(), 0.0874862);
+    }
+    
+    void TestReadingData2D()
+    {
+      Reader2D reader("mesh/test/data/ib_mesh_2d");
+      
+      // Reading node data
+      std::vector<double> nodeData = reader.GetNextNode();
+      std::vector<double> expectedNodeData {0, 0, 1};
+      TS_ASSERT_EQUALS(nodeData, expectedNodeData);
+      
+      // Reading grid row
+      std::vector<double> gridRowData = reader.GetNextGridRow();
+      std::vector<double> expectedGridRowData {0, 0, 0, 0, 0, 0, 0, 0};
+      TS_ASSERT_EQUALS(gridRowData, expectedGridRowData);
+      
+      ImmersedBoundaryElementData elementData = reader.GetNextImmersedBoundaryElementData();
+      ImmersedBoundaryElementData expectedElementData {{0, 1, 2}, 0};
+      TS_ASSERT_EQUALS(elementData.NodeIndices, expectedElementData.NodeIndices);
+      TS_ASSERT_EQUALS(elementData.AttributeValue, expectedElementData.AttributeValue);
+  
+      ImmersedBoundaryElementData laminaData = reader.GetNextImmersedBoundaryLaminaData();
+      ImmersedBoundaryElementData expectedLaminaData {{15, 16, 17, 18, 19}, 0};
+      TS_ASSERT_EQUALS(laminaData.NodeIndices, expectedLaminaData.NodeIndices);
+      TS_ASSERT_EQUALS(laminaData.AttributeValue, expectedLaminaData.AttributeValue);
+    }
+    
+    void TestReset()
+    {
+      Reader2D reader("mesh/test/data/ib_mesh_2d");
+      
+      // Reading node data
+      std::vector<double> nodeData = reader.GetNextNode();
+      std::vector<double> expectedResult {0, 0, 1};
+      TS_ASSERT_EQUALS(nodeData, expectedResult);
+
+      reader.Reset();
+
+      nodeData = reader.GetNextNode();
+      TS_ASSERT_EQUALS(nodeData, expectedResult);
+    }
+    
+    void TestConstructingMeshFromReader()
+    {
+      Reader2D reader("mesh/test/data/ib_mesh_2d");
+
+      ImmersedBoundaryMesh<2, 2> mesh;
+      mesh.ConstructFromMeshReader(reader);
+
+      TS_ASSERT_EQUALS(mesh.GetNumNodes(), 22);
+      TS_ASSERT_EQUALS(mesh.GetNumElements(), 3);
+      TS_ASSERT_EQUALS(mesh.GetNumLaminas(), 2);
     }
 };
 

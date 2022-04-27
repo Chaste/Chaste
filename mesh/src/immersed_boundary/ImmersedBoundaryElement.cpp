@@ -113,6 +113,7 @@ ImmersedBoundaryElement<1, SPACE_DIM>::ImmersedBoundaryElement(unsigned index, c
 template<unsigned SPACE_DIM>
 void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
 {
+    EXCEPTION("SetFluidSource not implemented for 1D");
 }
 
 template<unsigned SPACE_DIM>

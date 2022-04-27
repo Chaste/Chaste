@@ -306,19 +306,114 @@ public:
         TS_ASSERT_EQUALS(modifier.GetNoiseStrength(), 1.0);
         
         // Noise skip
-        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 0);
+        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 1);
         modifier.SetNoiseSkip(4);
         TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 4);
         
         // Noise length scale
-        TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 0);
+        TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 0.1000);
         modifier.SetNoiseLengthScale(4);
         TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 4);
 
         // Noise zero field sums
-        TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), 0);
-        modifier.SetZeroFieldSums(4);
-        TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), 4);
+        TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), false);
+        modifier.SetZeroFieldSums(true);
+        TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), true);
+    }
+    
+    void TestAddNormalNoise()
+    {
+        // Set up SimulationTime - needed by SetupConstantMemberVariables()
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create an immersed boundary cell population with 64 grid points
+        ImmersedBoundaryPalisadeMeshGenerator gen(2, 100, 0.2, 2.0, 0.15, true, false, false, 32);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        ImmersedBoundarySimulationModifier<2> modifier;
+        modifier.SetAdditiveNormalNoise(true);
+        modifier.SetupConstantMemberVariables(cell_population);
+        modifier.SetNoiseStrength(0.1);
+
+        auto& rForceGrids = modifier.mpArrays->rGetModifiableForceGrids();
+
+        // Helper function to sum absolute values in force grids
+        auto sumForceGridAbsoluteValues = [](multi_array<double, 3>& rForceGrid) {
+            double total = 0.0;
+            for (unsigned dim = 0; dim < rForceGrid.shape()[0]; dim++) {
+                for (unsigned x = 0; x < rForceGrid.shape()[1]; x += 1) {
+                    for (unsigned y = 0; y < rForceGrid.shape()[2]; y += 1) {
+                        total += abs(rForceGrid[dim][x][y]);
+                    }
+                }
+            }
+            return total;
+        };
+        
+        // Test total forces pre and post noise
+        double totalForcePreNoise = sumForceGridAbsoluteValues(rForceGrids);
+        modifier.AddNormalNoise();
+        double totalForcePostNoise = sumForceGridAbsoluteValues(rForceGrids);
+
+        TS_ASSERT_DIFFERS(totalForcePreNoise, totalForcePostNoise);
+    }
+    
+    void TestZeroFieldSums()
+    {
+        
+        // Set up SimulationTime - needed by SetupConstantMemberVariables()
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create an immersed boundary cell population with 64 grid points
+        ImmersedBoundaryPalisadeMeshGenerator gen(2, 100, 0.2, 2.0, 0.15, true, false, false, 32);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        ImmersedBoundarySimulationModifier<2> modifier;
+        modifier.SetupConstantMemberVariables(cell_population);
+
+        auto& rForceGrids = modifier.mpArrays->rGetModifiableForceGrids();
+
+        // Helper function to initialise values in force grids
+        auto initialiseForceGrid = [](multi_array<double, 3>& rForceGrid) {
+            for (unsigned dim = 0; dim < rForceGrid.shape()[0]; dim++) {
+                for (unsigned x = 0; x < rForceGrid.shape()[1]; x += 1) {
+                    for (unsigned y = 0; y < rForceGrid.shape()[2]; y += 1) {
+                        rForceGrid[dim][x][y] = 1.0;
+                    }
+                }
+            }
+        };
+        
+        auto checkWholeGridEquals = [](multi_array<double, 3>& grid, double value) {
+            bool allEqual = true;
+            for (unsigned dim = 0; dim < grid.shape()[0]; dim++) {
+                for (unsigned x = 0; x < grid.shape()[1]; x += 1) {
+                    for (unsigned y = 0; y < grid.shape()[2]; y += 1) {
+                        if (grid[dim][x][y] != value) {
+                            allEqual = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            return allEqual;
+        };
+        
+        // Test total forces pre and post noise
+        initialiseForceGrid(rForceGrids);
+        TS_ASSERT(checkWholeGridEquals(rForceGrids, 1.0));
+        modifier.ZeroFieldSums(rForceGrids);
+        TS_ASSERT(checkWholeGridEquals(rForceGrids, 0.0));
     }
 };
 

@@ -225,7 +225,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     buffer_stream >> lamina_idx;
 
     unsigned offset = mIndexFromZero ? 0 : 1;
-    if (lamina_idx != mElementsRead + offset)
+    if (lamina_idx != mLaminasRead + offset)
     {
         EXCEPTION("Data for lamina " << mLaminasRead << " missing");
     }
@@ -263,6 +263,7 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenFiles()
     OpenNodeFile();
     OpenElementsFile();
     OpenGridFile();
+    OpenLaminasFile();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -345,12 +346,12 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     GetNextLineFromStream(mNodesFile, buffer);
 
     // Element header
-    GetNextLineFromStream(mLaminasFile, buffer);
+    GetNextLineFromStream(mElementsFile, buffer);
     std::stringstream element_buffer_stream(buffer);
     element_buffer_stream >> mNumElements >> mNumElementAttributes;
 
     // Lamina header
-    GetNextLineFromStream(mElementsFile, buffer);
+    GetNextLineFromStream(mLaminasFile, buffer);
     std::stringstream lamina_buffer_stream(buffer);
     lamina_buffer_stream >> mNumLaminas >> mNumLaminaAttributes;
 

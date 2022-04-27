@@ -403,36 +403,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
     // Finally, zero out any systematic small errors on the force grids that may lead to a drift, if required
     if (mZeroFieldSums)
     {
-        for (unsigned dim = 0; dim < 2; dim++)
-        {
-            double total_force = 0.0;
-            long count = 0;
-
-            for (unsigned x = 0; x < mNumGridPtsX; x++)
-            {
-                for (unsigned y = 0; y < mNumGridPtsY; y++)
-                {
-                    if (force_grids[dim][x][y] != 0.0)
-                    {
-                        total_force += force_grids[dim][x][y];
-                        count++;
-                    }
-                }
-            }
-
-            const double average_force = (total_force / count);
-
-            for (unsigned x = 0; x < mNumGridPtsX; x++)
-            {
-                for (unsigned y = 0; y < mNumGridPtsY; y++)
-                {
-                    if (force_grids[dim][x][y] != 0.0)
-                    {
-                        force_grids[dim][x][y] -= average_force;
-                    }
-                }
-            }
-        }
+        ZeroFieldSums(force_grids);
     }
 }
 
@@ -638,33 +609,40 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     // Finally, zero out any systematic small errors on the velocity grids that may lead to a drift, if required
     if (mZeroFieldSums)
     {
-        for (unsigned dim = 0; dim < 2; dim++)
-        {
-            double total_vel = 0.0;
-            long count = 0;
+        ZeroFieldSums(vel_grids);
+    }
+}
 
-            for (unsigned x = 0; x < mNumGridPtsX; x++)
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::ZeroFieldSums(multi_array<double, 3>& field)
+{
+    
+    for (unsigned dim = 0; dim < 2; dim++)
+    {
+        double total_field_val = 0.0;
+        long count = 0;
+
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
-                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                if (field[dim][x][y] != 0.0)
                 {
-                    if (vel_grids[dim][x][y] != 0.0)
-                    {
-                        total_vel += vel_grids[dim][x][y];
-                        count++;
-                    }
+                    total_field_val += field[dim][x][y];
+                    count++;
                 }
             }
+        }
 
-            const double average_vel = (total_vel / count);
+        const double average_field_val = (total_field_val / count);
 
-            for (unsigned x = 0; x < mNumGridPtsX; x++)
+        for (unsigned x = 0; x < mNumGridPtsX; x++)
+        {
+            for (unsigned y = 0; y < mNumGridPtsY; y++)
             {
-                for (unsigned y = 0; y < mNumGridPtsY; y++)
+                if (field[dim][x][y] != 0.0)
                 {
-                    if (vel_grids[dim][x][y] != 0.0)
-                    {
-                        vel_grids[dim][x][y] -= average_vel;
-                    }
+                    field[dim][x][y] -= average_field_val;
                 }
             }
         }

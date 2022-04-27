@@ -72,7 +72,7 @@ public:
         source.SetStrength(57.0);
         element.SetFluidSource(&source);
 
-        TS_ASSERT(element.GetFluidSource() != NULL);
+        TS_ASSERT_EQUALS(element.GetFluidSource(), &source);
         TS_ASSERT_EQUALS(element.GetFluidSource()->GetIndex(), 0u);
         TS_ASSERT_DELTA(element.GetFluidSource()->GetStrength(), 57.0, 1e-6);
 

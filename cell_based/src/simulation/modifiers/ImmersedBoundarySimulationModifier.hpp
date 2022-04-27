@@ -250,6 +250,11 @@ private:
      * @param numGridPtsX the number of grid points in the x direction
      */
     void SetMemberVariablesForTesting(unsigned numGridPtsY, unsigned numGridPtsX);
+    
+    /**
+     * Removes any bias in field sums
+     */
+    void ZeroFieldSums(multi_array<double, 3>& field);
 
 public:
 
