@@ -87,6 +87,23 @@ public:
             delete(p_node);
         }
     }
+    
+    void Test1DMethods()
+    {
+      // Fluid source
+      ImmersedBoundaryElement<1, 2> element(0, {});
+      FluidSource<2> source(0, 0.5, 0.5);
+      source.SetStrength(57.0);
+
+      TS_ASSERT_THROWS_ANYTHING(element.SetFluidSource(&source));
+      TS_ASSERT_THROWS_ANYTHING(element.GetFluidSource());
+      
+      // Boundary methods
+      element.SetIsBoundaryElement(false);
+      TS_ASSERT_EQUALS(element.IsElementOnBoundary(), false);
+      element.SetIsBoundaryElement(true);
+      TS_ASSERT(element.IsElementOnBoundary());
+    }
 };
 
 #endif /*TESTIMMERSEDBOUNDARYELEMENT_HPP_*/

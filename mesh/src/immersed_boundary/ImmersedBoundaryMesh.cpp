@@ -735,8 +735,11 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
         double this_y = pos_1[1];
         double next_x = pos_2[0];
         double next_y = pos_2[1];
+        std::cout << "Element " << index << "   node " << local_index << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
+        std::cout << "Element " << index << "   node " << local_index + 1 << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
 
         double signed_area_term = this_x * next_y - this_y * next_x;
+        std::cout << "Signed area is " << signed_area_term << std::endl;
 
         centroid_x += (this_x + next_x) * signed_area_term;
         centroid_y += (this_y + next_y) * signed_area_term;
@@ -763,6 +766,7 @@ template <>
 void ImmersedBoundaryMesh<1, 1>::ConstructFromMeshReader(AbstractMeshReader<1, 1>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("ImmersedBoundaryMesh not yet supported for the specified dimensions");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -770,6 +774,7 @@ template <>
 void ImmersedBoundaryMesh<1, 2>::ConstructFromMeshReader(AbstractMeshReader<1, 2>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("ImmersedBoundaryMesh not yet supported for the specified dimensions");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -777,6 +782,7 @@ template <>
 void ImmersedBoundaryMesh<1, 3>::ConstructFromMeshReader(AbstractMeshReader<1, 3>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("ImmersedBoundaryMesh not yet supported for the specified dimensions");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -784,6 +790,7 @@ template <>
 void ImmersedBoundaryMesh<2, 3>::ConstructFromMeshReader(AbstractMeshReader<2, 3>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("ImmersedBoundaryMesh not yet supported for the specified dimensions");
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -897,6 +904,7 @@ template <>
 void ImmersedBoundaryMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    EXCEPTION("ImmersedBoundaryMesh not yet supported for the specified dimensions");
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

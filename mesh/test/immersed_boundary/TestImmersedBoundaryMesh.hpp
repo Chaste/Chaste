@@ -870,6 +870,106 @@ public:
             }
         }
     }
+    
+    void TestUnsupportedDimensions()
+    {
+      {
+        ImmersedBoundaryMesh<1, 1> mesh;
+        ImmersedBoundaryMeshReader<1, 1> meshReader("mesh/test/data/ib_mesh_2d");
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
+      }
+      {
+        ImmersedBoundaryMesh<1, 2> mesh;
+        ImmersedBoundaryMeshReader<1, 2> meshReader("mesh/test/data/ib_mesh_2d");
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
+      }
+      {
+        ImmersedBoundaryMesh<1, 3> mesh;
+        ImmersedBoundaryMeshReader<1, 3> meshReader("mesh/test/data/ib_mesh_2d");
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
+      }
+      {
+        ImmersedBoundaryMesh<2, 3> mesh;
+        ImmersedBoundaryMeshReader<2, 3> meshReader("mesh/test/data/ib_mesh_2d");
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
+      }
+      {
+        ImmersedBoundaryMesh<3, 3> mesh;
+        ImmersedBoundaryMeshReader<3, 3> meshReader("mesh/test/data/ib_mesh_2d");
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
+      }
+    }
+    
+    void TestBoundingBoxCalculation()
+    {
+      std::vector<Node<2>*> nodes;
+      nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+      nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+      nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+      nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+      std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+      elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+      ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+      
+      ChasteCuboid<2> boundingBox = mesh.CalculateBoundingBoxOfElement(0);
+      auto p1 = boundingBox.rGetLowerCorner();
+      auto p2 = boundingBox.rGetUpperCorner();
+
+      ChastePoint<2> expectedP1 = {0.0, 0.0};
+      ChastePoint<2> expectedP2 = {0.1, 0.1};
+      
+      TS_ASSERT_EQUALS(p1[0], expectedP1[0]);
+      TS_ASSERT_EQUALS(p1[1], expectedP1[1]);
+      TS_ASSERT_EQUALS(p2[0], expectedP2[0]);
+      TS_ASSERT_EQUALS(p2[1], expectedP2[1]);
+    }
+    
+    void TestVoronoiSurfaceArea()
+    {
+      { // Single element  
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+
+        TS_ASSERT_EQUALS(mesh.GetVoronoiSurfaceAreaOfElement(0), 1.0);
+      }
+    }
+    
+    void TestDividingElements()
+    {
+      {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        
+        c_vector<double, 2u> centroid;
+        centroid[0] = 0.5;
+        centroid[1] = 0.5;
+
+        c_vector<double, 2u> axis;
+        axis[0] = 1.0;
+        axis[1] = 1.0;
+
+        mesh.DivideElement(elems[0], 0, 2, centroid, axis); 
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
+      } 
+    }
 
 };
 

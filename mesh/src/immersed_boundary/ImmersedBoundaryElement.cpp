@@ -119,6 +119,7 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM
 template<unsigned SPACE_DIM>
 FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource()
 {
+    EXCEPTION("GetFluidSource not implemented for 1D");
     return nullptr;
 }
 
@@ -143,7 +144,7 @@ void ImmersedBoundaryElement<1, SPACE_DIM>::SetAverageNodeSpacing(double average
 template<unsigned SPACE_DIM>
 bool ImmersedBoundaryElement<1, SPACE_DIM>::IsElementOnBoundary() const
 {
-    return false;
+    return mIsBoundaryElement;
 }
 
 template<unsigned SPACE_DIM>
