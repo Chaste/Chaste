@@ -185,7 +185,7 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
         assert(mTimes.size() == num_solutions); // Paranoia
         mDerivedQuantities.resize(mTimes.size());
 #if CHASTE_SUNDIALS_VERSION >= 60000
-        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size(), CvodeContextManager::Instance()->GetContext()) : nullptr;
+        N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size(), CvodeContextManager::Instance()->GetSundialsContext()) : nullptr;
 #else
         N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size()) : nullptr;
 #endif
