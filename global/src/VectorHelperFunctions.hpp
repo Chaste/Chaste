@@ -51,6 +51,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // CVODE headers
 #include <nvector/nvector_serial.h>
 
+#if CHASTE_SUNDIALS_VERSION >= 60000
+#include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+
+#endif
+
 #endif
 
 /**
@@ -366,7 +370,11 @@ inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
 {
     if (rVec == nullptr)
     {
+#if CHASTE_SUNDIALS_VERSION >= 60000
+        rVec = N_VNew_Serial(size, CvodeContextManager::Instance()->GetSundialsContext());
+#else
         rVec = N_VNew_Serial(size);
+#endif
     }
 }
 
