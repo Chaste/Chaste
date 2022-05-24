@@ -43,10 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <nvector/nvector_serial.h>
 
-#include <boost/serialization/split_member.hpp>
-#include "ChasteSerialization.hpp"
-#include "SerializableSingleton.hpp"
-
 /**
  * A special singleton class to manage the SUNContext object required
  * by Sundials 6.0 and above.

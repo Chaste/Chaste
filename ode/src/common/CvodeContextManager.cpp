@@ -37,9 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include <cassert>
 #include <memory>
-#include <nvector/nvector_serial.h>
-#include "CvodeContextManager.hpp"
 
+#include <nvector/nvector_serial.h>
+
+#include "CvodeContextManager.hpp"
 
 CvodeContextManager::CvodeContextManager() : mSundialsContext() {}
 
