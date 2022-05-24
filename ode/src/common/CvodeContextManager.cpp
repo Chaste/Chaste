@@ -36,33 +36,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef CHASTE_CVODE
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include <cassert>
+#include <memory>
 #include <nvector/nvector_serial.h>
 #include "CvodeContextManager.hpp"
 
-CvodeContextManager* CvodeContextManager::mpInstance = nullptr;
 
-CvodeContextManager::CvodeContextManager()
-        : mSundialsContext()
-{
-    assert(mpInstance == nullptr); // Ensure correct serialization
-}
+CvodeContextManager::CvodeContextManager() : mSundialsContext() {}
 
 CvodeContextManager* CvodeContextManager::Instance()
 {
-    if (mpInstance == nullptr)
-    {
-        mpInstance = new CvodeContextManager();
-    }
-    return mpInstance;
-}
-
-void CvodeContextManager::Destroy()
-{
-    if (mpInstance)
-    {
-        delete mpInstance;
-        mpInstance = nullptr;
-    }
+    // Single instance per thread
+    static thread_local std::unique_ptr<CvodeContextManager> instance = std::unique_ptr<CvodeContextManager>(new CvodeContextManager()); 
+    return instance.get();
 }
 
 sundials::Context& CvodeContextManager::GetSundialsContext()

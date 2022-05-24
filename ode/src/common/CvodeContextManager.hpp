@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef CHASTE_CVODE
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include <sstream>
+#include <memory>
 
 #include <nvector/nvector_serial.h>
 
@@ -54,38 +55,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * CvodeContextManager* ctx = CvodeContextManager::Instance();
  *
  */
-class CvodeContextManager : public SerializableSingleton<CvodeContextManager>
+class CvodeContextManager
 {
 private:
     /** The SUNContext **/
     sundials::Context mSundialsContext;
 
-    /** Pointer to the single instance. */
-    static CvodeContextManager* mpInstance;
-
-    friend class boost::serialization::access;
-
     /**
-     * Serialization of a CvodeContextManager object must be done with care.
-     * Do not serialize this singleton directly.  Instead, serialize
-     * the object returned by GetSerializationWrapper.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template <class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & mSundialsContext;
-    }
-
-protected:
-    /**
-     * Protected constructor.
+     * Private constructor.
      * Use Instance() to access the context manager.
      */
     CvodeContextManager();
 
+    CvodeContextManager(const CvodeContextManager&) = delete; // disable copy constructor
+    CvodeContextManager& operator=(const CvodeContextManager&) = delete; // disable copy assignment
+    
 public:
     /**
      * @return a reference to the managed context object.
@@ -98,14 +82,6 @@ public:
      * The object is created the first time this method is called.
      */
     static CvodeContextManager* Instance();
-
-    /**
-     * Destroy the current instance of the context manager.
-     * The next call to Instance will create a new instance.
-     * This method *must* be called before program exit, to avoid a memory
-     * leak.
-     */
-    static void Destroy();
 };
 
 #endif // CHASTE_SUNDIALS_VERSION >= 60000
