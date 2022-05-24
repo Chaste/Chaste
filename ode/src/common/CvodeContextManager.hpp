@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_CVODE
 #if CHASTE_SUNDIALS_VERSION >= 60000
-#include <sstream>
 #include <memory>
 
 #include <nvector/nvector_serial.h>
