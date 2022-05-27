@@ -53,9 +53,9 @@ class TestImmersedBoundaryPalisadeMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    ///\todo Improve testing
-    void TestNothingMuch()
+    void TestApicalLamina()
     {
+        //ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true, true);
     }
 };
 

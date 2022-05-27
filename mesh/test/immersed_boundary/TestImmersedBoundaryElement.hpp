@@ -90,9 +90,13 @@ public:
     
     void Test1DMethods()
     {
+      std::vector<Node<1>*> nodes;
+      nodes.push_back(new Node<1>(0, true, 0.0));
+      nodes.push_back(new Node<1>(1, true, 1.0));
+
       // Fluid source
-      ImmersedBoundaryElement<1, 2> element(0, {});
-      FluidSource<2> source(0, 0.5, 0.5);
+      ImmersedBoundaryElement<1, 1> element(0, nodes);
+      FluidSource<1> source(0, 0.5, 0.5);
       source.SetStrength(57.0);
 
       TS_ASSERT_THROWS_ANYTHING(element.SetFluidSource(&source));
@@ -103,6 +107,7 @@ public:
       TS_ASSERT_EQUALS(element.IsElementOnBoundary(), false);
       element.SetIsBoundaryElement(true);
       TS_ASSERT(element.IsElementOnBoundary());
+      TS_ASSERT_DIFFERS(&(element.rGetCornerNodes()), nullptr);
     }
 };
 
