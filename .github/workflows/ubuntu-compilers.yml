@@ -1,0 +1,81 @@
+name: Ubuntu compilers
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  
+  compiler-all-libs:
+
+    name: Compile with multiple compilers
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - cc: "clang-10"
+            cxx: "clang++-10"
+          - cc: "clang-12"
+            cxx: "clang++-12"
+          - cc: "gcc-10"
+            cxx: "g++-10"
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v3
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+#        sudo apt install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
+#        sudo apt install intel-oneapi-compiler-dpcpp-cpp
+#        source /opt/intel/oneapi/setvars.sh
+
+    - name: g++ version
+      run: |
+        ${CXX} --version
+        ${CXX} --version > compiler.version
+
+    - name: cache build directory
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: chaste-build-dir
+        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html') }}-${{ hashFiles('compiler.version') }}
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      working-directory: chaste-build-dir
+
+    - name: build core libraries
+      run: cmake --build . --parallel 2 --target chaste_core
+      working-directory: chaste-build-dir
+
+    - name: build cell_based
+      run: cmake --build . --parallel 2 --target chaste_cell_based
+      working-directory: chaste-build-dir
+
+    - name: build crypt
+      run: cmake --build . --parallel 2 --target chaste_crypt
+      working-directory: chaste-build-dir
+
+    - name: build heart
+      run: cmake --build . --parallel 2 --target chaste_heart
+      working-directory: chaste-build-dir
+
+    - name: build lung
+      run: cmake --build . --parallel 2 --target chaste_lung
+      working-directory: chaste-build-dir

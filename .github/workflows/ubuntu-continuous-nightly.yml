@@ -1,4 +1,4 @@
-name: Ubuntu 18.04 continuous and nightly test suites
+name: Ubuntu continuous and nightly test suites
 
 on:
   pull_request:
@@ -9,8 +9,17 @@ jobs:
   
   build-and-test:
 
-    name: Test on Ubuntu 18.04
-    runs-on: ubuntu-18.04
+    name: Test on Ubuntu
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: "ubuntu-18.04"
+            codename: "bionic"
+          - os: "ubuntu-20.04"
+            codename: "focal"
+          - os: "ubuntu-22.04"
+            codename: "jammy"
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CC: gcc
@@ -18,11 +27,11 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu bionic/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -33,7 +42,7 @@ jobs:
         ${CXX} --version > compiler.version
 
     - name: cache build directory
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       id: cache
       with:
         path: chaste-build-dir
