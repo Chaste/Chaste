@@ -1,4 +1,4 @@
-name: Ubuntu continuous and nightly test suites
+name: Ubuntu tests
 
 on:
   pull_request:
@@ -9,25 +9,33 @@ jobs:
   
   build-and-test:
 
-    name: Test on Ubuntu
     runs-on: ${{ matrix.os }}
+
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: "ubuntu-18.04"
             codename: "bionic"
-            extra-cmake: ""
+            cc: "gcc"
+            cxx: "g++"
           - os: "ubuntu-20.04"
             codename: "focal"
-            extra-cmake: ""
+            cc: "gcc"
+            cxx: "g++"
           - os: "ubuntu-22.04"
             codename: "jammy"
-            extra-cmake: ""
+            cc: "gcc"
+            cxx: "g++"
+          - os: "ubuntu-22.04"
+            codename: "jammy"
+            cc: "icx"
+            cxx: "icpx"
+
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      CC: gcc
-      CXX: g++
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
 
     steps:
     - name: checkout repository
@@ -40,6 +48,16 @@ jobs:
         sudo apt update
         sudo apt install chaste-dependencies
 
+    - name: install and set up intel compilers
+      run: |
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        sudo apt update
+        sudo apt install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
+        source /opt/intel/oneapi/setvars.sh
+        printenv >> $GITHUB_ENV
+      if: startsWith(matrix.cc, 'ic')
+
     - name: compiler version
       run: |
         ${CXX} --version
@@ -50,7 +68,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release ${{ matrix.extra-cmake }} ..
+      run: cmake -DCMAKE_BUILD_TYPE=Release ..
       working-directory: chaste-build-dir
 
     - name: build core libraries

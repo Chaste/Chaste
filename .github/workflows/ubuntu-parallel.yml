@@ -1,4 +1,4 @@
-name: Ubuntu compilers
+name: Ubuntu parallel
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   
-  compiler-all-libs:
+  build-and-test:
 
     runs-on: ubuntu-20.04
 
@@ -15,14 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cc: "clang-10"
-            cxx: "clang++-10"
-          - cc: "clang-12"
-            cxx: "clang++-12"
-          - cc: "gcc-10"
-            cxx: "g++-10"
-          - cc: "icc"
-            cxx: "icpc"
+          - cc: "gcc"
+            cxx: "g++"
           - cc: "icx"
             cxx: "icpx"
 
@@ -37,7 +31,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -65,22 +59,10 @@ jobs:
       run: cmake -DCMAKE_BUILD_TYPE=Release ..
       working-directory: chaste-build-dir
 
-    - name: build core libraries
-      run: cmake --build . --parallel 2 --target chaste_core
+    - name: build parallel test pack
+      run: cmake --build . --parallel 2 --target Parallel
       working-directory: chaste-build-dir
 
-    - name: build cell_based
-      run: cmake --build . --parallel 2 --target chaste_cell_based
-      working-directory: chaste-build-dir
-
-    - name: build crypt
-      run: cmake --build . --parallel 2 --target chaste_crypt
-      working-directory: chaste-build-dir
-
-    - name: build heart
-      run: cmake --build . --parallel 2 --target chaste_heart
-      working-directory: chaste-build-dir
-
-    - name: build lung
-      run: cmake --build . --parallel 2 --target chaste_lung
+    - name: run parallel test pack
+      run: ctest -j2 -L Parallel --output-on-failure
       working-directory: chaste-build-dir
