@@ -54,14 +54,6 @@ jobs:
     - name: compiler version
       run: |
         ${CXX} --version
-        ${CXX} --version > compiler.version
-
-    - name: cache build directory
-      uses: actions/cache@v2
-      id: cache
-      with:
-        path: chaste-build-dir
-        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html') }}-${{ hashFiles('compiler.version') }}
 
     - name: make build and test directories
       run: |

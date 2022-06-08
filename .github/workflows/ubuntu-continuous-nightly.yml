@@ -17,10 +17,13 @@ jobs:
         include:
           - os: "ubuntu-18.04"
             codename: "bionic"
+            extra-cmake: ""
           - os: "ubuntu-20.04"
             codename: "focal"
+            extra-cmake: ""
           - os: "ubuntu-22.04"
             codename: "jammy"
+            extra-cmake: ""
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CC: gcc
@@ -40,14 +43,6 @@ jobs:
     - name: compiler version
       run: |
         ${CXX} --version
-        ${CXX} --version > compiler.version
-
-    - name: cache build directory
-      uses: actions/cache@v3
-      id: cache
-      with:
-        path: chaste-build-dir
-        key: ${{ runner.os }}-${{ hashFiles('docs/ReleaseNotes.html') }}-${{ hashFiles('compiler.version') }}
 
     - name: make build and test directories
       run: |
@@ -55,7 +50,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: cmake -DCMAKE_BUILD_TYPE=Release ${{ matrix.extra-cmake }} ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
