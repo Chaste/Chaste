@@ -172,7 +172,7 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
     if (checkOrthogonality)
     {
         // Note that we define this matrix before setting it as otherwise the profiling build will break (see #2367)
-        c_matrix<double,DIM,DIM> temp;
+        c_matrix<double,DIM,DIM> temp = zero_matrix<double>(DIM, DIM);
         temp = prod(trans(rFibreMatrix), rFibreMatrix);
 
         // Check temp is equal to the identity
