@@ -21,6 +21,10 @@ jobs:
             cxx: "clang++-12"
           - cc: "gcc-10"
             cxx: "g++-10"
+          - cc: "icc"
+            cxx: "icpc"
+          - cc: "icx"
+            cxx: "icpx"
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CC: ${{ matrix.cc }}
@@ -36,9 +40,16 @@ jobs:
         sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/Chaste%20Team.asc
         sudo apt update
         sudo apt install chaste-dependencies
-#        sudo apt install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
-#        sudo apt install intel-oneapi-compiler-dpcpp-cpp
-#        source /opt/intel/oneapi/setvars.sh
+
+    - name: install and set up intel compilers
+      run: |
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        sudo apt update
+        sudo apt install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
+        source /opt/intel/oneapi/setvars.sh
+        printenv >> $GITHUB_ENV
+      if: startsWith(${{ matrix.cc }}, 'ic')
 
     - name: g++ version
       run: |
