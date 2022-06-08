@@ -12,6 +12,7 @@ jobs:
     name: Compile with multiple compilers
     runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - cc: "clang-10"
