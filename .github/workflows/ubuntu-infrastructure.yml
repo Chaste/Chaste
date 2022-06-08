@@ -1,9 +1,9 @@
-name: Ubuntu np3
+name: Ubuntu infrastructure
 
 on:
   pull_request:
     branches:
-      - 'this_cannot_be_run_on_gh_actions'
+      - '**'
 
 jobs:
   
@@ -37,13 +37,9 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_NUM_CPUS_TEST=3 ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug ..
       working-directory: chaste-build-dir
 
-    - name: build continuous test pack
-      run: cmake --build . --parallel 2 --target Continuous
-      working-directory: chaste-build-dir
-
-    - name: run continuous test pack
-      run: ctest -L Continuous --output-on-failure
+    - name: run infrastructure checks
+      run: cmake --build . --target infrastructure
       working-directory: chaste-build-dir
