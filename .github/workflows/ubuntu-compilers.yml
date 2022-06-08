@@ -49,9 +49,9 @@ jobs:
         sudo apt install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
         source /opt/intel/oneapi/setvars.sh
         printenv >> $GITHUB_ENV
-      if: startsWith(${{ matrix.cc }}, 'ic')
+      if: startsWith(matrix.cc, 'ic')
 
-    - name: g++ version
+    - name: compiler version
       run: |
         ${CXX} --version
         ${CXX} --version > compiler.version
