@@ -70,7 +70,7 @@ void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<
         double y = node_iter->rGetLocation()[1]; // y-coordinate of node
 
         // If the node lies below the line y=0, then add the boundary force contribution to the node forces
-        if (y < 0.0)
+        if (y < 0.0 && DIM > 1)
         {
             c_vector<double, DIM> boundary_force = zero_vector<double>(DIM);
             boundary_force[1] = mForceStrength*SmallPow(y, 2);
