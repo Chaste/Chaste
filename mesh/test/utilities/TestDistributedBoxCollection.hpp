@@ -1218,7 +1218,7 @@ public:
             for (unsigned pos_y = 0 ; pos_y < 20 ; pos_y++)
             {
                 // Random first location
-                c_vector<double, 2> node_a_location;
+                c_vector<double, 2> node_a_location = zero_vector<double>(2);
                 node_a_location(0) = (0.25 + 0.5 * double(pos_x)) * box_size;
                 node_a_location(1) = (0.25 + 0.5 * double(pos_y)) * box_size;
 
@@ -1228,7 +1228,8 @@ public:
                     for (unsigned offset = 0 ; offset < num_offsets_to_test ; offset++)
                     {
                         // Offset a second position within the interaction distance
-                        c_vector<double, 2> node_b_location = node_a_location + (box_size - delta) * offsets_to_test[offset];
+                        c_vector<double, 2> node_b_location;
+                        node_b_location = node_a_location + (box_size - delta) * offsets_to_test[offset];
 
                         // Account for periodicity
                         node_b_location[0] = fmod(node_b_location[0] + 1.0, 1.0);
