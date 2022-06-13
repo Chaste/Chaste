@@ -293,7 +293,7 @@ def ignore_dir(dir_to_check):
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'codegen_python3_venv',
                    'testoutput', 'doc', 'projects', 'hierwikiplugin']
 
-    dir_ignore_contains = ['Debug_', 'cmake-build', 'venv']
+    dir_ignore_contains = ['Debug_', 'chaste-build', 'cmake-build', 'venv']
 
     startchar_ignores = ['_', '.']
 
