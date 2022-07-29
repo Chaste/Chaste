@@ -503,12 +503,15 @@ PetscErrorCode PetscTools::ChasteMatCopy(Mat A, Mat B, MatStructure str)
 
     PetscBool assembled;
     MatAssembled(B, &assembled);
+    assert(assembled != PETSC_TRUE);
+    /*
+     * (Part of original MatCopy)
     if (assembled == PETSC_TRUE)
     {
         ierr = MatZeroEntries(B);
         CHKERRQ(ierr);
     }
-
+    */
     ierr = MatGetOwnershipRange(A, &rstart, &rend);
     CHKERRQ(ierr);
     for (i = rstart; i < rend; i++)
