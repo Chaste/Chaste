@@ -47,7 +47,7 @@ class TestFluidSource : public CxxTest::TestSuite
 {
 public:
 
-    void TestConstructors()
+    void TestFluidSourceConstructors()
     {
         ChastePoint<2> point(0.1, -5.0);
         FluidSource<2> source_by_point(1, point);
@@ -84,7 +84,8 @@ public:
         TS_ASSERT_EQUALS(source.GetIndex(), 0u);
 
         source.SetIndex(132);
-        TS_ASSERT_EQUALS(source.GetIndex(), 132u);
+        auto res = source.GetIndex();
+        TS_ASSERT_EQUALS(res, 132u);
     }
 
     void TestStrengthMethods()

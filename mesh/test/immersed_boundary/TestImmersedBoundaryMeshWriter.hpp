@@ -146,6 +146,9 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.cell";
 
+        // Test adding point data
+        ib_mesh_writer.AddPointData("test", {1.0, 1.0});
+    }
 //        FileComparison comparer1(results_file1,"mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d.node");
 //        TS_ASSERT(comparer1.CompareFiles());
 //
@@ -178,6 +181,12 @@ public:
 //        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
 //        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 //#endif //CHASTE_VTK
+    void TestImmersedBoundaryMeshWriterNoMesh()
+    {
+      // Fails because assertion that mesh reader mustn't be null but it is - does it make any sense for this method to exist?
+      /*ImmersedBoundaryMeshWriter<2,2> ib_mesh_writer("TestIbMeshWriterWithNoMesh", "ib_mesh_2d");
+      auto result = ib_mesh_writer.GetNextNode();
+      TS_ASSERT_EQUALS(result.size(), 0); */
     }
 };
 

@@ -118,7 +118,7 @@ std::vector<double> ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextN
 {
     std::vector<double> node_data;
 
-    std::string buffer;
+    std::string buffer = "";
     GetNextLineFromStream(mNodesFile, buffer);
 
     std::stringstream buffer_stream(buffer);
@@ -149,7 +149,7 @@ std::vector<double> ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextG
     std::vector<double> grid_row;
     grid_row.resize(mNumGridPtsX);
 
-    std::string buffer;
+    std::string buffer = "";
     GetNextLineFromStream(mGridFile, buffer);
 
     std::stringstream buffer_stream(buffer);
@@ -170,7 +170,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     // Create data structure for this element
     ImmersedBoundaryElementData element_data;
 
-    std::string buffer;
+    std::string buffer = "";
     GetNextLineFromStream(mElementsFile, buffer);
 
     std::stringstream buffer_stream(buffer);
@@ -216,7 +216,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     // Create data structure for this lamina
     ImmersedBoundaryElementData lamina_data;
 
-    std::string buffer;
+    std::string buffer = "";
     GetNextLineFromStream(mLaminasFile, buffer);
 
     std::stringstream buffer_stream(buffer);
@@ -323,7 +323,7 @@ void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenGridFile()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
 {
-    std::string buffer;
+    std::string buffer = "";
     GetNextLineFromStream(mNodesFile, buffer);
 
     unsigned local_space_dim;

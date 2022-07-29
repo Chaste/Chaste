@@ -55,7 +55,11 @@ public:
 
     void TestApicalLamina()
     {
-        //ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true, true);
+        try {
+          ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true, true);
+        } catch (Exception& e) {
+          std::cout << e.GetMessage() << std::endl;
+        }
     }
 };
 

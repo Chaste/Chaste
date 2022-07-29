@@ -58,6 +58,22 @@ public:
     void TestNonExistentFile()
     {
       TS_ASSERT_THROWS_ANYTHING(Reader2D ibReader("NONEXISTENT_FILE"));
+      
+      TS_ASSERT_THROWS_ANYTHING(Reader2D missingElem("mesh/test/data/ib_mesh/missing_elem"));
+      TS_ASSERT_THROWS_ANYTHING(Reader2D missingNode("mesh/test/data/ib_mesh/missing_node"));
+      TS_ASSERT_THROWS_ANYTHING(Reader2D missingGrid("mesh/test/data/ib_mesh/missing_grid"));
+      TS_ASSERT_THROWS_ANYTHING(Reader2D missingLam("mesh/test/data/ib_mesh/missing_lam"));
+      
+      Reader2D missingElem("mesh/test/data/ib_mesh/missing_elem_data");
+      TS_ASSERT_THROWS_ANYTHING(missingElem.GetNextImmersedBoundaryElementData()); 
+
+      TS_ASSERT_THROWS_ANYTHING(Reader2D missingNode("mesh/test/data/ib_mesh/missing_node_data"));
+
+      Reader2D missingGrid("mesh/test/data/ib_mesh/missing_grid_data");
+      TS_ASSERT_THROWS_ANYTHING(missingGrid.GetNextGridRow()); 
+
+      Reader2D missingLam("mesh/test/data/ib_mesh/missing_lam_data");
+      TS_ASSERT_THROWS_ANYTHING(missingLam.GetNextImmersedBoundaryLaminaData());
     }
     
     void TestReadingFileHeaders2D()
@@ -123,6 +139,22 @@ public:
       TS_ASSERT_EQUALS(mesh.GetNumNodes(), 22);
       TS_ASSERT_EQUALS(mesh.GetNumElements(), 3);
       TS_ASSERT_EQUALS(mesh.GetNumLaminas(), 2);
+    }
+    
+    void TestOtherMethods()
+    {
+      Reader2D reader("mesh/test/data/ib_mesh_2d");
+      
+      // Seems to be set to return 0 by design
+      TS_ASSERT_EQUALS(reader.GetNumFaces(), 0);
+      
+      auto element = reader.GetNextElementData();
+      TS_ASSERT_EQUALS(element.NodeIndices.size(), 0);
+      TS_ASSERT_EQUALS(element.AttributeValue, 0);
+      
+      auto face = reader.GetNextFaceData();
+      TS_ASSERT_EQUALS(face.NodeIndices.size(), 0);
+      TS_ASSERT_EQUALS(face.AttributeValue, 0);
     }
 };
 

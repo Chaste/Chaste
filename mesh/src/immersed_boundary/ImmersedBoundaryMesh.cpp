@@ -168,6 +168,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
 {
+    std::cout << "In method \n";
     assert(SPACE_DIM == 2);
 
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
@@ -179,6 +180,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfE
     double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
 
     double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
+    std::cout << "Elongation shape factor is " << elongation_shape_factor << "\n";
     return elongation_shape_factor;
 }
 
@@ -710,6 +712,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
     // Only implemented in 2D
     assert(SPACE_DIM == 2);
 
+    //std::cout << "Index is " << index << "\n";
     ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
     unsigned num_nodes = p_element->GetNumNodes();
@@ -735,15 +738,16 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
         double this_y = pos_1[1];
         double next_x = pos_2[0];
         double next_y = pos_2[1];
-        std::cout << "Element " << index << "   node " << local_index << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
-        std::cout << "Element " << index << "   node " << local_index + 1 << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
+        //std::cout << "Element " << index << "   node " << local_index << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
+        //std::cout << "Element " << index << "   node " << local_index + 1 << " pos is (" << pos_2[0] << ", " << pos_2[1] << ")" << std::endl;
 
         double signed_area_term = this_x * next_y - this_y * next_x;
-        std::cout << "Signed area is " << signed_area_term << std::endl;
+        //std::cout << "Signed area is " << signed_area_term << std::endl;
 
         centroid_x += (this_x + next_x) * signed_area_term;
         centroid_y += (this_y + next_y) * signed_area_term;
         element_signed_area += 0.5 * signed_area_term;
+        //std::cout << "Element signed area is " << element_signed_area << std::endl;
 
         pos_1 = pos_2;
     }
@@ -1180,15 +1184,16 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
 
     // Create a vector perpendicular to the axis of division
-    c_vector<double, SPACE_DIM> perp_axis;
+    /*c_vector<double, SPACE_DIM> perp_axis;
     perp_axis(0) = -axisOfDivision(1);
-    perp_axis(1) = axisOfDivision(0);
+    perp_axis(1) = axisOfDivision(0);*/
 
     /*
      * Find which edges the axis of division crosses by finding any node
      * that lies on the opposite side of the axis of division to its next
      * neighbour.
      */
+    /*
     unsigned num_nodes = pElement->GetNumNodes();
     std::vector<unsigned> intersecting_nodes;
     bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
@@ -1200,20 +1205,21 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
             intersecting_nodes.push_back(i);
         }
         is_current_node_on_left = is_next_node_on_left;
-    }
+    }*/
 
     // If the axis of division does not cross two edges then we cannot proceed
-    if (intersecting_nodes.size() != 2)
+    /*if (intersecting_nodes.size() != 2)
     {
         EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
-    }
+    }*/
 
     // Now call DivideElement() to divide the element using the nodes found above
-    unsigned new_element_index = DivideElement(pElement,
+    unsigned new_element_index = 0;
+    /*unsigned new_element_index = DivideElement(pElement,
                                                intersecting_nodes[0],
                                                intersecting_nodes[1],
                                                centroid,
-                                               axisOfDivision);
+                                               axisOfDivision);*/
 
     return new_element_index;
 }
