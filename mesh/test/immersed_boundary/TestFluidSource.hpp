@@ -78,7 +78,7 @@ public:
         TS_ASSERT_DELTA(source_3d.rGetLocation()[2], 7.1, 1e-6);
     }
 
-    void TestIndexMethods()
+    void TestFluidSourceIndexMethods()
     {
         FluidSource<2> source(0, 1.3, 6.7);
         TS_ASSERT_EQUALS(source.GetIndex(), 0u);

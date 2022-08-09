@@ -55,11 +55,25 @@ public:
 
     void TestApicalLamina()
     {
-        try {
-          ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true, true);
-        } catch (Exception& e) {
-          std::cout << e.GetMessage() << std::endl;
-        }
+      try {
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, true);
+      } catch (Exception& e) {
+        TS_TRACE(e.GetMessage());
+      }
+    }
+    
+    void TestLeakyLaminasWithOverideNodesPerCell() {
+      try {
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, true, true, 100);
+      } catch (Exception& e) {
+        TS_TRACE(e.GetMessage());
+      }
+    }
+
+    void TestCellGenerationExceptions() {
+      {
+        TS_ASSERT_THROWS_ANYTHING(ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.01, 2.0, 0.5, true, true));
+      }
     }
 };
 

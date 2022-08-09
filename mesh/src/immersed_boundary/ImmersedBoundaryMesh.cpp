@@ -68,9 +68,12 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         case 3:
             EXCEPTION("Not implemented yet in 3D");
             break;
-
+        
+        //LCOV_EXCL_START
         default:
             NEVER_REACHED;
+            break;
+        //LCOV_EXCL_STOP
     }
 
     // Populate mNodes, mElements, and mLaminas
@@ -611,11 +614,12 @@ const multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet
     return m2dVelocityGrids;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+/*template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet3dVelocityGrids() const
 {
     return m3dVelocityGrids;
 }
+*/
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiable2dVelocityGrids()
@@ -623,11 +627,12 @@ multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifi
     return m2dVelocityGrids;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+/*template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiable3dVelocityGrids()
 {
     return m3dVelocityGrids;
 }
+*/
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)
@@ -1184,42 +1189,48 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
 
     // Create a vector perpendicular to the axis of division
-    /*c_vector<double, SPACE_DIM> perp_axis;
+    c_vector<double, SPACE_DIM> perp_axis;
     perp_axis(0) = -axisOfDivision(1);
-    perp_axis(1) = axisOfDivision(0);*/
+    perp_axis(1) = axisOfDivision(0);
 
+    std::stringstream str;
+    str << "Centroid is " << centroid[0] << ", " << centroid[1] << "\n" << "Axis is " << axisOfDivision(0) << ", " << axisOfDivision(1) << "\n";
+    std::cout << str.str();
     /*
      * Find which edges the axis of division crosses by finding any node
      * that lies on the opposite side of the axis of division to its next
      * neighbour.
      */
-    /*
+    
     unsigned num_nodes = pElement->GetNumNodes();
     std::vector<unsigned> intersecting_nodes;
     bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
     for (unsigned i = 0; i < num_nodes; i++)
     {
         bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i + 1) % num_nodes), centroid), perp_axis) >= 0);
+        std::stringstream left;
+        left << "Node " << i << " is on the left: " << is_current_node_on_left << ", node " << (i+1)%num_nodes << " is on the left: " << is_next_node_on_left << "\n";
+        std::cout << left.str(); 
         if (is_current_node_on_left != is_next_node_on_left)
         {
             intersecting_nodes.push_back(i);
         }
         is_current_node_on_left = is_next_node_on_left;
-    }*/
+    }
 
     // If the axis of division does not cross two edges then we cannot proceed
-    /*if (intersecting_nodes.size() != 2)
+    if (intersecting_nodes.size() != 2)
     {
         EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
-    }*/
+    }
 
     // Now call DivideElement() to divide the element using the nodes found above
-    unsigned new_element_index = 0;
-    /*unsigned new_element_index = DivideElement(pElement,
+    //unsigned new_element_index = 0;
+    unsigned new_element_index = DivideElement(pElement,
                                                intersecting_nodes[0],
                                                intersecting_nodes[1],
                                                centroid,
-                                               axisOfDivision);*/
+                                               axisOfDivision);
 
     return new_element_index;
 }

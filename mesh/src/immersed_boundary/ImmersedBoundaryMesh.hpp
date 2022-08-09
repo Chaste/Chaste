@@ -373,7 +373,7 @@ public:
     /**
      * @return reference to non-modifiable 3d fluid velocity grids.
      */
-    const multi_array<double, 4>& rGet3dVelocityGrids() const;
+    //const multi_array<double, 4>& rGet3dVelocityGrids() const;
 
     /**
      * @return reference to modifiable 2d fluid velocity grids.
@@ -383,7 +383,7 @@ public:
     /**
      * @return reference to modifiable 3d fluid velocity grids.
      */
-    multi_array<double, 4>& rGetModifiable3dVelocityGrids();
+    //multi_array<double, 4>& rGetModifiable3dVelocityGrids();
 
     /**
      * @param the new number of fluid mesh points in the x direction.

@@ -181,12 +181,30 @@ public:
 //        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
 //        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 //#endif //CHASTE_VTK
+    void TestImmersedBoundaryMeshWriterVTKCornerOverlap()
+    {
+      std::vector<Node<2>*> nodes;
+      nodes.push_back(new Node<2>(0, true, 0.3, 0.3));
+      nodes.push_back(new Node<2>(1, true, 1.1, 0.3));
+      nodes.push_back(new Node<2>(2, true, 1.1, 1.1));
+      nodes.push_back(new Node<2>(3, true, 0.3, 1.1));
+
+      std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+      elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+      ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+      
+      ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
+      ib_mesh_writer.WriteVtkUsingMesh(mesh);
+
+    }
+
     void TestImmersedBoundaryMeshWriterNoMesh()
     {
       // Fails because assertion that mesh reader mustn't be null but it is - does it make any sense for this method to exist?
-      /*ImmersedBoundaryMeshWriter<2,2> ib_mesh_writer("TestIbMeshWriterWithNoMesh", "ib_mesh_2d");
-      auto result = ib_mesh_writer.GetNextNode();
-      TS_ASSERT_EQUALS(result.size(), 0); */
+      /*ImmersedBoundaryMeshReader<2,2> ib_mesh_reader("ib_mesh_2d_no_mesh");
+      ImmersedBoundaryMeshWriter<2,2> ib_mesh_writer("TestIbMeshWriterWithNoMesh", "ib_mesh_2d_no_mesh_out");
+      ib_mesh_writer.WriteFilesUsingMeshReader(ib_mesh_reader);*/
     }
 };
 
