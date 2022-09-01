@@ -15,7 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - project: "Chaste/CellBasedComparison2017"
+          - project_org: "Chaste"
+            project_repo: "CellBasedComparison2017"
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"
 
@@ -36,8 +37,8 @@ jobs:
     - name: checkout project
       uses: actions/checkout@v3
       with:
-        repository: ${{ matrix.project }}
-        path: projects
+        repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
+        path: projects/${{ matrix.project_repo }}
 
     - name: compiler version
       run: |
