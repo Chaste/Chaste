@@ -1,0 +1,61 @@
+name: Project tests
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  
+  build-and-test:
+
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: "Chaste/CellBasedComparison2017"
+            build_target: "project_CellBasedComparison2017"
+            test_target: "project_CellBasedComparison2017"
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v3
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+    
+    - name: checkout project
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ matrix.project }}
+      working-directory: projects
+
+    - name: compiler version
+      run: |
+        g++ --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ERROR_ON_WARNING=OFF ..
+      working-directory: chaste-build-dir
+
+    - name: build targets
+      run: cmake --build . --parallel 2 --target ${{ matrix.build_target }}
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j2 -L ${{ matrix.test_target }}
+      working-directory: chaste-build-dir
