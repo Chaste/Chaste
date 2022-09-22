@@ -546,6 +546,22 @@ if(NOT pocketfft_POPULATED)
     list (APPEND Chaste_INCLUDES "${pocketfft_SOURCE_DIR}")
 endif()
 
+################################
+####  Find OpenSimplex
+################################
+FetchContent_Declare(
+    OpenSimplex
+    GIT_REPOSITORY git@github.com:KdotJPG/OpenSimplex2.git
+    GIT_TAG master
+)
+
+FetchContent_GetProperties(OpenSimplex)
+if(NOT OpenSimplex_POPULATED)
+    FetchContent_Populate(OpenSimplex)
+    add_library(OpenSimplex INTERFACE)
+    target_include_directories(OpenSimplex INTERFACE ${opensimplex_SOURCE_DIR})
+    list (APPEND Chaste_INCLUDES "${opensimplex_SOURCE_DIR}")
+endif()
 
 ################################
 ####  Find Eigen and Spectra
