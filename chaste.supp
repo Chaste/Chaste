@@ -427,6 +427,40 @@
 }
 
 {
+   HDF5 write on closure
+   Memcheck:Param
+   pwritev(vector[...])
+   fun:pwritev64
+   fun:pwritev
+   fun:mca_fbtl_posix_pwritev
+   fun:mca_common_ompio_file_write
+   fun:mca_common_ompio_file_write_at
+   fun:mca_io_ompio_file_write_at
+   fun:PMPI_File_write_at
+   fun:H5FD_mpio_write
+   fun:H5FD_write
+   fun:H5F__accum_write
+   fun:H5PB_write
+   fun:H5F_block_write
+   fun:H5C__flush_single_entry
+   fun:H5C__flush_candidates_in_ring
+   fun:H5C__flush_candidate_entries
+   fun:H5C_apply_candidate_list
+   fun:H5AC__rsp__dist_md_write__flush
+   fun:H5AC__run_sync_point
+   fun:H5AC__flush_entries
+   fun:H5AC_flush
+   fun:H5F__flush_phase2
+   fun:H5F__dest
+   fun:H5F_try_close
+   fun:H5F__close_cb
+   fun:H5I_dec_ref
+   fun:H5I_dec_app_ref
+   fun:H5F__close
+   fun:H5Fclose
+}
+
+{
    MPICH problem in calls from H5FD_mpio_open
    Memcheck:Leak
    fun:malloc
@@ -452,6 +486,39 @@
    fun:H5F_open
    fun:H5Fopen
    fun:_ZN14Hdf5DataWriterC1ER24DistributedVectorFactoryRKSsS3_bb
+}
+
+# OpenMPI https://github.com/cpmech/test-openmpi-valgrind
+{
+   OpenMPI/start_thread
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:/usr/lib/x86_64-linux-gnu/libevent-2.1.so.7.0.0
+   fun:event_base_loop
+   obj:*
+   fun:start_thread
+   fun:clone
+}
+
+{
+   OpenMPI/PetscInitialize
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   fun:mca_btl_base_select
+   obj:*
+   fun:mca_bml_base_init
+   fun:ompi_mpi_init
+   fun:PMPI_Init_thread
+   fun:PetscInitialize
 }
 
 {
