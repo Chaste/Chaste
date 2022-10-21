@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "Debug.hpp"
 #include "CheckpointArchiveTypes.hpp"
 
 class TestHoneycombVertexMeshGenerator : public CxxTest::TestSuite
@@ -99,12 +98,16 @@ public:
         }
     }
 
-    void xTestFlatBottomMesh()
+    void TestFlatBottomMesh()
     {
         HoneycombVertexMeshGenerator generator(4, 4, true);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 44u);
+	 
+        VertexMeshWriter<2,2> vertex_mesh_writer_2("TestHoneycombVertexMesh", "honeycombmeshflat");
+        vertex_mesh_writer_2.WriteFilesUsingMesh(*p_mesh);
+
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
         // now loop over all nodes
@@ -118,9 +121,8 @@ public:
                 minimal_y_position = this_y_position;
             }
         }
-        PRINT_VARIABLE(minimal_y_position);
+	
         // loop over all nodes again, find all nodes with that y position
-
         unsigned num_bottom_nodes = 0;
         for (unsigned node_index=0; node_index<44u; node_index++)
         {
@@ -128,10 +130,11 @@ public:
             if (this_y_position == minimal_y_position)
             {
                 num_bottom_nodes++;
-            }
+		//These nodes should be boundary nodes
+                TS_ASSERT(p_mesh->GetNode(node_index)->IsBoundaryNode())            }
         }
-        // these should be 5
-        PRINT_VARIABLE(num_bottom_nodes);
+
+        // The total number of bottom nodes should be 5
         TS_ASSERT_EQUALS(num_bottom_nodes, 5u);
 
         // loop over all elements
@@ -142,13 +145,11 @@ public:
         for (unsigned element_index=0; element_index<16u; element_index++)
         {
             double num_nodes = p_mesh->GetElement(element_index)->GetNumNodes();
-            //PRINT_VARIABLE(num_nodes)
             if (num_nodes == 5.0)
             {
                num_five_node_elements++;
             }
         }
-        PRINT_VARIABLE(num_five_node_elements);
         TS_ASSERT_EQUALS(num_five_node_elements,4u);
 
     }

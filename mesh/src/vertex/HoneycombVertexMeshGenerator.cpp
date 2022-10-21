@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HoneycombVertexMeshGenerator.hpp"
-#include "Debug.hpp"
 #include "CheckpointArchiveTypes.hpp"
 
 HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsAcross,
@@ -60,6 +59,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
     // Create the nodes, row by row, from the bottom up
 
     // On the first row we have numElementsAcross nodes, all of which are boundary nodes
+    // This row only exists if isFlatBottom is false
     if (!isFlatBottom)
     {
         for (unsigned i=0; i<numElementsAcross; i++)
@@ -70,9 +70,11 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         }
     }
     /*
-     * On each interior row we have numElementsAcross+1 nodes. On the second and penultimate
-     * row all nodes are boundary nodes. On other rows the first and last nodes only
-     * are boundary nodes.
+     * On each interior row, and the first row if isFlatBottom is true,
+     * we have numElementsAcross+1 nodes. On the penultimate
+     * row all nodes are boundary nodes. The same is true
+     * for the second row if isFlatBottom is false. On other rows the 
+     * first and last nodes only are boundary nodes.
      */
     for (unsigned j=1; j<2*numElementsUp+1; j++)
     {
@@ -132,6 +134,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
      * Create the elements. The array node_indices contains the
      * global node indices from bottom, going anticlockwise.
      */
+//    for (unsigned j=0; j<numElementsUp; j++)
     for (unsigned j=0; j<numElementsUp; j++)
     {
         if (j==0 && isFlatBottom)
@@ -166,7 +169,16 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 }
                 else
                 {
-                    node_indices[0] = 2*j*(numElementsAcross+1) - 1*(j%2==0) + i; // different for even/odd rows
+		    unsigned first_index;
+		    if (isFlatBottom)
+		    {
+		        first_index = 2*j*(numElementsAcross+1) - 1*(j%2==0) + i - numElementsAcross;
+		    }
+		    else
+		    {
+		        first_index = 2*j*(numElementsAcross+1) - 1*(j%2==0) + i;
+		    }
+                    node_indices[0] = first_index; // different for even/odd rows
                 }
                 node_indices[1] = node_indices[0] + numElementsAcross + 1 + 1*(j%2==0 && j>0);
                 node_indices[2] = node_indices[1] + numElementsAcross + 1;
