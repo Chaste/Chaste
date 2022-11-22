@@ -399,8 +399,26 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::LoadFromCache(const std::string
 
 template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
-{
-    // Generate mNumTotalGridPts normally-distributed random numbers
+{ 
+    // TODO: randomise seed
+    OpenSimplex2S os(123);
+    auto reshape = [](const double val) {
+        double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
+        double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
+        return val * (1.0 - 0.18 * strength);
+    };
+
+    std::vector<double> samples(mNumTotalGridPts);
+    for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
+        for (unsigned int y = 0; y < mNumGridPts[1]; x++) {
+            // TODO: Better rng for time/continuous time
+            samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, rand())));
+        }
+    }
+    
+    return samples;
+    
+    /*// Generate mNumTotalGridPts normally-distributed random numbers
     std::vector<double> samples_from_n01(mNumTotalGridPts);
     for (unsigned i = 0; i < samples_from_n01.size(); ++i)
     {
@@ -416,7 +434,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
     }
 
     // Translate to a std::vector so that eigen objects aren't leaking out to other places in Chaste
-    return std::vector<double>(grf.data(), grf.data() + grf.size());
+    return std::vector<double>(grf.data(), grf.data() + grf.size());*/
 }
 
 template <unsigned SPACE_DIM>
