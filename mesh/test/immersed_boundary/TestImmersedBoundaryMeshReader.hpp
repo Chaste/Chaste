@@ -141,6 +141,40 @@ public:
       TS_ASSERT_EQUALS(mesh.GetNumLaminas(), 2);
     }
     
+    void TestNoAttributes()
+    {
+      Reader2D reader("mesh/test/data/ib_mesh_2d_no_attributes");
+
+      ImmersedBoundaryMesh<2, 2> mesh;
+      mesh.ConstructFromMeshReader(reader);
+
+      TS_ASSERT_EQUALS(mesh.GetNumNodes(), 22);
+      TS_ASSERT_EQUALS(mesh.GetNumElements(), 3);
+      TS_ASSERT_EQUALS(mesh.GetNumLaminas(), 2);
+    }
+    
+    void TestMissingData()
+    {
+      {
+        Reader2D reader("mesh/test/data/ib_mesh_2d_missing_elem");
+
+        ImmersedBoundaryMesh<2, 2> mesh;
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(reader));
+      }      
+      {
+        Reader2D reader("mesh/test/data/ib_mesh_2d_missing_lam");
+
+        ImmersedBoundaryMesh<2, 2> mesh;
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(reader));
+      }      
+      {
+        Reader2D reader("mesh/test/data/ib_mesh_2d_missing_node");
+
+        ImmersedBoundaryMesh<2, 2> mesh;
+        TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(reader));
+      }      
+    }
+    
     void TestOtherMethods()
     {
       Reader2D reader("mesh/test/data/ib_mesh_2d");
@@ -156,6 +190,7 @@ public:
       TS_ASSERT_EQUALS(face.NodeIndices.size(), 0);
       TS_ASSERT_EQUALS(face.AttributeValue, 0);
     }
+
 };
 
 #endif /*TESTIMMERSEDBOUNDARYMESHREADER_HPP_*/

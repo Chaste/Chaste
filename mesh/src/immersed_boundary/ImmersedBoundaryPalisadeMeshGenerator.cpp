@@ -109,7 +109,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
     if (apical_cutoff < 0.5 * cell_height || apical_cutoff > cell_height || periapical_cutoff < basal_cutoff)
     {
-        EXCEPTION("Something went wrong calculating the height of top surface of the cell.");
+        EXCEPTION("Something went wrong calculating the height of top surface of the cell."); //LCOV_EXCL_LINE
     }
 
     // Corner 0 is left-apical, 1 is right-apical, 2 is right-basal, 3 is left-basal
@@ -162,7 +162,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
          (corner_indices[2] == UINT_MAX) ||
          (corner_indices[3] == UINT_MAX) )
     {
-        EXCEPTION("At least one corner not tagged");
+        EXCEPTION("At least one corner not tagged"); //LCOV_EXCL_LINE
     }
 
     // Should have RIGHT_APICAL_CORNER < LEFT_APICAL_CORNER < LEFT_BASAL_CORNER < RIGHT_BASAL_CORNER
@@ -170,13 +170,13 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
          (corner_indices[LEFT_APICAL_CORNER] > corner_indices[LEFT_BASAL_CORNER]) ||
          (corner_indices[LEFT_BASAL_CORNER] > corner_indices[RIGHT_BASAL_CORNER]) )
     {
-        EXCEPTION("Something went wrong when tagging corner locations");
+        EXCEPTION("Something went wrong when tagging corner locations"); //LCOV_EXCL_LINE
     }
 
     if ( corner_indices[LEFT_APICAL_CORNER] - corner_indices[RIGHT_APICAL_CORNER] !=
          corner_indices[RIGHT_BASAL_CORNER] - corner_indices[LEFT_BASAL_CORNER] )
     {
-        EXCEPTION("Apical and basal surfaces are different sizes");
+        EXCEPTION("Apical and basal surfaces are different sizes"); //LCOV_EXCL_LINE
     }
 
     // Create vectors of immersed boundary elements, laminas, nodes

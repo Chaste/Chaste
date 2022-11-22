@@ -139,7 +139,7 @@ std::vector<double> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextN
     }
     else
     {
-        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextNode();
+        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextNode(); //LCOV_EXCL_LINE fairly sure this is unreachable
     }
 }
 
