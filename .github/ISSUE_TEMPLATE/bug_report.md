@@ -46,7 +46,7 @@ mkdir build
 cd build
 cmake ..
 cmake --build . --target TestChasteBuildInfo
-ctest -V -R TestChasteBuildInfo --output-on-failure
+ctest -V -R TestChasteBuildInfo
 ```
 
 Please paste the full output in a [code block](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks). It will be similar to the truncated example below. 
