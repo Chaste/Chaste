@@ -73,13 +73,12 @@ void DeltaNotchEdgeOdeSystem::EvaluateYDerivatives(double time, const std::vecto
     const double notch = rY[0];
     const double delta = rY[1];
     const double neigh_delta = this->mParameters[0]; // Shorthand for "this->mParameter("neighbor delta");"
-    const double interior_delta = this->mParameters[1];
-    const double interior_notch = this->mParameters[2];
+    const double neigh_notch = this->mParameters[1]; // Shorthand for "this->mParameter("neighbor notch");"
     // The next two lines define the ODE system by Collier et al. (1996), except that we use neighbour Delta directly
     //That is, neighbour activates notch, which can be degraded and trafficked from cytoplasm to this edge
-    rDY[0] = neigh_delta*neigh_delta/(0.01 + neigh_delta*neigh_delta) - notch+0.1*interior_notch;  // d[Notch]/dt
+    rDY[0] = notch - 0.1 *(notch*neigh_notch) + 0.01*(delta*neigh_delta); // d[Notch]/dt
     // Delta is inhibited by notch in this this
-    rDY[1] = 1.0/(1.0 + 100.0*notch*notch) - delta+0.1*interior_delta;// d[Delta]/dt
+    rDY[1] = 0.1 *(notch*neigh_notch) - 0.01*(delta*neigh_delta);// d[Delta]/dt
 }
 
 template<>
@@ -95,9 +94,9 @@ void CellwiseOdeSystemInformation<DeltaNotchEdgeOdeSystem>::Initialise()
 
     this->mParameterNames.push_back("neighbour delta");
     this->mParameterUnits.push_back("non-dim");
-    this->mParameterNames.push_back("interior delta");
-    this->mParameterUnits.push_back("non-dim");
-    this->mParameterNames.push_back("interior notch");
+    this->mInitialised = true;
+    
+    this->mParameterNames.push_back("neighbour notch");
     this->mParameterUnits.push_back("non-dim");
     this->mInitialised = true;
 }

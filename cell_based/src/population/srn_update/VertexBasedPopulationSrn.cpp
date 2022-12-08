@@ -204,17 +204,6 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         new_edge_srn[i]->SetEdgeLocalIndex(i);
         new_edge_srn[i]->SetCell(pCellSrn->GetCell());
     }
-  
-    //For the case when edge quantities are returned into interior when edge shrinks due to node merging
-    boost::shared_ptr<AbstractSrnModel> interior_srn
-    =boost::shared_ptr<AbstractSrnModel>(pCellSrn->GetInteriorSrn());
-    if (interior_srn != nullptr)
-    {
-        for (unsigned int shrunkEdgeIndex:shrunk_edges)
-        {
-            interior_srn->AddShrunkEdgeToInterior(parent_srn_edges[shrunkEdgeIndex].get());
-        }
-    }
 
     pCellSrn->AddEdgeSrn(new_edge_srn);
     assert(n_edges == pCellSrn->GetNumEdgeSrn());

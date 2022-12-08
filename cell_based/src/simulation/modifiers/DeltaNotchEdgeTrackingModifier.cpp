@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchEdgeTrackingModifier.hpp"
 #include "CellSrnModel.hpp"
-#include "DeltaNotchInteriorSrnModel.hpp"
 #include "DeltaNotchEdgeSrnModel.hpp"
 
 template<unsigned DIM>
@@ -93,10 +92,6 @@ void DeltaNotchEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<
         cell_iter->GetCellEdgeData()->SetItem("edge notch", notch_vec);
         cell_iter->GetCellEdgeData()->SetItem("edge delta", delta_vec);
 
-        /* Cell interior data */
-        //We're not using interior model so interiors are set to 0
-        cell_iter->GetCellData()->SetItem("interior delta", 0);
-        cell_iter->GetCellData()->SetItem("interior notch", 0);
     }
 
     //After the edge data is filled, fill the edge neighbour data

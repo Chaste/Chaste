@@ -304,13 +304,6 @@ public:
     virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn);
 
     /**
-     * Adds the shrunk edge srn quantities to (this) interior srn
-     * This method is virtual and needs to be overriden by user-defined SRN model.
-     * @param p_shrunk_edge_srn
-     */
-    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn);
-
-    /**
      * Scales SRN quantities due to edge split. Amount of scaling may depend on the resulting proportions,
      * deetermined by relative position of the node that splits the edge.
      * This method is virtual and needs to be overriden by user-defined SRN model.

@@ -49,8 +49,7 @@ typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
  * SRN model at the cell level, has representation for edges internally.
- * Also contains cell interior (cytoplasmic) SRN.
- * Mostly serves to coordinate between interior/edge SRNs, in case these are specified. Functionality of SRNs is defined in AbstractSrnModel class
+ * Mostly serves to coordinate edge SRNs, in case these are specified. Functionality of SRNs is defined in AbstractSrnModel class
  * and user-defined SRN models.
  */
 class CellSrnModel : public AbstractSrnModel
@@ -71,13 +70,11 @@ private:
     {
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
         archive & mEdgeSrnModels;
-        archive & mInteriorSrnModel;
     }
 
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
     using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
-    boost::shared_ptr<AbstractSrnModel> mInteriorSrnModel;
 protected:
 
     /**
@@ -115,7 +112,7 @@ public:
 
     /**
      * Calls SRN model specific behaviour at the time of cell division
-     * All constituent SRNs models (edge and/or interior, if there are any) call their
+     * All constituent SRNs models (edge , if there are any) call their
      * implementation of this method
      */
     virtual void ResetForDivision() override;
@@ -161,17 +158,6 @@ public:
      */
     const std::vector<AbstractSrnModelPtr>& GetEdges() const;
 
-    /**
-     * Set interior SRN
-     * @param interiorSrn cytoplasmic SRN
-     */
-    void SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn);
-
-    /**
-     * Returns cytoplasmic SRN
-     * @return interior SRN
-     */
-    AbstractSrnModelPtr GetInteriorSrn() const;
 
     /**
      * Overriden method. We Set Cell for each SRN contained in this cell

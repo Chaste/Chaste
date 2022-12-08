@@ -161,9 +161,6 @@ void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
 void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
 {}
 
-void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
-{}
-
 void AbstractSrnModel::SplitEdgeSrn(const double relative_position)
 {}
 // LCOV_EXCL_STOP

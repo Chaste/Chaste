@@ -152,6 +152,11 @@ public:
      * @return the current level of Delta in the neighbouring cell's edge.
      */
     double GetNeighbouringDelta() const;
+    
+    /**
+     * @return the current level of Notch in the neighbouring cell's edge.
+     */
+    double GetNeighbouringNotch() const;
 
     /**
      * The value of interior Delta is stored as parameters in this model, which is

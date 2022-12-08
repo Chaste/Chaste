@@ -105,8 +105,7 @@ void DeltaNotchEdgeSrnModel::InitialiseDaughterCell()
     mpOdeSystem->SetStateVariable("Delta",0.0);
 
     mpOdeSystem->SetParameter("neighbour delta",0.0);
-    mpOdeSystem->SetParameter("interior delta",0.0);
-    mpOdeSystem->SetParameter("interior notch",0.0);
+    mpOdeSystem->SetParameter("neighbour notch",0.0);
 }
 
 void DeltaNotchEdgeSrnModel::UpdateDeltaNotch()
@@ -117,12 +116,10 @@ void DeltaNotchEdgeSrnModel::UpdateDeltaNotch()
     double neigh_delta
     = mpCell->GetCellEdgeData()->GetItem("neighbour delta")[this->GetEdgeLocalIndex()];
     mpOdeSystem->SetParameter("neighbour delta", neigh_delta);
-
-    double interior_delta = mpCell->GetCellData()->GetItem("interior delta");
-    mpOdeSystem->SetParameter("interior delta", interior_delta);
-
-    double interior_notch = mpCell->GetCellData()->GetItem("interior notch");
-    mpOdeSystem->SetParameter("interior notch", interior_notch);
+    
+    double neigh_notch
+    = mpCell->GetCellEdgeData()->GetItem("neighbour notch")[this->GetEdgeLocalIndex()];
+    mpOdeSystem->SetParameter("neighbour notch", neigh_notch);
 
 }
 
@@ -158,16 +155,10 @@ double DeltaNotchEdgeSrnModel::GetNeighbouringDelta() const
     return mpOdeSystem->GetParameter("neighbour delta");
 }
 
-double DeltaNotchEdgeSrnModel::GetInteriorDelta() const
+double DeltaNotchEdgeSrnModel::GetNeighbouringNotch() const
 {
     assert(mpOdeSystem != nullptr);
-    return mpOdeSystem->GetParameter("interior delta");
-}
-
-double DeltaNotchEdgeSrnModel::GetInteriorNotch() const
-{
-    assert(mpOdeSystem != nullptr);
-    return mpOdeSystem->GetParameter("interior notch");
+    return mpOdeSystem->GetParameter("neighbour notch");
 }
 
 

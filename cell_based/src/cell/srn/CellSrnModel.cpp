@@ -36,15 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellSrnModel.hpp"
 
 CellSrnModel::CellSrnModel(const CellSrnModel &rModel)
-    : AbstractSrnModel(rModel), mInteriorSrnModel(nullptr)
+    : AbstractSrnModel(rModel)
 {
     //edge SRN vector should be empty in the newly created cell. They are added in
     //VertexBasedPopulation::UpdateSrnAfterBirthOrDeath()
 
-    //Copy interior SRN to the new cell. Interior Srn should have custom implementation of a new interior SRN
-    //creation after cell division
-    if (rModel.mInteriorSrnModel!=nullptr)
-        this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
     mIsEdgeBasedModel = rModel.HasEdgeModel();
     for (auto edgeModel : rModel.mEdgeSrnModels)
     {
@@ -55,7 +51,7 @@ CellSrnModel::CellSrnModel(const CellSrnModel &rModel)
 
 CellSrnModel::CellSrnModel()
 {
-    mInteriorSrnModel = nullptr;
+
 }
 
 CellSrnModel::~CellSrnModel()
@@ -68,11 +64,6 @@ void CellSrnModel::Initialise()
     for (auto edgeModel : mEdgeSrnModels)
     {
         edgeModel->Initialise();
-    }
-
-    if (mInteriorSrnModel != nullptr)
-    {
-        mInteriorSrnModel->Initialise();
     }
 }
 
@@ -91,11 +82,6 @@ void CellSrnModel::ResetForDivision()
         edgeModel->ResetForDivision();
     }
 
-    if (mInteriorSrnModel != nullptr)
-    {
-        mInteriorSrnModel->ResetForDivision();
-    }
-
 }
 
 void CellSrnModel::SimulateToCurrentTime()
@@ -104,8 +90,6 @@ void CellSrnModel::SimulateToCurrentTime()
     {
         srnModel->SimulateToCurrentTime();
     }
-    if (mInteriorSrnModel != nullptr)
-        mInteriorSrnModel->SimulateToCurrentTime();
 
     mSimulatedToTime = mEdgeSrnModels[0]->GetSimulatedToTime();
 }
@@ -148,16 +132,6 @@ const std::vector<AbstractSrnModelPtr>& CellSrnModel::GetEdges() const
     return mEdgeSrnModels;
 }
 
-void CellSrnModel::SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn)
-{
-    mInteriorSrnModel = interiorSrn;
-}
-
-AbstractSrnModelPtr CellSrnModel::GetInteriorSrn() const
-{
-    return mInteriorSrnModel;
-}
-
 void CellSrnModel::SetCell(CellPtr pCell)
 {
     AbstractSrnModel::SetCell(pCell);
@@ -168,10 +142,6 @@ void CellSrnModel::SetCell(CellPtr pCell)
         srnModel->SetCell(pCell);
     }
 
-    if (mInteriorSrnModel != nullptr)
-    {
-        mInteriorSrnModel->SetCell(pCell);
-    }
 }
 
 

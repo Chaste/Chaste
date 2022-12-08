@@ -55,11 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DeltaNotchEdgeSrnModel.hpp"
 
 #include "CellSrnModel.hpp"
-#include "DeltaNotchInteriorSrnModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "DeltaNotchEdgeTrackingModifier.hpp"
-#include "DeltaNotchEdgeInteriorTrackingModifier.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -114,14 +112,6 @@ public:
             p_delta_notch_edge_srn_model->SetInitialConditions(starter_conditions);
             p_cell_srn_model->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
         }
-        boost::shared_ptr<DeltaNotchInteriorSrnModel> p_delta_notch_interior_srn_model(new DeltaNotchInteriorSrnModel());
-
-        // Create a vector of initial conditions
-        std::vector<double> starter_conditions;
-        starter_conditions.push_back(1.0);
-        starter_conditions.push_back(1.0);
-        p_delta_notch_interior_srn_model->SetInitialConditions(starter_conditions);
-        p_cell_srn_model->SetInteriorSrnModel(p_delta_notch_interior_srn_model);
 
         UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
 
@@ -146,8 +136,6 @@ public:
 
         const unsigned int n_edge_srns = p_cell_srn_model->GetNumEdgeSrn();
         TS_ASSERT_EQUALS(n_edge_srns, 4u);
-        TS_ASSERT_DELTA(p_delta_notch_interior_srn_model->GetDelta(), 1.5,1e-6);
-        TS_ASSERT_DELTA(p_delta_notch_interior_srn_model->GetNotch(), 1.5,1e-6);
         auto p_delta_notch_edge_0
         = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_cell_srn_model)->GetEdgeSrn(0));
         auto p_delta_notch_edge_1
@@ -216,7 +204,6 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         const std::vector<double> init_edge_vars(2, 1.0);
-        const std::vector<double> init_interior_vars(2, 1.0);
         for (unsigned elem_index=0; elem_index < vertex_mesh.GetNumElements(); elem_index++)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -234,9 +221,6 @@ public:
 
                 p_cell_srn_model->AddEdgeSrnModel(p_edge_model);
             }
-            MAKE_PTR(DeltaNotchInteriorSrnModel, p_interior_srn_model);
-            p_interior_srn_model->SetInitialConditions(init_interior_vars);
-            p_cell_srn_model->SetInteriorSrnModel(p_interior_srn_model);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -262,8 +246,6 @@ public:
         {
             CellPtr cell = cell_population.GetCellUsingLocationIndex(0);
             auto p_cell_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 4u);
@@ -285,8 +267,6 @@ public:
         {
             CellPtr cell = cell_population.GetCellUsingLocationIndex(2);
             auto p_cell_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 4u);
@@ -309,8 +289,6 @@ public:
         {
             CellPtr cell = cell_population.GetCellUsingLocationIndex(1);
             auto p_cell_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 3u);
@@ -325,16 +303,11 @@ public:
             TS_ASSERT_DELTA(edge_srn_models[1]->GetNotch(), 1.25,1e-6);
             TS_ASSERT_DELTA(edge_srn_models[2]->GetDelta(), 1.0,1e-6);
             TS_ASSERT_DELTA(edge_srn_models[2]->GetNotch(), 1.0,1e-6);
-
-            TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.5,1e-6);
-            TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.5,1e-6);
         }
 
         {
             CellPtr cell = cell_population.GetCellUsingLocationIndex(3);
             auto p_cell_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 3u);
@@ -350,8 +323,6 @@ public:
             TS_ASSERT_DELTA(edge_srn_models[2]->GetDelta(), 1.0,1e-6);
             TS_ASSERT_DELTA(edge_srn_models[2]->GetNotch(), 1.0,1e-6);
 
-            TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.5,1e-6);
-            TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.5,1e-6);
         }
     }
 
@@ -405,7 +376,6 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         const std::vector<double> init_edge_vars(2, 1.0);
-        const std::vector<double> init_interior_vars(2, 1.0);
         for (unsigned elem_index=0; elem_index < vertex_mesh.GetNumElements(); elem_index++)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -423,9 +393,6 @@ public:
 
                 p_cell_srn_model->AddEdgeSrnModel(p_edge_model);
             }
-            MAKE_PTR(DeltaNotchInteriorSrnModel, p_interior_srn_model);
-            p_interior_srn_model->SetInitialConditions(init_interior_vars);
-            p_cell_srn_model->SetInteriorSrnModel(p_interior_srn_model);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -471,8 +438,6 @@ public:
         {
             CellPtr cell = cell_population.GetCellUsingLocationIndex(i);
             auto p_cell_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 3u);
@@ -488,8 +453,6 @@ public:
             TS_ASSERT_DELTA(edge_srn_models[2]->GetDelta(), 1.25,1e-6);
             TS_ASSERT_DELTA(edge_srn_models[2]->GetNotch(), 1.25,1e-6);
 
-            TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.5,1e-6);
-            TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.5,1e-6);
         }
     }
 
@@ -555,7 +518,6 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         const std::vector<double> init_edge_vars(2, 1.0);
-        const std::vector<double> init_interior_vars(2, 1.0);
         for (unsigned elem_index=0; elem_index < mesh.GetNumElements(); elem_index++)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -573,9 +535,6 @@ public:
 
                 p_cell_srn_model->AddEdgeSrnModel(p_edge_model);
             }
-            MAKE_PTR(DeltaNotchInteriorSrnModel, p_interior_srn_model);
-            p_interior_srn_model->SetInitialConditions(init_interior_vars);
-            p_cell_srn_model->SetInteriorSrnModel(p_interior_srn_model);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -631,8 +590,6 @@ public:
         {
             CellPtr cell = cell_population.GetCellUsingLocationIndex(elem_index);
             auto p_cell_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             unsigned int n_splits= 0;
@@ -647,8 +604,6 @@ public:
                         n_splits++;
                 }
                 TS_ASSERT_EQUALS(n_splits, 5u);
-                TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.0,1e-6);
-                TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.0,1e-6);
                 for (unsigned int i=0; i<n_edge_srns; ++i)
                 {
                     edge_srn_models[i]
@@ -677,8 +632,6 @@ public:
                 //New edge has been added to element_1
                 TS_ASSERT_EQUALS(element_to_operations[elem_index].size(), 1u);
                 TS_ASSERT_EQUALS(element_to_operations[elem_index][0], EDGE_OPERATION_ADD);
-                TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.0,1e-6);
-                TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.0,1e-6);
                 for (unsigned int i=0; i<n_edge_srns; ++i)
                 {
                     edge_srn_models[i]
@@ -699,8 +652,6 @@ public:
                 //New edge has been added to element_2
                 TS_ASSERT_EQUALS(element_to_operations[elem_index].size(), 1u);
                 TS_ASSERT_EQUALS(element_to_operations[elem_index][0], EDGE_OPERATION_ADD);
-                TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.0,1e-6);
-                TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.0,1e-6);
                 for (unsigned int i=0; i<n_edge_srns; ++i)
                 {
                     edge_srn_models[i]
@@ -721,8 +672,6 @@ public:
                 //New edge has been added to element_3
                 TS_ASSERT_EQUALS(element_to_operations[elem_index].size(), 1u);
                 TS_ASSERT_EQUALS(element_to_operations[elem_index][0], EDGE_OPERATION_ADD);
-                TS_ASSERT_DELTA(p_interior_model->GetDelta(), 1.0,1e-6);
-                TS_ASSERT_DELTA(p_interior_model->GetNotch(), 1.0,1e-6);
                 for (unsigned int i=0; i<n_edge_srns; ++i)
                 {
                     edge_srn_models[i]
@@ -806,9 +755,6 @@ public:
                 p_srn_model->SetInitialConditions(initial_conditions);
                 p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
             }
-            MAKE_PTR(DeltaNotchInteriorSrnModel, p_interior_srn);
-            p_interior_srn->SetInitialConditions(std::vector<double>(2, 4.0));
-            p_cell_edge_srn_model->SetInteriorSrnModel(p_interior_srn);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
@@ -824,7 +770,7 @@ public:
 
         /* Create an edge tracking modifier. DeltaNotch models require information obtained from
            CellData and CellEdgeData */
-        MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_modifier);
+        MAKE_PTR(DeltaNotchEdgeTrackingModifier<2>, p_modifier);
         p_modifier->SetupSolve(cell_population,"TestVertexMeshCellDivisionWithSrn");
         /*Divide the 0th cell*/
         {
@@ -858,13 +804,11 @@ public:
 
         cell_population.Update(true);
 
-        // Test if interior/edge quantities are update properly
+        // Test if edge quantities are update properly
         // Check the 0th cell and its edges//
         {
             auto p_cell = cell_population.GetCellUsingLocationIndex(0);
             auto p_cell_model = static_cast<CellSrnModel*>(p_cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 4);
@@ -874,9 +818,6 @@ public:
                 edge_srn_models[i]
                                 = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_model->GetEdgeSrn(i));
             }
-
-            TS_ASSERT_DELTA(p_interior_model->GetDelta(), 2.0, 1e-6);
-            TS_ASSERT_DELTA(p_interior_model->GetNotch(), 2.0, 1e-6);
 
             TS_ASSERT_DELTA(edge_srn_models[0]->GetDelta(), 2.0, 1e-6);
             TS_ASSERT_DELTA(edge_srn_models[0]->GetNotch(), 2.0, 1e-6);
@@ -892,8 +833,6 @@ public:
         {
             auto p_cell = cell_population.GetCellUsingLocationIndex(2);
             auto p_cell_model = static_cast<CellSrnModel*>(p_cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 4);
@@ -903,9 +842,6 @@ public:
                 edge_srn_models[i]
                                 = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_model->GetEdgeSrn(i));
             }
-
-            TS_ASSERT_DELTA(p_interior_model->GetDelta(), 2.0, 1e-6);
-            TS_ASSERT_DELTA(p_interior_model->GetNotch(), 2.0, 1e-6);
 
             TS_ASSERT_DELTA(edge_srn_models[0]->GetDelta(), 1.0, 1e-6);
             TS_ASSERT_DELTA(edge_srn_models[0]->GetNotch(), 1.0, 1e-6);
@@ -921,8 +857,6 @@ public:
         {
             auto p_cell = cell_population.GetCellUsingLocationIndex(1);
             auto p_cell_model = static_cast<CellSrnModel*>(p_cell->GetSrnModel());
-            boost::shared_ptr<DeltaNotchInteriorSrnModel> p_interior_model
-            = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_model->GetInteriorSrn());
             const unsigned int n_edge_srns = p_cell_model->GetNumEdgeSrn();
             std::vector<boost::shared_ptr<DeltaNotchEdgeSrnModel> > edge_srn_models(n_edge_srns);
             TS_ASSERT_EQUALS(n_edge_srns, 4);
@@ -932,9 +866,6 @@ public:
                 edge_srn_models[i]
                                 = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_model->GetEdgeSrn(i));
             }
-
-            TS_ASSERT_DELTA(p_interior_model->GetDelta(), 4.0, 1e-6);
-            TS_ASSERT_DELTA(p_interior_model->GetNotch(), 4.0, 1e-6);
 
             TS_ASSERT_DELTA(edge_srn_models[0]->GetDelta(), 2.0, 1e-6);
             TS_ASSERT_DELTA(edge_srn_models[0]->GetNotch(), 2.0, 1e-6);
@@ -1004,7 +935,6 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         const std::vector<double> init_edge_vars(2, 1.0);
-        const std::vector<double> init_interior_vars(2, 1.0);
         for (unsigned elem_index=0; elem_index < vertex_mesh.GetNumElements(); elem_index++)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -1022,9 +952,6 @@ public:
 
                 p_cell_srn_model->AddEdgeSrnModel(p_edge_model);
             }
-            MAKE_PTR(DeltaNotchInteriorSrnModel, p_interior_srn_model);
-            p_interior_srn_model->SetInitialConditions(init_interior_vars);
-            p_cell_srn_model->SetInteriorSrnModel(p_interior_srn_model);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);

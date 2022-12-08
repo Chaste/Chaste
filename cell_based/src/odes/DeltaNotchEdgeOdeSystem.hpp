@@ -52,8 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Here, however, we include edge based model: Delta and Notch interactions between each cell
  * are modelled directly. We use similar ODE system as by Collier et al., except that we modify terms
  * corresponding to means of neighbour concentrations of Delta/Notch.
- * In this ODE model, concentration of edge Delta/Notch depend on intracellular (interior)
- * concentrations
  */
 class DeltaNotchEdgeOdeSystem : public AbstractOdeSystem
 {
@@ -87,7 +85,7 @@ public:
 
     /**
      * Notch in this edge is inhibited by Delta in neighbouring edge. Cytoplasmic Notch is trafficked into
-     * this junction. The type of interactions of Delta and Notch in this edge are similar to interior SRN model
+     * this junction.
      * @param time used to evaluate the RHS.
      * @param rY value of the solution vector used to evaluate the RHS.
      * @param rDY filled in with the resulting derivatives (using  Collier et al. system of equations).
