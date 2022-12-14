@@ -706,7 +706,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     //The order of stored data is illustrated below:
     // [_____|_][____|_]
     //  ^^^^  ^
-    // edge   cell interior
+    // edge   cell interior ( Interior will be used in Edge + Interior update).
     for (unsigned i=1; i<n_cells; ++i)
     {
         cell_offset_dist[i] = cell_offset_dist[i-1]+this->GetElement(i-1)->GetNumEdges()+1;

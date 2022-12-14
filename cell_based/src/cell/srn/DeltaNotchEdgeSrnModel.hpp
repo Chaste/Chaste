@@ -44,10 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in the sub-cellular reaction network.
- * This SRN model represents a membrane/cortex of a single junction of a cell. This class of models can be used together
- * with DeltaNotchInteriorSrn models. The ODE model used here is an attempt to use previous work (see DeltaNotchSrnModel class)
+ * This SRN model represents a membrane/cortex of a single junction of a cell. The ODE model used here is an attempt to use previous work (see DeltaNotchSrnModel class)
  * for more detailed description of Delta-Notch interactions involving edge quantities (this or neighbour edge information) and
- * potentially coupling with cytoplasmic concentrations (DeltaNotchInteriorSrn class).
+ * potentially coupling with cytoplasmic concentrations.
  * \todo #2987 document this class more thoroughly here
  */
 class DeltaNotchEdgeSrnModel : public AbstractOdeSrnModel
@@ -114,7 +113,7 @@ public:
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
-     * Updates parameters (such as neighbour or interior Delta/Notch) and
+     * Updates parameters (such as neighbour Delta/Notch) and
      * runs the simulation to current time
      */
     virtual void SimulateToCurrentTime() override;
@@ -157,20 +156,6 @@ public:
      * @return the current level of Notch in the neighbouring cell's edge.
      */
     double GetNeighbouringNotch() const;
-
-    /**
-     * The value of interior Delta is stored as parameters in this model, which is
-     * retrieved by this method
-     * @return the level of Delta in cell interior
-     */
-    double GetInteriorDelta() const;
-
-    /**
-     * The value of interior Notch is stored as parameters in this model, which is
-     * retrieved by this method
-     * @return the level of Notch in cell interior
-     */
-    double GetInteriorNotch() const;
 
     /**
      * Output SRN model parameters to file.
