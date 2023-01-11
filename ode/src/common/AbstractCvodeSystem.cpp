@@ -107,6 +107,7 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* p
     }
 
     //    // Something like this might help CVODE when things are a bit unstable...
+    //    We tried this again in Jan 2023 but now with VerifyStateVariables() returning a recoverable error when values look off. However this didn't improve the situation.
     //    try
     //    {
     //        p_ode_system->VerifyStateVariables();
