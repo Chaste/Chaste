@@ -89,33 +89,8 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
         mGridSpacing[dim] = (mUpperCorner[dim] - mLowerCorner[dim]) / mNumGridPts[dim];
         mOneOverGridSpacing[dim] = mNumGridPts[dim] / (mUpperCorner[dim] - mLowerCorner[dim]);
     }
-
-    // Check if there's a cached random field matching these parameters
-    FileFinder cached_version_file(mCacheDir + GetFilenameFromParams(), RelativeTo::ChasteTestOutput);
-
-    if (cached_version_file.Exists())
-    {
-        LoadFromCache(cached_version_file.GetAbsolutePath());
-    }
-    else
-    {
-        CalculateEigenDecomposition();
-    }
 }
 
-template <unsigned SPACE_DIM>
-UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(const std::string filename)
-{
-    // First check the cached random field exists
-    FileFinder cached_version_file(filename, RelativeTo::ChasteTestOutput);
-
-    if (!cached_version_file.Exists())
-    {
-        EXCEPTION("Cached random field " + cached_version_file.GetAbsolutePath() + " does not exist." );
-    }
-
-    LoadFromCache(cached_version_file.GetAbsolutePath());
-}
 
 template <unsigned SPACE_DIM>
 void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
@@ -358,46 +333,6 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
 }
 
 template <unsigned SPACE_DIM>
-void UniformGridRandomFieldGenerator<SPACE_DIM>::LoadFromCache(const std::string& absoluteFilePath)
-{
-    std::ifstream input_file(absoluteFilePath, std::ios::in | std::ios::binary);
-    if (!input_file.is_open())
-    {
-        EXCEPTION("File " + absoluteFilePath + " did not open successfully.");
-    }
-
-    // Read the header, and populate class parameters
-    RandomFieldCacheHeader<SPACE_DIM> header;
-    input_file.read((char*)& header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
-    mLowerCorner = header.mLowerCorner;
-    mUpperCorner = header.mUpperCorner;
-    mNumGridPts = header.mNumGridPts;
-    mPeriodicity = header.mPeriodicity;
-    mTraceProportion = header.mTraceProportion;
-    mLengthScale = header.mLengthScale;
-    mNumEigenvals = header.mNumEigenvals;
-
-    // Calculate how many grid points there are in total, and resize the eigen data arrays accordingly
-    mNumTotalGridPts = std::accumulate(mNumGridPts.begin(), mNumGridPts.end(), 1u, std::multiplies<unsigned>());
-    mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
-
-    // Calculate the remaining unknown: the grid spacing in each dimension, needed for interpolation
-    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
-    {
-        mGridSpacing[dim] = (mUpperCorner[dim] - mLowerCorner[dim]) / mNumGridPts[dim];
-        mOneOverGridSpacing[dim] = mNumGridPts[dim] / (mUpperCorner[dim] - mLowerCorner[dim]);
-    }
-
-    // Read the scaled eigenvectors into their respective data arrays
-    input_file.read((char*) mScaledEigenvecs.data(), mNumTotalGridPts * mNumEigenvals * sizeof(double));
-
-    input_file.close();
-
-    const double eval_prop = static_cast<double>(mNumEigenvals) / mNumTotalGridPts;
-    PRINT_VARIABLE(eval_prop);
-}
-
-template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
 { 
     // TODO: randomise seed
@@ -410,7 +345,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 
     std::vector<double> samples(mNumTotalGridPts);
     for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
-        for (unsigned int y = 0; y < mNumGridPts[1]; x++) {
+        for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
             // TODO: Better rng for time/continuous time
             samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, rand())));
         }
@@ -435,38 +370,6 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 
     // Translate to a std::vector so that eigen objects aren't leaking out to other places in Chaste
     return std::vector<double>(grf.data(), grf.data() + grf.size());*/
-}
-
-template <unsigned SPACE_DIM>
-const std::string UniformGridRandomFieldGenerator<SPACE_DIM>::SaveToCache() const
-{
-    // Get the absolute file path to the cached file, given the current parameters
-    const std::string file_relative_to_output = mCacheDir + GetFilenameFromParams();
-    FileFinder cached_version_file(file_relative_to_output, RelativeTo::ChasteTestOutput);
-
-    // If the cache does not exist, create it
-    if (not cached_version_file.Exists())
-    {
-        OutputFileHandler results_handler(mCacheDir, false);
-        auto results_file = results_handler.OpenOutputFile(GetFilenameFromParams(), std::ios::out | std::ios::binary);
-
-        // Generate the header struct
-        RandomFieldCacheHeader<SPACE_DIM> header;
-        header.mLowerCorner = mLowerCorner;
-        header.mUpperCorner = mUpperCorner;
-        header.mNumGridPts = mNumGridPts;
-        header.mPeriodicity = mPeriodicity;
-        header.mTraceProportion = mTraceProportion;
-        header.mLengthScale = mLengthScale;
-        header.mNumEigenvals = mNumEigenvals;
-
-        // Write the information to file
-        results_file->write((char *) &header, sizeof(RandomFieldCacheHeader<SPACE_DIM>));
-        results_file->write((char *) mScaledEigenvecs.data(), mScaledEigenvecs.size() * sizeof(double));
-        results_file->close();
-    }
-
-    return file_relative_to_output;
 }
 
 template <unsigned SPACE_DIM>

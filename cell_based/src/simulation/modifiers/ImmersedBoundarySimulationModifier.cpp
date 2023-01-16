@@ -220,7 +220,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
                 mNoiseLengthScale
         );
 
-        mpRandomField->SaveToCache();
     }
 }
 

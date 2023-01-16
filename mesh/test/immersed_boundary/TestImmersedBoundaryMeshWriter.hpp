@@ -47,6 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
+/*
+  This file is just missing a test which handles multiple overlaps
+*/
+
 class TestImmersedBoundaryMeshWriter : public CxxTest::TestSuite
 {
 public:
@@ -183,19 +187,60 @@ public:
 //#endif //CHASTE_VTK
     void TestImmersedBoundaryMeshWriterVTKCornerOverlap()
     {
-      std::vector<Node<2>*> nodes;
-      nodes.push_back(new Node<2>(0, true, 0.3, 0.3));
-      nodes.push_back(new Node<2>(1, true, 1.1, 0.3));
-      nodes.push_back(new Node<2>(2, true, 1.1, 1.1));
-      nodes.push_back(new Node<2>(3, true, 0.3, 1.1));
+      // Overlap top right
+      {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.6, 0.6));
+        nodes.push_back(new Node<2>(1, true, 0.2, 0.6));
+        nodes.push_back(new Node<2>(2, true, 0.9, 0.9));
+        nodes.push_back(new Node<2>(3, true, 0.6, 0.9));
 
-      std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-      elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-      ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-      
-      ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
-      ib_mesh_writer.WriteVtkUsingMesh(mesh);
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        
+        ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
+        ib_mesh_writer.WriteVtkUsingMesh(mesh);
+        TS_ASSERT(true);
+      }
+      /*// Overlap bottom left
+      {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, -0.1, -0.1));
+        nodes.push_back(new Node<2>(1, true, 0.7, -0.1));
+        nodes.push_back(new Node<2>(2, true, 0.7, 0.7));
+        nodes.push_back(new Node<2>(3, true, -0.1, 0.7));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        
+        ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
+        ib_mesh_writer.WriteVtkUsingMesh(mesh);
+        TS_ASSERT(true);
+      }
+      // Overlap everything 
+      {
+        // Generate nodes
+        std::vector<Node<2>*> nodes;
+        const int nodesToGenerate = 9;
+        for (int nodeIndex = 0; nodeIndex < nodesToGenerate; nodeIndex++) {
+            double offset = nodeIndex % 2 == 0 ? 0 : 0.6;
+            nodes.push_back(new Node<2>(nodeIndex, true, 0.3 + offset, 0.1 + 0.05 * nodeIndex));
+        }
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        
+        ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
+        ib_mesh_writer.WriteVtkUsingMesh(mesh);
+        TS_ASSERT(true);
+      }
+      */
 
     }
 

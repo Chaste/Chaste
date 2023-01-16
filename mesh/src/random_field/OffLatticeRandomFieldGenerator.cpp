@@ -259,9 +259,28 @@ double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
     return dist_squared;
 }
 
+// Check what this method actually should be doing - should presumably be sampling at node locations?
 template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
 {
+
+    // TODO: randomise seed
+    OpenSimplex2S os(123);
+    auto reshape = [](const double val) {
+        double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
+        double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
+        return val * (1.0 - 0.18 * strength);
+    };
+
+    std::vector<double> samples(mNumNodesAtLastUpdate);
+    for (unsigned int x = 0; x < mNumNodesAtLastUpdate; x++) {
+        // TODO: Better rng for time/continuous time
+        samples[x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, 0.0, rand())));
+    }
+
+    return samples;
+
+    /*
     // Generate a normally-distributed random number for each node in the mesh
     std::vector<double> samples_from_n01(mNumNodesAtLastUpdate);
     for (auto& sample : samples_from_n01)
@@ -284,7 +303,7 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     }
 
     // Translate to a std::vector so that eigen objects aren't leaking out to other places in Chaste
-    return std::vector<double>(grf.data(), grf.data() + grf.size());
+    return std::vector<double>(grf.data(), grf.data() + grf.size());*/
 }
 
 // Explicit instantiation

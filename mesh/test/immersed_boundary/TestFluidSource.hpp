@@ -54,7 +54,6 @@ public:
         TS_ASSERT_EQUALS(source_by_point.GetIndex(), 1u);
         TS_ASSERT_DELTA(source_by_point.rGetLocation()[0], 0.1, 1e-6);
         TS_ASSERT_DELTA(source_by_point.rGetLocation()[1], -5.0, 1e-6);
-        printf("FLUIDSOURCE\n");
 
         c_vector<double, 3> vector;
         vector[0] = 3.2;

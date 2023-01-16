@@ -187,18 +187,6 @@ private:
      */
     std::string GetFilenameFromParams() const noexcept;
 
-    /**
-     * Load the pre-calculated random field from cache.  Throws if the file cannot be opened.
-     *
-     * The cache format is as follows:
-     *
-     * 1x RandomFieldCacheHeader (which is sizeof(RandomFieldCacheHeader<SPACE_DIM>) chars)
-     * mScaledEigenvecs matrix (which is total_grid_pts * mNumEigenvals * sizeof(double) chars
-     *
-     * @param absoluteFilePath the absolute file path of the cached random field
-     */
-    void LoadFromCache(const std::string& absoluteFilePath);
-
 
 public:
 
@@ -222,13 +210,6 @@ public:
                                     double traceProportion,
                                     double lengthScale);
 
-    /**
-     * Constructor that takes a filename of a pre-cached random field. This constructor will attempt to load the
-     * random field from file, and throw if something goes wrong.
-     *
-     * @param filename the file name, relative to $CHASTE_TEST_OUTPUT
-     */
-    explicit UniformGridRandomFieldGenerator(const std::string filename);
 
     /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then

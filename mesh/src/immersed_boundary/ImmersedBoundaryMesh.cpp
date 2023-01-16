@@ -216,6 +216,10 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
     }
 
     double straight_line_length = norm_2(centroids[0] - centroids[centroids.size() - 1]);
+    // Avoid division by zero
+    if (straight_line_length < 0.00001) {
+        return 0;
+    }
 
     return total_length / straight_line_length;
 }
@@ -1209,7 +1213,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
     {
         bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i + 1) % num_nodes), centroid), perp_axis) >= 0);
         std::stringstream left;
-        left << "Node " << i << " is on the left: " << is_current_node_on_left << ", node " << (i+1)%num_nodes << " is on the left: " << is_next_node_on_left << "\n";
         std::cout << left.str(); 
         if (is_current_node_on_left != is_next_node_on_left)
         {

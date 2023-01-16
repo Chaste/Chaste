@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ObsoleteBoxCollection.hpp"
 #include "UblasVectorInclude.hpp"
 
+#include "_old/cpp/OpenSimplex2S.hpp"
+
 /**
  * An OffLatticeRandomFieldGenerator for adding spatially-correlated noise to a mesh with off-lattice nodes.
  */
