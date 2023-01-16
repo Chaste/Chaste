@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -315,7 +315,7 @@ public:
         //Check testout/archive/specific_secondary.arch
         FileFinder archive_dir("global/test/data", RelativeTo::ChasteSourceRoot);
         std::string archive_file = "future_boost.arch";
-        // future_boost has got archive version 19 in it
+        // future_boost has got archive version 20 in it
         // 1.33 => 3
         // 1.34 => 4
         // 1.36 => 5
@@ -349,6 +349,10 @@ public:
         // 1.72 => 17
         // 1.73 => 18
         // 1.74 => 18
+        // 1.75 => 18
+        // 1.76 => 19
+        // 1.77 => 19
+        // 1.78 => 19
 
 #ifndef BOOST_VERSION
         TS_FAIL("This test needs to know the version of Boost with which it was compiled.");
