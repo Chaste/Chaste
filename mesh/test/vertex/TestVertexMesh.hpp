@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1965,6 +1965,44 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
+    }
+
+    void TestTessellationConstructor2dWithBoundedTesselation()
+    {
+        // Create a simple 2D tetrahedral mesh, the Delaunay triangulation
+        std::vector<Node<2> *> delaunay_nodes;
+        delaunay_nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        delaunay_nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        delaunay_nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        delaunay_nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        delaunay_nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
+        MutableMesh<2,2> delaunay_mesh(delaunay_nodes);
+
+        TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 5u);
+
+        // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
+        bool is_bounded = true;
+        VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded);
+
+        // Test the Voronoi tessellation has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 16u);
+
+        // Test the number of nodes owned by each Voronoi element
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop ofother node
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
+
+        // Test element areas
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.875, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.875, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.875, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
     }
 

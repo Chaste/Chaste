@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CellLocationIndexWriter.hpp"
+#include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(
@@ -42,9 +43,13 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
      std::vector<CellPtr>& rCells,
      const std::vector<unsigned> locationIndices,
      bool deleteMesh,
-     double ghostSpringStiffness)
+     double ghostCellSpringStiffness,
+     double ghostGhostSpringStiffness,
+     double ghostSpringRestLength)
              : MeshBasedCellPopulation<DIM,DIM>(rMesh, rCells, locationIndices, deleteMesh, false), // do not call the base class Validate()
-               mGhostSpringStiffness(ghostSpringStiffness)
+               mGhostCellSpringStiffness(ghostCellSpringStiffness),
+               mGhostGhostSpringStiffness(ghostGhostSpringStiffness),
+               mGhostSpringRestLength(ghostSpringRestLength)
 {
     if (!locationIndices.empty())
     {
@@ -78,9 +83,13 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                                                                  double ghostSpringStiffness)
+                                                                                  double ghostCellSpringStiffness,
+                                                                                  double ghostGhostSpringStiffness,
+                                                                                  double ghostSpringRestLength)
     : MeshBasedCellPopulation<DIM,DIM>(rMesh),
-      mGhostSpringStiffness(ghostSpringStiffness)
+      mGhostCellSpringStiffness(ghostCellSpringStiffness),
+      mGhostGhostSpringStiffness(ghostGhostSpringStiffness),
+      mGhostSpringRestLength(ghostSpringRestLength)
 {
 }
 
@@ -151,9 +160,15 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
     double distance_between_nodes = norm_2(unit_difference);
     unit_difference /= distance_between_nodes;
 
-    double rest_length = 1.0;
+    double rest_length = 1.0; // TODO this could also be a parameter.
+    double spring_stiffness = mGhostCellSpringStiffness;
+    if (this->mIsGhostNode[rNodeAGlobalIndex] && this->mIsGhostNode[rNodeBGlobalIndex])
+    {
+        rest_length = mGhostSpringRestLength;
+        spring_stiffness  = mGhostGhostSpringStiffness;
+    }
 
-    return mGhostSpringStiffness * unit_difference * (distance_between_nodes - rest_length);
+    return spring_stiffness * unit_difference * (distance_between_nodes - rest_length);
 }
 
 template<unsigned DIM>
@@ -203,6 +218,14 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
             EXCEPTION("Node " << i << " does not appear to be a ghost node or have a cell associated with it");
         }
     }
+}
+
+template<unsigned DIM>
+void MeshBasedCellPopulationWithGhostNodes<DIM>::RemoveGhostNode(unsigned nodeIndex)
+{
+    assert(mIsGhostNode[nodeIndex]);
+
+    static_cast<MutableMesh<DIM,DIM>&>((this->mrMesh)).DeleteNodePriorToReMesh(nodeIndex);
 }
 
 template<unsigned DIM>
@@ -336,14 +359,77 @@ template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
+    // Store the present time as a string
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    std::stringstream time;
+    time << num_timesteps;
+
+    if (this->mWriteVtkAsPoints)
+    {
+        // Create mesh writer for VTK output
+        VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "mesh_results_"+time.str(), false);
+
+        // Iterate over any cell writers that are present
+        unsigned num_vtk_cells = this->rGetMesh().GetNumNodes();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+             cell_writer_iter != this->mCellWriters.end();
+             ++cell_writer_iter)
+        {
+            // Create vector to store VTK cell data
+            std::vector<double> vtk_cell_data(num_vtk_cells);
+
+            // Loop over nodes of mesh
+            for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+                node_iter != this->rGetMesh().GetNodeIteratorEnd();
+                ++node_iter)
+            {
+                // Get the indices of this node
+                unsigned node_index = node_iter->GetIndex();
+
+                // If this node corresponds to a ghost node, set any "cell" data to be -1.0
+                if (this->IsGhostNode(node_index))
+                {
+                    // Populate the vector of VTK cell data
+                    vtk_cell_data[node_index] = -1.0;
+                }
+                else
+                {
+                    // Get the cell corresponding to this node
+                    CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+
+                    // Populate the vector of VTK cell data
+                    vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                }
+            }
+
+            mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        }
+
+        // Next, record which nodes are ghost nodes
+        // Note that the cell writer hierarchy can not be used to do this as ghost nodes don't have corresponding cells.
+        std::vector<double> ghosts(num_vtk_cells);
+        for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+            node_iter != this->rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+            ghosts[node_index]  = (double) (this->IsGhostNode(node_index));
+        }
+        mesh_writer.AddPointData("Non-ghosts", ghosts);
+
+        ///\todo #1975 - deal with possibility of information stored in CellData
+
+        mesh_writer.WriteFilesUsingMesh(this->rGetMesh());
+        *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
+        *(this->mpVtkMetaFile) << num_timesteps;
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"mesh_results_";
+        *(this->mpVtkMetaFile) << num_timesteps;
+        *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    }
     if (this->mpVoronoiTessellation != nullptr)
     {
-        unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
-        std::stringstream time;
-        time << num_timesteps;
-
         // Create mesh writer for VTK output
-        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
+        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "voronoi_results", false);
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
@@ -400,7 +486,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         mesh_writer.WriteVtkUsingMesh(*(this->mpVoronoiTessellation), time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
         *(this->mpVtkMetaFile) << num_timesteps;
-        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"voronoi_results_";
         *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
@@ -410,7 +496,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<GhostSpringStiffness>" << mGhostSpringStiffness << "</GhostSpringStiffness>\n";
+    *rParamsFile << "\t\t<GhostCellSpringStiffness>" << mGhostCellSpringStiffness << "</GhostCellSpringStiffness>\n";
+    *rParamsFile << "\t\t<GhostGhostSpringStiffness>" << mGhostGhostSpringStiffness << "</GhostGhostSpringStiffness>\n";
+    *rParamsFile << "\t\t<GhostSpringRestLength>" << mGhostSpringRestLength << "</GhostSpringRestLength>\n";
 
     // Call method on direct parent class
     MeshBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);

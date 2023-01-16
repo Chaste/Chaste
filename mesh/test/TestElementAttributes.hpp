@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -128,11 +128,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            ElementAttributes<2,2>* const p_element_attributes = NULL;
+            ElementAttributes<2,2>* const p_element_attributes = nullptr;
 
             output_arch << p_element_attributes;
 
-            delete p_element_attributes;
+            // This is an unnecessary delete and GCC 11 does not like it
+            // delete p_element_attributes;
         }
 
         {

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryNodeWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "LegacyCellProliferativeTypesWriter.hpp"
+#include "CellRemovalLocationsWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -101,6 +102,10 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor)
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
     }
+
+    // Clear stored divisions and removals information
+    ClearDivisionsInformation();
+    ClearRemovalsInformation();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -564,6 +569,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
         p_count_writer->OpenOutputFile(rOutputFileHandler);
         p_count_writer->WriteHeader(this);
     }
+
+    // Open output files and write headers for any population event writers
+    typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+    BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+    {
+        p_event_writer->OpenOutputFile(rOutputFileHandler);
+        p_event_writer->WriteHeader(this);
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -661,6 +674,34 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             {
                 p_count_writer->WriteNewline();
                 p_count_writer->CloseFile();
+            }
+        }
+
+
+        // Outside the round robin, deal with population event writers
+        typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+
+        if (PetscTools::AmMaster())
+        {
+            // Open mCellPopulationCountWriters in append mode for writing
+            BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+            {
+                p_event_writer->OpenOutputFileForAppend(output_file_handler);
+            }
+        }
+        for (typename std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator event_writer_iter = mCellPopulationEventWriters.begin();
+             event_writer_iter != mCellPopulationEventWriters.end();
+             ++event_writer_iter)
+        {
+            AcceptPopulationEventWriter(*event_writer_iter);
+        }
+
+        if (PetscTools::AmMaster())
+        {
+            // Close any output files
+            BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+            {
+                p_event_writer->CloseFile();
             }
         }
     }
@@ -783,7 +824,81 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVi
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
+{
+    return mDivisionsInformation;
+}
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(std::string divisionInformation)
+{
+    mDivisionsInformation.push_back(divisionInformation);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearDivisionsInformation()
+{
+    mDivisionsInformation.clear();
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
+{
+    return mRemovalsInformation;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(std::string removalInformation)
+{
+    mRemovalsInformation.push_back(removalInformation);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
+{
+    mRemovalsInformation.clear();
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(CellPtr pCell, std::string killerInfo)
+{
+    //If necessary store the information about the cell removal
+    c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
+    if (HasWriter<CellRemovalLocationsWriter>())
+    {
+        std::stringstream removal_info;
+        removal_info << SimulationTime::Instance()->GetTime() << "\t";
+        for (unsigned i = 0; i < SPACE_DIM; i++)
+        {
+            removal_info << cell_location[i] << "\t";
+        }
+        removal_info << "\t" << pCell->GetAge() << "\t" << pCell->GetCellId() << "\t" << killerInfo << "\t";
+
+        AddRemovalInformation(removal_info.str());
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(CellPtr pCell, std::string killerInfo)
+{
+    //If necessary store the information about the cell removal
+    GenerateRemovalInformation(pCell, killerInfo);
+
+    //Mark cell as dead
+    pCell->Kill();
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(CellPtr pCell, std::string killerInfo)
+{
+    //If necessary store the information about the cell removal
+    GenerateRemovalInformation(pCell, killerInfo);
+
+    //Mark cell as Apoptotic
+    pCell->StartApoptosis();
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(CellPtr pCell)
 {
     return true;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -697,7 +697,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 6u);
 
-        // Find the element with node indices 2,3,5 (which stradles the periodic boundary)
+        // Find the element with node indices 2,3,5 (which straddles the periodic boundary)
         unsigned element_index;
         std::set<unsigned> target_element_node_indices;
         for (element_index=0; element_index<mesh.GetNumElements(); element_index++)
@@ -726,7 +726,7 @@ public:
 //        TS_ASSERT_DELTA(circumsphere[2], 0.2526, 1e-3);
 
         /* The reason that the circumsphere is calculated correctly for a periodic boundary
-         * stradling element is somewhat obscure.
+         * straddling element is somewhat obscure.
          * The Jacobian of the element is calculated when the element has a mirror node
          * The mirror node is then replaced with the node within the periodic mesh
          * The circumsphere is calculated based on the Jacobian and the replaced node within the periodic mesh
@@ -801,7 +801,7 @@ public:
                 continue;
             }
 
-            // Iterate over countaining elements to get the elements of the forward star
+            // Iterate over containing elements to get the elements of the forward star
             for (Node<2>::ContainingElementIterator it = p_node->ContainingElementsBegin();
                 it != p_node->ContainingElementsEnd();
                 ++it)

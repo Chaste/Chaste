@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,7 +87,7 @@ private:
         archive & mUseAreaBasedDampingConstant;
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
-        archive & mOutputMeshInVtk;
+        archive & mBoundVoronoiTessellation;
         archive & mHasVariableRestLength;
 
         this->Validate();
@@ -134,8 +134,8 @@ protected:
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
 
-    /** Whether to output the underlying MutableMesh  in VTK. */
-    bool mOutputMeshInVtk;
+    /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
+    bool mBoundVoronoiTessellation;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
@@ -302,6 +302,14 @@ public:
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
+
+    /**
+     * A virtual method to accept a cell population event writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationEventWriter the population event writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -553,16 +561,16 @@ public:
     bool GetWriteVtkAsPoints();
 
     /**
-     * Set mOutputMeshInVtk.
+     * Set mBoundVoronoiTessellation.
      *
-     * @param outputMeshInVtk whether to write cells as points in VTK
+     * @param boundVoronoiTessellation whether to bound the Voronoi Tesselation.
      */
-    void SetOutputMeshInVtk(bool outputMeshInVtk);
+    void SetBoundVoronoiTessellation(bool boundVoronoiTessellation);
 
     /**
-     * @return mOutputMeshInVtk.
+     * @return mBoundVoronoiTessellation.
      */
-    bool GetOutputMeshInVtk();
+    bool GetBoundVoronoiTessellation();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.

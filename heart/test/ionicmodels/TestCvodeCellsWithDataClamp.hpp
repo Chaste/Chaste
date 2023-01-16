@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,12 +66,12 @@ private:
     {
 #ifdef CHASTE_CVODE
         OutputFileHandler handler(outputFolder, true);
-	
+
         FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(cellml_file);
 
-	CellMLToSharedLibraryConverter converter(true);
-	converter.SetOptions(args);
+    CellMLToSharedLibraryConverter converter(true);
+    converter.SetOptions(args);
 
         // Do the conversion
         FileFinder copied_file(outputFolder + "/Shannon2004.cellml", RelativeTo::ChasteTestOutput);

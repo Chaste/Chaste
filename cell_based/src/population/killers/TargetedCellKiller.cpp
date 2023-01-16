@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,11 +58,12 @@ unsigned TargetedCellKiller<DIM>::GetBloodLust() const
 template<unsigned DIM>
 void TargetedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    if (!mBloodLust || this->mpCellPopulation->GetNumRealCells()==0 || this->mpCellPopulation->GetNumRealCells()<mTargetIndex+1)
+    if (!mBloodLust || this->mpCellPopulation->GetNumRealCells() == 0 || this->mpCellPopulation->GetNumRealCells() < mTargetIndex + 1)
     {
         return;
     }
-    this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex)->Kill();
+    // Mark the cell as killed and store removal information if required.
+    this->mpCellPopulation->KillCell(this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex), "TargetedCellKiller");
     mBloodLust = false;
 }
 

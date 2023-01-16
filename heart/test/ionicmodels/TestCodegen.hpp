@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -214,25 +214,25 @@ public:
         TS_ASSERT_THROWS_CONTAINS(opt.GetIIonic(), "membrane_voltage outside lookup table range");
         opt.SetVoltage(v);
 
-	// Set up for dynamic loading
-	FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
+    // Set up for dynamic loading
+    FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
 
-	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_lut("TestCodegen", true);
-       	FileFinder copied_file = handler_lut.CopyFileTo(cellml_file);
-	CellMLToSharedLibraryConverter converter(true);
-       	converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
+    // Dynamic load with different lookup table start to the default
+    OutputFileHandler handler_lut("TestCodegen", true);
+           FileFinder copied_file = handler_lut.CopyFileTo(cellml_file);
+    CellMLToSharedLibraryConverter converter(true);
+           converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_lut = converter.Convert(copied_file);
-	AbstractCardiacCell* opt_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_lut->CreateCell(p_solver, p_stimulus));
+    AbstractCardiacCell* opt_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_lut->CreateCell(p_solver, p_stimulus));
 
-	// Dynamic load with different lookup table start to the default
-	OutputFileHandler handler_be_lut("TestCodegen/BE", true);
-       	copied_file = handler_be_lut.CopyFileTo(cellml_file);
-       	converter.SetOptions({"--backward-euler", "--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
+    // Dynamic load with different lookup table start to the default
+    OutputFileHandler handler_be_lut("TestCodegen/BE", true);
+           copied_file = handler_be_lut.CopyFileTo(cellml_file);
+           converter.SetOptions({"--backward-euler", "--opt", "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_be_lut = converter.Convert(copied_file);
-	AbstractCardiacCell* be_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_be_lut->CreateCell(p_solver, p_stimulus));
+    AbstractCardiacCell* be_lut = dynamic_cast<AbstractCardiacCell*>(p_loader_be_lut->CreateCell(p_solver, p_stimulus));
 
 
         // Check tables using AbstractLookupTableCollection interface, with different lookup table options
@@ -341,8 +341,8 @@ public:
 
         // Dynamic load with different lookup table start to the default
         OutputFileHandler handler_cvode_lut("TestC/CVODE", true);
-       	copied_file = handler_cvode_lut.CopyFileTo(cellml_file);
-       	converter.SetOptions({"--opt", "--cvode",
+           copied_file = handler_cvode_lut.CopyFileTo(cellml_file);
+           converter.SetOptions({"--opt", "--cvode",
                               "--lookup-table", "membrane_voltage", "-150.0001", "199.9999", "0.001",
                               "--lookup-table", "cytosolic_calcium_concentration", "0.00001", "30.00001", "0.0001"});
         DynamicCellModelLoaderPtr p_loader_cvode_lut = converter.Convert(copied_file);
@@ -390,7 +390,7 @@ public:
         // Attributes
         CheckAttributes(cvode_cell);
         CheckAttributes(cvode_opt);
-        
+
         delete cvode_lut;
 #endif // CHASTE_CVODE
 

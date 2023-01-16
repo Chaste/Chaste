@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "AbstractForce.hpp"
+#include "AbstractCellPopulationBoundaryCondition.hpp"
 
 /**
  * An abstract class representing a numerical method for off lattice cell based simulations.
@@ -83,6 +84,9 @@ protected:
     /** Pointer to the force collection to apply*/
     std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
 
+    /** Pointer to the boundary conditions to apply*/
+    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* mpBoundaryConditions;
+
     /**
      * Whether the numerical method uses an adaptive time step.
      * Initialized to false in the AbstractNumericalMethod constructor.
@@ -105,6 +109,18 @@ protected:
      * Initialized to true in the AbstractNumericalMethod constructor.
      */
     bool mGhostNodeForcesEnabled;
+
+    /**
+     * Helper method to store the node locations used when applying the boundary conditions in higher order methods.
+     * @return the current node locations.
+     */
+    std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > SaveCurrentNodeLocations();
+
+    /**
+     * Helper method to apply boundary conditions. Used in higher order methods like RK4.
+     * @param rOldLocations the node locations prior to being updated.
+     */
+    void ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations);
 
     /**
      * Computes and returns the force on each node, including the damping factor
@@ -165,6 +181,13 @@ public:
      * @param pForces Pointer to the simulation's force collection
      */
     void SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces);
+
+    /**
+     * Sets the pointer to the boundary conditions applied by this method
+     *
+     * @param pBoundaryConditions Pointer to the simulation's boundary condition collection
+     */
+    void SetBoundaryConditions(std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions);
 
     /**
      * Set mUseAdaptiveTimestep.

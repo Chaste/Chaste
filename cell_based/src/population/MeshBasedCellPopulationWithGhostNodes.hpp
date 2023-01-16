@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,9 +64,19 @@ private:
     std::vector<bool> mIsGhostNode;
 
     /**
+     * Spring stiffness for springs between ghost nodes and cells.
+     */
+    double mGhostCellSpringStiffness;
+
+    /**
      * Spring stiffness for springs between ghost nodes.
      */
-    double mGhostSpringStiffness;
+    double mGhostGhostSpringStiffness;
+
+    /**
+     * Rest length for springs between ghost nodes.
+     */
+    double mGhostSpringRestLength;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -86,16 +96,11 @@ private:
     {
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
         archive & mIsGhostNode;
-        archive & mGhostSpringStiffness;
+        archive & mGhostCellSpringStiffness;
+        archive & mGhostGhostSpringStiffness;
+        archive & mGhostSpringRestLength;
         archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM, DIM> >(*this);
     }
-
-    /**
-     * Set the ghost nodes by taking in a set of which nodes indices are ghost nodes.
-     *
-     * @param rGhostNodeIndices set of node indices corresponding to ghost nodes
-     */
-    void SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices);
 
     /**
      * This is called after a cell population has been constructed to check the
@@ -126,22 +131,30 @@ public:
      * @param rCells cells corresponding to the nodes of the mesh
      * @param locationIndices an optional vector of location indices that correspond to real cells
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
-     * @param ghostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
+     * @param ghostCellSpringStiffness spring stiffness used to move the ghost nodes when connected to cells defaults to 15.0.
+     * @param ghostGhostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
+     * @param ghostSpringRestLength spring rest length used to move the ghost nodes defaults to 1.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
                                           std::vector<CellPtr>& rCells,
                                           const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
                                           bool deleteMesh=false,
-                                          double ghostSpringStiffness=15.0);
+                                          double ghostCellSpringStiffness=15.0,
+                                          double ghostGhostSpringStiffness=15.0,
+                                          double ghostSpringRestLength=1.0);
 
     /**
      * Constructor for use by the de-serializer.
      *
      * @param rMesh a mutable tetrahedral mesh.
-     * @param ghostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
+     * @param ghostCellSpringStiffness spring stiffness used to move the ghost nodes when connected to cells defaults to 15.0.
+     * @param ghostGhostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
+     * @param ghostSpringRestLength spring rest length used to move the ghost nodes defaults to 1.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                          double ghostSpringStiffness=15.0);
+                                          double ghostCellSpringStiffness=15.0,
+                                          double ghostGhostSpringStiffness=15.0,
+                                          double ghostSpringRestLength=1.0);
 
     /**
      * Empty destructor so archiving works with static libraries.
@@ -166,6 +179,13 @@ public:
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
+     * Set the ghost nodes by taking in a set of which nodes indices are ghost nodes.
+     *
+     * @param rGhostNodeIndices set of node indices corresponding to ghost nodes
+     */
+    void SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices);
 
     /**
      * Applies the appropriate force to each ghost node in the population.
@@ -195,6 +215,10 @@ public:
      */
     std::set<unsigned> GetGhostNodeIndices();
 
+    /**
+     * @param nodeIndex the index of the node to be removed.
+     */
+    void RemoveGhostNode(unsigned nodeIndex);
 
     /**
      * Update mIsGhostNode if required by a remesh.

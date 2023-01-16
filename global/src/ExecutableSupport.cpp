@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -306,7 +306,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 #else
     //GNU
     *out_file << "\nInformation on number and type of processors:\n";
@@ -315,7 +315,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 
     *out_file << "\nInformation on processor caches, in the same order as above:\n";
     system_info = popen("grep ^cache.size /proc/cpuinfo", "r");
@@ -323,7 +323,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 
     *out_file << "\nInformation on system memory:\n";
     system_info = popen("grep ^MemTotal /proc/meminfo", "r");
@@ -331,7 +331,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     {
         *out_file << buffer;
     }
-    fclose(system_info);
+    pclose(system_info);
 #endif //end of __APPLE__ not defined
 #endif //end of _MSC_VER not defined
 
@@ -442,6 +442,8 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t</Optional>\n";
 
     output << "\t</Libraries>\n";
+
+    output << "\t<ChasteCodegenVersion>" << ChasteBuildInfo::GetChasteCodegenVersion() <<  "</ChasteCodegenVersion>\n";
 
     output << "</ChasteBuildInfo>" << std::endl;
     rInfo = output.str();

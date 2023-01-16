@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::AbstractNumericalMethod()
       mUseUpdateNodeLocation(false),
       mGhostNodeForcesEnabled(true)
 {
-    // mpCellPopulation and mpForceCollection are initialized by the OffLatticeSimulation constructor
+    // mpCellPopulation, mpForceCollection and mpBoundaryConditions are initialized by the OffLatticeSimulation constructor
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -86,6 +86,12 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vec
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetBoundaryConditions(std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions)
+{
+    mpBoundaryConditions = pBoundaryConditions;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseAdaptiveTimestep(bool useAdaptiveTimestep)
 {
     mUseAdaptiveTimestep = useAdaptiveTimestep;
@@ -95,6 +101,33 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::HasAdaptiveTimestep()
 {
     return mUseAdaptiveTimestep;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SaveCurrentNodeLocations()
+{
+    std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > node_locations;
+
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+            node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
+    }
+
+    return node_locations;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations)
+{
+    // Apply any boundary conditions
+    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mpBoundaryConditions->begin();
+         bcs_iter != mpBoundaryConditions->end();
+         ++bcs_iter)
+    {
+        (*bcs_iter)->ImposeBoundaryCondition(rOldNodeLocations);
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

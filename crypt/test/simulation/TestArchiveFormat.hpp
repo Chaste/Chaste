@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -77,17 +77,19 @@ public:
      *
      * Note that when updating the archive, you can run TestGenerateSteadyStateCrypt.hpp with build=GccOpt to speed up the test.
      *
-     * Note: from Chaste release 3.3 onward the earliest version of Boost supported is 1.40.
+     * Note: from Chaste release 2021.1 onward the earliest version of Boost supported is 1.58.
      *
-     * NB: Produce archives with
-     *  scons build=GccOpt_hostconfig,boost=1-40,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
-     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
+     * NB: Produce archives with something similar to 
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/path/to/boost1.58 -DChaste_USE_CVODE=OFF /path/to/Chaste
+     *  # YOUR MILEAGE MAY VARY because CMake is very good at finding other versions of Boost:
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON DChaste_USE_CVODE=FALSE ..
+     *  make TestGenerateSteadyStateCrypt
+     *  ctest -R TestGenerateSteadyStateCrypt
+     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
      *
      * OR to produce archives in CMake:
-     *  cmake -DBOOST_ROOT=/path/to/boost1.40 -DChaste_USE_CVODE=OFF /path/to/Chaste
-     *  make TestGenerateSteadyStateCrypt_simulation_Runner
-     *  ctest -R TestGenerateSteadyStateCrypt
-     *  cp /path/to/Chaste/testoutput/SteadyStateCrypt/archive/?*_150.* /path/to/Chaste/crypt/test/data/SteadyStateCrypt/archive/
+     *  scons build=GccOpt_hostconfig,boost=1-58,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
+     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
      */
     void TestLoadArchive()

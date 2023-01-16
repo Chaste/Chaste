@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -69,7 +69,8 @@ void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 
         if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
         {
-            cell_iter->Kill();
+            // Mark the cell as killed and store removal information if required.
+            this->mpCellPopulation->KillCell(*cell_iter, "PlaneBasedCellKiller");
         }
     }
 }

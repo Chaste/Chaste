@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,7 +86,8 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
                 // ...and if none do, then kill this cell
                 if (num_labelled_neighbours == 0)
                 {
-                    cell_iter->Kill();
+                    // Mark the cell as killed and store removal information if required.
+                    this->mpCellPopulation->KillCell(*cell_iter, "IsolatedLabelledCellKiller");
                 }
             }
         }

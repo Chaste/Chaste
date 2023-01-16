@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "PopulationTestingForce.hpp"
+#include "PlaneBoundaryCondition.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "Warnings.hpp"
 
@@ -111,7 +112,6 @@ public:
             saved_locations = numerical_method.SaveCurrentLocations();
 
             TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
-
         }
 
         // This tests the exceptions for Node based with Buske Update
@@ -142,6 +142,73 @@ public:
             TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Non-Euler steppers are not yet implemented for NodeBasedCellPopulationWithBuskeUpdate");
             Warnings::QuietDestroy();
 
+        }
+    }
+
+    void TestApplyingBoundaryConditions()
+    {
+
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
+        unsigned cells_across = 7;
+        unsigned cells_up = 5;
+
+        HoneycombMeshGenerator generator(cells_across, cells_up, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create a force collection
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        // Create a Boundary condition collection
+        std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<2,2> > > boundary_condition_collection;
+        c_vector<double,2> point = zero_vector<double>(2);
+        point(1) = 0.5;
+        c_vector<double,2> normal = zero_vector<double>(2);
+        normal(1) = -1.0;
+        MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_test_bcs, (&cell_population, point, normal)); // y>0.5
+        boundary_condition_collection.push_back(p_test_bcs);
+
+        // Create Numerical method
+        ForwardEulerNumericalMethod<2> numerical_method;
+
+        numerical_method.SetCellPopulation(&cell_population);
+        numerical_method.SetForceCollection(&force_collection);
+        numerical_method.SetUseAdaptiveTimestep(true);
+        numerical_method.SetBoundaryConditions(&boundary_condition_collection);
+
+        std::map<Node<2>*, c_vector<double, 2> > saved_locations;
+        saved_locations = numerical_method.SaveCurrentNodeLocations();
+        TS_ASSERT_EQUALS(saved_locations.size(), cell_population.GetNumRealCells());
+
+        numerical_method.ImposeBoundaryConditions(saved_locations);
+
+        std::map<Node<2>*, c_vector<double, 2> > new_locations;
+        new_locations = numerical_method.SaveCurrentNodeLocations();
+        TS_ASSERT_EQUALS(new_locations.size(), saved_locations.size());
+
+        // Check the bcs has been imposed
+        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        {
+            TS_ASSERT_DELTA(new_locations[cell_population.GetNode(node_index)](0), saved_locations[cell_population.GetNode(node_index)](0), 1e-3);
+
+            if (node_index<7) // These nodes moved by BCS
+            {
+                TS_ASSERT_DELTA(new_locations[cell_population.GetNode(node_index)](1), 0.5, 1e-3);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(new_locations[cell_population.GetNode(node_index)](1), saved_locations[cell_population.GetNode(node_index)](1), 1e-3);
+            }
         }
     }
 

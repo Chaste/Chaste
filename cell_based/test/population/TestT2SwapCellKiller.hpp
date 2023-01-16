@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,22 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTT2SWAPCELLKILLER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
-#include "ArchiveOpener.hpp"
-#include "CellsGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "VertexMeshWriter.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "T2SwapCellKiller.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "FileComparison.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "Warnings.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "SmartPointers.hpp"
+#include "ArchiveOpener.hpp"
+#include "CellRemovalLocationsWriter.hpp"
+#include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "T2SwapCellKiller.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "VertexMeshWriter.hpp"
+#include "Warnings.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -223,7 +224,7 @@ public:
     {
         /**
          * This is performs a single T2 swap in a simulation and tests that the cells and vertex elements are
-         * deleted correctly.
+         * deleted correctly. Also check the cell removal is output correctly.
          */
         // Make 6 nodes to assign to four elements
         std::vector<Node<2>*> nodes;
@@ -273,6 +274,9 @@ public:
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        // Add a writer to store when cells are removed from simulation
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 
         // make a simulator
         OffLatticeSimulation<2> simulator(cell_population);
@@ -337,6 +341,12 @@ public:
 
         // We also do not have any undeleted cells
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(),3u);
+
+        //Check the cell removal is recorded correctly.
+        FileFinder generated_file("TestT2SwapCellKillerInSimulation/results_from_time_0.003/removals.dat", RelativeTo::ChasteTestOutput);
+        FileFinder reference_file("cell_based/test/data/TestT2SwapCellKillerInSimulation/removals.dat", RelativeTo::ChasteSourceRoot);
+        FileComparison files(generated_file, reference_file);
+        TS_ASSERT(files.CompareFiles());
     }
 
     void TestKillerForMultipleT2Swaps()

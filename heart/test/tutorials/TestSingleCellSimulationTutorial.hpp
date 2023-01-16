@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -169,7 +169,7 @@ public:
         p_model->SetTolerances(1e-8, 1e-8);
 
         /*
-         * By default we use an analytic Jacobian for CVODE cells. 
+         * By default we use an analytic Jacobian for CVODE cells.
          * In some cases (the Hund-Rudy model particularly being one) the
          * analytic Jacobian contains effectively divide-by-zero entries, even at resting potential. If you observe
          * CVODE errors when trying to run simulations, it can be worth switching off the analytic Jacobian and resorting

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "MutableVertexMesh.hpp"
+#include "Toroidal2dMesh.hpp"
 
 /**
  * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
@@ -114,6 +115,15 @@ public:
     Toroidal2dVertexMesh();
 
     /**
+     * Alternative constructor. Creates a Voronoi tessellation of a given Toroidal2dMesh,
+     * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
+     *
+     * @param rMesh a Toroidal2dMesh
+     * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
+     */
+    Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded = false);
+
+    /**
      * Destructor.
      */
     ~Toroidal2dVertexMesh();
@@ -175,6 +185,14 @@ public:
      * @return the global index of the new node
      */
     unsigned AddNode(Node<2>* pNewNode);
+
+    /**
+     * Helper method to check if a node is within [0,mWidth]x[0,mHeight]
+     * and move back into the domain if needed.
+     *
+     * @param pNewNode the node to be checked
+     */
+    void CheckNodeLocation(Node<2>* pNode);
 
     /**
      * Overridden GetMeshForVtk() method.

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * '''NB:''' recent improvements (available from release 2021.1) mean that
  * an ''analytic jacobian'' is automatically made available to CVODE via the
  * native `AbstractCvodeCell`, and this will provide a speed up of between 5-30% (depending on the size of
- * the ODE system). 
+ * the ODE system).
  *
  * So here we do the `#include` to import the native CVODE version of the cell model.
  */

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "ExecutableSupport.hpp"
 #include "AbstractPdeModifier.hpp"
+#include "CellDivisionLocationsWriter.hpp"
+#include "CellRemovalLocationsWriter.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
@@ -60,7 +62,8 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mNumDeaths(0),
       mOutputDivisionLocations(false),
       mOutputCellVelocities(false),
-      mSamplingTimestepMultiple(1)
+      mSamplingTimestepMultiple(1),
+      mUpdatingTimestepMultiple(1)
 {
     // Set a random seed of 0 if it wasn't specified earlier
     RandomNumberGenerator::Instance();
@@ -119,31 +122,22 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                     /**
                      * If required, output this location to file
                      *
-                     * \todo (#2578)
+                     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
                      *
-                     * For consistency with the rest of the output code, consider removing the
-                     * AbstractCellBasedSimulation member mOutputDivisionLocations, adding a new
-                     * member mAgesAndLocationsOfDividingCells to AbstractCellPopulation, adding
-                     * a new class CellDivisionLocationsWriter to the CellPopulationWriter hierarchy
-                     * to output the content of mAgesAndLocationsOfDividingCells to file (remembering
-                     * to clear mAgesAndLocationsOfDividingCells at each timestep), and replacing the
-                     * following conditional statement with something like
-                     *
-                     * if (mrCellPopulation.HasWriter<CellDivisionLocationsWriter>())
-                     * {
-                     *     mCellDivisionLocations.push_back(new_location);
-                     * }
                      */
-                    if (mOutputDivisionLocations)
+                    if (mrCellPopulation.template HasWriter<CellDivisionLocationsWriter>())
                     {
                         c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-                        *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
-                        for (unsigned i=0; i<SPACE_DIM; i++)
+                        std::stringstream division_info;
+                        division_info << SimulationTime::Instance()->GetTime() << "\t";
+                        for (unsigned i = 0; i < SPACE_DIM; i++)
                         {
-                            *mpDivisionLocationFile << cell_location[i] << "\t";
+                            division_info << cell_location[i] << "\t";
                         }
-                        *mpDivisionLocationFile << "\t" << cell_age << "\t" << parent_cell_id << "\t" << cell_iter->GetCellId() << "\t" << p_new_cell->GetCellId() << "\n";
+                        division_info << "\t" << cell_age << "\t" << parent_cell_id << "\t" << cell_iter->GetCellId() << "\t" << p_new_cell->GetCellId() << "\t";
+
+                        mrCellPopulation.AddDivisionInformation(division_info.str());
                     }
 
                     // Add the new cell to the cell population
@@ -229,6 +223,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetSamplingTimestepMult
 {
     assert(samplingTimestepMultiple > 0);
     mSamplingTimestepMultiple = samplingTimestepMultiple;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetUpdatingTimestepMultiple(unsigned updatingTimestepMultiple)
+{
+    assert(updatingTimestepMultiple > 0);
+    mUpdatingTimestepMultiple = updatingTimestepMultiple;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -364,19 +365,20 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     // Set up simulation
 
     // Create output files for the visualizer
-    OutputFileHandler output_file_handler(results_directory+"/", true);
-
-    mrCellPopulation.OpenWritersFiles(output_file_handler);
+    OutputFileHandler output_file_handler(results_directory + "/", true);
 
     if (mOutputDivisionLocations)
     {
-        mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
+        mrCellPopulation.template AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
+        mrCellPopulation.template AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
     }
     if (mOutputCellVelocities)
     {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory + "/", false);
         mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
     }
+
+    mrCellPopulation.OpenWritersFiles(output_file_handler);
 
     if (PetscTools::AmMaster())
     {
@@ -448,8 +450,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
 
-        // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
-        UpdateCellPopulation();
+
+        if (p_simulation_time->GetTimeStepsElapsed()%mUpdatingTimestepMultiple == 0)
+        {
+            // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
+            UpdateCellPopulation();
+        }
 
         // Store whether we are sampling results at the current timestep
         SimulationTime* p_time = SimulationTime::Instance();
@@ -572,10 +578,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     mrCellPopulation.CloseWritersFiles();
 
-    if (mOutputDivisionLocations)
-    {
-        mpDivisionLocationFile->close();
-    }
     if (mOutputCellVelocities)
     {
         mpCellVelocitiesFile->close();
@@ -619,7 +621,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
 
     // Update topology of cell population
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
-    if (mUpdateCellPopulation)
+    SimulationTime* p_time = SimulationTime::Instance();
+    if (mUpdateCellPopulation && (p_time->GetTimeStepsElapsed() % mUpdatingTimestepMultiple == 0) )
     {
         LOG(1, "\tUpdating cell population...");
         mrCellPopulation.Update(births_or_death_occurred);
@@ -627,7 +630,18 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellPopulation()
     }
     else if (births_or_death_occurred)
     {
-        EXCEPTION("CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
+        if (!mUpdateCellPopulation)
+        {
+            EXCEPTION("CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
+        }
+        else if ((p_time->GetTimeStepsElapsed() % mUpdatingTimestepMultiple != 0))
+        {
+            EXCEPTION("CellPopulation has had births or deaths but you were on a non update step, make sure your cell cycle model and killer only operate on update steps.");
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
     }
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATECELLPOPULATION);
 }
@@ -724,7 +738,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
 {
     *rParamsFile << "\t\t<Dt>" << mDt << "</Dt>\n";
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
+    *rParamsFile << "\t\t<UpdateCellPopulation>" << mUpdateCellPopulation << "</UpdateCellPopulation>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
+    *rParamsFile << "\t\t<UpdatingTimestepMultiple>" << mUpdatingTimestepMultiple << "</UpdatingTimestepMultiple>\n";
     *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
     *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
 }

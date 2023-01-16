@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Identifiable.hpp"
+#include "AbstractCellPopulationEventWriter.hpp"
 #include "AbstractCellPopulationCountWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
@@ -150,6 +151,21 @@ protected:
 
     /** A list of cell population count writers. */
     std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
+
+    /** A list of cell population event writers. */
+    std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationEventWriters;
+
+    /**
+     * Details of cell divisions, to be used by CellDivisionLocationsWriter
+     * The locations are stored until they are cleared by ClearDivisionsInformation().
+     */
+    std::vector<std::string> mDivisionsInformation;
+
+    /**
+     * Details of cell removals, to be used by CellRemovalLocationsWriter
+     * The locations are stored until they are cleared by ClearRemovalsInformation().
+     */
+    std::vector<std::string> mRemovalsInformation;
 
     /**
      * Check consistency of our internal data structures.
@@ -645,6 +661,16 @@ public:
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
+     * Accept a cell population event writer so it can write data from this object to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pPopulationCountWriter the population count writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
+
+    /**
      * Accept a cell writer so it can write data from this object to file.
      *
      * As this method is pure virtual, it must be overridden
@@ -653,7 +679,71 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) = 0;
+
+    /**
+     * Return details of all divisions since the last sampling time step.
+     *
+     * @return mDivisionsInformation
+     */
+    std::vector<std::string> GetDivisionsInformation();
+
+    /**
+     * Add information for a division event.
+     *
+     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
+     *
+     * @param divisionInformation  division information string
+     */
+    void AddDivisionInformation(std::string divisionInformation);
+
+    /**
+     * Clear the stored division information ready for the next output step.
+     */
+    void ClearDivisionsInformation();
+
+    /**
+     * Return details of all cell removals since the last sampling time step.
+     *
+     * @return mRemovalsInformation
+     */
+    std::vector<std::string> GetRemovalsInformation();
+
+    /**
+     * Add information for a division event.
+     *
+     * @param removalInformation  removal information string
+     */
+    void AddRemovalInformation(std::string removalInformation);
+
+    /**
+     * Clear the stored removal information ready for the next output step.
+     */
+    void ClearRemovalsInformation();
+
+    /**
+     * Helper method to store information about the removal in mRemovalInformation
+     *
+     * @param pCell the cell
+     * @param killerInfo additional information the killer wants output i.e. the type of killer.
+     */
+    void GenerateRemovalInformation(CellPtr pCell, std::string killerInfo);
+
+    /**
+     * Helper method to mark a cell as killed and store information about the removal.
+     *
+     * @param pCell the cell
+     * @param killerInfo additional information the killer wants output i.e. the type of killer.
+     */
+    void KillCell(CellPtr pCell, std::string killerInfo);
+
+    /**
+     * Helper method to mark a cell as starting apoptosis and store information about the removal.
+     *
+     * @param pCell the cell
+     * @param killerInfo additional information the killer wants output i.e. the type of killer.
+     */
+    void StartApoptosisOnCell(CellPtr pCell, std::string killerInfo);
 
     /**
      * Outputs CellPopulation used in the simulation to file and then calls OutputCellPopulationParameters to output all relevant parameters.
@@ -730,6 +820,18 @@ public:
     }
 
     /**
+     * Add a cell population event writer based on its type. Template parameters are inferred from the population.
+     * The implementation of this function must be available in the header file.
+     *
+     * @return This method returns void
+     */
+    template<template <unsigned, unsigned> class T>
+    void AddCellPopulationEventWriter()
+    {
+        mCellPopulationEventWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+    }
+
+    /**
      * Add a cell population writer through an input argument.
      * This alternative to the templated AddPopulationWriter()
      * method allows the user to, for example, add a writer
@@ -772,6 +874,20 @@ public:
     }
 
     /**
+     * Add a cell population count writer through an input argument.
+     * This alternative to the templated AddCellPopulationEventWriter()
+     * method allows the user to, for example, add a writer
+     * with a non-default value for its member mFileName.
+     *
+     * @param pCellPopulationEventWriter shared pointer to a cell population event writer
+     * @return This method returns void
+     */
+    void AddCellPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
+    {
+        mCellPopulationEventWriters.push_back(pCellPopulationEventWriter);
+    }
+
+    /**
      * Get whether the population has a writer of the specified type.
      *
      * @return whether the population has this writer
@@ -799,6 +915,14 @@ public:
         BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_count_writer.get()))
+            {
+                return true;
+            }
+        }
+        typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+        BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+        {
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_event_writer.get()))
             {
                 return true;
             }

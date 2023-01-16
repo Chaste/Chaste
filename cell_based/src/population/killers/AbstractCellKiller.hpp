@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,14 +84,14 @@ public:
     virtual ~AbstractCellKiller();
 
     /**
-     * Pure method which should call StartApoptosis() on any cell
-     * which should be about to undergo programmed death, or Kill()
-     * on any cell which should die immediately.
+     * Pure virtual; method which should call StartApoptosisOnCell() on the population
+     * passing the cell which should be about to undergo programmed death,
+     * or KillCell() on the population passing the cell which should die immediately.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      */
-    virtual void CheckAndLabelCellsForApoptosisOrDeath()=0;
+    virtual void CheckAndLabelCellsForApoptosisOrDeath() = 0;
 
     /**
      * Get a pointer to the cell population.
@@ -116,7 +116,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellKillerParameters(out_stream& rParamsFile)=0;
+    virtual void OutputCellKillerParameters(out_stream& rParamsFile) = 0;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellKiller)

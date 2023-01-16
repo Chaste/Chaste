@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -121,29 +121,35 @@ public:
          * and cell proliferation is governed by a stochastic generation-based cell-cycle model
          * with no differentiation.
          */
-        HoneycombMeshGenerator generator(10, 10, 2);
+        HoneycombMeshGenerator generator(10, 10);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
-        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /*
-         * The following line tells the cell population to write data to .vtu files with cells
-         * not as points, but as polytopes. This is the default setting: we include the call
-         * here to highlight this option. If writing point data, we may choose the shape used
-         * to visualize each cell in Paraview using glyphs.
-         */
-        cell_population.SetWriteVtkAsPoints(false);
-
-        /* In order to output the .vtu files required for Paraview, we explicitly
+         * The default output method for mesh based simulations is as polytopes
+         * In order to output the .vtu files required for Paraview, we explicitly
          * instruct the simulation to output the data we need.
          */
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
+
+        /*
+         * The following line tells the cell population to also write data to .vtu files with cells
+         * as points, where we may choose the shape used to visualize each cell in Paraview using
+         * glyphs.
+         */
+        cell_population.SetWriteVtkAsPoints(true);
+
+        /*
+         * In order to visualise the cells on the boundary we apply a bound to the voronoi
+         * tesselation. Note this defaults to false.
+         */
+        cell_population.SetBoundVoronoiTessellation(true);
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory and end time. */
@@ -174,21 +180,13 @@ public:
     * To visualize the results, we must first open Paraview. We open the folder containing our test output using the 'file' menu at
     * the top. The output will be located in {{{/tmp/$USER/testoutput/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0}}}.
     * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
-    * simply select {{{results.pvd}}}. We should now see {{{results.pvd}}}  in the pipeline browser. We click {{{Apply}}} in the properties tab
-    * of the object inspector, and we should now see a visualization in the right hand window.  (An alternative to opening the {{{results.pvd}}}
-    * file is to open all the time steps en masse where we open {{{results_..vtu}}} and see {{{results_*}}} appear in the pipeline browser.)
+    * simply select {{{voronoi_results_..vtu}}}. We should now see {{{voronoi_results*}}}  in the pipeline browser. We click {{{Apply}}} in the properties tab
+    * of the object inspector, and we should now see a visualization in the right hand window.
     *
     * At this stage, it will be necessary to refine how we wish to view this particular visualisation. The viewing styles can be edited using
     * the display tab of the object inspector. In particular, under {{{Style}}}, the representation drop down menu allows us to view
     * the cells as a surface with edges, or as simply a wireframe. It is advisable at this point to familiarize ourselves with the different
     * viewing options, colour and size settings.
-    *
-    * At this stage, the viewer is showing all cells in the simulation, including the ghost nodes. In order to view only real cells, we must
-    * apply a threshold. This is achieved using the threshold button on the third toolbar (the icon is a cube with a green 'T' inside). Once you
-    * click the threshold button, you will see a new threshold appear below your results in the pipeline browser. Go to the properties tab and
-    * reset the lower threshold to be less than 0, and the upper threshold to be between 0 and 1, ensuring that the 'Non-ghosts' option is
-    * selected in the 'Scalars' drop down menu. Once we have edited this, we click apply (we may need to click it twice), and the visualisation on the
-    * right window will have changed to eliminate ghost nodes.
     *
     * To view the simulation, simply use the animation buttons located on the top toolbar. We can also save a screenshot, or an animation, using
     * the appropriate options from the file menu. Next to the threshold button are two other useful options, 'slice' and 'clip', but these will
@@ -203,7 +201,7 @@ public:
      * In the second test, similar to the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
      * in which we use
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model. However here we impose periodic boundaries.
-     * The only difference in this test is the generation of the mesh
+     * The only difference in this test is the generation of the mesh and use of ghost nodes.
      */
     void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing()
     {
@@ -250,8 +248,17 @@ public:
     * EMPTYLINE
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, {{{Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing}}}. You will see that the left an righ sides
-    * of the monolayer are the same. As in the first test you can threshold to remove the ghost nodes.
+    * test output from the new folder, {{{Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing}}}. You will see that the left an right sides
+    * of the monolayer are the same.
+    *
+    * At this stage, the viewer is showing all cells in the simulation, including the ghost nodes. In order to view only real cells, we must
+    * apply a threshold. This is achieved using the threshold button on the third toolbar (the icon is a cube with a green 'T' inside). Once you
+    * click the threshold button, you will see a new threshold appear below your results in the pipeline browser. Go to the properties tab and
+    * reset the lower threshold to be less than 0, and the upper threshold to be between 0 and 1, ensuring that the 'Non-ghosts' option is
+    * selected in the 'Scalars' drop down menu. Once we have edited this, we click apply (we may need to click it twice), and the visualisation on the
+    * right window will have changed to eliminate ghost nodes.
+    *
+    * Note that you cant currently output the mesh when using ghost nodes.
     *
     * EMPTYLINE
     *

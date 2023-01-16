@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,6 +80,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeVelocityWriter.hpp"
 #include "VoronoiDataWriter.hpp"
+
+// Cell Populaton Event Write
+#include "CellDivisionLocationsWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -844,14 +847,18 @@ public:
 
         // Test set/get methods
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false);
 
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
-        cell_population.SetOutputMeshInVtk(true);
+        cell_population.SetBoundVoronoiTessellation(true);
 
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
-        TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), true);
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
+
+        // All presaved data uses infinite VT
+        cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -947,18 +954,18 @@ public:
         // Test that VTK writer has produced some files
 
         // Initial condition files
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file.Exists());
+        FileFinder vtk_file1(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file1.Exists());
 
-        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_mesh_file.Exists());
-
-        // Final files
-        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "mesh_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 
-        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_mesh_file2.Exists());
+        // Final files
+        FileFinder vtk_file3(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file3.Exists());
+
+        FileFinder vtk_file4(results_dir + "mesh_results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file4.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
@@ -1032,7 +1039,6 @@ public:
 
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
-        cell_population.SetOutputMeshInVtk(true);
 
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
@@ -1041,6 +1047,11 @@ public:
         MAKE_PTR(MutWriter, p_count_writer);
         p_count_writer->SetFileName("new_cellmutationstates.dat");
         cell_population.AddCellPopulationCountWriter(p_count_writer);
+
+        typedef CellDivisionLocationsWriter<2, 2> DivWriter;
+        MAKE_PTR(DivWriter, p_event_writer);
+        p_event_writer->SetFileName("new_divisions.dat");
+        cell_population.AddCellPopulationEventWriter(p_event_writer);
 
         typedef CellAgesWriter<2, 2> AgWriter;
         MAKE_PTR(AgWriter, p_ages_writer);
@@ -1076,29 +1087,30 @@ public:
         FileComparison(results_dir + "new_voronoi.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/voronoi.dat").CompareFiles();
         FileComparison(results_dir + "new_cellmutationstates.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "new_cellages.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "new_divisions.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/divisions.dat").CompareFiles();
 
 #ifdef CHASTE_VTK
         // Test that VTK writer has produced some files
 
         // Initial condition files
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file(results_dir + "voronoi_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
 
-        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
+        FileFinder vtk_mesh_file(results_dir + "mesh_results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_mesh_file.Exists());
 
         // Final files
-        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_file2(results_dir + "voronoi_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 
-        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
+        FileFinder vtk_mesh_file2(results_dir + "mesh_results_1.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_mesh_file2.Exists());
 
         // PVD file
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+        VtkMeshReader<2,2> vtk_reader(results_dir + "/mesh_results_0.vtu");
 
         std::vector<double> ages_data;
         vtk_reader.GetPointData("New Ages", ages_data);

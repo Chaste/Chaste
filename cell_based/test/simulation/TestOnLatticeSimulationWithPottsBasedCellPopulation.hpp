@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,6 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "CellMutationStatesCountWriter.hpp"
+#include "CellDivisionLocationsWriter.hpp"
+#include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
@@ -274,6 +276,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -297,6 +300,12 @@ public:
         // Test no deaths and some births
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+        // Check files
+        std::string output_directory = "TestPottsMonolayerWithBirth/results_from_time_0/";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        FileComparison( results_dir + "divisions.dat", "cell_based/test/data/TestPottsMonolayerWithBirth/divisions.dat").CompareFiles();
     }
 
     void TestPottsMonolayerCellSorting()

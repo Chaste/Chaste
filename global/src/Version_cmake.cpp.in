@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -176,6 +176,23 @@ std::string ChasteBuildInfo::GetProvenanceString()
     }
     prov << "." << std::endl;
     return prov.str();
+}
+
+std::string ChasteBuildInfo::GetChasteCodegenVersion(){
+    FileFinder chaste_build_root("", RelativeTo::ChasteBuildRoot);
+    char buffer[100];
+    std::string codgen_version_command = chaste_build_root.GetAbsolutePath() + "/codegen_python3_venv/bin/chaste_codegen --version";
+    FILE* codegen_version = popen(codgen_version_command.c_str(), "r");
+    std::string results = "";
+
+    while (fgets(buffer, 100, codegen_version) != nullptr)
+    {
+        results +=  buffer;
+    }
+    pclose(codegen_version);
+
+    boost::algorithm::trim(results);
+    return results;
 }
 
 const char* ChasteBuildInfo::GetXsdVersion()

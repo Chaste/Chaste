@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -366,7 +366,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
             }
         }
     }
-    // Finally remove any elememts that have been removed
+    // Finally remove any elements that have been removed
     assert(mDeletedElementIndices.size() <= 1); // Should have at most one element to remove
     if (mDeletedElementIndices.size() == 1)
     {

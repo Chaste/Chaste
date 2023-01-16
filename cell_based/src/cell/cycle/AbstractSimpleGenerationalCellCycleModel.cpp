@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,9 +75,9 @@ void AbstractSimpleGenerationalCellCycleModel::ResetForDivision()
     mGeneration++;
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-	/*
-	* Run this check first to allow for mMaxTransitGenerations = 0
-	*/
+    /*
+    * Run this check first to allow for mMaxTransitGenerations = 0
+    */
         mGeneration = 0;
     }
     if (mGeneration > mMaxTransitGenerations)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -340,7 +340,7 @@ public:
 
         {
             // Backward Euler
-	    args.push_back("--backward-euler");
+        args.push_back("--backward-euler");
             OutputFileHandler handler2(dirname + "/BE");
             FileFinder copied_file2 = handler2.CopyFileTo(cellml_file);
             converter.SetOptions(args);

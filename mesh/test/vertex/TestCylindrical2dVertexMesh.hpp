@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,32 +38,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
-#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
+#include "CylindricalHoneycombVertexMeshGenerator.hpp"
 
-#include "CylindricalHoneycombMeshGenerator.hpp"
 #include "Cylindrical2dMesh.hpp"
+#include "CylindricalHoneycombMeshGenerator.hpp"
 #include "TrianglesMeshWriter.hpp"
+#include "VtkMeshWriter.hpp"
 
-#include "VertexMeshWriter.hpp"
 #include "ArchiveOpener.hpp"
+#include "VertexMeshWriter.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestCylindrical2dVertexMesh : public CxxTest::TestSuite
 {
 public:
-
     void TestEachNodeIsContainedInAtLeastOneElement()
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(18, 25, true);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); node_index++)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
@@ -84,7 +84,7 @@ public:
         ///\todo this should really be 4 as mesh is periodic
         TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], 3.5, 1e-4);
 
-        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 13.0*0.5/sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 13.0 * 0.5 / sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], 0.0, 1e-4);
 
@@ -93,11 +93,10 @@ public:
         double height = p_mesh->GetWidth(1);
 
         TS_ASSERT_DELTA(width, 4, 1e-4);
-        TS_ASSERT_DELTA(height, 13.0*0.5/sqrt(3.0), 1e-4);
-
+        TS_ASSERT_DELTA(height, 13.0 * 0.5 / sqrt(3.0), 1e-4);
 
         //Scale mesh and check its updated correctly
-        p_mesh->Scale(0.5,1.0);
+        p_mesh->Scale(0.5, 1.0);
         TS_ASSERT_DELTA(p_mesh->GetWidth(0), 2, 1e-4);
     }
 
@@ -139,13 +138,13 @@ public:
         // Move one of the nodes to near the periodic boundary
         c_vector<double, 2> new_point_location;
         new_point_location[0] = -0.01;
-        new_point_location[1] = 3.0*0.5/sqrt(3.0);
+        new_point_location[1] = 3.0 * 0.5 / sqrt(3.0);
         ChastePoint<2> new_point(new_point_location);
 
         // This node was on left and is now near the right
         p_mesh->SetNode(12, new_point);
         TS_ASSERT_DELTA(p_mesh->GetNode(12)->rGetLocation()[0], 3.99, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(12)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(12)->rGetLocation()[1], 3.0 * 0.5 / sqrt(3.0), 1e-4);
 
         // This node has stayed close to where it was
         new_point.SetCoordinate(0, 0.2);
@@ -156,7 +155,7 @@ public:
         new_point.SetCoordinate(0, 4.1);
         p_mesh->SetNode(8, new_point);
         TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[0], 0.1, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0 * 0.5 / sqrt(3.0), 1e-4);
     }
 
     void TestAddNodeAndReMesh()
@@ -171,7 +170,7 @@ public:
         // Choose a node on the left boundary
         ChastePoint<2> point = p_mesh->GetNode(18)->GetPoint();
         TS_ASSERT_DELTA(point[0], 0.5, 1e-4);
-        TS_ASSERT_DELTA(point[1], 4.0*0.5/sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(point[1], 4.0 * 0.5 / sqrt(3.0), 1e-4);
 
         // Create a new node close to this node
         point.SetCoordinate(0, -0.01);
@@ -223,7 +222,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
 
         // Test area and perimeter calculations for all elements
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); i++)
         {
             TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(i), 0.8660, 1e-4);
             TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(i), 3.4641, 1e-4);
@@ -232,23 +231,23 @@ public:
         // Test centroid calculations for non-periodic element
         c_vector<double, 2> centroid = p_mesh->GetCentroidOfElement(5);
         TS_ASSERT_DELTA(centroid(0), 2.0, 1e-4);
-        TS_ASSERT_DELTA(centroid(1), 5.0*0.5/sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(centroid(1), 5.0 * 0.5 / sqrt(3.0), 1e-4);
 
         // Test centroid calculations for periodic element
         centroid = p_mesh->GetCentroidOfElement(7);
         TS_ASSERT_DELTA(centroid(0), 0.0, 1e-4);
-        TS_ASSERT_DELTA(centroid(1), 5.0*0.5/sqrt(3.0), 1e-4);
+        TS_ASSERT_DELTA(centroid(1), 5.0 * 0.5 / sqrt(3.0), 1e-4);
 
         // Test CalculateMomentOfElement() for all elements
         // all elements are regular hexagons with edge 1/sqrt(3.0)
         c_vector<double, 3> moments;
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); i++)
         {
             moments = p_mesh->CalculateMomentsOfElement(i);
 
-            TS_ASSERT_DELTA(moments(0), 5*sqrt(3.0)/16/9, 1e-6); // Ixx
-            TS_ASSERT_DELTA(moments(1), 5*sqrt(3.0)/16/9, 1e-6); // Iyy
-            TS_ASSERT_DELTA(moments(2), 0.0, 1e-6);            // Ixy = 0 by symmetry
+            TS_ASSERT_DELTA(moments(0), 5 * sqrt(3.0) / 16 / 9, 1e-6); // Ixx
+            TS_ASSERT_DELTA(moments(1), 5 * sqrt(3.0) / 16 / 9, 1e-6); // Iyy
+            TS_ASSERT_DELTA(moments(2), 0.0, 1e-6); // Ixy = 0 by symmetry
         }
 
         // Test methods with a cylindrical mesh comprising a single rectangular element
@@ -257,8 +256,8 @@ public:
         rectangle_nodes.push_back(new Node<2>(1, false, 8.0, 0.0));
         rectangle_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
         rectangle_nodes.push_back(new Node<2>(3, false, 2.0, 2.0));
-        std::vector<VertexElement<2,2>*> rectangle_elements;
-        rectangle_elements.push_back(new VertexElement<2,2>(0, rectangle_nodes));
+        std::vector<VertexElement<2, 2>*> rectangle_elements;
+        rectangle_elements.push_back(new VertexElement<2, 2>(0, rectangle_nodes));
 
         Cylindrical2dVertexMesh rectangle_mesh(10.0, rectangle_nodes, rectangle_elements);
 
@@ -271,9 +270,9 @@ public:
         TS_ASSERT_DELTA(rectangle_centroid(1), 1.0, 1e-4);
 
         c_vector<double, 3> rectangle_moments = rectangle_mesh.CalculateMomentsOfElement(0);
-        TS_ASSERT_DELTA(rectangle_moments(0), 8.0/3.0, 1e-6);  // Ixx
-        TS_ASSERT_DELTA(rectangle_moments(1), 32.0/3.0, 1e-6); // Iyy
-        TS_ASSERT_DELTA(rectangle_moments(2), 0.0, 1e-6);      // Ixy = 0 by symmetry
+        TS_ASSERT_DELTA(rectangle_moments(0), 8.0 / 3.0, 1e-6); // Ixx
+        TS_ASSERT_DELTA(rectangle_moments(1), 32.0 / 3.0, 1e-6); // Iyy
+        TS_ASSERT_DELTA(rectangle_moments(2), 0.0, 1e-6); // Ixy = 0 by symmetry
 
         c_vector<double, 2> rectangle_short_axis = rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(rectangle_short_axis(0), 0.0, 1e-4);
@@ -290,8 +289,8 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
 
         c_vector<double, 2> axis_of_division;
-        axis_of_division(0) = 1.0/sqrt(2.0);
-        axis_of_division(1) = 1.0/sqrt(2.0);
+        axis_of_division(0) = 1.0 / sqrt(2.0);
+        axis_of_division(1) = 1.0 / sqrt(2.0);
 
         // Divide non-periodic element
         unsigned new_element_index = p_mesh->DivideElementAlongGivenAxis(p_mesh->GetElement(2), axis_of_division, true);
@@ -359,10 +358,10 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestVertexMeshWriters", "DelaunayMesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestVertexMeshWriters", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
-        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3.0);
         TS_ASSERT_EQUALS(p_delaunay_mesh->CheckIsVoronoi(), true);
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumElements(), 12u);
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumNodes(), 9u);
@@ -370,43 +369,46 @@ public:
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
         Cylindrical2dVertexMesh voronoi_mesh(*p_delaunay_mesh);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestVertexMeshWriters", "VertexMesh", false);
+        VertexMeshWriter<2, 2> vertexmesh_writer("TestVertexMeshWriters", "CylindricalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
+
+        // TODO Check this file !
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteVtkUsingMesh(voronoi_mesh, "0"));
 
         // Test the Voronoi tessellation has the correct number of nodes and elements
         TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(0), 3u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 9u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 12u);
-//
+
         // Test the location of the Voronoi nodes
         /* These are ordered from right to left from bottom to top as
          * 10 1 0 5 4 6 9 2 3 11 7 8
          * Due to the numbering of the elements in the generator.
          */
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(10)->rGetLocation()[0], 3.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(10)->rGetLocation()[1], sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(10)->rGetLocation()[1], sqrt(3.0) / 3.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[0], 0.5, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[1], sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(1)->rGetLocation()[1], sqrt(3.0) / 6.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], sqrt(3.0) / 3.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[0], 1.5, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[1], sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[1], sqrt(3.0) / 6.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[0], 2.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[1], sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[1], sqrt(3.0) / 3.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(6)->rGetLocation()[0], 2.5, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(6)->rGetLocation()[1], sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(6)->rGetLocation()[1], sqrt(3.0) / 6.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 2.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 2.0 * sqrt(3.0) / 3.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(2)->rGetLocation()[0], 0.5, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(2)->rGetLocation()[1], 5.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(2)->rGetLocation()[1], 5.0 * sqrt(3.0) / 6.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(3)->rGetLocation()[0], 1.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(3)->rGetLocation()[1], 2.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(3)->rGetLocation()[1], 2.0 * sqrt(3.0) / 3.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[0], 1.5, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[1], 5.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[1], 5.0 * sqrt(3.0) / 6.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(7)->rGetLocation()[0], 2.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(7)->rGetLocation()[1], 2.0*sqrt(3.0)/3.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(7)->rGetLocation()[1], 2.0 * sqrt(3.0) / 3.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(8)->rGetLocation()[0], 2.5, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(8)->rGetLocation()[1], 5.0*sqrt(3.0)/6.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(8)->rGetLocation()[1], 5.0 * sqrt(3.0) / 6.0, 1e-6);
 
         // Test the number of nodes owned by each Voronoi element
         TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 3u);
@@ -420,15 +422,86 @@ public:
         TS_ASSERT_EQUALS(voronoi_mesh.GetElement(8)->GetNumNodes(), 3u);
 
         // Test element areas
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), sqrt(3.0)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), sqrt(3.0)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), sqrt(3.0) / 12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), sqrt(3.0) / 12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), sqrt(3.0) / 12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), sqrt(3.0) / 2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), sqrt(3.0) / 2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), sqrt(3.0) / 2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), sqrt(3.0) / 12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), sqrt(3.0) / 12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), sqrt(3.0) / 12.0, 1e-6);
+    }
+
+    void TestBoundedTessellationConstructor()
+    {
+        // Create a simple Cylindrical2dMesh, the Delaunay triangulation
+        unsigned cells_across = 3;
+        unsigned cells_up = 3;
+        unsigned thickness_of_ghost_layer = 0;
+        CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
+        Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
+
+        TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMesh", "DelaunayMesh", false);
+        TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
+
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->CheckIsVoronoi(), true);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumElements(), 12u);
+        TS_ASSERT_EQUALS(p_delaunay_mesh->GetNumNodes(), 9u);
+
+        // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
+        bool is_bounded = true;
+        Cylindrical2dVertexMesh voronoi_mesh(*p_delaunay_mesh,is_bounded);
+
+        VertexMeshWriter<2,2> vertexmesh_writer("TestBoundedCylindricalVertexMesh", "CylindricalVertexMesh", false);
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
+
+        // TODO Check this file !
+        TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteVtkUsingMesh(voronoi_mesh,"0"));
+
+        // Test the Voronoi tessellation has the correct number of nodes and elements
+        TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(0), 3u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 9u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 30u);
+
+        // Test the location of some Voronoi nodes
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], -0.375, 1e-6);
+
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5)->rGetLocation()[1], 0.2886, 1e-3);
+
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 0.5, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 2.1070, 1e-4);
+
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[0], 1.25, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(11)->rGetLocation()[1], 2.2320, 1e-3);
+
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[0], 1.75, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], 2.232, 1e-4);
+
+        // Test the number of nodes owned by each Voronoi element
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(5)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 7u);//5
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 7u);//5
+        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(8)->GetNumNodes(), 7u);//5
+
+        // Test element areas
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.9017, 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.9017, 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.9017, 1e-4);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), sqrt(3.0)/2.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), sqrt(3.0)/2.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), sqrt(3.0)/2.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), sqrt(3.0)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), sqrt(3.0)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), 0.9017, 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), 0.9017, 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), 0.9017, 1e-4);
     }
 
     void TestArchiving()
@@ -441,7 +514,7 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 7;
         CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        AbstractMesh<2,2>* const p_saved_mesh = generator.GetCylindricalMesh();
+        AbstractMesh<2, 2>* const p_saved_mesh = generator.GetCylindricalMesh();
 
         double crypt_width = num_cells_across;
 
@@ -468,7 +541,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_loaded_mesh;
+            AbstractMesh<2, 2>* p_loaded_mesh;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -488,7 +561,7 @@ public:
             // Compare nodes
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
 
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumNodes(); i++)
             {
                 Node<2>* p_node = p_mesh->GetNode(i);
                 Node<2>* p_node2 = p_mesh2->GetNode(i);
@@ -496,7 +569,7 @@ public:
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j < 2; j++)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }
@@ -506,12 +579,12 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumElements(), p_mesh2->GetNumElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), p_mesh2->GetNumAllElements());
 
-            for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumElements(); i++)
             {
-                VertexElement<2,2>* p_elt = p_mesh->GetElement(i);
-                VertexElement<2,2>* p_elt2 = p_mesh2->GetElement(i);
+                VertexElement<2, 2>* p_elt = p_mesh->GetElement(i);
+                VertexElement<2, 2>* p_elt2 = p_mesh2->GetElement(i);
                 TS_ASSERT_EQUALS(p_elt->GetNumNodes(), p_elt2->GetNumNodes());
-                for (unsigned j=0; j<p_elt->GetNumNodes(); j++)
+                for (unsigned j = 0; j < p_elt->GetNumNodes(); j++)
                 {
                     TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
                 }
@@ -538,7 +611,7 @@ public:
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
 
         // Check that there are the correct number of elements
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across*num_cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_cells_across * num_cells_up);
     }
 
     void TestCylindricalReMeshAfterDelete()
@@ -550,7 +623,7 @@ public:
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
-        unsigned num_old_elements = num_cells_across*num_cells_up;
+        unsigned num_old_elements = num_cells_across * num_cells_up;
 
         // Delete a node
         p_mesh->DeleteElementPriorToReMesh(8);
@@ -564,7 +637,7 @@ public:
 
         // Check that there are the correct number of elements and nodes
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_old_nodes);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_old_elements-1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), num_old_elements - 1);
     }
 
     void TestCylindricalElementIncludesPointAndGetLocalIndexForElementEdgeClosestToPoint()
@@ -575,8 +648,8 @@ public:
         nodes.push_back(new Node<2>(1, false, 9.0, 0.0));
         nodes.push_back(new Node<2>(2, false, 1.0, 0.0));
         nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         Cylindrical2dVertexMesh mesh(10.0, nodes, elements);
 
@@ -630,7 +703,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
 
         // Every element in the mesh for VTK should have 6 nodes
-        for (unsigned elem_index=0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh_for_vtk->GetNumElements(); elem_index++)
         {
             TS_ASSERT_EQUALS(p_mesh_for_vtk->GetElement(elem_index)->GetNumNodes(), 6u);
         }

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,6 +105,7 @@ private:
         archive & mSimulationModifiers;
         archive & mTopologyUpdateSimulationModifiers;
         archive & mSamplingTimestepMultiple;
+        archive & mUpdatingTimestepMultiple;
     }
 
 protected:
@@ -176,6 +177,12 @@ protected:
      * of timesteps at which results are written to file.
      */
     unsigned mSamplingTimestepMultiple;
+
+    /**
+     * The ratio of the number of actual timesteps to the number
+     * of timesteps at which cells and topology are updated.
+     */
+    unsigned mUpdatingTimestepMultiple;
 
     /**
      * Writes out special information about the mesh to the visualizer.
@@ -341,6 +348,14 @@ public:
     void SetSamplingTimestepMultiple(unsigned samplingTimestepMultiple);
 
     /**
+     * Set the ratio of the number of actual timesteps to the number of timesteps
+     * at which the cells are updated. Default value is set to 1 by the constructor.
+     *
+     * @param updatingTimestepMultiple the ratio to use
+     */
+    void SetUpdatingTimestepMultiple(unsigned updatingTimestepMultiple);
+
+    /**
      * Set the simulation to run with no birth.
      *
      * @param noBirth whether to run with no birth
@@ -418,7 +433,7 @@ public:
      *
      * Next, we set up each cell by calling ReadyToDivide() on it, which updates the cell's age and
      * cell cycle model. Finally, we call WriteVisualizerSetupFile() and OutputSimulationSetup(),
-     * as well as WriteResultsToFiles() on the cell population, to record the initial configration.
+     * as well as WriteResultsToFiles() on the cell population, to record the initial configuration.
      * This completes the set up process.
      *
      * The main time loop:

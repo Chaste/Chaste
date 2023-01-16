@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,7 +73,8 @@ void RandomCellKiller<DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
     if (!pCell->HasApoptosisBegun() &&
         RandomNumberGenerator::Instance()->ranf() < death_prob_this_timestep)
     {
-        pCell->StartApoptosis();
+        // Mark the cell as apoptotic and store removal information if required.
+        this->mpCellPopulation->StartApoptosisOnCell(pCell, "RandomCellKiller");
     }
 }
 

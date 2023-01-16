@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2022, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
+#include "Toroidal2dMesh.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "CellId.hpp"
 #include "CellVolumesWriter.hpp"
@@ -58,7 +60,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
       mUseAreaBasedDampingConstant(false),
       mAreaBasedDampingConstantParameter(0.1),
       mWriteVtkAsPoints(false),
-      mOutputMeshInVtk(false),
+      mBoundVoronoiTessellation(false),
       mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
@@ -583,6 +585,12 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationCountWriter
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)
+{
+    pPopulationEventWriter->Visit(this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
@@ -599,10 +607,6 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
     // Store the number of cells for which to output data to VTK
     unsigned num_cells_from_mesh = GetNumNodes();
-    if (!mWriteVtkAsPoints && (mpVoronoiTessellation != nullptr))
-    {
-        num_cells_from_mesh = mpVoronoiTessellation->GetNumElements();
-    }
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
@@ -615,17 +619,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         cell_data.push_back(cell_data_var);
     }
 
-    if (mOutputMeshInVtk)
-    {
-        // Create mesh writer for VTK output
-        VtkMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "mesh_"+time.str(), false);
-        mesh_writer.WriteFilesUsingMesh(rGetMesh());
-    }
-
     if (mWriteVtkAsPoints)
     {
         // Create mesh writer for VTK output
-        VtkMeshWriter<SPACE_DIM, SPACE_DIM> cells_writer(rDirectory, "results_"+time.str(), false);
+        VtkMeshWriter<ELEMENT_DIM, SPACE_DIM> cells_writer(rDirectory, "mesh_results_"+time.str(), false);
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
@@ -669,30 +666,18 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             cells_writer.AddPointData(cell_data_names[var], cell_data[var]);
         }
 
-        // Make a copy of the nodes in a disposable mesh for writing
-        {
-            std::vector<Node<SPACE_DIM>* > nodes;
-            for (unsigned index=0; index<this->mrMesh.GetNumNodes(); index++)
-            {
-                Node<SPACE_DIM>* p_node = this->mrMesh.GetNode(index);
-                nodes.push_back(p_node);
-            }
-
-            NodesOnlyMesh<SPACE_DIM> mesh;
-            mesh.ConstructNodesWithoutMesh(nodes, 1.5); // Arbitrary cut off as connectivity not used.
-            cells_writer.WriteFilesUsingMesh(mesh);
-        }
-
+        // Write data using the mesh
+        cells_writer.WriteFilesUsingMesh(rGetMesh());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
         *(this->mpVtkMetaFile) << num_timesteps;
-        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"mesh_results_";
         *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
-    else if (mpVoronoiTessellation != nullptr)
+    if (mpVoronoiTessellation != nullptr)
     {
         // Create mesh writer for VTK output
-        VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
+        VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "voronoi_results", false);
         std::vector<double> cell_volumes(num_cells_from_mesh);
 
         // Iterate over any cell writers that are present
@@ -749,7 +734,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         mesh_writer.WriteVtkUsingMesh(*mpVoronoiTessellation, time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
         *(this->mpVtkMetaFile) << num_timesteps;
-        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
+        *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"voronoi_results_";
         *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
@@ -833,15 +818,15 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetWriteVtkAsPoints()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputMeshInVtk(bool outputMeshInVtk)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetBoundVoronoiTessellation(bool boundVoronoiTessellation)
 {
-    mOutputMeshInVtk = outputMeshInVtk;
+    mBoundVoronoiTessellation = boundVoronoiTessellation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputMeshInVtk()
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundVoronoiTessellation()
 {
-    return mOutputMeshInVtk;
+    return mBoundVoronoiTessellation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -850,6 +835,11 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupF
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh))))
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+    }
+    if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
+    {
+        *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
+        *pVizSetupFile << "MeshHeight\t" << this->GetWidth(1) << "\n";
     }
 }
 
@@ -954,11 +944,16 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&mrMesh)))
     {
         is_mesh_periodic = true;
-        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh));
+        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
+    }
+    else if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
+    {
+        is_mesh_periodic = true;
+        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
     }
     else
     {
-        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
+        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
     }
 }
 
@@ -1175,7 +1170,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParamet
     *rParamsFile << "\t\t<UseAreaBasedDampingConstant>" << mUseAreaBasedDampingConstant << "</UseAreaBasedDampingConstant>\n";
     *rParamsFile << "\t\t<AreaBasedDampingConstantParameter>" <<  mAreaBasedDampingConstantParameter << "</AreaBasedDampingConstantParameter>\n";
     *rParamsFile << "\t\t<WriteVtkAsPoints>" << mWriteVtkAsPoints << "</WriteVtkAsPoints>\n";
-    *rParamsFile << "\t\t<OutputMeshInVtk>" << mOutputMeshInVtk << "</OutputMeshInVtk>\n";
+    *rParamsFile << "\t\t<BoundVoronoiTessellation>" << mBoundVoronoiTessellation << "</BoundVoronoiTessellation>\n";
     *rParamsFile << "\t\t<HasVariableRestLength>" << mHasVariableRestLength << "</HasVariableRestLength>\n";
 
     // Call method on direct parent class
