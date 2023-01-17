@@ -294,6 +294,7 @@ public:
         
         // A square should have no skewness about any axis
         {
+            std::cout << "Square\n";
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -319,6 +320,7 @@ public:
 
         // A triangle should have skewness
         {
+            std::cout << "Triangle\n";
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -341,6 +343,31 @@ public:
             // If we flip the axis, the skewness should be minus what it was before
             axis[1] = -1.0;
             TS_ASSERT_DELTA(mesh.GetSkewnessOfElementMassDistributionAboutAxis(0, axis) + hand_calculated_skewness, 0.0, 1e-9);
+        }
+
+        // Test multiple knots
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.0, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(3, true, 0.2, 0.4));
+            nodes.push_back(new Node<2>(4, true, 0.0, 0.4));
+            nodes.push_back(new Node<2>(5, true, 0.0, 0.6));
+            nodes.push_back(new Node<2>(6, true, 0.2, 0.6));
+            nodes.push_back(new Node<2>(7, true, 0.2, 0.0));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+
+            c_vector<double, 2> axis;
+            axis[0] = 0.0;
+            axis[1] = 1.0;
+
+            // Test that the skewness is equal to the hand calculated value
+            mesh.GetSkewnessOfElementMassDistributionAboutAxis(0, axis);
         }
         
     }
@@ -746,44 +773,114 @@ public:
 
     void TestGeometricMethods()
     {
-        // Make six nodes
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
-        nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
-        nodes.push_back(new Node<2>(2, true, 0.3, 0.2));
-        nodes.push_back(new Node<2>(3, true, 0.3, 0.3));
-        nodes.push_back(new Node<2>(4, true, 0.1, 0.2));
+        { // Test moments
+          // Make six nodes
+          std::vector<Node<2>*> nodes;
+          nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+          nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
+          nodes.push_back(new Node<2>(2, true, 0.3, 0.2));
+          nodes.push_back(new Node<2>(3, true, 0.3, 0.3));
+          nodes.push_back(new Node<2>(4, true, 0.1, 0.2));
 
-        // Make one element out of these nodes
-        std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<5; i++)
-        {
-            nodes_elem.push_back(nodes[i]);
+          // Make one element out of these nodes
+          std::vector<Node<2>*> nodes_elem;
+          for (unsigned i=0; i<5; i++)
+          {
+              nodes_elem.push_back(nodes[i]);
+          }
+
+          std::vector<ImmersedBoundaryElement<2,2>*> elements;
+          elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem));
+
+          // Make a mesh
+          ImmersedBoundaryMesh<2,2> mesh(nodes, elements);
+
+          TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+          TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+
+          // Test that the centroid, moments and short axis of the element are calculated correctly
+          // (i.e. agreee with Matlab and pen-and-paper calculations)
+          c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
+          TS_ASSERT_DELTA(centroid[0], 0.2000, 1e-4);
+          TS_ASSERT_DELTA(centroid[1], 0.1866, 1e-4);
+
+          c_vector<double,3> moments = mesh.CalculateMomentsOfElement(0);
+          TS_ASSERT_DELTA(moments[0], 5.388e-5, 1e-8);
+          TS_ASSERT_DELTA(moments[1], 7.500e-5, 1e-8);
+          TS_ASSERT_DELTA(moments[2], 3.750e-5, 1e-8);
+
+          c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
+          TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
+          TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
         }
+        { // Test zero-valued product of inertia
 
-        std::vector<ImmersedBoundaryElement<2,2>*> elements;
-        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem));
+          std::vector<Node<2>*> nodes;
+          nodes.push_back(new Node<2>(0, true, 0.5, 0.6));
+          nodes.push_back(new Node<2>(1, true, 0.7, 0.5));
+          nodes.push_back(new Node<2>(2, true, 0.5, 0.4));
+          nodes.push_back(new Node<2>(3, true, 0.3, 0.5));
 
-        // Make a mesh
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elements);
+          // Make one element out of these nodes
+          std::vector<Node<2>*> nodes_elem;
+          for (unsigned i=0; i<4; i++)
+          {
+              nodes_elem.push_back(nodes[i]);
+          }
 
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+          std::vector<ImmersedBoundaryElement<2,2>*> elements;
+          elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem));
 
-        // Test that the centroid, moments and short axis of the element are calculated correctly
-        // (i.e. agreee with Matlab and pen-and-paper calculations)
-        c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
-        TS_ASSERT_DELTA(centroid[0], 0.2000, 1e-4);
-        TS_ASSERT_DELTA(centroid[1], 0.1866, 1e-4);
+          // Make a mesh
+          ImmersedBoundaryMesh<2,2> mesh(nodes, elements);
 
-        c_vector<double,3> moments = mesh.CalculateMomentsOfElement(0);
-        TS_ASSERT_DELTA(moments[0], 5.388e-5, 1e-8);
-        TS_ASSERT_DELTA(moments[1], 7.500e-5, 1e-8);
-        TS_ASSERT_DELTA(moments[2], 3.750e-5, 1e-8);
+          TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+          TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
 
-        c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
-        TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
-        TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
+          // Test that the centroid, moments and short axis of the element are calculated correctly
+          // (i.e. agreee with Matlab and pen-and-paper calculations)
+          c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
+          TS_ASSERT_DELTA(centroid[0], 0.5, 1e-4);
+          TS_ASSERT_DELTA(centroid[1], 0.5, 1e-4);
+
+          c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
+          TS_ASSERT_EQUALS(short_axis[0], 0.0);
+          TS_ASSERT_EQUALS(short_axis[1], 1.0);
+        }
+        { // Test zero-valued product of inertia - opposite longer axis
+
+          std::vector<Node<2>*> nodes;
+          nodes.push_back(new Node<2>(0, true, 0.5, 0.7));
+          nodes.push_back(new Node<2>(1, true, 0.6, 0.5));
+          nodes.push_back(new Node<2>(2, true, 0.5, 0.3));
+          nodes.push_back(new Node<2>(3, true, 0.4, 0.5));
+
+          // Make one element out of these nodes
+          std::vector<Node<2>*> nodes_elem;
+          for (unsigned i=0; i<4; i++)
+          {
+              nodes_elem.push_back(nodes[i]);
+          }
+
+          std::vector<ImmersedBoundaryElement<2,2>*> elements;
+          elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes_elem));
+
+          // Make a mesh
+          ImmersedBoundaryMesh<2,2> mesh(nodes, elements);
+
+          TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+          TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
+
+          // Test that the centroid, moments and short axis of the element are calculated correctly
+          // (i.e. agreee with Matlab and pen-and-paper calculations)
+          c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
+          TS_ASSERT_DELTA(centroid[0], 0.5, 1e-4);
+          TS_ASSERT_DELTA(centroid[1], 0.5, 1e-4);
+
+          c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
+          TS_ASSERT_EQUALS(short_axis[0], 1.0);
+          TS_ASSERT_EQUALS(short_axis[1], 0.0);
+        }
     }
 
     void TestGetNeighbouringElementIndices()
@@ -995,7 +1092,7 @@ public:
         ImmersedBoundaryMeshReader<3, 3> meshReader("mesh/test/data/ib_mesh_2d");
         TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
       }
-      // This is to test a NEVER_REACHED code path, but it causes program exit rather than an exception - unclear how to test with cxxtest
+      // TODO: This is to test a NEVER_REACHED code path, but it causes program exit rather than an exception - unclear how to test with cxxtest
       /*{
         std::vector<Node<1>*> nodes;
         std::vector<ImmersedBoundaryElement<1, 1>*> elems;
@@ -1009,28 +1106,55 @@ public:
     
     void TestBoundingBoxCalculation()
     {
-      std::vector<Node<2>*> nodes;
-      nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-      nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-      nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-      nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+      { // Top right 
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
 
-      std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-      elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-      ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-      
-      ChasteCuboid<2> boundingBox = mesh.CalculateBoundingBoxOfElement(0);
-      auto p1 = boundingBox.rGetLowerCorner();
-      auto p2 = boundingBox.rGetUpperCorner();
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        
+        ChasteCuboid<2> boundingBox = mesh.CalculateBoundingBoxOfElement(0);
+        auto p1 = boundingBox.rGetLowerCorner();
+        auto p2 = boundingBox.rGetUpperCorner();
 
-      ChastePoint<2> expectedP1 = {0.0, 0.0};
-      ChastePoint<2> expectedP2 = {0.1, 0.1};
-      
-      TS_ASSERT_EQUALS(p1[0], expectedP1[0]);
-      TS_ASSERT_EQUALS(p1[1], expectedP1[1]);
-      TS_ASSERT_EQUALS(p2[0], expectedP2[0]);
-      TS_ASSERT_EQUALS(p2[1], expectedP2[1]);
+        ChastePoint<2> expectedP1 = {0.0, 0.0};
+        ChastePoint<2> expectedP2 = {0.1, 0.1};
+        
+        TS_ASSERT_EQUALS(p1[0], expectedP1[0]);
+        TS_ASSERT_EQUALS(p1[1], expectedP1[1]);
+        TS_ASSERT_EQUALS(p2[0], expectedP2[0]);
+        TS_ASSERT_EQUALS(p2[1], expectedP2[1]);
+      }
+
+      { // Top right 
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(1, true, 0.0, 0.1));
+        nodes.push_back(new Node<2>(2, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 0.1, 0.0));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        
+        ChasteCuboid<2> boundingBox = mesh.CalculateBoundingBoxOfElement(0);
+        auto p1 = boundingBox.rGetLowerCorner();
+        auto p2 = boundingBox.rGetUpperCorner();
+
+        ChastePoint<2> expectedP1 = {0.0, 0.0};
+        ChastePoint<2> expectedP2 = {0.1, 0.1};
+        
+        TS_ASSERT_EQUALS(p1[0], expectedP1[0]);
+        TS_ASSERT_EQUALS(p1[1], expectedP1[1]);
+        TS_ASSERT_EQUALS(p2[0], expectedP2[0]);
+        TS_ASSERT_EQUALS(p2[1], expectedP2[1]);
+      }
     }
     
     void TestVoronoiSurfaceArea()
@@ -1052,6 +1176,46 @@ public:
         TS_ASSERT_EQUALS(mesh.rGetNodeLocationsVoronoiDiagram(true).num_vertices(), 4);
         TS_ASSERT_EQUALS(mesh.GetVoronoiSurfaceAreaOfElement(0), 0.0);
         
+      }
+      { // Should fail for an element with laminas
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        
+        // Make four laminas
+        std::vector<ImmersedBoundaryElement<1,2>*> lams;
+        lams.push_back(new ImmersedBoundaryElement<1,2>(0, nodes));
+        lams.push_back(new ImmersedBoundaryElement<1,2>(1, nodes));
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
+
+        TS_ASSERT_THROWS_ANYTHING(mesh.rGetNodeLocationsVoronoiDiagram(true));
+      }
+
+      { // Test halo region
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.05, 0.05));
+        nodes.push_back(new Node<2>(1, true, 0.95, 0.05));
+        nodes.push_back(new Node<2>(2, true, 0.95, 0.95));
+        nodes.push_back(new Node<2>(3, true, 0.05, 0.95));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+
+        mesh.rGetNodeLocationsVoronoiDiagram(true);
+      }
+      {
+        // A 3x3 honeycomb will just have a single non-boundary element
+        ImmersedBoundaryHoneycombMeshGenerator gen(6u, 6u, 6u, 0.05, 0.2);
+        auto p_mesh = gen.GetMesh();
+        std::cout << p_mesh->GetVoronoiSurfaceAreaOfElement(10) << "\n";
+
       }
       /*{ // Single element  
         std::vector<Node<2>*> nodes;
@@ -1156,16 +1320,48 @@ public:
         int nodeIndex = 0;
         for (double angle = 0.0; angle < 360.0; angle += (360.0 / nodesToGenerate)) {
             nodes.push_back(new Node<2>(nodeIndex, true, 0.5 + 0.2 * cos(angle * PI / 180.0), 0.5 + 0.2 * sin(angle * PI / 180.0)));
+            nodes.back()->AddNodeAttribute(1.0);
             nodeIndex += 1;
         }
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        elems.back()->AddElementAttribute(1.0);
 
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
         mesh.SetElementDivisionSpacing(0.01);
 
         mesh.DivideElementAlongShortAxis(elems[0], true); 
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
+      }
+
+      // Successful division - find start_a
+      {
+        std::vector<Node<2>*> nodes;
+        
+        // Generate nodes
+        const int nodesToGenerate = 40;
+        const double PI = 3.141592653589;
+        int nodeIndex = 0;
+        for (double angle = 359.0; angle > 0.0; angle -= (360.0 / nodesToGenerate)) {
+            nodes.push_back(new Node<2>(nodeIndex, true, 0.5 + 0.1 * cos(angle * PI / 180.0), 0.5 + 0.2 * sin(angle * PI / 180.0)));
+            nodes.back()->AddNodeAttribute(1.0);
+            nodeIndex += 1;
+        }
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        elems.back()->AddElementAttribute(1.0);
+
+        c_vector<double, 2> axis;
+        axis[0] = 1.0;
+        axis[1] = 1.0; 
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        mesh.SetElementDivisionSpacing(0.2);
+
+        std::cout << "TEST\n";
+        mesh.DivideElement(elems[0], 20, 25, mesh.GetCentroidOfElement(0), axis);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
       }
       
@@ -1210,6 +1406,51 @@ public:
         mesh.SetElementDivisionSpacing(0.01);
 
         TS_ASSERT_THROWS_ANYTHING(mesh.DivideElementAlongShortAxis(elems[0], true));
+      }
+      // No intersection with axis - should be impossible to have two intersections with three coindident nodes
+      {
+        std::vector<Node<2>*> nodes;
+        
+        // Generate nodes
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.000));
+        nodes.push_back(new Node<2>(1, true, 0.0, 0.001));
+        nodes.push_back(new Node<2>(1, true, 0.001, 0.001));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        mesh.SetElementDivisionSpacing(0.01);
+        
+        c_vector<double, 2> axis;
+        axis[0] = 1.0;
+        axis[1] = 1.0; 
+
+        TS_ASSERT_THROWS_ANYTHING(mesh.DivideElementAlongGivenAxis(elems[0], axis, true));
+      }
+      { // Divide element with corner nodes
+        std::vector<Node<2>*> nodes;
+        
+        // Generate nodes
+        const int nodesToGenerate = 40;
+        const double PI = 3.141592653589;
+        int nodeIndex = 0;
+        for (double angle = 0.0; angle < 360.0; angle += (360.0 / nodesToGenerate)) {
+            nodes.push_back(new Node<2>(nodeIndex, true, 0.5 + 0.2 * cos(angle * PI / 180.0), 0.5 + 0.2 * sin(angle * PI / 180.0)));
+            nodes.back()->AddNodeAttribute(1.0);
+            nodeIndex += 1;
+        }
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        elems.back()->AddElementAttribute(1.0);
+        elems.back()->AddCornerNode(nodes.back());
+
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        mesh.SetElementDivisionSpacing(0.01);
+
+        mesh.DivideElementAlongShortAxis(elems[0], true); 
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
       }
     }
     

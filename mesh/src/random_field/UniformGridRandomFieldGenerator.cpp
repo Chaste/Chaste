@@ -40,8 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <numeric>
 
 // Spectra includes (for the eigenvalue and eigenvector calculations)
-#include <SymEigsSolver.h>
-#include <MatOp/SparseGenMatProd.h>
+//#include <SymEigsSolver.h>
+//#include <MatOp/SparseGenMatProd.h>
 
 #include "Exception.hpp"
 #include "FileFinder.hpp"
@@ -95,72 +95,72 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
 template <unsigned SPACE_DIM>
 void UniformGridRandomFieldGenerator<SPACE_DIM>::CalculateEigenDecomposition()
 {
-    Eigen::SparseMatrix<double> cov_matrix = CalculateCovarianceMatrix();
+    // Eigen::SparseMatrix<double> cov_matrix = CalculateCovarianceMatrix();
 
-    // mTraceProportion * mNumTotalGridPts is an upper bound for the number of eigenvalues to calculate
-    const double trace_threshold = mTraceProportion * mNumTotalGridPts;
+    // // mTraceProportion * mNumTotalGridPts is an upper bound for the number of eigenvalues to calculate
+    // const double trace_threshold = mTraceProportion * mNumTotalGridPts;
 
-    // Calculate incremental proportions of the eigenvalues
-    // \todo: refine how this is done. There should be a way to provide a good residual vec from previous calculation
-    for (const double& proportion : {0.2, 0.4, 0.6, 0.8, 1.0})
-    {
-        const long num_evals_to_compute = std::min(std::lround(proportion * trace_threshold) + 1l, mNumTotalGridPts - 1l);
+    // // Calculate incremental proportions of the eigenvalues
+    // // \todo: refine how this is done. There should be a way to provide a good residual vec from previous calculation
+    // for (const double& proportion : {0.2, 0.4, 0.6, 0.8, 1.0})
+    // {
+    //     const long num_evals_to_compute = std::min(std::lround(proportion * trace_threshold) + 1l, mNumTotalGridPts - 1l);
 
-        Spectra::SparseGenMatProd<double> op(cov_matrix);
-        Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
-                &op, num_evals_to_compute, mNumTotalGridPts);
+    //     Spectra::SparseGenMatProd<double> op(cov_matrix);
+    //     Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
+    //             &op, num_evals_to_compute, mNumTotalGridPts);
 
-        eigs.init();
-        eigs.compute();
+    //     eigs.init();
+    //     eigs.compute();
 
-        if (eigs.info() != Spectra::SUCCESSFUL)
-        {
-            EXCEPTION("Spectra decomposition was not successful.");
-        }
+    //     if (eigs.info() != Spectra::SUCCESSFUL)
+    //     {
+    //         EXCEPTION("Spectra decomposition was not successful.");
+    //     }
 
-        PRINT_2_VARIABLES(eigs.eigenvalues().array().sum(), trace_threshold);
+    //     PRINT_2_VARIABLES(eigs.eigenvalues().array().sum(), trace_threshold);
 
-        // Go straight back to the top of the loop at this point if we didn't calculate enough eigenvalues
-        // but only continue if we haven't already calculated the maximum number of eigenvalues
-        if (eigs.eigenvalues().array().sum() < trace_threshold && num_evals_to_compute < mNumTotalGridPts - 1l)
-        {
-            continue;
-        }
+    //     // Go straight back to the top of the loop at this point if we didn't calculate enough eigenvalues
+    //     // but only continue if we haven't already calculated the maximum number of eigenvalues
+    //     if (eigs.eigenvalues().array().sum() < trace_threshold && num_evals_to_compute < mNumTotalGridPts - 1l)
+    //     {
+    //         continue;
+    //     }
 
-        /*
-         * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen
-         * due to rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we
-         * don't mind the slight error.
-         */
-        const Eigen::ArrayXd& evals = eigs.eigenvalues().array().max(0.0);
+    //     /*
+    //      * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen
+    //      * due to rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we
+    //      * don't mind the slight error.
+    //      */
+    //     const Eigen::ArrayXd& evals = eigs.eigenvalues().array().max(0.0);
 
-        // Decide how many eigenvalues to keep
-        double cumulative_sum = 0.0;
-        mNumEigenvals = num_evals_to_compute;
-        for (unsigned e_val_idx = 0; e_val_idx < evals.size(); ++e_val_idx)
-        {
-            cumulative_sum += evals.coeffRef(e_val_idx);
+    //     // Decide how many eigenvalues to keep
+    //     double cumulative_sum = 0.0;
+    //     mNumEigenvals = num_evals_to_compute;
+    //     for (unsigned e_val_idx = 0; e_val_idx < evals.size(); ++e_val_idx)
+    //     {
+    //         cumulative_sum += evals.coeffRef(e_val_idx);
 
-            if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
-            {
-                mNumEigenvals = e_val_idx + 1;
-                break;
-            }
-        }
+    //         if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
+    //         {
+    //             mNumEigenvals = e_val_idx + 1;
+    //             break;
+    //         }
+    //     }
 
-        // Store only those eigenvectors that we need
-        const auto e_vectors = eigs.eigenvectors();
-        mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
-        for (unsigned e_val = 0; e_val < mNumEigenvals; ++e_val)
-        {
-            mScaledEigenvecs.col(e_val) = std::sqrt(evals.coeffRef(e_val)) * e_vectors.col(e_val);
-        }
+    //     // Store only those eigenvectors that we need
+    //     const auto e_vectors = eigs.eigenvectors();
+    //     mScaledEigenvecs.resize(mNumTotalGridPts, mNumEigenvals);
+    //     for (unsigned e_val = 0; e_val < mNumEigenvals; ++e_val)
+    //     {
+    //         mScaledEigenvecs.col(e_val) = std::sqrt(evals.coeffRef(e_val)) * e_vectors.col(e_val);
+    //     }
 
-        PRINT_VARIABLE(mNumEigenvals);
+    //     PRINT_VARIABLE(mNumEigenvals);
 
-        // Break out of the loop to prevent any unnecessary eigenvalue calculations
-        break;
-    }
+    //     // Break out of the loop to prevent any unnecessary eigenvalue calculations
+    //     break;
+    // }
 }
 
 template <unsigned SPACE_DIM>

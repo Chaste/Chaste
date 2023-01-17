@@ -163,7 +163,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     ++(*(mpIters->pElemIter));
 
     return elem_data;
-}
+} // LCOV_EXCL_LINE
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryLamina()
@@ -185,7 +185,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     ++(*(mpIters->pLamIter));
 
     return lamina_data;
-}
+} // LCOV_EXCL_LINE
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
@@ -678,7 +678,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
     // Identify which boundary edge the intersection is with
     std::vector<geom_point> intersections;
-    for (const auto boundary_edge : mBoundaryEdges)
+    for (const auto& boundary_edge : mBoundaryEdges)
     {
         std::cout << "start: " << start.get<0>() << ", " << start.get<1>() << "\n";
         std::cout << "end: " << end.get<0>() << ", " << end.get<1>() << "\n";

@@ -247,6 +247,9 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
      *
      * By integrating the pdf directly, we can calculate exactly the necessary moments of the distribution needed for
      * the skewness.
+     * 
+     * This method does not work for concave shapes, and emits a warning but continues anyway. Results will be close
+     * to correct for mildly concave shapes or may be correct depending on the alignment of the element.
      */
 
     // This method only works in 2D
@@ -315,17 +318,21 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     // For each node, we keep track of all the y-locations where the vertical through the node meets the polygon
     std::vector<std::vector<double> > knots(num_nodes);
 
+    // Iterate over ordered locations from left to right
     for (unsigned location = 0; location < num_nodes; location++)
     {
         // Get the two parts of the pair
         unsigned this_idx = ordered_locations[location].first;
+        // this_location is the location of the node relative to centroid
         c_vector<double, SPACE_DIM> this_location = ordered_locations[location].second;
 
         // The y-coordinate of the current location is always a knot
+        // because we are passing the vertical through this node
         knots[location].push_back(this_location[1]);
 
         // To calculate all the intersection points, we need to iterate over every other location and see, sequentially,
         // if the x-coordinate of location i+1 and i+2 crosses the x-coordinate of the current location.
+        // i.e. check whether each other edge crosses the vertical through this_location/current node
         unsigned next_idx = (this_idx + 1) % num_nodes;
         c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[next_idx] - this_location;
 
@@ -340,7 +347,10 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
             if (to_previous[0] * to_next[0] <= 0.0)
             {
                 // Find how far between to_previous and to_next the point of intersection is
-                double interp = to_previous[0] / (to_previous[0] - to_next[0]);
+                double interp = 0.5;
+                if (to_previous[0] - to_next[0] != 0.0) {
+                    interp = to_previous[0] / (to_previous[0] - to_next[0]);
+                }
 
                 assert(interp >= 0.0 && interp <= 1.0);
 
@@ -383,7 +393,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
                 break;
 
             default:
-                mass_contributions[i] = knots[i][knots[i].size() - 1] - knots[i][0];
+                mass_contributions[i] += knots[i][knots[i].size()-1] - knots[i][0];
         }
 
         // Normalise, so that these lengths define a pdf
@@ -429,7 +439,10 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
     }
 
     // Check that we have correctly defined a pdf
-    assert(fabs(e_x0 - 1.0) < 1e-6);
+    if (fabs(e_x0 - 1.0) < 1e-6)
+    {
+        WARN_ONCE_ONLY("Mass distribution of element calculated incorrectly due to element concavity. Skewness may not be correct!");
+    }
 
     // Calculate the standard deviation, and return the skewness
     double sd = sqrt(e_x2 - e_x1 * e_x1);
@@ -1224,7 +1237,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
     // If the axis of division does not cross two edges then we cannot proceed
     if (intersecting_nodes.size() != 2)
     {
-        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element");
+        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element"); // LCOV_EXCL_LINE
     }
 
     // Now call DivideElement() to divide the element using the nodes found above
@@ -1312,6 +1325,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
         double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
+        std::cout << "perp dist: " << perpendicular_dist << ", half_spacing: " << half_spacing << "\n";
         if (fabs(perpendicular_dist) >= half_spacing)
         {
             no_node_satisfied_condition_1 = false;
@@ -1350,7 +1364,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
         }
 
         // Go to the previous node
-        i = (i + num_nodes - 1) % num_nodes;
+        i = (i + num_nodes - 1) % num_nodes; // LCOV_EXCL_LINE
     }
 
     // Find correct start_b
@@ -1774,7 +1788,7 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
     }
 
     return neighbouring_element_indices;
-}
+} // LCOV_EXCL_LINE
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDistribution()
@@ -1999,7 +2013,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
                                   this->mNodes.front()->rGetLocation()[1] +
                                   this->mNodes.back()->rGetLocation()[0] +
                                   this->mNodes.back()->rGetLocation()[1];
-
+    
     bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
 
     /*

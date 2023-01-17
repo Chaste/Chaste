@@ -190,10 +190,10 @@ public:
       // Overlap top right
       {
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.6, 0.6));
-        nodes.push_back(new Node<2>(1, true, 0.2, 0.6));
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
         nodes.push_back(new Node<2>(2, true, 0.9, 0.9));
-        nodes.push_back(new Node<2>(3, true, 0.6, 0.9));
+        nodes.push_back(new Node<2>(3, true, 0.1, 0.2));
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));

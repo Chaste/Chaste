@@ -143,6 +143,11 @@ public:
 
     /** @param isBoundaryElement whether the element is on the boundary */
     void SetIsBoundaryElement(bool isBoundaryElement);
+    
+    /**
+     * @param node the node to add as a corner node
+     */
+    void AddCornerNode(Node<SPACE_DIM>* node);
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -222,6 +227,7 @@ public:
 
     /** @param isBoundaryElement whether the element is on the boundary */
     void SetIsBoundaryElement(bool isBoundaryElement);
+
 };
 
 #endif /*IMMERSEDBOUNDARYELEMENT_HPP_*/
