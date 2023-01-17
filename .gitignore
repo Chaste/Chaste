@@ -59,7 +59,10 @@ _local/
 /apps/src/Chaste
 /apps/src/MeshConvert
 
+# IDEs
 \.vscode/
+.idea
+
 appredict_lookup_table_manifest.txt
 
 # Build directories
