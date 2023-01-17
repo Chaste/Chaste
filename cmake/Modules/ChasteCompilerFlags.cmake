@@ -60,7 +60,10 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} ST
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    if (${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rno-debug-disables-optimization -Wno-unused-but-set-variable")
+    endif()
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     message(STATUS "\t... for Intel compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
     set(Intel_flags
