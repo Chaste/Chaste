@@ -3,7 +3,7 @@ name: Ubuntu np3
 on:
   pull_request:
     branches:
-      - 'this_cannot_be_run_on_gh_actions'
+      - '**'
 
 jobs:
   
