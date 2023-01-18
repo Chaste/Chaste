@@ -72,6 +72,8 @@ public:
         std::vector<std::string> bad_models = spectail_streatment_models(models, {"hund_rudy_2004_a"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
+
         RunTests(dirname, models, args, true);
 
         dirname = dirname + "-difficult";

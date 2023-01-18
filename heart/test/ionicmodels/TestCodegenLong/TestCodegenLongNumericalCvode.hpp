@@ -61,7 +61,15 @@ public:
 
         SetUseCvodeJacobian(false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
+        // check test for negative concentrations works
+        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
+
+        // initial value for membrane_L_type_calcium_current_f_gate in Shannon2004 is slightly above 1 (it is a probability)
+        std::vector<std::string> bigger_tolerance_models = spectail_streatment_models(models, {"Shannon2004"});
         RunTests(dirname, models, args);
+
+        SetUseCvOdeTolerances(1e-4);
+        RunTests(dirname, bigger_tolerance_models, args);
         SetUseCvodeJacobian(true);
 #endif
     }

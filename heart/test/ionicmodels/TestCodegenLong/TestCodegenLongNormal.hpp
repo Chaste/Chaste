@@ -63,6 +63,8 @@ public:
         std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
+        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
+
         RunTests(dirname, models, args);
 
         // See Cooper Spiteri Mirams paper table 2

@@ -63,6 +63,8 @@ public:
 
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
+        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
+
         RunTests(dirname, models, args, false, 0, false);
 
         // See Cooper Spiteri Mirams paper table 2

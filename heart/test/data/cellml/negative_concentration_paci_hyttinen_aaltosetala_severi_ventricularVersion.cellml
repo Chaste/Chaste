@@ -3500,7 +3500,7 @@
     </component>
     <component name="calcium_dynamics">
         <variable cmeta:id="cytosolic_calcium_concentration" initial_value="1.80773974140477e-5" name="Cai" public_interface="out" units="millimolar"/>
-        <variable cmeta:id="JSR_calcium_concentration" initial_value="0.2734234751931" name="Ca_SR" units="millimolar"/>
+        <variable cmeta:id="JSR_calcium_concentration" initial_value="-0.2734234751931" name="Ca_SR" units="millimolar"/>
         <variable name="Vc" public_interface="in" units="micrometre_cube"/>
         <variable name="V_SR" public_interface="in" units="micrometre_cube"/>
         <variable name="time" public_interface="in" units="second"/>

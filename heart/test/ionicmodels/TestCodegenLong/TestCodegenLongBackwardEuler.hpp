@@ -72,7 +72,14 @@ public:
         std::vector<std::string> bad_models = spectail_streatment_models(models, {"hund_rudy_2004_a"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args, true);
+        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
+
+        // initial value for membrane_L_type_calcium_current_f_gate in Shannon2004 is slightly above 1 (it is a probability)
+        std::vector<std::string> bigger_tolerance_models = spectail_streatment_models(models, {"Shannon2004"});
+        RunTests(dirname, models, args);
+
+        SetUseCvOdeTolerances(1e-4);
+        RunTests(dirname, bigger_tolerance_models, args);
 
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
