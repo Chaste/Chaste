@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -275,12 +275,6 @@ public:
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.997877574));
         simulator.AddCellKiller(p_killer);
 
-        // For coverage of an exception.
-        simulator.SetUpdateCellPopulationRule(false);
-        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
-
-        simulator.SetUpdateCellPopulationRule(true);
         simulator.Solve();
 
         // Check that the number of nodes is equal to the number of cells
@@ -294,6 +288,58 @@ public:
         // Note that this test used to take an extra time step
         TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
     }
+
+
+    /**
+     * Test some cell-based simulation exceptions.
+     *
+     * In this test, we attempt to solve a cell-based simulation without ghost nodes and
+     * check that the numbers of nodes and cells match at the end of the
+     * simulation.
+     */
+    void TestOffLatticeSimulationExceptions()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
+        // Create a simple 2D MeshBasedCellPopulation
+        int num_cells_depth = 5;
+        int num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationExceptions");
+        simulator.SetEndTime(0.5);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
+
+        // Add cell killer
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.997877574));
+        simulator.AddCellKiller(p_killer);
+
+        // For coverage of two exceptions.
+        simulator.SetUpdateCellPopulationRule(false);
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but mUpdateCellPopulation is set to false, please set it to true.");
+        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
+        simulator.SetUpdateCellPopulationRule(true);
+
+        simulator.SetUpdatingTimestepMultiple(60); // Son only look for births and deaths at start and end
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but you were on a non update step, make sure your cell cycle model and killer only operate on update steps.");
+
+        // Note that this test used to take an extra time step
+        TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
+    }
+
 
     /**
      * Test a cell-based simulation with multiple cell killers.
@@ -415,7 +461,7 @@ public:
     }
 
     /**
-     * Test a cell-based simulation with variabe rest lengths forces.
+     * Test a cell-based simulation with variable rest lengths forces.
      */
     void TestOffLatticeSimulationWithVariableRestLengths()
     {
@@ -630,7 +676,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Output Voroni for visualisation
+        // Output Voronoi for visualisation
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.SetWriteVtkAsPoints(true);
 
@@ -664,7 +710,7 @@ public:
 
         // Create a simple mesh
         int cells_up = 6;
-        int cells_across = 6; 
+        int cells_across = 6;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
@@ -677,7 +723,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Output Voroni for visualisation
+        // Output Voronoi for visualisation
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.SetWriteVtkAsPoints(true);
 
@@ -685,7 +731,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithToroidalMesh");
         simulator.SetEndTime(0.5);
-        
+
         // Create some force laws and pass them to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
@@ -986,6 +1032,17 @@ public:
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetEndTime(0.5);
+
+
+        // Test SetSamplingTimestepMultiple method
+        TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 1u);
+        simulator.SetSamplingTimestepMultiple(2);
+        TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 2u);
+
+        // Test SetUpdatingTimestepMultiple method
+        TS_ASSERT_EQUALS(simulator.mUpdatingTimestepMultiple, 1u);
+        simulator.SetUpdatingTimestepMultiple(2);
+        TS_ASSERT_EQUALS(simulator.mUpdatingTimestepMultiple, 2u);
 
         // We call SetupSolve() here to set up the default numerical method, which is otherwise NULL
         simulator.SetupSolve();

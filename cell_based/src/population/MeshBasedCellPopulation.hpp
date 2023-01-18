@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -302,7 +302,7 @@ public:
      * @param pPopulationCountWriter the population count writer.
      */
     virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
-    
+
     /**
      * A virtual method to accept a cell population event writer so it can
      * write data from this object to file.

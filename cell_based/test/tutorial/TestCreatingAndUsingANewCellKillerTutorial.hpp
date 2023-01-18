@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -229,7 +229,7 @@ public:
         /* We now use the cell population to construct a cell killer object. */
         MyCellKiller my_cell_killer(&cell_population);
 
-        /* To store information about the lovations and times of the killed cells use the 
+        /* To store information about the lovations and times of the killed cells use the
          * {{{CellRemovalLocationsWriter}}} */
         cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 

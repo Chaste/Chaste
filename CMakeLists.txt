@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2022, University of Oxford.
+# Copyright (c) 2005-2023, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -28,11 +28,10 @@
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
-# Fergus's comment take 4
-
-cmake_minimum_required (VERSION 3.5.1)
+# The version that ships with Ubuntu 18.04
+cmake_minimum_required (VERSION 3.10.2)
 
 # Set standard to C++14. Note that CMake < 3.6 does not know how to set the standard flag for the Intel compiler, so
 # the ChasteCompilerFlags.cmake also sets the --std=c++14 flag, too.
@@ -442,7 +441,7 @@ if (PETSC_MPIEXEC)
         find_program (MPIEXEC ${PETSC_MPIEXEC})
     endif ()
 endif ()
-find_package (MPI REQUIRED)
+find_package (MPI REQUIRED COMPONENTS CXX)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")

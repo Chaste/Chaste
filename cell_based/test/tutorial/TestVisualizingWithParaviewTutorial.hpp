@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -131,7 +131,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* 
+        /*
          * The default output method for mesh based simulations is as polytopes
          * In order to output the .vtu files required for Paraview, we explicitly
          * instruct the simulation to output the data we need.
@@ -140,13 +140,13 @@ public:
 
         /*
          * The following line tells the cell population to also write data to .vtu files with cells
-         * as points, where we may choose the shape used to visualize each cell in Paraview using 
+         * as points, where we may choose the shape used to visualize each cell in Paraview using
          * glyphs.
          */
         cell_population.SetWriteVtkAsPoints(true);
 
         /*
-         * In order to visualise the cells on the boundary we apply a bound to the voronoi 
+         * In order to visualise the cells on the boundary we apply a bound to the voronoi
          * tesselation. Note this defaults to false.
          */
         cell_population.SetBoundVoronoiTessellation(true);
@@ -181,7 +181,7 @@ public:
     * the top. The output will be located in {{{/tmp/$USER/testoutput/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0}}}.
     * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
     * simply select {{{voronoi_results_..vtu}}}. We should now see {{{voronoi_results*}}}  in the pipeline browser. We click {{{Apply}}} in the properties tab
-    * of the object inspector, and we should now see a visualization in the right hand window. 
+    * of the object inspector, and we should now see a visualization in the right hand window.
     *
     * At this stage, it will be necessary to refine how we wish to view this particular visualisation. The viewing styles can be edited using
     * the display tab of the object inspector. In particular, under {{{Style}}}, the representation drop down menu allows us to view
@@ -249,15 +249,15 @@ public:
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
     * test output from the new folder, {{{Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing}}}. You will see that the left an right sides
-    * of the monolayer are the same. 
-    * 
+    * of the monolayer are the same.
+    *
     * At this stage, the viewer is showing all cells in the simulation, including the ghost nodes. In order to view only real cells, we must
     * apply a threshold. This is achieved using the threshold button on the third toolbar (the icon is a cube with a green 'T' inside). Once you
     * click the threshold button, you will see a new threshold appear below your results in the pipeline browser. Go to the properties tab and
     * reset the lower threshold to be less than 0, and the upper threshold to be between 0 and 1, ensuring that the 'Non-ghosts' option is
     * selected in the 'Scalars' drop down menu. Once we have edited this, we click apply (we may need to click it twice), and the visualisation on the
     * right window will have changed to eliminate ghost nodes.
-    * 
+    *
     * Note that you cant currently output the mesh when using ghost nodes.
     *
     * EMPTYLINE

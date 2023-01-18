@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -185,7 +185,7 @@ protected:
      * @param pNodeB the other node to perform the swap
      */
     virtual void IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
-
+public:
     /**
      * Helper method for ReMesh(), called by IdentifySwapType().
      *
@@ -197,7 +197,7 @@ protected:
      * @param pNodeB the other node to perform the merge with
      */
     void PerformNodeMerge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
-
+private:
     /**
      * Helper method for ReMesh(), called by IdentifySwapType().
      *

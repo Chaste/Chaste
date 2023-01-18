@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,6 +42,7 @@ mesh_writer.WriteFilesUsingMesh(*this);
 */
 #include "Cylindrical2dMesh.hpp"
 #include "Exception.hpp"
+#include "VtkMeshWriter.hpp"
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width)
   : MutableMesh<2,2>(),
@@ -794,7 +795,6 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
 //    {
 //        mMismatchedBoundaryElements = true;
 //        // In here - if you hit this case, we want to stop the test and move on, so we work with a stopping event
-//
 //    }
 
     // Every boundary element on the left must have a corresponding element on the right

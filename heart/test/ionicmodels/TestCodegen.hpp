@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -390,7 +390,7 @@ public:
         // Attributes
         CheckAttributes(cvode_cell);
         CheckAttributes(cvode_opt);
-        
+
         delete cvode_lut;
 #endif // CHASTE_CVODE
 

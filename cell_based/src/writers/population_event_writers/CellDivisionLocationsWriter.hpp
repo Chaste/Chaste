@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -73,14 +73,14 @@ public:
      * Visit the population and write the data.
      *
      * Outputs [num divisions] lines of tab-separated values of the form:
-     *  [Div time 0] [Div 0 x-pos] [Div 0 y-pos] [Div 0 z-pos] [Parent 0 Age] [Parent 0 ID] [Child 0 ID] 
+     *  [Div time 0] [Div 0 x-pos] [Div 0 y-pos] [Div 0 z-pos] [Parent 0 Age] [Parent 0 ID] [Child 0 ID]
      *  [Div time 1] [Div 1 x-pos] ...
      *
      * where [num divisions] denotes the number of Divisions since the previous output step
      * with other imformation about each division event.
      *
      * This line is appended to the output written by AbstractCellBasedEventWriter, which is nothing.
-     * 
+     *
      * @param pCellPopulation a pointer to the population to visit.
      */
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
@@ -89,7 +89,7 @@ public:
      * Visit the population and write the data.
      *
      * Just passes through to VisitAnyPopulation
-     * 
+     *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
@@ -116,7 +116,7 @@ public:
      * Visit the population and write the data.
      *
      * Just passes through to VisitAnyPopulation
-     * 
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);

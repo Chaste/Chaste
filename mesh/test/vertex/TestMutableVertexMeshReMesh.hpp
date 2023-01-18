@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -186,7 +186,7 @@ public:
     {
         /*
          * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
-         * We will test that that a T1 swap of the two central nodes is correctly implemented.
+         * We will test that a T1 swap of the two central nodes is correctly implemented.
          *  _____
          * |\   /|
          * | \ / |
@@ -280,7 +280,7 @@ public:
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all nodes are
-         * boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
+         * boundary nodes, as shown below. We will test that a T1 swap is correctly implemented.
          *  _____
          * |\   /
          * | \ /
@@ -368,7 +368,7 @@ public:
     {
         /*
          * Create a mesh comprising six nodes contained in three elements such that all but one node
-         * are boundary nodes, as shown below. We will test that that a T1 swap is correctly implemented.
+         * are boundary nodes, as shown below. We will test that a T1 swap is correctly implemented.
          *
          * |\   /|
          * | \ / |
@@ -642,7 +642,92 @@ public:
         }
     }
 
-    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement()
+    void TestRemoveTriangularVoidWithRemovingEdgeFromInternalTriangularVoid()
+    {
+        /**
+         * In this test we check that a T1 swap occurs if we have a triangular void
+         *
+         *       ____________
+         *      |            |\
+         *      |____________| \  Where the small triangles are voids so the bottom
+         *      |  |/   \|   | /  Element is (slightly) convex
+         *      |____________|/
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 2.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 2.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(5, true, 0.5, 1.0));
+        nodes.push_back(new Node<2>(6, true, 0.7, 1.0));
+        nodes.push_back(new Node<2>(7, true, 1.3, 1.0));
+        nodes.push_back(new Node<2>(8, true, 1.5, 1.0));
+        nodes.push_back(new Node<2>(9, false, 2.0, 1.0));
+        nodes.push_back(new Node<2>(10, true, 2.5, 1.0));
+        nodes.push_back(new Node<2>(11, true, 0.5, 0.9));
+        nodes.push_back(new Node<2>(12, true, 1.5, 0.9));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[10] = {0, 1, 9, 8, 12, 7, 6, 11, 5, 4};
+        unsigned node_indices_elem_1[8] = {4, 5, 6, 7, 8, 9, 2, 3};
+        unsigned node_indices_elem_2[4] = {1, 10, 2, 9};
+
+
+        for (unsigned i=0; i<10; i++)
+        {
+            if (i < 8)
+            {
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            }
+            if (i < 4)
+            {
+                nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            }
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+        }
+
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+
+        // Ensure that the inner edge will be considered for a swap
+        vertex_mesh.SetCellRearrangementThreshold(0.11);
+
+        // Check for T1 swaps and carry them out if allowed - the short edge on the right should swap and remove the void
+        vertex_mesh.CheckForSwapsFromShortEdges();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+
+        // Check for T1 swaps and carry them out if allowed - the short edge on the left should swap and remove the void
+        vertex_mesh.CheckForSwapsFromShortEdges();
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
+
+        // Test boundary property of nodes. All are boundary nodes except node 3.
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            bool expected_boundary_node = (i!=5);
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
+        }
+
+        // Test that each element has the correct area and perimeter following the rearrangement
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(0), 2.0, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(1), 2, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetVolumeOfElement(2), 0.5, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(0), 6.0, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 6.0, 1e-6);
+        TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 2.0+sqrt(5.0), 1e-6);
+    }
+
+    void TestDoNotPerformT1SwapWithRemovingEdgeFromTriangularElement()
     {
         /**
          * In this test we check that a T1 swap does not occur if one of the elements is triangular
@@ -2154,7 +2239,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
 
-        // Node 1 now has 2 elements whereas nodes 1 and 7 have only one element
+        // Node 0 now has 2 elements whereas nodes 1 and 7 have only one element
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->GetNumContainingElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->GetNumContainingElements(), 1u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->GetNumContainingElements(), 1u);
@@ -2671,6 +2756,13 @@ public:
                 TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
             }
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+        }
+
+        // Test that the correct nodes are boundary nodes
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        {
+            bool expected_boundary_node = (i!=4);
+            TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
     }
 

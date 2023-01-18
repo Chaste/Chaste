@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -239,12 +239,24 @@ public:
         OdeSolution solution = p_model->Compute(start_time, end_time, sampling_timestep);
 
         /*
+         * This call will add to the solution object the ODE system's labelled "derived quantities"
+         * these are things that are not state variables, but are calculated from state variables
+         * (e.g. currents), and have been tagged in the CellML file with metadata.
+         * See [wiki:ChasteGuides/CodeGenerationFromCellML] for annotation instructions.
+         */
+        solution.CalculateDerivedQuantitiesAndParameters(p_model.get());
+
+        /*
          * `p_model` retains the state variables at the end of `Solve`, if you call `Solve` again the state
          * variables will evolve from their new state, not the original initial conditions.
          *
-         * Write the data out to a file.
+         * Write the data out to a file. Here we show the full range of options.
          */
-        solution.WriteToFile("TestCvodeCells", "Shannon2004Cvode", "ms");
+        unsigned steps_per_row = 1u; // allows you to downsample output.
+        bool clean_dir = false;
+        unsigned precision = 6u;
+        bool include_derived_quantities = true;
+        solution.WriteToFile("TestCvodeCells", "Shannon2004Cvode", "ms", steps_per_row, clean_dir, precision, include_derived_quantities);
 
         /*
          * == Calculating APD and Upstroke Velocity ==
