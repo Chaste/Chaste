@@ -522,13 +522,6 @@ endif ()
 
 
 ################################
-####  Find FFTW
-################################
-find_package(FFTW REQUIRED)
-list(APPEND Chaste_INCLUDES "${FFTW_INCLUDES}")
-list(APPEND Chaste_LINK_LIBRARIES "${FFTW_LIBRARIES}")
-
-################################
 ####  Find pocketfft
 ################################
 FetchContent_Declare(
@@ -561,15 +554,6 @@ if(NOT OpenSimplex_POPULATED)
     target_include_directories(OpenSimplex INTERFACE ${opensimplex_SOURCE_DIR})
     list (APPEND Chaste_INCLUDES "${opensimplex_SOURCE_DIR}")
 endif()
-
-################################
-####  Find Eigen and Spectra
-################################
-find_package(Eigen REQUIRED)
-list(APPEND Chaste_INCLUDES "${EIGEN_INCLUDES}")
-
-find_package(Spectra REQUIRED)
-list(APPEND Chaste_INCLUDES "${SPECTRA_INCLUDES}")
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 

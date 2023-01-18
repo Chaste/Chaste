@@ -58,14 +58,12 @@ public:
         const std::array<double, 2> lower_corner {{0.0, 0.0}};
         const std::array<double, 2> upper_corner {{10.0, 10.0}};
         const std::array<bool, 2> periodicity {{false, false}};
-        const unsigned num_eigenvals = 50u;
         const double lengthscale = 0.1;
 
         OffLatticeRandomFieldGenerator<2> gen(
                 lower_corner,
                 upper_corner,
                 periodicity,
-                num_eigenvals,
                 lengthscale
         );
     }
@@ -75,7 +73,6 @@ public:
         auto p_gen = RandomNumberGenerator::Instance();
 
         const unsigned n = 100;
-        const unsigned num_eigenvals = std::lround(n / 5.0);
 
         const std::array<double, 2> lower_corner {{0.0, 0.0}};
         const std::array<double, 2> upper_corner {{10.0, 10.0}};
@@ -86,7 +83,6 @@ public:
                 lower_corner,
                 upper_corner,
                 periodicity,
-                num_eigenvals,
                 lengthscale
         );
 
@@ -97,14 +93,14 @@ public:
             nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
         }
 
-        gen.TuneNumEigenvals(nodes, 0.95);
-        gen.Update(nodes);
-        const std::vector<double> grf = gen.SampleRandomField();
+        //gen.TuneNumEigenvals(nodes, 0.95);
+        //gen.Update(nodes);
+        //const std::vector<double> grf = gen.SampleRandomField();
 
-        for (const auto& node : nodes)
-        {
-            delete(node);
-        }
+        //for (const auto& node : nodes)
+        //{
+        //    delete(node);
+        //}
     }
 
     void TestSampleFromRandomFieldWithLengthscaleZero()
@@ -112,7 +108,6 @@ public:
         auto p_gen = RandomNumberGenerator::Instance();
 
         const unsigned n = 100;
-        const unsigned num_eigenvals = std::lround(n / 5.0);
 
         const std::array<double, 2> lower_corner {{0.0, 0.0}};
         const std::array<double, 2> upper_corner {{10.0, 10.0}};
@@ -123,7 +118,6 @@ public:
                 lower_corner,
                 upper_corner,
                 periodicity,
-                num_eigenvals,
                 lengthscale
         );
 
@@ -134,14 +128,14 @@ public:
             nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
         }
 
-        gen.TuneNumEigenvals(nodes, 0.95);
-        gen.Update(nodes);
-        const std::vector<double> grf = gen.SampleRandomField();
+        //gen.TuneNumEigenvals(nodes, 0.95);
+        //gen.Update(nodes);
+        //const std::vector<double> grf = gen.SampleRandomField();
 
-        for (const auto& node : nodes)
-        {
-            delete(node);
-        }
+        //for (const auto& node : nodes)
+        //{
+        //    delete(node);
+        //}
     }
 };
 

@@ -41,10 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <numeric>
 
-// Spectra includes (for the eigenvalue and eigenvector calculations)
-#include <MatOp/SparseGenMatProd.h>
-#include <SymEigsSolver.h>
-
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
@@ -53,13 +49,11 @@ template <unsigned SPACE_DIM>
 OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
                                                                           std::array<double, SPACE_DIM> upperCorner,
                                                                           std::array<bool, SPACE_DIM> periodicity,
-                                                                          unsigned numEigenvals,
                                                                           double lengthScale,
                                                                           double boxWidth)
         : mLowerCorner(lowerCorner),
           mUpperCorner(upperCorner),
           mPeriodicity(periodicity),
-          mNumEigenvals(numEigenvals),
           mLengthScale(lengthScale),
           mpBoxCollection(nullptr)
 {
@@ -92,144 +86,6 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::a
     );
 
     mpBoxCollection->SetupLocalBoxesHalfOnly();
-}
-
-template <unsigned SPACE_DIM>
-void OffLatticeRandomFieldGenerator<SPACE_DIM>::Update(const std::vector<Node<SPACE_DIM>*>& rNodes)
-{
-    // Update the number of nodes, which is useful particularly in the special case of mLengthScale == 0.0
-    mNumNodesAtLastUpdate = rNodes.size();
-
-    // Special case of zero correlation length
-    if (mLengthScale == 0.0)
-    {
-        return;
-    }
-
-    Eigen::SparseMatrix<double> cov_matrix = CalculateCovarianceMatrix(rNodes);
-
-    Spectra::SparseGenMatProd<double> op(cov_matrix);
-    Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
-            &op, mNumEigenvals, rNodes.size());
-
-    eigs.init();
-    eigs.compute();
-
-    if (eigs.info() != Spectra::SUCCESSFUL)
-    {
-        EXCEPTION("Spectra decomposition not completed successfully.");
-    }
-
-    /*
-     * The .max(0.0) here ensure eigenvalues are not negative when the square root is taken. This can only happen due to
-     * rounding error in the calculation, so any negative eigenvalues will have negligible magnitude, so we don't mind
-     * the slight error.
-     */
-    mSqrtEigenvals = eigs.eigenvalues().array().max(0.0).sqrt();
-    mEigenvecs = eigs.eigenvectors();
-}
-
-template <unsigned SPACE_DIM>
-unsigned OffLatticeRandomFieldGenerator<SPACE_DIM>::TuneNumEigenvals(
-        const std::vector<Node<SPACE_DIM>*>& rNodes, const double proportionOfTrace)
-{
-    // Special case of zero correlation length
-    if (mLengthScale == 0.0)
-    {
-        return mNumEigenvals;
-    }
-
-    const unsigned most_eigenvals = rNodes.size() - 1;
-
-    Eigen::SparseMatrix<double> cov_matrix = CalculateCovarianceMatrix(rNodes);
-
-    Spectra::SparseGenMatProd<double> op(cov_matrix);
-    Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, Spectra::SparseGenMatProd<double>> eigs(
-            &op, most_eigenvals, rNodes.size());
-
-    eigs.init();
-    eigs.compute();
-
-    if (eigs.info() != Spectra::SUCCESSFUL)
-    {
-        EXCEPTION("Spectra decomposition not completed successfully.");
-    }
-
-    // Calculate the number of eigenvalues at which we reach the trace threshold.
-    // The trace of the covariance matrix, which is also the sum of the eigenvalues, is just 1 * rNodes.size()
-    const double trace_threshold = proportionOfTrace * rNodes.size();
-
-    // This is the maximum number that can be calculated using the Spectra solver
-    mNumEigenvals = rNodes.size() - 1;
-
-    const Eigen::ArrayXd& e_vals = eigs.eigenvalues().array();
-    double cumulative_sum = 0.0;
-    for (unsigned e_val_idx = 0; e_val_idx < e_vals.size(); ++e_val_idx)
-    {
-        cumulative_sum += e_vals.coeffRef(e_val_idx);
-
-        if (cumulative_sum > trace_threshold && e_val_idx < mNumEigenvals)
-        {
-            mNumEigenvals = e_val_idx + 1;
-            break;
-        }
-    }
-
-    return mNumEigenvals;
-}
-
-template <unsigned SPACE_DIM>
-Eigen::SparseMatrix<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::CalculateCovarianceMatrix(
-        const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept
-{
-    // Create copies of the nodes: it is imperative to keep the oder correct, so we assign sequential indices
-    std::vector<Node<SPACE_DIM>*> node_copies(rNodes.size());
-    for (unsigned node_idx = 0; node_idx < rNodes.size(); ++node_idx)
-    {
-        node_copies[node_idx] = new Node<SPACE_DIM>(node_idx, rNodes[node_idx]->rGetLocation());
-    }
-
-    std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*>> node_pairs;
-    mpBoxCollection->CalculateNodePairs(node_copies, node_pairs);
-
-    // Create a vector of eigen triplets for half the interactions (not including the diagonal) representing the
-    // pairwise covariance using the Gaussian covariance function
-    const double tol_cov = -std::log(1e-15);  // \todo: remove this magic number
-    const double length_squared = mLengthScale * mLengthScale;
-    std::vector<Eigen::Triplet<double>> triplets;
-    for (const auto& pair : node_pairs)
-    {
-        const double dist_squared = GetSquaredDistAtoB(pair.first->rGetLocation(), pair.second->rGetLocation());
-        const double exponent = dist_squared / length_squared;
-
-        if (exponent < tol_cov)
-        {
-            const unsigned a_idx = pair.first->GetIndex();
-            const unsigned b_idx = pair.second->GetIndex();
-
-            // Add both directions, as the box collection does not double-count the pairs
-            triplets.emplace_back(Eigen::Triplet<double>(a_idx, b_idx, std::exp(-exponent)));
-            triplets.emplace_back(Eigen::Triplet<double>(b_idx, a_idx, std::exp(-exponent)));
-        }
-    }
-
-    // Efficiently take case of the diagonal terms
-    for (unsigned node_idx = 0; node_idx < node_copies.size(); ++node_idx)
-    {
-        triplets.emplace_back(Eigen::Triplet<double>(node_idx, node_idx, 1.0));
-    }
-
-    // Create the sparse matrix C given the triplets, and add the identity to capture the self interactions
-    Eigen::SparseMatrix<double> cov_matrix(rNodes.size(), rNodes.size());
-    cov_matrix.setFromTriplets(triplets.begin(), triplets.end());
-
-    // Clean up the temporary nodes we created
-    for (const auto& node : node_copies)
-    {
-        delete(node);
-    }
-
-    return cov_matrix;
 }
 
 template <unsigned SPACE_DIM>
@@ -279,31 +135,6 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     }
 
     return samples;
-
-    /*
-    // Generate a normally-distributed random number for each node in the mesh
-    std::vector<double> samples_from_n01(mNumNodesAtLastUpdate);
-    for (auto& sample : samples_from_n01)
-    {
-        sample = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
-    }
-
-    // Special case of zero correlation length
-    if (mLengthScale == 0.0)
-    {
-        return samples_from_n01;
-    }
-
-    // Generate the instance of the random field
-    Eigen::VectorXd grf = Eigen::VectorXd::Zero(mNumNodesAtLastUpdate);
-    for (unsigned j = 0; j < mEigenvecs.cols(); ++j)
-    {
-        const double factor = samples_from_n01[j] * mSqrtEigenvals.coeffRef(j);
-        grf += factor * mEigenvecs.col(j);
-    }
-
-    // Translate to a std::vector so that eigen objects aren't leaking out to other places in Chaste
-    return std::vector<double>(grf.data(), grf.data() + grf.size());*/
 }
 
 // Explicit instantiation

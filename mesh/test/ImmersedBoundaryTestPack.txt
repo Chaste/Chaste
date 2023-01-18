@@ -1,4 +1,3 @@
-immersed_boundary/TestFftwMethods.hpp
 immersed_boundary/TestFluidSource.hpp
 immersed_boundary/TestImmersedBoundary2dArrays.hpp
 immersed_boundary/TestImmersedBoundaryElement.hpp

@@ -40,10 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 
-// Eigen includes
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-
 #include "ChasteSerialization.hpp"
 #include "Node.hpp"
 #include "ObsoleteBoxCollection.hpp"
@@ -71,17 +67,8 @@ private:
     /** Whether the grid is periodic in each dimension */
     std::array<bool, SPACE_DIM> mPeriodicity;
 
-    /** Number of eigenvalues to calculate in the matrix decomposition */
-    unsigned mNumEigenvals;
-
     /** Length scale over which the noise is to be correlated */
     double mLengthScale;
-
-    /** Array storing the square roots of the first mNumEigenvals largest eigenvalues of the covariance matrix */
-    Eigen::ArrayXd mSqrtEigenvals;
-
-    /** Matrix storing the first mNumEigenvals eigenvectors of the covariance matrix */
-    Eigen::MatrixXd mEigenvecs;
 
     /** An owning pointer to a box collection for efficiently keeping track of nearby nodes */
     std::unique_ptr<ObsoleteBoxCollection<SPACE_DIM>> mpBoxCollection;
@@ -102,20 +89,8 @@ private:
         archive & mLowerCorner;
         archive & mUpperCorner;
         archive & mPeriodicity;
-        archive & mNumEigenvals;
         archive & mLengthScale;
     }
-
-    /**
-     * Helper method for Update().
-     *
-     * This matrix C is of size rNodes.size() x rNodes.size(), where C_ij is the some function of the distance
-     * between locations i and j.  Here, that function is exp{-dist_squared / mLengthScale^2}.
-     *
-     * @param rNodes the nodes in the mesh
-     * @return and Eigen::SparseMatrix<double> holding the point-point covariance data
-     */
-    Eigen::SparseMatrix<double> CalculateCovarianceMatrix(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept;
 
     /**
      * Get the squared distance between two points, which is needed to calculate the covariance matrix.
@@ -143,7 +118,6 @@ public:
     OffLatticeRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
                                    std::array<double, SPACE_DIM> upperCorner,
                                    std::array<bool, SPACE_DIM> periodicity,
-                                   unsigned numEigenvals,
                                    double lengthScale,
                                    double boxWidth=DOUBLE_UNSET);
 
@@ -164,20 +138,6 @@ public:
      * @param rNodes the nodes in the mesh
      */
     void Update(const std::vector<Node<SPACE_DIM>*>& rNodes);
-
-    /**
-     * Tune the number of eigenvalues to calculate, by calculating the majority and determining the number at which
-     * the partial sum of eigenvalues exceeds proportionOfTrace * Trace(C).
-     *
-     * This method re-sets numEigenvals to a value different than that set in the constructor.
-     *
-     * This method returns early if mLengthScale = 0 (noise is not spatially correlated at all).
-     *
-     * @param rNodes
-     * @param proportionOfTrace
-     * @return the number of eigenvalues that will be calculated per update, after this tuning
-     */
-    unsigned TuneNumEigenvals(const std::vector<Node<SPACE_DIM>*>& rNodes, const double proportionOfTrace);
 
     /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then

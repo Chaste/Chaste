@@ -127,33 +127,6 @@ private:
     }
 
     /**
-     * Helper method for the constructor that takes parameters as arguments.
-     *
-     * This is the main workhorse of this class.  Fills in mScaledEigenvecs given the parameters passed to the
-     * constructor, in the case where there is no cache saved to file.
-     *
-     * This method will throw if the Spectra eigen decomposition is unsuccessful.
-     *
-
-     * Uses the Spectra routines to calculate the first N eigenvalues and eigenvectors of this matrix
-     */
-    void CalculateEigenDecomposition();
-
-    /**
-     * Helper method for CalculateEigenDecomposition().
-     *
-     * This method:
-     *  * Creates a grid of Nodes given mLowerCorner, mUpperCorner, and mNumGridPts
-     *  * Calculates (up to tolerance of ~1e-12) a sparse covariance matrix given the grid and mPeriodicity
-     *
-     * This matrix C is of size mNumTotalGridPts x mNumTotalGridPts, where C_ij is the some function of the distance
-     * between grid points i and j.  Here, that function is exp{-dist_squared / mLengthScale^2}.
-     *
-     * @return and Eigen::SparseMatrix<double> holding the point-point covariance data
-     */
-    Eigen::SparseMatrix<double> CalculateCovarianceMatrix() const noexcept;
-
-    /**
      * Get the squared distance between two points, which is needed to calculate the covariance matrix.
      * This function takes into account possible periodicity in the mesh.
      * @param rLocation1 the first location
