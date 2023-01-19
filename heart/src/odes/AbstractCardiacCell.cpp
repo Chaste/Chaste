@@ -78,7 +78,13 @@ OdeSolution AbstractCardiacCell::Compute(double tStart, double tEnd, double tSam
     {
         tSamp = mDt;
     }
-    return mpOdeSolver->Solve(this, rGetStateVariables(), tStart, tEnd, mDt, tSamp);
+    OdeSolution solution = mpOdeSolver->Solve(this, rGetStateVariables(), tStart, tEnd, mDt, tSamp);
+#ifndef NDEBUG
+    // Note that tests which rely on this throwing  (e.g. such-and-such a variable is out of range)
+    // ought to be annotated with the NDEBUG macro
+    VerifyStateVariables();
+#endif // NDEBUG
+    return solution;
 }
 
 void AbstractCardiacCell::ComputeExceptVoltage(double tStart, double tEnd)

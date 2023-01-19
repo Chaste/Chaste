@@ -235,8 +235,8 @@ public:
         double duration = 25;
         HeartConfig::Instance()->SetSimulationDuration(duration); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        double pde_time_step = 0.1; //ms
-        double printing_time_step = 0.1; //ms
+        double pde_time_step = 0.01; //ms
+        double printing_time_step = 0.01; //ms
 
         std::vector<double> fe_node_0;
         std::vector<double> fe_node_100;
