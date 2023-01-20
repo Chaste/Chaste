@@ -59,7 +59,7 @@ public:
         args.push_back("--rush-larsen");
 
         // Models that need a very small dt
-        std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});
+        std::vector<std::string> small_dt_models = special_treatment_models(models, {"li_mouse_2010"});
 
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);

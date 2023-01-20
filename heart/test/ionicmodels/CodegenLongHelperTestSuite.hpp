@@ -241,7 +241,7 @@ protected:
     std::vector<std::string> easy_models;
 
     // Returns a list of all models in special_treatment_models that exist in all_models and deletes these models from all_models
-    std::vector<std::string> spectail_streatment_models(std::vector<std::string>& all_models, std::vector<std::string> special_treatment_models)
+    std::vector<std::string> special_treatment_models(std::vector<std::string>& all_models, std::vector<std::string> special_treatment_models)
     {
         BOOST_FOREACH (std::string model, special_treatment_models)
         {

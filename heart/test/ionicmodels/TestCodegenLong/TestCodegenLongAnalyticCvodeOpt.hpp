@@ -63,12 +63,12 @@ public:
         args.push_back("--opt");
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = spectail_streatment_models(models, {"aslanidi_model_2009",
+        std::vector<std::string> bad_models = special_treatment_models(models, {"aslanidi_model_2009",
                                                                                   "hund_rudy_2004_a",
                                                                                   "livshitz_rudy_2007"});
 
         // Models that need a different lookup table
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"ten_tusscher_model_2004_endo",
+        std::vector<std::string> different_lookup_table_models = special_treatment_models(models, {"ten_tusscher_model_2004_endo",
                                                                                                      "noble_model_1991",
                                                                                                      "luo_rudy_1994"});
 
@@ -78,7 +78,7 @@ public:
         TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
 
         // initial value for membrane_L_type_calcium_current_f_gate in Shannon2004 is slightly above 1 (it is a probability)
-        std::vector<std::string> bigger_tolerance_models = spectail_streatment_models(models, {"Shannon2004"});
+        std::vector<std::string> bigger_tolerance_models = special_treatment_models(models, {"Shannon2004"});
         RunTests(dirname, models, args);
 
         SetUseCvOdeTolerances(1e-4);

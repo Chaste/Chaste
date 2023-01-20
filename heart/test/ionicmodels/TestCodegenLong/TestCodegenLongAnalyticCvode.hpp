@@ -62,7 +62,7 @@ public:
         args.push_back("--use-analytic-jacobian");
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = spectail_streatment_models(models, {"aslanidi_model_2009",
+        std::vector<std::string> bad_models = special_treatment_models (models, {"aslanidi_model_2009",
                                                                                   "hund_rudy_2004_a",
                                                                                   "livshitz_rudy_2007"});
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
@@ -70,7 +70,7 @@ public:
         TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
 
         // initial value for membrane_L_type_calcium_current_f_gate in Shannon2004 is slightly above 1 (it is a probability)
-        std::vector<std::string> bigger_tolerance_models = spectail_streatment_models(models, {"Shannon2004"});
+        std::vector<std::string> bigger_tolerance_models = special_treatment_models(models, {"Shannon2004"});
         RunTests(dirname, models, args);
 
         SetUseCvOdeTolerances(1e-4);

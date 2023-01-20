@@ -62,7 +62,7 @@ public:
 
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
 
-        std::vector<std::string> smaller_timestep_models = spectail_streatment_models(models, {"Shannon2004",
+        std::vector<std::string> smaller_timestep_models = special_treatment_models(models, {"Shannon2004",
                                                                                                "bondarenko_model_2004_apex",
                                                                                                "courtemanche_ramirez_nattel_model_1998",
                                                                                                "demir_model_1994",

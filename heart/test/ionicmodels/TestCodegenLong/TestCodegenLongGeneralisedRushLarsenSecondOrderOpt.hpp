@@ -60,7 +60,7 @@ public:
         args.push_back("--grl2");
         args.push_back("--opt");
 
-        std::vector<std::string> smaller_timestep_models = spectail_streatment_models(models, {"bondarenko_model_2004_apex",
+        std::vector<std::string> smaller_timestep_models = special_treatment_models(models, {"bondarenko_model_2004_apex",
                                                                                                "courtemanche_ramirez_nattel_model_1998",
                                                                                                "demir_model_1994",
                                                                                                "dokos_model_1996",
