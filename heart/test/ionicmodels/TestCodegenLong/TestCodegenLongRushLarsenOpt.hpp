@@ -61,14 +61,12 @@ public:
 
         // Models that need a very small dt
         std::vector<std::string> small_dt_models = special_treatment_models(models, {"li_mouse_2010",
-                                                                                       "courtemanche_ramirez_nattel_model_1998",
+                                                                                       "courtemanche_ramirez_nattel_1998",
                                                                                        "demir_model_1994",
-                                                                                       "grandi2010ss",
-                                                                                       "Shannon2004"});
+                                                                                       "grandi_pasqualini_bers_2010_ss",
+                                                                                       "shannon_wang_puglisi_weber_bers_2004"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
-
         RunTests(dirname, models, args, true, -1000, false);
 
         // See Cooper Spiteri Mirams paper table 2

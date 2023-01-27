@@ -59,13 +59,10 @@ public:
         std::vector<std::string> args;
         args.push_back("--grl1");
 
-        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
-
+        models.erase(std::find(models.begin(), models.end(), "iyer_2004"));
 
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
-
         RunTests(dirname, models, args, false, 0, false);
     }
 

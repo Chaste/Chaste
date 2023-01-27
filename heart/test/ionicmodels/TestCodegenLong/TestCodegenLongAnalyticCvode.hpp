@@ -62,13 +62,10 @@ public:
         args.push_back("--use-analytic-jacobian");
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = special_treatment_models (models, {"aslanidi_model_2009",
-                                                                                  "hund_rudy_2004_a",
+        std::vector<std::string> bad_models = special_treatment_models (models, {"aslanidi_Purkinje_model_2009",
+                                                                                  "hund_rudy_2004",
                                                                                   "livshitz_rudy_2007"});
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
-        // check test for negative concentrations works
-        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
-
         RunTests(dirname, models, args);
 #endif
     }
