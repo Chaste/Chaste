@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from __future__ import print_function  # print without newline character
 
 import platform
+import distro
 
 
 """
@@ -49,9 +50,10 @@ def main():
 
     # Linux
     if platform_name.lower().startswith('linux'):
-        linux_ver = platform.linux_distribution()
-        return '%s %s (%s)' % (linux_ver[0], linux_ver[1], linux_ver[2])
-    # E.g.                      ^ Ubuntu      ^ 14.04       ^ trusty
+        # linux_ver = platform.linux_distribution()
+        # return '%s %s (%s)' % (linux_ver[0], linux_ver[1], linux_ver[2])
+        return f"{distro.name()} {distro.version()} ({distro.codename()})"
+    # E.g.               ^ Ubuntu.       ^ 14.04             ^ trusty
 
     # Mac
     elif platform_name.lower().startswith('darwin'):
