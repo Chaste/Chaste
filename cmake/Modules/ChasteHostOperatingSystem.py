@@ -48,8 +48,6 @@ def main():
 
     # Linux
     if platform_name.lower().startswith('linux'):
-        # linux_ver = platform.linux_distribution()
-        # return '%s %s (%s)' % (linux_ver[0], linux_ver[1], linux_ver[2])
         return f"{distro.name()} {distro.version()} ({distro.codename()})"
     # E.g.               ^ Ubuntu.       ^ 14.04             ^ trusty
 
@@ -57,14 +55,14 @@ def main():
     elif platform_name.lower().startswith('darwin'):
         mac_ver = platform.mac_ver()
         mac_name = get_mac_name_from_darwin_version(mac_ver[0])
-        return '%s (%s)' % (mac_name, mac_ver[0])
-    # E.g.                  ^ macOS Sierra ^ 10.12.6
+        return f"{mac_name} ({mac_ver[0]})"
+    # E.g.        ^ macOS Sierra ^ 10.12.6
 
     # Windows
     elif platform_name.lower().startswith('windows'):
         win_ver = platform.win32_ver()
-        return 'Windows %s %s' % (win_ver[0], win_ver[2])
-    # E.g.                         ^ 7         ^ SP1
+        return f"Windows {win_ver[0]} {win_ver[2]}"
+    # E.g.                ^ 7          ^ SP1
 
     # Unknown
     else:
