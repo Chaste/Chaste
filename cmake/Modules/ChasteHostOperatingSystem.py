@@ -102,6 +102,14 @@ def get_mac_name_from_darwin_version(version_str):
         return 'macOS High Sierra'
     elif version_str.startswith('10.14.'):
         return 'macOS Mojave'
+    elif version_str.startswith('10.15.'):
+        return 'macOS Catalina'
+    elif version_str.startswith('11.'):
+        return 'macOS Big Sur'
+    elif version_str.startswith('12.'):
+        return 'macOS Monterey'
+    elif version_str.startswith('13.'):
+        return 'macOS Ventura'
     else:
         return 'Unknown Mac Version'
 
