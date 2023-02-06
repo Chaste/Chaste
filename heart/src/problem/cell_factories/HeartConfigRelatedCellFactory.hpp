@@ -82,7 +82,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
 #include "NobleVargheseKohlNoble1998aBackwardEuler.hpp"
-#include "Shannon2004.hpp"
+#include "shannon_wang_puglisi_weber_bers_2004.hpp"
 #include "TenTusscher2006EpiOpt.hpp"
 
 /**

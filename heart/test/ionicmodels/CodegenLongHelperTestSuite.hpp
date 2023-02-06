@@ -297,7 +297,7 @@ public:
             catch (const Exception& e)
             {
                 failures.push_back(rModels[i]);
-                EXCEPTION("Failure testing cell model " + rModels[i] + ": " + e.GetMessage());
+                TS_FAIL("Failure testing cell model " + rModels[i] + ": " + e.GetMessage());
             }
             if (!warningsOk)
             {

@@ -58,8 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998a.hpp"
 #include "NobleVargheseKohlNoble1998aCvode.hpp"
 #include "RegularStimulus.hpp"
-#include "Shannon2004.hpp"
-#include "Shannon2004Cvode.hpp"
+#include "shannon_wang_puglisi_weber_bers_2004.hpp"
+#include "shannon_wang_puglisi_weber_bers_2004Cvode.hpp"
 #include "TenTusscher2006Epi.hpp"
 #include "TenTusscher2006EpiCvode.hpp"
 
@@ -96,8 +96,8 @@ public:
                 case 1:
                 {
                     // Shannon model
-                    p_cell_cvode_adaptor.reset(new CellShannon2004FromCellML(p_cvode_adaptor, p_stimulus));
-                    p_cell_cvode.reset(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
+                    p_cell_cvode_adaptor.reset(new Cellshannon_wang_puglisi_weber_bers_2004FromCellML(p_cvode_adaptor, p_stimulus));
+                    p_cell_cvode.reset(new Cellshannon_wang_puglisi_weber_bers_2004FromCellMLCvode(p_solver, p_stimulus));
                     break;
                 }
                 case 2:
