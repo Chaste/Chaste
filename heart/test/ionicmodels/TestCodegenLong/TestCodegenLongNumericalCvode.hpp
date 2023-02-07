@@ -63,6 +63,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
 
         RunTests(dirname, models, args);
+
 #endif
     }
 };

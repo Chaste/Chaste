@@ -72,12 +72,17 @@ public:
                                                                                                      "noble_model_1991",
                                                                                                      "luo_rudy_1994"});
 
+for (std::vector<char>::const_iterator i = models.begin(); i != models.end(); ++i)
+    std::cout << *i << ' ';
+
+for (std::vector<char>::const_iterator i = special_treatment_models.begin(); i != special_treatment_models.end(); ++i)
+    std::cout << *i << ' ';
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        RunTests(dirname, models, args);
+//        RunTests(dirname, models, args);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models, args);
+//        RunTests(dirname, different_lookup_table_models, args);
 
 #endif
     }
