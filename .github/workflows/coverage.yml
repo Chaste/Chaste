@@ -56,8 +56,8 @@ jobs:
 
     - name: run coverage
       run: |
-        lcov --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --directory . --capture --output-file coverage.info
-        lcov --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --remove coverage.info /usr/* */fortests/* */test/* */3rdparty/* */global/src/random/* Debug/* Debug_*/* cxxtest/* --output-file coverage.info
+        lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
+        lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
       working-directory: chaste-build-dir
 
     - name: upload to codecov
