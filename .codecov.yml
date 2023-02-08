@@ -6,6 +6,7 @@
 
 codecov:
   require_ci_to_pass: no
+  branch: develop              # default branch on codecov
 
 coverage:
   status:
