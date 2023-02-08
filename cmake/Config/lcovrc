@@ -127,6 +127,6 @@ lcov_list_width = 80
 lcov_list_truncate_max = 20
 
 # Specify the expression that should be used to ignore single lines.
-lcov_excl_line = (NEVER_REACHED|^\s*assert\s*\(|LCOV_EXCL_LINE|^\s*catch\s*\(|^\s*TERMINATE\s*\()
+lcov_excl_line = (NEVER_REACHED|^\s*assert\s*\(|LCOV_EXCL_LINE|^\s*catch\s*\(|^\s*TERMINATE\s*\(|^\s*}\s*$)
 
 
