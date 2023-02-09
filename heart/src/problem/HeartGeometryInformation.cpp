@@ -293,8 +293,8 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
                 return mDistMapRightVentricle[nodeIndex] ;
                 break;
 
+            // LCOV_EXCL_START
             case UNKNOWN:
-                // LCOV_EXCL_START
                 std::cerr << "Wrong distances node: " << nodeIndex << "\t"
                           << "Epi " << mDistMapEpicardium[nodeIndex] << "\t"
                           << "RV " << mDistMapRightVentricle[nodeIndex] << "\t"
@@ -304,7 +304,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
                 // Make wall_thickness=0 as in Martin's code
                 return 0.0;
                 break;
-                // LCOV_EXCL_STOP
+            // LCOV_EXCL_STOP
 
             default:
                 NEVER_REACHED;

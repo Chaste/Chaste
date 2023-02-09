@@ -359,7 +359,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(
         case 2:
             displacement[1] = yMovement;
         // fallthrough on purpose
-        case 1:
+        case 1: // LCOV_EXCL_LINE
             displacement[0] = xMovement;
             // fallthrough on purpose
     }

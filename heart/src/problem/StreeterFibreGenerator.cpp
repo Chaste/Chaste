@@ -129,7 +129,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetFibreMaxAngle(
                 rv++;
                 break;
 
-            case HeartGeometryInformation<SPACE_DIM>::UNKNOWN:
+            case HeartGeometryInformation<SPACE_DIM>::UNKNOWN: // LCOV_EXCL_LINE
             default:
                 NEVER_REACHED;
         }
