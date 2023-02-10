@@ -243,8 +243,8 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
                 dist_endo = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
                 break;
 
+            // LCOV_EXCL_START
             case HeartGeometryInformation<SPACE_DIM>::UNKNOWN:
-                // LCOV_EXCL_START
                 std::cerr << "Wrong distances node: " << node_index << "\t"
                           << "Epi " << mpGeometryInfo->rGetDistanceMapEpicardium()[node_index] << "\t"
                           << "RV " << mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index] << "\t"
@@ -255,7 +255,7 @@ void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& 
                 dist_epi = 1;
                 dist_endo = 0;
                 break;
-                // LCOV_EXCL_STOP
+            // LCOV_EXCL_STOP
 
             default:
                 NEVER_REACHED;
