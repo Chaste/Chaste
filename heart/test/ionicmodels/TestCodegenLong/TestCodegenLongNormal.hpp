@@ -61,7 +61,6 @@ public:
 
         // Models that need a very small dt
         std::vector<std::string> small_dt_models = special_treatment_models(models, {"pandit_clark_giles_demir_2001_epicardial_cell", "ten_tusscher_model_2006_epi", "li_mouse_2010"});
-
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args);
 
