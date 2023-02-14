@@ -75,7 +75,7 @@ public:
                                                                                              "winslow_model_1999",
                                                                                              "li_mouse_2010"});
 
-        std::vector<std::string> bad_models = special_treatment_models(models, {"faber_rudy_2000"});
+        std::vector<std::string> bad_models = special_treatment_models(models, {"difrancesco_noble_model_1985", "faber_rudy_2000"});
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
 
