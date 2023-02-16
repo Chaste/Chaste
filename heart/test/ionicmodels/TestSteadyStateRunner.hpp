@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "VectorHelperFunctions.hpp" // For CopyToStdVector and DeleteVector
 
-#include "shannon_wang_puglisi_weber_bers_2004Cvode.hpp"
+#include "Shannon2004Cvode.hpp"
 #include "SteadyStateRunner.hpp"
 #include "ZeroStimulus.hpp"
 
@@ -66,7 +66,7 @@ public:
         // Setup a CVODE model that has empty solver and stimulus
         boost::shared_ptr<RegularStimulus> p_stimulus;
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        boost::shared_ptr<AbstractCvodeCell> p_model(new Cellshannon_wang_puglisi_weber_bers_2004FromCellMLCvode(p_solver, p_stimulus));
+        boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
         // Get it to use the default stimulus from CellML
         boost::shared_ptr<RegularStimulus> p_reg_stim = p_model->UseCellMLDefaultStimulus();

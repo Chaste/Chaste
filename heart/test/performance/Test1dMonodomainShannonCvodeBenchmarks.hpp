@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "MonodomainProblem.hpp"
 #include "RegularStimulus.hpp"
-#include "shannon_wang_puglisi_weber_bers_2004.hpp"
-#include "shannon_wang_puglisi_weber_bers_2004Cvode.hpp"
+#include "Shannon2004.hpp"
+#include "Shannon2004Cvode.hpp"
 //#include "Shannon2004BackwardEulerOpt.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "HeartConfig.hpp"
@@ -128,12 +128,12 @@ public:
         p_cvode_solver->SetTolerances(1e-4,1e-6);// NB These defaulted to different values in AbstractCvodeSystem.
         if (pNode->GetPoint()[0] == 0.0)
         {
-            p_cell = new Cellshannon_wang_puglisi_weber_bers_2004FromCellML(p_cvode_solver,
+            p_cell = new CellShannon2004FromCellML(p_cvode_solver,
                                                    mpStimulus);
         }
         else
         {
-            p_cell = new Cellshannon_wang_puglisi_weber_bers_2004FromCellML(p_cvode_solver,
+            p_cell = new CellShannon2004FromCellML(p_cvode_solver,
                                                    this->mpZeroStimulus);
         }
 
@@ -174,12 +174,12 @@ public:
 
         if (pNode->GetPoint()[0] == 0.0)
         {
-            p_cell = new Cellshannon_wang_puglisi_weber_bers_2004FromCellMLCvode(p_empty_solver,
+            p_cell = new CellShannon2004FromCellMLCvode(p_empty_solver,
                                                         mpStimulus);
         }
         else
         {
-            p_cell = new Cellshannon_wang_puglisi_weber_bers_2004FromCellMLCvode(p_empty_solver,
+            p_cell = new CellShannon2004FromCellMLCvode(p_empty_solver,
                                                         this->mpZeroStimulus);
         }
         // p_cell->SetMinimalReset(true); // This is now done by AbstractCardiacCellFactory for any AbstractCvodeCell.
@@ -245,7 +245,7 @@ public:
         {
             HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/forward_euler");
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0025,pde_time_step,printing_time_step);
-            ShannonCardiacCellFactory<Cellshannon_wang_puglisi_weber_bers_2004FromCellML> cell_factory;
+            ShannonCardiacCellFactory<CellShannon2004FromCellML> cell_factory;
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
@@ -267,10 +267,10 @@ public:
         /*
          * To test backward Euler you need to generate an extra Chaste variant of the model from the CellML.
          *
-         * i.e. go to heart/src/odes/cellml/shannon_wang_puglisi_weber_bers_2004-conf.xml and add
+         * i.e. go to heart/src/odes/cellml/Shannon2004-conf.xml and add
          * <arg>--backward-euler</arg>
          *
-         * then uncomment the //#include "shannon_wang_puglisi_weber_bers_2004BackwardEulerOpt.hpp" and the below block of code.
+         * then uncomment the //#include "Shannon2004BackwardEulerOpt.hpp" and the below block of code.
          *
          * Same idea for checking optimised models.
          */
@@ -278,7 +278,7 @@ public:
 //        {
 //            HeartConfig::Instance()->SetOutputDirectory("ShannonBenchmark/backward_euler");
 //            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(pde_time_step,pde_time_step,printing_time_step);
-//            ShannonCardiacCellFactory<Cellshannon_wang_puglisi_weber_bers_2004FromCellMLBackwardEulerOpt> cell_factory;
+//            ShannonCardiacCellFactory<CellShannon2004FromCellMLBackwardEulerOpt> cell_factory;
 //            MonodomainProblem<1> monodomain_problem( &cell_factory );
 //
 //            monodomain_problem.Initialise();

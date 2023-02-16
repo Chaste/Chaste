@@ -67,7 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProperties.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "RegularStimulus.hpp"
-#include "shannon_wang_puglisi_weber_bers_2004Cvode.hpp"
+#include "Shannon2004Cvode.hpp"
 #include "SteadyStateRunner.hpp"
 /* This test is always run sequentially (never in parallel)*/
 #include "FakePetscSetup.hpp"
@@ -99,7 +99,7 @@ public:
          */
         boost::shared_ptr<RegularStimulus> p_stimulus;
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        boost::shared_ptr<AbstractCvodeCell> p_model(new Cellshannon_wang_puglisi_weber_bers_2004FromCellMLCvode(p_solver, p_stimulus));
+        boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
         /*
          * Once the model is set up we can tell it to use the the default stimulus from CellML,
@@ -256,7 +256,7 @@ public:
         bool clean_dir = false;
         unsigned precision = 6u;
         bool include_derived_quantities = true;
-        solution.WriteToFile("TestCvodeCells", "shannon_wang_puglisi_weber_bers_2004Cvode", "ms", steps_per_row, clean_dir, precision, include_derived_quantities);
+        solution.WriteToFile("TestCvodeCells", "Shannon2004Cvode", "ms", steps_per_row, clean_dir, precision, include_derived_quantities);
 
         /*
          * == Calculating APD and Upstroke Velocity ==
@@ -279,8 +279,8 @@ public:
          *
          * (These reference values were generated with tolerances of Abs=1e-12, Rel=1e-12.)
          */
-        TS_ASSERT_DELTA(apd, 212.411, 1e-2);
-        TS_ASSERT_DELTA(upstroke_velocity, 338.704, 1.25);
+        TS_ASSERT_DELTA(apd, 211.9487, 1e-2);
+        TS_ASSERT_DELTA(upstroke_velocity, 337.4159, 1.25);
 
         /* CVODE is still an optional dependency for Chaste, but is required for this tutorial.
          * If CVODE is not installed this tutorial will
