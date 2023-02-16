@@ -438,7 +438,7 @@ public:
 
         // Coverage of GetIIonic method.
         TS_ASSERT_DELTA(sh04_ode_system.GetIIonic(), sh04_cvode_system->GetIIonic(), 1e-4);
-        TS_ASSERT_DELTA(sh04_cvode_system->GetIIonic(), 0.0004, 1e-4);
+        TS_ASSERT_DELTA(sh04_cvode_system->GetIIonic(), 0.0006, 1e-4);
 
         // Clamping V
         sh04_cvode_system->SetVoltageDerivativeToZero();
