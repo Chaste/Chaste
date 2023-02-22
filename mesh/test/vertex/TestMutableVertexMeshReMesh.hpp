@@ -310,11 +310,6 @@ public:
         std::vector< c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
         //Check location
         // Test T1 swap location tracking
-        std::vector<c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
-        // Test T1 swap location tracking
-        std::vector<T1SwapInfo<2> > swap_info
-                    = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
-        std::vector<c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
         TS_ASSERT_EQUALS(t1_locations.size(), 1u);
         TS_ASSERT_DELTA(t1_locations[0][0], 0.5, 1e-6);
         TS_ASSERT_DELTA(t1_locations[0][1], 0.5, 1e-6);
@@ -925,8 +920,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
@@ -983,8 +976,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);
 
         // Perform a T2 swap on the central triangle element
@@ -1767,7 +1758,6 @@ public:
 
         MutableVertexMesh<2,2> mesh(nodes, elements);
         mesh.SetMeshOperationTracking(true);
-        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         // Test default value of mCheckForT3Swaps, as well as setting and getting
         TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
@@ -3048,8 +3038,6 @@ public:
 
         MutableVertexMesh<2,2> mesh(nodes, elements);
         mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> mesh(nodes, elements);
-        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
