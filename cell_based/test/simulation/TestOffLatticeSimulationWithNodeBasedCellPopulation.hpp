@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,30 +41,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include "CellsGenerator.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "Cylindrical2dNodesOnlyMesh.hpp"
-#include "PeriodicNodesOnlyMesh.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
-#include "RandomCellKiller.hpp"
-#include "PlaneBasedCellKiller.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
-#include "LogFile.hpp"
-#include "WildTypeCellMutationState.hpp"
-#include "PlaneBoundaryCondition.hpp"
-#include "SmartPointers.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellsGenerator.hpp"
+#include "Cylindrical2dNodesOnlyMesh.hpp"
 #include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
+#include "GeneralisedLinearSpringForce.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "LogFile.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "PeriodicNodesOnlyMesh.hpp"
+#include "PlaneBasedCellKiller.hpp"
+#include "PlaneBoundaryCondition.hpp"
+#include "RandomCellKiller.hpp"
+#include "SmartPointers.hpp"
+#include "WildTypeCellMutationState.hpp"
 
 // Cell population writers
+#include "CellDivisionLocationsWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
-#include "CellPopulationAreaWriter.hpp"
+#include "CellRemovalLocationsWriter.hpp"
 #include "NodeVelocityWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
@@ -171,8 +173,8 @@ public:
         std::vector<Node<2>*> nodes = GenerateMesh(num_cells_width,num_cells_depth);
 
         // Create the mesh
-	    NodesOnlyMesh<2> mesh; 
-	    mesh.ConstructNodesWithoutMesh(nodes,1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes,1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -375,8 +377,8 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
      * to test periodicity.
      */
-    
-    void TestSimpleYPeriodicMonolayer() 
+
+    void TestSimpleYPeriodicMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -515,8 +517,8 @@ public:
      * Create a simulation of a NodeBasedCellPopulation with a PeriodicNodesOnlyMesh
      * to test periodicity.
      */
-    
-    void TestSimpleXYPeriodicMonolayer() 
+
+    void TestSimpleXYPeriodicMonolayer()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -628,7 +630,7 @@ public:
             {
                 TS_ASSERT_DELTA(y_1-offset, y_2, 1e-6)
             }
-            
+
         }
 
     }
@@ -899,8 +901,85 @@ public:
         FileFinder reference_type_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results.vizcelltypes",RelativeTo::ChasteSourceRoot);
         FileFinder reference_node_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results.viznodes",RelativeTo::ChasteSourceRoot);
 
-        FileComparison type_files(generated_type_file,reference_type_file);
-        FileComparison node_files(generated_node_file,reference_node_file);
+        FileComparison type_files(generated_type_file, reference_type_file);
+        FileComparison node_files(generated_node_file, reference_node_file);
+
+        TS_ASSERT(type_files.CompareFiles());
+        TS_ASSERT(node_files.CompareFiles());
+    }
+
+    /**
+     * Create a simulation of a NodeBasedCellPopulation with a NodeBasedCellPopulationMechanicsSystem
+     * CellProliferation and a CellKiller. Test that no exceptions are thrown, and write the results to file.
+     */
+    void TestRecordingCellBirthDeath()
+    {
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator does not work in parallel.
+
+        // Create a simple mesh
+        int num_cells_depth = 5;
+        int num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        TetrahedralMesh<2, 2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+
+        // Create a node based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+        //Add a cell removal writer to output cell deaths
+        node_based_cell_population.AddCellPopulationEventWriter<CellDivisionLocationsWriter>();
+        node_based_cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs");
+        simulator.SetEndTime(1.0);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        // Add cell killer
+        c_vector<double, 2> normal = zero_vector<double>(2);
+        normal[1] = 1.0;
+        c_vector<double, 2> point = zero_vector<double>(2);
+        point[1] = 3.5;
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&node_based_cell_population, point, normal)); // y>3.5
+        simulator.AddCellKiller(p_killer);
+
+        // Solve
+        simulator.Solve();
+
+        // Check some results
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 1u);
+
+        // Test the results are written correctly
+        FileFinder generated_node_file("TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs/results_from_time_0/results.viznodes", RelativeTo::ChasteTestOutput);
+        FileFinder generated_division_file("TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs/results_from_time_0/divisions.dat", RelativeTo::ChasteTestOutput);
+        FileFinder generated_removal_file("TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs/results_from_time_0/removals.dat", RelativeTo::ChasteTestOutput);
+
+        FileFinder reference_node_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs/results.viznodes", RelativeTo::ChasteSourceRoot);
+        FileFinder reference_division_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs/divisions.dat", RelativeTo::ChasteSourceRoot);
+        FileFinder reference_removal_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationOutputs/removals.dat", RelativeTo::ChasteSourceRoot);
+
+        FileComparison node_files(generated_node_file, reference_node_file);
+        FileComparison division_files(generated_division_file, reference_division_file);
+        FileComparison removal_files(generated_removal_file, reference_removal_file);
+
+        TS_ASSERT(node_files.CompareFiles());
+        TS_ASSERT(division_files.CompareFiles());
+        TS_ASSERT(removal_files.CompareFiles());
     }
 
     double mNode3x, mNode4x, mNode3y, mNode4y; // To preserve locations between the below test and test load.

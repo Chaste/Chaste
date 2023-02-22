@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -312,9 +312,9 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
         }
         // Periodic cases
 
-        // LCOV_EXCL_START 
-        /* This block cannot be covered by regular testing, 
-         * but it is covered by the Nightly -np 3 builder 
+        // LCOV_EXCL_START
+        /* This block cannot be covered by regular testing,
+         * but it is covered by the Nightly -np 3 builder
          * See TestGetNodesOutsideLocalDomainwithPeriodicMesh
          */
         else if ( owning_process == (PetscTools::GetNumProcs()-1) )
@@ -546,7 +546,7 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
         for (unsigned d=0; d<SPACE_DIM; d++)
         {
-            if ( !is_periodic(d) && 
+            if ( !is_periodic(d) &&
                  ( location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation) ) )
             {
                 is_local_node_close = 1;

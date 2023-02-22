@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,7 +115,7 @@ public:
 
             if (p_vector_factory->GetLocalOwnership() > 0)
             {
-                // One warning will come from the lookup table hitting an nan                
+                // One warning will come from the lookup table hitting an nan
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
                 std::stringstream msg;
                 msg << "Cannot apply drug to cell at node " << p_vector_factory->GetLow() << " as it has no parameter named 'not_a_current_conductance'.";
@@ -649,11 +649,11 @@ public:
 
         std::vector<std::string> args;
         args.push_back("--cvode");
-	CellMLToSharedLibraryConverter converter(true);
-	converter.SetOptions(args);
-	// Need to perform conversion here as otherwise we can't tell it to convert a cvode
+    CellMLToSharedLibraryConverter converter(true);
+    converter.SetOptions(args);
+    // Need to perform conversion here as otherwise we can't tell it to convert a cvode
         // It would work with a normal model too, without pre-converting this is tested in TestCardiacSimulationPatchwork
-       	FileFinder copied_file("DynamicallyLoadedModelCvode/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteTestOutput);
+           FileFinder copied_file("DynamicallyLoadedModelCvode/luo_rudy_1991_dyn.cellml", RelativeTo::ChasteTestOutput);
         converter.Convert(copied_file);
         CardiacSimulation simulation("heart/test/data/xml/dynamic_cvode_model.xml");
 #else

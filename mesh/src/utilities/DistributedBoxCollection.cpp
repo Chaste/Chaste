@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -153,7 +153,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
             mHalosRight.push_back(global_index - mNumBoxesInAFace);
         }
     }
-    // Otherwise if I am the top most and periodic in y (2d) or z (3d) add halo boxes for 
+    // Otherwise if I am the top most and periodic in y (2d) or z (3d) add halo boxes for
     // the base process
     else if ( mIsPeriodicAcrossProcs )
     {
@@ -182,7 +182,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
             mHalosLeft.push_back(global_index  + mNumBoxesInAFace);
         }
     }
-    // Otherwise if I am the bottom most and periodic in y (2d) or z (3d) add halo boxes for 
+    // Otherwise if I am the bottom most and periodic in y (2d) or z (3d) add halo boxes for
     // the top process
     else if ( mIsPeriodicAcrossProcs )
     {
@@ -635,7 +635,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                 // Locally store the bottom processor row
                 unsigned bottom_proc = mpDistributedBoxStackFactory->GetLow();
                 unsigned top_proc = mpDistributedBoxStackFactory->GetHigh();
-                
+
                 // Outer loop: over y
                 for ( unsigned j = j_start; j < (j_end+1); j++ )
                 {
@@ -646,7 +646,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         /* We want to add (for non-boundary)
                         (i-1,j+1) (i,j+1) (i+1,j+1)
                                     (i,j)   (i+1,j)   */
-                        
+
                         int j_mod = j; // This is used to account for y periodic boundaries
                         // If we are on the bottom of the processor, we may need to add the row below
                         int dj = -1 * (int)(j == bottom_proc && (j > 0 || (mIsPeriodicInY && top_proc < nJ)) );
@@ -661,7 +661,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                 j_mod_2 = ( dj < 0 ) ? nJ : 0;
                             }
 
-                            // The -1*dj ensures we get the upper left, the max ensures we don't hit the left boundary, 
+                            // The -1*dj ensures we get the upper left, the max ensures we don't hit the left boundary,
                             // the min ensures we don't hit the right boundary
                             int boxi = std::max((int) i-1*std::abs(dj),(int) 0);
                             for ( ; boxi < std::min((int)i+2,(int)nI); boxi++ )
@@ -673,7 +673,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                             {
                                 local_boxes.insert( (j_mod+dj+j_mod_2)*nI );
                             }
-                            // If the y boundary is periodic, the new j level is the bottom row; we use jmod to adjust 
+                            // If the y boundary is periodic, the new j level is the bottom row; we use jmod to adjust
                             // for this to adjust for dj = 1
                             if ( mIsPeriodicInY && j == (nJ-1) && dj == 0 )
                             {
@@ -707,7 +707,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         mLocalBoxes.push_back(local_boxes);
                     }
                 }
-                
+
                 break;
             }
             case 3:
@@ -718,7 +718,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                 // Now we need to work out the min and max z indices
                 unsigned k_start = CalculateGridIndices(mMinBoxIndex)(2);
                 unsigned k_end = CalculateGridIndices(mMaxBoxIndex)(2);
-                
+
                 // Determine the number of boxes in each direction
                 unsigned nI = mNumBoxesEachDirection(0);
                 unsigned nJ = mNumBoxesEachDirection(1);
@@ -727,7 +727,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                 // Work out the bottom/top processor
                 unsigned bottom_proc = mpDistributedBoxStackFactory->GetLow();
                 unsigned top_proc = mpDistributedBoxStackFactory->GetHigh();
-                
+
                 // Outer loop: over z
                 for ( unsigned k = k_start; k <= k_end; k++ )
                 {
@@ -738,14 +738,14 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         for ( unsigned i = 0; i < nI; i++ )
                         {
                             std::set<unsigned> local_boxes;
-                            
+
                             // Same z level
                             unsigned z_offset = k*nI*nJ;
                             // (See case dim=2 for commented code of X-Y implementation)
                             int j_mod = (int)j;
                             for ( int dj = 0; dj < std::min((int)nJ-j_mod,2); dj++ )
                             {
-                                for ( int boxi = std::max((int)i-1*dj,0); 
+                                for ( int boxi = std::max((int)i-1*dj,0);
                                             boxi < std::min((int)i+2,(int)nI); boxi++ )
                                 {
                                     local_boxes.insert( z_offset + (j_mod+dj)*nI + boxi );
@@ -791,7 +791,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                             {
                                 k_offset.push_back(nK-1);
                             }
-                            
+
                             for ( std::vector<unsigned>::iterator k_offset_it = k_offset.begin(); k_offset_it != k_offset.end(); ++k_offset_it )
                             {
                                 z_offset = (*k_offset_it)*nI*nJ;
@@ -804,11 +804,11 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                     {
                                         int box_to_add = z_offset + (boxj*(int)nI) + boxi;
                                         // Check for x periodicity
-                                        // i==(nI-1) only when we are periodic and on the right, 
+                                        // i==(nI-1) only when we are periodic and on the right,
                                         // i==-1 only when we are periodic and on the left
                                         box_to_add += ( (unsigned)(boxi==-1) - (unsigned)(boxi==(int)nI) )*nI;
                                         // Check for y periodicity
-                                        // j==nJ only when we are periodic and on the right, 
+                                        // j==nJ only when we are periodic and on the right,
                                         // j==-1 only when we are periodic and on the left
                                         box_to_add += ( (unsigned)(boxj==-1) - (unsigned)(boxj==(int)nJ) )*nI*nJ;
                                         local_boxes.insert( box_to_add );
@@ -1203,7 +1203,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     if ( !is_zmin[i] )
                     {
                         z_i_offsets.push_back(-M*N); // Add the z box level below
-                    } 
+                    }
                     if ( !is_zmax[i] )
                     {
                         z_i_offsets.push_back(M*N); // Add the z box level above
@@ -1227,7 +1227,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                             }
                         }
                     }
-                    
+
                     // If we are on the right, add the nine on the left
                     else if ( is_xmax[i] )
                     {
@@ -1337,7 +1337,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                             // Lower z level
                             local_boxes.insert(i-2*(N-1)*M-1);
                         }
-                        
+
                     }
                     if ( is_xmax[i] && is_ymax[i] )
                     {
@@ -1351,7 +1351,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                             // Lower z level
                             local_boxes.insert(i - 2*M*N + 1);
                         }
-                        
+
                     }
                 }
 
@@ -1397,9 +1397,9 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                             {
                                 // Add the xy periodic box in top layer if at y min or max
                                 local_boxes.insert(above_box-M*(N-2)-1);
-                            }  
+                            }
                         }
-                        
+
                         if (!is_xmax[i])
                         {
                             // Also add the boxes to the left and at the top
@@ -1429,7 +1429,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                                     // Add the xy periodic box in top layer if at y min or max
                                     local_boxes.insert(above_box-M*N+1);
                                 }
-                            }  
+                            }
                         }
 
 
@@ -1440,7 +1440,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                         else if ( mIsPeriodicInY )
                         {
                             local_boxes.insert(above_box-M*(N-1));
-                            if ( !is_xmin[i] ) 
+                            if ( !is_xmin[i] )
                             {
                                 local_boxes.insert(above_box-M*(N-1)-1);
                             }
@@ -1456,7 +1456,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                         else if ( mIsPeriodicInY )
                         {
                             local_boxes.insert(above_box+M*(N-1));
-                            if ( !is_xmin[i] ) 
+                            if ( !is_xmin[i] )
                             {
                                 local_boxes.insert(above_box+M*(N-1)-1);
                             }
@@ -1501,9 +1501,9 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                                     // Add the xy periodic box in top layer if at y min or max
                                     local_boxes.insert(below_box-M*(N-2)-1);
                                 }
-                            }  
+                            }
                         }
-                        
+
                         if (!is_xmax[i])
                         {
                             // Also add the boxes to the left and at the top
@@ -1533,7 +1533,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                                     // Add the xy periodic box in top layer if at y min or max
                                     local_boxes.insert(below_box-M*N+1);
                                 }
-                            }  
+                            }
                         }
 
 
