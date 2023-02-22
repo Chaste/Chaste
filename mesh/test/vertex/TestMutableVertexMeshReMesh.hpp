@@ -2742,7 +2742,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
@@ -2850,7 +2849,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
@@ -2920,7 +2918,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.ReMesh(); // Edges too long so nothing happens
 
@@ -3139,7 +3136,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Move node 4 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
@@ -3234,7 +3230,6 @@ public:
 
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);//For coverage
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Move node 5 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();
