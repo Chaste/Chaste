@@ -353,10 +353,14 @@ private:
         archive & mDeletedElementIndices;
         archive & mDistanceForT3SwapChecking;
 <<<<<<< HEAD
+<<<<<<< HEAD
         archive & mOperationRecorder;
 =======
         archive & mCheckForT3Swaps;
 >>>>>>> origin/develop
+=======
+        archive & mCheckForT3Swaps;
+>>>>>>> 2659b88b542ef9a0af2f2565a281f2537ac49a0e
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
@@ -531,16 +535,22 @@ public:
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
      * This is a shortcut to get locations from mOperationRecorder
      * @return the locations of the T3 swaps
 =======
+=======
+>>>>>>> 2659b88b542ef9a0af2f2565a281f2537ac49a0e
      * @return mCheckForT3Swaps, either to check for T3 swaps or not.
      */
     bool GetCheckForT3Swaps() const;
 
     /**
      * @return the locations of the T1 swaps
+<<<<<<< HEAD
 >>>>>>> origin/develop
+=======
+>>>>>>> 2659b88b542ef9a0af2f2565a281f2537ac49a0e
      */
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
 
