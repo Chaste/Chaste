@@ -59,6 +59,7 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
      * The static_cast will work since we already know it's a VertexBasedCellPopulation.
      */
     MutableVertexMesh<DIM,DIM>& mesh = static_cast<MutableVertexMesh<DIM,DIM>&>(this->mpCellPopulation->rGetMesh());
+    VertexBasedCellPopulation<DIM>* p_vertex_population = static_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation);
     VertexElementMap element_map(mesh.GetNumAllElements());
 
     bool recheck_mesh = true;
