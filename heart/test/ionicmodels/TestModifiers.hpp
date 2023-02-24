@@ -73,7 +73,7 @@ private:
                    boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
                       OutputFileHandler handler("TestModifiers", true);
 
-                   FileFinder cellml_file("heart/test/data/cellml/cellml/cellml/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteSourceRoot);
+                   FileFinder cellml_file("_deps/cellml_repo-src/cellml/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteBuildRoot);
                       handler.CopyFileTo(cellml_file);
 
                CellMLToSharedLibraryConverter converter(true);
