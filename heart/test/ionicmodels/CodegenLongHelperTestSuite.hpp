@@ -170,7 +170,7 @@ private:
     {
         // Copy CellML file into output dir
         OutputFileHandler handler(rOutputDirName, true);
-        FileFinder cellml_file("heart/test/data/cellml/cellml/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
+        FileFinder cellml_file("_deps/cellml_repo-src/cellml/" + rModelName + ".cellml", RelativeTo::ChasteBuildRoot);
         handler.CopyFileTo(cellml_file);
 
         //Out files no longer needed with codegen

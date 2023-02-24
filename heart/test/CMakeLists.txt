@@ -29,7 +29,9 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+include(FetchContent)
+FetchContent_Declare(CellML_repo URL https://github.com/Chaste/cellml/archive/refs/heads/master.zip)
+FetchContent_MakeAvailable(CellML_repo)
 
-project(testheart)
 
 chaste_do_test_component(heart)
