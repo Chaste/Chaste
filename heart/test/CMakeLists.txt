@@ -29,6 +29,11 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Download the (relevant commit of the) CellML repo for use in tests
+#
+# CellMl files are found using cmake_fetch in /heart/test/CMakeLists.txt 
+# the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src/cellml/ 
+
 include(FetchContent)
 FetchContent_Declare(CellML_repo
                      GIT_REPOSITORY https://github.com/Chaste/cellml.git
