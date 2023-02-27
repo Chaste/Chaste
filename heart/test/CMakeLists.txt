@@ -30,7 +30,9 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 include(FetchContent)
-FetchContent_Declare(CellML_repo URL https://github.com/Chaste/cellml/archive/refs/heads/master.zip)
+FetchContent_Declare(CellML_repo
+                     GIT_REPOSITORY https://github.com/Chaste/cellml.git
+                     GIT_TAG 09720d70c6a2676225a9325d625331258821ef81)
 FetchContent_MakeAvailable(CellML_repo)
 
 

@@ -344,14 +344,14 @@ public:
         // Need to load dynamicly as we don't have config files anymore
            OutputFileHandler handler("TestCvodeCells", true);
 
-        FileFinder cellml_file("_deps/cellml_repo-src/cellml/Shannon2004.cellml", RelativeTo::ChasteBuildRoot);
+        FileFinder cellml_file("_deps/cellml_repo-src/cellml/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteBuildRoot);
            handler.CopyFileTo(cellml_file);
 
            CellMLToSharedLibraryConverter converter(true);
            converter.SetOptions({"-m", "--cvode"});
 
         // Do the conversion
-           FileFinder copied_file("TestCvodeCells/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+           FileFinder copied_file("TestCvodeCells/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteTestOutput);
 
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
            AbstractCardiacCellWithModifiers<AbstractCvodeCell>* sh04_cvode_system = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
