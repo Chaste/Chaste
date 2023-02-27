@@ -344,7 +344,7 @@ public:
         // Need to load dynamicly as we don't have config files anymore
            OutputFileHandler handler("TestCvodeCells", true);
 
-        FileFinder cellml_file("heart/src/odes/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
+        FileFinder cellml_file("_deps/cellml_repo-src/cellml/Shannon2004.cellml", RelativeTo::ChasteBuildRoot);
            handler.CopyFileTo(cellml_file);
 
            CellMLToSharedLibraryConverter converter(true);
