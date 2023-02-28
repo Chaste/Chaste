@@ -60,26 +60,17 @@ public:
         args.push_back("--backward-euler");
 
         // models that need a smaller dt
-        std::vector<std::string> diff_models = special_treatment_models(models, {"iyer_model_2004",
-                                                                                   "iyer_model_2007",
-                                                                                   "jafri_rice_winslow_model_1998",
-                                                                                   "pandit_model_2001_epi",
-                                                                                   "priebe_beuckelmann_model_1998",
-                                                                                   "viswanathan_model_1999_epi",
-                                                                                   "winslow_model_1999"});
+        std::vector<std::string> diff_models = special_treatment_models(models, {"difrancesco_noble_model_1985",
+                                                                                 "faber_rudy_2000",
+                                                                                 "iyer_2004",
+                                                                                 "iyer_model_2007",
+                                                                                 "jafri_rice_winslow_model_1998",
+                                                                                 "winslow_model_1999"});
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = special_treatment_models(models, {"hund_rudy_2004_a"});
-
+        std::vector<std::string> bad_models = special_treatment_models(models, {"hund_rudy_2004"});
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
-        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
-
-        // initial value for membrane_L_type_calcium_current_f_gate in Shannon2004 is slightly above 1 (it is a probability)
-        std::vector<std::string> bigger_tolerance_models = special_treatment_models(models, {"Shannon2004"});
         RunTests(dirname, models, args);
-
-        SetUseCvOdeTolerances(1e-4);
-        RunTests(dirname, bigger_tolerance_models, args);
 
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);

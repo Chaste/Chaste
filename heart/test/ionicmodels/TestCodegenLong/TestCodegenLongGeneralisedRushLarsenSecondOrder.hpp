@@ -59,10 +59,9 @@ public:
         std::vector<std::string> args;
         args.push_back("--grl2");
 
+        std::vector<std::string> bad_models = special_treatment_models(models, {"difrancesco_noble_model_1985", "faber_rudy_2000"});
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
-
         RunTests(dirname, models, args, false, 0, false);
     }
 };

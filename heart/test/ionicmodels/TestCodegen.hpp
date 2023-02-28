@@ -60,9 +60,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
 #include "NobleVargheseKohlNoble1998aBackwardEulerOpt.hpp"
 
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion.hpp"
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionOpt.hpp"
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionBackwardEulerOpt.hpp"
+
 #ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
 #include "LuoRudy1991CvodeOpt.hpp"
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionCvodeOpt.hpp"
 #endif // CHASTE_CVODE
 
 //This test is always run sequentially (never in parallel)
@@ -159,8 +164,13 @@ public:
         double end_time = 1000.0; //One second in milliseconds
         double i_ionic_end_time = 60.0; // ms
         double i_ionic = 1.9411; // test value
+        double sampling_interval = 1.0; // for testing codegen error check
 
         // Normal model
+        // test error from codegen about concentration
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellML normal_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_THIS(normal_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0\n\nState:\n\tmembrane_voltage:-75.6527 millivolt\n\tcytosolic_calcium_concentration:1.82277e-05 millimolar\n\tmembrane_fast_sodium_current_m_gate:0.0955691 dimensionless\n\tmembrane_fast_sodium_current_h_gate:0.816449 dimensionless\n\tmembrane_fast_sodium_current_j_gate:0.22308 dimensionless\n\tmembrane_L_type_calcium_current_d_gate:7.42312e-05 dimensionless\n\tmembrane_L_type_calcium_current_f_gate:0.9493 dimensionless\n\tmembrane_L_type_calcium_current_f2_gate:0.999975 dimensionless\n\tmembrane_L_type_calcium_current_fCa_gate:0.998916 dimensionless\n\ti_Kr_Xr1_gate__Xr1:0.0170191 dimensionless\n\ti_Kr_Xr2_gate__Xr2:0.438636 dimensionless\n\ti_Ks_Xs_gate__Xs:0.0298399 dimensionless\n\tmembrane_hyperpolarisation_activated_funny_current_single_gate:0.0852445 dimensionless\n\ti_to_q_gate__q:0.852268 dimensionless\n\ti_to_r_gate__r:0.0053468 dimensionless\n\tcytosolic_sodium_concentration:10.9304 millimolar\n\tJSR_calcium_concentration:-0.273443 millimolar\n\tcalcium_dynamics__g:1 dimensionless\n");
+
         CellLuoRudy1991FromCellML normal(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(normal.GetVoltageIndex(), 0u);
         CheckCai(normal, true, 0.0002);
@@ -169,12 +179,18 @@ public:
         normal.SetTimestep(HeartConfig::Instance()->GetOdeTimeStep());
 
         // Optimised model
+        // test error from codegen about concentration
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLOpt opt_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_THIS(opt_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0\n\nState:\n\tmembrane_voltage:-75.6527 millivolt\n\tcytosolic_calcium_concentration:1.82277e-05 millimolar\n\tmembrane_fast_sodium_current_m_gate:0.0955691 dimensionless\n\tmembrane_fast_sodium_current_h_gate:0.816449 dimensionless\n\tmembrane_fast_sodium_current_j_gate:0.22308 dimensionless\n\tmembrane_L_type_calcium_current_d_gate:7.42312e-05 dimensionless\n\tmembrane_L_type_calcium_current_f_gate:0.9493 dimensionless\n\tmembrane_L_type_calcium_current_f2_gate:0.999975 dimensionless\n\tmembrane_L_type_calcium_current_fCa_gate:0.998916 dimensionless\n\ti_Kr_Xr1_gate__Xr1:0.0170191 dimensionless\n\ti_Kr_Xr2_gate__Xr2:0.438636 dimensionless\n\ti_Ks_Xs_gate__Xs:0.0298399 dimensionless\n\tmembrane_hyperpolarisation_activated_funny_current_single_gate:0.0852445 dimensionless\n\ti_to_q_gate__q:0.852268 dimensionless\n\ti_to_r_gate__r:0.0053468 dimensionless\n\tcytosolic_sodium_concentration:10.9304 millimolar\n\tJSR_calcium_concentration:-0.273443 millimolar\n\tcalcium_dynamics__g:1 dimensionless\n");
         AbstractLookupTableCollection::EventHandler::Enable();
         CellLuoRudy1991FromCellMLOpt opt(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(opt.GetVoltageIndex(), 0u);
         CheckCai(opt, true, 0.0002);
 
         // Backward Euler optimised model
+        // test error from codegen about concentration
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLBackwardEulerOpt be_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_THIS(be_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0\n\nState:\n\tmembrane_voltage:-74.3339 millivolt\n\tcytosolic_calcium_concentration:1.80774e-05 millimolar\n\tmembrane_fast_sodium_current_m_gate:0.102954 dimensionless\n\tmembrane_fast_sodium_current_h_gate:0.786924 dimensionless\n\tmembrane_fast_sodium_current_j_gate:0.253946 dimensionless\n\tmembrane_L_type_calcium_current_d_gate:8.96105e-05 dimensionless\n\tmembrane_L_type_calcium_current_f_gate:0.970413 dimensionless\n\tmembrane_L_type_calcium_current_f2_gate:0.999966 dimensionless\n\tmembrane_L_type_calcium_current_fCa_gate:0.998925 dimensionless\n\ti_Kr_Xr1_gate__Xr1:0.00778489 dimensionless\n\ti_Kr_Xr2_gate__Xr2:0.432162 dimensionless\n\ti_Ks_Xs_gate__Xs:0.0322947 dimensionless\n\tmembrane_hyperpolarisation_activated_funny_current_single_gate:0.100616 dimensionless\n\ti_to_q_gate__q:0.839295 dimensionless\n\ti_to_r_gate__r:0.00573294 dimensionless\n\tcytosolic_sodium_concentration:10.9248 millimolar\n\tJSR_calcium_concentration:-0.273423 millimolar\n\tcalcium_dynamics__g:1 dimensionless\n");
         CellLuoRudy1991FromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
 
         TS_ASSERT_EQUALS(be.GetVoltageIndex(), 0u);
@@ -315,6 +331,10 @@ public:
 
 #ifdef CHASTE_CVODE
         // CVODE version
+        // test error from codegen about concentration
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLCvodeOpt cvode_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_THIS(cvode_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0\n\nState:\n\tmembrane_voltage:-74.321 millivolt\n\tcytosolic_calcium_concentration:1.80786e-05 millimolar\n\tmembrane_fast_sodium_current_m_gate:0.103029 dimensionless\n\tmembrane_fast_sodium_current_h_gate:0.786615 dimensionless\n\tmembrane_fast_sodium_current_j_gate:0.254225 dimensionless\n\tmembrane_L_type_calcium_current_d_gate:8.97758e-05 dimensionless\n\tmembrane_L_type_calcium_current_f_gate:0.970568 dimensionless\n\tmembrane_L_type_calcium_current_f2_gate:0.999966 dimensionless\n\tmembrane_L_type_calcium_current_fCa_gate:0.998925 dimensionless\n\ti_Kr_Xr1_gate__Xr1:0.00772763 dimensionless\n\ti_Kr_Xr2_gate__Xr2:0.432099 dimensionless\n\ti_Ks_Xs_gate__Xs:0.0323197 dimensionless\n\tmembrane_hyperpolarisation_activated_funny_current_single_gate:0.100737 dimensionless\n\ti_to_q_gate__q:0.839163 dimensionless\n\ti_to_r_gate__r:0.00573685 dimensionless\n\tcytosolic_sodium_concentration:10.9248 millimolar\n\tJSR_calcium_concentration:-0.273423 millimolar\n\tcalcium_dynamics__g:1 dimensionless\n");
+
         CellLuoRudy1991FromCellMLCvode cvode_cell(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(cvode_cell.GetVoltageIndex(), 0u);
         // Optimised CVODE version

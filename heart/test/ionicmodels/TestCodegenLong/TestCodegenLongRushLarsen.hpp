@@ -59,17 +59,18 @@ public:
         args.push_back("--rush-larsen");
 
         // Models that need a very small dt
-        std::vector<std::string> small_dt_models = special_treatment_models(models, {"li_mouse_2010"});
+        std::vector<std::string> small_dt_models = special_treatment_models(models, {"li_mouse_2010", "pandit_clark_giles_demir_2001_epicardial_cell",});
 
+        // These have NaN in the jacobian due to massive exponentials
+        std::vector<std::string> bad_models = special_treatment_models(models, {"faber_rudy_2000", "difrancesco_noble_model_1985"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
-        TS_ASSERT_THROWS_ANYTHING(RunTests(dirname, {"negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion"}, args));
-
         RunTests(dirname, models, args, false, 0, false);
 
         // See Cooper Spiteri Mirams paper table 2
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
         RunTests(dirname + "-small-dt", small_dt_models, args, false, 0, false);
+
     }
 };
 

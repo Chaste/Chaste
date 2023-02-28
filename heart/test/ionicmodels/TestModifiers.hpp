@@ -33,6 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/* 
+CellMl files are found using cmake_fetch in /heart/test/CMakeLists.txt 
+the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src/cellml/ 
+*/
+
 #ifndef _TESTMODIFIERS_HPP_
 #define _TESTMODIFIERS_HPP_
 
@@ -73,14 +78,14 @@ private:
                    boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
                       OutputFileHandler handler("TestModifiers", true);
 
-                   FileFinder cellml_file("heart/test/data/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
+                   FileFinder cellml_file("_deps/cellml_repo-src/cellml/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteBuildRoot);
                       handler.CopyFileTo(cellml_file);
 
                CellMLToSharedLibraryConverter converter(true);
                converter.SetOptions({"-m", "--normal", "--expose-annotated-variables"});
 
                    // Do the conversion
-                      FileFinder copied_file("TestModifiers/Shannon2004.cellml", RelativeTo::ChasteTestOutput);
+                      FileFinder copied_file("TestModifiers/shannon_wang_puglisi_weber_bers_2004.cellml", RelativeTo::ChasteTestOutput);
                    DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
 
                p_shannon = dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCardiacCell>*>(p_loader->CreateCell(p_solver, p_stimulus));
