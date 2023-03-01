@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
           
       - name: compiler version
         run: |
