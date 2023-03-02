@@ -88,3 +88,9 @@ jobs:
           chmod +x codecov
           ./codecov
         working-directory: chaste-build-dir
+
+      - name: upload as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-info
+          path: chaste-build-dir/coverage.info
