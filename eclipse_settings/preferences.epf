@@ -28,7 +28,6 @@ file_export_version=3.0
 /instance/org.eclipse.core.resources/encoding=ISO-8859-1
 /instance/org.eclipse.core.resources/version=1
 /instance/org.eclipse.core.runtime/content-types/org.eclipse.cdt.core.cxxSource/file-names=*.cpp.in
-/instance/org.eclipse.core.runtime/content-types/org.python.pydev.pythonfile/file-names=SConscript
 /instance/org.eclipse.debug.ui/org.eclipse.debug.ui.build_before_launch=false
 /instance/org.eclipse.team.svn.ui/preference.decoration.icon.modified=true
 /instance/org.eclipse.team.svn.ui/preference.history.connectToCompareWith=false
@@ -40,7 +39,6 @@ file_export_version=3.0
 /instance/org.eclipse.ui.editors/spacesForTabs=true
 /instance/org.eclipse.ui.ide/EXIT_PROMPT_ON_CLOSE_LAST_WINDOW=false
 /instance/org.eclipse.ui.workbench/perspectives=<C/C++>
-/instance/org.eclipse.ui.workbench/resourcetypes=<?xml version\="1.0" encoding\="UTF-8"?>\n<editors version\="3.1">\n<info extension\="" name\="SConstruct">\n<editor id\="org.python.pydev.editor.PythonEditor"/>\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\n</info>\n<info extension\="" name\="SConscript">\n<editor id\="org.python.pydev.editor.PythonEditor"/>\n<defaultEditor id\="org.python.pydev.editor.PythonEditor"/>\n</info>\n</editors>
 /instance/org.python.pydev/COMMENT_COLOR=128,128,128
 /instance/org.python.pydev/DOCSTRING\ CHARACTER="
 /instance/org.python.pydev/DONT_GENERATE_TYPETAGS_PREFIXES=sz\u0000n\u0000f\u0000

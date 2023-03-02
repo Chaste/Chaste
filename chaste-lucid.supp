@@ -6,12 +6,7 @@
 #############################################################
 
 #################################################
-# Note if memory leaks depend on the context (e.g. 
-# CHASTE_TEST_OUTPUT it may be advisable for Scons
-# to produce suppressions automatically:
-#       python/BuildTypes.py
-#       -    #_valgrind_flags +=" --gen-suppressions=all"
-#       +    _valgrind_flags +=" --gen-suppressions=all"
+# Note if memory leaks depend on the context
 #################################################
 
 # HDF5

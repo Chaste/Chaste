@@ -315,10 +315,9 @@ if __name__ == '__main__':
     # .cpp, .hpp., .py, .java are C++, Python and Java code.
     exts = ['.cpp', '.hpp', '.py', '.java']
 
-    # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
-    named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE',
+    named_files = ['SConstruct', 'CMakeLists.txt', './LICENSE',
                    'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
 
     exclusions = []
