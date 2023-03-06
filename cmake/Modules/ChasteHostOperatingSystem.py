@@ -30,9 +30,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from __future__ import print_function  # print without newline character
-
 import platform
+import distro
 
 
 """
@@ -49,22 +48,21 @@ def main():
 
     # Linux
     if platform_name.lower().startswith('linux'):
-        linux_ver = platform.linux_distribution()
-        return '%s %s (%s)' % (linux_ver[0], linux_ver[1], linux_ver[2])
-    # E.g.                      ^ Ubuntu      ^ 14.04       ^ trusty
+        return f"{distro.name()} {distro.version()} ({distro.codename()})"
+    # E.g.               ^ Ubuntu.       ^ 14.04             ^ trusty
 
     # Mac
     elif platform_name.lower().startswith('darwin'):
         mac_ver = platform.mac_ver()
         mac_name = get_mac_name_from_darwin_version(mac_ver[0])
-        return '%s (%s)' % (mac_name, mac_ver[0])
-    # E.g.                  ^ macOS Sierra ^ 10.12.6
+        return f"{mac_name} ({mac_ver[0]})"
+    # E.g.        ^ macOS Sierra ^ 10.12.6
 
     # Windows
     elif platform_name.lower().startswith('windows'):
         win_ver = platform.win32_ver()
-        return 'Windows %s %s' % (win_ver[0], win_ver[2])
-    # E.g.                         ^ 7         ^ SP1
+        return f"Windows {win_ver[0]} {win_ver[2]}"
+    # E.g.                ^ 7          ^ SP1
 
     # Unknown
     else:
@@ -102,6 +100,14 @@ def get_mac_name_from_darwin_version(version_str):
         return 'macOS High Sierra'
     elif version_str.startswith('10.14.'):
         return 'macOS Mojave'
+    elif version_str.startswith('10.15.'):
+        return 'macOS Catalina'
+    elif version_str.startswith('11.'):
+        return 'macOS Big Sur'
+    elif version_str.startswith('12.'):
+        return 'macOS Monterey'
+    elif version_str.startswith('13.'):
+        return 'macOS Ventura'
     else:
         return 'Unknown Mac Version'
 
