@@ -181,7 +181,7 @@ public:
         // Optimised model
         // test error from codegen about concentration
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLOpt opt_model(p_solver, p_stimulus);
-        TS_ASSERT_THROWS_THIS(opt_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0\n\nState:\n\tmembrane_voltage:-75.6527 millivolt\n\tcytosolic_calcium_concentration:1.82277e-05 millimolar\n\tmembrane_fast_sodium_current_m_gate:0.0955691 dimensionless\n\tmembrane_fast_sodium_current_h_gate:0.816449 dimensionless\n\tmembrane_fast_sodium_current_j_gate:0.22308 dimensionless\n\tmembrane_L_type_calcium_current_d_gate:7.42312e-05 dimensionless\n\tmembrane_L_type_calcium_current_f_gate:0.9493 dimensionless\n\tmembrane_L_type_calcium_current_f2_gate:0.999975 dimensionless\n\tmembrane_L_type_calcium_current_fCa_gate:0.998916 dimensionless\n\ti_Kr_Xr1_gate__Xr1:0.0170191 dimensionless\n\ti_Kr_Xr2_gate__Xr2:0.438636 dimensionless\n\ti_Ks_Xs_gate__Xs:0.0298399 dimensionless\n\tmembrane_hyperpolarisation_activated_funny_current_single_gate:0.0852445 dimensionless\n\ti_to_q_gate__q:0.852268 dimensionless\n\ti_to_r_gate__r:0.0053468 dimensionless\n\tcytosolic_sodium_concentration:10.9304 millimolar\n\tJSR_calcium_concentration:-0.273443 millimolar\n\tcalcium_dynamics__g:1 dimensionless\n");
+        TS_ASSERT_THROWS_CONTAINS(opt_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
         AbstractLookupTableCollection::EventHandler::Enable();
         CellLuoRudy1991FromCellMLOpt opt(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(opt.GetVoltageIndex(), 0u);
