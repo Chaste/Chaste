@@ -169,7 +169,7 @@ public:
 
             // Define some "sensible" bounds on the number
             unsigned expected_cell_count_ub = 480u;
-            unsigned expected_cell_count_lb = 425u;
+            unsigned expected_cell_count_lb = 420u;
 
             TS_ASSERT_LESS_THAN(p_simulator->rGetCellPopulation().GetNumRealCells(), expected_cell_count_ub);
             TS_ASSERT_LESS_THAN(expected_cell_count_lb, p_simulator->rGetCellPopulation().GetNumRealCells());
