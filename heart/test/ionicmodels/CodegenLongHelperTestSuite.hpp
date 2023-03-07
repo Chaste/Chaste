@@ -33,6 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/* 
+CellMl files are found using cmake_fetch in /heart/test/CMakeLists.txt 
+the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src/cellml/ 
+*/
+
+
 #ifndef CODEGENLONGHELPERCLASS_HPP_
 #define CODEGENLONGHELPERCLASS_HPP_
 
@@ -170,7 +176,7 @@ private:
     {
         // Copy CellML file into output dir
         OutputFileHandler handler(rOutputDirName, true);
-        FileFinder cellml_file("heart/test/data/cellml/" + rModelName + ".cellml", RelativeTo::ChasteSourceRoot);
+        FileFinder cellml_file("_deps/cellml_repo-src/cellml/" + rModelName + ".cellml", RelativeTo::ChasteBuildRoot);
         handler.CopyFileTo(cellml_file);
 
         //Out files no longer needed with codegen
@@ -195,7 +201,7 @@ private:
             // Tell the cell to use the default stimulus and retrieve it
             boost::shared_ptr<RegularStimulus> p_reg_stim = p_cell->UseCellMLDefaultStimulus();
 
-            if (rModelName != "aslanidi_model_2009") // Even before recent changes aslanidi model has stimulus of -400 !
+            if (rModelName != "aslanidi_Purkinje_model_20099") // Even before recent changes aslanidi model has stimulus of -400 !
             {
                 // Stimulus magnitude should be approximately between -5 and -81 uA/cm^2
                 TS_ASSERT_LESS_THAN(p_reg_stim->GetMagnitude(), -5);
@@ -241,7 +247,7 @@ protected:
     std::vector<std::string> easy_models;
 
     // Returns a list of all models in special_treatment_models that exist in all_models and deletes these models from all_models
-    std::vector<std::string> spectail_streatment_models(std::vector<std::string>& all_models, std::vector<std::string> special_treatment_models)
+    std::vector<std::string> special_treatment_models(std::vector<std::string>& all_models, std::vector<std::string> special_treatment_models)
     {
         BOOST_FOREACH (std::string model, special_treatment_models)
         {
@@ -306,7 +312,7 @@ public:
                     // We know this model does something that provokes one warning...
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
                 }
-                else if(rModels[i] == "courtemanche_ramirez_nattel_model_1998")
+                else if(rModels[i] == "courtemanche_ramirez_nattel_1998")
                 {
                     // Can throw 1 lookup table warning
                    TS_ASSERT_LESS_THAN(Warnings::Instance()->GetNumWarnings(), 2u)
@@ -334,16 +340,15 @@ public:
 
     void AddAllModels(std::vector<std::string>& rModels)
     {
-        rModels.emplace_back("aslanidi_model_2009");
-        rModels.emplace_back("bondarenko_model_2004_apex");
-        rModels.emplace_back("courtemanche_ramirez_nattel_model_1998");
+        rModels.emplace_back("aslanidi_Purkinje_model_2009");
+        rModels.emplace_back("courtemanche_ramirez_nattel_1998");
         rModels.emplace_back("decker_2009");
         rModels.emplace_back("demir_model_1994");
         rModels.emplace_back("dokos_model_1996");
         rModels.emplace_back("fink_noble_giles_model_2008");
-        rModels.emplace_back("grandi2010ss");
-        rModels.emplace_back("hund_rudy_2004_a");
-        rModels.emplace_back("iyer_model_2004");
+        rModels.emplace_back("grandi_pasqualini_bers_2010_ss");
+        rModels.emplace_back("hund_rudy_2004");
+        rModels.emplace_back("iyer_2004");
         rModels.emplace_back("iyer_model_2007");
         rModels.emplace_back("jafri_rice_winslow_model_1998");
         rModels.emplace_back("livshitz_rudy_2007");
@@ -351,9 +356,9 @@ public:
         rModels.emplace_back("noble_model_1991");
         rModels.emplace_back("noble_model_1998");
         rModels.emplace_back("nygren_atrial_model_1998");
-        rModels.emplace_back("pandit_model_2001_epi");
-        rModels.emplace_back("priebe_beuckelmann_model_1998");
-        rModels.emplace_back("Shannon2004");
+        rModels.emplace_back("pandit_clark_giles_demir_2001_epicardial_cell");
+        rModels.emplace_back("priebe_beuckelmann_1998");
+        rModels.emplace_back("shannon_wang_puglisi_weber_bers_2004");
         rModels.emplace_back("stewart_zhang_model_2008_ss");
         rModels.emplace_back("ten_tusscher_model_2004_endo");
         rModels.emplace_back("ten_tusscher_model_2004_epi");
@@ -362,8 +367,8 @@ public:
         rModels.emplace_back("winslow_model_1999");
 
         // Additional models added for testing when introducing codegen, as these caused some unit conversion isssues (in ApPredict)
-        rModels.emplace_back("DiFrancescoNoble1985");
-        rModels.emplace_back("FaberRudy2000");
+        rModels.emplace_back("difrancesco_noble_model_1985");
+        rModels.emplace_back("faber_rudy_2000");
         rModels.emplace_back("li_mouse_2010");
         rModels.emplace_back("paci_hyttinen_aaltosetala_severi_ventricularVersion");
         rModels.emplace_back("sachse_moreno_abildskov_2008_b");
@@ -378,15 +383,14 @@ public:
        rModels.emplace_back("espinosa_model_1998_normal");
        rModels.emplace_back("hilgemann_noble_model_1987");
        rModels.emplace_back("hodgkin_huxley_squid_axon_model_1952_modified");
-       rModels.emplace_back("iribe_model_2006_without_otherwise_section");
+       rModels.emplace_back("iribe_model_2006");
        rModels.emplace_back("kurata_model_2002");
-       rModels.emplace_back("mahajan_2008");
+       rModels.emplace_back("mahajan_shiferaw_2008");
        rModels.emplace_back("matsuoka_model_2003");
        rModels.emplace_back("noble_noble_SAN_model_1984");
        rModels.emplace_back("noble_SAN_model_1989");
        rModels.emplace_back("sakmann_model_2000_epi");
        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
-       rModels.emplace_back("zhang_SAN_model_2000_all");
     }
 
 
