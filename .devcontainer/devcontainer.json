@@ -7,9 +7,9 @@
 	// If you prefer to start with a contianer with the latest Chaste release pre-built, use the following line:
 	// "image": "chaste/release",
 	// Otherwise, to start from an image with pre-built Chaste libraries from the develop branch, use the following line:
-	"image": "chaste/develop",
+	// "image": "chaste/develop",
 	// Note: specific versions can be selected by adding one of the the tags listed on Docker Hub e.g.:
-	// "image": "chaste/release:2021.1",
+	"image": "chaste/release:2021.1",
 
 	"mounts": [
 		{
