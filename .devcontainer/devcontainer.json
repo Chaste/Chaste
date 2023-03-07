@@ -69,6 +69,7 @@
 	// "postCreateCommand": "cmake -DCMAKE_BUILD_TYPE:STRING=Debug -DChaste_ERROR_ON_WARNING:BOOL=ON -DChaste_UPDATE_PROVENANCE:BOOL=OFF -H$CHASTE_SOURCE_DIR -B$CHASTE_BUILD_DIR", // && make --no-print-directory -j$(nproc) -C $CHASTE_BUILD_DIR",
 	// "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	// "postStartCommand": "zsh"
+	"postAttachCommand": "bash",
 
 	// Configure tool-specific properties.
 	"customizations": {
