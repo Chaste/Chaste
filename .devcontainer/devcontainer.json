@@ -41,7 +41,8 @@
 
 	// Requires workspaceMount be set. Sets the default path that devcontainer.json supporting services / tools should open when connecting to the container. 
 	// Defaults to the automatic source code mount location.
-	"workspaceFolder": "/home/chaste/src",
+	// "workspaceFolder": "/home/chaste/src",
+	"workspaceFolder": "/home/chaste",
 
 	// This allows ptrace based debuggers like C++ to work in the container
 	"runArgs": [
