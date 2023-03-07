@@ -16,12 +16,14 @@
 			"source": "chaste_data",
 			"target": "/home/chaste",
 			"type": "volume"
+		},
+		{
+			// Warning: This assumes that a directory called `testoutput' exists at the same level as the Chaste folder
+			// "source": "${localWorkspaceFolder}/../testoutput",
+			"source": "${localWorkspaceFolder}/test_summary",
+			"target": "/home/testoutput",
+			"type": "bind"
 		}
-		// {
-		// 	"source": "${localWorkspaceFolder}/testoutput",
-		// 	"target": "/home/testoutput",
-		// 	"type": "bind"
-		// }
 	],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
