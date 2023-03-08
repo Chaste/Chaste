@@ -1,4 +1,4 @@
 FIXED -1
 UNLIMITED 1
 VARIABLES 19
-Created by Chaste version 2.1.11280 on Wed, 12 Jan 2011 16:58:59 +0000.  Chaste was built on Wed, 12 Jan 2011 11:21:20 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64' using settings: GccOptNative, no Chaste libraries.
+Created by Chaste version 2021.1.2eff91f (with uncommitted modifications) on Tue, 07 Feb 2023 10:54:35 +0000.  Chaste was built on Tue, 07 Feb 2023 10:37:20 +0000 by machine (uname) 'Linux' using settings: Debug.

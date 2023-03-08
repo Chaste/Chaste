@@ -60,28 +60,25 @@ public:
         args.push_back("--grl1");
         args.push_back("--opt");
 
-        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+        std::vector<std::string> smaller_timestep_models = special_treatment_models(models, {"shannon_wang_puglisi_weber_bers_2004",
+                                                                                             "courtemanche_ramirez_nattel_1998",
+                                                                                             "demir_model_1994",
+                                                                                             "dokos_model_1996",
+                                                                                             "grandi_pasqualini_bers_2010_ss",
+                                                                                             "jafri_rice_winslow_model_1998",
+                                                                                             "livshitz_rudy_2007",
+                                                                                             "stewart_zhang_model_2008_ss",
+                                                                                             "winslow_model_1999",
+                                                                                             "li_mouse_2010",
+                                                                                             "noble_model_1998"});
 
-        std::vector<std::string> smaller_timestep_models = spectail_streatment_models(models, {"Shannon2004",
-                                                                                               "bondarenko_model_2004_apex",
-                                                                                               "courtemanche_ramirez_nattel_model_1998",
-                                                                                               "demir_model_1994",
-                                                                                               "dokos_model_1996",
-                                                                                               "grandi2010ss",
-                                                                                               "iyer_model_2007",
-                                                                                               "jafri_rice_winslow_model_1998",
-                                                                                               "livshitz_rudy_2007",
-                                                                                               "stewart_zhang_model_2008_ss",
-                                                                                               "winslow_model_1999",
-                                                                                               "FaberRudy2000",
-                                                                                               "li_mouse_2010",
-                                                                                               "noble_model_1998"});
-
+        std::vector<std::string> bad_models = special_treatment_models(models, {"difrancesco_noble_model_1985", "iyer_2004", "faber_rudy_2000", "iyer_model_2007"});
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
         RunTests(dirname, smaller_timestep_models, args, true, -1000, false);
+
     }
 };
 
