@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
@@ -53,6 +53,7 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
      * The static_cast will work since we already know it's a VertexBasedCellPopulation.
      */
     MutableVertexMesh<DIM,DIM>& mesh = static_cast<MutableVertexMesh<DIM,DIM>&>(this->mpCellPopulation->rGetMesh());
+    VertexBasedCellPopulation<DIM>* p_vertex_population = static_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation);
     VertexElementMap element_map(mesh.GetNumAllElements());
 
     bool recheck_mesh = true;
@@ -63,13 +64,35 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
         /*
          * There might have maximally one T2 swap happened above, where a vertex element was removed from the
          * mesh but the associated cell is still there. Here we check whether a new cell
-         * underwent a T2 swap and label it as dead.
+         * underwent a T2 swap and label it as dead as well as record its location and ID.
          */
         for (unsigned elem_index = 0; elem_index < element_map.Size(); elem_index++)
         {
             CellPtr p_cell = this->mpCellPopulation->GetCellUsingLocationIndex(elem_index);
             if (element_map.IsDeleted(elem_index) && !(p_cell->IsDead()))
             {
+                p_vertex_population->AddLocationOfT2Swap(mesh.GetLastT2SwapLocation());
+                p_vertex_population->AddCellIdOfT2Swap(p_cell->GetCellId());
+
+                /* Mark the cell as killed and store removal information if required.
+                 * Note we can't use the KillCell() helper method here as it will fail as the
+                 * element has already been deleted.
+                 * this->mpCellPopulation->KillCell(p_cell, "T2SwapCellKiller");
+                 */
+                if (p_vertex_population->template HasWriter<CellRemovalLocationsWriter>())
+                {
+                    std::stringstream removal_info;
+                    removal_info << SimulationTime::Instance()->GetTime() << "\t";
+                    for (unsigned i = 0; i < DIM; i++)
+                    {
+                        removal_info << mesh.GetLastT2SwapLocation()[i] << "\t";
+                    }
+                    removal_info << "\t" << p_cell->GetAge() << "\t" << p_cell->GetCellId() << "\t"
+                                 << "T2SwapCellKiller"
+                                 << "\t";
+
+                    p_vertex_population->AddRemovalInformation(removal_info.str());
+                }
                 p_cell->Kill();
 
                 // There can't have been more than one new cell death, so leave the for loop here.
