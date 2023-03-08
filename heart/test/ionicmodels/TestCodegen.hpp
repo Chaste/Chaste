@@ -185,7 +185,7 @@ public:
 #ifndef NDEBUG
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLOpt opt_model(p_solver, p_stimulus);
         TS_ASSERT_THROWS_CONTAINS(opt_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
-
+#endif // NDEBUG
         AbstractLookupTableCollection::EventHandler::Enable();
         CellLuoRudy1991FromCellMLOpt opt(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(opt.GetVoltageIndex(), 0u);
