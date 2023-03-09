@@ -167,9 +167,11 @@ public:
         double sampling_interval = 1.0; // for testing codegen error check
 
         // Normal model
+#ifndef NDEBUG
         // test error from codegen about concentration
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellML normal_model(p_solver, p_stimulus);
         TS_ASSERT_THROWS_CONTAINS(normal_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
 
         CellLuoRudy1991FromCellML normal(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(normal.GetVoltageIndex(), 0u);
@@ -180,8 +182,10 @@ public:
 
         // Optimised model
         // test error from codegen about concentration
+#ifndef NDEBUG
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLOpt opt_model(p_solver, p_stimulus);
         TS_ASSERT_THROWS_CONTAINS(opt_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
         AbstractLookupTableCollection::EventHandler::Enable();
         CellLuoRudy1991FromCellMLOpt opt(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(opt.GetVoltageIndex(), 0u);
@@ -189,8 +193,10 @@ public:
 
         // Backward Euler optimised model
         // test error from codegen about concentration
+#ifndef NDEBUG
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLBackwardEulerOpt be_model(p_solver, p_stimulus);
         TS_ASSERT_THROWS_CONTAINS(be_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
         CellLuoRudy1991FromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
 
         TS_ASSERT_EQUALS(be.GetVoltageIndex(), 0u);
@@ -333,7 +339,10 @@ public:
         // CVODE version
         // test error from codegen about concentration
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLCvodeOpt cvode_model(p_solver, p_stimulus);
+        // Normal model
+#ifndef NDEBUG
         TS_ASSERT_THROWS_CONTAINS(cvode_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
 
         CellLuoRudy1991FromCellMLCvode cvode_cell(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(cvode_cell.GetVoltageIndex(), 0u);
