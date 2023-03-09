@@ -521,23 +521,6 @@ if (Chaste_USE_XERCES)
 endif ()
 
 
-################################
-####  Find pocketfft
-################################
-FetchContent_Declare(
-    pocketfft
-    GIT_REPOSITORY https://gitlab.mpcdf.mpg.de/mtr/pocketfft.git
-    GIT_TAG cpp
-)
-
-FetchContent_GetProperties(pocketfft)
-if(NOT pocketfft_POPULATED)
-    FetchContent_Populate(pocketfft)
-    add_library(pocketfft INTERFACE)
-    target_include_directories(pocketfft INTERFACE ${pocketfft_SOURCE_DIR})
-    list (APPEND Chaste_INCLUDES "${pocketfft_SOURCE_DIR}")
-endif()
-
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 
 set (CXXTEST_INCLUDES "${Chaste_BINARY_DIR}/cxxtest")
