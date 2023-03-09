@@ -164,10 +164,9 @@ public:
         double end_time = 1000.0; //One second in milliseconds
         double i_ionic_end_time = 60.0; // ms
         double i_ionic = 1.9411; // test value
-        double sampling_interval = 1.0; // for testing codegen error check
-
         // Normal model
 #ifndef NDEBUG
+        double sampling_interval = 1.0; // for testing codegen error check
         // test error from codegen about concentration
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellML normal_model(p_solver, p_stimulus);
         TS_ASSERT_THROWS_CONTAINS(normal_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
