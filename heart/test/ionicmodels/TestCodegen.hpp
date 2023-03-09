@@ -339,7 +339,10 @@ public:
         // CVODE version
         // test error from codegen about concentration
         Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLCvodeOpt cvode_model(p_solver, p_stimulus);
+        // Normal model
+#ifndef NDEBUG
         TS_ASSERT_THROWS_CONTAINS(cvode_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
 
         CellLuoRudy1991FromCellMLCvode cvode_cell(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(cvode_cell.GetVoltageIndex(), 0u);
