@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryMeshReader.hpp"
+#include "FileComparison.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -146,19 +147,21 @@ public:
         // Test files are written correctly
         ib_mesh_writer.WriteFilesUsingMesh(mesh);
 
-        OutputFileHandler handler("TestVertexMeshWriterIn2d", false);
+        OutputFileHandler handler("TestIbMeshWriterIn2d", false);
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.node";
-        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.cell";
+        std::string results_file2 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.elem";
+        
+        std::cout << "Should have saved to " << results_file1 << std::endl;
 
         // Test adding point data
         ib_mesh_writer.AddPointData("test", {1.0, 1.0});
-    }
-//        FileComparison comparer1(results_file1,"mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d.node");
-//        TS_ASSERT(comparer1.CompareFiles());
-//
-//        FileComparison comparer2(results_file2,"mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d.cell");
-//        TS_ASSERT(comparer2.CompareFiles());
-//
+
+        FileComparison comparer1(results_file1,"mesh/test/data/TestIbMeshWriter/ib_mesh_2d.node");
+        TS_ASSERT(comparer1.CompareFiles());
+
+        FileComparison comparer2(results_file2,"mesh/test/data/TestIbMeshWriter/ib_mesh_2d.elem");
+        TS_ASSERT(comparer2.CompareFiles());
+
 //#ifdef CHASTE_VTK
 //        std::vector<double> cell_ids;
 //        cell_ids.push_back(0.0);
@@ -185,6 +188,8 @@ public:
 //        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
 //        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 //#endif //CHASTE_VTK
+    }
+    
     void TestImmersedBoundaryMeshWriterVTKCornerOverlap()
     {
       // Overlap top right

@@ -230,13 +230,10 @@ public:
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 678u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 678u);
 
-
         ib_mesh.SetNumGridPtsX(456u);
         ib_mesh.SetNumGridPtsY(567u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 456u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 567u);
-
-
     }
 
     void TestGetVectorFromAtoB()
@@ -367,7 +364,7 @@ public:
             axis[1] = 1.0;
 
             // Test that the skewness is equal to the hand calculated value
-            mesh.GetSkewnessOfElementMassDistributionAboutAxis(0, axis);
+            TS_ASSERT_DELTA(mesh.GetSkewnessOfElementMassDistributionAboutAxis(0, axis), 0.0, 1e-9);
         }
         
     }
@@ -381,8 +378,6 @@ public:
          * The specific ReMeshElements and ReMeshLaminas methods are tested separately.
          */
         
-        /*
-
         std::vector<Node<2>*> nodes;
 
         std::vector<Node<2>*> nodes_elem1;
@@ -477,7 +472,7 @@ public:
         {
             TS_ASSERT_DELTA(old_locations[node_idx][0], mesh.GetNode(node_idx)->rGetLocation()[0], 1e-12);
             TS_ASSERT_DELTA(old_locations[node_idx][1], mesh.GetNode(node_idx)->rGetLocation()[1], 1e-12);
-        }*/
+        }
     }
 
     void TestReMeshElement()
@@ -1092,16 +1087,6 @@ public:
         ImmersedBoundaryMeshReader<3, 3> meshReader("mesh/test/data/ib_mesh_2d");
         TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
       }
-      // TODO: This is to test a NEVER_REACHED code path, but it causes program exit rather than an exception - unclear how to test with cxxtest
-      /*{
-        std::vector<Node<1>*> nodes;
-        std::vector<ImmersedBoundaryElement<1, 1>*> elems;
-        std::vector<ImmersedBoundaryElement<0, 1>*> lams;
-        elems.push_back(new ImmersedBoundaryElement<1, 1>(0, nodes));
-
-        using Mesh = ImmersedBoundaryMesh<1,1>;
-        TS_ASSERT_THROWS_ANYTHING(Mesh mesh(nodes, elems, lams, 5, 5));
-      }*/
     }
     
     void TestBoundingBoxCalculation()
@@ -1208,7 +1193,8 @@ public:
         
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
-        mesh.rGetNodeLocationsVoronoiDiagram(true);
+        // 8 ghost cells will be created, one for each side & corner of the square
+        TS_ASSERT_EQUALS(mesh.rGetNodeLocationsVoronoiDiagram(true).num_vertices(), 9);
       }
       {
         // A 3x3 honeycomb will just have a single non-boundary element
@@ -1217,20 +1203,20 @@ public:
         std::cout << p_mesh->GetVoronoiSurfaceAreaOfElement(10) << "\n";
 
       }
-      /*{ // Single element  
+      { // Single element  
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 2.0, 0.0));
-        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
-        TS_ASSERT_EQUALS(mesh.GetVoronoiSurfaceAreaOfElement(0), 1.0);
-      }*/
+        TS_ASSERT_EQUALS(mesh.GetVoronoiSurfaceAreaOfElement(0), 0.0);
+      }
     }
     
     void TestElongationShapeFactor()
@@ -1360,7 +1346,6 @@ public:
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
         mesh.SetElementDivisionSpacing(0.2);
 
-        std::cout << "TEST\n";
         mesh.DivideElement(elems[0], 20, 25, mesh.GetCentroidOfElement(0), axis);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
       }
