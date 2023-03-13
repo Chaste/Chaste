@@ -181,7 +181,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
 
     if (Chaste_MEMORY_TESTING AND NOT python)
         set(test_command ${VALGRIND_COMMAND})
-        set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out") 
+        set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt") 
         set(test_args "${test_args} --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS}")
         set(test_args "${test_args} --gen-suppressions=all $<TARGET_FILE:${exeTargetName}> -malloc_debug -malloc_dump -memory_info")
         set(num_cpus 1)
