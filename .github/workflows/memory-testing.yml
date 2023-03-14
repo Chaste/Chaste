@@ -1,4 +1,4 @@
-name: Ubuntu infrastructure
+name: Memory testing
 
 on:
   pull_request:
@@ -48,15 +48,15 @@ jobs:
 
     - name: cmake configure
       run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=2 ..
-      working-directory: ${CHASTE_BUILD_DIR}
+      working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
     - name: build continuous test pack
       run: cmake --build . --target Continuous --parallel 2
-      working-directory: ${CHASTE_BUILD_DIR}
+      working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
     - name: run memtest
       run: cmake --build . --target memtest --parallel 2
-      working-directory: ${CHASTE_BUILD_DIR}
+      working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
     - name: copy results
       run: |
@@ -68,7 +68,7 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install dominate
         python write_index.py
-      working-directory: ${MEMTEST_DIR}
+      working-directory: ${{ env.MEMTEST_DIR }}
 
     - name: commit and push results
       run: |
@@ -77,4 +77,4 @@ jobs:
         git add --all
         git commit -m "upload memtest results" || echo "No changes to commit"
         git push
-      working-directory: ${MEMTEST_DIR}
+      working-directory: ${{ env.MEMTEST_DIR }}
