@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <petscvec.h>
 #include <petscmat.h>
+#include <limits>
 
 #include "PetscSetupAndFinalize.hpp"
 #include "PetscException.hpp"
@@ -71,20 +72,20 @@ public:
         //#define PETSC_ERR_ARG_WRONGSTATE   73   /* object in argument is in wrong */
         //#define PETSC_ERR_ARG_INCOMP       75   /* two arguments are incompatible */
         TS_ASSERT_EQUALS(err, PETSC_ERR_ARG_INCOMP);
-        TS_ASSERT_THROWS(PETSCEXCEPT(err), Exception);
+        TS_ASSERT_THROWS(PETSCEXCEPT(err), Exception&);
 
         err=PETSC_ERR_FILE_OPEN;
         //#define PETSC_ERR_FILE_OPEN        65   /* unable to open file */
         TS_ASSERT_EQUALS(err, PETSC_ERR_FILE_OPEN);
-        TS_ASSERT_THROWS(PETSCEXCEPT(err), Exception);
+        TS_ASSERT_THROWS(PETSCEXCEPT(err), Exception&);
 
         // See if we can do it without a temporary
         TS_ASSERT_THROWS(
-            PETSCEXCEPT(VecCreateMPI(PETSC_COMM_WORLD, 2, 1, &v)), Exception);
+            PETSCEXCEPT(VecCreateMPI(PETSC_COMM_WORLD, 2, 1, &v)), Exception&);
         PetscTools::Destroy(v);
 
         // This test give back an "unknown error" message
-        TS_ASSERT_THROWS( PETSCEXCEPT(-3), Exception);
+        TS_ASSERT_THROWS( PETSCEXCEPT(-3), Exception&);
     }
 
     void TestKspExceptionsForCoverage()
@@ -98,12 +99,12 @@ public:
          */
         TS_ASSERT_THROWS_CONTAINS( KSPEXCEPT(KSP_DIVERGED_ITS), "DIVERGED_ITS in function \'TestKspExceptionsForCoverage\' on line");
         // The next one is deliberately fragile because it contains the line number in this test suite (to check that the line number is output correctly).
-        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line 101 of file ./global/test/TestPetscSetup.hpp");
-        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN), Exception );
-        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN_BICG), Exception );
-        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_NONSYMMETRIC), Exception );
-        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_INDEFINITE_PC), Exception );
-        TS_ASSERT_THROWS( KSPEXCEPT(-735827), Exception );
+        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line 102 of file ./global/test/TestPetscSetup.hpp");
+        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN), Exception& );
+        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN_BICG), Exception& );
+        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_NONSYMMETRIC), Exception& );
+        TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_INDEFINITE_PC), Exception& );
+        TS_ASSERT_THROWS( KSPEXCEPT(-735827), Exception& );
 
 
         KSPWARNIFFAILED(KSP_DIVERGED_ITS);

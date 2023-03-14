@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cfloat>  // For DBL_MAX
 #include <climits> // For UINT_MAX & INT_MAX, necessary in gcc-4.3
 #include <cstdlib> // Necessary in gcc-4.3 and later which don't include stdlib by default
+#include <exception>
 
 /** Use when initialising an unsigned variable that doesn't have a sensible default value. */
 const unsigned UNSIGNED_UNSET = UINT_MAX;
@@ -60,7 +61,7 @@ const double DOUBLE_UNSET = DBL_MAX;
  * All exceptions thrown by this code are currently instances of this class.
  *
  */
-class Exception
+class Exception : public std::runtime_error
 {
 public:
     /**
@@ -71,6 +72,11 @@ public:
      * @param lineNumber  which line number of the source file threw the exception
      */
     Exception(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber);
+
+    /**
+     * Virtual destructor
+     */
+    virtual ~Exception();
 
     /**
      * Get the message associated with the exception with file and line number
@@ -117,6 +123,11 @@ public:
      * @param lineNumber  which line number of the source file produced the termination error
      */
     static void Terminate(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber);
+
+    /**
+     * Override of std::runtime_error - returns the error message
+     */
+    virtual const char* what() const noexcept override;
 
 protected:
     /**

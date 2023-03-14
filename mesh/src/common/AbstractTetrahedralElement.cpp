@@ -77,7 +77,7 @@ AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralElement(u
         {
             CalculateJacobian(jacobian, det);
         }
-        catch (Exception)
+        catch (const Exception&)
         {
             // if the Jacobian is negative the orientation of the element is probably
             // wrong, so swap the last two nodes around.
