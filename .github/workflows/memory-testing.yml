@@ -12,7 +12,7 @@ jobs:
 
     if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
 
-    runs-on: newchaste-22.04
+    runs-on: self-hosted
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
