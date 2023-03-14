@@ -1,0 +1,103 @@
+// For format details, see https://aka.ms/devcontainer.json.
+{
+	"name": "Chaste",
+
+	// To start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
+	// "image": "chaste/base",
+	// If you prefer to start with a contianer with the latest Chaste release pre-built, use the following line:
+	// "image": "chaste/release",
+	// Otherwise, to start from an image with pre-built Chaste libraries from the develop branch, use the following line:
+	"image": "chaste/develop",
+	// Note: specific versions can be selected by adding one of the the tags listed on Docker Hub e.g.:
+	// "image": "chaste/release:2021.1",
+
+	"mounts": [
+		{
+			"source": "chaste_data",
+			"target": "/home/chaste",
+			"type": "volume"
+		},
+		{
+			// Warning: This assumes that a directory called `testoutput' exists at the same level as the Chaste folder
+			// "source": "${localWorkspaceFolder}/../testoutput",
+			"source": "${localWorkspaceFolder}/test_summary",
+			"target": "/home/testoutput",
+			"type": "bind"
+		}
+	],
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {},
+		// "ghcr.io/devcontainers/features/git": {},
+		"ghcr.io/devcontainers/features/github-cli": {}
+	},
+
+	// Requires workspaceFolder be set as well. Overrides the default local mount point for the workspace when the container is created. 
+	// Supports the same values as the Docker CLI --mount flag. Environment and pre-defined variables may be referenced in the value. 
+	// For example: "workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/workspace,type=bind,consistency=cached", "workspaceFolder": "/workspace"
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/chaste/src,type=bind,consistency=cached",
+	// "workspaceMount": "source=${localWorkspaceFolder},target=/home/chaste/src,type=volume",
+
+	// Requires workspaceMount be set. Sets the default path that devcontainer.json supporting services / tools should open when connecting to the container. 
+	// Defaults to the automatic source code mount location.
+	// "workspaceFolder": "/home/chaste/src",
+	"workspaceFolder": "/home/chaste",
+
+	// This allows ptrace based debuggers like C++ to work in the container
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined"
+	],
+
+	// If you want to reference an existing container variable while setting this one (like updating the PATH), use remoteEnv instead.
+	"containerEnv": {
+		// "MY_VARIABLE": "${localEnv:MY_VARIABLE}"
+		"CMAKE_BUILD_TYPE": "Debug",
+		"Chaste_ERROR_ON_WARNING": "ON",
+		"Chaste_UPDATE_PROVENANCE": "OFF"
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	"onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+	// "onCreateCommand": "apt update && apt install -y git && git config --global --add safe.directory /example"
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "build_chaste.sh develop",
+	// "postCreateCommand": "cmake -DCMAKE_BUILD_TYPE:STRING=Debug -DChaste_ERROR_ON_WARNING:BOOL=ON -DChaste_UPDATE_PROVENANCE:BOOL=OFF -H$CHASTE_SOURCE_DIR -B$CHASTE_BUILD_DIR", // && make --no-print-directory -j$(nproc) -C $CHASTE_BUILD_DIR",
+	// "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+	// "postStartCommand": "zsh"
+	"postAttachCommand": "bash",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode":{
+			"extensions": [
+				"ms-vscode.cpptools-extension-pack",
+				"ms-vscode.cmake-tools"
+			]
+			// TODO
+			// "settings": {
+			// 	// "terminal.integrated.shell.linux": "/bin/zsh"
+			// 	"terminal.integrated.defaultProfile.linux": "zsh",
+			// 	"terminal.integrated.profiles.linux": {
+			// 		"zsh": {
+			// 			"path": "/usr/bin/zsh"
+			// 		}
+			// 	}
+			// }
+		}
+	},
+
+	// TODO: https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/cmake-presets.md
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+
+	"hostRequirements": {
+		"memory": "4gb",
+		"storage": "8gb"
+	}
+}
