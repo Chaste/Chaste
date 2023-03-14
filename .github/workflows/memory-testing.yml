@@ -12,7 +12,7 @@ jobs:
 
     if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
 
-    runs-on: ubuntu-22.04
+    runs-on: newchaste-22.04
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -39,12 +39,12 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.MEMORY_TESTING_ACCESS }}
 
-    - name: install dependencies
-      run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
-        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
-        sudo apt update
-        sudo apt install chaste-dependencies
+    # - name: install dependencies
+    #   run: |
+    #     echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+    #     sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
+    #     sudo apt update
+    #     sudo apt install chaste-dependencies
 
     - name: make build and test directories
       run: |
@@ -52,15 +52,15 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=2 ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
       working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
     - name: build continuous test pack
-      run: cmake --build . --target Continuous --parallel 2
+      run: cmake --build . --target Continuous --parallel 6
       working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
     - name: run memtest
-      run: cmake --build . --target memtest --parallel 2
+      run: cmake --build . --target memtest --parallel 6
       working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
     - name: copy results
@@ -70,6 +70,8 @@ jobs:
 
     - name: generate index file
       run: |
+        python -m venv venv
+        source venv/bin/activate
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install dominate
         python write_index.py
