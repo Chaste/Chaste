@@ -2,7 +2,7 @@ VS Code Development Container
 =============================
 
 Using this development environment requires:
-* [Docker](https://www.docker.com/get-started)
+* [Docker](https://www.docker.com/get-started) we reccomend installing docker desktop using the installation packages for most people (unless you want to use a remote server)
 * [VS Code](https://code.visualstudio.com/)
 * [Remote development extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
 
