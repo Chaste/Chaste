@@ -429,6 +429,19 @@ void doAssertSameFiles(const char* file, int line,
 #   define _TS_WARN(f,l,e) CxxTest::doWarn( (f), (l), TS_AS_STRING(e) )
 #   define TS_WARN(e) _TS_WARN( __FILE__, __LINE__, e )
 
+// Chaste-specific TS_ASSERT_THROWS_THIS shorthand for our Exception class.
+#    define CHASTE_ASSERT_EXCEPTION_MESSAGE(f,l,e,method,y) { \
+        bool _ts_threw_expected = false, _ts_threw_else = false; \
+            _TS_TRY { e; } \
+            _TS_CATCH_TYPE( (const Exception& _err), { TSM_ASSERT(_err.method(y), _err.method(y) == ""); _ts_threw_expected = true; } ) \
+            _TS_CATCH_ABORT( { throw; } ) \
+            _TS_LAST_CATCH( { _ts_threw_else = true; } ) \
+            if ( !_ts_threw_expected ) { CxxTest::doFailAssertThrows( (f), (l), #e, "const Exception& err", _ts_threw_else, 0 ); } }
+//This version would remove the need for CHASTE_ASSERT_EXCEPTION_MESSAGE, but is uglier:
+//#   define TS_ASSERT_THROWS_THIS(e,y) TS_ASSERT_THROWS_EQUALS(e,const Exception &err,err.CheckShortMessage(y),"")
+#   define TS_ASSERT_THROWS_THIS(e,y) CHASTE_ASSERT_EXCEPTION_MESSAGE(__FILE__,__LINE__,e,CheckShortMessage,y)
+#   define TS_ASSERT_THROWS_CONTAINS(e,y) CHASTE_ASSERT_EXCEPTION_MESSAGE(__FILE__,__LINE__,e,CheckShortMessageContains,y)
+
 // TS_SKIP
 #   define _TS_SKIP(f,l,e) CxxTest::doSkipTest( (f), (l), TS_AS_STRING(e) )
 #   define TS_SKIP(e) _TS_SKIP( __FILE__, __LINE__, e )
@@ -446,6 +459,7 @@ void doAssertSameFiles(const char* file, int line,
 
 #   define ETS_ASSERT(e) _ETS_ASSERT(__FILE__,__LINE__,e)
 #   define TS_ASSERT(e) _TS_ASSERT(__FILE__,__LINE__,e)
+#   define TS_ASSERT_CHAMPION(e) TS_ASSERT(e) // Ensure Northern compatibility
 
 #   define _ETSM_ASSERT(f,l,m,e) ___ETS_ASSERT(f,l,e,TS_AS_STRING(m) )
 #   define _TSM_ASSERT(f,l,m,e) ___TS_ASSERT(f,l,e,TS_AS_STRING(m) )
@@ -702,6 +716,7 @@ void doAssertSameFiles(const char* file, int line,
 
 #   define _TS_ASSERT_THROWS_NOTHING(f,l,e) ___TS_ASSERT_THROWS_NOTHING(f,l,e,0)
 #   define TS_ASSERT_THROWS_NOTHING(e) _TS_ASSERT_THROWS_NOTHING(__FILE__,__LINE__,e)
+#   define TS_ASSERT_THROWS_NOWT(e) TS_ASSERT_THROWS_NOTHING(e)
 
 #   define _TSM_ASSERT_THROWS_NOTHING(f,l,m,e) ___TS_ASSERT_THROWS_NOTHING(f,l,e,TS_AS_STRING(m))
 #   define TSM_ASSERT_THROWS_NOTHING(m,e) _TSM_ASSERT_THROWS_NOTHING(__FILE__,__LINE__,m,e)

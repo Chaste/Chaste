@@ -50,7 +50,7 @@ typedef PetscTruth PetscBool;
 #endif
 
 Exception::Exception(const std::string& rMessage,
-                     const std::string& rFilename, unsigned lineNumber)
+                     const std::string& rFilename, unsigned lineNumber) : std::runtime_error(rMessage)
 {
     SetMessage(rMessage, rFilename, lineNumber);
     ///// The following would write the error message to the log file, if one exists.
@@ -60,6 +60,9 @@ Exception::Exception(const std::string& rMessage,
     //// it to the log file (if one exists) in case it is.
     // std::string log_file_message = "Exception occurred (although possibly handled), error message:\n" + message;
     // LOG(1, log_file_message);
+}
+
+Exception::~Exception() {
 }
 
 void Exception::SetMessage(const std::string& rMessage,
@@ -88,6 +91,10 @@ std::string Exception::GetMessage() const
 std::string Exception::GetShortMessage() const
 {
     return mShortMessage;
+}
+
+const char* Exception::what() const noexcept {
+    return mMessage.c_str();
 }
 
 std::string Exception::CheckShortMessage(std::string expected) const
