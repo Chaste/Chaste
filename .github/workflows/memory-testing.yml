@@ -67,6 +67,7 @@ jobs:
       run: |
         mkdir ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}
         cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}/
+      if: always()
 
     - name: generate index file
       run: |
@@ -76,6 +77,7 @@ jobs:
         python -m pip install dominate
         python write_index.py
       working-directory: ${{ env.MEMTEST_DIR }}
+      if: always()
 
     - name: commit and push results
       run: |
@@ -85,3 +87,4 @@ jobs:
         git commit -m "upload memtest results" || echo "No changes to commit"
         git push
       working-directory: ${{ env.MEMTEST_DIR }}
+      if: always()
