@@ -1,0 +1,85 @@
+name: Memory testing
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  
+  build-and-test:
+
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
+
+    runs-on: ubuntu-22.04
+
+    env:
+      CHASTE_DIR: ${{ github.workspace }}/Chaste
+      MEMTEST_DIR: ${{ github.workspace }}/memory-testing
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    steps:
+
+    - name: get current datetime
+      run: echo "::set-output name=datetime::$(date +%Y-%m-%d_%H-%M-%S)"
+
+    - name: checkout Chaste
+      uses: actions/checkout@v3
+      with:
+        repository: Chaste/Chaste
+        path: Chaste
+
+    - name: checkout memory-testing
+      uses: actions/checkout@v3
+      with:
+        repository: Chaste/memory-testing
+        path: memory-testing
+        fetch-depth: 0
+        token: ${{ secrets.MEMORY_TESTING_ACCESS }}
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: make build and test directories
+      run: |
+        mkdir -p ${CHASTE_BUILD_DIR}
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=2 ..
+      working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+    - name: build continuous test pack
+      run: cmake --build . --target Continuous --parallel 2
+      working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+    - name: run memtest
+      run: cmake --build . --target memtest --parallel 2
+      working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+    - name: copy results
+      run: |
+        mkdir ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}
+        cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}/
+
+    - name: generate index file
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install dominate
+        python write_index.py
+      working-directory: ${{ env.MEMTEST_DIR }}
+
+    - name: commit and push results
+      run: |
+        git config user.name "github-action"
+        git config user.email "github-action"
+        git add --all
+        git commit -m "upload memtest results" || echo "No changes to commit"
+        git push
+      working-directory: ${{ env.MEMTEST_DIR }}
