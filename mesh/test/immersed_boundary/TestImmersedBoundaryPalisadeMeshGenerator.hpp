@@ -55,6 +55,7 @@ public:
 
     void TestApicalLamina()
     {
+      // TODO: Is this missing an assertion
       try {
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, true);
       } catch (Exception& e) {
@@ -63,6 +64,7 @@ public:
     }
     
     void TestLeakyLaminasWithOverideNodesPerCell() {
+      // TODO: Is this missing an assertion
       try {
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, true, true, 100);
       } catch (Exception& e) {

@@ -1201,6 +1201,7 @@ public:
         ImmersedBoundaryHoneycombMeshGenerator gen(6u, 6u, 6u, 0.05, 0.2);
         auto p_mesh = gen.GetMesh();
         std::cout << p_mesh->GetVoronoiSurfaceAreaOfElement(10) << "\n";
+        // TODO: Fix this test
 
       }
       { // Single element  

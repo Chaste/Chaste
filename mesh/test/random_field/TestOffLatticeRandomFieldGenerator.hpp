@@ -55,6 +55,7 @@ public:
 
     void TestConstructor()
     {
+        // TODO: Missing assertion?
         const std::array<double, 2> lower_corner {{0.0, 0.0}};
         const std::array<double, 2> upper_corner {{10.0, 10.0}};
         const std::array<bool, 2> periodicity {{false, false}};
@@ -101,6 +102,8 @@ public:
         //{
         //    delete(node);
         //}
+        
+        // TODO: Missing assertion
     }
 
     void TestSampleFromRandomFieldWithLengthscaleZero()
@@ -136,6 +139,7 @@ public:
         //{
         //    delete(node);
         //}
+        // TODO: Missing assertion
     }
 };
 

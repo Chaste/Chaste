@@ -209,7 +209,7 @@ public:
         ib_mesh_writer.WriteVtkUsingMesh(mesh);
         TS_ASSERT(true);
       }
-      /*// Overlap bottom left
+      // Overlap bottom left
       {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, -0.1, -0.1));
@@ -245,16 +245,8 @@ public:
         ib_mesh_writer.WriteVtkUsingMesh(mesh);
         TS_ASSERT(true);
       }
-      */
+      
 
-    }
-
-    void TestImmersedBoundaryMeshWriterNoMesh()
-    {
-      // Fails because assertion that mesh reader mustn't be null but it is - does it make any sense for this method to exist?
-      /*ImmersedBoundaryMeshReader<2,2> ib_mesh_reader("ib_mesh_2d_no_mesh");
-      ImmersedBoundaryMeshWriter<2,2> ib_mesh_writer("TestIbMeshWriterWithNoMesh", "ib_mesh_2d_no_mesh_out");
-      ib_mesh_writer.WriteFilesUsingMeshReader(ib_mesh_reader);*/
     }
 };
 
