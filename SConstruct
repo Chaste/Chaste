@@ -372,7 +372,7 @@ if not requested_tests:
 
 
 # Create Builders for generating test .cpp files, and running test executables
-test = Builder(action='cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCES')
+test = Builder(action='cxxtest/python/python3/cxxtest/cxxtestgen.py --error-printer -o $TARGET $SOURCES')
 import TestRunner
 def TestDescription(target, source, env):
     return "Running '%s'" % (source[0])

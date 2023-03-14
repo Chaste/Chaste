@@ -1177,7 +1177,7 @@ _states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation
 _state_res = list(map(re.compile,
                  [r"[^ ]*mpicxx ",
                   r"BuildTest\(\[",
-                  r"cxxtest/cxxtestgen.py",
+                  r"cxxtest/python/python3/cxxtest/cxxtestgen.py",
                   r"RunCodegen\(\[",
                   r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"]))
 # For newer scons versions the timing line includes the target that was created, so we parse that instead
