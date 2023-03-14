@@ -1,6 +1,7 @@
 name: Memory testing
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - '**'
@@ -8,6 +9,8 @@ on:
 jobs:
   
   build-and-test:
+
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
 
     runs-on: ubuntu-22.04
 
