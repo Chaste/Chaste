@@ -103,7 +103,7 @@ jobs:
       - name: build Nightly
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target Continuous --parallel 2"
+          su -m runner -c "cmake --build . --target Nightly --parallel 2"
         working-directory: chaste-build-dir
 
       - name: run Continuous
