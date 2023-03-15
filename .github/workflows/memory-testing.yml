@@ -32,14 +32,6 @@ jobs:
           repository: Chaste/Chaste
           path: Chaste
 
-      - name: checkout memory-testing
-        uses: actions/checkout@v3
-        with:
-          repository: Chaste/memory-testing
-          path: memory-testing
-          fetch-depth: 0
-          token: ${{ secrets.MEMORY_TESTING_ACCESS }}
-
       - name: make build and test directories
         run: |
           mkdir -p ${CHASTE_BUILD_DIR}
@@ -56,6 +48,14 @@ jobs:
       - name: run memtest
         run: cmake --build . --target memtest --parallel 6
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        
+      - name: checkout memory-testing
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/memory-testing
+          path: memory-testing
+          fetch-depth: 0
+          token: ${{ secrets.MEMORY_TESTING_ACCESS }}
 
       - name: copy results
         run: |
