@@ -60,7 +60,7 @@ jobs:
       - name: copy results
         run: |
           mkdir ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
-          cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}/
+          cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
         if: always()
 
       - name: generate index file
