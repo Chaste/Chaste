@@ -518,7 +518,7 @@ endif ()
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 
 set (CXXTEST_INCLUDES "${Chaste_BINARY_DIR}/cxxtest")
-set (CXXTEST_PYTHON_TESTGEN_EXECUTABLE ${CXXTEST_INCLUDES}/python/python3/cxxtest/cxxtestgen.py)
+set (CXXTEST_PYTHON_TESTGEN_EXECUTABLE ${CXXTEST_INCLUDES}/python/python3/chaste_helper.py)
 
 if (WIN32 OR CYGWIN)
     #MS Includes

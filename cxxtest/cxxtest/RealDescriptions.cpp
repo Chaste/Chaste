@@ -26,8 +26,6 @@ RealTestDescription::RealTestDescription()
 }
 
 
-const char* RealWorldDescription::_worldName;
-
 RealTestDescription::RealTestDescription(List &argList,
         SuiteDescription &argSuite,
         unsigned argLine,

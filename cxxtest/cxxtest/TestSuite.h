@@ -26,6 +26,8 @@
 #include <sstream>
 #include <cstring>
 
+#include "Exception.hpp"
+
 #if defined(_CXXTEST_HAVE_STD)
 #   include <stdexcept>
 #endif // _CXXTEST_HAVE_STD

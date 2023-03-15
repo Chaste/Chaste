@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
+#include "Exception.hpp"
 
 /**
  * Abstract class for comparing two files, looking for differences in tests.
