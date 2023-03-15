@@ -48,6 +48,16 @@ jobs:
       - name: run memtest
         run: cmake --build . --target memtest --parallel 6
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: check if index file successfully created
+        id: index-exists
+        run: |
+          if [ -e ${CHASTE_BUILD_DIR}/memtest/index.html ]; then
+            echo "index=True"  >> $GITHUB_OUTPUT
+          else
+            echo "index=False"  >> $GITHUB_OUTPUT
+          fi
+        if: always()
         
       - name: checkout memory-testing
         uses: actions/checkout@v3
@@ -56,12 +66,13 @@ jobs:
           path: memory-testing
           fetch-depth: 0
           token: ${{ secrets.MEMORY_TESTING_ACCESS }}
+        if: steps.index-exists.outputs.index == 'True'
 
       - name: copy results
         run: |
           mkdir ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
           cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
-        if: always()
+        if: steps.index-exists.outputs.index == 'True'
 
       - name: generate index file
         run: |
@@ -71,7 +82,7 @@ jobs:
           python -m pip install dominate
           python write_index.py
         working-directory: ${{ env.MEMTEST_DIR }}
-        if: always()
+        if: steps.index-exists.outputs.index == 'True'
 
       - name: commit and push results
         run: |
@@ -81,4 +92,4 @@ jobs:
           git commit -m "upload memtest results" || echo "No changes to commit"
           git push
         working-directory: ${{ env.MEMTEST_DIR }}
-        if: always()
+        if: steps.index-exists.outputs.index == 'True'
