@@ -271,7 +271,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
                 mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
                 break;
 
-            default :
+            default:
                 NEVER_REACHED;
         }
     }

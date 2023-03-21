@@ -5,14 +5,17 @@ on:
   pull_request:
     branches:
       - '**'
+  push:
+    branches:
+      - develop
 
 jobs:
   
   build-and-test:
 
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -22,64 +25,76 @@ jobs:
 
     steps:
 
-    - name: get current datetime
-      run: echo "::set-output name=datetime::$(date +%Y-%m-%d_%H-%M-%S)"
+      - name: get current datetime
+        id: get-datetime
+        run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
-    - name: checkout Chaste
-      uses: actions/checkout@v3
-      with:
-        repository: Chaste/Chaste
-        path: Chaste
+      - name: checkout Chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
 
-    - name: checkout memory-testing
-      uses: actions/checkout@v3
-      with:
-        repository: Chaste/memory-testing
-        path: memory-testing
-        fetch-depth: 0
-        token: ${{ secrets.MEMORY_TESTING_ACCESS }}
+      - name: make build and test directories
+        run: |
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
 
-    - name: install dependencies
-      run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
-        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
-        sudo apt update
-        sudo apt install chaste-dependencies
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
-    - name: make build and test directories
-      run: |
-        mkdir -p ${CHASTE_BUILD_DIR}
-        mkdir -p ${CHASTE_TEST_OUTPUT}
+      - name: build continuous test pack
+        run: cmake --build . --target Continuous --parallel 6
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
-    - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=2 ..
-      working-directory: ${{ env.CHASTE_BUILD_DIR }}
+      - name: run memtest
+        run: cmake --build . --target memtest --parallel 6
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
-    - name: build continuous test pack
-      run: cmake --build . --target Continuous --parallel 2
-      working-directory: ${{ env.CHASTE_BUILD_DIR }}
+      - name: check if index file successfully created
+        id: index-exists
+        run: |
+          if [ -e ${CHASTE_BUILD_DIR}/memtest/index.html ]; then
+            echo "Index file exists"
+            echo "index=True"  >> $GITHUB_OUTPUT
+          else
+            echo "Index file does not exist"
+            echo "index=False"  >> $GITHUB_OUTPUT
+          fi
+        if: always()
+        
+      - name: checkout memory-testing
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/memory-testing
+          path: memory-testing
+          fetch-depth: 0
+          token: ${{ secrets.MEMORY_TESTING_ACCESS }}
+        if: always() && steps.index-exists.outputs.index == 'True'
 
-    - name: run memtest
-      run: cmake --build . --target memtest --parallel 2
-      working-directory: ${{ env.CHASTE_BUILD_DIR }}
+      - name: copy results
+        run: |
+          mkdir ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
+          cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
+        if: always() && steps.index-exists.outputs.index == 'True'
 
-    - name: copy results
-      run: |
-        mkdir ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}
-        cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get_datetime.outputs.datetime }}/
+      - name: generate index file
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install dominate
+          python write_index.py
+        working-directory: ${{ env.MEMTEST_DIR }}
+        if: always() && steps.index-exists.outputs.index == 'True'
 
-    - name: generate index file
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install dominate
-        python write_index.py
-      working-directory: ${{ env.MEMTEST_DIR }}
-
-    - name: commit and push results
-      run: |
-        git config user.name "github-action"
-        git config user.email "github-action"
-        git add --all
-        git commit -m "upload memtest results" || echo "No changes to commit"
-        git push
-      working-directory: ${{ env.MEMTEST_DIR }}
+      - name: commit and push results
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "upload memtest results" || echo "No changes to commit"
+          git push
+        working-directory: ${{ env.MEMTEST_DIR }}
+        if: always() && steps.index-exists.outputs.index == 'True'

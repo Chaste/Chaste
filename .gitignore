@@ -62,6 +62,12 @@ _local/
 # IDE files
 \.vscode/
 cmake-build*
-\.idea
+.idea
 
 appredict_lookup_table_manifest.txt
+
+# Build directories
+Debug
+Release
+cmake-build*
+chaste-build*

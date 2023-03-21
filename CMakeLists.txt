@@ -963,7 +963,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         set (extension svg)
         set (NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else ()
-        set (extension gmon)
+        set (extension txt)
         set (NUM_CPUS ${Chaste_PROFILE_GPROF_CPUS})
     endif ()
 

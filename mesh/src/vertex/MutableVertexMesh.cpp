@@ -397,8 +397,10 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                                                 c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
+    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
+    {
+        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
+    }
 
     // Get the centroid of the element
     c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
@@ -1688,6 +1690,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                                                               Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
 {
+    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
+    {
+        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
+    }
+
     // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
@@ -2231,8 +2238,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2);                 // LCOV_EXCL_LINE - code will be removed at compile time
-    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
+    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
+    {
+        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
+    }
 
     assert(pNode->IsBoundaryNode());
 
