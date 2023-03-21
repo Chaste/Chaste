@@ -13,6 +13,7 @@ jobs:
   
   build-and-test:
 
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
     runs-on: ubuntu-22.04
 
@@ -23,11 +24,6 @@ jobs:
       CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
 
     steps:
-
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
 
       - name: get current datetime
         id: get-datetime
