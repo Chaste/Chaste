@@ -13,7 +13,7 @@ jobs:
   
   build-and-test:
 
-    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
     runs-on: ubuntu-20.04
 

@@ -15,7 +15,7 @@ jobs:
 
     runs-on: ubuntu-20.04
 
-    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
