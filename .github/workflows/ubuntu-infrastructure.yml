@@ -12,7 +12,7 @@ jobs:
 
     runs-on: ubuntu-20.04
 
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
+    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir

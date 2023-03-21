@@ -8,6 +8,9 @@ on:
 
 jobs:
   build-and-test:
+
+    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
+
     strategy:
       fail-fast: false
       matrix:

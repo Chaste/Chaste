@@ -10,7 +10,7 @@ jobs:
   
   build-and-test:
 
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, 'ci skip')
+    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
 
     runs-on: self-hosted
 
