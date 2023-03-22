@@ -270,18 +270,20 @@ macro(Chaste_DO_COMMON component)
         add_custom_target(${component})
     endif()
 
+    # process cellml dirs for building cellml
+    cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
+    foreach(dir ${Chaste_${component}_CELLML_DIRS})
+        file(RELATIVE_PATH rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${dir})
+        list(APPEND Chaste_${component}_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${rel_dir})
+    endforeach()
+
     # check if include dirs exists yet, and generate it if not
     if (NOT Chaste_${component}_INCLUDE_DIRS)
         set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
         header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_SOURCE_INCLUDE_DIRS)
-        cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
 
         # generate include dirs
         set(Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_SOURCE_INCLUDE_DIRS})
-        foreach(dir ${Chaste_${component}_CELLML_DIRS})
-            file(RELATIVE_PATH rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${dir})
-            list(APPEND Chaste_${component}_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${rel_dir})
-        endforeach()
     endif()
 
     # Find source files
