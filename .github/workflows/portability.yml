@@ -80,7 +80,7 @@ jobs:
 
       - name: set runner user privileges
         run: |
-          chown -R runner:runner chaste
+          chown -R runner:runner .
           
       - name: cmake configure
         run: |
