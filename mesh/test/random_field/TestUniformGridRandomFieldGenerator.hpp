@@ -107,6 +107,11 @@ public:
         // TODO: Missing assertion
         TS_ASSERT(true);
     }
+    
+    void TestSampleRandomField()
+    {
+        
+    }
 
     void TestGetLinearIndex()
     {

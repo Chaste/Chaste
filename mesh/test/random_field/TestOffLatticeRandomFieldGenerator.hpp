@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <array>
 #include <vector>
+#include <algorithm>
 
 #include "Node.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -71,39 +72,66 @@ public:
 
     void TestSampleFromRandomField()
     {
-        auto p_gen = RandomNumberGenerator::Instance();
+        { // 1D
+            auto p_gen = RandomNumberGenerator::Instance();
 
-        const unsigned n = 100;
+            const unsigned n = 100;
 
-        const std::array<double, 2> lower_corner {{0.0, 0.0}};
-        const std::array<double, 2> upper_corner {{10.0, 10.0}};
-        const std::array<bool, 2> periodicity {{false, false}};
-        const double lengthscale = 2.0;
+            const std::array<double, 1> lower_corner {{0.0}};
+            const std::array<double, 1> upper_corner {{10.0}};
+            const std::array<bool, 1> periodicity {{false}};
+            const double lengthscale = 2.0;
 
-        OffLatticeRandomFieldGenerator<2> gen(
-                lower_corner,
-                upper_corner,
-                periodicity,
-                lengthscale
-        );
+            OffLatticeRandomFieldGenerator<1> gen(
+                    lower_corner,
+                    upper_corner,
+                    periodicity,
+                    lengthscale
+            );
 
-        // Generate some nodes
-        std::vector<Node<2>*> nodes(n);
-        for (unsigned node_idx = 0; node_idx < n; ++node_idx)
-        {
-            nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
+            // Generate some nodes
+            std::vector<Node<1>*> nodes(n);
+            for (unsigned node_idx = 0; node_idx < n; ++node_idx)
+            {
+                nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
+            }
+            
+            auto randomField = gen.SampleRandomField(nodes);
+
+            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            TS_ASSERT(sum > 0.0)
         }
+        { // 2D
+            auto p_gen = RandomNumberGenerator::Instance();
 
-        //gen.TuneNumEigenvals(nodes, 0.95);
-        //gen.Update(nodes);
-        //const std::vector<double> grf = gen.SampleRandomField();
+            const unsigned n = 100;
 
-        //for (const auto& node : nodes)
-        //{
-        //    delete(node);
-        //}
-        
-        // TODO: Missing assertion
+            const std::array<double, 2> lower_corner {{0.0, 0.0}};
+            const std::array<double, 2> upper_corner {{10.0, 10.0}};
+            const std::array<bool, 2> periodicity {{false, false}};
+            const double lengthscale = 2.0;
+
+            OffLatticeRandomFieldGenerator<2> gen(
+                    lower_corner,
+                    upper_corner,
+                    periodicity,
+                    lengthscale
+            );
+
+            // Generate some nodes
+            std::vector<Node<2>*> nodes(n);
+            for (unsigned node_idx = 0; node_idx < n; ++node_idx)
+            {
+                nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
+            }
+            
+            auto randomField = gen.SampleRandomField(nodes);
+
+            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            TS_ASSERT(sum > 0.0)
+        }
     }
 
     void TestSampleFromRandomFieldWithLengthscaleZero()

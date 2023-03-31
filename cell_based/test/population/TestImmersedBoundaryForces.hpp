@@ -157,7 +157,34 @@ public:
 
     void TestImmersedBoundaryMorseInteractionForceMethods()
     {
-        ///\todo Test this class
+        // Create a small 1x1 mesh
+        ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+        p_mesh->SetNumGridPtsXAndY(32);
+
+        // Create a minimal cell population
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetInteractionDistance(0.01);
+
+        // Create two nodes and put them in a vector of pairs
+        Node<2> node0(0, true, 0.1, 0.1);
+        Node<2> node1(0, true, 0.2, 0.1);
+        std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
+        node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
+
+        // Put the nodes in different elements so force calculation is triggered
+        node0.AddElement(0);
+        node1.AddElement(1);
+
+
+        node0.ClearAppliedForce();
+        node1.ClearAppliedForce();
+
+        ImmersedBoundaryMorseInteractionForce<2> force;
+        force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
     }
 
     void TestArchivingOfImmersedBoundaryMorseInteractionForce()

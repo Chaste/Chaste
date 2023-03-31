@@ -105,6 +105,8 @@ public:
 
     /** Performs inverse fourier transforms */
     void FftExecuteInverse();
+    
+    friend class TestImmersedBoundaryFftInterface; 
 };
 
 #endif /*IMMERSEDBOUNDARYFFTINTERFACE_HPP_*/

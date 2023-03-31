@@ -128,18 +128,6 @@ public:
     virtual ~OffLatticeRandomFieldGenerator() = default;
 
     /**
-     * Update the members mSqrtEigenvals and mEigenvecs. This is the main workhorse of this class.
-     *
-     * Uses the Spectra routines to calculate the first mEigenvals eigenvalues and eigenvectors of the covariance
-     * matrix. This method will throw if the Spectra eigen decomposition is unsuccessful.
-     *
-     * This method returns early if mLengthScale = 0 (noise is not spatially correlated at all).
-     *
-     * @param rNodes the nodes in the mesh
-     */
-    void Update(const std::vector<Node<SPACE_DIM>*>& rNodes);
-
-    /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
      * create an appropriate linear combination of the eigenvectors.
      *
@@ -147,7 +135,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomField() const noexcept;
+    std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept;
 };
 
 

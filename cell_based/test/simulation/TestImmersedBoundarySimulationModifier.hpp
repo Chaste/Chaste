@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include <limits>
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -222,7 +223,23 @@ public:
 
     void TestDelta1D()
     {
-        ///\todo Test this method
+        {
+            // Division by zero
+            ImmersedBoundarySimulationModifier<2> modifier;
+            TS_ASSERT(std::isnan(modifier.Delta1D(0.0, 0.0)))
+        }
+        {
+            ImmersedBoundarySimulationModifier<2> modifier;
+            TS_ASSERT_DELTA(modifier.Delta1D(0.0, 0.5), 0.5, 1e-9)
+        }
+        {
+            ImmersedBoundarySimulationModifier<2> modifier;
+            TS_ASSERT_DELTA(modifier.Delta1D(1.0, 0.5), 0.0, 1e-9)
+        }
+        {
+            ImmersedBoundarySimulationModifier<2> modifier;
+            TS_ASSERT_DELTA(modifier.Delta1D(0.5, 0.5), 0.25, 1e-9)
+        }
     }
 
     void TestUpwind2d()

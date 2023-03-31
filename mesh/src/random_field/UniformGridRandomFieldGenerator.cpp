@@ -176,11 +176,39 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
     };
 
     std::vector<double> samples(mNumTotalGridPts);
-    for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
-        for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
-            // TODO: Better rng for time/continuous time
-            samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, rand())));
-        }
+    
+    switch(SPACE_DIM) {
+        case 1:
+            for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
+                // TODO: Better rng for time/continuous time
+                samples[x] = reshape(reshape(os.noise2_XBeforeY(x * mLengthScale, rand())));
+            }
+            break;
+        
+        case 2:
+            for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
+                for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
+                    // TODO: Better rng for time/continuous time
+                    samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, rand())));
+                }
+            }
+            break;
+
+        case 3:
+            for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
+                for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
+                    for (unsigned int z = 0; z < mNumGridPts[2]; z++) {
+                        // TODO: Better rng for time/continuous time
+                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(os.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, rand())));
+                    }
+                }
+            }
+            break;
+            
+        default:
+            NEVER_REACHED;
+            break;
+
     }
     
     return samples;

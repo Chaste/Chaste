@@ -115,11 +115,10 @@ double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
     return dist_squared;
 }
 
-// Check what this method actually should be doing - should presumably be sampling at node locations?
+// TODO: Check what this method actually should be doing - should presumably be sampling at node locations?
 template <unsigned SPACE_DIM>
-std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
+std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept
 {
-
     // TODO: randomise seed
     OpenSimplex2S os(123);
     auto reshape = [](const double val) {
@@ -128,10 +127,27 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
         return val * (1.0 - 0.18 * strength);
     };
 
-    std::vector<double> samples(mNumNodesAtLastUpdate);
-    for (unsigned int x = 0; x < mNumNodesAtLastUpdate; x++) {
+    std::vector<double> samples(rNodes.size());
+    for (unsigned int i = 0; i < samples.size(); i++) {
         // TODO: Better rng for time/continuous time
-        samples[x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, 0.0, rand())));
+        auto nodeLocation = rNodes[i]->rGetLocation();
+        switch(SPACE_DIM) {
+            case 1:
+                samples[i] = reshape(reshape(os.noise2_XBeforeY(nodeLocation[0] * mLengthScale, rand())));
+                break;
+            
+            case 2:
+                samples[i] = reshape(reshape(os.noise3_XYBeforeZ(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, rand())));
+                break;
+
+            case 3:
+                samples[i] = reshape(reshape(os.noise4_XYBeforeZW(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, nodeLocation[2] * mLengthScale, rand())));
+                break;
+                
+            default:
+                NEVER_REACHED;
+                break;
+        }
     }
 
     return samples;
