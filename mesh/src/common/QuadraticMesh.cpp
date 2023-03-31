@@ -102,7 +102,11 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool stagger)
 {
-    assert(DIM==2); // LCOV_EXCL_LINE
+    if (DIM != 2)
+    {
+        EXCEPTION("This cuboid construction is only valid in 3D"); // LCOV_EXCL_LINE
+    }
+
     assert(numElemX > 0);
     assert(numElemY > 0);
 
@@ -242,7 +246,10 @@ unsigned QuadraticMesh<DIM>::LookupInternalNode(unsigned globalIndex1, unsigned 
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
 {
-    assert(DIM==3); // LCOV_EXCL_LINE
+    if (DIM != 3)
+    {
+        EXCEPTION("This cuboid construction is only valid in 3D"); // LCOV_EXCL_LINE
+    }
 
     assert(numElemX > 0);
     assert(numElemY > 0);

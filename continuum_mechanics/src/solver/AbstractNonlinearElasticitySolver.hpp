@@ -1810,26 +1810,25 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     // warn if ksp reports failure
     KSPConvergedReason reason;
     KSPGetConvergedReason(solver,&reason);
-
-    if (reason != KSP_DIVERGED_ITS)
+    if (reason == KSP_DIVERGED_ITS || reason == KSP_DIVERGED_BREAKDOWN)
     {
-        // Throw an exception if the solver failed for any reason other than DIVERGED_ITS.
-        // This is not covered as would be difficult to cover - requires a bad matrix to
-        // assembled, for example.
-        // LCOV_EXCL_START
-        KSPEXCEPT(reason);
-        // LCOV_EXCL_STOP
-    }
-    else
-    {
-        // DIVERGED_ITS just means it didn't converge in the given maximum number of iterations,
-        // which is potentially not a problem, as the nonlinear solver may (and often will) still converge.
+        // DIVERGED_ITS or DIVERGED_BREAKDOWN just means it didn't converge in the given maximum number of iterations,
+        // or similar, which is potentially not a problem, as the nonlinear solver may (and often will) still converge.
         // Just warn once.
         // (Very difficult to cover in normal tests, requires relative and absolute ksp tols to be very small, there
         // is no interface for setting both of these. Could be covered by setting up a problem the solver
         // finds difficult to solve, but this would be overkill.)
         // LCOV_EXCL_START
         WARN_ONCE_ONLY("Linear solve (within a mechanics solve) didn't converge, but this may not stop nonlinear solve converging")
+        // LCOV_EXCL_STOP
+    }
+    else
+    {
+        // Throw an exception if the solver failed for any reason other than DIVERGED_ITS.
+        // This is not covered as would be difficult to cover - requires a bad matrix to
+        // assembled, for example.
+        // LCOV_EXCL_START
+        KSPEXCEPT(reason);
         // LCOV_EXCL_STOP
     }
 

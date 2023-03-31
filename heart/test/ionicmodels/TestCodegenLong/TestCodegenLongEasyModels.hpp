@@ -62,7 +62,6 @@ public:
         args.push_back("--use-analytic-jacobian");
         args.push_back("--opt");
 
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, easy_models, args);
 #endif
     }

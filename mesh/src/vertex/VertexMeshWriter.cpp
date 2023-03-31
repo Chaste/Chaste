@@ -288,17 +288,21 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
     // Make the Vtk mesh
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
-    for (unsigned node_num=0; node_num<rMesh.GetNumNodes(); node_num++)
+    for (unsigned node_num = 0; node_num < rMesh.GetNumNodes(); node_num++)
     {
         c_vector<double, SPACE_DIM> position;
         position = rMesh.GetNode(node_num)->rGetLocation();
-        if (SPACE_DIM==2)
+        if (SPACE_DIM == 2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
-        else
+        else if (SPACE_DIM == 3)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], position[2]);
+        }
+        else
+        {
+            NEVER_REACHED;
         }
     }
 

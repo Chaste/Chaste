@@ -105,7 +105,9 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 {
-    delete mpElementTessellation;
+    // This pointer is always null because PottsBasedCellPopulation::CreateElementTessellation
+    // is not implemented. See #1666 in the trac ticket archive for more information.
+    assert(mpElementTessellation == nullptr);
 
     delete mpMutableMesh;
 

@@ -183,7 +183,7 @@ WntConcentrationType SimpleWntCellCycleModel::GetWntType()
             wnt_type = WntConcentration<DIM>::Instance()->GetType();
             break;
         }
-        case UNSIGNED_UNSET:
+        case UNSIGNED_UNSET: // LCOV_EXCL_LINE
         {
             // If you trip this you have tried to use a simulation without setting the dimension.
             NEVER_REACHED;
