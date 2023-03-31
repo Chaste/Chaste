@@ -30,4 +30,4 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from SCons.Errors import BuildError
-raise BuildError(errstr="Scons builds are no longer supported, please see <web page> for cmake instructions")
+raise BuildError(errstr="Scons builds are no longer supported, please see the Chaste wiki for cmake instructions")
