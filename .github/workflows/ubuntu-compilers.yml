@@ -15,22 +15,33 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - cc: "clang-10"
-            cxx: "clang++-10"
           - cc: "clang-12"
             cxx: "clang++-12"
+            build-type: "Debug"
+          - cc: "clang-14"
+            cxx: "clang++-14"
+            build-type: "Release"
           - cc: "gcc-10"
             cxx: "g++-10"
+            build-type: "Release"
+          - cc: "gcc-12"
+            cxx: "g++-12"
+            build-type: "Debug"
           - cc: "icc"
             cxx: "icpc"
+            build-type: "Debug"
           - cc: "icx"
             cxx: "icpx"
+            build-type: "Debug"
+          - cc: "icx"
+            cxx: "icpx"
+            build-type: "Release"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -43,7 +54,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -68,7 +79,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
