@@ -15,6 +15,15 @@ our special binary version of the Triangle/Tetgen format.
  to containing element indices.  The presence of this file cuts the calculation cost at mesh load time.
  * If a Chaste format fibre file (.axi or .ortho) is associated with the mesh then this will also be converted to our binary format.
 
+
+=== Making the executable(s) ===
+We no longer distribute cardiac executables due to difficulties getting compatible cross-platform executables. 
+However the top level apps directory (and indeed the apps directory in any user project) can have stand-alone executables with their own int main() methods.
+to compile these as an executable:
+
+`cmake .. where .. is the source folder for Chaste` followed by
+`make <target name> -DCMAKE_BUILD_TYPE=Release` where is your build tareget e.g. Chaste, or a user project such as ApPredict
+
 === Running the converter ===
 
 You may want to download and save the attached file [attachment:MeshConvert.tgz MeshConvert.tgz] and 
