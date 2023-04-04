@@ -15,19 +15,6 @@ our special binary version of the Triangle/Tetgen format.
  to containing element indices.  The presence of this file cuts the calculation cost at mesh load time.
  * If a Chaste format fibre file (.axi or .ortho) is associated with the mesh then this will also be converted to our binary format.
 
-=== Making the executable(s) ===
-
-It is assumed that as you are running on a parallel cluster or supercomputer you have access to the Chaste 
-source code.  You can produce all executables (including the standalone Chaste program) using:
-{{{
-#!sh
-scons chaste_libs=1 compile_only=1 exe=1 build=GccOpt apps
-}}}
-Binaries {{{Chaste, MeshConvert...}}} are made in {{{apps/src}}}.
-
-You may get a speed improvement from using a "no debug" build-type like {{{build=GccOpt_ndebug}}}, but
-this is at the expense of doing less error checking.
-
 === Running the converter ===
 
 You may want to download and save the attached file [attachment:MeshConvert.tgz MeshConvert.tgz] and 

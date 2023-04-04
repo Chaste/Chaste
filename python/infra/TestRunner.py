@@ -265,9 +265,9 @@ if __name__ == '__main__':
 
     run_test(exefile, logfile, build, run_time_flags, echo)
 
-# Builder function for running via SCons
+# Builder function
 def get_build_function(build, run_time_flags='', test_time_limit=0):
-    """Return a function that can be used as a Builder by SCons."""
+    """Return a function that can be used as a Builder."""
 
     def build_function(target, source, env):
         # Set up the environment from env['ENV']

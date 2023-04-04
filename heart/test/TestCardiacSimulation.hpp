@@ -438,15 +438,6 @@ public:
     /**
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
      * The earliest version of Boost supported is 1.34
-     * Run TestCardiacSimulationArchiveBidomain on 4 processors to create the archive for this test,
-     * and copy it to the repository using:
-     *
-       scons build=GccOpt_hostconfig,boost=1-34_4 test_suite=heart/test/TestCardiacSimulation.hpp
-       cp -r /tmp/$USER/testoutput/SaveBidomainShort_checkpoints/0.2ms heart/test/data/checkpoint_migration_via_xml/
-       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/progress_status.txt
-       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/mesh.ncl
-       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/ChasteParameters_?_?xsd
-       rm -rf heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/output
      */
     void TestCardiacSimulationResumeMigration()
     {
