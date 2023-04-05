@@ -39,14 +39,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableElement<ELEMENT_DIM, SPACE_DIM>::MutableElement(unsigned index)
-    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index)
+    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index),
+    mEdgeHelper(nullptr)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MutableElement<ELEMENT_DIM, SPACE_DIM>::MutableElement(unsigned index,
                                                      const std::vector<Node<SPACE_DIM>*>& rNodes)
-    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
+    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
+    mEdgeHelper(nullptr)
 {
     if (SPACE_DIM == ELEMENT_DIM)
     {
@@ -80,7 +82,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
     //Update edges in the element so they know they are not contained by it
-    for (unsigned i=0; i<this->GetNumEdges(); i++)
+    for (unsigned i=0; i< GetNumEdges(); i++)
     {
         this->mEdges[i]->RemoveElement(this->mIndex);
     }
@@ -264,6 +266,92 @@ bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
     return is_element_on_boundary;
 }
 
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void MutableElement<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
+{
+    this->mEdgeHelper = edgeHelper;
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void MutableElement<ELEMENT_DIM, SPACE_DIM>::ClearEdges()
+{
+    for (auto edge: mEdges)
+    {
+        edge->RemoveElement(this->mIndex);
+    }
+    mEdges.clear();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void MutableElement<ELEMENT_DIM, SPACE_DIM>::BuildEdges()
+{
+    assert(mEdgeHelper != nullptr);
+
+    // If SPACE_DIM == 2 then we can assume that the node layout
+    // in the array corresponds to its connections
+    // We can then infer the edge connection information
+    if (SPACE_DIM == 2)
+    {
+        this->ClearEdges();
+        for (unsigned i = 0; i < this->mNodes.size(); i++)
+        {
+            unsigned i_next = (i+1) % this->mNodes.size();
+            mEdges.push_back(mEdgeHelper->GetEdgeFromNodes(this->mIndex, this->mNodes[i], this->mNodes[i_next]));
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex]->GetIndex();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Edge<SPACE_DIM> *MutableElement<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex];
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdges.size();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElementAtEdgeIndex(unsigned localIndex)
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex]->GetOtherElements(this->mIndex);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MutableElement<ELEMENT_DIM, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
+{
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+            return true;
+    }
+    return false;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+long MutableElement<ELEMENT_DIM, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
+{
+    long result = -1;
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+        {
+            result = i;
+        }
+    }
+    return result;
+}
+
 //////////////////////////////////////////////////////////////////////
 //                  Specialization for 1d elements                  //
 //                                                                  //
@@ -276,7 +364,8 @@ bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
  */
 template<unsigned SPACE_DIM>
 MutableElement<1, SPACE_DIM>::MutableElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
-    : AbstractElement<1, SPACE_DIM>(index, rNodes)
+    : AbstractElement<1, SPACE_DIM>(index, rNodes),
+    mEdgeHelper(nullptr)
 {
     // Sanity checking
     assert(this->mNodes.size() == 2);
@@ -321,6 +410,81 @@ void MutableElement<1, SPACE_DIM>::ResetIndex(unsigned index)
     RegisterWithNodes();
     RegisterWithEdges();//does nothing in 1D
     RebuildEdges();//does nothing in 1D
+}
+
+template<unsigned SPACE_DIM>
+unsigned MutableElement<1, SPACE_DIM>::GetNumEdges() const {
+    return mEdges.size();
+}
+
+template<unsigned SPACE_DIM>
+Edge<SPACE_DIM> *MutableElement<1, SPACE_DIM>::GetEdge(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex];
+}
+
+template<unsigned int SPACE_DIM>
+void MutableElement<1, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
+{
+    this->mEdgeHelper = edgeHelper;
+}
+
+template<unsigned int SPACE_DIM>
+void MutableElement<1, SPACE_DIM>::BuildEdges()
+{
+    assert(mEdgeHelper != nullptr);
+
+    // If SPACE_DIM == 2 then we can assume that the node layout
+    // in the array corresponds to its connections
+    // We can then infer the edge connection information
+    if (SPACE_DIM == 2)
+    {
+        this->ClearEdges();
+        for (unsigned i = 0; i < this->mNodes.size(); i++)
+        {
+            unsigned i_next = (i+1) % this->mNodes.size();
+            mEdges.push_back(mEdgeHelper->GetEdgeFromNodes(this->mIndex, this->mNodes[i], this->mNodes[i_next]));
+        }
+    }
+}
+
+template<unsigned int SPACE_DIM>
+void MutableElement<1, SPACE_DIM>::ClearEdges()
+{
+    for (auto edge: mEdges)
+    {
+        edge->RemoveElement(this->mIndex);
+    }
+    mEdges.clear();
+}
+
+template <unsigned SPACE_DIM>
+long MutableElement<1, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
+{
+    long result = -1;
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+        {
+            result = i;
+        }
+    }
+    return result;
+}
+
+template<unsigned int SPACE_DIM>
+unsigned MutableElement<1, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex]->GetIndex();
+}
+
+template<unsigned SPACE_DIM>
+std::set<unsigned> MutableElement<1, SPACE_DIM>::GetNeighbouringElementAtEdgeIndex(unsigned localIndex)
+{
+    assert(localIndex < mEdges.size());
+    return mEdges[localIndex]->GetOtherElements(this->mIndex);
 }
 
 template<unsigned SPACE_DIM>
@@ -403,9 +567,12 @@ bool MutableElement<1, SPACE_DIM>::IsElementOnBoundary() const
 }
 
 // Explicit instantiation
+template class MutableElement<0,1>;
 template class MutableElement<1,1>;
+template class MutableElement<0,2>;
 template class MutableElement<1,2>;
-template class MutableElement<1,3>;
 template class MutableElement<2,2>;
+template class MutableElement<0,3>;
+template class MutableElement<1,3>;
 template class MutableElement<2,3>;
 template class MutableElement<3,3>;
