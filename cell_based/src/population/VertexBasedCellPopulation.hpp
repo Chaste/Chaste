@@ -177,7 +177,7 @@ private:
      * Check the consistency of internal data structures.
      * Each VertexElement must have a CellPtr associated with it.
      */
-    void Validate();
+    void Validate() override;
 
 public:
 
