@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -591,13 +591,13 @@ public:
 
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
-	// Dynamic load fr2000_ode_system_opt as we need a different lookup table start to the default
-	FileFinder cellml_file("heart/src/odes/cellml/FaberRudy2000.cellml", RelativeTo::ChasteSourceRoot);
-	OutputFileHandler handler("TestIonicModels", true);
-       	handler.CopyFileTo(cellml_file);
-       	CellMLToSharedLibraryConverter converter(true);
-       	converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"});
-       	FileFinder copied_file("TestIonicModels/FaberRudy2000.cellml", RelativeTo::ChasteTestOutput);
+    // Dynamic load fr2000_ode_system_opt as we need a different lookup table start to the default
+    FileFinder cellml_file("heart/src/odes/cellml/FaberRudy2000.cellml", RelativeTo::ChasteSourceRoot);
+    OutputFileHandler handler("TestIonicModels", true);
+           handler.CopyFileTo(cellml_file);
+           CellMLToSharedLibraryConverter converter(true);
+           converter.SetOptions({"--opt", "--lookup-table", "membrane_voltage", "-250.0005", "549.9999", "0.001"});
+           FileFinder copied_file("TestIonicModels/FaberRudy2000.cellml", RelativeTo::ChasteTestOutput);
         DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
 
         AbstractCardiacCell* fr2000_ode_system_opt = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));

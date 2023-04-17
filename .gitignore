@@ -59,5 +59,9 @@ _local/
 /apps/src/Chaste
 /apps/src/MeshConvert
 
+# IDE files
 \.vscode/
+cmake-build*
+\.idea
+
 appredict_lookup_table_manifest.txt

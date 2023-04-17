@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,12 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 #include "Node.hpp"
-#include "Edge.hpp"
-#include "EdgeHelper.hpp"
 #include "ElementAttributes.hpp"
 
-template<unsigned int SPACE_DIM>
-class EdgeHelper;
 /*
  * When creating an element within a mesh one needs to specify its global index.
  * If the element is not used within a mesh the following constant is used instead.
@@ -62,12 +58,6 @@ protected:
 
     /** The nodes forming this element. */
     std::vector<Node<SPACE_DIM>*> mNodes;
-
-    /** The edges forming this element **/
-    std::vector<Edge<SPACE_DIM>*> mEdges;
-
-    /** EdgeHelper class to keep track of edges */
-    EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
     /** The index of this element within the mesh */
     unsigned mIndex;
@@ -253,62 +243,6 @@ public:
      * @return the number of node attributes associated with this node.
      */
     unsigned GetNumElementAttributes();
-
-    /**
-     * Sets edge helper
-     * @param edgeHelper
-     */
-    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* edgeHelper);
-
-    /**
-     * Clear edges from element
-     */
-    void ClearEdges();
-
-    /**
-     * Builds edges from element nodes
-     */
-    void BuildEdges();
-
-    /**
-     * Gets the global index of the edge at localIndex
-     * @param localIndex local index of the edge in this element
-     * @return Global index of the edge
-     */
-    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
-
-    /**
-     * Gets the edge at localIndex
-     * @param localIndex local index of the edge in this element
-     * @return
-     */
-    Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
-
-    /**
-     * @return Number of edges associated with this element
-     */
-    unsigned GetNumEdges() const;
-
-    /**
-     * Gets a set of element indices that neighours the element at the specified edge
-     * @param localIndex Local index of the edge in this element
-     * @return A set of element indices that neighbours this edge
-     */
-    std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
-
-    /**
-     * Checks if the element contains edge
-     * @param edge
-     * @return
-     */
-    bool ContainsEdge(const Edge<SPACE_DIM> *edge) const;
-
-    /**
-     * returns the local index of edge
-     * @param edge
-     * @return -1 if an edge was not found
-     */
-    long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
 };
 
 #endif /*ABSTRACTELEMENT_HPP_*/

@@ -191,6 +191,8 @@ public:
      */
     virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
 
+    // adding comment for testing only, to be removed.
+
     /**
      * Here we add Delta/Notch when junctions merge via common vertex deletion
      * Override the method declared in AbstractSrnModel class

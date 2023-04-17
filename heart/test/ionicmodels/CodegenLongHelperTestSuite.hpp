@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -388,7 +388,7 @@ public:
        rModels.emplace_back("zhang_SAN_model_2000_0D_capable");
        rModels.emplace_back("zhang_SAN_model_2000_all");
     }
-    
+
 
     void SetUseCvodeJacobian(bool useCvodeJacobian)
     {

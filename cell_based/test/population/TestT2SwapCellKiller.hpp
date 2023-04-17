@@ -1,14 +1,10 @@
 /*
-
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
-
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
-
 This file is part of Chaste.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright notice,
@@ -19,7 +15,6 @@ modification, are permitted provided that the following conditions are met:
  * Neither the name of the University of Oxford nor the names of its
    contributors may be used to endorse or promote products derived from this
    software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,29 +25,29 @@ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 */
 
 #ifndef TESTT2SWAPCELLKILLER_HPP_
 #define TESTT2SWAPCELLKILLER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
-#include "ArchiveOpener.hpp"
-#include "CellsGenerator.hpp"
-#include "FixedG1GenerationalCellCycleModel.hpp"
-#include "VertexMeshWriter.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "T2SwapCellKiller.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "FileComparison.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "Warnings.hpp"
-#include "HoneycombMeshGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "SmartPointers.hpp"
+#include "ArchiveOpener.hpp"
+#include "CellRemovalLocationsWriter.hpp"
+#include "CellsGenerator.hpp"
+#include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "FileComparison.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "T2SwapCellKiller.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "VertexMeshWriter.hpp"
+#include "Warnings.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -169,28 +164,6 @@ public:
         TS_ASSERT_EQUALS(t2_locations.size(), 0u);
         TS_ASSERT_EQUALS(t2_cell_ids.size(), 0u);
 
-        //Test addition of T2SwapInfo for coverage
-        c_vector<double, 2> test_location;
-        test_location(0) = 2.0;
-        test_location(1) = 3.0;
-        cell_population.AddLocationOfT2Swap(test_location);
-        t2_locations = cell_population.GetLocationsOfT2Swaps();
-        t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
-        TS_ASSERT_EQUALS(t2_locations.size(), 1u);
-        TS_ASSERT_EQUALS(t2_cell_ids.size(), 1u);
-        TS_ASSERT_DELTA(t2_locations[0][0], 2.0, 1e-8);
-        TS_ASSERT_DELTA(t2_locations[0][1], 3.0, 1e-8);
-        TS_ASSERT_EQUALS(t2_cell_ids[0], 0u);
-
-        cell_population.AddCellIdOfT2Swap(2);
-        t2_locations = cell_population.GetLocationsOfT2Swaps();
-        t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
-        TS_ASSERT_EQUALS(t2_locations.size(), 2u);
-        TS_ASSERT_EQUALS(t2_cell_ids.size(), 2u);
-        TS_ASSERT_DELTA(t2_locations[1][0], 0.0, 1e-8);
-        TS_ASSERT_DELTA(t2_locations[1][1], 0.0, 1e-8);
-        TS_ASSERT_EQUALS(t2_cell_ids[1], 2u);
-
         // Test that each element contains the correct number of nodes following the rearrangement
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
@@ -223,7 +196,7 @@ public:
     {
         /**
          * This is performs a single T2 swap in a simulation and tests that the cells and vertex elements are
-         * deleted correctly.
+         * deleted correctly. Also check the cell removal is output correctly.
          */
         // Make 6 nodes to assign to four elements
         std::vector<Node<2>*> nodes;
@@ -273,6 +246,9 @@ public:
         std::vector<CellPtr> cells;
         cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements(), std::vector<unsigned>());
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        // Add a writer to store when cells are removed from simulation
+        cell_population.AddCellPopulationEventWriter<CellRemovalLocationsWriter>();
 
         // make a simulator
         OffLatticeSimulation<2> simulator(cell_population);
@@ -337,6 +313,12 @@ public:
 
         // We also do not have any undeleted cells
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(),3u);
+
+        //Check the cell removal is recorded correctly.
+        FileFinder generated_file("TestT2SwapCellKillerInSimulation/results_from_time_0.003/removals.dat", RelativeTo::ChasteTestOutput);
+        FileFinder reference_file("cell_based/test/data/TestT2SwapCellKillerInSimulation/removals.dat", RelativeTo::ChasteSourceRoot);
+        FileComparison files(generated_file, reference_file);
+        TS_ASSERT(files.CompareFiles());
     }
 
     void TestKillerForMultipleT2Swaps()
@@ -447,10 +429,8 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], 0.5, 1e-3);
 
         // Test tracking of T2 swaps
-        std::vector<T2SwapInfo<2> > swap_info= cell_population.rGetMesh().GetOperationRecorder()->GetT2SwapsInfo();
         std::vector< c_vector<double, 2> > t2_locations = cell_population.GetLocationsOfT2Swaps();
         std::vector< unsigned > t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
-
         TS_ASSERT_EQUALS(t2_locations.size(), 2u);
         TS_ASSERT_EQUALS(t2_cell_ids.size(), 2u);
         TS_ASSERT_EQUALS(t2_cell_ids[0], 4u);
@@ -459,6 +439,13 @@ public:
         TS_ASSERT_DELTA(t2_locations[0][1], 0.5, 1e-3);
         TS_ASSERT_DELTA(t2_locations[1][0], 2.0/3.0, 1e-3);
         TS_ASSERT_DELTA(t2_locations[1][1], 0.5, 1e-3);
+
+        // Test T2 swap Location clearing
+        cell_population.ClearLocationsAndCellIdsOfT2Swaps();
+        t2_locations = cell_population.GetLocationsOfT2Swaps();
+        t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
+        TS_ASSERT_EQUALS(t2_locations.size(), 0u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 0u);
 
         // Test that after remeshing, each element contains the correct nodes
         unsigned node_indices_element_0[4] = {0, 1, 6, 10};
@@ -988,6 +975,7 @@ public:
             cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
             VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
             T2SwapCellKiller<2> cell_killer(&cell_population);
 
             // Create an output archive

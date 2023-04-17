@@ -3706,14 +3706,5 @@ http://www.CellML.org/
       <rdf:Description rdf:about="#K_F">
          <pycml:derived-quantity>yes</pycml:derived-quantity>
       </rdf:Description>
-      <rdf:Description rdf:about="#stim_period">
-         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_period"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="#stim_amplitude">
-         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="#stim_duration">
-         <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_duration"/>
-      </rdf:Description>
    </rdf:RDF>
 </model>

@@ -1,14 +1,10 @@
 /*
-
-Copyright (c) 2005-2021, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
-
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
-
 This file is part of Chaste.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright notice,
@@ -19,7 +15,6 @@ modification, are permitted provided that the following conditions are met:
  * Neither the name of the University of Oxford nor the names of its
    contributors may be used to endorse or promote products derived from this
    software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +25,6 @@ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 */
 
 #ifndef VERTEXBASEDCELLPOPULATION_HPP_
@@ -40,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableVertexMesh.hpp"
 #include "TrapezoidEdgeVertexMeshWriter.hpp"
 #include "VertexBasedPopulationSrn.hpp"
+
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/set.hpp>
@@ -49,6 +44,7 @@ template<unsigned DIM>
 class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
 template<unsigned DIM>
 class VertexBasedPopulationSrn;
+
 /**
  * A facade class encapsulating a vertex-based cell population.
  *
@@ -67,6 +63,7 @@ private:
     friend class TestVertexBasedDivisionRules;
     friend class TestVertexBasedCellPopulation;
     friend class TestMutableVertexMeshOperationsWithPopulationSrn;
+
     /**
      * Whether to delete the mesh when we are destroyed.
      * Needed if this cell population has been de-serialized.
@@ -85,6 +82,18 @@ private:
     /** A pointer to a division rule that is used to generate the axis when dividing cells.
      * This is a specialisation for Vertex models. */
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
+
+    /**
+     * Locations of T2 swaps (the centre of the removed triangle), stored so they can be accessed and output by the cell killer and
+     * population writer classes. The locations are stored until they are cleared by ClearLocationsAndCellIdsOfT2Swaps().
+     */
+    std::vector< c_vector<double, DIM> > mLocationsOfT2Swaps;
+
+    /**
+     * The Ids of cells that have undergone T2 swaps, stored so they can be accessed and output by the cell killer and population
+     * writer classes. The Ids are stored until they are cleared by ClearLocationsAndCellIdsOfT2Swaps().
+     */
+    std::vector< unsigned > mCellIdsOfT2Swaps;
 
     /**
      * Whether to restrict the vertex movement if vertex displacement is larger than
@@ -156,14 +165,13 @@ private:
         archive & mOutputCellRearrangementLocations;
         archive & mpVertexBasedDivisionRule;
         archive & mRestrictVertexMovement;
-        archive & mPopulationSrn;
     }
 
     /**
      * Check the consistency of internal data structures.
      * Each VertexElement must have a CellPtr associated with it.
      */
-    virtual void Validate() override;
+    void Validate();
 
 public:
 
@@ -204,7 +212,7 @@ public:
      * @param nodeIndex the global index of this node
      * @return the average damping constant of the cells surrounding the node.
      */
-    virtual double GetDampingConstant(unsigned nodeIndex) override;
+    double GetDampingConstant(unsigned nodeIndex);
 
     /**
      * @return reference to  mrMesh.
@@ -235,7 +243,7 @@ public:
      *
      * @return the number of nodes in the cell population.
      */
-    virtual unsigned GetNumNodes() override;
+    unsigned GetNumNodes();
 
     /**
      * Overridden GetLocationOfCellCentre() method.
@@ -248,7 +256,7 @@ public:
      *
      * @return the location of the centre of mass of the element corresponding to this cell.
      */
-    virtual c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell) override;
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
     /**
      * Overridden GetNode() method.
@@ -257,7 +265,7 @@ public:
      *
      * @return a pointer to the node.
      */
-    virtual Node<DIM>* GetNode(unsigned index) override;
+    Node<DIM>* GetNode(unsigned index);
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
@@ -267,8 +275,7 @@ public:
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
-
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
      * Overridden GetNeighbouringEdgeIndices() method.
@@ -277,8 +284,7 @@ public:
      * @param pEdgeIndex Local edge index
      * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex) override;
-
+    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex);
 
     /**
      * Overridden AddNode() method.
@@ -288,7 +294,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    virtual unsigned AddNode(Node<DIM>* pNewNode) override;
+    unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
      * Checks whether a given node displacement violates the movement threshold
@@ -299,7 +305,7 @@ public:
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt) override;
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt);
 
     /**
      * Overridden SetNode() method.
@@ -309,7 +315,7 @@ public:
      * @param index the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    virtual void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation) override;
+    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
 
     /**
      * Get a pointer to the element corresponding to a given CellPtr.
@@ -329,7 +335,7 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr()) override;
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.
@@ -340,7 +346,7 @@ public:
      *
      * @return number of cells removed
      */
-    virtual unsigned RemoveDeadCells() override;
+    unsigned RemoveDeadCells();
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
@@ -348,7 +354,7 @@ public:
      * @param pCell the cell
      * @return whether a given cell is associated with a deleted element.
      */
-    virtual bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
      * Remove the VertexElements which have been marked as deleted, perform
@@ -358,7 +364,7 @@ public:
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      * not needed in this cell population class
      */
-    virtual void Update(bool hasHadBirthsOrDeaths=true) override;
+    void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
      * Overridden OpenWritersFiles() method.
@@ -367,7 +373,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
     */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -375,7 +381,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -383,7 +389,15 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+
+    /**
+     * A virtual method to accept a cell population event writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationEventWriter the population event writer.
+     */
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -392,7 +406,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Get the "rosette rank" of a cell.
@@ -410,33 +424,31 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
-    virtual double GetVolumeOfCell(CellPtr pCell) override;
+    double GetVolumeOfCell(CellPtr pCell);
 
     /**
      * Return all locations of T2 swaps since the last sampling time step.
-     * This method is a shortcut to get the locations from mOperationRecorder object in
-     * MutableVertexMesh class
+     *
      * @return mLocationsOfT2Swaps
      */
     std::vector< c_vector< double, DIM > > GetLocationsOfT2Swaps();
 
-    /**
+     /**
      * Return all IDs of cells undergoing T2 swaps since the last sampling time step.
-     * This method is a shortcut to get the IDs from mOperationRecorder object in
-     * MutableVertexMesh class
+     *
      * @return mLocationsOfT2Swaps
      */
     std::vector< unsigned > GetCellIdsOfT2Swaps();
 
     /**
-     * Add location of T2 Swap. Adds T2SwapInfo with location locationOfT2Swap and cellId 0
+     * Add location of T2 Swap.
      *
      * @param locationOfT2Swap  Location of the T2 swap
      */
     void AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap);
 
     /**
-     * Add ID of T2 Swap. Adds T2SwapInfo with location of zero_vector and cellId idOfT2Swap
+     * Add ID of T2 Swap.
      *
      * @param idOfT2Swap ID of the cell undergoing a T2 swap
      */
@@ -444,8 +456,6 @@ public:
 
     /**
      * Clear the locations and IDs of cells undergoing T2 Swaps.
-     * This method is a shortcut to clear the locations and CellIds from mOperationRecorder object in
-     * MutableVertexMesh class
      */
     void ClearLocationsAndCellIdsOfT2Swaps();
 
@@ -466,7 +476,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile) override;
+    void OutputCellPopulationParameters(out_stream& rParamsFile);
 
     /**
      * Overridden GetWidth() method.
@@ -477,7 +487,7 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    virtual double GetWidth(const unsigned& rDimension) override;
+    double GetWidth(const unsigned& rDimension);
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
@@ -485,7 +495,7 @@ public:
      * @param index the node index
      * @return the set of neighbouring node indices.
      */
-    virtual std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
@@ -496,7 +506,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
 
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
@@ -507,7 +517,7 @@ public:
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -527,7 +537,7 @@ public:
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0) override;
+                                            double dirichletBoundaryValue=0.0);
 
     /**
      * @return The Vertex division rule that is currently being used.
@@ -551,7 +561,7 @@ public:
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep() override;
+    virtual double GetDefaultTimeStep();
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
@@ -560,7 +570,7 @@ public:
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 
     /**
      * Overridden SimulationSetupHook() method.
@@ -575,7 +585,7 @@ public:
      *
      * @param pSimulation pointer to a cell-based simulation object
      */
-    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation) override;
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
 
     /**
      * Get the value of the mRestrictVertexMovement boolean.
