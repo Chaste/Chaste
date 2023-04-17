@@ -140,8 +140,8 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
         {
             c_vector<double, SPACE_DIM> node_position;
             node_position = elem->GetNode(elem_node_num)->rGetLocation();
-            const double new_x = (node_position[0]-elem_centroid[0])*alpha + elem_centroid[0];
-            const double new_y = (node_position[1]-elem_centroid[1])*alpha + elem_centroid[1];
+            const double new_x = (node_position[0] - elem_centroid[0])*alpha + elem_centroid[0];
+            const double new_y = (node_position[1] - elem_centroid[1])*alpha + elem_centroid[1];
             p_pts->InsertPoint(cell_offset_dist[elem->GetIndex()]+elem_node_num,
                                new_x, new_y, 0.0);
         }
