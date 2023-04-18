@@ -482,7 +482,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden GetWidth() method.
@@ -493,7 +493,7 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    double GetWidth(const unsigned& rDimension);
+    double GetWidth(const unsigned& rDimension) override;
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
@@ -501,7 +501,7 @@ public:
      * @param index the node index
      * @return the set of neighbouring node indices.
      */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
 
     /**
      * Overridden GetTetrahedralMeshForPdeModifier() method.
@@ -512,7 +512,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
@@ -523,7 +523,7 @@ public:
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -543,7 +543,7 @@ public:
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            double dirichletBoundaryValue=0.0) override;
 
     /**
      * @return The Vertex division rule that is currently being used.
@@ -567,7 +567,7 @@ public:
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    virtual double GetDefaultTimeStep() override;
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
@@ -576,7 +576,7 @@ public:
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 
     /**
      * Overridden SimulationSetupHook() method.
@@ -591,7 +591,7 @@ public:
      *
      * @param pSimulation pointer to a cell-based simulation object
      */
-    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
+    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation) override;
 
     /**
      * Get the value of the mRestrictVertexMovement boolean.
