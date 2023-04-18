@@ -103,17 +103,22 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
     assert(SPACE_DIM==2); // LCOV_EXCL_LINE
 #ifdef CHASTE_VTK
     // Make the Vtk mesh
-    vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
+    vtkPoints* p_pts; 
+    p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
     /*
      * Populating points. First, outer points of elements
      */
     const unsigned n_vertices = rMesh.GetNumNodes();
-    for (unsigned i=0; i<n_vertices; ++i)
+    for (unsigned i=0; i<rMesh.GetNumNodes(); ++i)
     {
         c_vector<double, SPACE_DIM> position; 
         position = rMesh.GetNode(i)->rGetLocation();
-        p_pts->InsertPoint(i, position[0], position[1], 0.0);
+        if (SPACE_DIM==2){
+         p_pts->InsertPoint(i, position[0], position[1], 0.0);
+        }else{
+         p_pts->InsertPoint(i, position[0], position[1], position[2]);
+        }
     }
     /*
      * Populating inner points.
