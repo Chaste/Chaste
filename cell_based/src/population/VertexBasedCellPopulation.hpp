@@ -218,7 +218,7 @@ public:
      * @param nodeIndex the global index of this node
      * @return the average damping constant of the cells surrounding the node.
      */
-    double GetDampingConstant(unsigned nodeIndex);
+    double GetDampingConstant(unsigned nodeIndex) override;
 
     /**
      * @return reference to  mrMesh.
@@ -249,7 +249,7 @@ public:
      *
      * @return the number of nodes in the cell population.
      */
-    unsigned GetNumNodes();
+    unsigned GetNumNodes() override;
 
     /**
      * Overridden GetLocationOfCellCentre() method.
@@ -262,7 +262,7 @@ public:
      *
      * @return the location of the centre of mass of the element corresponding to this cell.
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell) override;
 
     /**
      * Overridden GetNode() method.
@@ -271,7 +271,7 @@ public:
      *
      * @return a pointer to the node.
      */
-    Node<DIM>* GetNode(unsigned index);
+    Node<DIM>* GetNode(unsigned index) override;
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
@@ -281,7 +281,7 @@ public:
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
      * Overridden GetNeighbouringEdgeIndices() method.
@@ -290,7 +290,7 @@ public:
      * @param pEdgeIndex Local edge index
      * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex);
+    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex) override;
 
     /**
      * Overridden AddNode() method.
@@ -300,7 +300,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    unsigned AddNode(Node<DIM>* pNewNode);
+    unsigned AddNode(Node<DIM>* pNewNode) override;
 
     /**
      * Checks whether a given node displacement violates the movement threshold
@@ -311,7 +311,7 @@ public:
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt);
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt) override;
 
     /**
      * Overridden SetNode() method.
@@ -321,7 +321,7 @@ public:
      * @param index the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
+    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation) override;
 
     /**
      * Get a pointer to the element corresponding to a given CellPtr.
@@ -341,7 +341,7 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr()) override;
 
     /**
      * Remove all cells labelled as dead.
@@ -352,7 +352,7 @@ public:
      *
      * @return number of cells removed
      */
-    unsigned RemoveDeadCells();
+    unsigned RemoveDeadCells() override;
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
@@ -360,7 +360,7 @@ public:
      * @param pCell the cell
      * @return whether a given cell is associated with a deleted element.
      */
-    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
 
     /**
      * Remove the VertexElements which have been marked as deleted, perform
@@ -370,7 +370,7 @@ public:
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      * not needed in this cell population class
      */
-    void Update(bool hasHadBirthsOrDeaths=true);
+    void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
      * Overridden OpenWritersFiles() method.
@@ -379,7 +379,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
     */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -387,7 +387,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -395,7 +395,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -403,7 +403,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -412,7 +412,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Get the "rosette rank" of a cell.
@@ -430,7 +430,7 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
-    double GetVolumeOfCell(CellPtr pCell);
+    double GetVolumeOfCell(CellPtr pCell) override;
 
     /**
      * Return all locations of T2 swaps since the last sampling time step.
