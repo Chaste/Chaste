@@ -100,7 +100,7 @@ template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM> &rMesh)
 {
     // Only 2D version is supported at the moment
-    assert(SPACE_DIM==2); // LCOV_EXCL_LINE
+    //assert(SPACE_DIM==2); // LCOV_EXCL_LINE
 #ifdef CHASTE_VTK
     // Make the Vtk mesh
     vtkPoints* p_pts; 
@@ -114,7 +114,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
     {
         c_vector<double, 2> position; 
         position = rMesh.GetNode(node_num)->rGetLocation();
-         p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
+        p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
     }
     /*
      * Populating inner points.
