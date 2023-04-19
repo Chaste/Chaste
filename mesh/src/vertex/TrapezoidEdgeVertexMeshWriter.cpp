@@ -112,7 +112,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
     const unsigned n_vertices = rMesh.GetNumNodes();
     for (unsigned node_num=0; node_num<rMesh.GetNumNodes(); node_num++)
     {
-        c_vector<double, SPACE_DIM> position; 
+        c_vector<double, 2> position; 
         position = rMesh.GetNode(node_num)->rGetLocation();
          p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
     }
