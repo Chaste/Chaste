@@ -114,11 +114,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
     {
         c_vector<double, SPACE_DIM> position; 
         position = rMesh.GetNode(i)->rGetLocation();
-        if (SPACE_DIM==2){
          p_pts->InsertPoint(i, position[0], position[1], 0.0);
-        }else{
-         p_pts->InsertPoint(i, position[0], position[1], position[2]);
-        }
     }
     /*
      * Populating inner points.
