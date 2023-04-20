@@ -62,9 +62,6 @@ Exception::Exception(const std::string& rMessage,
     // LOG(1, log_file_message);
 }
 
-Exception::~Exception() {
-}
-
 void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {

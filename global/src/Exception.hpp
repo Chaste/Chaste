@@ -76,7 +76,7 @@ public:
     /**
      * Virtual destructor
      */
-    virtual ~Exception();
+    virtual ~Exception() = default;
 
     /**
      * Get the message associated with the exception with file and line number
