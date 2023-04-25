@@ -82,8 +82,7 @@ public:
     void TestMainConstructor()
     {
         const unsigned n = 12u;
-
-        UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 0.8, 0.03);
+        UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 0.03);
 
         OutputFileHandler results_handler("", true);
         out_stream results_file = results_handler.OpenOutputFile("a_hist.csv");
@@ -104,20 +103,49 @@ public:
 
         // Tidy up
         results_file->close();
-        // TODO: Missing assertion
-        TS_ASSERT(true);
     }
     
     void TestSampleRandomField()
     {
+        { // Correct sample numbers
+            { // 1D
+                const unsigned n = 12u;
+                UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{n}}, {{true}}, 0.03);
+                auto samples = gen.SampleRandomField();
+                TS_ASSERT_EQUALS(samples.size(), n);
+            }
+            { // 2D
+                const unsigned n = 12u;
+                UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 0.03);
+                auto samples = gen.SampleRandomField();
+                TS_ASSERT_EQUALS(samples.size(), n * n);
+            }
+            { // 3D
+                const unsigned n = 12u;
+                UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{n, n, n}}, {{true, true, true}}, 0.03);
+                auto samples = gen.SampleRandomField();
+                TS_ASSERT_EQUALS(samples.size(), n * n * n);
+            }
+        }
         
+        { // Length scale
+            
+            const unsigned n = 4;
+            UniformGridRandomFieldGenerator<1> gen1({{0.0}}, {{1.0}}, {{n}}, {{true}}, 1.00);
+            auto samples1 = gen1.SampleRandomFieldAtTime(0.0);
+            UniformGridRandomFieldGenerator<1> gen2({{0.0}}, {{1.0}}, {{n}}, {{true}}, 2.00);
+            auto samples2 = gen2.SampleRandomFieldAtTime(0.0);
+
+            TS_ASSERT_EQUALS(samples1[0], samples2[0]);           
+            TS_ASSERT_EQUALS(samples1[2], samples2[1]);           
+        }
     }
 
     void TestGetLinearIndex()
     {
         // 1d
         {
-            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
 
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l}), 0l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({15l}), 15l);
@@ -126,7 +154,7 @@ public:
 
         // 2d
         {
-            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.3);
 
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 0l}), 0l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({15l, 0l}), 15l);
@@ -138,7 +166,7 @@ public:
 
         // 3d
         {
-            UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.3);
 
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 0l, 0l}), 0l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({15l, 0l, 0l}), 15l);
@@ -156,7 +184,7 @@ public:
     {
         // 1d
         {
-            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
 
             TestEqualityOfArrays<double, 1>(gen.GetPositionUsingGridIndex({0l}), {{0.0}});
             TestEqualityOfArrays<double, 1>(gen.GetPositionUsingGridIndex({3l}), {{3.0 / 8.0}});
@@ -165,7 +193,7 @@ public:
 
         // 2d
         {
-            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.3);
 
             TestEqualityOfArrays<double, 2>(gen.GetPositionUsingGridIndex({0l, 0l}), {{0.0, 0.0}});
             TestEqualityOfArrays<double, 2>(gen.GetPositionUsingGridIndex({1l, 2l}), {{0.25, 0.5}});
@@ -174,7 +202,7 @@ public:
 
         // 3d
         {
-            UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.3);
 
             TestEqualityOfArrays<double, 3>(gen.GetPositionUsingGridIndex({0l, 0l, 0l}), {{0.0, 0.0, 0.0}});
             TestEqualityOfArrays<double, 3>(gen.GetPositionUsingGridIndex({1l, 2l, 3l}), {{0.25, 0.5, 0.75}});
@@ -186,7 +214,7 @@ public:
     {
         // 1d
         {
-            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
 
             // If the field is constant everywhere then that constant should always be the interpolated value
             {
@@ -214,7 +242,7 @@ public:
 
         // 2d
         {
-            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.3);
 
             // If the field is constant everywhere then that constant should always be the interpolated value
             {
@@ -262,7 +290,7 @@ public:
 
         // 3d
         {
-            UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.8, 0.3);
+            UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.3);
 
             // If the field is constant everywhere then that constant should always be the interpolated value
             {

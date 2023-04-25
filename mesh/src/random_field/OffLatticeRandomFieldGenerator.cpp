@@ -119,8 +119,14 @@ double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
 template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept
 {
+    return this->SampleRandomFieldAtTime(rNodes, rand());
+}
+
+template <unsigned SPACE_DIM>
+std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) const noexcept
+{
     // TODO: randomise seed
-    OpenSimplex2S os(123);
+    OpenSimplex2S os(321);
     auto reshape = [](const double val) {
         double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
         double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
@@ -129,19 +135,18 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
 
     std::vector<double> samples(rNodes.size());
     for (unsigned int i = 0; i < samples.size(); i++) {
-        // TODO: Better rng for time/continuous time
         auto nodeLocation = rNodes[i]->rGetLocation();
         switch(SPACE_DIM) {
             case 1:
-                samples[i] = reshape(reshape(os.noise2_XBeforeY(nodeLocation[0] * mLengthScale, rand())));
+                samples[i] = reshape(reshape(os.noise2_XBeforeY(nodeLocation[0] * mLengthScale, time + 0.5)));
                 break;
             
             case 2:
-                samples[i] = reshape(reshape(os.noise3_XYBeforeZ(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, rand())));
+                samples[i] = reshape(reshape(os.noise3_XYBeforeZ(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, time)));
                 break;
 
             case 3:
-                samples[i] = reshape(reshape(os.noise4_XYBeforeZW(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, nodeLocation[2] * mLengthScale, rand())));
+                samples[i] = reshape(reshape(os.noise4_XYBeforeZW(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, nodeLocation[2] * mLengthScale, time)));
                 break;
                 
             default:
@@ -152,7 +157,6 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
 
     return samples;
 }
-
 // Explicit instantiation
 template class OffLatticeRandomFieldGenerator<1>;
 template class OffLatticeRandomFieldGenerator<2>;

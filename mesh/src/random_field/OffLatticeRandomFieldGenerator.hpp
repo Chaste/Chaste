@@ -136,6 +136,7 @@ public:
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept;
+    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) const noexcept;
 };
 
 

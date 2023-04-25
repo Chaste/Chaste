@@ -55,18 +55,20 @@ public:
 
     void TestApicalLamina()
     {
-      // TODO: Is this missing an assertion
       try {
-        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, false, true, false);
+        auto mesh = gen.GetMesh();
+        TS_ASSERT(mesh->GetNumLaminas() > 0);
       } catch (Exception& e) {
         TS_TRACE(e.GetMessage());
       }
     }
     
     void TestLeakyLaminasWithOverideNodesPerCell() {
-      // TODO: Is this missing an assertion
       try {
-        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, true, true, 100);
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, false, true, 100);
+        auto mesh = gen.GetMesh();
+        TS_ASSERT(mesh->GetNumLaminas() > 0);
       } catch (Exception& e) {
         TS_TRACE(e.GetMessage());
       }

@@ -56,7 +56,6 @@ public:
 
     void TestConstructor()
     {
-        // TODO: Missing assertion?
         const std::array<double, 2> lower_corner {{0.0, 0.0}};
         const std::array<double, 2> upper_corner {{10.0, 10.0}};
         const std::array<bool, 2> periodicity {{false, false}};
@@ -96,8 +95,8 @@ public:
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
             
-            auto randomField = gen.SampleRandomField(nodes);
-
+            auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
+            
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
             TS_ASSERT(sum > 0.0)
@@ -126,7 +125,7 @@ public:
                 nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
             }
             
-            auto randomField = gen.SampleRandomField(nodes);
+            auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
@@ -159,15 +158,12 @@ public:
             nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
         }
 
-        //gen.TuneNumEigenvals(nodes, 0.95);
-        //gen.Update(nodes);
-        //const std::vector<double> grf = gen.SampleRandomField();
+        const std::vector<double> grf = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
-        //for (const auto& node : nodes)
-        //{
-        //    delete(node);
-        //}
-        // TODO: Missing assertion
+        for (const auto& val : grf)
+        {
+            TS_ASSERT_EQUALS(val, 0.0);
+        }
     }
 };
 

@@ -94,17 +94,23 @@ public:
 
         ImmersedBoundaryMesh<2,2>* mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
-        ImmersedBoundaryFftInterface<2> fft(mesh, nullptr, nullptr, nullptr, true);
+        std::vector<double> in;
+        for (int i = 0; i < 49152; i++) {
+          in.push_back(0.0);
+        }
+        std::vector<std::complex<double>> comp(in.size());
+        std::vector<double> out(in.size() * 2);
+        ImmersedBoundaryFftInterface<2> fft(mesh, in.data(), comp.data(), out.data(), true);
         
-        //fft.FftExecuteForward();
-          
-        // TODO: try to find some sensible test data
+        fft.FftExecuteForward();
+        for (auto i : out) {
+          TS_ASSERT(i == 0.0);
+        }
       }
     }
 
     void TestFftExecuteInverse()
     {
-      {
         // Create a square test mesh
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -116,24 +122,25 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-        
-        std::vector<double> reference = {1.0, 0.5, 0.0, 0.5};
-        std::vector<double> in = {1.0, 0.5, 0.0, 0.5};
-        std::vector<std::complex<double>> comp(in.size());
-        std::vector<double> out(in.size());
 
         ImmersedBoundaryMesh<2,2>* mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
+        std::vector<double> in;
+        for (int i = 0; i < 49152; i++) {
+          in.push_back(0.0);
+        }
+        std::vector<std::complex<double>> comp(in.size());
+        std::vector<double> out(in.size() * 2);
         ImmersedBoundaryFftInterface<2> fft(mesh, in.data(), comp.data(), out.data(), true);
-
-        fft.FftExecuteForward();
-        //fft.FftExecuteInverse();
         
-        // Forward followed by inverse should give back original data
-        //for (auto i = 0u; i < in.size(); i++) {
-        //  TS_ASSERT_EQUALS(reference[i], out[i])
-        //} 
-      }
+        fft.FftExecuteForward();
+        fft.FftExecuteInverse();
+        for (auto i : out) {
+          TS_ASSERT(i == 0.0);
+        }
+        for (auto i : in) {
+          TS_ASSERT(i == 0.0);
+        }
     }
 };
 

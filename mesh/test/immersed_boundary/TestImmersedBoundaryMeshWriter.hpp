@@ -151,8 +151,6 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.elem";
         
-        std::cout << "Should have saved to " << results_file1 << std::endl;
-
         // Test adding point data
         ib_mesh_writer.AddPointData("test", {1.0, 1.0});
 
@@ -161,33 +159,6 @@ public:
 
         FileComparison comparer2(results_file2,"mesh/test/data/TestIbMeshWriter/ib_mesh_2d.elem");
         TS_ASSERT(comparer2.CompareFiles());
-
-//#ifdef CHASTE_VTK
-//        std::vector<double> cell_ids;
-//        cell_ids.push_back(0.0);
-//        cell_ids.push_back(1.0);
-//
-//        vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
-//        // Add distance from origin into the node "point" data
-//        std::vector<double> distance;
-//        for (unsigned i=0; i<basic_vertex_mesh.GetNumNodes(); i++)
-//        {
-//            distance.push_back(norm_2(basic_vertex_mesh.GetNode(i)->rGetLocation()));
-//        }
-//        vertex_mesh_writer.AddPointData("Distance from origin", distance);
-//
-//        vertex_mesh_writer.WriteVtkUsingMesh(basic_vertex_mesh);
-//
-//        {
-//            ///\todo #1076.  We need a way to test the contents of the VTK file
-//            std::string results_file3 = handler.GetOutputDirectoryFullPath() + "vertex_mesh_2d.vtu";
-//            FileFinder vtk_file(results_file3, RelativeTo::Absolute);
-//            TS_ASSERT(vtk_file.Exists());
-//        }
-//#else
-//        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
-//        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
-//#endif //CHASTE_VTK
     }
     
     void TestImmersedBoundaryMeshWriterVTKCornerOverlap()
@@ -207,34 +178,21 @@ public:
         
         ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
         ib_mesh_writer.WriteVtkUsingMesh(mesh);
-        TS_ASSERT(true);
-      }
-      // Overlap bottom left
-      {
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, -0.1, -0.1));
-        nodes.push_back(new Node<2>(1, true, 0.7, -0.1));
-        nodes.push_back(new Node<2>(2, true, 0.7, 0.7));
-        nodes.push_back(new Node<2>(3, true, -0.1, 0.7));
 
-        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        OutputFileHandler handler("TestIbMeshWriterVTKCornerOverlap", false);
+        std::string results_file = handler.GetOutputDirectoryFullPath() + "ib_mesh_vtk_corner_overlap.vtu";
+        FileFinder vtk_file(results_file, RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
         
-        ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
-        ib_mesh_writer.WriteVtkUsingMesh(mesh);
-        TS_ASSERT(true);
       }
       // Overlap everything 
       {
         // Generate nodes
         std::vector<Node<2>*> nodes;
-        const int nodesToGenerate = 9;
-        for (int nodeIndex = 0; nodeIndex < nodesToGenerate; nodeIndex++) {
-            double offset = nodeIndex % 2 == 0 ? 0 : 0.6;
-            nodes.push_back(new Node<2>(nodeIndex, true, 0.3 + offset, 0.1 + 0.05 * nodeIndex));
-        }
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(1, true, 0.9, 0.1));
+        nodes.push_back(new Node<2>(2, true, 0.9, 0.9));
+        nodes.push_back(new Node<2>(3, true, 0.1, 0.9));
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
@@ -243,10 +201,12 @@ public:
         
         ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
         ib_mesh_writer.WriteVtkUsingMesh(mesh);
-        TS_ASSERT(true);
-      }
-      
 
+        OutputFileHandler handler("TestIbMeshWriterVTKCornerOverlap", false);
+        std::string results_file = handler.GetOutputDirectoryFullPath() + "ib_mesh_vtk_corner_overlap.vtu";
+        FileFinder vtk_file(results_file, RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
+      }
     }
 };
 

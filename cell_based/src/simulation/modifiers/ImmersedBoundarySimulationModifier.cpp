@@ -198,7 +198,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
 
         // Calculate about a quarter of the eigenvalues \todo: remove this magic number
         const double total_gridpts = std::accumulate(num_grid_pts.begin(), num_grid_pts.end(), 1.0, std::multiplies<double>());
-        const double trace_proportion = 0.8;
 
         // Warn at this point if parameters are not sensible
         if (mNumGridPtsX % mNoiseSkip != 0)
@@ -216,7 +215,6 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
                 upper_corner,
                 num_grid_pts,
                 periodicity,
-                trace_proportion,
                 mNoiseLengthScale
         );
 

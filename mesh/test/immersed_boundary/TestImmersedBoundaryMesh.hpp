@@ -80,6 +80,13 @@ public:
 
     void TestSetupFluidVelocityGrids()
     {
+      std::vector<Node<2>*> nodes;
+      std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+
+      ImmersedBoundaryMesh<2, 2>* mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+      TS_ASSERT(&(mesh->rGet2dVelocityGrids()));
+      TS_ASSERT(&(mesh->rGetModifiable2dVelocityGrids()));
+      
     }
     
     void Test3DVelocityGrids() {
@@ -291,7 +298,6 @@ public:
         
         // A square should have no skewness about any axis
         {
-            std::cout << "Square\n";
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -317,7 +323,6 @@ public:
 
         // A triangle should have skewness
         {
-            std::cout << "Triangle\n";
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));

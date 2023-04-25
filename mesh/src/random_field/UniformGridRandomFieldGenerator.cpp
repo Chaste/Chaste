@@ -53,13 +53,11 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
                                                                             std::array<double, SPACE_DIM> upperCorner,
                                                                             std::array<unsigned, SPACE_DIM> numGridPts,
                                                                             std::array<bool, SPACE_DIM> periodicity,
-                                                                            double traceProportion,
                                                                             double lengthScale)
         : mLowerCorner(lowerCorner),
           mUpperCorner(upperCorner),
           mNumGridPts(numGridPts),
           mPeriodicity(periodicity),
-          mTraceProportion(traceProportion),
           mLengthScale(lengthScale),
           mCacheDir("CachedRandomFields/")
 {
@@ -74,8 +72,6 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
             assert(mNumGridPts[dim] > 0);
         }
 
-        assert(mTraceProportion > 0.0);
-        assert(mTraceProportion < 1.0);
         assert(mLengthScale > 0.0);
     }
 
@@ -129,7 +125,6 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
                  << mUpperCorner[0] << "_"
                  << mNumGridPts[0] << "_"
                  << mPeriodicity[0] << "_"
-                 << mTraceProportion << "_"
                  << mLengthScale;
             break;
         }
@@ -140,7 +135,6 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
                  << mUpperCorner[0] << "_" << mUpperCorner[1] << "_"
                  << mNumGridPts[0] << "_" << mNumGridPts[1] << "_"
                  << mPeriodicity[0] << "_" << mPeriodicity[1] << "_"
-                 << mTraceProportion << "_"
                  << mLengthScale;
             break;
         }
@@ -151,7 +145,6 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
                  << mUpperCorner[0] << "_" << mUpperCorner[1] << "_" << mUpperCorner[2] << "_"
                  << mNumGridPts[0] << "_" << mNumGridPts[1] << "_" << mNumGridPts[2] << "_"
                  << mPeriodicity[0] << "_" << mPeriodicity[1] << "_" << mPeriodicity[2] << "_"
-                 << mTraceProportion << "_"
                  << mLengthScale;
             break;
         }
@@ -167,6 +160,12 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
 template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
 { 
+    return this->SampleRandomFieldAtTime(rand());
+}
+
+template <unsigned SPACE_DIM>
+std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time) const noexcept
+{ 
     // TODO: randomise seed
     OpenSimplex2S os(123);
     auto reshape = [](const double val) {
@@ -180,16 +179,14 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
     switch(SPACE_DIM) {
         case 1:
             for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
-                // TODO: Better rng for time/continuous time
-                samples[x] = reshape(reshape(os.noise2_XBeforeY(x * mLengthScale, rand())));
+                samples[x] = reshape(reshape(os.noise2_XBeforeY(x * mLengthScale, time)));
             }
             break;
         
         case 2:
             for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
                 for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
-                    // TODO: Better rng for time/continuous time
-                    samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, rand())));
+                    samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time)));
                 }
             }
             break;
@@ -198,8 +195,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
             for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
                 for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
                     for (unsigned int z = 0; z < mNumGridPts[2]; z++) {
-                        // TODO: Better rng for time/continuous time
-                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(os.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, rand())));
+                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(os.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time)));
                     }
                 }
             }
@@ -212,26 +208,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
     }
     
     return samples;
-    
-    /*// Generate mNumTotalGridPts normally-distributed random numbers
-    std::vector<double> samples_from_n01(mNumTotalGridPts);
-    for (unsigned i = 0; i < samples_from_n01.size(); ++i)
-    {
-        samples_from_n01[i] = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
-    }
-
-    // Generate the instance of the random field
-    Eigen::VectorXd grf(mNumTotalGridPts);
-    grf.setZero();
-    for (unsigned j = 0; j < mScaledEigenvecs.cols(); ++j)
-    {
-        grf += samples_from_n01[j] * mScaledEigenvecs.col(j);
-    }
-
-    // Translate to a std::vector so that eigen objects aren't leaking out to other places in Chaste
-    return std::vector<double>(grf.data(), grf.data() + grf.size());*/
 }
-
 template <unsigned SPACE_DIM>
 double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector<double>& rRandomField,
                                                                const c_vector<double, SPACE_DIM>& rLocation) const noexcept

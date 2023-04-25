@@ -55,9 +55,7 @@ struct RandomFieldCacheHeader
     std::array<double, SPACE_DIM> mUpperCorner;
     std::array<unsigned, SPACE_DIM> mNumGridPts;
     std::array<bool, SPACE_DIM> mPeriodicity;
-    double mTraceProportion;
     double mLengthScale;
-    unsigned mNumEigenvals;
 };
 
 /**
@@ -83,9 +81,6 @@ private:
 
     /** Whether the grid is periodic in each dimension */
     std::array<bool, SPACE_DIM> mPeriodicity;
-
-    /** Proportion of the trace that the sum of N calculated eigenvalues must exceed */
-    double mTraceProportion;
 
     /** Length scale over which the noise is to be correlated */
     double mLengthScale;
@@ -122,7 +117,6 @@ private:
         archive & mUpperCorner;
         archive & mNumGridPts;
         archive & mPeriodicity;
-        archive & mTraceProportion;
         archive & mLengthScale;
     }
 
@@ -180,7 +174,6 @@ public:
                                     std::array<double, SPACE_DIM> upperCorner,
                                     std::array<unsigned, SPACE_DIM> numGridPts,
                                     std::array<bool, SPACE_DIM> periodicity,
-                                    double traceProportion,
                                     double lengthScale);
 
 
@@ -191,6 +184,14 @@ public:
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomField() const noexcept;
+    
+    /**
+     * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
+     * create an appropriate linear combination of the eigenvectors.
+     *
+     * @return A vector representing an instance of the random field.
+     */
+    std::vector<double> SampleRandomFieldAtTime(double time) const noexcept;
 
     /**
      * Interpolate from the random field by returning the value at the node of the random field closest to the given

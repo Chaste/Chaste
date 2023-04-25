@@ -218,6 +218,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
     //p_writer->PrintSelf(std::cout, vtkIndent());
     p_writer->Write();
     p_writer->Delete(); // Reference counted
+   
 #endif //CHASTE_VTK
 }
 
