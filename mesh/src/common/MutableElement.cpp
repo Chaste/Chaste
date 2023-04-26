@@ -427,36 +427,19 @@ Edge<SPACE_DIM> *MutableElement<1, SPACE_DIM>::GetEdge(unsigned localIndex) cons
 template<unsigned int SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
 {
-    this->mEdgeHelper = edgeHelper;
+    // Does nothing in 1D
 }
 
 template<unsigned int SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::BuildEdges()
 {
-    assert(mEdgeHelper != nullptr);
-
-    // If SPACE_DIM == 2 then we can assume that the node layout
-    // in the array corresponds to its connections
-    // We can then infer the edge connection information
-    if (SPACE_DIM == 2)
-    {
-        this->ClearEdges();
-        for (unsigned i = 0; i < this->mNodes.size(); i++)
-        {
-            unsigned i_next = (i+1) % this->mNodes.size();
-            mEdges.push_back(mEdgeHelper->GetEdgeFromNodes(this->mIndex, this->mNodes[i], this->mNodes[i_next]));
-        }
-    }
+    // Does nothing in 1D
 }
 
 template<unsigned int SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::ClearEdges()
 {
-    for (auto edge: mEdges)
-    {
-        edge->RemoveElement(this->mIndex);
-    }
-    mEdges.clear();
+    //Does nothing in 1D
 }
 
 template <unsigned SPACE_DIM>
