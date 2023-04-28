@@ -114,6 +114,13 @@ def TidyFile(filepath):
                     library_call = "tetgen"
                 if ("fun:H5F" in line):
                     library_call = "HDF5"
+                if ("vtk" in line):
+                    library_call = "VTK"
+                if ("fun:CVode" in line):
+                    library_call = "CVODE"
+                if ("boost" in line):
+                    library_call = "boost"
+
                 body += line
     # Sort the list of tuples by the body (lexicographically)
     suppressions.sort()

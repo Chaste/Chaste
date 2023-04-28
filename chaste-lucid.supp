@@ -5,9 +5,6 @@
 # to support the "..." syntax.                              #
 #############################################################
 
-# HDF5
-######
-
 {
     Leak in nss_lookup_function
     Memcheck:Leak
@@ -27,129 +24,6 @@
    fun:PCHYPRESetType_HYPRE
    ...
    fun:PCSetFromOptions
-}
-# CVODE
-#######
-{
-   CVode stopping event todo - check this
-   Memcheck:Cond
-   fun:CVode
-   fun:_ZN12CvodeAdaptor5SolveEP17AbstractOdeSystemRSt6vectorIdSaIdEEdddd
-   fun:_ZN16TestCvodeAdaptor*
-}
-{
-   VTK ExpandTable Reader
-   Memcheck:Cond
-   fun:_ZN14vtkInformation11ExpandTableEv
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   ...
-   fun:_ZN13VtkMeshReader*
-}
-# VTK
-#####
-{
-   VTK ExpandTable Writer
-   Memcheck:Cond
-   fun:_ZN14vtkInformation11ExpandTableEv
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   ...
-   fun:_ZN32vtkStreamingDemandDrivenPipeline*
-   ...
-   fun:_ZN12vtkXMLWriter*
-   fun:*MeshWriter*
-}
-{
-   VTK ExpandTable Writer UnRegister
-   Memcheck:Cond
-   fun:_ZN14vtkInformation11ExpandTableEv
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   fun:_ZN13vtkDataObject10InitializeEv
-   fun:_ZN10vtkDataSet10InitializeEv
-   fun:_ZN11vtkPointSet10InitializeEv
-   fun:_ZN19vtkUnstructuredGrid10InitializeEv
-   fun:_ZN19vtkUnstructuredGridD0Ev
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   fun:_ZN16VertexMeshWriter*
-}
-{
-   VTK-information leak
-   Memcheck:Addr8
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   fun:_ZN24vtkInformationIntegerKey3SetEP14vtkInformationi
-   fun:_ZN32vtkStreamingDemandDrivenPipeline21PropagateUpdateExtentEi
-   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
-   fun:_ZN12vtkXMLWriter5WriteEv
-}
-{
-   VTK-information-copy
-   Memcheck:Cond
-   fun:_ZN14vtkInformation4CopyEPS_i
-   fun:_ZN34vtkInformationInformationVectorKey8DeepCopyEP14vtkInformationS1_
-   ...
-   fun:_ZN13vtkDataObject25CopyInformationToPipelineEP14vtkInformationS1_S1_i
-   fun:_ZN23vtkDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   ...
-   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
-   ...
-   fun:_ZN13VtkMeshReader*
-}
-{
-   VTK-information delete
-   Memcheck:Cond
-   fun:_ZN14vtkInformationD*Ev
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:_ZN13vtkDataObject14SetInformationEP14vtkInformation
-   fun:_ZN13vtkDataObjectD*Ev
-   ...
-   fun:_ZN19vtkUnstructuredGridD0Ev
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:*V*Mesh*er*
-}
-{
-   VTK-information delete via garbage-collector
-   Memcheck:Cond
-   fun:_ZN14vtkInformationD*Ev
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:_ZN23vtkGarbageCollectorImpl16CollectComponentEPNS_13ComponentTypeE
-   fun:_ZN23vtkGarbageCollectorImpl15CollectInternalEP13vtkObjectBase
-   fun:_ZN19vtkGarbageCollector7CollectEP13vtkObjectBase
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:*V*Mesh*er*
-}
-# Bug in Boost 1.44 - 1.46
-{
-   boost terminate bug
-   Memcheck:Addr4
-   fun:_ZNK5boost13serialization13typeid_system27extended_type_info_typeid_012is_less_thanERKNS0_18extended_type_infoE
-   fun:_ZNK5boost13serialization18extended_type_infoltERKS1_
-   fun:_ZNK5boost13serialization16void_cast_detail11void_casterltERKS2_
-   fun:_ZNK5boost13serialization16void_cast_detail11void_caster20recursive_unregisterEv
-   fun:_ZN5boost13serialization16void_cast_detail20void_caster_shortcutD0Ev
-   fun:_ZNK5boost13serialization16void_cast_detail11void_caster20recursive_unregisterEv
-   ...
-   fun:__cxa_finalize
-   ...
-   fun:__run_exit_handlers
-   fun:exit
-   fun:(below main)
-}
-# Boost
-#######
-{
-   boost serialization error
-   Memcheck:Leak
-   fun:_Znw*
-   fun:_ZNK5boost13serialization16void_cast_detail11void_caster18recursive_registerEb
 }
 {
    leak due to boost bug (2)
@@ -202,25 +76,6 @@
    fun:call_init
    fun:_dl_init
 }
-{
-   VTK ZLib
-   Memcheck:Cond
-   fun:inflateReset2
-   fun:inflateInit2_
-   fun:inflateInit_
-   fun:uncompress
-   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
-   fun:_ZN17vtkDataCompressor10UncompressEPKhmPhm
-}
-{
-   VTK ZLib with fewer inits
-   Memcheck:Cond
-   fun:inflateReset2
-   fun:inflateInit2_
-   fun:uncompress
-   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
-   fun:_ZN16vtkXMLDataParser9ReadBlockEjPh
-}
 # This last one is perhaps a little more dubious...
 {
    keyval create (malloc)
@@ -246,6 +101,40 @@
    ...
    fun:_dl_fini
 }
+# Bug in Boost 1.44 - 1.46
+{
+   boost terminate bug
+   Memcheck:Addr4
+   fun:_ZNK5boost13serialization13typeid_system27extended_type_info_typeid_012is_less_thanERKNS0_18extended_type_infoE
+   fun:_ZNK5boost13serialization18extended_type_infoltERKS1_
+   fun:_ZNK5boost13serialization16void_cast_detail11void_casterltERKS2_
+   fun:_ZNK5boost13serialization16void_cast_detail11void_caster20recursive_unregisterEv
+   fun:_ZN5boost13serialization16void_cast_detail20void_caster_shortcutD0Ev
+   fun:_ZNK5boost13serialization16void_cast_detail11void_caster20recursive_unregisterEv
+   ...
+   fun:__cxa_finalize
+   ...
+   fun:__run_exit_handlers
+   fun:exit
+   fun:(below main)
+}
+# Boost
+#######
+{
+   boost serialization error
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZNK5boost13serialization16void_cast_detail11void_caster18recursive_registerEb
+}
+# CVODE
+#######
+{
+   CVODE    CVode stopping event todo - check this
+   Memcheck:Cond
+   fun:CVode
+   fun:_ZN12CvodeAdaptor5SolveEP17AbstractOdeSystemRSt6vectorIdSaIdEEdddd
+   fun:_ZN16TestCvodeAdaptor*
+}
 {
    HDF5 file create
    Memcheck:Leak
@@ -257,6 +146,8 @@
    ...
    fun:H5F_open
 }
+# HDF5
+######
 {
    HDF5 file close
    Memcheck:Param
@@ -358,4 +249,112 @@
    fun:*PetscInitialize*
    ...
    fun:_ZN10PetscSetup10setUpWorldEv
+}
+{
+   VTK ExpandTable Reader
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   ...
+   fun:_ZN13VtkMeshReader*
+}
+# VTK
+#####
+{
+   VTK ExpandTable Writer
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   ...
+   fun:_ZN32vtkStreamingDemandDrivenPipeline*
+   ...
+   fun:_ZN12vtkXMLWriter*
+   fun:*MeshWriter*
+}
+{
+   VTK ExpandTable Writer UnRegister
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   fun:_ZN13vtkDataObject10InitializeEv
+   fun:_ZN10vtkDataSet10InitializeEv
+   fun:_ZN11vtkPointSet10InitializeEv
+   fun:_ZN19vtkUnstructuredGrid10InitializeEv
+   fun:_ZN19vtkUnstructuredGridD0Ev
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   fun:_ZN16VertexMeshWriter*
+}
+{
+   VTK-information leak
+   Memcheck:Addr8
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   fun:_ZN24vtkInformationIntegerKey3SetEP14vtkInformationi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline21PropagateUpdateExtentEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkXMLWriter5WriteEv
+}
+{
+   VTK-information-copy
+   Memcheck:Cond
+   fun:_ZN14vtkInformation4CopyEPS_i
+   fun:_ZN34vtkInformationInformationVectorKey8DeepCopyEP14vtkInformationS1_
+   ...
+   fun:_ZN13vtkDataObject25CopyInformationToPipelineEP14vtkInformationS1_S1_i
+   fun:_ZN23vtkDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   ...
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   ...
+   fun:_ZN13VtkMeshReader*
+}
+{
+   VTK-information delete
+   Memcheck:Cond
+   fun:_ZN14vtkInformationD*Ev
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:_ZN13vtkDataObject14SetInformationEP14vtkInformation
+   fun:_ZN13vtkDataObjectD*Ev
+   ...
+   fun:_ZN19vtkUnstructuredGridD0Ev
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:*V*Mesh*er*
+}
+{
+   VTK-information delete via garbage-collector
+   Memcheck:Cond
+   fun:_ZN14vtkInformationD*Ev
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:_ZN23vtkGarbageCollectorImpl16CollectComponentEPNS_13ComponentTypeE
+   fun:_ZN23vtkGarbageCollectorImpl15CollectInternalEP13vtkObjectBase
+   fun:_ZN19vtkGarbageCollector7CollectEP13vtkObjectBase
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:*V*Mesh*er*
+}
+{
+   VTK ZLib
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:inflateInit_
+   fun:uncompress
+   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
+   fun:_ZN17vtkDataCompressor10UncompressEPKhmPhm
+}
+{
+   VTK ZLib with fewer inits
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:uncompress
+   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
+   fun:_ZN16vtkXMLDataParser9ReadBlockEjPh
 }
