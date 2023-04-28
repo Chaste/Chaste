@@ -35,8 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 Useful functions for use by the build system, and utility scripts.
 
-These have been extracted from SConsTools.py so they can be used by scripts
-run externally to an SConscript.
+These have been extracted from SConsTools.py as we moved the build system to Cmake.
 """
 
 import os

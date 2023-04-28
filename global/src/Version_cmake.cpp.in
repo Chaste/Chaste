@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * This is a template file for generating the Version.cpp source on the fly.
  * Content of the form ${example} is replaced by suitable values.
- * See the function GetVersionCpp in python/SConsTools.py for more details.
  */
 
 #include "Version.hpp"

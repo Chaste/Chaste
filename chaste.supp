@@ -1,16 +1,6 @@
 # To create a suppression run something like:
 # valgrind --tool=memcheck --track-fds=yes --leak-check=yes --num-callers=50 --suppressions=chaste.supp --gen-suppressions=yes io/build/debug/TestSpiralParametersReaderRunner
 
-#################################################
-# Note if memory leaks depend on the context (e.g. 
-# CHASTE_TEST_OUTPUT it may be advisable for Scons
-# to produce suppressions automatically:
-#       python/BuildTypes.py
-#       -    #_valgrind_flags +=" --gen-suppressions=all"
-#       +    _valgrind_flags +=" --gen-suppressions=all"
-#################################################
-
-
 #
 # Suppression a memory checking error caused by Boost's serialization library
 #

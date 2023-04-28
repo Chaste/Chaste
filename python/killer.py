@@ -132,20 +132,7 @@ def try_kill(proc, sig):
     except:
         pass
 
-# First, try killing off scons
-for pid in get_procs():
-    cmdline = check_pid(pid)
-    if cmdline is not None:
-        if len(cmdline) > 1 and 'scons' in cmdline[1]:
-            print(("SCons is running as PID %s" % pid))
-            if not sim:
-                try_kill(pid, signal.SIGTERM)
-                print("  ** Killing (sent SIGTERM)")
-                # Now sleep for a bit to let it die
-                time.sleep(10) # seconds
-                break
-
-# Next, try to make the builder script save any results folders to the right place
+# Try to make the builder script save any results folders to the right place
 for pid in get_procs():
     cmdline = check_pid(pid)
     if cmdline is not None:
