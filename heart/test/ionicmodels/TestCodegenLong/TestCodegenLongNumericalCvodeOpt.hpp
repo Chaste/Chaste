@@ -61,7 +61,7 @@ public:
         args.push_back("--opt");
 
         // Models we need to run it wirth finer tolerances
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"ten_tusscher_model_2004_endo"});
+        std::vector<std::string> different_lookup_table_models = special_treatment_models(models, {"ten_tusscher_model_2004_endo"});
 
         SetUseCvodeJacobian(false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);

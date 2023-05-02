@@ -60,9 +60,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
 #include "NobleVargheseKohlNoble1998aBackwardEulerOpt.hpp"
 
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersion.hpp"
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionOpt.hpp"
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionBackwardEulerOpt.hpp"
+
 #ifdef CHASTE_CVODE
 #include "LuoRudy1991Cvode.hpp"
 #include "LuoRudy1991CvodeOpt.hpp"
+#include "negative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionCvodeOpt.hpp"
 #endif // CHASTE_CVODE
 
 //This test is always run sequentially (never in parallel)
@@ -159,8 +164,14 @@ public:
         double end_time = 1000.0; //One second in milliseconds
         double i_ionic_end_time = 60.0; // ms
         double i_ionic = 1.9411; // test value
-
         // Normal model
+#ifndef NDEBUG
+        double sampling_interval = 1.0; // for testing codegen error check
+        // test error from codegen about concentration
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellML normal_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_CONTAINS(normal_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
+
         CellLuoRudy1991FromCellML normal(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(normal.GetVoltageIndex(), 0u);
         CheckCai(normal, true, 0.0002);
@@ -169,12 +180,22 @@ public:
         normal.SetTimestep(HeartConfig::Instance()->GetOdeTimeStep());
 
         // Optimised model
+        // test error from codegen about concentration
+#ifndef NDEBUG
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLOpt opt_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_CONTAINS(opt_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
         AbstractLookupTableCollection::EventHandler::Enable();
         CellLuoRudy1991FromCellMLOpt opt(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(opt.GetVoltageIndex(), 0u);
         CheckCai(opt, true, 0.0002);
 
         // Backward Euler optimised model
+        // test error from codegen about concentration
+#ifndef NDEBUG
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLBackwardEulerOpt be_model(p_solver, p_stimulus);
+        TS_ASSERT_THROWS_CONTAINS(be_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
         CellLuoRudy1991FromCellMLBackwardEulerOpt be(p_solver, p_stimulus);
 
         TS_ASSERT_EQUALS(be.GetVoltageIndex(), 0u);
@@ -315,6 +336,13 @@ public:
 
 #ifdef CHASTE_CVODE
         // CVODE version
+        // test error from codegen about concentration
+        Cellnegative_concentration_paci_hyttinen_aaltosetala_severi_ventricularVersionFromCellMLCvodeOpt cvode_model(p_solver, p_stimulus);
+        // Normal model
+#ifndef NDEBUG
+        TS_ASSERT_THROWS_CONTAINS(cvode_model.Compute(0.0, end_time, sampling_interval), "Concentration JSR_calcium_concentration below 0");
+#endif // NDEBUG
+
         CellLuoRudy1991FromCellMLCvode cvode_cell(p_solver, p_stimulus);
         TS_ASSERT_EQUALS(cvode_cell.GetVoltageIndex(), 0u);
         // Optimised CVODE version

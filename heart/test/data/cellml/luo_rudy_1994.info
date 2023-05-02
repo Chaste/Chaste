@@ -1,5 +1,4 @@
 FIXED -1
 UNLIMITED 1
 VARIABLES 12
-ODE SOLVER: EulerIvpOdeSolver
-Created by Chaste version 3.1.21123 (with uncommitted modifications) on Thu, 17 Apr 2014 13:53:02 +0000.  Chaste was built on Thu, 27 Feb 2014 13:21:08 +0000 by machine (uname) 'Linux dizzy 2.6.32-55-generic #117-Ubuntu SMP Tue Dec 3 17:31:12 UTC 2013 x86_64' using settings: GccOptNative, no Chaste libraries.  Checked-out project versions: 2020Science=21123; AidanDaly=21124; CryptMigration2012=21123; FC-cell-based=21123; FunctionalCuration=21123; LouiseB=21123M; SimpleSensitivity=21123; Wisc2013=21123; cellml=21123; jonc=21123; jonc-misc=21123; template=21123; website=21123.
+Created by Chaste version 2021.1.2eff91f (with uncommitted modifications) on Tue, 07 Feb 2023 10:51:39 +0000.  Chaste was built on Tue, 07 Feb 2023 10:37:20 +0000 by machine (uname) 'Linux' using settings: Debug.
