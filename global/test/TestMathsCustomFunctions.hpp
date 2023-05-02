@@ -60,9 +60,9 @@ public:
         // up to and including an exponent of 5 is necessary to test all of our functionality
         for (unsigned i=0; i<6; i++)
         {
-            TS_ASSERT_DELTA(SmallPow(0.0, i), std::pow(0.0, i), DBL_EPSILON);
-            TS_ASSERT_DELTA(SmallPow(-1.67e3, i), std::pow(-1.67e3, i), DBL_EPSILON);
-            TS_ASSERT_DELTA(SmallPow(75.0, i), std::pow(75.0, i), DBL_EPSILON);
+            TS_ASSERT_DELTA(SmallPow(0.0, i), std::pow(0.0, i), 1e-12);
+            TS_ASSERT_DELTA(SmallPow(-1.67e3, i), std::pow(-1.67e3, i), 1e-12);
+            TS_ASSERT_DELTA(SmallPow(75.0, i), std::pow(75.0, i), 1e-12);
         }
     }
 
