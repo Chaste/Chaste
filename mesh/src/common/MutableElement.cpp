@@ -424,6 +424,17 @@ Edge<SPACE_DIM> *MutableElement<1, SPACE_DIM>::GetEdge(unsigned localIndex) cons
     return mEdges[localIndex];
 }
 
+template <unsigned SPACE_DIM>
+bool MutableElement<1, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
+{
+    for (unsigned int i=0; i<mEdges.size(); ++i)
+    {
+        if ((*mEdges[i])==(*edge))
+            return true;
+    }
+    return false;
+}
+
 template<unsigned int SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
 {

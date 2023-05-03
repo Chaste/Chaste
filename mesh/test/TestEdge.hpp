@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2021, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -141,6 +141,87 @@ public:
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
         TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19);
+    }
+
+    /**
+     * Check whether edge building works as intended
+     */
+    void TestEdgeInitialisation1d()
+    {
+        const unsigned ELEMENT_DIM = 1;
+        const unsigned SPACE_DIM = 1;
+
+        unsigned exampleEdgeIndex = 1;
+
+        Edge<SPACE_DIM>* testEdge = new Edge<SPACE_DIM>(exampleEdgeIndex);
+        TS_ASSERT(testEdge->GetNumNodes()==0);
+
+        TS_ASSERT_EQUALS(exampleEdgeIndex, testEdge->GetIndex());
+
+        // Add nodes to the edge, check validity and centre position
+        Node<SPACE_DIM> node0(0, ChastePoint<SPACE_DIM>(0));
+        Node<SPACE_DIM> node1(1, ChastePoint<SPACE_DIM>(1));
+
+        testEdge->SetNodes(&node0, &node1);
+        auto edgeCentreLocation = testEdge->rGetCentreLocation();
+        TS_ASSERT(testEdge->GetNumNodes()==2);
+        TS_ASSERT(testEdge->GetNode(0)==&node0 ||testEdge->GetNode(0) == &node1);
+        TS_ASSERT(testEdge->GetNode(1)==&node0 ||testEdge->GetNode(1) == &node1);
+        TS_ASSERT(testEdge->GetNode(0)!=testEdge->GetNode(1));
+
+        // Generate two line vertex elements
+        std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
+        nodes0.push_back(new Node<SPACE_DIM>(0, false, 0.0));
+        nodes0.push_back(new Node<SPACE_DIM>(1, false, 1.0));
+
+        nodes1.push_back(nodes0[0]);
+        nodes1.push_back(new Node<SPACE_DIM>(2, false, -1.0));
+
+        allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
+        allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
+
+        std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
+        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
+        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
+
+        // Generate a mesh which will automatically build the edges in the constructor
+        VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
+        EdgeHelper<SPACE_DIM> edge_helper = mesh->GetEdgeHelper();
+        //There are two elements in our mesh
+        //We test Edge class methods here
+        for (unsigned int i=0; i<2; i++)
+        {
+            VertexElement<ELEMENT_DIM, SPACE_DIM>* element = elements[i];
+            const unsigned int n_edges = element->GetNumEdges();
+            for (unsigned int index = 0; index<n_edges; index++)
+            {
+                Edge<SPACE_DIM>* p_edge = element->GetEdge(index);
+                TS_ASSERT(p_edge->GetNumNodes()==2);
+                TS_ASSERT(p_edge->GetNode(0)!=p_edge->GetNode(1));
+                TS_ASSERT(p_edge->GetNumElements()>0&&p_edge->GetNumElements()<=2);
+                TS_ASSERT(element->ContainsEdge(p_edge));
+            }
+        }
+        for (unsigned int i=0; i<mesh->GetNumEdges(); i++)
+        {
+            Edge<SPACE_DIM>* p_edge = mesh->GetEdge(i);
+            TS_ASSERT(edge_helper.GetEdge(i)==p_edge);
+            TS_ASSERT(elements[0]->ContainsEdge(p_edge)||elements[1]->ContainsEdge(p_edge));
+        }
+
+        //For coverage
+        {
+            const VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh_const = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
+            const EdgeHelper<SPACE_DIM> edge_helper_for_const = mesh_const->GetEdgeHelper();
+            for (unsigned int i=0; i<mesh_const->GetNumEdges(); i++)
+            {
+                Edge<SPACE_DIM>* p_edge = mesh_const->GetEdge(i);
+                TS_ASSERT(edge_helper_for_const.GetEdge(i)==p_edge);
+                TS_ASSERT(edge_helper_for_const[i]==p_edge);
+                TS_ASSERT(elements[0]->ContainsEdge(p_edge)||elements[1]->ContainsEdge(p_edge));
+            }
+        }
+
     }
 
     void TestEdgeProperties()

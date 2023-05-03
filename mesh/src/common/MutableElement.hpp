@@ -330,6 +330,13 @@ public:
      */
     Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
 
+     /**
+     * Checks if the element contains edge
+     * @param edge
+     * @return
+     */
+    bool ContainsEdge(const Edge<SPACE_DIM> *edge) const;
+
     /**
      * @return Number of edges associated with this element
      */
