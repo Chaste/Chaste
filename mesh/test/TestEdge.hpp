@@ -191,14 +191,14 @@ public:
         //We test Edge class methods here
         for (unsigned int i=0; i<2; i++)
         {
-            VertexElement<ELEMENT_DIM, SPACE_DIM>* element = elements[i];
+            VertexElement<1, 1>* element = elements[i];
             const unsigned int n_edges = element->GetNumEdges();
             for (unsigned int index = 0; index<n_edges; index++)
             {
                 Edge<SPACE_DIM>* p_edge = element->GetEdge(index);
-                TS_ASSERT(p_edge->GetNumNodes()==2);
-                TS_ASSERT(p_edge->GetNode(0)!=p_edge->GetNode(1));
-                TS_ASSERT(p_edge->GetNumElements()>0&&p_edge->GetNumElements()<=2);
+                TS_ASSERT(element->GetEdge(index)->GetNumNodes()==2);
+                TS_ASSERT(element->GetEdge(index)->GetNode(0)!=p_edge->GetNode(1));
+                TS_ASSERT(element->GetEdge(index)->GetNumElements()>0&&p_edge->GetNumElements()<=2);
                 TS_ASSERT(element->ContainsEdge(p_edge));
             }
         }
