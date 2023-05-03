@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * Temporary re-creation of this file until I can work out why heart/CMakeFiles/chaste_heart.dir/src/odes/cellml/*.cpp
+ * Temporary re-creation of this file until I can work out why heart/CMakeFiles/chaste_heart.dir/src/odes/cellml/###.cpp
  * are generating code with this IsNan.hpp header...
  */
 
