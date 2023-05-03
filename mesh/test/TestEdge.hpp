@@ -148,7 +148,6 @@ public:
      */
     void TestEdgeInitialisation1d()
     {
-        const unsigned ELEMENT_DIM = 1;
         const unsigned SPACE_DIM = 1;
 
         unsigned exampleEdgeIndex = 1;
@@ -180,18 +179,18 @@ public:
         allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
         allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
 
-        std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
+        std::vector<VertexElement<1,SPACE_DIM>*> elements;
+        elements.push_back(new VertexElement<1,SPACE_DIM>(0, nodes0));
+        elements.push_back(new VertexElement<1,SPACE_DIM>(1, nodes1));
 
         // Generate a mesh which will automatically build the edges in the constructor
-        VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
+        VertexMesh<1, SPACE_DIM>* mesh = new VertexMesh<1, SPACE_DIM>(allnodes, elements);
         EdgeHelper<SPACE_DIM> edge_helper = mesh->GetEdgeHelper();
         //There are two elements in our mesh
         //We test Edge class methods here
         for (unsigned int i=0; i<2; i++)
         {
-            VertexElement<1, 1>* element = elements[i];
+            VertexElement<1, SPACE_DIM>* element = elements[i];
             const unsigned int n_edges = element->GetNumEdges();
             for (unsigned int index = 0; index<n_edges; index++)
             {
@@ -211,7 +210,7 @@ public:
 
         //For coverage
         {
-            const VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh_const = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
+            const VertexMesh<1, SPACE_DIM>* mesh_const = new VertexMesh<1, SPACE_DIM>(allnodes, elements);
             const EdgeHelper<SPACE_DIM> edge_helper_for_const = mesh_const->GetEdgeHelper();
             for (unsigned int i=0; i<mesh_const->GetNumEdges(); i++)
             {
