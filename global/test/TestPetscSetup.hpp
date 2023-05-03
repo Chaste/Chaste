@@ -44,7 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscException.hpp"
 #include "PetscTools.hpp"
 #include "Warnings.hpp"
-#include "IsNan.hpp"
+
+#include <cmath>
 
 class TestPetscSetup : public CxxTest::TestSuite
 {

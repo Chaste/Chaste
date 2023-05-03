@@ -45,7 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteBuildRoot.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "BoostFilesystem.hpp"
-#include "IsNan.hpp"
+
+#include <cmath>
 
 /**
  * Test for a strange 'feature' of Debian sarge systems, where the
