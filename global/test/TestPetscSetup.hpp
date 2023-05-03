@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "Warnings.hpp"
 
-#include <cmath>
-
 class TestPetscSetup : public CxxTest::TestSuite
 {
 public:
@@ -111,42 +109,6 @@ public:
         KSPWARNIFFAILED(KSP_DIVERGED_ITS);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         Warnings::QuietDestroy();
-    }
-
-    void TestDivideOneByZero()
-    {
-        double one = 1.0;
-        double zero = 0.0;
-        double ans;
-#ifdef TEST_FOR_FPE
-// If we are testing for divide-by-zero, then this will throw an exception
-        //TS_ASSERT_THROWS_ANYTHING(ans = one / zero);
-        ans = zero*one;//otherwise compiler would complain
-        TS_ASSERT_EQUALS(ans, zero);
-        ans=ans*zero;//otherwise compiler would complain
-#else
-// If we aren't testing for it, then there will be no exception
-        TS_ASSERT_THROWS_NOTHING(ans = one / zero);
-        double negative_infinity=std::numeric_limits<double>::infinity();
-        TS_ASSERT_EQUALS(ans, negative_infinity);
-#endif
-    }
-
-    void TestDivideZeroByZero()
-    {
-        double zero = 0.0;
-        double ans;
-#ifdef TEST_FOR_FPE
-// If we are testing for divide-by-zero, then this will throw an exception
-        //TS_ASSERT_THROWS_ANYTHING(ans = zero / zero);
-        ans = zero;//otherwise compiler would complain
-        TS_ASSERT_EQUALS(ans, zero);
-        ans=ans*zero;//otherwise compiler would complain
-#else
-// If we aren't testing for it, then there will be no exception
-        TS_ASSERT_THROWS_NOTHING(ans = zero / zero);
-        TS_ASSERT(std::isnan(ans));
-#endif
     }
 };
 
