@@ -106,22 +106,12 @@ def TidyFile(filepath):
                 memcheck = line
                 body = ""
             else:
-                if ("PetscInitialize" in line):
-                    library_call = "PetscInitialize"
-                if ("PetscFinalize" in line):
-                    library_call = "PetscFinalize"
-                if ("tetgen" in line):
-                    library_call = "tetgen"
-                if ("fun:H5F" in line):
-                    library_call = "HDF5"
-                if ("vtk" in line):
-                    library_call = "VTK"
-                if ("fun:CVode" in line):
-                    library_call = "CVODE"
-                if ("boost" in line):
-                    library_call = "boost"
-
+                # Add line to body
+                for pattern in ["PetscInitialize", "PetscFinalize", "tetgen", "H5F", "vtk", "CVode", "boost", "xerces"]:
+                    if (pattern in line):
+                        library_call = pattern
                 body += line
+            #end if
     # Sort the list of tuples by the body (lexicographically)
     suppressions.sort()
     
@@ -130,8 +120,8 @@ def TidyFile(filepath):
     
     # Write out - overwrites the original file
     for (library_call, body, comment, name, memcheck, match) in suppressions:
-        if (not body in seen_set):
-            seen_set.add(body)
+        if (not (match, body) in seen_set):
+            seen_set.add((match, body))
             
             # Top of suppression
             out.write(comment)

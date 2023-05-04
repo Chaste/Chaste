@@ -7,6 +7,7 @@
 # This file is used automatically if valgrind is new enough #
 # to support the "..." syntax.                              #
 #############################################################
+
 {
     Leak in nss_lookup_function
     Memcheck:Leak
@@ -26,16 +27,6 @@
    fun:PCHYPRESetType_HYPRE
    ...
    fun:PCSetFromOptions
-}
-#
-# Xerces memory error
-#
-{
-   xerces-reader 
-   Memcheck:Cond
-   fun:_ZN11xercesc_2_717XMLUTF8Transcoder13transcodeFromEPKhjPtjRjPh
-   fun:_ZN11xercesc_2_79XMLReader14xcodeMoreCharsEPtPhj
-   fun:_ZN11xercesc_2_79XMLReader17refreshCharBufferEv
 }
 {
    leak due to boost bug (2)
@@ -298,7 +289,7 @@
    fun:_ZN16TestCvodeAdaptor*
 }
 {
-   HDF5 file create
+   H5F HDF5 file create
    Memcheck:Leak
    fun:malloc
    ...
@@ -309,7 +300,7 @@
    fun:H5F_open
 }
 {
-   HDF5    MPICH problem in calls from H5FD_mpio_open
+   MPICH problem in calls from H5FD_mpio_open
    Memcheck:Leak
    fun:malloc
    fun:ADIOI_Malloc_fn
@@ -322,7 +313,7 @@
    fun:_ZN14Hdf5DataWriter13EndDefineModeEv
 }
 {
-   HDF5    MPICH problem in calls from H5FD_mpio_open
+   MPICH problem in calls from H5FD_mpio_open
    Memcheck:Leak
    fun:malloc
    fun:ADIOI_Malloc_fn
@@ -335,7 +326,7 @@
    fun:_ZN14Hdf5DataWriterC1ER24DistributedVectorFactoryRKSsS3_bb
 }
 {
-   HDF5 write on closure
+   H5F: HDF5 write on closure
    Memcheck:Param
    pwritev(vector[...])
    fun:pwritev64
@@ -370,7 +361,7 @@
 # HDF5
 ######
 {
-   HDF5 file close
+   H5F: HDF5 file close
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
@@ -384,7 +375,7 @@
    fun:H5Fclose
 }
 {
-   HDF5-free-lists-variant2
+   H5F: HDF5-free-lists-variant2
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
@@ -408,7 +399,7 @@
 # HDF5 free lists (see http://hdf.ncsa.uiuc.edu/HDF5/faq/valgrind.html )
 #
 {
-   HDF5-free-lists-variant1
+   H5F: HDF5-free-lists-variant1
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
@@ -638,114 +629,6 @@
    fun:_ZN10PetscSetup10setUpWorldEv
 }
 {
-   VTK ExpandTable Reader
-   Memcheck:Cond
-   fun:_ZN14vtkInformation11ExpandTableEv
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   ...
-   fun:_ZN13VtkMeshReader*
-}
-# VTK
-#####
-{
-   VTK ExpandTable Writer
-   Memcheck:Cond
-   fun:_ZN14vtkInformation11ExpandTableEv
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   ...
-   fun:_ZN32vtkStreamingDemandDrivenPipeline*
-   ...
-   fun:_ZN12vtkXMLWriter*
-   fun:*MeshWriter*
-}
-{
-   VTK ExpandTable Writer UnRegister
-   Memcheck:Cond
-   fun:_ZN14vtkInformation11ExpandTableEv
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   fun:_ZN13vtkDataObject10InitializeEv
-   fun:_ZN10vtkDataSet10InitializeEv
-   fun:_ZN11vtkPointSet10InitializeEv
-   fun:_ZN19vtkUnstructuredGrid10InitializeEv
-   fun:_ZN19vtkUnstructuredGridD0Ev
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   fun:_ZN16VertexMeshWriter*
-}
-{
-   VTK-information leak
-   Memcheck:Addr8
-   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
-   fun:_ZN24vtkInformationIntegerKey3SetEP14vtkInformationi
-   fun:_ZN32vtkStreamingDemandDrivenPipeline21PropagateUpdateExtentEi
-   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
-   fun:_ZN12vtkXMLWriter5WriteEv
-}
-{
-   VTK-information-copy
-   Memcheck:Cond
-   fun:_ZN14vtkInformation4CopyEPS_i
-   fun:_ZN34vtkInformationInformationVectorKey8DeepCopyEP14vtkInformationS1_
-   ...
-   fun:_ZN13vtkDataObject25CopyInformationToPipelineEP14vtkInformationS1_S1_i
-   fun:_ZN23vtkDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   ...
-   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
-   ...
-   fun:_ZN13VtkMeshReader*
-}
-{
-   VTK-information delete
-   Memcheck:Cond
-   fun:_ZN14vtkInformationD*Ev
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:_ZN13vtkDataObject14SetInformationEP14vtkInformation
-   fun:_ZN13vtkDataObjectD*Ev
-   ...
-   fun:_ZN19vtkUnstructuredGridD0Ev
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:*V*Mesh*er*
-}
-{
-   VTK-information delete via garbage-collector
-   Memcheck:Cond
-   fun:_ZN14vtkInformationD*Ev
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:_ZN23vtkGarbageCollectorImpl16CollectComponentEPNS_13ComponentTypeE
-   fun:_ZN23vtkGarbageCollectorImpl15CollectInternalEP13vtkObjectBase
-   fun:_ZN19vtkGarbageCollector7CollectEP13vtkObjectBase
-   ...
-   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
-   ...
-   fun:*V*Mesh*er*
-}
-{
-   VTK ZLib
-   Memcheck:Cond
-   fun:inflateReset2
-   fun:inflateInit2_
-   fun:inflateInit_
-   fun:uncompress
-   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
-   fun:_ZN17vtkDataCompressor10UncompressEPKhmPhm
-}
-{
-   VTK ZLib with fewer inits
-   Memcheck:Cond
-   fun:inflateReset2
-   fun:inflateInit2_
-   fun:uncompress
-   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
-   fun:_ZN16vtkXMLDataParser9ReadBlockEjPh
-}
-{
    boost-archive-reset-object-address-value
    Memcheck:Value4
    fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
@@ -834,4 +717,122 @@
    fun:_ZN6tetgen14tetrahedralizeEPNS_14tetgenbehaviorEPNS_8tetgenioES3_S3_S3_
    fun:_ZN6tetgen14tetrahedralizeEPcPNS_8tetgenioES2_S2_S2_
    fun:_ZN13QuadraticMeshILj3EE29ConstructFromLinearMeshReaderER18AbstractMeshReaderILj3ELj3EE
+}
+{
+   vtk    VTK ExpandTable Reader
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   ...
+   fun:_ZN13VtkMeshReader*
+}
+# VTK
+#####
+{
+   vtk: VTK ExpandTable Writer
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   ...
+   fun:_ZN32vtkStreamingDemandDrivenPipeline*
+   ...
+   fun:_ZN12vtkXMLWriter*
+   fun:*MeshWriter*
+}
+{
+   vtk: VTK ExpandTable Writer UnRegister
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   fun:_ZN13vtkDataObject10InitializeEv
+   fun:_ZN10vtkDataSet10InitializeEv
+   fun:_ZN11vtkPointSet10InitializeEv
+   fun:_ZN19vtkUnstructuredGrid10InitializeEv
+   fun:_ZN19vtkUnstructuredGridD0Ev
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   fun:_ZN16VertexMeshWriter*
+}
+{
+   vtk: VTK-information leak
+   Memcheck:Addr8
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   fun:_ZN24vtkInformationIntegerKey3SetEP14vtkInformationi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline21PropagateUpdateExtentEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkXMLWriter5WriteEv
+}
+{
+   vtk: VTK-information-copy
+   Memcheck:Cond
+   fun:_ZN14vtkInformation4CopyEPS_i
+   fun:_ZN34vtkInformationInformationVectorKey8DeepCopyEP14vtkInformationS1_
+   ...
+   fun:_ZN13vtkDataObject25CopyInformationToPipelineEP14vtkInformationS1_S1_i
+   fun:_ZN23vtkDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline18ExecuteInformationEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   ...
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   ...
+   fun:_ZN13VtkMeshReader*
+}
+{
+   vtk: VTK-information delete
+   Memcheck:Cond
+   fun:_ZN14vtkInformationD*Ev
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:_ZN13vtkDataObject14SetInformationEP14vtkInformation
+   fun:_ZN13vtkDataObjectD*Ev
+   ...
+   fun:_ZN19vtkUnstructuredGridD0Ev
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:*V*Mesh*er*
+}
+{
+   vtk: VTK-information delete via garbage-collector
+   Memcheck:Cond
+   fun:_ZN14vtkInformationD*Ev
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:_ZN23vtkGarbageCollectorImpl16CollectComponentEPNS_13ComponentTypeE
+   fun:_ZN23vtkGarbageCollectorImpl15CollectInternalEP13vtkObjectBase
+   fun:_ZN19vtkGarbageCollector7CollectEP13vtkObjectBase
+   ...
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   ...
+   fun:*V*Mesh*er*
+}
+{
+   vtk: VTK ZLib
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:inflateInit_
+   fun:uncompress
+   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
+   fun:_ZN17vtkDataCompressor10UncompressEPKhmPhm
+}
+{
+   vtk: VTK ZLib with fewer inits
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:uncompress
+   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
+   fun:_ZN16vtkXMLDataParser9ReadBlockEjPh
+}
+#
+# Xerces memory error
+#
+{
+   xerces-reader
+   Memcheck:Cond
+   fun:_ZN11xercesc_2_717XMLUTF8Transcoder13transcodeFromEPKhjPtjRjPh
+   fun:_ZN11xercesc_2_79XMLReader14xcodeMoreCharsEPtPhj
+   fun:_ZN11xercesc_2_79XMLReader17refreshCharBufferEv
 }
