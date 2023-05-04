@@ -103,6 +103,8 @@ private:
     double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
                               const c_vector<double, SPACE_DIM>& rLocation2) const noexcept;
 
+    OpenSimplex2S os;
+
 public:
 
     /**
@@ -135,8 +137,10 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept;
-    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) const noexcept;
+    std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept;
+    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) noexcept;
+
+    void SetRandomSeed(const unsigned int seed);
 };
 
 

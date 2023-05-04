@@ -734,7 +734,6 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
     // Only implemented in 2D
     assert(SPACE_DIM == 2);
 
-    //std::cout << "Index is " << index << "\n";
     ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
     unsigned num_nodes = p_element->GetNumNodes();
@@ -1026,6 +1025,11 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
     }
 
     return surface_area;
+}
+
+template <>
+double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx) noexcept {
+    return 0.0
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

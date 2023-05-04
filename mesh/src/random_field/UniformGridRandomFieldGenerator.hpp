@@ -153,6 +153,8 @@ private:
      * @return A unique filename based on the parameters.
      */
     std::string GetFilenameFromParams() const noexcept;
+    
+    OpenSimplex2S os;
 
 
 public:
@@ -183,7 +185,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomField() const noexcept;
+    std::vector<double> SampleRandomField() noexcept;
     
     /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
@@ -191,7 +193,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomFieldAtTime(double time) const noexcept;
+    std::vector<double> SampleRandomFieldAtTime(double time) noexcept;
 
     /**
      * Interpolate from the random field by returning the value at the node of the random field closest to the given
@@ -217,6 +219,8 @@ public:
      * @return the file name of the cached file, relative to $CHASTE_TEST_OUTPUT
      */
     const std::string SaveToCache() const;
+    
+    void SetRandomSeed(const unsigned int seed);
 };
 
 

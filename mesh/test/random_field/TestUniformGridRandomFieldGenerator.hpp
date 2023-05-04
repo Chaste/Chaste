@@ -132,8 +132,10 @@ public:
             
             const unsigned n = 4;
             UniformGridRandomFieldGenerator<1> gen1({{0.0}}, {{1.0}}, {{n}}, {{true}}, 1.00);
+            gen1.SetRandomSeed(123);
             auto samples1 = gen1.SampleRandomFieldAtTime(0.0);
             UniformGridRandomFieldGenerator<1> gen2({{0.0}}, {{1.0}}, {{n}}, {{true}}, 2.00);
+            gen2.SetRandomSeed(123);
             auto samples2 = gen2.SampleRandomFieldAtTime(0.0);
 
             TS_ASSERT_EQUALS(samples1[0], samples2[0]);           

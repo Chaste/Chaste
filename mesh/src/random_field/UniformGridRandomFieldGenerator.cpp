@@ -81,6 +81,13 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
         mGridSpacing[dim] = (mUpperCorner[dim] - mLowerCorner[dim]) / mNumGridPts[dim];
         mOneOverGridSpacing[dim] = mNumGridPts[dim] / (mUpperCorner[dim] - mLowerCorner[dim]);
     }
+    
+    os = OpenSimplex2S(rand());
+}
+
+template <unsigned SPACE_DIM>
+void UniformGridRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned int seed) {
+    os = OpenSimplex2S(seed);
 }
 
 template <unsigned SPACE_DIM>
@@ -158,16 +165,15 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
 }
 
 template <unsigned SPACE_DIM>
-std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField() const noexcept
+std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField() noexcept
 { 
     return this->SampleRandomFieldAtTime(rand());
 }
 
 template <unsigned SPACE_DIM>
-std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time) const noexcept
+std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time) noexcept
 { 
     // TODO: randomise seed
-    OpenSimplex2S os(123);
     auto reshape = [](const double val) {
         double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
         double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;

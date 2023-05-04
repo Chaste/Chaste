@@ -86,6 +86,8 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::a
     );
 
     mpBoxCollection->SetupLocalBoxesHalfOnly();
+    
+    os = OpenSimplex2S(rand());
 }
 
 template <unsigned SPACE_DIM>
@@ -115,18 +117,22 @@ double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
     return dist_squared;
 }
 
+template <unsigned SPACE_DIM>
+void OffLatticeRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned int seed) {
+    os = OpenSimplex2S(seed);
+}
+
 // TODO: Check what this method actually should be doing - should presumably be sampling at node locations?
 template <unsigned SPACE_DIM>
-std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) const noexcept
+std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept
 {
     return this->SampleRandomFieldAtTime(rNodes, rand());
 }
 
 template <unsigned SPACE_DIM>
-std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) const noexcept
+std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) noexcept
 {
     // TODO: randomise seed
-    OpenSimplex2S os(321);
     auto reshape = [](const double val) {
         double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
         double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
