@@ -1029,7 +1029,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
 
 template <>
 double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx) noexcept {
-    return 0.0
+    return 0.0;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
