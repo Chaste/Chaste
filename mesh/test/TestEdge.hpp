@@ -195,9 +195,11 @@ public:
             for (unsigned int index = 0; index<n_edges; index++)
             {
                 Edge<SPACE_DIM>* p_edge = element->GetEdge(index);
-                TS_ASSERT(element->GetEdge(index)->GetNumNodes()==2);
-                TS_ASSERT(element->GetEdge(index)->GetNode(0)!=p_edge->GetNode(1));
-                TS_ASSERT(element->GetEdge(index)->GetNumElements()>0&&p_edge->GetNumElements()<=2);
+                TS_ASSERT(p_edge->GetNumNodes()==2);
+                TS_ASSERT(p_edge->GetNode(0)!=p_edge->GetNode(1));
+                TS_ASSERT(p_edge->GetNumElements()>0&&p_edge->GetNumElements()<=2);
+                TS_ASSERT(element->GetLocalEdgeIndex(p_edge) > 0 && element->GetLocalEdgeIndex(p_edge) < 2);
+                TS_ASSERT(element->GetEdgeGlobalIndex(index) > 0 && element->GetEdgeGlobalIndex(index) <2);
                 TS_ASSERT(element->ContainsEdge(p_edge));
             }
         }
