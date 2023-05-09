@@ -148,7 +148,7 @@ public:
      */
     void TestEdgeInitialisation1d()
     {
-        const unsigned SPACE_DIM = 1;
+        const unsigned SPACE_DIM = 2;
 
         unsigned exampleEdgeIndex = 1;
 
