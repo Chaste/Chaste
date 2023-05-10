@@ -191,8 +191,6 @@ public:
         for (unsigned int i=0; i<2; i++)
         {
             VertexElement<1, SPACE_DIM>* element = elements[i];
-            //MutableElement<1, SPACE_DIM>* element2 = elements[i];
-            //VertexElement<1, SPACE_DIM>* element = static_cast<VertexElement<1, SPACE_DIM>*>(element2);
             const unsigned int n_edges = element->GetNumEdges();
             for (unsigned int index = 0; index<n_edges; index++)
             {
@@ -202,6 +200,8 @@ public:
                 TS_ASSERT(p_edge->GetNumElements()>0&&p_edge->GetNumElements()<=2);
                 TS_ASSERT(element->GetLocalEdgeIndex(p_edge) > 0 && element->GetLocalEdgeIndex(p_edge) < 2);
                 TS_ASSERT(element->GetEdgeGlobalIndex(index) <2);
+                unsigned EdgeLocalIndex = element->GetLocalEdgeIndex(p_edge);
+                TS_ASSERT(element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex).size() == 0);
                 TS_ASSERT(element->ContainsEdge(p_edge));
             }
         }
