@@ -444,7 +444,7 @@ void MutableElement<1, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelp
 template<unsigned int SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::BuildEdges()
 {
-        assert(mEdgeHelper != nullptr);
+    assert(mEdgeHelper != nullptr);
 
     // If SPACE_DIM == 2 then we can assume that the node layout
     // in the array corresponds to its connections
@@ -463,7 +463,11 @@ void MutableElement<1, SPACE_DIM>::BuildEdges()
 template<unsigned int SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::ClearEdges()
 {
-    //Does nothing in 1D
+    for (auto edge: mEdges)
+    {
+        edge->RemoveElement(this->mIndex);
+    }
+    mEdges.clear();
 }
 
 template <unsigned SPACE_DIM>
