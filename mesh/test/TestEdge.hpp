@@ -194,14 +194,9 @@ public:
             //MutableElement<1, SPACE_DIM>* element2 = elements[i];
             //VertexElement<1, SPACE_DIM>* element = static_cast<VertexElement<1, SPACE_DIM>*>(element2);
             const unsigned int n_edges = element->GetNumEdges();
-
-            cout << "" << n_edges << ".";
             for (unsigned int index = 0; index<n_edges; index++)
             {
                 Edge<SPACE_DIM>* p_edge = element->GetEdge(index);
-                cout << " Local Index " << element->GetLocalEdgeIndex(p_edge) << ".";
-                cout << " Global Index Index " << element->GetEdgeGlobalIndex(index) << ".";
-
                 TS_ASSERT(p_edge->GetNumNodes()==2);
                 TS_ASSERT(p_edge->GetNode(0)!=p_edge->GetNode(1));
                 TS_ASSERT(p_edge->GetNumElements()>0&&p_edge->GetNumElements()<=2);
