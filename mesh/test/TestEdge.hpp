@@ -203,6 +203,7 @@ public:
                 unsigned EdgeLocalIndex = element->GetLocalEdgeIndex(p_edge);
                 TS_ASSERT(element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex).size() == 0);
                 TS_ASSERT(element->ContainsEdge(p_edge));
+                //Forcing test re-runs, remove after running.
             }
         }
         for (unsigned int i=0; i<mesh->GetNumEdges(); i++)
