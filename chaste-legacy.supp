@@ -131,13 +131,14 @@
    ...
    fun:H5F_open
 }
-{
-   H5F: HDF5 write on closure
-   Memcheck:Param
-   pwritev(vector[...])
-   ...
-   fun:H5Fclose
-}
+# Obsolete syntax
+#{
+#   H5F: HDF5 write on closure
+#   Memcheck:Param
+#   pwritev(vector[...])
+#   ...
+#   fun:H5Fclose
+#}
 {
    H5F: HDF5-free-lists-variant2
    Memcheck:Param
