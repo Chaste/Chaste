@@ -8,8 +8,8 @@
 # This takes about 2 hours.  All tests should pass, but a memory report will be given at the end
 
 # To run a single test and generate missing suppressions:
-mpiexec -np 1 valgrind --leak-check=full --suppressions=../chaste.supp --suppressions=../chaste-legacy.supp --gen-suppressions=all ./heart/test/Test1dMonodomainShannonCvodeBenchmarks
-
+# $  mpiexec -np 1 valgrind --leak-check=full --suppressions=../chaste.supp --suppressions=../chaste-legacy.supp --gen-suppressions=all ./heart/test/Test1dMonodomainShannonCvodeBenchmarks
+#
 
 
 # PETSc/OpenMPI
