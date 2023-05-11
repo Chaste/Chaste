@@ -59,7 +59,6 @@
    ...
    fun:_dl_init
 }
-
 {
    keyval create (malloc)
    Memcheck:Leak
@@ -74,7 +73,6 @@
    ...
    fun:_Z16PetscGetUserNamePc?
 }
-
 # OpenMPI https://github.com/cpmech/test-openmpi-valgrind
 {
    OpenMPI/start_thread
@@ -91,13 +89,6 @@
    fun:backtrace_symbols
    ...
    fun:_dl_fini
-}
-{
-   dlopen-addr4
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   ...
-   fun:dlopen
 }
 {
    dlopen-addr2

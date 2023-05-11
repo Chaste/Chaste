@@ -50,6 +50,13 @@
 # HDF5
 ######
 {
+   H5F: HDF5 write 
+   Memcheck:Param
+   pwrite64(buf)
+   ...
+   fun:H5FD_write
+}
+{
    H5F: HDF5 write on closure
    Memcheck:Param
    pwrite64(buf)
