@@ -1,12 +1,17 @@
-# To create a suppression run something like:
-# valgrind --tool=memcheck --track-fds=yes --leak-check=yes --num-callers=50 --suppressions=chaste.supp --gen-suppressions=yes io/build/debug/TestSpiralParametersReaderRunner
-
 #############################################################
-# Suppressions of library errors in Ubuntu Lucid and newer. #
+# Suppressions of library errors in Ubuntu versions prior   #
+# to our current memory testing base (Ubuntu 22.04).        #
 #                                                           #
-# This file is used automatically if valgrind is new enough #
-# to support the "..." syntax.                              #
+# New suppressions should NOT BE ADDED HERE but rather to   #
+# the current suppression file "chaste.supp".               #
+#                                                           #
+# Some of these are very old but have been updated to use   #
+# the "..." syntax which is available to modern versions    #
+# of Valgrind.  If you spot suppressions of upsupported     #
+# library versions then please feel free to remove them.    #
 #############################################################
+
+
 
 # Miscellaneous (PETSc or Boost)
 ################################
