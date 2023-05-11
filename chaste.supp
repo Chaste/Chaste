@@ -1,0 +1,124 @@
+# PETSc/OpenMPI
+###############
+{
+   PETSc "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   ...
+   fun:orte_init
+}
+{
+   PETSc "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:_dl_catch_error
+}
+{
+   PETSc "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:ompi_mpi_finalize
+}
+{
+   PETSc "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:orte_init
+}
+{
+   H5F    <insert_a_suppression_name_here>
+   Memcheck:Param
+   pwrite64(buf)
+   ...
+   fun:H5Fclose
+}
+{
+   PetscFinalize "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:PetscFinalize
+}
+{
+   PetscInitialize "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize    <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize    <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize    <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:realloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize "Hello world" leak
+   Memcheck:Param
+   setsockopt(optlen)
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize "Hello world" leak
+   Memcheck:Param
+   socketcall.getsockopt(optlen)
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize "Hello world" leak
+   Memcheck:Param
+   socketcall.getsockopt(optlen_out)
+   ...
+   fun:PetscInitialize
+}
+{
+   tetgen    <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
+   ...
+   fun:main
+}
