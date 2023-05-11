@@ -1,7 +1,22 @@
+#  To run a regular memory test
+# 1. Configure a cmake
+# $  cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
+# (or similar)
+# 2. Run all tests through Valgrind
+# $  cmake --build . --target memtest
+# (which effectively uses cmake --build . --target memtest --parallel 6 because of the CPUS etting)
+# This takes about 2 hours.  All tests should pass, but a memory report will be given at the end
+
+# To run a single test and generate missing suppressions:
+mpiexec -np 1 valgrind --leak-check=full --suppressions=../chaste.supp --suppressions=../chaste-legacy.supp --gen-suppressions=all ./heart/test/Test1dMonodomainShannonCvodeBenchmarks
+
+
+
 # PETSc/OpenMPI
 ###############
+# OpenMPI https://github.com/cpmech/test-openmpi-valgrind
 {
-   PETSc "Hello world" leak
+   PETSc/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:calloc
@@ -9,7 +24,7 @@
    fun:orte_init
 }
 {
-   PETSc "Hello world" leak
+   PETSc/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
@@ -17,7 +32,7 @@
    fun:_dl_catch_error
 }
 {
-   PETSc "Hello world" leak
+   PETSc/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
@@ -25,22 +40,24 @@
    fun:ompi_mpi_finalize
 }
 {
-   PETSc "Hello world" leak
+   PETSc/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
    ...
    fun:orte_init
 }
+# HDF5
+######
 {
-   H5F    <insert_a_suppression_name_here>
+   H5F: HDF5 write on closure
    Memcheck:Param
    pwrite64(buf)
    ...
    fun:H5Fclose
 }
 {
-   PetscFinalize "Hello world" leak
+   PetscFinalize/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
@@ -48,7 +65,7 @@
    fun:PetscFinalize
 }
 {
-   PetscInitialize "Hello world" leak
+   PetscInitialize/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    ...
@@ -63,7 +80,7 @@
    fun:PetscInitialize
 }
 {
-   PetscInitialize "Hello world" leak
+   PetscInitialize/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:calloc
@@ -71,7 +88,7 @@
    fun:PetscInitialize
 }
 {
-   PetscInitialize    <insert_a_suppression_name_here>
+   PetscInitialize    mpi_init (malloc)
    Memcheck:Leak
    match-leak-kinds: possible
    fun:malloc
@@ -79,7 +96,7 @@
    fun:PetscInitialize
 }
 {
-   PetscInitialize "Hello world" leak
+   PetscInitialize/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:malloc
@@ -95,28 +112,30 @@
    fun:PetscInitialize
 }
 {
-   PetscInitialize "Hello world" leak
+   PetscInitialize/OpenMPI "Hello world" leak
    Memcheck:Param
    setsockopt(optlen)
    ...
    fun:PetscInitialize
 }
 {
-   PetscInitialize "Hello world" leak
+   PetscInitialize/OpenMPI "Hello world" leak
    Memcheck:Param
    socketcall.getsockopt(optlen)
    ...
    fun:PetscInitialize
 }
 {
-   PetscInitialize "Hello world" leak
+   PetscInitialize/OpenMPI "Hello world" leak
    Memcheck:Param
    socketcall.getsockopt(optlen_out)
    ...
    fun:PetscInitialize
 }
+# Tetgen
+########
 {
-   tetgen    <insert_a_suppression_name_here>
+   tetgen    Memory problem in Tetgen with quadratic meshes
    Memcheck:Cond
    fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
    ...
