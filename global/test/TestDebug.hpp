@@ -76,7 +76,7 @@ public:
         PRINT_4_VARIABLES(my_var, another_var, cancer_curing_constant, heart_disease_ending_constant);
         use_vars += heart_disease_ending_constant;
 
-        std::cout << "\n\n";
+        std::cout << "\n\n" << use_vars << "\n\n";
 
         for (unsigned i=0; i<10; i++)
         {

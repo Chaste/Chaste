@@ -55,7 +55,10 @@ double CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(Ce
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+    if (SPACE_DIM != 2)
+    {
+        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
+    }
 
     unsigned global_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     double x = pCellPopulation->GetLocationOfCellCentre(pCell)[0];

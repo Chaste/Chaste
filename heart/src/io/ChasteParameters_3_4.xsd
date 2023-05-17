@@ -261,8 +261,7 @@
       <xs:documentation xml:lang="en"> An attribute for path_type elements that describes how to
         interpret the path value. It can be relative to the current working directory, relative to
         $CHASTE_TEST_OUTPUT, relative to the parameters file, relative to the Chaste source
-        code root, relative to the directory Chaste was built in (which for SCons builds is the same
-        as the source root, but may differ for CMake builds), or an absolute path. It can also be
+        code root, relative to the directory Chaste was built in, or an absolute path. It can also be
         specified as a path relative to the XML configuration file. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">

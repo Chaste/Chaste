@@ -33,6 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+/* 
+CellMl files are found using cmake_fetch in /heart/test/CMakeLists.txt 
+the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src/cellml/ 
+*/
+
+
 #ifndef TESTCVODECELLS_HPP_
 #define TESTCVODECELLS_HPP_
 
@@ -438,7 +444,7 @@ public:
 
         // Coverage of GetIIonic method.
         TS_ASSERT_DELTA(sh04_ode_system.GetIIonic(), sh04_cvode_system->GetIIonic(), 1e-4);
-        TS_ASSERT_DELTA(sh04_cvode_system->GetIIonic(), 0.0004, 1e-4);
+        TS_ASSERT_DELTA(sh04_cvode_system->GetIIonic(), 0.0006, 1e-4);
 
         // Clamping V
         sh04_cvode_system->SetVoltageDerivativeToZero();

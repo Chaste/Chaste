@@ -60,23 +60,22 @@ public:
         args.push_back("--grl2");
         args.push_back("--opt");
 
-        std::vector<std::string> smaller_timestep_models = spectail_streatment_models(models, {"bondarenko_model_2004_apex",
-                                                                                               "courtemanche_ramirez_nattel_model_1998",
-                                                                                               "demir_model_1994",
-                                                                                               "dokos_model_1996",
-                                                                                               "grandi2010ss",
-                                                                                               "iyer_model_2004",
-                                                                                               "iyer_model_2007",
-                                                                                               "jafri_rice_winslow_model_1998",
-                                                                                               "livshitz_rudy_2007",
-                                                                                               "nygren_atrial_model_1998",
-                                                                                               "Shannon2004",
-                                                                                               "stewart_zhang_model_2008_ss",
-                                                                                               "ten_tusscher_model_2004_endo",
-                                                                                               "winslow_model_1999",
-                                                                                               "FaberRudy2000",
-                                                                                               "li_mouse_2010"});
+        std::vector<std::string> smaller_timestep_models = special_treatment_models(models, {"courtemanche_ramirez_nattel_1998",
+                                                                                             "demir_model_1994",
+                                                                                             "dokos_model_1996",
+                                                                                             "grandi_pasqualini_bers_2010_ss",
+                                                                                             "iyer_2004",
+                                                                                             "iyer_model_2007",
+                                                                                             "jafri_rice_winslow_model_1998",
+                                                                                             "livshitz_rudy_2007",
+                                                                                             "nygren_atrial_model_1998",
+                                                                                             "shannon_wang_puglisi_weber_bers_2004",
+                                                                                             "stewart_zhang_model_2008_ss",
+                                                                                             "ten_tusscher_model_2004_endo",
+                                                                                             "winslow_model_1999",
+                                                                                             "li_mouse_2010"});
 
+        std::vector<std::string> bad_models = special_treatment_models(models, {"difrancesco_noble_model_1985", "faber_rudy_2000"});
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true, -1000, false);
 

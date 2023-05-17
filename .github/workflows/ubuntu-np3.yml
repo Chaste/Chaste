@@ -1,0 +1,48 @@
+name: Ubuntu np3
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: self-hosted
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: gcc
+      CXX: g++
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v3
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_NUM_CPUS_TEST=3 ..
+      working-directory: chaste-build-dir
+
+    - name: build continuous test pack
+      run: cmake --build . --parallel 2 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: run continuous test pack
+      run: ctest -L Continuous --output-on-failure
+      working-directory: chaste-build-dir

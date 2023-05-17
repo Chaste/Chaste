@@ -122,8 +122,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * == IMPORTANT: using HYPRE ==
  *
  * Mechanics solves being nonlinear are expensive, so it is recommended you also use a `Release` build type for `cmake`
- * (or `build=GccOpt_ndebug` when running on the old `scons` build system)
- * on larger problems. Also:
+  * on larger problems. Also:
  *
  * Mechanics solves involve solving a nonlinear system, which is broken down into a sequence of linear solves.
  * When running '''incompressible''' problems '''in 3D, or with more elements than in the first test below''',

@@ -1,5 +1,0 @@
-FIXED -1
-UNLIMITED 1
-VARIABLES 25
-ODE SOLVER: EulerIvpOdeSolver
-Created by Chaste version 2019.1.f0f0a7a (with uncommitted modifications) on Mon, 10 Aug 2020 10:10:51 +0000.  Chaste was built on Mon, 10 Aug 2020 10:42:00 +0000 by machine (uname) 'Linux' using settings: Debug.

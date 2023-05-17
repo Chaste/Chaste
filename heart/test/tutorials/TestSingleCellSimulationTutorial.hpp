@@ -279,8 +279,8 @@ public:
          *
          * (These reference values were generated with tolerances of Abs=1e-12, Rel=1e-12.)
          */
-        TS_ASSERT_DELTA(apd, 212.411, 1e-2);
-        TS_ASSERT_DELTA(upstroke_velocity, 338.704, 1.25);
+        TS_ASSERT_DELTA(apd, 211.9487, 1e-2);
+        TS_ASSERT_DELTA(upstroke_velocity, 337.4159, 1.25);
 
         /* CVODE is still an optional dependency for Chaste, but is required for this tutorial.
          * If CVODE is not installed this tutorial will

@@ -87,9 +87,6 @@ public:
      *  ctest -R TestGenerateSteadyStateCrypt
      *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
      *
-     * OR to produce archives in CMake:
-     *  scons build=GccOpt_hostconfig,boost=1-58,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
-     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
      */
     void TestLoadArchive()
