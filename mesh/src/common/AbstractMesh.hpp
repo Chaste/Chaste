@@ -47,8 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #include "Node.hpp"
-#include "Edge.hpp"
-#include "EdgeHelper.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "ProcessSpecificArchive.hpp"
 #include "ChasteCuboid.hpp"

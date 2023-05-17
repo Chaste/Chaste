@@ -49,6 +49,8 @@ class VertexMeshWriter;
 #include "ChasteSerialization.hpp"
 
 #include "AbstractMesh.hpp"
+#include "Edge.hpp"
+#include "EdgeHelper.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VertexElement.hpp"
