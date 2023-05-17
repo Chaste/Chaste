@@ -84,6 +84,9 @@ protected:
     /** Vector of pointers to VertexElements. */
     std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*> mFaces;
 
+    /** Vector of pointers to edges in the mesh **/
+    EdgeHelper<SPACE_DIM> mEdges;
+
     /**
      * Map that is used only when the vertex mesh is used to represent
      * a Voronoi tessellation, the dual to a Delaunay tetrahedral mesh.
@@ -285,6 +288,26 @@ public:
      * Destructor.
      */
     virtual ~VertexMesh();
+
+    /**
+     * Gets the number of edges in the mesh
+     * @return The number of edges in the mesh
+     */
+    unsigned GetNumEdges() const;
+
+    /**
+     * Fetches an edge
+     * @param Global index of the edge
+     * @return Pointer to the edge at the index
+     */
+    Edge<SPACE_DIM>* GetEdge(unsigned index) const;
+
+    /**
+     * Fetches EdgeHelper
+     * @param Global index of the edge
+     * @return Pointer to the edge at the index
+     */
+    EdgeHelper<SPACE_DIM> GetEdgeHelper() const;
 
     /**
      * @return the number of Nodes in the mesh.

@@ -507,6 +507,21 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
     }
 }
 
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdges.GetNumEdges();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+Edge<SPACE_DIM> * VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const {
+    return mEdges.GetEdge(index);
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+EdgeHelper<SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeHelper() const{
+    return mEdges;
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
@@ -595,7 +610,8 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::~VertexMesh()
 {
-    Clear();
+ mEdges.Clear();
+ Clear();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

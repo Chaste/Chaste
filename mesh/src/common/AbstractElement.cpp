@@ -51,7 +51,6 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const s
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(nullptr)
-
 {
     // Sanity checking
     assert(ELEMENT_DIM <= SPACE_DIM);
@@ -63,13 +62,11 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(nullptr)
-
 {}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
 {
-
     delete mpElementAttributes;
 }
 
@@ -86,7 +83,6 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldN
         }
     }
     EXCEPTION("You didn't have that node to start with.");
-
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
