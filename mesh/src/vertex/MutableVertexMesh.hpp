@@ -49,6 +49,7 @@ class VertexMeshWriter;
 #include <boost/serialization/split_member.hpp>
 
 #include "VertexMesh.hpp"
+#include "EdgeHelper.hpp"
 #include "RandomNumberGenerator.hpp"
 
 #include "VertexMeshOperationRecorder.hpp"
@@ -110,6 +111,9 @@ protected:
 
     /** Indices of elements that have been deleted. These indices can be reused when adding new elements. */
     std::vector<unsigned> mDeletedElementIndices;
+
+    /** Vector of pointers to edges in the mesh **/
+    EdgeHelper<SPACE_DIM>* mEdges;
 
     /**
      * Distance for T3 swap checking. At each time step we check for each boundary node whether

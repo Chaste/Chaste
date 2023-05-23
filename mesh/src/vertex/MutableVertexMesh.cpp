@@ -394,7 +394,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(VertexElement<ELE
         this->mElements[new_element_index] = pNewElement;
     }
     pNewElement->RegisterWithNodes();
-    pNewElement->SetEdgeHelper(&this->mEdges);
+    pNewElement->SetEdgeHelper(mEdges);
     pNewElement->BuildEdges();
     return pNewElement->GetIndex();
 }
@@ -410,10 +410,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
                                                                                 c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                 bool placeOriginalElementBelow)
 {
-    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
-    {
-        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
-    }
+    assert(SPACE_DIM == 2);                // LCOV_EXCL_LINE
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE
 
     //Storing element edge map prior to division. This is needed for division recording.
     std::vector<unsigned int> edgeIds;
@@ -938,7 +936,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
     }
 
     // Remove deleted edges and update the node-edge mapping
-    this->mEdges.RemoveDeletedEdges();
+    this->mEdges->RemoveDeletedEdges();
 
     // Remove deleted nodes
     RemoveDeletedNodes();
@@ -975,9 +973,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     }
 
     // Remove deleted edges and update the node-edge mapping
-    this->mEdges.RemoveDeletedEdges();
+    this->mEdges->RemoveDeletedEdges();
     // Update the node-edge mapping
-    this->mEdges.UpdateEdgesMapKey();
+    this->mEdges->UpdateEdgesMapKey();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1792,11 +1790,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                                                               Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
 {
-    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
-    {
-        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
-    }
-
     // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
     double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
 
@@ -2455,10 +2448,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* pNode, unsigned elementIndex)
 {
-    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
-    {
-        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
-    }
+    assert(SPACE_DIM == 2);                 // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM);    // LCOV_EXCL_LINE - code will be removed at compile time
 
     assert(pNode->IsBoundaryNode());
 
@@ -4040,8 +4031,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshOperationTracking(const b
     mTrackMeshOperations = track;
     if (track)
     {
-        EdgeHelper<SPACE_DIM> *pEdgeHelper(&(this->mEdges));
-        mOperationRecorder.SetEdgeHelper(pEdgeHelper);
+        mOperationRecorder.SetEdgeHelper(mEdges);
     }
 }
 
