@@ -43,17 +43,12 @@ EdgeHelper<SPACE_DIM>::EdgeHelper()
 template<unsigned int SPACE_DIM>
 EdgeHelper<SPACE_DIM>::~EdgeHelper()
 {
-    Clear();
+    this->mEdges.clear();
 }
 
 template<unsigned int SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::Clear()
 {
-    // Iterate over edges and free the memory
-    for (auto edge: mEdges)
-    {
-        delete edge;
-    }
     mEdges.clear();
 }
 
@@ -76,9 +71,9 @@ Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM> *node0,
     auto edgeItt = mEdgesMap.find(edgeMapIndices);
     if (edgeItt == mEdgesMap.end() || edgeItt->second->IsDeleted())
     {
-        edge = new Edge<SPACE_DIM>(mEdges.size(), node0, node1);
-        mEdgesMap[edgeMapIndices] = edge;
-        mEdges.push_back(edge);
+        mEdges.push_back(std::make_unique<Edge<SPACE_DIM>> (mEdges.size(), node0, node1));
+        Edge<SPACE_DIM>* p_edge = mEdges[mEdges.size()].get(); 
+        mEdgesMap[edgeMapIndices] = p_edge;
     }
     else
     {
@@ -102,50 +97,50 @@ template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::GetEdge(unsigned index)
 {
     assert(index<mEdges.size());
-    return mEdges[index];
+    return mEdges[index].get();
 }
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::GetEdge(unsigned index) const
 {
     assert(index<mEdges.size());
-    return mEdges[index];
+    return mEdges[index].get();
 }
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::operator[](unsigned index)
 {
     assert(index<mEdges.size());
-    return mEdges[index];
+    return mEdges[index].get();
 }
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *EdgeHelper<SPACE_DIM>::operator[](unsigned index) const
 {
     assert(index<mEdges.size());
-    return mEdges[index];
+    return mEdges[index].get();
 }
 
 template<unsigned int SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
 {
     // Remove any edges that have been marked for deletion and store all other nodes in a temporary structure
-    std::vector<Edge<SPACE_DIM>*> live_edges;
-    for (unsigned i=0; i<this->mEdges.size(); i++)
+    std::vector<std::unique_ptr<Edge<SPACE_DIM>>> live_edges;
+
+    for (auto& edge : mEdges)
     {
-        // An edge can be deleted if it is not contained in any elements
-        if (this->mEdges[i]->GetNumElements() == 0)
-        {
-            delete this->mEdges[i];
-        }
-        else
-        {
-            live_edges.push_back(this->mEdges[i]);
-        }
+      // An edge can be deleted if it is not contained in any elements
+      if (edge->GetNumElements() != 0)
+      {
+        live_edges.push_back(std::move(edge));
+      }
+      // Note: there's no need to manually delete the edge,
+      // because the unique_ptr automatically takes care of that when it goes out of scope
     }
 
     // Repopulate the edges vector
-    this->mEdges = live_edges;
+    mEdges = std::move(live_edges); // We use std::move to efficiently transfer ownership of the pointers
+
 
     for (unsigned i=0; i<this->mEdges.size(); i++)
     {
@@ -158,9 +153,9 @@ void EdgeHelper<SPACE_DIM>::UpdateEdgesMapKey()
 {
     mEdgesMap.clear();
 
-    for (auto edge : mEdges)
+    for (auto & edge : mEdges) 
     {
-        mEdgesMap[edge->GetMapIndex()] = edge;
+        mEdgesMap[edge->GetMapIndex()] = edge.get();
     }
 }
 

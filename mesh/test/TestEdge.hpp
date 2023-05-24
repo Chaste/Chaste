@@ -101,7 +101,7 @@ public:
 
         // Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-        EdgeHelper<SPACE_DIM> edge_helper = mesh->GetEdgeHelper();
+        const EdgeHelper<SPACE_DIM>& edge_helper = mesh->GetEdgeHelper();
         //There are two elements in our mesh
         //We test Edge class methods here
         for (unsigned int i=0; i<2; i++)
@@ -127,7 +127,7 @@ public:
         //For coverage
         {
             const VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh_const = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-            const EdgeHelper<SPACE_DIM> edge_helper_for_const = mesh_const->GetEdgeHelper();
+            const EdgeHelper<SPACE_DIM>& edge_helper_for_const = mesh_const->GetEdgeHelper();
             for (unsigned int i=0; i<mesh_const->GetNumEdges(); i++)
             {
                 Edge<SPACE_DIM>* p_edge = mesh_const->GetEdge(i);
@@ -185,7 +185,7 @@ public:
 
         // Generate a mesh which will automatically build the edges in the constructor
         VertexMesh<1, SPACE_DIM>* mesh = new VertexMesh<1, SPACE_DIM>(allnodes, elements);
-        EdgeHelper<SPACE_DIM> edge_helper = mesh->GetEdgeHelper();
+        const EdgeHelper<SPACE_DIM>& edge_helper = mesh->GetEdgeHelper();
         //There are two elements in our mesh
         //We test Edge class methods here
         for (unsigned int i=0; i<2; i++)
@@ -216,7 +216,7 @@ public:
         //For coverage
         {
             const VertexMesh<1, SPACE_DIM>* mesh_const = new VertexMesh<1, SPACE_DIM>(allnodes, elements);
-            const EdgeHelper<SPACE_DIM> edge_helper_for_const = mesh_const->GetEdgeHelper();
+            const EdgeHelper<SPACE_DIM>& edge_helper_for_const = mesh_const->GetEdgeHelper();
             for (unsigned int i=0; i<mesh_const->GetNumEdges(); i++)
             {
                 Edge<SPACE_DIM>* p_edge = mesh_const->GetEdge(i);

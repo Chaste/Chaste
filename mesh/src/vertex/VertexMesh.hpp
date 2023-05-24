@@ -309,7 +309,7 @@ public:
      * @param Global index of the edge
      * @return Pointer to the edge at the index
      */
-    EdgeHelper<SPACE_DIM> GetEdgeHelper() const;
+    const EdgeHelper<SPACE_DIM>& GetEdgeHelper() const;
 
     /**
      * @return the number of Nodes in the mesh.

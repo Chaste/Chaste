@@ -52,7 +52,7 @@ class EdgeHelper {
 private:
 
     //List of mesh edges
-    std::vector<Edge<SPACE_DIM>*> mEdges;
+    std::vector<std::unique_ptr<Edge<SPACE_DIM>>> mEdges;
     // Map of node pairs to edges
     std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
 public:
