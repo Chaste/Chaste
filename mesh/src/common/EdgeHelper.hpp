@@ -60,12 +60,7 @@ public:
     /**
      * Default constructor
      */
-    EdgeHelper();
-
-    /**
-     * Default destructor
-     */
-    ~EdgeHelper();
+    EdgeHelper() = default;
 
     /**
      * Clear the mesh from edges
@@ -94,26 +89,12 @@ public:
      * @param index
      * @return
      */
-    Edge<SPACE_DIM>* GetEdge(unsigned index);
-
-    /**
-     * Const version of GetEdge()
-     * @param index
-     * @return
-     */
     Edge<SPACE_DIM>* GetEdge(unsigned index) const;
 
     /**
      * Access operator.
      * @param index
      * @return mEdges[index]
-     */
-    Edge<SPACE_DIM>* operator[](unsigned index);
-
-    /**
-     * Const version of operator[]
-     * @param index
-     * @return
      */
     Edge<SPACE_DIM>* operator[](unsigned index) const;
 
