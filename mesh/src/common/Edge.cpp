@@ -34,25 +34,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Edge.hpp"
-template<unsigned SPACE_DIM>
+
+template <unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index)
-    : mIndex(index),
-      mIsDeleted(false)
+        : mIndex(index),
+          mIsDeleted(false)
 {
     this->mIndex = index;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index, Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1)
-    : mIndex(index),
-      mIsDeleted(false)
+        : mIndex(index),
+          mIsDeleted(false)
 {
     this->SetNodes(pNode0, pNode1);
-}
-
-template<unsigned SPACE_DIM>
-Edge<SPACE_DIM>::~Edge()
-{
 }
 
 template<unsigned SPACE_DIM>

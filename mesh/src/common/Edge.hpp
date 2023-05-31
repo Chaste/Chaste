@@ -85,7 +85,7 @@ public:
      *
      * @param index Index of this edge within the mesh
      */
-    Edge(unsigned index);
+    explicit Edge(unsigned index);
 
     /**
      * Create an Edge that has an index and associated nodes.
@@ -96,11 +96,7 @@ public:
      */
     Edge(unsigned index, Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1);
 
-    /**
-     * Destructor.
-     */
-    ~Edge();
-
+    
     /**
      * Mark the Edge to be deleted
      */
@@ -129,7 +125,6 @@ public:
      * @return Obtains a pair of associated nodes' indices
      */
     std::pair<unsigned, unsigned> GetMapIndex();
-
 
     /**
      * Clear all associated nodes
