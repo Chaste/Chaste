@@ -52,7 +52,7 @@ Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM> *node0,
         node1 = swapNode;
     }
 
-    auto edgeMapIndices = UIndexPair(node0->GetIndex(), node1->GetIndex());
+    auto edgeMapIndices = std::make_pair(node0->GetIndex(), node1->GetIndex());
 
     // Check that an edge hasn't been created already
     Edge<SPACE_DIM>* p_edge = nullptr;
@@ -119,7 +119,7 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
 
     for (unsigned i=0; i<this->mEdges.size(); i++)
     {
-        this->mEdges[i]->SetIndex(i);
+        mEdges[i]->SetIndex(i);
     }
 }
 

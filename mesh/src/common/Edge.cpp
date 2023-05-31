@@ -82,7 +82,7 @@ unsigned Edge<SPACE_DIM>::GetIndex() const
 }
 
 template<unsigned SPACE_DIM>
-UIndexPair Edge<SPACE_DIM>::GetMapIndex()
+std::pair<unsigned ,unsigned> Edge<SPACE_DIM>::GetMapIndex()
 {
     assert(mNodes.size() == 2);
     auto index0 = mNodes[0]->GetIndex();
@@ -94,7 +94,7 @@ UIndexPair Edge<SPACE_DIM>::GetMapIndex()
         index1 = indexSwap;
     }
 
-    return UIndexPair(index0, index1);
+    return std::make_pair(index0, index1);
 }
 
 template<unsigned SPACE_DIM>

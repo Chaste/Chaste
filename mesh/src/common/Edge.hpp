@@ -44,10 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 #include "Node.hpp"
 
-typedef std::pair<unsigned ,unsigned> UIndexPair;
-
 /**
- * An edge in a finite element mesh.
+ * An edge in a mutable mesh.
  */
 template<unsigned SPACE_DIM>
 class Edge
@@ -130,7 +128,7 @@ public:
      * Obtains a pair of associated nodes' indices
      * @return Obtains a pair of associated nodes' indices
      */
-    UIndexPair GetMapIndex();
+    std::pair<unsigned, unsigned> GetMapIndex();
 
 
     /**

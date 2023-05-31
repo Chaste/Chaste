@@ -51,10 +51,16 @@ class EdgeHelper {
 
 private:
 
-    //List of mesh edges
+    /**
+     * Vector owning the individual edge objects.
+     */
     std::vector<std::unique_ptr<Edge<SPACE_DIM>>> mEdges;
-    // Map of node pairs to edges
-    std::map< UIndexPair, Edge<SPACE_DIM>*> mEdgesMap;
+
+    /**
+     * Explicit map between the two node global indices and the edge they represent
+     */
+    std::map<std::pair<unsigned, unsigned>, Edge<SPACE_DIM>*> mEdgesMap;
+
 public:
 
     /**
