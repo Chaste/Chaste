@@ -91,12 +91,13 @@ public:
      * Create an Edge that has an index and associated nodes.
      *
      * @param index Index of this edge within the mesh
-     * @param pNode0
-     * @param pNode1
+     * @param pNodeA A Node that forms one point of the edge
+     * @param pNodeB A different Node that forms the other point of the edge
      */
-    Edge(unsigned index, Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1);
+    Edge(unsigned index, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
-    
+    static std::pair<unsigned, unsigned> GenerateMapIndex(unsigned index1, unsigned index2);
+
     /**
      * Mark the Edge to be deleted
      */
@@ -133,10 +134,10 @@ public:
 
     /**
      * Set the Edge's associated nodes
-     * @param pNode0 A Node that forms one point of the edge
-     * @param pNode1 A different Node that forms the other point of the edge
+     * @param pNodeA A Node that forms one point of the edge
+     * @param pNodeB A different Node that forms the other point of the edge
      */
-    void SetNodes(Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1);
+    void SetNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
     /**
      * Replace a Node in this Edge with another
@@ -225,6 +226,7 @@ public:
      */
     bool operator==(const Edge<SPACE_DIM>& edge) const;
 };
+
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(Edge)

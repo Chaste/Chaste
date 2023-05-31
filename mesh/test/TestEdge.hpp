@@ -417,6 +417,12 @@ public:
             delete edge_oper;
         }
     }
+
+    void TestEdgeGenerateMapIndex()
+    {
+        TS_ASSERT_EQUALS(std::make_pair(1u, 2u), Edge<2>::GenerateMapIndex(1u, 2u));
+        TS_ASSERT_EQUALS(std::make_pair(1u, 2u), Edge<2>::GenerateMapIndex(2u, 1u));
+    }
 };
 
 #endif //_TESTEDGE_HPP_

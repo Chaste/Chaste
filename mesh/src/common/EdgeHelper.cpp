@@ -42,17 +42,9 @@ void EdgeHelper<SPACE_DIM>::Clear()
 }
 
 template<unsigned int SPACE_DIM>
-Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM> *node0, Node<SPACE_DIM> *node1)
+Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* nodeA, Node<SPACE_DIM>* nodeB)
 {
-    // Swap node so we always have the lower index as node 0
-    if (node0->GetIndex() > node1->GetIndex())
-    {
-        auto swapNode = node0;
-        node0 = node1;
-        node1 = swapNode;
-    }
-
-    auto edgeMapIndices = std::make_pair(node0->GetIndex(), node1->GetIndex());
+    auto edgeMapIndices = Edge<SPACE_DIM>::GenerateMapIndex(nodeA->GetIndex(), nodeB->GetIndex());
 
     // Check that an edge hasn't been created already
     Edge<SPACE_DIM>* p_edge = nullptr;
@@ -60,14 +52,14 @@ Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM> *node0,
     auto edgeItt = mEdgesMap.find(edgeMapIndices);
     if (edgeItt == mEdgesMap.end() || edgeItt->second->IsDeleted())
     {
-        mEdges.push_back(std::make_unique<Edge<SPACE_DIM>> (mEdges.size(), node0, node1));
+        mEdges.push_back(std::make_unique<Edge<SPACE_DIM>> (mEdges.size(), nodeA, nodeB));
         p_edge = mEdges.back().get();
         mEdgesMap[edgeMapIndices] = p_edge;
     }
     else
     {
         p_edge = edgeItt->second;
-        p_edge->SetNodes(node0, node1);
+        p_edge->SetNodes(nodeA, nodeB);
     }
 
     return p_edge;

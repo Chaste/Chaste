@@ -44,11 +44,17 @@ Edge<SPACE_DIM>::Edge(unsigned index)
 }
 
 template <unsigned SPACE_DIM>
-Edge<SPACE_DIM>::Edge(unsigned index, Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1)
+Edge<SPACE_DIM>::Edge(unsigned index, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
         : mIndex(index),
           mIsDeleted(false)
 {
-    this->SetNodes(pNode0, pNode1);
+    this->SetNodes(pNodeA, pNodeB);
+}
+
+template <unsigned int SPACE_DIM>
+std::pair<unsigned, unsigned> Edge<SPACE_DIM>::GenerateMapIndex(unsigned int indexA, unsigned int indexB)
+{
+    return std::make_pair(std::min(indexA, indexB), std::max(indexA, indexB));
 }
 
 template<unsigned SPACE_DIM>
@@ -81,16 +87,10 @@ template<unsigned SPACE_DIM>
 std::pair<unsigned ,unsigned> Edge<SPACE_DIM>::GetMapIndex()
 {
     assert(mNodes.size() == 2);
-    auto index0 = mNodes[0]->GetIndex();
-    auto index1 = mNodes[1]->GetIndex();
-    if (index0 > index1)
-    {
-        auto indexSwap = index0;
-        index0 = index1;
-        index1 = indexSwap;
-    }
+    const unsigned index0 = mNodes[0]->GetIndex();
+    const unsigned index1 = mNodes[1]->GetIndex();
 
-    return std::make_pair(index0, index1);
+    return Edge<SPACE_DIM>::GenerateMapIndex(index0, index1);
 }
 
 template<unsigned SPACE_DIM>
@@ -100,14 +100,14 @@ void Edge<SPACE_DIM>::RemoveNodes()
 }
 
 template<unsigned SPACE_DIM>
-void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNode0, Node<SPACE_DIM>* pNode1)
+void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
     // Clear the nodes first
     this->RemoveNodes();
 
     // Add nodes
-    this->mNodes.push_back(pNode0);
-    this->mNodes.push_back(pNode1);
+    this->mNodes.push_back(pNodeA);
+    this->mNodes.push_back(pNodeB);
 }
 
 template<unsigned SPACE_DIM>
@@ -214,7 +214,7 @@ bool Edge<SPACE_DIM>::IsBoundaryEdge() const
 template <unsigned SPACE_DIM>
 bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& edge) const
 {
-    return this->ContainsNode(edge.GetNode(0))&&this->ContainsNode(edge.GetNode(1));
+    return this->ContainsNode(edge.GetNode(0)) && this->ContainsNode(edge.GetNode(1));
 }
 
 // Explicit instantiation
