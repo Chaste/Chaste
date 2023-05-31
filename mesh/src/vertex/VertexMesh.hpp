@@ -86,8 +86,8 @@ protected:
     /** Vector of pointers to VertexElements. */
     std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*> mFaces;
 
-    /** Vector of pointers to edges in the mesh **/
-    EdgeHelper<SPACE_DIM> mEdges;
+    /** Object that owns and manages edges **/
+    EdgeHelper<SPACE_DIM> mEdgeHelper;
 
     /**
      * Map that is used only when the vertex mesh is used to represent
