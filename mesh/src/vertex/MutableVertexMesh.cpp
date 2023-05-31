@@ -393,8 +393,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(VertexElement<ELE
     {
         this->mElements[new_element_index] = pNewElement;
     }
+
     pNewElement->RegisterWithNodes();
-    pNewElement->SetEdgeHelper(mEdges);
+    pNewElement->SetEdgeHelper(&(this->mEdgeHelper));
     pNewElement->BuildEdges();
     return pNewElement->GetIndex();
 }
@@ -936,7 +937,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
     }
 
     // Remove deleted edges and update the node-edge mapping
-    this->mEdges->RemoveDeletedEdges();
+    this->mEdgeHelper.RemoveDeletedEdges();
 
     // Remove deleted nodes
     RemoveDeletedNodes();
@@ -973,9 +974,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     }
 
     // Remove deleted edges and update the node-edge mapping
-    this->mEdges->RemoveDeletedEdges();
+    this->mEdgeHelper.RemoveDeletedEdges();
     // Update the node-edge mapping
-    this->mEdges->UpdateEdgesMapKey();
+    this->mEdgeHelper.UpdateEdgesMapKey();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -4031,7 +4032,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshOperationTracking(const b
     mTrackMeshOperations = track;
     if (track)
     {
-        mOperationRecorder.SetEdgeHelper(mEdges);
+        mOperationRecorder.SetEdgeHelper(&(this->mEdgeHelper));
     }
 }
 

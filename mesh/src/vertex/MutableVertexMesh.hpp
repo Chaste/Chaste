@@ -112,9 +112,6 @@ protected:
     /** Indices of elements that have been deleted. These indices can be reused when adding new elements. */
     std::vector<unsigned> mDeletedElementIndices;
 
-    /** Vector of pointers to edges in the mesh **/
-    EdgeHelper<SPACE_DIM>* mEdges;
-
     /**
      * Distance for T3 swap checking. At each time step we check for each boundary node whether
      * it intersects with any boundary elements (cells) whose centroids lie within this distance
