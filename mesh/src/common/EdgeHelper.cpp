@@ -108,11 +108,13 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
     // Repopulate the edges vector
     mEdges = std::move(live_edges); // We use std::move to efficiently transfer ownership of the pointers
 
-
+    // Reset the edge indices
     for (unsigned i=0; i<this->mEdges.size(); i++)
     {
         mEdges[i]->SetIndex(i);
     }
+
+    UpdateEdgesMapKey();
 }
 
 template<unsigned int SPACE_DIM>

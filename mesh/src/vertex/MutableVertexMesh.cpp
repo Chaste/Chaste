@@ -936,9 +936,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
         this->mElements[i]->ResetIndex(i);
     }
 
-    // Remove deleted edges and update the node-edge mapping
-    this->mEdgeHelper.RemoveDeletedEdges();
-
     // Remove deleted nodes
     RemoveDeletedNodes();
 }
@@ -973,10 +970,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
         this->mNodes[i]->SetIndex(i);
     }
 
-    // Remove deleted edges and update the node-edge mapping
+    // Remove deleted edges
     this->mEdgeHelper.RemoveDeletedEdges();
-    // Update the node-edge mapping
-    this->mEdgeHelper.UpdateEdgesMapKey();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -61,6 +61,11 @@ private:
      */
     std::map<std::pair<unsigned, unsigned>, Edge<SPACE_DIM>*> mEdgesMap;
 
+    /**
+     * Rebuilds node-node to edge map, which is required after removing deleted edges
+     */
+    void UpdateEdgesMapKey();
+
 public:
 
     /**
@@ -108,11 +113,6 @@ public:
      * Remove deleted edges.
      */
     void RemoveDeletedEdges();
-
-    /**
-     * Rebuilds node-node to edge map
-     */
-    void UpdateEdgesMapKey();
 
     /**
      * returns total number of edges
