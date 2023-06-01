@@ -168,23 +168,26 @@ public:
         TS_ASSERT(p_test_edge->GetNode(1) == &node0 || p_test_edge->GetNode(1) == &node1);
         TS_ASSERT(p_test_edge->GetNode(0) != p_test_edge->GetNode(1));
 
+        std::vector<Node<SPACE_DIM>*> nodes;
+        nodes.push_back(new Node<SPACE_DIM>(0, false, 0.0));
+        nodes.push_back(new Node<SPACE_DIM>(1, false, 1.0));
+        nodes.push_back(new Node<SPACE_DIM>(2, false, -1.0));
+
         // Generate two line vertex elements
-        std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
-        nodes0.push_back(new Node<SPACE_DIM>(0, false, 0.0));
-        nodes0.push_back(new Node<SPACE_DIM>(1, false, 1.0));
+        std::vector<Node<SPACE_DIM>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
 
-        nodes1.push_back(nodes0[0]);
-        nodes1.push_back(new Node<SPACE_DIM>(2, false, -1.0));
-
-        allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
-        allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
+        std::vector<Node<SPACE_DIM>*> nodes_elem_2;
+        nodes_elem_2.push_back(nodes[1]);
+        nodes_elem_2.push_back(nodes[2]);
 
         std::vector<VertexElement<1, SPACE_DIM>*> elements;
-        elements.push_back(new VertexElement<1, SPACE_DIM>(0, nodes0));
-        elements.push_back(new VertexElement<1, SPACE_DIM>(1, nodes1));
+        elements.push_back(new VertexElement<1, SPACE_DIM>(0, nodes_elem_1));
+        elements.push_back(new VertexElement<1, SPACE_DIM>(1, nodes_elem_2));
 
         // Generate a mesh which will automatically build the edges in the constructor
-        auto p_mesh = std::make_unique<VertexMesh<1, SPACE_DIM>>(allnodes, elements);
+        auto p_mesh = std::make_unique<VertexMesh<1, SPACE_DIM>>(nodes, elements);
         const EdgeHelper<SPACE_DIM>& edge_helper = p_mesh->GetEdgeHelper();
         // There are two elements in our mesh
         // We test Edge class methods here
