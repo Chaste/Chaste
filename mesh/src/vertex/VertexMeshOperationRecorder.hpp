@@ -36,163 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VERTEXMESHOPERATIONRECORDER_HPP_
 #define VERTEXMESHOPERATIONRECORDER_HPP_
 
-#include "VertexElement.hpp"
-#include "EdgeHelper.hpp"
-#include "EdgeOperation.hpp"
+#include <vector>
 
-#include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-/**
- * Contains information about a T1 swap.
- * mLocation - central point of the shrinking edge
- * mPreSwapEdge - orientation of the shrinking edge
- * mPostSwapEdge - orientation of the post swap edge
- */
-template<unsigned int SPACE_DIM>
-struct T1SwapInfo
-{
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Archive the object.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & mLocation;
-        archive & mPreSwapEdge;
-        archive & mPostSwapEdge;
-    }
-
-    /**
-     * Default constructor
-     */
-    T1SwapInfo()
-    {};
-
-    ~T1SwapInfo()
-    {};
-
-    c_vector<double, SPACE_DIM> mLocation;
-
-    //Vector from one node of the edge to the other.
-    // Represents orientation of an edge to be shrunk
-    c_vector<double, SPACE_DIM> mPreSwapEdge;
-
-    //Vector from one node of the edge to the other
-    // Represents the orientation of the newly formed edge
-    c_vector<double, SPACE_DIM> mPostSwapEdge;
-};
-/**
- * Contains information about a T2 swap.
- * mLocation - centroid of the element undergoing T2 swap
- */
-template<unsigned int SPACE_DIM>
-struct T2SwapInfo
-{
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Archive the object.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & mCellId;
-        archive & mLocation;
-    }
-    /**
-     * Default constructor/destructor so that boos does not throw errors
-     */
-    T2SwapInfo()
-    {};
-
-    ~T2SwapInfo()
-    {};
-    unsigned int mCellId;
-    c_vector<double, SPACE_DIM> mLocation;
-};
-
-template<unsigned int SPACE_DIM>
-struct T3SwapInfo
-{
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Archive the object.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & mLocation;
-    }
-
-    /**
-     * Default constructor/destructor so that boos does not throw errors
-     */
-    T3SwapInfo()
-    {};
-    ~T3SwapInfo()
-    {};
-
-    c_vector<double, SPACE_DIM> mLocation;
-};
-
-/**
- * Contains information about cell division event
- * mLocation - centroid of the mother cell
- * mDaughtaurLocation1, mDaughtaurLocation1 - centroids of the two daughter cells
- * mDaughterOrientation1, mDaughterOrientation2 - orientation of the two daughter cells
- * mDivisionAxis - orientation of the division axis
- */
-template<unsigned int SPACE_DIM>
-struct CellDivisionInfo
-{
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Archive the object.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & mLocation;
-        archive & mDaughterLocation1;
-        archive & mDaughterLongAxis1;
-        archive & mDaughterLocation2;
-        archive & mDaughterLongAxis2;
-        archive & mDivisionAxis;
-    }
-
-    /**
-     * Default constructor/destructor so that boos does not throw errors
-     */
-    CellDivisionInfo()
-    {};
-
-    ~CellDivisionInfo()
-    {};
-    c_vector<double, SPACE_DIM> mLocation;
-    c_vector<double, SPACE_DIM> mDaughterLocation1;
-    c_vector<double, SPACE_DIM> mDaughterLongAxis1;
-    c_vector<double, SPACE_DIM> mDaughterLocation2;
-    c_vector<double, SPACE_DIM> mDaughterLongAxis2;
-    c_vector<double, SPACE_DIM> mDivisionAxis;
-};
+#include "CellDivisionInfo.hpp"
+#include "ChasteSerialization.hpp"
+#include "EdgeHelper.hpp"
+#include "EdgeOperation.hpp"
+#include "T1SwapInfo.hpp"
+#include "T2SwapInfo.hpp"
+#include "T3SwapInfo.hpp"
+#include "VertexElement.hpp"
 
 /**
  * This class records operations performed on the mesh.
@@ -200,7 +56,7 @@ struct CellDivisionInfo
  * The sequence of operations as well as their nature are needed for remapping of old (prior to an operation) edge based quantities
  * into new state. For example, when an edge is split into two or shrinked, the edge quantities may change according to the kind of operation
  */
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 class VertexMeshOperationRecorder
 {
 private:
@@ -212,8 +68,8 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
         archive & mT1Swaps;
         archive & mT2Swaps;
@@ -235,20 +91,15 @@ private:
     std::vector<EdgeOperation*> mEdgeOperations;
 
     // Pointer to edge handler
-    EdgeHelper<SPACE_DIM> *mpEdgeHelper;
+    EdgeHelper<SPACE_DIM>* mpEdgeHelper;
 
 public:
-    /**
-     * Default constructor/destructors. Do noething
-     */
-    VertexMeshOperationRecorder();
-    ~VertexMeshOperationRecorder();
 
     /**
      * Sets edge helper associated with the vertex mesh
      * @param pEdgeHelper
      */
-    void SetEdgeHelper(EdgeHelper<SPACE_DIM> *pEdgeHelper);
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
 
     /**
      * Record T1 swap info
@@ -317,7 +168,7 @@ public:
     /**
      * @return Edge operations since last clearing
      */
-    const std::vector<EdgeOperation*> & GetEdgeOperations();
+    const std::vector<EdgeOperation*>& GetEdgeOperations();
 
     /**
      * Clears edge operations
@@ -333,7 +184,7 @@ public:
      *  element indices have been remapped (e.g. before elements are deleted)
      */
     void RecordNodeMergeOperation(const std::vector<unsigned int> oldIds,
-                                  VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+                                  VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                   const std::pair<unsigned int, unsigned int> merged_nodes_pair,
                                   const bool elementIndexIsRemapped = false);
 
@@ -357,15 +208,15 @@ public:
      * @param pElement2 Daughter element
      */
     void RecordCellDivideOperation(const std::vector<unsigned int>& oldIds,
-                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement1,
-                                   VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement2);
+                                   VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement1,
+                                   VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement2);
 
     /**
      * Records edge formation
      * @param pElement
      * @param edge_index - new edge index
      */
-    void RecordNewEdgeOperation(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement,
+    void RecordNewEdgeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                 const unsigned int edge_index);
     /**
      * Records merging of adjacent edges due to deletion of the shared node node_index in element pElement

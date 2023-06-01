@@ -34,16 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VertexMeshOperationRecorder.hpp"
-#include "EdgeRemapInfo.hpp"
-template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
-VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::VertexMeshOperationRecorder()
-:mpEdgeHelper(nullptr)
-{}
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::~VertexMeshOperationRecorder()
-{
-}
+#include "EdgeRemapInfo.hpp"
+
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *pEdgeHelper)
@@ -476,18 +469,6 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperati
     EdgeRemapInfo* remap_info = new EdgeRemapInfo(edge_mapping, edge_status);
     mEdgeOperations.push_back(new EdgeOperation(EDGE_OPERATION_MERGE, element_index, remap_info));
 }
-
-template struct T1SwapInfo<1>;
-template struct T1SwapInfo<2>;
-template struct T1SwapInfo<3>;
-
-template struct T2SwapInfo<1>;
-template struct T2SwapInfo<2>;
-template struct T2SwapInfo<3>;
-
-template struct T3SwapInfo<1>;
-template struct T3SwapInfo<2>;
-template struct T3SwapInfo<3>;
 
 template class VertexMeshOperationRecorder<1,1>;
 template class VertexMeshOperationRecorder<1,2>;
