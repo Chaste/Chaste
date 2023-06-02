@@ -37,11 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EDGEOPERATION_HPP_
 
 #include <vector>
-#include "EdgeRemapInfo.hpp"
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/serialization.hpp>
+
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include "ChasteSerialization.hpp"
+#include "EdgeRemapInfo.hpp"
 
 enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
@@ -61,8 +63,8 @@ private:
     unsigned mElementIndex;
     unsigned mElementIndex2;
 
-    EdgeRemapInfo* mpRemapInfo;
-    EdgeRemapInfo* mpRemapInfo2;
+    EdgeRemapInfo mRemapInfo;
+    EdgeRemapInfo mRemapInfo2;
 
     bool mIsElementIndexRemapped;
 
@@ -81,14 +83,14 @@ private:
         archive & mElementIndex;
         archive & mElementIndex2;
         archive & mIsElementIndexRemapped;
-        archive & mpRemapInfo;
-        archive & mpRemapInfo2;
+        archive & mRemapInfo;
+        archive & mRemapInfo2;
     }
 public:
     /**
      * Default constructor. Here for boost serialization purposes
      */
-    EdgeOperation();
+    EdgeOperation() = default;
 
     /**
      * Constructor for add, split, node and edge merge operations
@@ -100,7 +102,7 @@ public:
      * RemoveDeletedNodesAndELements() function. See also Update() function in VertexBasedCellPopulation class
      */
     EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex,
-                  EdgeRemapInfo* pRemapInfo, const bool isIndexRemapped = false);
+                  EdgeRemapInfo remapInfo, const bool isIndexRemapped = false);
 
      /**
       * Constructor for the DIVIDE operation
@@ -111,12 +113,8 @@ public:
       */
     EdgeOperation(unsigned elementIndex,
                   unsigned elementIndex2,
-                  EdgeRemapInfo* pRemapInfo,
-                  EdgeRemapInfo* pRemapInfo2);
-    /**
-     * Destructor
-     */
-    ~EdgeOperation();
+                  EdgeRemapInfo remapInfo,
+                  EdgeRemapInfo remapInfo2);
 
     /**
      * @return edge operations
@@ -147,12 +145,12 @@ public:
     /**
      * @return Edge remap info
      */
-    EdgeRemapInfo* GetRemapInfo() const;
+    const EdgeRemapInfo& rGetRemapInfo() const;
 
     /**
      * @return Edge remap info after cell division
      */
-    EdgeRemapInfo* GetRemapInfo2() const;
+    const EdgeRemapInfo& rGetRemapInfo2() const;
 
     /**
      * @return mIsElementIndexRemapped

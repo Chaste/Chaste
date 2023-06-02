@@ -339,10 +339,10 @@ public:
 
     void TestEdgeOperations()
     {
-        //Testing EdgeOperation and EdgeMapInfo class methods
-        EdgeRemapInfo* info = new EdgeRemapInfo;
-        info->SetSplitProportions(std::vector<double>(2, 0.5));
-        EdgeOperation edge_oper (EDGE_OPERATION_ADD, 2, info, false);
+        // Testing EdgeOperation and EdgeMapInfo class methods
+        EdgeRemapInfo info;
+        info.SetSplitProportions(std::vector<double>(2, 0.5));
+        EdgeOperation edge_oper(EDGE_OPERATION_ADD, 2, info, false);
 
         TS_ASSERT_EQUALS(edge_oper.GetOperation(), EDGE_OPERATION_ADD);
         TS_ASSERT_EQUALS(edge_oper.GetElementIndex(), 2u);
@@ -353,57 +353,53 @@ public:
         TS_ASSERT_EQUALS(edge_oper.GetElementIndex(), 1u);
         TS_ASSERT_EQUALS(edge_oper.GetElementIndex2(), 5u);
 
-        TS_ASSERT_EQUALS(info, edge_oper.GetRemapInfo());
-        TS_ASSERT_EQUALS(edge_oper.GetRemapInfo()->GetSplitProportions(), std::vector<double>(2,0.5));
+        TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo().GetSplitProportions(), std::vector<double>(2,0.5));
 
-        EdgeRemapInfo* info_1 = new EdgeRemapInfo(std::vector<long>(4, 7), std::vector<unsigned> (4, 8));
-        EdgeRemapInfo* info_2 = new EdgeRemapInfo(std::vector<long>(3, 5), std::vector<unsigned> (3, 4));
-        EdgeOperation edge_oper2 (0, 1, info_1, info_2);
-        TS_ASSERT_EQUALS(edge_oper2.GetRemapInfo()->GetEdgesMapping(), std::vector<long>(4, 7));
-        TS_ASSERT_EQUALS(edge_oper2.GetRemapInfo()->GetEdgesStatus(), std::vector<unsigned>(4, 8));
-        TS_ASSERT_EQUALS(edge_oper2.GetRemapInfo2()->GetEdgesMapping(), std::vector<long>(3, 5));
-        TS_ASSERT_EQUALS(edge_oper2.GetRemapInfo2()->GetEdgesStatus(), std::vector<unsigned>(3, 4));
+        const EdgeRemapInfo info_1(std::vector<long>(4, 7), std::vector<unsigned>(4, 8));
+        const EdgeRemapInfo info_2(std::vector<long>(3, 5), std::vector<unsigned>(3, 4));
+        EdgeOperation edge_oper2(0, 1, info_1, info_2);
+        TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo().GetEdgesMapping(), std::vector<long>(4, 7));
+        TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo().GetEdgesStatus(), std::vector<unsigned>(4, 8));
+        TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo2().GetEdgesMapping(), std::vector<long>(3, 5));
+        TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo2().GetEdgesStatus(), std::vector<unsigned>(3, 4));
     }
 
     void TestEdgeOperationArchive()
     {
         OutputFileHandler handler("TestEdgeOperation", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "edgeOperation.arch";
+        const std::string archive_filename = handler.GetOutputDirectoryFullPath() + "edgeOperation.arch";
 
         {
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            EdgeRemapInfo* info = new EdgeRemapInfo;
-            info->SetSplitProportions(std::vector<double>(2, 0.5));
+            EdgeRemapInfo info;
+            info.SetSplitProportions(std::vector<double>(2, 0.5));
 
-            EdgeRemapInfo* info_2 = new EdgeRemapInfo(std::vector<long>(3, 5), std::vector<unsigned> (3, 4));
-            EdgeOperation* edge_oper = new EdgeOperation(2, 10, info, info_2);
+            const EdgeRemapInfo info_2(std::vector<long>(3, 5), std::vector<unsigned> (3, 4));
+            const EdgeOperation edge_oper(2, 10, info, info_2);
 
             // Write the edge to file
             output_arch << edge_oper;
-            delete edge_oper;
         }
 
         {
-            // Restore the nodes
+            // Restore edge operation
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            EdgeOperation* edge_oper;
+            EdgeOperation edge_oper;
             input_arch >> edge_oper;
 
-            TS_ASSERT_EQUALS(edge_oper->GetOperation(), EDGE_OPERATION_DIVIDE);
-            TS_ASSERT_EQUALS(edge_oper->GetElementIndex(), 2u);
-            TS_ASSERT_EQUALS(edge_oper->GetElementIndex2(), 10u);
-            TS_ASSERT_EQUALS(edge_oper->IsElementIndexRemapped(), false);
+            TS_ASSERT_EQUALS(edge_oper.GetOperation(), EDGE_OPERATION_DIVIDE);
+            TS_ASSERT_EQUALS(edge_oper.GetElementIndex(), 2u);
+            TS_ASSERT_EQUALS(edge_oper.GetElementIndex2(), 10u);
+            TS_ASSERT_EQUALS(edge_oper.IsElementIndexRemapped(), false);
 
-            TS_ASSERT_EQUALS(edge_oper->GetRemapInfo()->GetSplitProportions(), std::vector<double>(2,0.5));
-            TS_ASSERT_EQUALS(edge_oper->GetRemapInfo2()->GetEdgesMapping(), std::vector<long>(3, 5));
-            TS_ASSERT_EQUALS(edge_oper->GetRemapInfo2()->GetEdgesStatus(), std::vector<unsigned>(3, 4));
-
-            delete edge_oper;
+            TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo().GetSplitProportions(), std::vector<double>(2,0.5));
+            TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo2().GetEdgesMapping(), std::vector<long>(3, 5));
+            TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo2().GetEdgesStatus(), std::vector<unsigned>(3, 4));
         }
     }
 

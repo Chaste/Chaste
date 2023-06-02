@@ -53,8 +53,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * This class records operations performed on the mesh.
  * In particular, this class records operations on edges and nodes during e.g. T1 transition or cell division
- * The sequence of operations as well as their nature are needed for remapping of old (prior to an operation) edge based quantities
- * into new state. For example, when an edge is split into two or shrinked, the edge quantities may change according to the kind of operation
+ *
+ * The sequence of operations as well as their nature are needed for remapping of old (prior to an operation) edge based
+ * quantities into new state. For example, when an edge is split into two or, shrinks, the edge quantities may change
+ * according to the kind of operation.
  */
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 class VertexMeshOperationRecorder
@@ -62,6 +64,7 @@ class VertexMeshOperationRecorder
 private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
+
     /**
      * Archive the object.
      *
@@ -80,21 +83,23 @@ private:
 
     // Storage for T1 swap info
     std::vector<T1SwapInfo<SPACE_DIM> > mT1Swaps;
+
     // Storage for T2 swap info
     std::vector<T2SwapInfo<SPACE_DIM> > mT2Swaps;
+
     // Storage for T3 swap info
     std::vector<T3SwapInfo<SPACE_DIM> > mT3Swaps;
+
     // Storage for cell division info
     std::vector<CellDivisionInfo<SPACE_DIM> > mCellDivisions;
 
     // Stores all mesh operations
-    std::vector<EdgeOperation*> mEdgeOperations;
+    std::vector<EdgeOperation> mEdgeOperations;
 
     // Pointer to edge handler
-    EdgeHelper<SPACE_DIM>* mpEdgeHelper;
+    EdgeHelper<SPACE_DIM>* mpEdgeHelper = nullptr;
 
 public:
-
     /**
      * Sets edge helper associated with the vertex mesh
      * @param pEdgeHelper
@@ -160,7 +165,7 @@ public:
      */
     std::vector<CellDivisionInfo<SPACE_DIM> > GetCellDivisionInfo() const;
 
-    /**
+    /*
      * Clear information about T3 swaps
      */
     void ClearCellDivisionInfo();
@@ -168,7 +173,7 @@ public:
     /**
      * @return Edge operations since last clearing
      */
-    const std::vector<EdgeOperation*>& GetEdgeOperations();
+    const std::vector<EdgeOperation>& GetEdgeOperations();
 
     /**
      * Clears edge operations

@@ -54,15 +54,14 @@ template <unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap)
 {
     // Get recorded edge operations
-    std::vector<EdgeOperation*> edge_operations
-    = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
+    const std::vector<EdgeOperation>& edge_operations = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
     for (auto operation:edge_operations)
     {
         // An operation with deleted element may be recorded,
         // e.g. following a T2 swap, neighbouring element may become triangular due to node merging
         // and may subsequently be marked for deletion, despite being marked to perform edge operations (e.g. node merging).
 
-        switch (operation->GetOperation())
+        switch (operation.GetOperation())
         {
         // All operations, except cell division, require the same information
         case EDGE_OPERATION_ADD:
@@ -70,12 +69,12 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
         case EDGE_OPERATION_SPLIT:
         case EDGE_OPERATION_MERGE:
         {
-            const unsigned int stored_index = operation->GetElementIndex();
+            const unsigned int stored_index = operation.GetElementIndex();
             unsigned int location_index = stored_index;
 
             // If operation is recorded before element indices are changed. For example, if the operations recorded
             // during T2 swap
-            if (operation->IsElementIndexRemapped())
+            if (operation.IsElementIndexRemapped())
             {
                 // If the element is deleted, then ignore this operation
                 if (rElementMap.IsDeleted(location_index))
@@ -90,21 +89,21 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
                 }
             }
             // Get the necessary information to perform Remap
-            EdgeRemapInfo *pEdgeChange = operation->GetRemapInfo();
+            const EdgeRemapInfo& rEdgeChange = operation.rGetRemapInfo();
             CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
             auto old_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
             std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
 
-            RemapCellSrn(old_srn_edges, old_model, pEdgeChange);
+            RemapCellSrn(old_srn_edges, old_model, rEdgeChange);
             old_srn_edges.clear();
             break;
         }
         case EDGE_OPERATION_DIVIDE:
         {
-            const unsigned int location_index_1 = rElementMap.GetNewIndex(operation->GetElementIndex());
-            const unsigned int location_index_2 = rElementMap.GetNewIndex(operation->GetElementIndex2());
-            EdgeRemapInfo *pEdgeChange_1 = operation->GetRemapInfo();
-            EdgeRemapInfo *pEdgeChange_2 = operation->GetRemapInfo2();
+            const unsigned int location_index_1 = rElementMap.GetNewIndex(operation.GetElementIndex());
+            const unsigned int location_index_2 = rElementMap.GetNewIndex(operation.GetElementIndex2());
+            const EdgeRemapInfo& rEdgeChange_1 = operation.rGetRemapInfo();
+            const EdgeRemapInfo& rEdgeChange_2 = operation.rGetRemapInfo2();
             CellPtr cell_1 = mpCellPopulation->GetCellUsingLocationIndex(location_index_1);
             CellPtr cell_2 = mpCellPopulation->GetCellUsingLocationIndex(location_index_2);
 
@@ -112,8 +111,8 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
             std::vector<AbstractSrnModelPtr> parent_srn_edges = old_model_1->GetEdges();
             auto old_model_2 = static_cast<CellSrnModel*>(cell_2->GetSrnModel());
 
-            RemapCellSrn(parent_srn_edges, old_model_1, pEdgeChange_1);
-            RemapCellSrn(parent_srn_edges, old_model_2, pEdgeChange_2);
+            RemapCellSrn(parent_srn_edges, old_model_1, rEdgeChange_1);
+            RemapCellSrn(parent_srn_edges, old_model_2, rEdgeChange_2);
             parent_srn_edges.clear();
             break;
         }
@@ -125,11 +124,11 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
 template <unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
                                                  CellSrnModel* pCellSrn,
-                                                 EdgeRemapInfo* pEdgeChange)
+                                                 const EdgeRemapInfo& rEdgeChange)
 {
-    auto edge_mapping = pEdgeChange->GetEdgesMapping();
+    auto edge_mapping = rEdgeChange.GetEdgesMapping();
     std::vector<AbstractSrnModelPtr> new_edge_srn(edge_mapping.size());
-    const std::vector<double> split_proportions = pEdgeChange->GetSplitProportions();
+    const std::vector<double> split_proportions = rEdgeChange.GetSplitProportions();
     const unsigned int n_edges = edge_mapping.size();
     std::vector<unsigned int> shrunk_edges;
   
@@ -147,7 +146,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
         //3 - Edge below or above the edge that was deleted due to node merging
         //4 - Edge above was merged into this edge
-        const unsigned int remapStatus = pEdgeChange->GetEdgesStatus()[i];
+        const unsigned int remapStatus = rEdgeChange.GetEdgesStatus()[i];
 
         //Remap index cannot be negative when it's a direct remap or an edge split
         assert(!((remapStatus == 0 || remapStatus == 1) && remapIndex < 0));
@@ -175,7 +174,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             // If the edge above or below this edge was deleted
             new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parent_srn_edges[remapIndex]->CreateSrnModel());
 
-            const bool isPrevEdge = pEdgeChange->GetEdgesStatus()[(i+1)%n_edges]==3;
+            const bool isPrevEdge = rEdgeChange.GetEdgesStatus()[(i+1)%n_edges]==3;
             //Find the shrunk edge
             unsigned int shrunkEdge = 0;
             //If this edge is below the shrunk edge

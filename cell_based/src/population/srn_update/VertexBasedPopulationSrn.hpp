@@ -102,12 +102,12 @@ public:
      * Remaps cell SRN. If an edge has not been modified, the old edge SRN is mapped to its junction.
      * Otherwise, edge SRNs are updated according to the operation performed.
      * @param parent_srn_edges Edge SRNs before topology is changed
-     * @param pCellSrn_1 CellSrnModel of the cell
-     * @param pEdgeChange_1 Contains information about which edge changes occurred
+     * @param pCellSrn CellSrnModel of the cell
+     * @param pEdgeChange Contains information about which edge changes occurred
      */
     void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
-                             CellSrnModel* pCellSrn_1,
-                             EdgeRemapInfo* pEdgeChange_1);
+                             CellSrnModel* pCellSrn,
+                             const EdgeRemapInfo& rEdgeChange);
 };
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedPopulationSrn)

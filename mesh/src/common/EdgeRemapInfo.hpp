@@ -48,6 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class EdgeRemapInfo {
 private:
+
+    bool mUnused = true;
+
     /**
      * Contains a mapping to the old local edge indices. Negative value means a new edge
      */
@@ -81,6 +84,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & mUnused;
         archive & mEdgesMapping;
         archive & mEdgeStatus;
         archive & mSplitProportions;
@@ -89,7 +93,7 @@ public:
     /**
      * Default constructor. Does nothing.
      */
-    EdgeRemapInfo();
+    EdgeRemapInfo() = default;
 
     /**
      * Constructor for edge remapping.
@@ -98,11 +102,6 @@ public:
      * @param edgesStatus status of the edges in the element
      */
     EdgeRemapInfo(const std::vector<long int> &edgesMapping, const std::vector<unsigned int> &edgesStatus);
-
-    /**
-     * Here for boost serialization
-     */
-    ~EdgeRemapInfo();
 
     /**
      * Contains a mapping to the old local edges index. Negative value means a new edge
@@ -125,6 +124,8 @@ public:
      * @param thetas
      */
     void SetSplitProportions(const std::vector<double> thetas);
+
+    bool GetUnused() const;
 };
 
 

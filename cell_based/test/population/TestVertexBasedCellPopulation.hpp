@@ -532,7 +532,7 @@ public:
 
         // Test if the swap has been recorded properly
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
-        std::vector<EdgeOperation*> edge_operations = operation_recorder->GetEdgeOperations();
+        const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
         const unsigned int n_operations = edge_operations.size();
         // Two node merging operations in two elements and two new edge operations in the other two elements
         TS_ASSERT_EQUALS(n_operations, 2u);
@@ -540,13 +540,13 @@ public:
         std::vector<std::vector<unsigned int> > element_to_operations(5);
         for (unsigned int i=0; i<n_operations; ++i)
         {
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_DIVIDE)
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_DIVIDE)
                 n_divisions++;
-            if (edge_operations[i]->GetOperation() == EDGE_OPERATION_SPLIT)
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
                 n_edge_splits++;
             //Determine operations that an element underwent
-            const unsigned int elem_index = edge_operations[i]->GetElementIndex();
-            element_to_operations[elem_index].push_back(edge_operations[i]->GetOperation());
+            const unsigned int elem_index = edge_operations[i].GetElementIndex();
+            element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
         }
         TS_ASSERT_EQUALS(n_divisions, 1u);
         TS_ASSERT_EQUALS(n_edge_splits, 1u);
