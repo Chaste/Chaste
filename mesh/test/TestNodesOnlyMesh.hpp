@@ -238,7 +238,38 @@ public:
             TS_ASSERT(mesh.IsOwned(location));
         }
     }
+    void TestConstuctingLargerMesh()
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 2.0, 2.0));
+        nodes.push_back(new Node<2>(1, false, 2.0, 200.0));
+        nodes.push_back(new Node<2>(2, false, 200.0, 2.0));
+        nodes.push_back(new Node<2>(3, false, 200.0, 200.0));
 
+        NodesOnlyMesh<2> mesh;
+        ChasteCuboid<2> bounding_cuboid = mesh.CalculateBoundingBox(nodes);
+
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[0], 200.0, 1e-16);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[1], 200.0, 1e-16);
+
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[0], 2.0, 1e-16);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[1], 2.0, 1e-16);
+
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        c_vector<double,4> swollen_box = mesh.GetBoxCollection()->rGetDomainSize();
+        
+        TS_ASSERT_DELTA(swollen_box(0), 2, 1e-11);
+        TS_ASSERT_DELTA(swollen_box(1),  201.5, 1e-11);
+        TS_ASSERT_DELTA(swollen_box(2), 2, 1e-11);
+        TS_ASSERT_DELTA(swollen_box(3), 201.5,1e-11);
+        
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+        
+    }
     void TestConstuctingAndEnlargingInitialBoxCollection()
     {
         double cut_off = 0.5;
