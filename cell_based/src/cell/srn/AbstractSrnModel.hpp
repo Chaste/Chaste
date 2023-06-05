@@ -44,9 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
+#include "Cell.hpp"
+#include "Exception.hpp"
 #include "OutputFileHandler.hpp"
 #include "SimulationTime.hpp"
-#include "Cell.hpp"
 
 class Cell; // Circular definition (cells need to know about SRN models and vice-versa)
 typedef boost::shared_ptr<Cell> CellPtr;
@@ -108,12 +109,12 @@ protected:
     /**
      * The local edge index when used as part of a edge-based SRN
      */
-    unsigned mEdgeLocalIndex;
+    unsigned mEdgeLocalIndex = UNSIGNED_UNSET;
 
     /**
      * Indicates if edge model has been introduced. False by default.
      */
-    bool mIsEdgeBasedModel;
+    bool mIsEdgeBasedModel = false;
 
     /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
@@ -142,7 +143,7 @@ public:
      * does not delete mpCell. Instead, the cell takes responsibility for deleting
      * the SRN model when it is destroyed.
      */
-    virtual ~AbstractSrnModel();
+    virtual ~AbstractSrnModel() = default;
 
     /**
      * Gives the SRN model a pointer to its host cell.

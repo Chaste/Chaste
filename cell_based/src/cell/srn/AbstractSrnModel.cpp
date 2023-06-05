@@ -36,11 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSrnModel.hpp"
 
 AbstractSrnModel::AbstractSrnModel()
-    : mSimulatedToTime(SimulationTime::Instance()->GetTime()), mIsEdgeBasedModel(false)
-{
-}
-
-AbstractSrnModel::~AbstractSrnModel()
+    : mSimulatedToTime(SimulationTime::Instance()->GetTime())
 {
 }
 
