@@ -33,26 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
 #ifndef _TESTEDGE_HPP_
 #define _TESTEDGE_HPP_
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
-#include "MutableVertexMesh.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
 #include "ArchiveOpener.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "MutableVertexMesh.hpp"
 
-//This test is always run sequentially (never in parallel)
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestEdge : public CxxTest::TestSuite
 {
 public:
-
     /**
      * Check whether edge building works as intended
      */
@@ -61,85 +59,79 @@ public:
         const unsigned ELEMENT_DIM = 2;
         const unsigned SPACE_DIM = 2;
 
-        unsigned exampleEdgeIndex = 1;
+        const unsigned exampleEdgeIndex = 1;
 
-        Edge<SPACE_DIM>* testEdge = new Edge<SPACE_DIM>(exampleEdgeIndex);
-        TS_ASSERT(testEdge->GetNumNodes()==0);
+        auto p_test_edge = std::make_unique<Edge<SPACE_DIM> >(exampleEdgeIndex);
+        TS_ASSERT(p_test_edge->GetNumNodes() == 0);
 
-        TS_ASSERT_EQUALS(exampleEdgeIndex, testEdge->GetIndex());
+        TS_ASSERT_EQUALS(exampleEdgeIndex, p_test_edge->GetIndex());
 
         // Add nodes to the edge, check validity and centre position
-        Node<SPACE_DIM> node0(0, ChastePoint<SPACE_DIM>(0,0,0));
-        Node<SPACE_DIM> node1(1, ChastePoint<SPACE_DIM>(1,1,1));
+        Node<SPACE_DIM> node0(0, ChastePoint<SPACE_DIM>(0, 0, 0));
+        Node<SPACE_DIM> node1(1, ChastePoint<SPACE_DIM>(1, 1, 1));
 
-        testEdge->SetNodes(&node0, &node1);
-        auto edgeCentreLocation = testEdge->rGetCentreLocation();
-        TS_ASSERT(testEdge->GetNumNodes()==2);
-        TS_ASSERT(testEdge->GetNode(0)==&node0 ||testEdge->GetNode(0) == &node1);
-        TS_ASSERT(testEdge->GetNode(1)==&node0 ||testEdge->GetNode(1) == &node1);
-        TS_ASSERT(testEdge->GetNode(0)!=testEdge->GetNode(1));
+        p_test_edge->SetNodes(&node0, &node1);
+        auto edgeCentreLocation = p_test_edge->rGetCentreLocation();
+        TS_ASSERT(p_test_edge->GetNumNodes() == 2);
+        TS_ASSERT(p_test_edge->GetNode(0) == &node0 || p_test_edge->GetNode(0) == &node1);
+        TS_ASSERT(p_test_edge->GetNode(1) == &node0 || p_test_edge->GetNode(1) == &node1);
+        TS_ASSERT(p_test_edge->GetNode(0) != p_test_edge->GetNode(1));
         TS_ASSERT(edgeCentreLocation[0] == 0.5 && edgeCentreLocation[1] == 0.5);
 
-        // Generate two square vertex elements
-        std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
-        nodes0.push_back(new Node<SPACE_DIM>(0, false, 0.0, 0.0));
-        nodes0.push_back(new Node<SPACE_DIM>(1, false, 1.0, 0.0));
-        nodes0.push_back(new Node<SPACE_DIM>(2, false, 1.0, 1.0));
-        nodes0.push_back(new Node<SPACE_DIM>(3, false, 0.0, 1.0));
 
-        nodes1.push_back(nodes0[1]);
-        nodes1.push_back(nodes0[0]);
-        nodes1.push_back(new Node<SPACE_DIM>(4, false, 0.0, -1.0));
-        nodes1.push_back(new Node<SPACE_DIM>(5, false, 1.0, -1.0));
+        std::vector<Node<SPACE_DIM>*> nodes;
+        nodes.push_back(new Node<SPACE_DIM>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<SPACE_DIM>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<SPACE_DIM>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<SPACE_DIM>(3, false, 0.0, 1.0));
+        nodes.push_back(new Node<SPACE_DIM>(4, false, 0.0, -1.0));
+        nodes.push_back(new Node<SPACE_DIM>(5, false, 1.0, -1.0));
 
-        allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
-        allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
+        // Generate two line vertex elements
+        std::vector<Node<SPACE_DIM>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+        nodes_elem_0.push_back(nodes[3]);
 
-        std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
+        std::vector<Node<SPACE_DIM>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[4]);
+        nodes_elem_1.push_back(nodes[5]);
+
+        std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> elements;
+        elements.push_back(new VertexElement<ELEMENT_DIM, SPACE_DIM>(0, nodes_elem_0));
+        elements.push_back(new VertexElement<ELEMENT_DIM, SPACE_DIM>(1, nodes_elem_1));
 
         // Generate a mesh which will automatically build the edges in the constructor
-        VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-        const EdgeHelper<SPACE_DIM>& edge_helper = mesh->GetEdgeHelper();
-        //There are two elements in our mesh
-        //We test Edge class methods here
-        for (unsigned int i=0; i<2; i++)
+        auto p_mesh = std::make_unique<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(nodes, elements);
+        const EdgeHelper<SPACE_DIM>& edge_helper = p_mesh->GetEdgeHelper();
+        // There are two elements in our mesh
+        // We test Edge class methods here
+        for (unsigned int i = 0; i < 2; i++)
         {
             VertexElement<ELEMENT_DIM, SPACE_DIM>* element = elements[i];
             const unsigned int n_edges = element->GetNumEdges();
-            for (unsigned int index = 0; index<n_edges; index++)
+            for (unsigned int index = 0; index < n_edges; index++)
             {
                 Edge<SPACE_DIM>* p_edge = element->GetEdge(index);
-                TS_ASSERT(p_edge->GetNumNodes()==2);
-                TS_ASSERT(p_edge->GetNode(0)!=p_edge->GetNode(1));
-                TS_ASSERT(p_edge->GetNumElements()>0&&p_edge->GetNumElements()<=2);
+                TS_ASSERT(p_edge->GetNumNodes() == 2);
+                TS_ASSERT(p_edge->GetNode(0) != p_edge->GetNode(1));
+                TS_ASSERT(p_edge->GetNumElements() > 0 && p_edge->GetNumElements() <= 2);
                 TS_ASSERT(element->ContainsEdge(p_edge));
             }
         }
-        for (unsigned int i=0; i<mesh->GetNumEdges(); i++)
+        for (unsigned int i = 0; i < p_mesh->GetNumEdges(); i++)
         {
-            Edge<SPACE_DIM>* p_edge = mesh->GetEdge(i);
-            TS_ASSERT(edge_helper.GetEdge(i)==p_edge);
-            TS_ASSERT(elements[0]->ContainsEdge(p_edge)||elements[1]->ContainsEdge(p_edge));
-        }
-
-        //For coverage
-        {
-            const VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh_const = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-            const EdgeHelper<SPACE_DIM>& edge_helper_for_const = mesh_const->GetEdgeHelper();
-            for (unsigned int i=0; i<mesh_const->GetNumEdges(); i++)
-            {
-                Edge<SPACE_DIM>* p_edge = mesh_const->GetEdge(i);
-                TS_ASSERT(edge_helper_for_const.GetEdge(i)==p_edge);
-                TS_ASSERT(edge_helper_for_const[i]==p_edge);
-                TS_ASSERT(elements[0]->ContainsEdge(p_edge)||elements[1]->ContainsEdge(p_edge));
-            }
+            Edge<SPACE_DIM>* p_edge = p_mesh->GetEdge(i);
+            TS_ASSERT(edge_helper.GetEdge(i) == p_edge);
+            TS_ASSERT(elements[0]->ContainsEdge(p_edge) || elements[1]->ContainsEdge(p_edge));
         }
 
         // Also test constructors in honeycomb mesh (MutableVertexMesh)
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* honeycombMesh = generator.GetMesh();
+        MutableVertexMesh<2, 2>* honeycombMesh = generator.GetMesh();
         TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19);
     }
 
@@ -152,7 +144,7 @@ public:
 
         unsigned exampleEdgeIndex = 1;
 
-        auto p_test_edge = std::make_unique<Edge<SPACE_DIM>>(exampleEdgeIndex);
+        auto p_test_edge = std::make_unique<Edge<SPACE_DIM> >(exampleEdgeIndex);
         TS_ASSERT(p_test_edge->GetNumNodes() == 0);
 
         TS_ASSERT_EQUALS(exampleEdgeIndex, p_test_edge->GetIndex());
@@ -187,7 +179,7 @@ public:
         elements.push_back(new VertexElement<1, SPACE_DIM>(1, nodes_elem_2));
 
         // Generate a mesh which will automatically build the edges in the constructor
-        auto p_mesh = std::make_unique<VertexMesh<1, SPACE_DIM>>(nodes, elements);
+        auto p_mesh = std::make_unique<VertexMesh<1, SPACE_DIM> >(nodes, elements);
         const EdgeHelper<SPACE_DIM>& edge_helper = p_mesh->GetEdgeHelper();
         // There are two elements in our mesh
         // We test Edge class methods here
@@ -224,60 +216,66 @@ public:
 
         unsigned exampleEdgeIndex = 1;
 
-        Edge<SPACE_DIM>* testEdge = new Edge<SPACE_DIM>(exampleEdgeIndex);
-        TS_ASSERT(testEdge->GetNumNodes()==0);
+        auto p_test_edge = std::make_unique<Edge<SPACE_DIM> >(exampleEdgeIndex);
+        TS_ASSERT(p_test_edge->GetNumNodes() == 0);
 
-        TS_ASSERT_EQUALS(exampleEdgeIndex, testEdge->GetIndex());
+        TS_ASSERT_EQUALS(exampleEdgeIndex, p_test_edge->GetIndex());
 
         // Add nodes to the edge, check validity and centre position
-        Node<SPACE_DIM> node0(0, ChastePoint<SPACE_DIM>(0,0,0));
-        Node<SPACE_DIM> node1(1, ChastePoint<SPACE_DIM>(1,1,1));
+        Node<SPACE_DIM> node0(0, ChastePoint<SPACE_DIM>(0, 0, 0));
+        Node<SPACE_DIM> node1(1, ChastePoint<SPACE_DIM>(1, 1, 1));
 
-       testEdge->SetNodes(&node1, &node0);
-       auto edge_node_indices = testEdge->GetMapIndex();
-       TS_ASSERT_EQUALS(edge_node_indices.first, 0u);
-       TS_ASSERT_EQUALS(edge_node_indices.second, 1u);
+        p_test_edge->SetNodes(&node1, &node0);
+        auto edge_node_indices = p_test_edge->GetMapIndex();
+        TS_ASSERT_EQUALS(edge_node_indices.first, 0u);
+        TS_ASSERT_EQUALS(edge_node_indices.second, 1u);
 
-       node0.AddEdge(exampleEdgeIndex);
-       node1.AddEdge(exampleEdgeIndex);
-       testEdge->MarkAsDeleted();
-       TS_ASSERT(testEdge->IsDeleted());
+        node0.AddEdge(exampleEdgeIndex);
+        node1.AddEdge(exampleEdgeIndex);
+        p_test_edge->MarkAsDeleted();
+        TS_ASSERT(p_test_edge->IsDeleted());
 
-       TS_ASSERT_THROWS_THIS(node0.RemoveEdge(0u), "Tried to remove an edge index which was not in the set");
+        TS_ASSERT_THROWS_THIS(node0.RemoveEdge(0u), "Tried to remove an edge index which was not in the set");
 
-       std::set<unsigned int> edge_indices;
-       edge_indices.insert(0);
-       edge_indices.insert(1);
-       node0.SetEdgeIndices(edge_indices);
-       TS_ASSERT_EQUALS(node0.GetEdgeIndices(), edge_indices);
+        std::set<unsigned int> edge_indices;
+        edge_indices.insert(0);
+        edge_indices.insert(1);
+        node0.SetEdgeIndices(edge_indices);
+        TS_ASSERT_EQUALS(node0.GetEdgeIndices(), edge_indices);
 
-       // Generate two square vertex elements
-       std::vector<Node<SPACE_DIM>*> nodes0, nodes1, allnodes;
-       nodes0.push_back(new Node<SPACE_DIM>(0, false, 0.0, 0.0));
-       nodes0.push_back(new Node<SPACE_DIM>(1, false, 1.0, 0.0));
-       nodes0.push_back(new Node<SPACE_DIM>(2, false, 1.0, 1.0));
-       nodes0.push_back(new Node<SPACE_DIM>(3, false, 0.0, 1.0));
+        std::vector<Node<SPACE_DIM>*> nodes;
+        nodes.push_back(new Node<SPACE_DIM>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<SPACE_DIM>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<SPACE_DIM>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<SPACE_DIM>(3, false, 0.0, 1.0));
+        nodes.push_back(new Node<SPACE_DIM>(4, false, 0.0, -1.0));
+        nodes.push_back(new Node<SPACE_DIM>(5, false, 1.0, -1.0));
 
-       nodes1.push_back(nodes0[1]);
-       nodes1.push_back(nodes0[0]);
-       nodes1.push_back(new Node<SPACE_DIM>(4, false, 0.0, -1.0));
-       nodes1.push_back(new Node<SPACE_DIM>(5, false, 1.0, -1.0));
+        // Generate two square vertex elements
+        std::vector<Node<SPACE_DIM>*> nodes_elem_0;
+        nodes_elem_0.push_back(nodes[0]);
+        nodes_elem_0.push_back(nodes[1]);
+        nodes_elem_0.push_back(nodes[2]);
+        nodes_elem_0.push_back(nodes[3]);
 
-        allnodes.insert(allnodes.end(), nodes0.begin(), nodes0.end());
-        allnodes.insert(allnodes.end(), nodes1.begin(), nodes1.end());
+        std::vector<Node<SPACE_DIM>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[4]);
+        nodes_elem_1.push_back(nodes[5]);
 
-        std::vector<VertexElement<ELEMENT_DIM,SPACE_DIM>*> elements;
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(0, nodes0));
-        elements.push_back(new VertexElement<ELEMENT_DIM,SPACE_DIM>(1, nodes1));
+        std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> elements;
+        elements.push_back(new VertexElement<ELEMENT_DIM, SPACE_DIM>(0, nodes_elem_0));
+        elements.push_back(new VertexElement<ELEMENT_DIM, SPACE_DIM>(1, nodes_elem_1));
 
         // Generate a mesh which will automatically build the edges in the constructor
-        VertexMesh<ELEMENT_DIM, SPACE_DIM>* mesh = new VertexMesh<ELEMENT_DIM, SPACE_DIM>(allnodes, elements);
-        Edge<SPACE_DIM>* edge0 = mesh->GetElement(0)->GetEdge(0);
-        Edge<SPACE_DIM>* edge1 = mesh->GetElement(0)->GetEdge(1);
+        auto p_mesh = std::make_unique<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(nodes, elements);
+        Edge<SPACE_DIM>* edge0 = p_mesh->GetElement(0)->GetEdge(0);
+        Edge<SPACE_DIM>* edge1 = p_mesh->GetElement(0)->GetEdge(1);
         TS_ASSERT(!edge0->IsBoundaryEdge());
         TS_ASSERT(edge1->IsBoundaryEdge());
 
-        std::set<unsigned> elements_contain_edge = edge0->GetNeighbouringElementIndices();
+        const std::set<unsigned> elements_contain_edge = edge0->GetNeighbouringElementIndices();
         std::set<unsigned> expected_elements;
         expected_elements.insert(0);
         expected_elements.insert(1);
@@ -298,8 +296,8 @@ public:
             testEdge->AddElement(0);
             testEdge->AddElement(1);
 
-            Node<2> node0(0, ChastePoint<2>(0,0.0,0.0));
-            Node<2> node1(1, ChastePoint<2>(1,1.0,1.0));
+            Node<2> node0(0, ChastePoint<2>(0, 0.0, 0.0));
+            Node<2> node1(1, ChastePoint<2>(1, 1.0, 1.0));
 
             testEdge->SetNodes(&node0, &node1);
             // Write the edge to file
@@ -353,7 +351,7 @@ public:
         TS_ASSERT_EQUALS(edge_oper.GetElementIndex(), 1u);
         TS_ASSERT_EQUALS(edge_oper.GetElementIndex2(), 5u);
 
-        TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo().GetSplitProportions(), std::vector<double>(2,0.5));
+        TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo().GetSplitProportions(), std::vector<double>(2, 0.5));
 
         const EdgeRemapInfo info_1(std::vector<long>(4, 7), std::vector<unsigned>(4, 8));
         const EdgeRemapInfo info_2(std::vector<long>(3, 5), std::vector<unsigned>(3, 4));
@@ -377,7 +375,7 @@ public:
             EdgeRemapInfo info;
             info.SetSplitProportions(std::vector<double>(2, 0.5));
 
-            const EdgeRemapInfo info_2(std::vector<long>(3, 5), std::vector<unsigned> (3, 4));
+            const EdgeRemapInfo info_2(std::vector<long>(3, 5), std::vector<unsigned>(3, 4));
             const EdgeOperation edge_oper(2, 10, info, info_2);
 
             // Write the edge to file
@@ -397,7 +395,7 @@ public:
             TS_ASSERT_EQUALS(edge_oper.GetElementIndex2(), 10u);
             TS_ASSERT_EQUALS(edge_oper.IsElementIndexRemapped(), false);
 
-            TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo().GetSplitProportions(), std::vector<double>(2,0.5));
+            TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo().GetSplitProportions(), std::vector<double>(2, 0.5));
             TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo2().GetEdgesMapping(), std::vector<long>(3, 5));
             TS_ASSERT_EQUALS(edge_oper.rGetRemapInfo2().GetEdgesStatus(), std::vector<unsigned>(3, 4));
         }
