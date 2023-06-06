@@ -152,7 +152,8 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchEdgeInteriorODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10.0);
+        simulator.SetDt(0.004);
+        simulator.SetEndTime(0.1);
 
         /* Update CellData and CellEdgeData so that SRN simulations can run properly */
         MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_cell_modifier);
@@ -243,7 +244,8 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchEdgeOnlyODESimulation");
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(10.0);
+        simulator.SetDt(0.004);
+        simulator.SetEndTime(0.1);
 
         /* Update CellEdgeData so that SRN simulations can run properly */
         MAKE_PTR(DeltaNotchEdgeTrackingModifier<2>, p_modifier);
