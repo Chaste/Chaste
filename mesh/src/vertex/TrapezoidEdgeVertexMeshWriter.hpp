@@ -88,12 +88,12 @@ private:
      * If writing from a mesh object, the mesh to write to disk.
      * Otherwise NULL.
      */
-    VertexMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    VertexMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh = nullptr;
 
 #ifdef CHASTE_VTK
-//Requires  "sudo aptitude install libvtk5-dev" or similar
+//Requires  "sudo apt install libvtk7-dev" or similar
 ///\todo Merge into VtkMeshWriter (#1076)
-    vtkUnstructuredGrid* mpVtkUnstructedMesh;
+    vtkUnstructuredGrid* mpVtkUnstructedMesh = nullptr;
 #endif //CHASTE_VTK
 
 public:

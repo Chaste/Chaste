@@ -40,21 +40,20 @@ template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::TrapezoidEdgeVertexMeshWriter(const std::string &rDirectory,
                                                                            const std::string &rBaseName,
                                                                            const bool clearOutputDir)
-        : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-        mpMesh(nullptr)
+        : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir)
 {
-
 #ifdef CHASTE_VTK
     // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
 #endif //CHASTE_VTK
-
 }
 
 template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
 TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::~TrapezoidEdgeVertexMeshWriter()
 {
-
+#ifdef CHASTE_VTK
+    mpVtkUnstructedMesh->Delete();
+#endif //CHASTE_VTK
 }
 
 
