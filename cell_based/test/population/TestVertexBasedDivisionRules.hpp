@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "RandomDirectionVertexBasedDivisionRule.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"
+#include "VonMisesVertexBasedDivisionRule.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "SmartPointers.hpp"
 
@@ -247,6 +248,72 @@ public:
         TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
     }
 
+    void TestVonMisesDirectionVertexBasedDivisionRule()
+    {
+        /**
+         * This tests the VonMisesVertexBasedDivisionRule. We first create a vertex based cell population and check whether we can
+         * give the division rule to the population and get it back. Then we create 10000 division vectors and check that they have 
+         * approximately the right mean and variance, given the specified mean and concentration parameters.
+         */
+
+        // Make some nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.0, 2.0));
+        nodes.push_back(new Node<2>(2, true, -2.0, 0.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, -2.0));
+
+        // Make a rectangular element out of nodes 0,1,2,3
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[3]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
+
+        // Create a cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
+
+        // Create a division rule and set the mean and concentration parameters
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesDirectionVertexBasedDivisionRule<2>());
+        double mu = 1.0;
+        double kappa = 100.0;
+        p_division_rule->SetMeanParameter(mu);
+        p_division_rule->SetConcentrationParameter(kappa);
+        cell_population.SetVertexBasedDivisionRule(p_division_rule);
+
+        // Get the division rule back from the population
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
+
+        // Get 10000 division vectors, check each length, their mean and their variance
+        double average_angle = 0.0;
+        double angle_variance = 0.0;
+        for (unsigned iteration = 0; iteration < 10000; iteration++)
+        {
+            c_vector<double, 2> division_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+            TS_ASSERT_DELTA(norm_2(division_axis), 1.0, 1e-6);
+            average_angle += asin(division_axis(0));
+            angle_variance += asin(division_axis(0))*asin(division_axis(0));
+        }
+        average_angle /= 10000.0;
+        angle_variance /= 10000.0;
+
+        TS_ASSERT_DELTA(average_angle, mu, 1e-2);
+        TS_ASSERT_DELTA(angle_variance, 1.0/kappa, 1e-2);
+    }
+
     void TestArchiveFixedVertexBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
@@ -344,6 +411,45 @@ public:
             (*p_arch) >> p_division_rule;
 
             TS_ASSERT(dynamic_cast<ShortAxisVertexBasedDivisionRule<2>*>(p_division_rule.get()));
+        }
+    }
+    
+    void TestArchiveVonMisesVertexBasedDivisionRule()
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "VonMisesVertexBasedDivisionRule.arch";
+
+        // Create data structures to store variables to test for equality here
+        {
+            double mean_parameter = 1.1;
+            double concentration_parameter = 72.3;
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesVertexBasedDivisionRule<2>(vector));
+            p_division_rule->SetMeanParameter(mean_parameter);
+            p_division_rule->SetConcentrationParameter(concentration_parameter);
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Record values to test into data structures
+            (*p_arch) << p_division_rule;
+        }
+
+        {
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
+
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_division_rule;
+
+            TS_ASSERT(dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()));
+
+            double mean_parameter = (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()))->GetMeanParameter();
+            double concentration_parameter = (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()))->GetConcentrationParameter();
+            TS_ASSERT_DELTA(mean_parameter, 1.1, 1e-6);
+            TS_ASSERT_DELTA(concentration_parameter, 72.3, 1e-6);
         }
     }
 };
