@@ -37,38 +37,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTDELTANOTCHEDGEINTERIORODESIMULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "CheckpointArchiveTypes.hpp"
+
 #include "AbstractCellBasedTestSuite.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "NagaiHondaForce.hpp"
-#include "SimpleTargetAreaModifier.hpp"
-#include "SmartPointers.hpp"
-#include "PetscSetupAndFinalize.hpp"
-#include "UniformG1GenerationalCellCycleModel.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "CellVolumesWriter.hpp"
 #include "CellAgesWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellProliferativeTypesCountWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
-#include "SmartPointers.hpp"
-#include "PetscSetupAndFinalize.hpp"
-#include "UniformCellCycleModel.hpp"
-#include "WildTypeCellMutationState.hpp"
-
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
 #include "CellSrnModel.hpp"
-
+#include "CellVolumesWriter.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "DeltaNotchEdgeInteriorTrackingModifier.hpp"
 #include "DeltaNotchEdgeSrnModel.hpp"
 #include "DeltaNotchEdgeTrackingModifier.hpp"
-
 #include "DeltaNotchInteriorSrnModel.hpp"
-#include "DeltaNotchEdgeInteriorTrackingModifier.hpp"
-
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "NagaiHondaForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SimpleTargetAreaModifier.hpp"
+#include "SmartPointers.hpp"
+#include "TransitCellProliferativeType.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "UniformG1GenerationalCellCycleModel.hpp"
+#include "VertexBasedCellPopulation.hpp"
+#include "WildTypeCellMutationState.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 /**
  * These tests check and demonstrate simulation of vertex based models with edge and interior Srn models
@@ -84,13 +79,13 @@ public:
         EXIT_IF_PARALLEL;
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
             /* Initalise cell cycle */
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -104,36 +99,36 @@ public:
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
             double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
             {
                 total_edge_length += p_element->GetEdge(i)->rGetLength();
             }
 
             /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
             {
                 auto p_elem_edge = p_element->GetEdge(i);
                 auto p_edge_length = p_elem_edge->rGetLength();
                 std::vector<double> initial_conditions;
 
                 /* Initial concentration of delta and notch vary depending on the edge length */
-                initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
-                initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+                initial_conditions.push_back(p_edge_length / total_edge_length * delta_concentration);
+                initial_conditions.push_back(p_edge_length / total_edge_length * notch_concentration);
 
                 MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
                 p_srn_model->SetInitialConditions(initial_conditions);
                 p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
             }
-            //Add interior SRN models to cells
+            // Add interior SRN models to cells
             MAKE_PTR(DeltaNotchInteriorSrnModel, p_cell_srn_model);
-            std::vector<double> zero_conditions(2);
+            const std::vector<double> zero_conditions(2);
             p_cell_srn_model->SetInitialConditions(zero_conditions);
             p_cell_edge_srn_model->SetInteriorSrnModel(p_cell_srn_model);
 
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
 
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
+            const double birth_time = -RandomNumberGenerator::Instance()->ranf() * 12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -178,13 +173,13 @@ public:
     {
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
             /* Initalise cell cycle */
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -200,21 +195,21 @@ public:
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
             double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
             {
                 total_edge_length += p_element->GetEdge(i)->rGetLength();
             }
 
             /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
             {
                 auto p_elem_edge = p_element->GetEdge(i);
                 auto p_edge_length = p_elem_edge->rGetLength();
                 std::vector<double> initial_conditions;
 
                 /* Initial concentration of delta and notch vary depending on the edge length */
-                initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
-                initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+                initial_conditions.push_back(p_edge_length / total_edge_length * delta_concentration);
+                initial_conditions.push_back(p_edge_length / total_edge_length * notch_concentration);
 
                 MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
                 p_srn_model->SetInitialConditions(initial_conditions);
@@ -224,7 +219,7 @@ public:
             CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
             p_cell->SetCellProliferativeType(p_diff_type);
 
-            double birth_time = -RandomNumberGenerator::Instance()->ranf()*12.0;
+            const double birth_time = -RandomNumberGenerator::Instance()->ranf() * 12.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -259,6 +254,5 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
     }
 };
-
 
 #endif /*TESTDELTANOTCHEDGEINTERIORODESIMULATION_HPP_*/
