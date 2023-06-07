@@ -52,7 +52,7 @@ jobs:
         # context: "{{defaultContext}}:docker"
         file: docker/Dockerfile
         build-args: |
-            "BASE=jammy"
+            "BASE_TAG=jammy"
             "GIT_TAG=."
         platforms: 'amd64,arm64'
         push: true
