@@ -4,6 +4,7 @@ FROM chaste/base:${BASE_TAG}
 # Build Chaste: TAG can be a branch or release ('-' skips by default)
 ARG GIT_TAG=.
 ENV GIT_TAG=${GIT_TAG}
+RUN echo "Building Chaste ${GIT_TAG} in $PWD..." && ls
 RUN build_chaste.sh ${GIT_TAG}
 
 # Automatically mount the home directory in a volume to persist changes made there.
