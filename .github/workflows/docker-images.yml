@@ -53,7 +53,8 @@ jobs:
         file: docker/Dockerfile
         build-args: |
             "BASE_TAG=jammy"
-            "GIT_TAG=."
+            "GIT_TAG=develop"
+            # "GIT_TAG=."
         platforms: 'amd64,arm64'
         push: true
         # tags: ${{ steps.meta.outputs.tags }}
