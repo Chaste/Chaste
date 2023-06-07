@@ -331,6 +331,10 @@ public:
 
             TS_ASSERT_EQUALS(arch_elements, check_set);
             TS_ASSERT_EQUALS(testEdge->GetIndex(), 0u);
+
+            // Unarchiving has created two new nodes and the edge
+            delete node0;
+            delete node1;
             delete testEdge;
         }
     }
