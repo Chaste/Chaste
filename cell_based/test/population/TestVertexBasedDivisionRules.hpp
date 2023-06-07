@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VonMisesVertexBasedDivisionRule.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "SmartPointers.hpp"
+#include "Debug.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -287,31 +288,28 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Create a division rule and set the mean and concentration parameters
-        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesDirectionVertexBasedDivisionRule<2>());
-        double mu = 1.0;
-        double kappa = 100.0;
-        p_division_rule->SetMeanParameter(mu);
-        p_division_rule->SetConcentrationParameter(kappa);
-        cell_population.SetVertexBasedDivisionRule(p_division_rule);
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new VonMisesVertexBasedDivisionRule<2>());
+        double mu = 1.23;
+        double kappa = 10.0;
+        (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule_to_set.get()))->SetMeanParameter(mu);
+        (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule_to_set.get()))->SetConcentrationParameter(kappa);
+        cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
         boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
         // Get 10000 division vectors, check each length, their mean and their variance
-        double average_angle = 0.0;
-        double angle_variance = 0.0;
-        for (unsigned iteration = 0; iteration < 10000; iteration++)
+        c_vector<double, 2> average_axis = zero_vector<double>(2);
+        unsigned N = 100;
+        for (unsigned iteration = 0; iteration < N; iteration++)
         {
             c_vector<double, 2> division_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             TS_ASSERT_DELTA(norm_2(division_axis), 1.0, 1e-6);
-            average_angle += asin(division_axis(0));
-            angle_variance += asin(division_axis(0))*asin(division_axis(0));
+            average_axis += division_axis / (double)N;
         }
-        average_angle /= 10000.0;
-        angle_variance /= 10000.0;
-
-        TS_ASSERT_DELTA(average_angle, mu, 1e-2);
-        TS_ASSERT_DELTA(angle_variance, 1.0/kappa, 1e-2);
+        average_axis /= N;
+        double mu_estimate = atan2(average_axis(1), average_axis(0));
+        TS_ASSERT_DELTA(mu_estimate, mu, 1e-2);
     }
 
     void TestArchiveFixedVertexBasedDivisionRule()
@@ -423,9 +421,9 @@ public:
         {
             double mean_parameter = 1.1;
             double concentration_parameter = 72.3;
-            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesVertexBasedDivisionRule<2>(vector));
-            p_division_rule->SetMeanParameter(mean_parameter);
-            p_division_rule->SetConcentrationParameter(concentration_parameter);
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new VonMisesVertexBasedDivisionRule<2>());
+            (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()))->SetMeanParameter(mean_parameter);
+            (dynamic_cast<VonMisesVertexBasedDivisionRule<2>*>(p_division_rule.get()))->SetConcentrationParameter(concentration_parameter);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);

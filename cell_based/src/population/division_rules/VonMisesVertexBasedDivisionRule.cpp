@@ -87,7 +87,7 @@ c_vector<double, SPACE_DIM> VonMisesVertexBasedDivisionRule<SPACE_DIM>::Calculat
 
     unsigned counter = 0;
     double theta = 0;
-    while (counter != 0)
+    while (counter <= 0)
     {
         double u1 = RandomNumberGenerator::Instance()->ranf();
         double u2 = RandomNumberGenerator::Instance()->ranf();
