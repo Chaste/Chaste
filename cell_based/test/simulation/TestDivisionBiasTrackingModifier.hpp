@@ -48,29 +48,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
-#include "OffLatticeSimulation.hpp"
-#include "DivisionBiasTrackingModifier.hpp"
+#include "HoneycombMeshGenerator.hpp"
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "CellsGenerator.hpp"
 #include "BiasedBernoulliTrialCellCycleModel.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "CellLabel.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
-#include "NagaiHondaForce.hpp"
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "HoneycombMeshGenerator.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "GeneralisedLinearSpringForce.hpp"
+#include "DivisionBiasTrackingModifier.hpp"
+#include "FarhadifarForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
-#include "CellsGenerator.hpp"
 #include "Warnings.hpp"
-#include "CellVolumesWriter.hpp"
 #include "FileComparison.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
-#include "NodeVelocityWriter.hpp"
-
 #include "PetscSetupAndFinalize.hpp"
 
 class TestDivisionBiasTrackingModifier : public AbstractCellBasedTestSuite
@@ -108,10 +101,13 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedSimulationWithDivisionBias");
 
+        TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); // Default value for off-lattice simulations
+        simulator.SetEndTime(simulator.GetDt()/2.0);
+
         // Create a division bias tracking modifier and pass it to the simulation
         c_vector<double, 2> bias_vector;
-        bias_vector(0) = 1.0;
-        bias_vector(1) = 0.0;
+        bias_vector(0) = 0.0;
+        bias_vector(1) = 1.0;
         MAKE_PTR_ARGS(DivisionBiasTrackingModifier<2>, p_modifier, (bias_vector));
         simulator.AddSimulationModifier(p_modifier);
 
@@ -123,25 +119,37 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test that the cell data are correct in CellData at the first timestep
+        // Test that the cell data are correct at the first timestep
+        double y_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[1];
+        double y_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[1];
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_LESS_THAN_EQUALS(0.0, cell_iter->GetCellData()->GetItem("bias"));
-            TS_ASSERT_LESS_THAN_EQUALS(cell_iter->GetCellData()->GetItem("bias"), 1.0);
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+            TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
     
-        // Run simulation
+        simulator.SetEndTime(2.0);
         simulator.Solve();
 
-        // Test that the cell data are correct in CellData at the end time
+        // Test that the cell data are correct at the end time
+        y_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[1];
+        y_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[1];
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
           cell_iter != cell_population.End();
           ++cell_iter)
         {
-            TS_ASSERT_LESS_THAN_EQUALS(0.0, cell_iter->GetCellData()->GetItem("bias"));
-            TS_ASSERT_LESS_THAN_EQUALS(cell_iter->GetCellData()->GetItem("bias"), 1.0);
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+            TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
     }
 
@@ -169,8 +177,6 @@ public:
         }
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
-        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -192,16 +198,41 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellData at the first timestep
+        // Test that the cell data are correct at the first timestep
+        double x_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[0];
+        double x_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[0];
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[0] - x_min)/(x_max - x_min);
+            
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+            TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
+        }
+        
+        simulator.SetEndTime(2.0);
+        simulator.Solve();
+
+        // Test that the cell data are correct at the end time
+        x_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[0];
+        x_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[0];
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[0] - x_min)/(x_max - x_min);
+            
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+            TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
     }
 
-    void TestMeshBasedSimulationWithGhostNodesAndContactInhibition()
+    void TestMeshBasedSimulationWithGhostNodesAndDivisionBias()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
 
@@ -226,8 +257,6 @@ public:
         }
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells,location_indices);
-        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
-        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -236,8 +265,8 @@ public:
 
         // Create a division bias tracking modifier and pass it to the simulation
         c_vector<double, 2> bias_vector;
-        bias_vector(0) = 1.0;
-        bias_vector(1) = 0.0;
+        bias_vector(0) = 0.0;
+        bias_vector(1) = 1.0;
         MAKE_PTR_ARGS(DivisionBiasTrackingModifier<2>, p_modifier, (bias_vector));
         simulator.AddSimulationModifier(p_modifier);
 
@@ -249,12 +278,27 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellData at the first timestep
+        // Test that the cell data are in the correct interval in CellData at the first timestep
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+        }
+        
+        simulator.SetEndTime(2.0);
+        simulator.Solve();
+
+        // Test that the cell data are in the correct interval in CellData at the end time
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
         }
     }
 
@@ -283,8 +327,6 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
-        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -293,32 +335,85 @@ public:
 
         // Create a division bias tracking modifier and pass it to the simulation
         c_vector<double, 2> bias_vector;
-        bias_vector(0) = 1.0;
-        bias_vector(1) = 0.0;
+        bias_vector(0) = 0.0;
+        bias_vector(1) = 1.0;
         MAKE_PTR_ARGS(DivisionBiasTrackingModifier<2>, p_modifier, (bias_vector));
         simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-        simulator.AddForce(p_nagai_honda_force);
+        MAKE_PTR(FarhadifarForce<2>, p_force);
+        simulator.AddForce(p_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        p_growth_modifier->SetGrowthDuration(1.0);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
         simulator.Solve();
 
-        // Test that the volumes of the cells are correct in CellData at the first timestep
+        // Test that the cell data are correct at the first timestep
+        double y_min = 100;
+        double y_max = -100;
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-          cell_iter != cell_population.End();
-          ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            if (y >y_max)
+            {
+                y_max = y;
+            }
+            if (y < y_min)
+            {
+                y_min = y;
+            }
+        }
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+            TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
+        }
+    
+        simulator.SetEndTime(2.0);
+        simulator.Solve();
+
+        // Test that the cell data are correct at the end time
+        y_min = 100;
+        y_max = -100;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            if (y >y_max)
+            {
+                y_max = y;
+            }
+            if (y < y_min)
+            {
+                y_min = y;
+            }
+        }
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double bias = cell_iter->GetCellData()->GetItem("bias");
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            
+            TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
+            TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
+            TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
     }
 
-    void TestVolumeTrackedOffLatticeSimulationArchiving()
+    void TestDivisionBiasOffLatticeSimulationArchiving()
     {
         EXIT_IF_PARALLEL;
 
@@ -343,7 +438,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create a contact inhibition simulator
+        // Create a simulator
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDivisionBiasTrackedOffLatticeSimulationSaveAndLoad");
         double end_time = 0.01;
@@ -371,7 +466,7 @@ public:
 
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
         CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
+        TS_ASSERT_DELTA(p_cell->GetAge(), 10.01, 1e-4);
 
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
@@ -387,7 +482,7 @@ public:
 
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
         CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
+        TS_ASSERT_DELTA(p_cell2->GetAge(), 10.01, 1e-4);
 
         // Run simulation
         p_simulator->Solve();
@@ -396,7 +491,7 @@ public:
         delete p_simulator;
 
         // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         Warnings::QuietDestroy();
     }
 
