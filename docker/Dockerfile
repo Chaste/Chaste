@@ -1,9 +1,11 @@
-ARG BASE_TAG=latest
-FROM chaste/base:${BASE_TAG}
+# ARG BASE_TAG=latest
+# FROM chaste/base:${BASE_TAG}
+FROM chaste/develop
 
 # Build Chaste: TAG can be a branch or release ('-' skips by default)
 ARG GIT_TAG=.
 ENV GIT_TAG=${GIT_TAG}
+ADD . ${CHASTE_SOURCE_DIR}
 RUN echo "Building Chaste ${GIT_TAG} in $PWD..." && ls
 RUN build_chaste.sh ${GIT_TAG}
 
