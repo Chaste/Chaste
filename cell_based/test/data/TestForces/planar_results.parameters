@@ -1,0 +1,5 @@
+			<PlanarPolarisedLineTensionMultiplier>2</PlanarPolarisedLineTensionMultiplier>
+			<AreaElasticityParameter>1</AreaElasticityParameter>
+			<PerimeterContractilityParameter>0.04</PerimeterContractilityParameter>
+			<LineTensionParameter>0.12</LineTensionParameter>
+			<BoundaryLineTensionParameter>0.12</BoundaryLineTensionParameter>

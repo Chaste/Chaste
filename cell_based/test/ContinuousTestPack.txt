@@ -63,6 +63,7 @@ population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/TestConstantTargetAreaModifier.hpp
 simulation/TestDeltaNotchModifier.hpp
+simulation/TestExtrinsicPullModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestDivisionBiasTrackingModifier.hpp
 simulation/TestOffLatticeSimulation.hpp
