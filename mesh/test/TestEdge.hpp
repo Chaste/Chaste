@@ -230,18 +230,8 @@ public:
         TS_ASSERT_EQUALS(edge_node_indices.first, 0u);
         TS_ASSERT_EQUALS(edge_node_indices.second, 1u);
 
-        node0.AddEdge(exampleEdgeIndex);
-        node1.AddEdge(exampleEdgeIndex);
         p_test_edge->MarkAsDeleted();
         TS_ASSERT(p_test_edge->IsDeleted());
-
-        TS_ASSERT_THROWS_THIS(node0.RemoveEdge(0u), "Tried to remove an edge index which was not in the set");
-
-        std::set<unsigned int> edge_indices;
-        edge_indices.insert(0);
-        edge_indices.insert(1);
-        node0.SetEdgeIndices(edge_indices);
-        TS_ASSERT_EQUALS(node0.GetEdgeIndices(), edge_indices);
 
         std::vector<Node<SPACE_DIM>*> nodes;
         nodes.push_back(new Node<SPACE_DIM>(0, false, 0.0, 0.0));

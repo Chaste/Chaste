@@ -61,8 +61,6 @@ template<unsigned SPACE_DIM>
 void Edge<SPACE_DIM>::MarkAsDeleted()
 {
     mIsDeleted = true;
-    mNodes[0]->RemoveEdge(mIndex);
-    mNodes[1]->RemoveEdge(mIndex);
 }
 
 template<unsigned SPACE_DIM>
