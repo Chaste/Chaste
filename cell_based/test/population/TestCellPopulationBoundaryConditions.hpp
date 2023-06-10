@@ -445,20 +445,16 @@ public:
     void TestSlidingBoundaryCondition()
     {
         // Create mesh
-        HoneycombMeshGenerator generator(2, 2, 0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-
-        // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // Create cell population
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         double threshold = 0.2;
         SlidingBoundaryCondition<2> boundary_condition(&cell_population, threshold);

@@ -135,6 +135,7 @@ public:
         std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
         TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));        
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetApplyExtrinsicPullToAllNodes(true);
+        boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetSpeed(2.0);
 
         simulator.SetEndTime(4.0*simulator.GetDt());
 
@@ -143,9 +144,9 @@ public:
 
         // Test that some of the nodes have the correct locations
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()[0], 0.5, 1e-3);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.611, 1e-3);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()[0], 1.7222, 1e-3);
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(5)->rGetLocation()[0], 0.0, 1e-3);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(6)->rGetLocation()[0], 1.0740, 1e-3);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(6)->rGetLocation()[0], 1.1481, 1e-3);
     }
 
     void TestSimulationArchivingWithExtrinsicPull()
