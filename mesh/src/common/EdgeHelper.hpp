@@ -74,11 +74,6 @@ public:
     EdgeHelper() = default;
 
     /**
-     * Clear the mesh from edges
-     */
-    void Clear();
-
-    /**
      * Get edge from the node pairs. Construct the edge if it has not been created
      * @param node0
      * @param node1

@@ -36,12 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeHelper.hpp"
 
 template<unsigned int SPACE_DIM>
-void EdgeHelper<SPACE_DIM>::Clear()
-{
-    mEdges.clear();
-}
-
-template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* nodeA, Node<SPACE_DIM>* nodeB)
 {
     auto edgeMapIndices = Edge<SPACE_DIM>::GenerateMapIndex(nodeA->GetIndex(), nodeB->GetIndex());
