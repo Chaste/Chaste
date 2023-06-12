@@ -33,67 +33,63 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef CONSTANTTARGETAREAMODIFIER_HPP_
+#define CONSTANTTARGETAREAMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractVertexBasedDivisionRule.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
-// Forward declaration prevents circular include chain
-template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
+#include "AbstractTargetAreaModifier.hpp"
 
 /**
- * A class to generate a division vector of unit length that points in a uniformly random direction.
+ * A modifier class in which the target area property of each cell is held constant over time.
  */
-template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+template<unsigned DIM>
+class ConstantTargetAreaModifier : public AbstractTargetAreaModifier<DIM>
 {
-private:
+    /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Serialize the object and its member variables.
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
      *
-     * @param archive the archive
-     * @param version the current version of this class
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractTargetAreaModifier<DIM> >(*this);
     }
 
 public:
+
     /**
      * Default constructor.
      */
-    RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    ConstantTargetAreaModifier();
 
     /**
-     * Empty destructor.
+     * Destructor.
      */
-    virtual ~RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    virtual ~ConstantTargetAreaModifier();
 
     /**
-     * Overridden CalculateCellDivisionVector() method.
+     * Overridden UpdateTargetAreaOfCell() method.
      *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
-     *
-     * @param pParentCell  The cell to divide
-     * @param rCellPopulation  The vertex-based cell population
-     * @return the division vector.
+     * @param pCell pointer to the cell
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual void UpdateTargetAreaOfCell(const CellPtr pCell);
+
+    /**
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ConstantTargetAreaModifier)
 
-#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#endif /*CONSTANTTARGETAREAMODIFIER_HPP_*/

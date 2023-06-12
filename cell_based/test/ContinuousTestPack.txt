@@ -61,8 +61,11 @@ population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
+simulation/TestConstantTargetAreaModifier.hpp
 simulation/TestDeltaNotchModifier.hpp
+simulation/TestExtrinsicPullModifier.hpp
 simulation/TestNumericalMethods.hpp
+simulation/TestDivisionBiasTrackingModifier.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithBuskeForces.hpp
