@@ -98,6 +98,8 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         }
     }
 
+    this->GenerateEdgesFromElements(mElements);
+
     this->mMeshChangesDuringSimulation = false;
 }
 
@@ -493,6 +495,33 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
+template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
+    std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>& elements)
+{
+    // Build a list of unique edges from nodes within all the elements
+    for (auto elem : elements)
+    {
+        elem->SetEdgeHelper(&mEdgeHelper);
+        elem->BuildEdges();
+    }
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdgeHelper.GetNumEdges();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+Edge<SPACE_DIM> * VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const {
+    return mEdgeHelper.GetEdge(index);
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+const EdgeHelper<SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeHelper() const{
+    return mEdgeHelper;
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
@@ -581,7 +610,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::~VertexMesh()
 {
-    Clear();
+ Clear();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -698,6 +727,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete mFaces[i];
     }
     mFaces.clear();
+
 
     // Delete nodes
     for (unsigned i = 0; i < this->mNodes.size(); i++)
@@ -1014,6 +1044,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
             p_element->SetAttribute(attribute_value);
         }
     }
+    GenerateEdgesFromElements(mElements);
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -1243,10 +1274,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
-    if (SPACE_DIM != 2 || ELEMENT_DIM != SPACE_DIM)
-    {
-        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
-    }
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    assert(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
@@ -1424,10 +1453,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
 {
-    if (SPACE_DIM != 2)
-    {
-        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
-    }
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
 
     // Define helper variables
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
@@ -1534,10 +1560,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
 {
-    if (SPACE_DIM != 2)
-    {
-        EXCEPTION("This function is only valid in 2D"); // LCOV_EXCL_LINE
-    }
+    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
 
     unsigned num_nodes_in_element = pElement->GetNumNodes();
     unsigned next_local_index = (localIndex + 1) % num_nodes_in_element;
@@ -1649,6 +1672,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELE
     c_vector<double, SPACE_DIM> unit_normal;
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
+
+
 
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)

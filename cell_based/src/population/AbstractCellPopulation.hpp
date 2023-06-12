@@ -66,7 +66,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
-
 /**
  * An abstract facade class encapsulating a cell population.
  *
@@ -594,6 +593,14 @@ public:
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell)=0;
 
     /**
+     * Gets the local edge index of the neighbouring element
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * @return pair of element location and local edge index
+     */
+    virtual std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeIndex);
+
+    /**
      * @return the centroid of the cell population.
      */
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();
@@ -624,7 +631,7 @@ public:
      *
      * The method also closes the .pvd output file if VTK is available.
      */
-    void CloseWritersFiles();
+    virtual void CloseWritersFiles();
 
     /**
      * Write results from the current cell population state to output files.

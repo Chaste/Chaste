@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 #include "AbstractCellBasedTestSuite.hpp"
+#include "AlwaysDivideCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApoptoticCellProperty.hpp"
@@ -104,6 +105,35 @@ public:
         {
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
+        }
+    }
+
+    void TestAlwaysDivideCellCycleModel()
+    {
+        // Test constructor
+        TS_ASSERT_THROWS_NOTHING(AlwaysDivideCellCycleModel cell_cycle_model);
+
+        // Test methods
+        AlwaysDivideCellCycleModel* p_model = new AlwaysDivideCellCycleModel;
+        TS_ASSERT_DELTA(p_model->GetAverageStemCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_DELTA(p_model->GetAverageTransitCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_EQUALS(p_model->ReadyToDivide(), true);
+
+        // Test the cell-cycle model works correctly with a cell
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
+        CellPtr p_cell(new Cell(p_healthy_state, p_model));
+        p_cell->SetCellProliferativeType(p_stem_type);
+        p_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        for (unsigned i = 0; i < 10; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
         }
     }
 
@@ -1349,6 +1379,52 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
+    void TestArchiveAlwaysDivideCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AlwaysDivideCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new AlwaysDivideCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(p_model2->ReadyToDivide(), true);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
     void TestArchiveNoCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
@@ -2162,6 +2238,23 @@ public:
         {
             FileFinder generated_file = output_file_handler.FindFile("fixed_sequence_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/fixed_sequence_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with AlwaysDivideCellCycleModel
+        AlwaysDivideCellCycleModel always_divide_cell_cycle_model;
+        TS_ASSERT_EQUALS(always_divide_cell_cycle_model.GetIdentifier(), "AlwaysDivideCellCycleModel");
+
+        out_stream always_divide_parameter_file = output_file_handler.OpenOutputFile("always_divide_results.parameters");
+        always_divide_cell_cycle_model.OutputCellCycleModelParameters(always_divide_parameter_file);
+        always_divide_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("always_divide_results.parameters");
+            //The model does not have any parameters and therefore it is compared to NoCellCycleModel
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/no_model_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
