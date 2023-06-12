@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#ifndef VONMISESVERTEXBASEDDIVISIONRULE_HPP_
+#define VONMISESVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -46,12 +46,21 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a uniformly random direction.
+ * A class to generate a division vector of unit length that points in a direction 
+ * randomly sampled from a von Mises distribution parameterised by mu (mean parameter) 
+ * and kappa (concentration parameter).
  */
 template <unsigned SPACE_DIM>
-class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class VonMisesVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
+
+    /** Mean parameter. Initialised to 0 in the constructor. */
+    double mMeanParameter;
+
+    /** Concentration parameter. Must be positive. Initialised to 1 in the constructor.  */
+    double mConcentrationParameter;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -63,27 +72,49 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
+        archive & mMeanParameter;
+        archive & mConcentrationParameter;
     }
 
 public:
     /**
      * Default constructor.
      */
-    RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    VonMisesVertexBasedDivisionRule();
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionVertexBasedDivisionRule()
-    {
-    }
+    virtual ~VonMisesVertexBasedDivisionRule();
+
+    /**
+     * @return mMeanParameter
+     */
+    double GetMeanParameter();
+
+    /**
+     * @return mConcentrationParameter
+     */
+    double GetConcentrationParameter();
+
+    /**
+     * Set mMeanParameter.
+     *
+     * @param meanParameter the new value of mMeanParameter
+     */
+    void SetMeanParameter(double meanParameter);
+
+    /**
+     * Set mConcentrationParameter.
+     *
+     * @param concentrationParameter the new value of mConcentrationParameter
+     */
+    void SetConcentrationParameter(double concentrationParameter);
 
     /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
+     * Return a unit vector that points in a direction randomly sampled from a von Mises distribution, i.e the arguments are redundant for this division rule.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
@@ -94,6 +125,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VonMisesVertexBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#endif // VONMISESVERTEXBASEDDIVISIONRULE_HPP_
