@@ -129,6 +129,13 @@ public:
             TS_ASSERT(elements[0]->ContainsEdge(p_edge) || elements[1]->ContainsEdge(p_edge));
         }
 
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            VertexElement<ELEMENT_DIM, SPACE_DIM>* element = elements[i];
+            element->ClearEdges();
+            TS_ASSERT_EQUALS(element->GetNumEdges(), 0uADd );
+        }
+
         // Also test constructors in honeycomb mesh (MutableVertexMesh)
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2, 2>* honeycombMesh = generator.GetMesh();
@@ -201,11 +208,19 @@ public:
                 // Forcing test re-runs, remove after running.
             }
         }
+
         for (unsigned int i = 0; i < p_mesh->GetNumEdges(); i++)
         {
             Edge<SPACE_DIM>* p_edge = p_mesh->GetEdge(i);
             TS_ASSERT(edge_helper.GetEdge(i) == p_edge);
             TS_ASSERT(elements[0]->ContainsEdge(p_edge) || elements[1]->ContainsEdge(p_edge));
+        }
+
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            VertexElement<1, SPACE_DIM>* element = elements[i];
+            element->ClearEdges();
+            TS_ASSERT_EQUALS(element->GetNumEdges(), 0u);
         }
     }
 
@@ -354,6 +369,8 @@ public:
         TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo().GetEdgesStatus(), std::vector<unsigned>(4, 8));
         TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo2().GetEdgesMapping(), std::vector<long>(3, 5));
         TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo2().GetEdgesStatus(), std::vector<unsigned>(3, 4));
+        TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo().GetUnused(), false);
+        TS_ASSERT_EQUALS(edge_oper2.rGetRemapInfo2().GetUnused(), false);
     }
 
     void TestEdgeOperationArchive()
