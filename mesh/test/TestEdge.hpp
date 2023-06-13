@@ -133,7 +133,7 @@ public:
         {
             VertexElement<ELEMENT_DIM, SPACE_DIM>* element = elements[i];
             element->ClearEdges();
-            TS_ASSERT_EQUALS(element->GetNumEdges(), 0uADd );
+            TS_ASSERT_EQUALS(element->GetNumEdges(), 0u);
         }
 
         // Also test constructors in honeycomb mesh (MutableVertexMesh)
