@@ -8,6 +8,7 @@ FROM chaste/develop
 ARG GIT_TAG=.
 ENV GIT_TAG=${GIT_TAG}
 ADD . ${CHASTE_SOURCE_DIR}
+RUN git config --global --add safe.directory /home/chaste/src
 RUN echo "Building Chaste ${GIT_TAG} in $PWD..." && ls
 RUN build_chaste.sh ${GIT_TAG}
 
