@@ -46,13 +46,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Storage class contains a mapping to the old local edge indices and status of the new edges.
  */
-class EdgeRemapInfo {
+class EdgeRemapInfo
+{
 private:
 
+    /**
+     * Whether the EdgeMapInfor is unused. Initialised to false in the constructor.
+     */
     bool mUnused = true;
 
     /**
-     * Contains a mapping to the old local edge indices. Negative value means a new edge
+     * Contains a mapping to the old local edge indices. Negative value means a new edge.
      */
     std::vector<long int> mEdgesMapping;
 
@@ -93,10 +97,16 @@ public:
     /**
      * Default constructor. Does nothing.
      */
-    EdgeRemapInfo() = default;
+    EdgeRemapInfo();
+
+    /**
+     * Destructor.
+     */
+    ~EdgeRemapInfo();
 
     /**
      * Constructor for edge remapping.
+     * 
      * @param edgesMapping the map between the new edge indices and their local index in the element prior
      * to rearrangement
      * @param edgesStatus status of the edges in the element
@@ -125,6 +135,9 @@ public:
      */
     void SetSplitProportions(const std::vector<double> thetas);
 
+    /**
+     * @return mUnused.
+     */
     bool GetUnused() const;
 };
 

@@ -312,7 +312,7 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 {
     std::vector<T1SwapInfo<SPACE_DIM> > swap_info = mOperationRecorder.GetT1SwapsInfo();
     std::vector< c_vector<double, SPACE_DIM> > swap_locations;
-    for (unsigned int i=0; i<swap_info.size(); ++i)
+    for (unsigned i=0; i<swap_info.size(); ++i)
     {
         swap_locations.push_back(swap_info[i].mLocation);
     }
@@ -330,7 +330,7 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 {
     std::vector<T3SwapInfo<SPACE_DIM> > swap_info = mOperationRecorder.GetT3SwapsInfo();
     std::vector< c_vector<double, SPACE_DIM> > swap_locations;
-    for (unsigned int i=0; i<swap_info.size(); ++i)
+    for (unsigned i=0; i<swap_info.size(); ++i)
     {
         swap_locations.push_back(swap_info[i].mLocation);
     }
@@ -643,7 +643,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         // Record edge rearrangements in the daughter cells ...
         mOperationRecorder.RecordCellDivideOperation(edgeIds, pElement, this->mElements[new_element_index]);
         // ... and in each neighbouring cell
-        for (unsigned int i=0; i<edge_split_pairs.size(); ++i)
+        for (unsigned i=0; i<edge_split_pairs.size(); ++i)
         {
             mOperationRecorder.RecordEdgeSplitOperation(edge_split_pairs[i].first,
                                                         edge_split_pairs[i].second,
@@ -1857,7 +1857,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
          ++it)
     {
         std::vector<unsigned int> oldIds;
-        for (unsigned int i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+        for (unsigned i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
         {
             oldIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
         }
@@ -1869,7 +1869,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             assert(nodeB_local_index < UINT_MAX);
 
             std::vector<unsigned int> oldIds;
-            for (unsigned int i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+            for (unsigned i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
             {
                 oldIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
             }
@@ -1886,7 +1886,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
             assert(nodeA_local_index < UINT_MAX);
 
             std::vector<unsigned int> oldIds;
-            for (unsigned int i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+            for (unsigned i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
             {
                 oldIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
             }
@@ -2409,7 +2409,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
                 std::pair<unsigned int, unsigned int> node_pair;
                 if (mTrackMeshOperations)
                 {
-                    for (unsigned int k=0; k<p_this_elem->GetNumEdges(); ++k)
+                    for (unsigned k=0; k<p_this_elem->GetNumEdges(); ++k)
                     {
                         oldIds.push_back(p_this_elem->GetEdge(k)->GetIndex());
                     }
@@ -2503,7 +2503,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
         //Edge map before swap
         const unsigned int n_edges = p_intersecting_element->GetNumEdges();
         std::vector<unsigned int> oldIds(n_edges);
-        for (unsigned int i=0; i<n_edges; ++i)
+        for (unsigned i=0; i<n_edges; ++i)
         {
             oldIds[i] = p_intersecting_element->GetEdge(i)->GetIndex();
         }
@@ -3482,10 +3482,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIncrease(Node<
 
         if (hi_rank_elem_indices.count(*it) > 0)
         {
-            //For node merge recording
+            // For node merge recording
             std::vector<unsigned int> oldIds(this->mElements[*it]->GetNumEdges(),0);
 
-            for (unsigned int i=0; i<oldIds.size(); ++i)
+            for (unsigned i=0; i<oldIds.size(); ++i)
             {
                 oldIds[i] = this->mElements[*it]->GetEdge(i)->GetIndex();
             }

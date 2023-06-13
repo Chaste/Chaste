@@ -40,7 +40,6 @@ Edge<SPACE_DIM>::Edge(unsigned index)
         : mIndex(index),
           mIsDeleted(false)
 {
-    this->mIndex = index;
 }
 
 template <unsigned SPACE_DIM>
@@ -166,7 +165,9 @@ std::set<unsigned> Edge<SPACE_DIM>::GetOtherElements(unsigned elementIndex)
     std::set<unsigned> otherElements;
     for (unsigned elem: mElementIndices)
         if (elem != elementIndex)
+        {
             otherElements.insert(elem);
+        }
     return otherElements;
 }
 
@@ -191,8 +192,8 @@ std::set<unsigned> Edge<SPACE_DIM>::GetNeighbouringElementIndices()
     auto elem_indices1 = mNodes[1]->rGetContainingElementIndices();
 
     std::set_intersection(elem_indices0.begin(), elem_indices0.end(),
-            elem_indices1.begin(), elem_indices1.end(),
-            std::inserter(neighbouring_element_indices, neighbouring_element_indices.begin()));
+                          elem_indices1.begin(), elem_indices1.end(),
+                          std::inserter(neighbouring_element_indices, neighbouring_element_indices.begin()));
 
     return neighbouring_element_indices;
 }
@@ -210,9 +211,9 @@ bool Edge<SPACE_DIM>::IsBoundaryEdge() const
 }
 
 template <unsigned SPACE_DIM>
-bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& edge) const
+bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& rEdge) const
 {
-    return this->ContainsNode(edge.GetNode(0)) && this->ContainsNode(edge.GetNode(1));
+    return this->ContainsNode(rEdge.GetNode(0)) && this->ContainsNode(rEdge.GetNode(1));
 }
 
 // Explicit instantiation

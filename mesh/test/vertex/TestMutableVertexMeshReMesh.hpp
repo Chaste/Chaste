@@ -262,12 +262,16 @@ public:
         //Two node merging operations in two elements and two new edge operations in the other two elements
         TS_ASSERT_EQUALS(n_operations, 4u);
         unsigned n_node_merges= 0, n_new_edges= 0;
-        for (unsigned int i=0; i<n_operations; ++i)
+        for (unsigned i=0; i<n_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_NODE_MERGE)
+            {
                 n_node_merges++;
+            }
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
+            {
                 n_new_edges++;
+            }
         }
         TS_ASSERT_EQUALS(n_node_merges, 2u);
         TS_ASSERT_EQUALS(n_node_merges, 2u);
@@ -990,10 +994,12 @@ public:
         //Two node merging operations in two elements and two new edge operations in the other two elements
         TS_ASSERT_EQUALS(n_operations, 3u);
         unsigned n_node_merges= 0;
-        for (unsigned int i=0; i<n_operations; ++i)
+        for (unsigned i=0; i<n_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_NODE_MERGE)
+            {
                 n_node_merges++;
+            }
         }
         TS_ASSERT_EQUALS(n_node_merges, 3u);
 
@@ -1801,18 +1807,22 @@ public:
         TS_ASSERT_EQUALS(n_operations, 8u);
         unsigned n_edge_splits= 0, n_new_edges= 0;
         std::vector<std::vector<unsigned int> > element_to_operations(5);
-        for (unsigned int i=0; i<n_operations; ++i)
+        for (unsigned i=0; i<n_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
+            {
                 n_edge_splits++;
+            }
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
+            {
                 n_new_edges++;
-            //Determine operations that an element underwent
+            }
+            // Determine operations that an element underwent
             const unsigned int elem_index = edge_operations[i].GetElementIndex();
             element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
         }
         TS_ASSERT_EQUALS(n_edge_splits, 5u);
-        TS_ASSERT_EQUALS(n_new_edges, 3);
+        TS_ASSERT_EQUALS(n_new_edges, 3u);
 
         // Save the mesh data using mesh writers
         std::string dirname = "TempyTempy";

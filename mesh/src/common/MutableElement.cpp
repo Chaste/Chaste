@@ -330,10 +330,12 @@ std::set<unsigned> MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElemen
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableElement<ELEMENT_DIM, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
 {
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*edge))
+        {
             return true;
+        }
     }
     return false;
 }
@@ -342,9 +344,9 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 long MutableElement<ELEMENT_DIM, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
 {
     long result = -1;
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*edge))
         {
             result = i;
         }
@@ -427,10 +429,12 @@ Edge<SPACE_DIM> *MutableElement<1, SPACE_DIM>::GetEdge(unsigned localIndex) cons
 template <unsigned SPACE_DIM>
 bool MutableElement<1, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
 {
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*edge))
+        {
             return true;
+        }
     }
     return false;
 }
@@ -474,9 +478,9 @@ template <unsigned SPACE_DIM>
 long MutableElement<1, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
 {
     long result = -1;
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*edge))
         {
             result = i;
         }

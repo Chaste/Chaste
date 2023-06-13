@@ -139,7 +139,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
     std::vector<unsigned int> edge_status(elementNumEdges, 0);
 
     // Marking unaffected edges
-    for (unsigned int i = 0; i < oldIds.size(); ++i)
+    for (unsigned i = 0; i < oldIds.size(); ++i)
     {
         long index = pElement->GetLocalEdgeIndex((*mpEdgeHelper)[oldIds[i]]);
         if (index >= 0)
@@ -230,7 +230,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperati
         }
     }
     // Sanity check
-    for (unsigned int i = 0; i < edge_mapping.size(); ++i)
+    for (unsigned i = 0; i < edge_mapping.size(); ++i)
     {
         assert(edge_mapping[i] >= 0);
     }
@@ -258,7 +258,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeSplitOperati
     thetas[split_1] = inserted_node_rel_position;
     thetas[split_2] = 1.0 - inserted_node_rel_position;
     unsigned int count = 0;
-    for (unsigned int i = 0; i < elementNumEdges; ++i)
+    for (unsigned i = 0; i < elementNumEdges; ++i)
     {
         edge_mapping[i] = i - count;
         if (edge_status[i] == 1)
@@ -284,15 +284,17 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
 
     std::vector<unsigned int> old_split_edges(oldIds.size());
     // Keeps track of parent edges that are NOT retained in daughter cells
-    for (unsigned int i = 0; i < oldIds.size(); ++i)
+    for (unsigned i = 0; i < oldIds.size(); ++i)
+    {
         old_split_edges[i] = i;
+    }
     unsigned int counter_1 = 0;
     unsigned int counter_2 = 0;
 
     // First find parent edges that correspond directly to daughter cells' edges
     // At the end of the loop, old_split_edges contains parent edge indices that are split
 
-    for (unsigned int i = 0; i < oldIds.size(); ++i)
+    for (unsigned i = 0; i < oldIds.size(); ++i)
     {
         // Index of parent edge corresponding to daughter cell's edge.
         //-1 if not found.
@@ -327,14 +329,14 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
     // Go through unmapped edges of daughter cell to find a mapping between parent split edge and
     // daughter edge
     std::vector<unsigned int> old_split_edges_1(old_split_edges);
-    for (unsigned int i = 0; i < n_edges_1; ++i)
+    for (unsigned i = 0; i < n_edges_1; ++i)
     {
         if (edge_mapping_1[i] == -2)
         {
             auto node_1 = pElement1->GetEdge(i)->GetNode(0);
             auto node_2 = pElement1->GetEdge(i)->GetNode(1);
             bool split_edge_found = false;
-            for (unsigned int j = 0; j < old_split_edges_1.size(); ++j)
+            for (unsigned j = 0; j < old_split_edges_1.size(); ++j)
             {
                 auto old_edge = (*mpEdgeHelper)[oldIds[old_split_edges_1[j]]];
                 if (old_edge->ContainsNode(node_1) || old_edge->ContainsNode(node_2))
@@ -357,14 +359,14 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
         }
     }
 
-    for (unsigned int i = 0; i < n_edges_2; ++i)
+    for (unsigned i = 0; i < n_edges_2; ++i)
     {
         if (edge_mapping_2[i] == -2)
         {
             auto node_1 = pElement2->GetEdge(i)->GetNode(0);
             auto node_2 = pElement2->GetEdge(i)->GetNode(1);
             bool split_edge_found = false;
-            for (unsigned int j = 0; j < old_split_edges.size(); ++j)
+            for (unsigned j = 0; j < old_split_edges.size(); ++j)
             {
                 auto old_edge = (*mpEdgeHelper)[oldIds[old_split_edges[j]]];
                 if (old_edge->ContainsNode(node_1) || old_edge->ContainsNode(node_2))
@@ -407,14 +409,14 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNewEdgeOperation
     const unsigned int n_edges = pElement->GetNumEdges();
     std::vector<long> edge_mapping(n_edges, 0);
     std::vector<unsigned int> edge_status(n_edges);
-    for (unsigned int i = 0; i < edge_index; ++i)
+    for (unsigned i = 0; i < edge_index; ++i)
     {
         edge_mapping[i] = i;
         edge_status[i] = 0;
     }
     edge_mapping[edge_index] = -1;
     edge_status[edge_index] = 2;
-    for (unsigned int i = edge_index + 1; i < n_edges; ++i)
+    for (unsigned i = edge_index + 1; i < n_edges; ++i)
     {
         edge_mapping[i] = i - 1;
         edge_status[i] = 0;
@@ -443,7 +445,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperati
     if (low_edge > high_edge)
     {
         edge_status[low_edge - 1] = 4;
-        for (unsigned int i = 0; i < n_edges; ++i)
+        for (unsigned i = 0; i < n_edges; ++i)
         {
             edge_mapping[i] = i + 1;
         }
@@ -452,11 +454,11 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeMergeOperati
     else
     {
         edge_status[low_edge] = 4;
-        for (unsigned int i = 0; i < high_edge; ++i)
+        for (unsigned i = 0; i < high_edge; ++i)
         {
             edge_mapping[i] = i;
         }
-        for (unsigned int i = high_edge; i < n_edges; ++i)
+        for (unsigned i = high_edge; i < n_edges; ++i)
         {
             edge_mapping[i] = i + 1;
         }

@@ -36,9 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeHelper.hpp"
 
 template<unsigned int SPACE_DIM>
-Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* nodeA, Node<SPACE_DIM>* nodeB)
+Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
-    auto edgeMapIndices = Edge<SPACE_DIM>::GenerateMapIndex(nodeA->GetIndex(), nodeB->GetIndex());
+    auto edgeMapIndices = Edge<SPACE_DIM>::GenerateMapIndex(pNodeA->GetIndex(), pNodeB->GetIndex());
 
     // Check that an edge hasn't been created already
     Edge<SPACE_DIM>* p_edge = nullptr;
@@ -46,14 +46,14 @@ Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* nodeA,
     auto edgeItt = mEdgesMap.find(edgeMapIndices);
     if (edgeItt == mEdgesMap.end() || edgeItt->second->IsDeleted())
     {
-        mEdges.push_back(std::make_unique<Edge<SPACE_DIM>> (mEdges.size(), nodeA, nodeB));
+        mEdges.push_back(std::make_unique<Edge<SPACE_DIM>> (mEdges.size(), pNodeA, pNodeB));
         p_edge = mEdges.back().get();
         mEdgesMap[edgeMapIndices] = p_edge;
     }
     else
     {
         p_edge = edgeItt->second;
-        p_edge->SetNodes(nodeA, nodeB);
+        p_edge->SetNodes(pNodeA, pNodeB);
     }
 
     return p_edge;
@@ -61,9 +61,9 @@ Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* nodeA,
 
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *
-EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(unsigned elementIndex, Node<SPACE_DIM> *node0, Node<SPACE_DIM> *node1)
+EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(unsigned elementIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
-    auto edge = GetEdgeFromNodes(node0, node1);
+    auto edge = GetEdgeFromNodes(pNodeA, pNodeB);
     edge->AddElement(elementIndex);
     return edge;
 }
