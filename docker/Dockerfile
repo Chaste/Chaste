@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # ARG BASE_TAG=latest
 # FROM chaste/base:${BASE_TAG}
 FROM chaste/develop
