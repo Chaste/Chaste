@@ -280,7 +280,8 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
     return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
 }
 
-boost::shared_ptr<CellEdgeData> Cell::GetCellEdgeData() const {
+boost::shared_ptr<CellEdgeData> Cell::GetCellEdgeData() const
+{
     CellPropertyCollection cell_edge_data_collection = mCellPropertyCollection.GetPropertiesType<CellEdgeData>();
 
     /*

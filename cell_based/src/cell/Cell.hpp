@@ -151,8 +151,9 @@ protected:
     /** Whether the cell is being tracked specially. */
     bool mIsLogged;
 
-    /**Whether the cell has SRN associated to it*/
+    /** Whether the cell has SRN associated to it. */
     bool mHasSrnModel;
+
 public:
 
     /**
@@ -430,7 +431,7 @@ public:
     unsigned GetCellId() const;
 
     /**
-     * @return True if cell has SRN model associated to it
+     * @return if cell has SRN model associated to it
      */
     bool HasSrnModel() const;
 };

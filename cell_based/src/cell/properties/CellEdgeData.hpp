@@ -89,16 +89,16 @@ public:
      * This assigns the cell edge data vector.
      *
      * @param rVariableName the name of the data to be set.
-     * @param data the vector of values to set it to.
+     * @param rData the vector of values to set it to.
      */
-    void SetItem(const std::string& rVariableName, const std::vector<double> &data);
+    void SetItem(const std::string& rVariableName, const std::vector<double>& rData);
 
     /**
      * Retrieves the cell edge data array.
+     * Throws if rVariableName has not been stored.
      *
-     * @param rVariableName the index of the data required.
-     * throws if rVariableName has not been stored
-     *
+     * @param rVariableName the name of the data to get.
+     * 
      * @return An array of cell edge data
      */
     std::vector<double> GetItem(const std::string& rVariableName) const;
@@ -106,14 +106,14 @@ public:
     /**
      * Retrieves the data of rVariableName at index
      *
-     * @param rVariableName
-     * @param index
+     * @param rVariableName the name of the data to be set.
+     * @param index the index of the data of rVariableName
+     * 
      * @return A single value in the data array.
      */
     double GetItemAtIndex(const std::string& rVariableName, const unsigned int index);
 
     /**
-     *
      * @return number of data items
      */
     unsigned GetNumItems() const;

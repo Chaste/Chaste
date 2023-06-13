@@ -115,7 +115,7 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
         const unsigned int n_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
         std::vector<double> neigh_mean_delta(n_cell_edges);
 
-        /* Cell interior */
+        // Cell interior
         double total_edge_delta = 0;
         double total_edge_notch = 0;
 
@@ -131,10 +131,10 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
         cell_iter->GetCellData()->SetItem("total neighbour edge delta", total_edge_delta);
         cell_iter->GetCellData()->SetItem("total edge notch", total_edge_notch);
 
-        /* Cell edge */
-        for (unsigned int i=0; i<n_cell_edges; ++i)
+        // Cell edge
+        for (unsigned i=0; i<n_cell_edges; ++i)
         {
-            //Get neighbouring cell's values of delta on this
+            // Get neighbouring cell's values of delta on this
             auto elemNeighbours = rCellPopulation.GetNeighbouringEdgeIndices(*cell_iter, i);
             double mean_delta = 0;
             for (auto neighbourIndex: elemNeighbours)
@@ -143,16 +143,14 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(AbstractCellPop
                 std::vector<double> neighbour_delta_vec = neighbourCell->GetCellEdgeData()->GetItem("edge delta");
                 mean_delta += neighbour_delta_vec[neighbourIndex.second];
             }
-            if (elemNeighbours.size()>0)
+            if (elemNeighbours.size() > 0)
+            {
                 mean_delta = mean_delta/elemNeighbours.size();
+            }
             neigh_mean_delta[i] = mean_delta;
         }
-
         cell_iter->GetCellEdgeData()->SetItem("neighbour delta", neigh_mean_delta);
     }
-
-
-
 }
 
 template<unsigned DIM>

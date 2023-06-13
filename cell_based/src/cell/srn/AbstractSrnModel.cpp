@@ -36,7 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSrnModel.hpp"
 
 AbstractSrnModel::AbstractSrnModel()
-    : mSimulatedToTime(SimulationTime::Instance()->GetTime())
+    : mSimulatedToTime(SimulationTime::Instance()->GetTime()),
+      mEdgeLocalIndex(UNSIGNED_UNSET), 
+      mIsEdgeBasedModel(false)
 {
 }
 
@@ -138,29 +140,29 @@ void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
 }
 
 /*
- * We exclude the following from coverage, as these method are implemented elsewhere and tested accordingly
+ * We exclude the following from coverage, as these methods are implemented elsewhere and tested accordingly
  */
 // LCOV_EXCL_START
 void AbstractSrnModel::ScaleSrnVariables(const double theta)
 {
 }
 
-void AbstractSrnModel::AddSrnQuantities(AbstractSrnModel* p_other_srn,
+void AbstractSrnModel::AddSrnQuantities(AbstractSrnModel* pOtherSrn,
                                         const double scale)
 {
 }
 
-void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
+void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn)
 {
 }
 
-void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
+void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn)
 {}
 
-void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
+void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn)
 {}
 
-void AbstractSrnModel::SplitEdgeSrn(const double relative_position)
+void AbstractSrnModel::SplitEdgeSrn(const double relativePosition)
 {}
 // LCOV_EXCL_STOP
 

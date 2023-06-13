@@ -51,7 +51,7 @@ class VertexBasedCellPopulation;
 
 /**
  * After topological rearrangments, e.g. T1-3, node merges, or edge splits due to mitosis,
- * junctional srns must be updated accordingly. For example, after edge split due to mitosis
+ * junctional SRNs must be updated accordingly. For example, after edge split due to mitosis
  * a new SRN must be created that inherits modified model variables.
  * This class deals with Cell SRN update after a topological change occurs to the cell.
  */
@@ -79,17 +79,23 @@ private:
     }
     VertexBasedCellPopulation<DIM>* mpCellPopulation;
 public:
+
     /**
-     * Default constructor/destructor
+     * Default constructor.
      */
     VertexBasedPopulationSrn();
+
+    /**
+     * Destructor.
+     */
     ~VertexBasedPopulationSrn();
 
     /**
-     * Set the cell population
-     * @param p_vertex_population
+     * Set the cell population.
+     * 
+     * @param pVertexPopulation pointer to a VertexBasedCellPopulation
      */
-    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* p_vertex_population);
+    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pVertexPopulation);
 
     /**
      * This method iterates over edge operations performed on the mesh and
@@ -101,11 +107,12 @@ public:
     /**
      * Remaps cell SRN. If an edge has not been modified, the old edge SRN is mapped to its junction.
      * Otherwise, edge SRNs are updated according to the operation performed.
-     * @param parent_srn_edges Edge SRNs before topology is changed
-     * @param pCellSrn CellSrnModel of the cell
-     * @param pEdgeChange Contains information about which edge changes occurred
+     * 
+     * @param parentSrnEdges Edge SRNs before topology is changed
+     * @param pCellSrn pointer to CellSrnModel
+     * @param rEdgeChange Contains information about which edge changes occurred
      */
-    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
+    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parentSrnEdges,
                              CellSrnModel* pCellSrn,
                              const EdgeRemapInfo& rEdgeChange);
 };

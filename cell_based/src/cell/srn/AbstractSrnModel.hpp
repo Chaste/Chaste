@@ -107,14 +107,14 @@ protected:
     double mSimulatedToTime;
 
     /**
-     * The local edge index when used as part of a edge-based SRN
+     * The local edge index when used as part of a edge-based SRN.
      */
-    unsigned mEdgeLocalIndex = UNSIGNED_UNSET;
+    unsigned mEdgeLocalIndex;
 
     /**
      * Indicates if edge model has been introduced. False by default.
      */
-    bool mIsEdgeBasedModel = false;
+    bool mIsEdgeBasedModel;
 
     /**
      * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
@@ -275,49 +275,54 @@ public:
     void SetEdgeModelIndicator(const bool indicator);
 
     /**
-     * Scales srn variables by factor theta
-     * Method overriden in AbstractOdeSrnModel
+     * Scales SRN variables by factor theta.
+     * Method overriden in AbstractOdeSrnModel.
      */
     virtual void ScaleSrnVariables(const double theta);
 
     /**
-     * Adds Srn quantities (variables or parameters) to this.
+     * Adds SRN quantities (variables or parameters) to this.
      * The quantities can be scaled by factor scale.
      * This method is virtual and needs to be overriden by user-defined SRN model
-     * @param p_other_srn
-     * @param scale
+     * 
+     * @param pOtherSrn pointer to an SRN model
+     * @param scale scale factor
      */
-    virtual void AddSrnQuantities(AbstractSrnModel* p_other_srn,
+    virtual void AddSrnQuantities(AbstractSrnModel* pOtherSrn,
                                   const double scale = 1.0);
 
     /**
-     * Adds the shrunk edge srn quantities to this edge.
+     * Adds the shrunk edge SRN quantities to this edge.
      * This method is virtual and needs to be overriden by user-defined SRN model.
-     * @param p_shrunk_edge_srn
+     * 
+     * @param pShrunkEdgeSrn pointer to an SRN model
      */
-    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn);
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn);
 
     /**
-     * Adds the merged edge srn quantities to this edge
+     * Adds the merged edge SRN quantities to this edge.
      * This method is virtual and needs to be overriden by user-defined SRN model.
-     * @param p_merged_edge_srn
+     * 
+     * @param pMergedEdgeSrn pointer to an SRN model
      */
-    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn);
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn);
 
     /**
-     * Adds the shrunk edge srn quantities to (this) interior srn
+     * Adds the shrunk edge SRN quantities to (this) interior SRN.
      * This method is virtual and needs to be overriden by user-defined SRN model.
-     * @param p_shrunk_edge_srn
+     * 
+     * @param pShrunkEdgeSrn pointer to an SRN model
      */
-    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn);
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn);
 
     /**
      * Scales SRN quantities due to edge split. Amount of scaling may depend on the resulting proportions,
      * deetermined by relative position of the node that splits the edge.
      * This method is virtual and needs to be overriden by user-defined SRN model.
-     * @param relative_position - how close the added node is to the previous node
+     * 
+     * @param relativePosition how close the added node is to the previous node
      */
-    virtual void SplitEdgeSrn(const double relative_position);
+    virtual void SplitEdgeSrn(const double relativePosition);
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

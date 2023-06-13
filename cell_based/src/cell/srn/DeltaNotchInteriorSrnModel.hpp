@@ -163,9 +163,10 @@ public:
     /**
      * Sets how much of Delta/Notch is returned back to interior after a junction is shrunk
      * Override the method to reflect user-define assumptions
-     * @param p_shrunk_edge_srn
+     * 
+     * @param pShrunkEdgeSrn Pointer to an SRN model
      */
-    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn) override;
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn) override;
 };
 
 // Declare identifier for the serializer

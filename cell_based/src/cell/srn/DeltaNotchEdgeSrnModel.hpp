@@ -127,13 +127,14 @@ public:
     void UpdateDeltaNotch();
 
     /**
-     * @return the current Notch level in this edge
+     * @return the current Notch level in this edge.
      */
     double GetNotch();
 
     /**
-     * Set the notch level in this edge
-     * @param value
+     * Set the Notch level in this edge.
+     * 
+     * @param value the new Notch level in this edge
      */
     void SetNotch(double value);
 
@@ -143,8 +144,9 @@ public:
     double GetDelta();
 
     /**
-     * Set the delta level in this edge
-     * @param value
+     * Set the Delta level in this edge.
+     * 
+     * @param value the new Delta level in this edge
      */
     void SetDelta(double value);
 
@@ -156,6 +158,7 @@ public:
     /**
      * The value of interior Delta is stored as parameters in this model, which is
      * retrieved by this method
+     * 
      * @return the level of Delta in cell interior
      */
     double GetInteriorDelta() const;
@@ -163,6 +166,7 @@ public:
     /**
      * The value of interior Notch is stored as parameters in this model, which is
      * retrieved by this method
+     * 
      * @return the level of Notch in cell interior
      */
     double GetInteriorNotch() const;
@@ -175,37 +179,39 @@ public:
     virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
-     * Adds Delta/Notch from the input srn model to this model.
+     * Adds Delta/Notch from the input SRN model to this model.
      * Override the method declared in AbstractSrnModel class
-     * @param p_other_srn
-     * @param scale
+     * 
+     * @param pOtherSrn Pointer to an SRN
+     * @param scale scale factor
      */
-    virtual void AddSrnQuantities(AbstractSrnModel *p_other_srn,
+    virtual void AddSrnQuantities(AbstractSrnModel* pOtherSrn,
                                   const double scale = 1.0) override;
 
     /**
      * Here we assume that when a neighbouring junctions shrinks, 25% of its Delta/Notch
      * concentration is added to this edge
      * Override the method declared in AbstractSrnModel class
-     * @param p_shrunk_edge_srn
+     * 
+     * @param pShrunkEdgeSrn Pointer to an SRN
      */
-    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
-
-    // adding comment for testing only, to be removed.
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn) override;
 
     /**
      * Here we add Delta/Notch when junctions merge via common vertex deletion
      * Override the method declared in AbstractSrnModel class
-     * @param p_merged_edge_srn
+     * 
+     * @param pMergedEdgeSrn Pointer to an SRN
      */
-    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn) override;
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn) override;
 
     /**
      * By default, Edge concentrations are split according to relative lengths, when an edge is split.
      * Override the method declared in AbstractSrnModel class
-     * @param relative_position
+     * 
+     * @param relativePosition relative position to use when splitting Edge concentrations
      */
-    virtual void SplitEdgeSrn(const double relative_position) override;
+    virtual void SplitEdgeSrn(const double relativePosition) override;
 };
 
 typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;

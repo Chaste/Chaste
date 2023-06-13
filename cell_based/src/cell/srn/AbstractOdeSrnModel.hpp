@@ -152,8 +152,9 @@ public:
     virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
-     * Scales all ODE variables by factor theta. Used for example to scale model variables after cell division
-     * @param theta
+     * Scales all ODE variables by factor theta. Used for example to scale model variables after cell division.
+     * 
+     * @param theta factor by which to scale all ODE variables.
      */
     virtual void ScaleSrnVariables(const double theta) override;
 };

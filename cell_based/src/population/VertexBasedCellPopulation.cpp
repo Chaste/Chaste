@@ -481,7 +481,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 }
 
 template<unsigned int DIM>
-void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string &rDirectory)
+void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
 
@@ -570,7 +570,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
 }
 
 template<unsigned int DIM>
-void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::string &rDirectory)
+void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     //Writes cell only data
@@ -717,11 +717,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     //Total number of data items. Each data item (edge+interior) has its own value
     const unsigned int n_data_items = n_edge_data_items + n_cell_data_items;
     std::vector<std::string> data_names(n_data_items);
-    for (unsigned int var=0; var<n_edge_data_items; ++var)
+    for (unsigned var=0; var<n_edge_data_items; ++var)
     {
         data_names[var] = edge_data_names[var];
     }
-    for (unsigned int var=n_edge_data_items; var<n_data_items; ++var)
+    for (unsigned var=n_edge_data_items; var<n_data_items; ++var)
     {
         data_names[var] = cell_data_names[var-n_edge_data_items];
     }
@@ -740,13 +740,15 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         //Edge data for interior data is set to zero.
         auto element = this->GetElement(elem_index);
         unsigned elem_num_edges = element->GetNumEdges();
-        for (unsigned int var = 0; var < n_edge_data_items; ++var)
+        for (unsigned var = 0; var < n_edge_data_items; ++var)
         {
             // Write the same property in all the edges
-            for (unsigned int e = 0; e < elem_num_edges; ++e)
+            for (unsigned e = 0; e < elem_num_edges; ++e)
+            {
                 data_values[var][cell_offset_dist[elem_index]+e]
                                  = p_cell->GetCellEdgeData()->GetItem(data_names[var])[e];
-            //Cell interior is set to zero
+            }
+            // Cell interior is set to zero
             data_values[var][cell_offset_dist[elem_index]+elem_num_edges] = 0.0;
         }
     }
@@ -765,17 +767,15 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
 
-        for (unsigned int var = n_edge_data_items; var<n_data_items; ++var)
+        for (unsigned var = n_edge_data_items; var<n_data_items; ++var)
         {
-            //Data in the edges are set to 0
-            for (unsigned int e = 0; e < elem_num_edges; ++e)
+            // Data in the edges are set to 0
+            for (unsigned e = 0; e < elem_num_edges; ++e)
             {
                 data_values[var][cell_offset_dist[elem_index]+e] = 0.0;
             }
-            //Filling cell interior data
-            data_values[var][cell_offset_dist[elem_index]+elem_num_edges]
-                             = p_cell->GetCellData()->GetItem(data_names[var]);
-
+            // Filling cell interior data
+            data_values[var][cell_offset_dist[elem_index]+elem_num_edges] = p_cell->GetCellData()->GetItem(data_names[var]);
         }
     }
 
