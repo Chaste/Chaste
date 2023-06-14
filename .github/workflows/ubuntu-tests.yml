@@ -21,10 +21,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-18.04"
-            codename: "bionic"
-            cc: "gcc"
-            cxx: "g++"
           - os: "ubuntu-20.04"
             codename: "focal"
             cc: "gcc"
