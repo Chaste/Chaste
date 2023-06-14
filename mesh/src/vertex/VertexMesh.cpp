@@ -1272,7 +1272,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
+bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(
+    [[maybe_unused]] const c_vector<double, SPACE_DIM>& rTestPoint, [[maybe_unused]] unsigned elementIndex)
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
@@ -1393,7 +1394,8 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(
+    [[maybe_unused]] const c_vector<double, SPACE_DIM>& rTestPoint, [[maybe_unused]] unsigned elementIndex)
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
@@ -1458,7 +1460,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
+c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement([[maybe_unused]] unsigned index)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1517,7 +1519,7 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement([[maybe_unused]] unsigned index)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1576,7 +1578,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1604,7 +1607,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientO
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1632,7 +1636,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeG
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1655,7 +1660,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradi
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1676,7 +1682,9 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGrad
 //////////////////////////////////////////////////////////////////////
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace,
+    [[maybe_unused]] c_vector<double, SPACE_DIM>& rNormal)
 {
     if constexpr (SPACE_DIM == 3)
     {
@@ -1712,7 +1720,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(Ver
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
 {
     if constexpr (SPACE_DIM == 3)
     {
