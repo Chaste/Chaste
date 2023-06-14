@@ -35,8 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Electrodes.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include "IsNan.hpp"
 #include "HeartConfig.hpp"
+
+#include <cmath>
 
 template<unsigned DIM>
 Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)

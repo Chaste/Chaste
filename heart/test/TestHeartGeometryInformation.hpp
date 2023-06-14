@@ -121,9 +121,9 @@ public:
         for (unsigned index=low_index; index<high_index; index++)
         {
             double x = mesh.GetNode(index)->rGetLocation()[0];
-            TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),(5.0-x)/5.0);
-            TS_ASSERT_EQUALS(info.rGetDistanceMapEpicardium()[index],x);
-            TS_ASSERT_EQUALS(info.rGetDistanceMapEndocardium()[index],(5.0-x));
+            TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index), (5.0 - x) / 5.0, 1e-10);
+            TS_ASSERT_DELTA(info.rGetDistanceMapEpicardium()[index], x, 1e-10);
+            TS_ASSERT_DELTA(info.rGetDistanceMapEndocardium()[index], 5.0 - x, 1e-10);
         }
     }
 
@@ -169,9 +169,9 @@ public:
         for (unsigned index=low_index; index<high_index; index++)
         {
             double x = mesh.GetNode(index)->rGetLocation()[0];
-            TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),(5-x)/5);
-            TS_ASSERT_EQUALS(info.rGetDistanceMapEpicardium()[index],x);
-            TS_ASSERT_EQUALS(info.rGetDistanceMapEndocardium()[index],(5.0-x));
+            TS_ASSERT_DELTA(info.CalculateRelativeWallPosition(index), (5.0 - x) / 5.0, 1e-10);
+            TS_ASSERT_DELTA(info.rGetDistanceMapEpicardium()[index], x, 1e-10);
+            TS_ASSERT_DELTA(info.rGetDistanceMapEndocardium()[index], 5.0 - x, 1e-10);
         }
         ChasteCuboid<3> epi_bounding_box=info.CalculateBoundingBoxOfEpi();
         ChasteCuboid<3> endo_bounding_box=info.CalculateBoundingBoxOfEndo();

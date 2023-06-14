@@ -50,15 +50,15 @@ jobs:
         sudo apt update
         sudo apt install chaste-dependencies
 
-    - name: install and set up intel compilers
+    - name: install and set up Intel LLVM compiler
       run: |
         echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
         sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
         sudo apt update
-        sudo apt install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic
+        sudo apt install intel-oneapi-compiler-dpcpp-cpp
         source /opt/intel/oneapi/setvars.sh
         printenv >> $GITHUB_ENV
-      if: startsWith(matrix.cc, 'ic')
+      if: ${{ matrix.cc == 'icx' }}
 
     - name: compiler version
       run: |
