@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * There is no real 'testing' in this class; just verification that the compiler can cope with various new language
  * features.
  *
- * Chaste currently uses C++14.
+ * Chaste currently uses C++17.
  */
 class TestModernCppFeatures : public CxxTest::TestSuite
 {

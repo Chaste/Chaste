@@ -6,9 +6,6 @@ if (Chaste_ERROR_ON_WARNING)
     set(default_flags "${default_flags} -Werror")
 endif()
 
-# Set the C++ Standard
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
 set(default_exe_linker_flags "")
 if (UNIX)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
