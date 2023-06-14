@@ -497,8 +497,8 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     return neighbouring_node_indices;
 }
 
-template<unsigned DIM>
-double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
+template <unsigned DIM>
+double NodeBasedCellPopulation<DIM>::GetVolumeOfCell([[maybe_unused]] CellPtr pCell)
 {
     // Not implemented or tested in 1D
     if constexpr ((DIM == 2) || (DIM == 3))

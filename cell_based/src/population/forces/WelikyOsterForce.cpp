@@ -48,8 +48,8 @@ WelikyOsterForce<DIM>::~WelikyOsterForce()
 {
 }
 
-template<unsigned DIM>
-void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+template <unsigned DIM>
+void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This method only works in 2D at present
     if constexpr (DIM == 2)

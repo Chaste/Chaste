@@ -74,8 +74,9 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetUseJiggledNodesOnPlane()
     return mUseJiggledNodesOnPlane;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
+    [[maybe_unused]] const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
     if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {

@@ -108,7 +108,8 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant([[maybe_unused]] bool useAreaBasedDampingConstant) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(
+    [[maybe_unused]] bool useAreaBasedDampingConstant) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     if constexpr (SPACE_DIM == 2)
     {

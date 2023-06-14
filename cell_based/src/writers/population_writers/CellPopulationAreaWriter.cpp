@@ -48,8 +48,9 @@ CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter()
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit([[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    [[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
