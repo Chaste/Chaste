@@ -416,8 +416,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 //#endif //CHASTE_VTK
 }
 
-template<>
-void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh) {
+template <>
+void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<1, 1>& rMesh) {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
