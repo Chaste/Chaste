@@ -413,7 +413,7 @@ public:
     bool IsLogged();
 
     /**
-     * Give the Cell an index which it passes to its children.
+     * Give the cell an index which it passes to its children.
      *
      * @param pCellAncestor the cell's ancestor
      */
@@ -431,7 +431,7 @@ public:
     unsigned GetCellId() const;
 
     /**
-     * @return if cell has SRN model associated to it
+     * @return whether the cell has an SRN model associated to it.
      */
     bool HasSrnModel() const;
 };

@@ -55,7 +55,7 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
 {
     // Get recorded edge operations
     const std::vector<EdgeOperation>& edge_operations = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
-    for (auto operation:edge_operations)
+    for (auto operation : edge_operations)
     {
         // An operation with deleted element may be recorded,
         // e.g. following a T2 swap, neighbouring element may become triangular due to node merging

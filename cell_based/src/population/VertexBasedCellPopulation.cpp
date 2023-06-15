@@ -198,16 +198,17 @@ VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsign
     auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex);
 
     // Normally there is only one neighbouring element
-    for (auto neighbourElementIndex : neighbourElementIndices)
+    for (auto neighbour_element_index : neighbourElementIndices)
     {
-        auto neighbourElement = this->GetElement(neighbourElementIndex);
+        auto p_neighbour_element = this->GetElement(neighbour_element_index);
+
         // Iterate over neighbouring element indices
-        for (unsigned eIndex = 0; eIndex < neighbourElement->GetNumEdges(); eIndex++)
+        for (unsigned elem_index = 0; elem_index < p_neighbour_element->GetNumEdges(); elem_index++)
         {
             // If the neighbours edge matches EdgeLocalIndex
-            if (neighbourElement->GetEdge(eIndex)->GetIndex() == globalEdgeIndex)
+            if (p_neighbour_element->GetEdge(elem_index)->GetIndex() == globalEdgeIndex)
             {
-                neighbours.insert(std::pair<unsigned, unsigned>(neighbourElementIndex, eIndex));
+                neighbours.insert(std::pair<unsigned, unsigned>(neighbour_element_index, elem_index));
             }
         }
     }
@@ -675,7 +676,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     // Iterate over any cell writers that are present
     // The data that is written below is associated with the entire cell
     // E.g. the cell age. Thus, edges also share the same characteristic
-    for (auto cell_writer: this->mCellWriters)
+    for (auto cell_writer : this->mCellWriters)
     {
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data(num_edges+n_cells);
@@ -686,28 +687,30 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         {
             // Get index of this element in the vertex mesh
             unsigned elem_index = elem_iter->GetIndex();
+
             // Get the cell corresponding to this element
             CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
             assert(p_cell);
+
             // Write the same property in all the edges
             auto element = this->GetElement(elem_index);
             unsigned elem_num_edges = element->GetNumEdges();
-            //Edge data
+
+            // Edge data
             for (unsigned e = 0; e < elem_num_edges; ++e)
             {
                 // Populate the vector of VTK cell data
-                vtk_cell_data[cell_offset_dist[elem_index]+e]
-                              = cell_writer->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[cell_offset_dist[elem_index]+e] = cell_writer->GetCellDataForVtkOutput(p_cell, this);
             }
-            //Internal cell data
-            vtk_cell_data[cell_offset_dist[elem_index]+elem_num_edges]
-                          =cell_writer->GetCellDataForVtkOutput(p_cell, this);
+            // Internal cell data
+            vtk_cell_data[cell_offset_dist[elem_index]+elem_num_edges] = cell_writer->GetCellDataForVtkOutput(p_cell, this);
         }
         mesh_writer.AddCellData(cell_writer->GetVtkCellDataName(), vtk_cell_data);
     }
-    //When outputting CellData and CellEdgeData, we assume that the first cell
-    //and its edges are representative of the population.
-    //Get cell/edge data names
+    // When outputting CellData and CellEdgeData, we assume that the first cell
+    // and its edges are representative of the population
+
+    // Get cell/edge data names
     const unsigned int n_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
@@ -737,7 +740,8 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         const unsigned int elem_index = elem_iter ->GetIndex();
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
-        //Edge data for interior data is set to zero.
+
+        // Edge data for interior data is set to zero.
         auto element = this->GetElement(elem_index);
         unsigned elem_num_edges = element->GetNumEdges();
         for (unsigned var = 0; var < n_edge_data_items; ++var)

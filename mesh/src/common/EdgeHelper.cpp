@@ -38,17 +38,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM>* EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
-    auto edgeMapIndices = Edge<SPACE_DIM>::GenerateMapIndex(pNodeA->GetIndex(), pNodeB->GetIndex());
+    auto edge_map_indices = Edge<SPACE_DIM>::GenerateMapIndex(pNodeA->GetIndex(), pNodeB->GetIndex());
 
     // Check that an edge hasn't been created already
     Edge<SPACE_DIM>* p_edge = nullptr;
 
-    auto edgeItt = mEdgesMap.find(edgeMapIndices);
+    auto edgeItt = mEdgesMap.find(edge_map_indices);
     if (edgeItt == mEdgesMap.end() || edgeItt->second->IsDeleted())
     {
         mEdges.push_back(std::make_unique<Edge<SPACE_DIM>> (mEdges.size(), pNodeA, pNodeB));
         p_edge = mEdges.back().get();
-        mEdgesMap[edgeMapIndices] = p_edge;
+        mEdgesMap[edge_map_indices] = p_edge;
     }
     else
     {
@@ -63,8 +63,8 @@ template<unsigned int SPACE_DIM>
 Edge<SPACE_DIM> *
 EdgeHelper<SPACE_DIM>::GetEdgeFromNodes(unsigned elementIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
-    auto edge = GetEdgeFromNodes(pNodeA, pNodeB);
-    edge->AddElement(elementIndex);
+    auto p_edge = GetEdgeFromNodes(pNodeA, pNodeB);
+    p_edge->AddElement(elementIndex);
     return edge;
 }
 
@@ -88,12 +88,12 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
     // Remove any edges that have been marked for deletion and store all other nodes in a temporary structure
     std::vector<std::unique_ptr<Edge<SPACE_DIM>>> live_edges;
 
-    for (auto& edge : mEdges)
+    for (auto& p_edge : mEdges)
     {
       // An edge can be deleted if it is not contained in any elements
-      if (edge->GetNumElements() != 0)
+      if (p_edge->GetNumElements() != 0)
       {
-        live_edges.push_back(std::move(edge));
+        live_edges.push_back(std::move(p_edge));
       }
       // Note: there's no need to manually delete the edge,
       // because the unique_ptr automatically takes care of that when it goes out of scope
@@ -116,14 +116,15 @@ void EdgeHelper<SPACE_DIM>::UpdateEdgesMapKey()
 {
     mEdgesMap.clear();
 
-    for (auto & edge : mEdges) 
+    for (auto& p_edge : mEdges) 
     {
-        mEdgesMap[edge->GetMapIndex()] = edge.get();
+        mEdgesMap[p_edge->GetMapIndex()] = p_edge.get();
     }
 }
 
 template<unsigned int SPACE_DIM>
-unsigned EdgeHelper<SPACE_DIM>::GetNumEdges() const {
+unsigned EdgeHelper<SPACE_DIM>::GetNumEdges() const
+{
     return mEdges.size();
 }
 

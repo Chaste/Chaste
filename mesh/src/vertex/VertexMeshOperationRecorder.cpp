@@ -44,9 +44,9 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelp
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT1Swap(T1SwapInfo<SPACE_DIM>& rSwap_info)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT1Swap(T1SwapInfo<SPACE_DIM>& rSwapInfo)
 {
-    mT1Swaps.push_back(rSwap_info);
+    mT1Swaps.push_back(rSwapInfo);
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
@@ -62,9 +62,9 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearT1SwapsInfo()
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT2Swap(T2SwapInfo<SPACE_DIM>& rSwap_info)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT2Swap(T2SwapInfo<SPACE_DIM>& rSwapInfo)
 {
-    mT2Swaps.push_back(rSwap_info);
+    mT2Swaps.push_back(rSwapInfo);
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
@@ -80,9 +80,9 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearT2SwapsInfo()
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT3Swap(T3SwapInfo<SPACE_DIM>& rSwap_info)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordT3Swap(T3SwapInfo<SPACE_DIM>& rSwapInfo)
 {
-    mT3Swaps.push_back(rSwap_info);
+    mT3Swaps.push_back(rSwapInfo);
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
@@ -98,9 +98,9 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearT3SwapsInfo()
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivisionInfo(CellDivisionInfo<SPACE_DIM>& rDivision_info)
+void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivisionInfo(CellDivisionInfo<SPACE_DIM>& rDivisionInfo)
 {
-    mCellDivisions.push_back(rDivision_info);
+    mCellDivisions.push_back(rDivisionInfo);
 }
 
 template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>

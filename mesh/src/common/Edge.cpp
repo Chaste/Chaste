@@ -135,9 +135,9 @@ unsigned Edge<SPACE_DIM>::GetNumNodes()
 template<unsigned SPACE_DIM>
 bool Edge<SPACE_DIM>::ContainsNode(Node<SPACE_DIM>* pNode) const
 {
-    for (auto node : mNodes)
+    for (auto p_node : mNodes)
     {
-        if (node->GetIndex() == pNode->GetIndex())
+        if (p_node->GetIndex() == p_node->GetIndex())
         {
             return true;
         }

@@ -83,7 +83,7 @@ public:
 
             // Create cell edge SRN with four edges
             auto p_cell_edge_srn_model = new CellSrnModel();
-            for (int i = 0; i < 4; i++)
+            for (unsigned i = 0; i < 4; i++)
             {
                 boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
@@ -117,7 +117,6 @@ public:
             for (unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
             {
                 auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
-
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.5, 1e-4);
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.5, 1e-4);
             }
@@ -138,7 +137,6 @@ public:
             for (unsigned i = 0; i < p_cell_edge_srn_model->GetNumEdgeSrn(); i++)
             {
                 auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model->GetEdgeSrn(i));
-
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetNotch(), 0.9900, 1e-4);
                 TS_ASSERT_DELTA(p_delta_notch_edge_srn_model->GetDelta(), 0.0101, 1e-4);
             }
@@ -146,10 +144,8 @@ public:
 
         void TestDeltaNotchEdgeSrnCreateCopy()
         {
-            int numEdges = 4;
-
             auto p_cell_edge_srn_model = new CellSrnModel();
-            for (int i = 0; i < numEdges; i++)
+            for (unsigned i = 0; i < 4; i++)
             {
                 boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
@@ -165,10 +161,9 @@ public:
             // Create a copy
             CellSrnModel* p_cell_edge_srn_model2 = static_cast<CellSrnModel*> (p_cell_edge_srn_model->CreateSrnModel());
 
-            for (int i = 0; i < numEdges; i++)
+            for (unsigned i = 0; i < 4; i++)
             {
                 auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_edge_srn_model2->GetEdgeSrn(i));
-                // Check correct initializations
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetNotch(), 2.0);
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetDelta(), 3.0);
             }
@@ -180,8 +175,6 @@ public:
 
         void TestArchiveDeltaNotchSrnModel()
         {
-            int numEdges = 4;
-
             OutputFileHandler handler("archive", false);
             std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_edge_srn.arch";
 
@@ -194,7 +187,7 @@ public:
 
                 // As usual, we archive via a pointer to the most abstract class possible
                 AbstractSrnModel* p_srn_model = new CellSrnModel();
-                for (int i = 0; i < numEdges; i++)
+                for (unsigned i = 0; i < 4; i++)
                 {
                     MAKE_PTR(DeltaNotchEdgeSrnModel, p_delta_notch_edge_srn_model);
                     static_cast<CellSrnModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
@@ -217,10 +210,9 @@ public:
                 boost::archive::text_oarchive output_arch(ofs);
 
                 // Read neighbour/interior Delta from CellEdgeData
-                for (int i = 0; i < numEdges; i++)
+                for (unsigned i = 0; i < 4; i++)
                 {
-                    auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
+                    auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     p_delta_notch_edge_model->UpdateDeltaNotch();
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
@@ -244,7 +236,7 @@ public:
 
                 input_arch >> p_srn_model;
 
-                for (int i = 0; i < numEdges; i++)
+                for (unsigned i = 0; i < 4; i++)
                 {
                     auto p_delta_notch_edge_model
                     = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
@@ -343,7 +335,7 @@ public:
 
             // Create cell edge SRN with four edges
             auto p_cell_srn_model = new CellSrnModel();
-            for (int i = 0; i < 4; i++)
+            for (unsigned i = 0; i < 4; i++)
             {
                 boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
@@ -422,10 +414,8 @@ public:
 
         void TestDeltaNotchEdgeInteriorSrnCreateCopy()
         {
-            int numEdges = 4;
-
             auto p_cell_srn_model = new CellSrnModel();
-            for (int i = 0; i < numEdges; i++)
+            for (unsigned i = 0; i < 4; i++)
             {
                 boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 
@@ -444,19 +434,20 @@ public:
             p_delta_notch_interior_srn_model->SetOdeSystem(new DeltaNotchInteriorOdeSystem(state_variables));
             p_delta_notch_interior_srn_model->SetInitialConditions(state_variables);
             p_cell_srn_model->SetInteriorSrnModel(p_delta_notch_interior_srn_model);
+
             // Create a copy
             CellSrnModel* p_cell_srn_model2 = static_cast<CellSrnModel*> (p_cell_srn_model->CreateSrnModel());
 
-            for (int i = 0; i < numEdges; i++)
+            for (unsigned i = 0; i < 4; i++)
             {
                 auto p_delta_notch_edge_srn_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(p_cell_srn_model2->GetEdgeSrn(i));
-                // Check correct initializations
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetNotch(), 2.0);
                 TS_ASSERT_EQUALS(p_delta_notch_edge_srn_model->GetDelta(), 3.0);
             }
             auto p_interior_srn_model2 = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(p_cell_srn_model2->GetInteriorSrn());
             TS_ASSERT_EQUALS(p_interior_srn_model2->GetNotch(), 5.0);
             TS_ASSERT_EQUALS(p_interior_srn_model2->GetDelta(), 7.0);
+
             // Destroy models
             delete p_cell_srn_model;
             delete p_cell_srn_model2;
@@ -464,8 +455,6 @@ public:
 
         void TestArchiveDeltaNotchEdgeInteriorSrnModel()
         {
-            int numEdges = 4;
-
             OutputFileHandler handler("archive", false);
             std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_edge_srn.arch";
 
@@ -478,7 +467,7 @@ public:
 
                 // As usual, we archive via a pointer to the most abstract class possible
                 AbstractSrnModel* p_srn_model = new CellSrnModel();
-                for (int i = 0; i < numEdges; i++)
+                for (unsigned i = 0; i < 4; i++)
                 {
                     MAKE_PTR(DeltaNotchEdgeSrnModel, p_delta_notch_edge_srn_model);
                     static_cast<CellSrnModel *>(p_srn_model)->AddEdgeSrnModel(p_delta_notch_edge_srn_model);
@@ -504,17 +493,15 @@ public:
                 boost::archive::text_oarchive output_arch(ofs);
 
                 // Read neighbour/interior Delta from CellEdgeData
-                for (int i = 0; i < numEdges; i++)
+                for (unsigned i = 0; i < 4; i++)
                 {
-                    auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
+                    auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     p_delta_notch_edge_model->UpdateDeltaNotch();
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorNotch(), 1.0, 1e-12);
                 }
-                auto p_interior_srn
-                = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetInteriorSrn());
+                auto p_interior_srn = boost::static_pointer_cast<DeltaNotchInteriorSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetInteriorSrn());
                 p_interior_srn->UpdateDeltaNotch();
                 TS_ASSERT_DELTA(p_interior_srn ->GetTotalEdgeDelta(), 40.0, 1e-12);
                 TS_ASSERT_DELTA(p_interior_srn ->GetTotalEdgeNotch(), 4.0, 1e-12);
@@ -536,10 +523,9 @@ public:
 
                 input_arch >> p_srn_model;
 
-                for (int i = 0; i < numEdges; i++)
+                for (unsigned i = 0; i < 4; i++)
                 {
-                    auto p_delta_notch_edge_model
-                    = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
+                    auto p_delta_notch_edge_model = boost::static_pointer_cast<DeltaNotchEdgeSrnModel>(static_cast<CellSrnModel*>(p_srn_model)->GetEdgeSrn(i));
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetNeighbouringDelta(), 10.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorDelta(), 5.0, 1e-12);
                     TS_ASSERT_DELTA(p_delta_notch_edge_model->GetInteriorNotch(), 1.0, 1e-12);

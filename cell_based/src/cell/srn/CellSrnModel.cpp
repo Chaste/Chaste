@@ -51,9 +51,9 @@ CellSrnModel::CellSrnModel(const CellSrnModel &rModel)
         this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
     }
     mIsEdgeBasedModel = rModel.HasEdgeModel();
-    for (auto edgeModel : rModel.mEdgeSrnModels)
+    for (auto iter : rModel.mEdgeSrnModels)
     {
-        mEdgeSrnModels.push_back(boost::shared_ptr<AbstractSrnModel>(edgeModel->CreateSrnModel()));
+        mEdgeSrnModels.push_back(boost::shared_ptr<AbstractSrnModel>(iter->CreateSrnModel()));
     }
 }
 
@@ -68,9 +68,9 @@ CellSrnModel::~CellSrnModel()
 
 void CellSrnModel::Initialise()
 {
-    for (auto edgeModel : mEdgeSrnModels)
+    for (auto iter : mEdgeSrnModels)
     {
-        edgeModel->Initialise();
+        iter->Initialise();
     }
 
     if (mpInteriorSrnModel != nullptr)
@@ -93,9 +93,9 @@ void CellSrnModel::ResetForDivision()
      * after cell divisions depends on local topology. That is custom behavior of edge SRN models 
      * is important to implement correctly.
      */
-    for (auto edgeModel : mEdgeSrnModels)
+    for (auto iter : mEdgeSrnModels)
     {
-        edgeModel->ResetForDivision();
+        iter->ResetForDivision();
     }
 
     if (mpInteriorSrnModel != nullptr)
@@ -106,9 +106,9 @@ void CellSrnModel::ResetForDivision()
 
 void CellSrnModel::SimulateToCurrentTime()
 {
-    for (auto srnModel : mEdgeSrnModels)
+    for (auto iter : mEdgeSrnModels)
     {
-        srnModel->SimulateToCurrentTime();
+        iter->SimulateToCurrentTime();
     }
     if (mpInteriorSrnModel != nullptr)
     {
@@ -173,9 +173,9 @@ void CellSrnModel::SetCell(CellPtr pCell)
     AbstractSrnModel::SetCell(pCell);
 
     // Make a copy of all SRN models inside the system
-    for (auto srnModel : mEdgeSrnModels)
+    for (auto iter : mEdgeSrnModels)
     {
-        srnModel->SetCell(pCell);
+        iter->SetCell(pCell);
     }
 
     if (mpInteriorSrnModel != nullptr)

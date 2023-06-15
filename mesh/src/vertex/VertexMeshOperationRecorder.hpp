@@ -101,16 +101,18 @@ private:
 
 public:
     /**
-     * Sets edge helper associated with the vertex mesh
-     * @param pEdgeHelper
+     * Sets edge helper associated with the vertex mesh.
+     * 
+     * @param pEdgeHelper pointer to an edge helper
      */
     void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
 
     /**
-     * Record T1 swap info
-     * @param rSwap_info - information about T1 swap
+     * Record T1 swap info.
+     * 
+     * @param rSwapInfo information about a T1 swap
      */
-    void RecordT1Swap(T1SwapInfo<SPACE_DIM>& rSwap_info);
+    void RecordT1Swap(T1SwapInfo<SPACE_DIM>& rSwapInfo);
 
     /**
      * @return Information about all T1 swaps
@@ -123,10 +125,11 @@ public:
     void ClearT1SwapsInfo();
 
     /**
-     * Record T2 swap info
-     * @param rSwap_info
+     * Record T2 swap info.
+     * 
+     * @param rSwapInfo information about a T2 swap
      */
-    void RecordT2Swap(T2SwapInfo<SPACE_DIM>& rSwap_info);
+    void RecordT2Swap(T2SwapInfo<SPACE_DIM>& rSwapInfo);
 
     /**
      * @return Information about T2 swaps
@@ -139,10 +142,11 @@ public:
     void ClearT2SwapsInfo();
 
     /**
-     * Record T3 swap info
-     * @param rSwap_info
+     * Record T3 swap info.
+     * 
+     * @param rSwapInfo information about a T3 swap
      */
-    void RecordT3Swap(T3SwapInfo<SPACE_DIM>& rSwap_info);
+    void RecordT3Swap(T3SwapInfo<SPACE_DIM>& rSwapInfo);
 
     /**
      * @return Information about T3 swaps
@@ -155,8 +159,9 @@ public:
     void ClearT3SwapsInfo();
 
     /**
-     * Record cell division event
-     * @param rSwap_info
+     * Record cell division event.
+     * 
+     * @param rDivisionInfo information about a cell division event.
      */
     void RecordCellDivisionInfo(CellDivisionInfo<SPACE_DIM>& rDivision_info);
 
@@ -166,7 +171,7 @@ public:
     std::vector<CellDivisionInfo<SPACE_DIM> > GetCellDivisionInfo() const;
 
     /*
-     * Clear information about T3 swaps
+     * Clear information about T3 swaps.
      */
     void ClearCellDivisionInfo();
 
@@ -176,12 +181,13 @@ public:
     const std::vector<EdgeOperation>& GetEdgeOperations();
 
     /**
-     * Clears edge operations
+     * Clear edge operations.
      */
     void ClearEdgeOperations();
 
     /**
-     * Records node merging (or edge shrinkage) event
+     * Record node merging (or edge shrinkage) event.
+     * 
      * @param oldIds
      * @param pElement
      * @param merged_nodes_pair - the index of the deleted node is stored in the second position

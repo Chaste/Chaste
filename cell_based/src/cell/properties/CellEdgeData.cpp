@@ -89,7 +89,7 @@ unsigned CellEdgeData::GetNumItems() const
 std::vector<std::string> CellEdgeData::GetKeys() const
 {
     std::vector<std::string> keys;
-    for (auto& kv: mCellEdgeData)
+    for (auto& kv : mCellEdgeData)
     {
         keys.push_back(kv.first);
     }
