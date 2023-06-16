@@ -56,7 +56,7 @@ public:
         // Should throw because node 95 never crosses the threshold
         TS_ASSERT_THROWS_THIS(ppc.CalculateConductionVelocity(5,95,0.9),
                 "AP did not occur, never descended past threshold voltage.");
-        TS_ASSERT_THROWS_THIS(ppc.CalculateAllConductionVelocities(5,95,0.9)[0],
+        TS_ASSERT_THROWS_THIS(ppc.CalculateAllConductionVelocities(5,95,0.9),
                 "AP did not occur, never descended past threshold voltage.");
 
         // Should throw because AP is not complete here
@@ -65,7 +65,7 @@ public:
         // Should not throw because the upstroke propagated far enough in simulation time
         //for both methods of last conduction velocity and all of them
         TS_ASSERT_THROWS_NOTHING(ppc.CalculateConductionVelocity(20,40,0.1));
-        TS_ASSERT_THROWS_NOTHING(ppc.CalculateAllConductionVelocities(20,40,0.1)[0]);
+        TS_ASSERT_THROWS_NOTHING(ppc.CalculateAllConductionVelocities(20,40,0.1));
 
         //check some value
         TS_ASSERT_DELTA(ppc.CalculateConductionVelocity(20,40,0.2),0.0498,0.01);
