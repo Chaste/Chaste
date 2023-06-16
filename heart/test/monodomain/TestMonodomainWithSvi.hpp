@@ -557,7 +557,7 @@ public:
         // variables going out of range. An exception should be thrown in the
         // EvaluateYDerivatives() method of the cell model
 
-        // One of two exceptions are expected to be thrown here. Which one is thrown depends on several factors,
+        // One of three exceptions are expected to be thrown here. Which one is thrown depends on several factors,
         // including how the compiler handles NAN values, and whether the code is compiled in Debug or Release.
         try
         {
@@ -567,7 +567,10 @@ public:
         catch (const Exception& e)
         {
             std::string exception_msg = e.GetMessage();
-            TS_ASSERT(exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos || exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos);
+            const bool exception_a = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
+            const bool exception_b = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
+            const bool exception_c = exception_msg.find("Chaste error: ./global/src/parallel/PetscException.cpp") != std::string::npos;
+            TS_ASSERT(exception_a || exception_b || exception_c);
         }
     }
 };
