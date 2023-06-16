@@ -570,6 +570,7 @@ public:
             const bool exception_a = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
             const bool exception_b = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
             const bool exception_c = exception_msg.find("Chaste error: ./global/src/parallel/PetscException.cpp") != std::string::npos;
+            std::cout << "\n\n########\n" << exception_msg << "\n###########\n\n";
             TS_ASSERT(exception_a || exception_b || exception_c);
         }
     }
