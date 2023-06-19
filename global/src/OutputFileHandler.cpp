@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -164,7 +164,7 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
     FileFinder directory_root;
     if (chaste_test_output == nullptr || *chaste_test_output == 0)
     {
-        // Mimic the old SCons behaviour of setting CHASTE_TEST_OUTPUT: /tmp/'+os.environ['USER']+'/testoutput/
+        // Mimic the old behaviour of setting CHASTE_TEST_OUTPUT: /tmp/'+os.environ['USER']+'/testoutput/
         std::stringstream  tmp_directory;
         if (getenv("USER")!=NULL)
         {

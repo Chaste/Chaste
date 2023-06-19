@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2022, University of Oxford.
+# Copyright (c) 2005-2023, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -28,11 +28,10 @@
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
-# Fergus's comment take 4
-
-cmake_minimum_required (VERSION 3.5.1)
+# The version that ships with Ubuntu 18.04
+cmake_minimum_required (VERSION 3.10.2)
 
 # Set standard to C++14. Note that CMake < 3.6 does not know how to set the standard flag for the Intel compiler, so
 # the ChasteCompilerFlags.cmake also sets the --std=c++14 flag, too.
@@ -263,7 +262,7 @@ endif ()
 ################################
 find_package(PythonInterp 3.5)
 if (PYTHON_VERSION_STRING VERSION_LESS 3.5.0)
-    message(FATAL_ERROR "Python 3.5 or higer is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
+    message(FATAL_ERROR "Python 3.5 or higher is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
@@ -330,17 +329,27 @@ if (Chaste_USE_VTK)
 
     # Depending on the VTK version, we need different components. 5.x require the following
     if (VTK_MAJOR_VERSION EQUAL 5)
-        find_package (VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
+        find_package(VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
         # 6.0 and 6.1 require the following
     elseif ((VTK_MAJOR_VERSION EQUAL 6) AND (VTK_MINOR_VERSION LESS 2))
-        find_package (VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                      vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
-                      vtkIOLegacy vtkIOXML REQUIRED)
-        # 6.2 and up, up to and including 7.1, require the following
+        find_package(
+                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy vtkIOXML
+                REQUIRED
+        )
+        # 6.2 and up, up to and including 8.x, require the following
+    elseif (VTK_MAJOR_VERSION LESS 9)
+        find_package(
+                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
+                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy
+                vtkIOParallelXML vtkIOXML REQUIRED
+        )
+        # VTK 9.0 and above require the following
     else ()
-        find_package (VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                      vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
-                      vtkIOLegacy vtkIOParallelXML vtkIOXML REQUIRED)
+        find_package(
+                VTK COMPONENTS CommonCore CommonDataModel FiltersCore FiltersGeneral FiltersGeneric FiltersGeometry
+                FiltersModeling FiltersSources IOCore IOGeometry IOLegacy IOParallelXML IOXML REQUIRED
+        )
     endif ()
 
     add_definitions (-DCHASTE_VTK)
@@ -427,7 +436,7 @@ if (PETSC_MPIEXEC)
         find_program (MPIEXEC ${PETSC_MPIEXEC})
     endif ()
 endif ()
-find_package (MPI REQUIRED)
+find_package (MPI REQUIRED COMPONENTS CXX)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
@@ -438,7 +447,7 @@ if (Chaste_MEMORY_TESTING)
     get_filename_component (openmpi_supp_path ${openmpi_supp_path} PATH)
     set (openmpi_supp_path "${openmpi_supp_path}/share/openmpi/openmpi-valgrind.supp")
     set (Chaste_MEMORY_TESTING_SUPPS "--suppressions=${Chaste_SOURCE_DIR}/chaste.supp")
-    set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${Chaste_SOURCE_DIR}/chaste-lucid.supp")
+    set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${Chaste_SOURCE_DIR}/chaste-legacy.supp")
     if (EXISTS ${openmpi_supp_path})
         set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${openmpi_supp_path}")
     endif ()
@@ -954,7 +963,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         set (extension svg)
         set (NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else ()
-        set (extension gmon)
+        set (extension txt)
         set (NUM_CPUS ${Chaste_PROFILE_GPROF_CPUS})
     endif ()
 

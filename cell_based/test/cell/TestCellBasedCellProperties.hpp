@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellId.hpp"
 #include "CellData.hpp"
+#include "CellEdgeData.hpp"
 
 #include "CellPropertyRegistry.hpp"
 
@@ -184,6 +185,95 @@ public:
 
             // Tidy up
             delete p_cell_data;
+        }
+    }
+
+    void TestCellEdgeDataMethods()
+    {
+        MAKE_PTR(CellEdgeData, p_cell_edge_data);
+
+        TS_ASSERT_THROWS_THIS(p_cell_edge_data->GetItem("thing1"), "The item thing1 is not stored");
+        TS_ASSERT_THROWS_THIS(p_cell_edge_data->GetItemAtIndex("thing1", 0), "The item thing1 is not stored");
+
+        std::vector<double> thing1 {1.0, 2.0, 3.0};
+        std::vector<double> thing2 {4.0, 5.0, 6.0};
+        std::vector<double> thing3 {7.0, 8.0, 9.0};
+        p_cell_edge_data->SetItem("thing1", thing1);
+        p_cell_edge_data->SetItem("thing2", thing2);
+        p_cell_edge_data->SetItem("thing3", thing3);
+
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing1",0), 1.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing1",1), 2.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing1",2), 3.0, 1e-8);
+
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing2",0), 4.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing2",1), 5.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing2",2), 6.0, 1e-8);
+
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing3",0), 7.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing3",1), 8.0, 1e-8);
+        TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing3",2), 9.0, 1e-8);
+
+        TS_ASSERT_THROWS_THIS(p_cell_edge_data->GetItemAtIndex("thing1", 3), "The item thing1 does not have index 3");
+
+        std::vector<double> another_thing1 = p_cell_edge_data->GetItem("thing1");
+
+        TS_ASSERT_DELTA(another_thing1[0], 1.0, 1e-8);
+        TS_ASSERT_DELTA(another_thing1[1], 2.0, 1e-8);
+        TS_ASSERT_DELTA(another_thing1[2], 3.0, 1e-8);
+
+        TS_ASSERT_EQUALS(p_cell_edge_data->GetNumItems(), 3u);
+    }
+
+    void TestArchiveCellEdgeData()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_edge_data.arch";
+
+        // Archive Cell data
+        {
+            CellEdgeData* p_cell_edge_data = new CellEdgeData;
+            std::vector<double> thing1 {1.0, 2.0};
+            std::vector<double> thing2 {3.0, 4.0};
+            p_cell_edge_data->SetItem("thing1",thing1);
+            p_cell_edge_data->SetItem("thing2",thing2);
+
+            TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing1",0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing1",1), 2.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing2",0), 3.0, 1e-8);
+            TS_ASSERT_DELTA(p_cell_edge_data->GetItemAtIndex("thing2",1), 4.0, 1e-8);
+
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the cell to the archive
+            const AbstractCellProperty* const p_const_cell_data = p_cell_edge_data;
+            output_arch << p_const_cell_data;
+
+            delete p_cell_edge_data;
+        }
+
+        // Restore Cell data
+        {
+            AbstractCellProperty* p_cell_edge_data;
+
+            // Restore the Cell data
+            std::ifstream ifs(archive_filename.c_str());
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_edge_data;
+
+            CellEdgeData* p_real_cell_data = dynamic_cast<CellEdgeData*>(p_cell_edge_data);
+            TS_ASSERT(p_real_cell_data != NULL);
+
+            TS_ASSERT_DELTA(p_real_cell_data->GetItemAtIndex("thing1",0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetItemAtIndex("thing1",1), 2.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetItemAtIndex("thing2",0), 3.0, 1e-8);
+            TS_ASSERT_DELTA(p_real_cell_data->GetItemAtIndex("thing2",1), 4.0, 1e-8);
+
+            // Tidy up
+            delete p_cell_edge_data;
         }
     }
 };

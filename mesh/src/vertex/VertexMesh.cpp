@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,6 +98,8 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         }
     }
 
+    this->GenerateEdgesFromElements(mElements);
+
     this->mMeshChangesDuringSimulation = false;
 }
 
@@ -190,7 +192,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
             }
         }
     }
-    else // Is Bounded 
+    else // Is Bounded
     {
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
@@ -206,12 +208,12 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
-        {   
+        {
             for (unsigned j=0; j<3; j++)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
-                
+
                 std::set<unsigned> node_a_element_indices = p_node_a->rGetContainingElementIndices();
                 std::set<unsigned> node_b_element_indices = p_node_b->rGetContainingElementIndices();
 
@@ -223,13 +225,13 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
                                       std::inserter(shared_elements, shared_elements.begin()));
 
 
-                /* 
-                 * Note using boundary nodes to identify the boundary egdes wont work with 
+                /*
+                 * Note using boundary nodes to identify the boundary edges won't work with
                  * triangles which have 3 boundary nodes
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
                  */
-             
-                if (shared_elements.size() == 1) // Its a boundary edge
+
+                if (shared_elements.size() == 1) // It's a boundary edge
                 {
                     c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
                     double edge_length = norm_2(edge);
@@ -237,12 +239,12 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
 
                     normal_vector[0]= edge[1];
                     normal_vector[1]= -edge[0];
-                    
+
                     double dij = norm_2(normal_vector);
                     assert(dij>1e-5); //Sanity check
                     normal_vector /= dij;
 
-                    double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells) 
+                    double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells)
 
                     int num_sections = ceil(edge_length*extra_node_scaling);
                     for (int section=0; section<=num_sections; section++)
@@ -280,9 +282,9 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
             for (unsigned local_index = 0; local_index < 3; local_index++)
-            {   
+            {
                 unsigned elem_index = extended_mesh.GetElement(i)->GetNodeGlobalIndex(local_index);
-                
+
                 if (elem_index < num_elements)
                 {
                     unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
@@ -493,6 +495,33 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
+template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
+    std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>& elements)
+{
+    // Build a list of unique edges from nodes within all the elements
+    for (auto elem : elements)
+    {
+        elem->SetEdgeHelper(&mEdgeHelper);
+        elem->BuildEdges();
+    }
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+    return mEdgeHelper.GetNumEdges();
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+Edge<SPACE_DIM> * VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const {
+    return mEdgeHelper.GetEdge(index);
+}
+
+template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+const EdgeHelper<SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeHelper() const{
+    return mEdgeHelper;
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
@@ -581,7 +610,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::~VertexMesh()
 {
-    Clear();
+ Clear();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -698,6 +727,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete mFaces[i];
     }
     mFaces.clear();
+
 
     // Delete nodes
     for (unsigned i = 0; i < this->mNodes.size(); i++)
@@ -1014,6 +1044,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
             p_element->SetAttribute(attribute_value);
         }
     }
+    GenerateEdgesFromElements(mElements);
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -1641,6 +1672,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELE
     c_vector<double, SPACE_DIM> unit_normal;
     return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
+
+
 
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)

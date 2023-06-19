@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -85,7 +85,7 @@ public:
 
     /**
      * Pure virtual; method which should call StartApoptosisOnCell() on the population
-     * passing the cell which should be about to undergo programmed death, 
+     * passing the cell which should be about to undergo programmed death,
      * or KillCell() on the population passing the cell which should die immediately.
      *
      * As this method is pure virtual, it must be overridden

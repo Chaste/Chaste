@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * This is a template file for generating the Version.cpp source on the fly.
  * Content of the form ${example} is replaced by suitable values.
- * See the function GetVersionCpp in python/SConsTools.py for more details.
  */
 
 #include "Version.hpp"
@@ -189,7 +188,7 @@ std::string ChasteBuildInfo::GetChasteCodegenVersion(){
     {
         results +=  buffer;
     }
-    fclose(codegen_version);
+    pclose(codegen_version);
 
     boost::algorithm::trim(results);
     return results;

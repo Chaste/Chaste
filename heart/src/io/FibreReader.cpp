@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -172,7 +172,7 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
     if (checkOrthogonality)
     {
         // Note that we define this matrix before setting it as otherwise the profiling build will break (see #2367)
-        c_matrix<double,DIM,DIM> temp;
+        c_matrix<double,DIM,DIM> temp = zero_matrix<double>(DIM, DIM);
         temp = prod(trans(rFibreMatrix), rFibreMatrix);
 
         // Check temp is equal to the identity

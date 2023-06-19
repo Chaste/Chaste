@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ public:
      *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
      * value [present simulation time], followed by a tab.
-     * 
+     *
      * @param pCellPopulation a pointer to the population to visit.
      */
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
@@ -89,7 +89,7 @@ public:
      * Visit the population and write the data.
      *
      * Just passes through to VisitAnyPopulation
-     * 
+     *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
@@ -116,7 +116,7 @@ public:
      * Visit the population and write the data.
      *
      * Just passes through to VisitAnyPopulation
-     * 
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -162,7 +162,7 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
 
     double rest_length = 1.0; // TODO this could also be a parameter.
     double spring_stiffness = mGhostCellSpringStiffness;
-    if (this->mIsGhostNode[rNodeAGlobalIndex] && this->mIsGhostNode[rNodeBGlobalIndex]) 
+    if (this->mIsGhostNode[rNodeAGlobalIndex] && this->mIsGhostNode[rNodeBGlobalIndex])
     {
         rest_length = mGhostSpringRestLength;
         spring_stiffness  = mGhostGhostSpringStiffness;
@@ -363,7 +363,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
     time << num_timesteps;
-    
+
     if (this->mWriteVtkAsPoints)
     {
         // Create mesh writer for VTK output
@@ -378,14 +378,14 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_vtk_cells);
 
-            // Loop over nodes of mesh 
+            // Loop over nodes of mesh
             for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
                 node_iter != this->rGetMesh().GetNodeIteratorEnd();
                 ++node_iter)
-            {     
-                // Get the indices of this node 
+            {
+                // Get the indices of this node
                 unsigned node_index = node_iter->GetIndex();
-                
+
                 // If this node corresponds to a ghost node, set any "cell" data to be -1.0
                 if (this->IsGhostNode(node_index))
                 {

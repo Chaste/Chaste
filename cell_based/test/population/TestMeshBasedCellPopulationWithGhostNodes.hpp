@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -453,14 +453,14 @@ public:
         TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.rGetGhostNodes().size(), mesh.GetNumNodes());
 
         // Nodes 0-9 should not been renumbered so are still ghost nodes.
-        // the ghost node at node 80 is now at 79 as node 27 was deleted..
+        // the ghost node at node 80 is now at 79 as node 27 was deleted.
         for (unsigned i=0; i<mesh.GetNumAllNodes(); i++)
         {
             // True (ie should be a ghost) if i<10 or i==79, else false
             TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.IsGhostNode(i), ((i<10)||(i==79)));
         }
 
-        // Finally, check the cells node indices have updated
+        // Finally, check the cell node indices have updated
 
         // We expect the cell node indices to be {10,11,...,79}
         std::set<unsigned> expected_node_indices;
@@ -554,11 +554,11 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
 
         // Test RemoveGhostNode()
-        cell_population.RemoveGhostNode(0u); // as nodes 0-9 and 80 are ghosts 
-    
+        cell_population.RemoveGhostNode(0u); // as nodes 0-9 and 80 are ghosts
+
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 82u);
-        // Cant call cell_population.GetNumRealCells yet as doenst work before 
+        // Can't call cell_population.GetNumRealCells yet as doesn't work before
         // the Update as the cells aren't updated yet
 
         cell_population.Update();
@@ -760,7 +760,7 @@ public:
         cells[1]->SetMutationState(p_apc1);
         cells[2]->SetMutationState(p_apc2);
         cells[3]->SetMutationState(p_bcat1);
-        
+
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(mesh, cells, location_indices); // Note currently no ghosts
         cell_population.InitialiseCells();
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulationWithGhostNodes-2");
@@ -899,7 +899,7 @@ public:
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Resetting the Maximum cell Id to zero (to account for previous tests)
+        // Resetting the Maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
         // Create a simple 3D mesh with some ghost nodes
@@ -1223,9 +1223,9 @@ public:
         unsigned num_cells_depth = 7;
         unsigned num_cells_width = 3;
         unsigned num_ghost_nodes = 0;
-        
+
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, num_ghost_nodes);
-    
+
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->Scale(0.9,0.9);
 
@@ -1249,18 +1249,18 @@ public:
         // Create a cell population
         double ghost_cell_spring_stiffness = 1.0;
         double ghost_ghost_spring_stiffness = 1.0;
-        double ghost_spring_rest_length = 1.0; 
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, 
-                                                                 cells, 
-                                                                 location_indices, 
-                                                                 false, 
-                                                                 ghost_cell_spring_stiffness, 
-                                                                 ghost_ghost_spring_stiffness, 
+        double ghost_spring_rest_length = 1.0;
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh,
+                                                                 cells,
+                                                                 location_indices,
+                                                                 false,
+                                                                 ghost_cell_spring_stiffness,
+                                                                 ghost_ghost_spring_stiffness,
                                                                  ghost_spring_rest_length);
 
         GeneralisedLinearSpringForce<2> linear_force;
 
-        //Check all node forces are zero 
+        //Check all node forces are zero
         for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
@@ -1279,7 +1279,7 @@ public:
         {
             unsigned node_index =  node_iter->GetIndex();
             double force_magnitude = norm_2(node_iter->rGetAppliedForce());
-            
+
             if (cell_population.IsGhostNode(node_index))
             {
                 TS_ASSERT_DELTA(force_magnitude, 0.0, 1e-5);
@@ -1313,7 +1313,7 @@ public:
         {
             unsigned node_index =  node_iter->GetIndex();
             double force_magnitude = norm_2(node_iter->rGetAppliedForce());
-            
+
             // Normal Nodes
             if (node_index==4||node_index==19)
             {
@@ -1331,7 +1331,7 @@ public:
             {
                 TS_ASSERT_DELTA(force_magnitude, 1.4999, 1e-4);
             }
-            
+
             // Ghost Nodes
             if (node_index==10||node_index==13||node_index==16)
             {

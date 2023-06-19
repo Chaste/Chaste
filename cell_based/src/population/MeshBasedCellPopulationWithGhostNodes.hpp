@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -216,7 +216,7 @@ public:
     std::set<unsigned> GetGhostNodeIndices();
 
     /**
-     * @param nodeIndex the index of the node to be removed. 
+     * @param nodeIndex the index of the node to be removed.
      */
     void RemoveGhostNode(unsigned nodeIndex);
 

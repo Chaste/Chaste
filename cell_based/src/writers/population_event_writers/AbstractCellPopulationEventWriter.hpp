@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,7 +56,7 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
  * needs to be collected from all processes, such as global counters for mutation states. These writers
  * concentrate the information from all processes and then write it at each timestep for which output
  * is required.
- * 
+ *
  * These writers also only write data when an event has occured since the last output step/
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,7 +75,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
 
     double x0 = 0.0;
     double y0 = 0.0;
-    
+
     // Write node file
     out_stream p_node_file = output_file_handler.OpenOutputFile(mMeshFilename+".node");
     (*p_node_file) << std::scientific;

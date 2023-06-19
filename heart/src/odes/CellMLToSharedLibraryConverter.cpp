@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -196,7 +196,6 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                 r_cellml_file.CopyTo(tmp_folder);
             }
 
-#ifdef CHASTE_CMAKE
             std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
             cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
@@ -219,25 +218,6 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             EXPECT0(chdir, tmp_folder.GetAbsolutePath());
             EXPECT0(system, "cmake" + cmake_args + " .");
             EXPECT0(system, "cmake --build . --config " + ChasteBuildType());
-#else
-            // Change to Chaste source folder
-            EXPECT0(chdir, chaste_root.GetAbsolutePath());
-
-            // Run scons to generate C++ code and compile it to a .so
-            EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 chaste_libs=1 --codegen_args=\""+codegen_args+"\" --codegen_base_folder=" + chaste_source.GetAbsolutePath() + " build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
-            if (mPreserveGeneratedSources)
-            {
-                // Copy the generated source (.hpp and .cpp) to the same place as the .so file is going.
-                // NB. CMake does this by default
-                FileFinder destination_folder_for_sources(rCellmlFolder, RelativeTo::Absolute);
-                // Copy generated source code as well
-                std::vector<FileFinder> generated_files = build_folder.FindMatches("*.?pp");
-                BOOST_FOREACH(const FileFinder& r_generated_file, generated_files)
-                {
-                    r_generated_file.CopyTo(destination_folder_for_sources);
-                }
-            }
-#endif
 
             FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
 std::cout<< "so file: "<< tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix <<std::endl;

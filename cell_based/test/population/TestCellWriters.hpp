@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1739,7 +1739,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         c_vector<double, 2> vec_data = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        for(auto& component : vec_data)
+        for (auto& component : vec_data)
         {
             TS_ASSERT_EQUALS(component, DOUBLE_UNSET);
         }

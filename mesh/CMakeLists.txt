@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2022, University of Oxford.
+# Copyright (c) 2005-2023, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,11 +50,11 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     set(PREDICATES_FLAGS "-Wno-error -O0")
     set(TETGEN_FLAGS "-Wno-error -O0")
     set(TRIANGLE_FLAGS "-Wno-error -Wno-strict-overflow")
-elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang"  OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
     set(PREDICATES_FLAGS "-Wno-error -O0")
     set(TETGEN_FLAGS "-Wno-error -O0")
     set(TRIANGLE_FLAGS "-Wno-error -Wno-strict-overflow")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(PREDICATES_FLAGS "-Wno-error -O0")
     set(TETGEN_FLAGS "-Wno-error -O0")
     set(TRIANGLE_FLAGS "-Wno-error")

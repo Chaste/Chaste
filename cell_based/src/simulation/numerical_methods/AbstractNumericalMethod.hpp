@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -117,10 +117,10 @@ protected:
     std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > SaveCurrentNodeLocations();
 
     /**
-     * Helper method to apply boundarty conditons. Used in higher order methods like RK4.
+     * Helper method to apply boundary conditions. Used in higher order methods like RK4.
      * @param rOldLocations the node locations prior to being updated.
      */
-    void ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLoctions);
+    void ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations);
 
     /**
      * Computes and returns the force on each node, including the damping factor

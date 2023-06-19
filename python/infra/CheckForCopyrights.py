@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2022, University of Oxford.
+"""Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,7 +70,7 @@ deprecated_notice = re.compile(r"""(# ){0,1}Copyright \(c\) 2005-\d{4}, Universi
 """, re.MULTILINE)
 
 
-current_notice = """Copyright (c) 2005-2022, University of Oxford.
+current_notice = """Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -293,7 +293,7 @@ def ignore_dir(dir_to_check):
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'codegen_python3_venv',
                    'testoutput', 'doc', 'projects', 'hierwikiplugin']
 
-    dir_ignore_contains = ['Debug_', 'cmake-build', 'venv']
+    dir_ignore_contains = ['Debug_', 'chaste-build', 'cmake-build', 'venv']
 
     startchar_ignores = ['_', '.']
 
@@ -315,10 +315,9 @@ if __name__ == '__main__':
     # .cpp, .hpp., .py, .java are C++, Python and Java code.
     exts = ['.cpp', '.hpp', '.py', '.java']
 
-    # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
-    named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE',
+    named_files = ['SConstruct', 'CMakeLists.txt', './LICENSE',
                    'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
 
     exclusions = []

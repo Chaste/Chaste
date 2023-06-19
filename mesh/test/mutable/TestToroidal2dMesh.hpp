@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,7 +67,7 @@ public:
         unsigned cells_up = 4;
         double domain_width = (double) cells_across;
         double domain_height = (double) cells_up*0.5*sqrt(3.0);
-        
+
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1,1);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
@@ -403,7 +403,7 @@ public:
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
-       
+
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
 
@@ -433,7 +433,7 @@ public:
     {
         unsigned cells_across = 3;
         unsigned cells_up = 3;
-       
+
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
 
@@ -522,7 +522,7 @@ public:
 
             TS_ASSERT_DELTA(p_mesh2->GetWidth(0), 5.0, 1e-7);
             TS_ASSERT_DELTA(p_mesh2->GetWidth(1), 1.5*sqrt(3.0), 1e-7);
-            
+
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), p_mesh2->GetNumAllNodes());
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
@@ -577,7 +577,7 @@ public:
 
         const double width = 1.0;
         const double height = 1.0;
-        
+
         Toroidal2dMesh mesh(width, height, nodes);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 12u);
@@ -668,19 +668,19 @@ public:
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u); 
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);
 
         //Translate mesh which calls RefreshMesh()
         p_mesh->Translate(-1,-1);
-        
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u); 
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);
 
         //Translate mesh which calls RefreshMesh()
-        p_mesh->Translate(2,2);     
+        p_mesh->Translate(2,2);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u); 
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);
     }
 

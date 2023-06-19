@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,7 +66,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
-
 /**
  * An abstract facade class encapsulating a cell population.
  *
@@ -594,6 +593,14 @@ public:
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell)=0;
 
     /**
+     * Gets the local edge index of the neighbouring element
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * @return pair of element location and local edge index
+     */
+    virtual std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeIndex);
+
+    /**
      * @return the centroid of the cell population.
      */
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();
@@ -624,7 +631,7 @@ public:
      *
      * The method also closes the .pvd output file if VTK is available.
      */
-    void CloseWritersFiles();
+    virtual void CloseWritersFiles();
 
     /**
      * Write results from the current cell population state to output files.
@@ -683,8 +690,8 @@ public:
 
     /**
      * Add information for a division event.
-     * 
-     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.              
+     *
+     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
      *
      * @param divisionInformation  division information string
      */
@@ -716,7 +723,7 @@ public:
 
     /**
      * Helper method to store information about the removal in mRemovalInformation
-     * 
+     *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
@@ -724,7 +731,7 @@ public:
 
     /**
      * Helper method to mark a cell as killed and store information about the removal.
-     * 
+     *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */
@@ -732,7 +739,7 @@ public:
 
     /**
      * Helper method to mark a cell as starting apoptosis and store information about the removal.
-     * 
+     *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
      */

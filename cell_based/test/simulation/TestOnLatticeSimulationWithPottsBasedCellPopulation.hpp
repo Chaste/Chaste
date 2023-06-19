@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -284,7 +284,7 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(20);
         simulator.SetSamplingTimestepMultiple(20);
-        
+
         // Create update rules and pass to the simulation
         MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
         simulator.AddUpdateRule(p_volume_constraint_update_rule);

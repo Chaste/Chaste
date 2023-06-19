@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -334,8 +334,8 @@ public:
         simulator.SetUpdateCellPopulationRule(true);
 
         simulator.SetUpdatingTimestepMultiple(60); // Son only look for births and deaths at start and end
-        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but you were on a non update step, make sure your cell cylce model and killer only operate on update steps.");
-        
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"CellPopulation has had births or deaths but you were on a non update step, make sure your cell cycle model and killer only operate on update steps.");
+
         // Note that this test used to take an extra time step
         TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
     }
@@ -461,7 +461,7 @@ public:
     }
 
     /**
-     * Test a cell-based simulation with variabe rest lengths forces.
+     * Test a cell-based simulation with variable rest lengths forces.
      */
     void TestOffLatticeSimulationWithVariableRestLengths()
     {
@@ -676,7 +676,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Output Voroni for visualisation
+        // Output Voronoi for visualisation
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.SetWriteVtkAsPoints(true);
 
@@ -710,7 +710,7 @@ public:
 
         // Create a simple mesh
         int cells_up = 6;
-        int cells_across = 6; 
+        int cells_across = 6;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
@@ -723,7 +723,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Output Voroni for visualisation
+        // Output Voronoi for visualisation
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.SetWriteVtkAsPoints(true);
 
@@ -731,7 +731,7 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithToroidalMesh");
         simulator.SetEndTime(0.5);
-        
+
         // Create some force laws and pass them to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);

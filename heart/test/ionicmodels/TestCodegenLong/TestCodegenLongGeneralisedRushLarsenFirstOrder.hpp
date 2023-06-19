@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,8 @@ public:
         std::vector<std::string> args;
         args.push_back("--grl1");
 
-        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+        // These have NaN in the jacobian due to massive exponentials
+        std::vector<std::string> bad_models = special_treatment_models(models, {"difrancesco_noble_model_1985", "iyer_2004", "faber_rudy_2000"});
 
 
         // Winslow model needs a smaller timestep

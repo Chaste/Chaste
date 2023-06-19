@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,14 +119,14 @@ std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > AbstractNumericalMethod
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLoctions)
+void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations)
 {
     // Apply any boundary conditions
     for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mpBoundaryConditions->begin();
          bcs_iter != mpBoundaryConditions->end();
          ++bcs_iter)
     {
-        (*bcs_iter)->ImposeBoundaryCondition(rOldNodeLoctions);
+        (*bcs_iter)->ImposeBoundaryCondition(rOldNodeLocations);
     }
 }
 

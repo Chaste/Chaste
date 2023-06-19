@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,6 +103,7 @@ private:
         archive & mOutputCellVelocities;
         archive & mCellKillers;
         archive & mSimulationModifiers;
+        archive & mTopologyUpdateSimulationModifiers;
         archive & mSamplingTimestepMultiple;
         archive & mUpdatingTimestepMultiple;
     }
@@ -165,6 +166,11 @@ protected:
 
     /** List of SimulationModifier rules. */
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
+
+    /** List of SimulationModifier rules that need to be applied before locations or topology are updated.
+     *  For example, junctional tension may change after Remeshing in Vertex Based Models.
+     */
+    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mTopologyUpdateSimulationModifiers;
 
     /**
      * The ratio of the number of actual timesteps to the number
@@ -395,6 +401,19 @@ public:
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
 
     /**
+     * Add a Topology SimulationModifier to be used in this simulation. This modifier updates cell population after topology has been
+     * changed (e.g. after T1 swap or cell division in case of vertex based models) and before cell locations updated.
+     * This can be useful when a topology update (e.g. cell division) influences movement of cells.
+     * @param pSimulationModifier pointer to a SimulationModifier
+     */
+    void AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+
+    /**
+     * @return a pointer to the vector of SimulationModifiers that influence topology update in this simulation.
+     */
+    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetTopologyUpdateSimulationModifiers();
+
+    /**
      * Main Solve() method, used to evolve the cell population. Note that prior to calling Solve()
      * we must have called SetEndTime(). We may also have optionally called SetDt(); if not, then
      * a default time step is used.
@@ -414,7 +433,7 @@ public:
      *
      * Next, we set up each cell by calling ReadyToDivide() on it, which updates the cell's age and
      * cell cycle model. Finally, we call WriteVisualizerSetupFile() and OutputSimulationSetup(),
-     * as well as WriteResultsToFiles() on the cell population, to record the initial configration.
+     * as well as WriteResultsToFiles() on the cell population, to record the initial configuration.
      * This completes the set up process.
      *
      * The main time loop:
