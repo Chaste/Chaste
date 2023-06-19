@@ -58,8 +58,16 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} ST
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rno-debug-disables-optimization -Wno-unused-but-set-variable -fp-model precise")
-    endif()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rno-debug-disables-optimization -Wno-unused-but-set-variable")
+        option(Chaste_USE_INTEL_PRECISE_FP_MODEL "Use Intel -fp-model precise" ON)
+        if (Chaste_USE_INTEL_PRECISE_FP_MODEL)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fp-model precise")
+            message(STATUS
+                    "Using Intel floating point model \"precise\". "
+                    "To use the default fast floating point model, set -DChaste_USE_INTEL_PRECISE_FP_MODEL=OFF. "
+                    "Note that this may reduce the precision of calculations and change other behaviour.")
+        endif ()
+    endif ()
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     message(STATUS "\t... for Intel compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
