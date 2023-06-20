@@ -74,11 +74,11 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: build specific test
-      run: cmake --build . --parallel 2 --target TestTimer
+      run: cmake --build . --parallel 2 --target TestDynamicallyLoadedCellModels
       working-directory: chaste-build-dir
 
     - name: run specific test
-      run: ctest -V -R TestTimer
+      run: ctest -V -R TestDynamicallyLoadedCellModels
       working-directory: chaste-build-dir
 
 #    - name: build core libraries
