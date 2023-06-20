@@ -78,7 +78,7 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: run specific test
-      run: ctest -V -R TestDynamicallyLoadedCellModels
+      run: ctest -V -R ^TestDynamicallyLoadedCellModels$
       working-directory: chaste-build-dir
 
 #    - name: build core libraries
