@@ -211,6 +211,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
                                       "if (${CMAKE_SYSTEM_NAME} MATCHES \"Darwin\")\n" <<
                                       "   target_link_libraries(" << cellml_leaf_name << " \"-Wl,-undefined,dynamic_lookup\")\n" <<
+                                      "endif()\n" <<
+                                      "if (${CMAKE_CXX_COMPILER_ID} STREQUAL \"IntelLLVM\")" <<
+                                      "   set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -fp-model precise\")" <<
                                       "endif()\n";
             cmake_lists_filestream.close();
             std::string cmake_args = " -DCMAKE_PREFIX_PATH=" + chaste_root.GetAbsolutePath() +
