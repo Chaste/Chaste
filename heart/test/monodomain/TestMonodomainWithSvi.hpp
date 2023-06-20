@@ -567,10 +567,14 @@ public:
         catch (const Exception& e)
         {
             std::string exception_msg = e.GetMessage();
-            const bool exception_a = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
-            const bool exception_b = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
-            const bool exception_c = exception_msg.find("Chaste error: ./global/src/parallel/Petsc") != std::string::npos;
-            TS_ASSERT(exception_a || exception_b || exception_c);
+#ifndef NDEBUG
+            // VerifyStateVariables is only called when debug is on
+            const bool exception_tripped = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
+#else
+            // This test hits a later assert(!isnan) if we do a ndebug build.
+            const bool exception_tripped = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
+#endif // NDEBUG
+            TS_ASSERT(exception_tripped);
         }
     }
 };
