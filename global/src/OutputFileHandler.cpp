@@ -222,7 +222,7 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
                 if (created_dir)
                 {
                     // Add the Chaste signature file
-                    fs::ofstream sig_file(next_folder / SIG_FILE_NAME);
+                    std::ofstream sig_file(next_folder / SIG_FILE_NAME);
                     sig_file.close();
                 }
             }
