@@ -198,7 +198,9 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
     if (!rel_path.empty() && (*(--rel_path.end())) == ".")
     {
         // rDirectory has a trailing slash, which gives an unhelpful last component
-        rel_path.remove_leaf();
+        //rel_path.remove_leaf();
+
+        rel_path.remove_filename();
     }
 
     // Make master wait (because other processes may be checking whether a directory exists)
@@ -301,7 +303,8 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
     }
     fs::path from_path(rSourceFile.GetAbsolutePath());
     fs::path to_path(GetOutputDirectoryFullPath());
-    to_path /= from_path.leaf();
+    //to_path /= from_path.leaf(); //Deprecated issue 100
+    to_path /= from_path.filename();
     if (PetscTools::AmMaster())
     {
         try

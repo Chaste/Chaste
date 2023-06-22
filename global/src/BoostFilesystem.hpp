@@ -35,7 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef BOOSTFILESYSTEM_HPP_
 #define BOOSTFILESYSTEM_HPP_
-
+// Bring all interfaces up-to-date so the transition from boost::filesystem to std::filesystem is more obvious 
+#define BOOST_FILESYSTEM_NO_DEPRECATED // Deprecated issue #100
 /**
  * @file
  * Include the Boost Filesystem library headers,
@@ -52,7 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PATH_LEAF_NAME(path) path.leaf()
 #else
 /** How to get a leafname as a string (in version 3). */
-#define PATH_LEAF_NAME(path) path.leaf().string()
+//#define PATH_LEAF_NAME(path) path.leaf().string() // Deprecated issue #100
+#define PATH_LEAF_NAME(path) path.filename().string()
 #endif
 
 /*
