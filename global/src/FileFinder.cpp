@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <cassert>
 
-#include "BoostFilesystem.hpp"
+#include "Filesystem.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
@@ -55,16 +55,16 @@ std::string FileFinder::msFakePath = "";
 #define UNSET_PATH "UNSET!"
 
 /**
- * This macro converts boost filesystem exceptions into Chaste Exceptions.
+ * This macro converts std::filesystem exceptions into Chaste Exceptions.
  *
  * It should be put round any calls in this class' public methods to
  * either:
- *  * boost filesystem
+ *  * std::filesystem
  *  * or private methods of this class
  *
  * that are likely to throw.
  *
- * @param code some code that could throw a boost file system error
+ * @param code some code that could throw a std::file system error
  */
 #define CONVERT_ERROR(code)               \
     try                                   \
@@ -210,7 +210,7 @@ bool FileFinder::IsEmpty() const
         fs::directory_iterator end_iter;
         for (fs::directory_iterator dir_iter(mAbsPath); dir_iter != end_iter; ++dir_iter)
         {
-            if (PATH_LEAF_NAME(dir_iter->path()).substr(0, 1) != ".")
+            if ((dir_iter->path().filename().string()).substr(0, 1) != ".")
             {
                 empty = false;
                 break;
@@ -242,7 +242,7 @@ bool FileFinder::IsNewerThan(const FileFinder& rOtherEntity) const
 
 std::string FileFinder::GetLeafName() const
 {
-    return PATH_LEAF_NAME(fs::path(mAbsPath));
+    return fs::path(mAbsPath).filename().string();
 }
 
 std::string FileFinder::GetLeafNameNoExtension() const
@@ -483,7 +483,7 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
         fs::path our_path(mAbsPath);
         for (fs::directory_iterator dir_iter(our_path); dir_iter != end_iter; ++dir_iter)
         {
-            std::string leafname = PATH_LEAF_NAME(dir_iter->path());
+            std::string leafname = dir_iter->path().filename().string();
             size_t leaf_len = leafname.length();
             if (leafname[0] != '.' // Don't include hidden files
                 && leaf_len >= len) // Ignore stuff that can't match

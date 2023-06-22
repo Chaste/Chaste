@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "FileFinder.hpp"
-#include "BoostFilesystem.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "OutputFileHandler.hpp"
 #include "GetCurrentWorkingDirectory.hpp"

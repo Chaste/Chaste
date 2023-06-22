@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POSIXPATHFIXER_HPP_
 #define POSIXPATHFIXER_HPP_
 
-#include "BoostFilesystem.hpp"
+#include <string>
+#include "Filesystem.hpp"
 
 /**
  * A helper class to convert native paths into POSIX syntax.

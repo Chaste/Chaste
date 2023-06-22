@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
-#include "BoostFilesystem.hpp"
+#include "Filesystem.hpp"
 
 /**
  * Test for a strange 'feature' of Debian sarge systems, where the

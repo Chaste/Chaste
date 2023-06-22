@@ -38,9 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 
 #include "ArchiveLocationInfo.hpp"
-#include "BoostFilesystem.hpp"
+#include "Filesystem.hpp"
 #include "Exception.hpp"
 #include "FileFinder.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
@@ -72,7 +73,7 @@ void CleanFolder(const fs::path& rPath, bool isTop)
         else
         {
             const fs::path& r_item_path(dir_iter->path());
-            if (!isTop || PATH_LEAF_NAME(r_item_path)[0] != '.')
+            if (!isTop || (r_item_path.filename().string())[0] != '.')
             {
                 fs::remove(r_item_path);
             }
