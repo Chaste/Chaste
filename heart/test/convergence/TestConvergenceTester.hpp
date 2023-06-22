@@ -160,7 +160,7 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
 
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<1>, 1, 2> tester;
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-4);
+        HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-4);
         tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5.5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);

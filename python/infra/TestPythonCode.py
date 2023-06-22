@@ -32,6 +32,12 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import importlib.util
+import os
+import sys
+import time
+import functools
+
 """
 Tester for Chaste Python code.  Runs unittest tests and makes the output
 follow the same format as the cxxtest shipped with Chaste.
@@ -55,38 +61,10 @@ Also, the module-scope variable CHASTE_NUM_PROCS will be set to the maximum
 number of processes to use for any test that can be run in parallel.
 """
 
-import imp
-import os
-import sys
-import time
-import functools
-
 try:
     import unittest2 as unittest
 except ImportError:
     import unittest
-
-if sys.version_info[:2] < (2,7):
-    # Add subprocess.check_output to earlier Python versions
-    import subprocess
-    def check_output(*popenargs, **kwargs):
-        """Run command with arguments and return its output as a string."""
-        if 'stdout' in kwargs:
-            raise ValueError('stdout argument not allowed, it will be overridden.')
-        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-        output, unused_err = process.communicate()
-        retcode = process.poll()
-        if retcode:
-            cmd = kwargs.get("args")
-            if cmd is None:
-                cmd = popenargs[0]
-            print("Called process failed; output was:", file=sys.stderr)
-            print("%s" % output, file=sys.stderr)
-            print("Called process failed; output was:")
-            print(output)
-            raise subprocess.CalledProcessError(retcode, cmd)
-        return output
-    subprocess.check_output = check_output
 
 
 class TestTest(unittest.TestCase):
@@ -99,10 +77,6 @@ class TestTest(unittest.TestCase):
 
     def TestError(self):
         self.assertEqual(1, 1/0)
-
-#def MakeTestSuite():
-#    """An example of how to create a suite of tests."""
-#    return unittest.TestSuite(map(TestTest, ['TestOk', 'TestFail', 'TestError']))
 
 
 class ChasteTestResult(unittest.TestResult):
@@ -121,12 +95,12 @@ class ChasteTestResult(unittest.TestResult):
         if self.debug:
             import pdb
             self.pdb = pdb
-    
+
     def _Debug(self, err):
-        type, value, traceback = err
+        err_type, value, traceback = err
         if (hasattr(sys, 'ps1')
-            or not sys.stderr.isatty() or not sys.stdin.isatty() or not sys.stdout.isatty()
-            or type == SyntaxError):
+                or not sys.stderr.isatty() or not sys.stdin.isatty() or not sys.stdout.isatty()
+                or err_type == SyntaxError):
             # Debugging is not possible
             return
         self.pdb.post_mortem(traceback)
@@ -158,6 +132,7 @@ class ChasteTestResult(unittest.TestResult):
         self.stream.write("Failed\n")
         if self.debug:
             self._Debug(err)
+
 
 class ChasteTestRunner:
     """A test runner class that displays results in Chaste's cxxtest format."""
@@ -215,6 +190,7 @@ class ChasteTestRunner:
                 stats.print_callers(.2, 30)
         return result
 
+
 class ChasteTestLoader(unittest.TestLoader):
     """Allow test methods to start with either Test or test."""
     def getTestCaseNames(self, testCaseClass):
@@ -231,6 +207,7 @@ class ChasteTestLoader(unittest.TestLoader):
             test_names.sort(key=functools.cmp_to_key(self.sortTestMethodsUsing))
         return test_names
 
+
 def SetTestOutput(module):
     """Set the CHASTE_TEST_OUTPUT attribute in the given test module, and ensure the folder exists."""
     module.CHASTE_TEST_OUTPUT = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
@@ -238,6 +215,7 @@ def SetTestOutput(module):
         os.makedirs(module.CHASTE_TEST_OUTPUT)
     except os.error:
         pass
+
 
 def main(filepath, profile=False, lineProfile=False, numProcs=1):
     """Run tests defined in the given Python file.
@@ -252,15 +230,13 @@ def main(filepath, profile=False, lineProfile=False, numProcs=1):
     if ext != '.py':
         raise ValueError(filepath + ' is not a Python source file')
     # Load Python file
-    dirpath = os.path.dirname(filepath)
-    (file, pathname, desc) = imp.find_module(base, [dirpath])
+    spec = importlib.util.spec_from_file_location(base, filepath)
     try:
-        module = imp.load_module(base, file, pathname, desc)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
     except ImportError:
         print("Python module search path: %s %s" % (sys.path, os.environ.get('PYTHONPATH')))
         raise
-    finally:
-        file.close()
     # Extract and run its tests
     SetTestOutput(module)
     module.CHASTE_NUM_PROCS = numProcs
@@ -271,6 +247,7 @@ def main(filepath, profile=False, lineProfile=False, numProcs=1):
         sys.exit(not result.wasSuccessful())
     else:
         unittest.main(module=module, argv=[sys.argv[0]], testRunner=runner, testLoader=ChasteTestLoader())
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -287,7 +264,7 @@ if __name__ == '__main__':
         except ValueError:
             num_procs = 1
         original_argv = sys.argv[:]
-        sys.argv[0:1] = [] # Remove this file from list
+        sys.argv[0:1] = []  # Remove this file from list
         main(sys.argv[0], profile=profile, lineProfile=line_profile, numProcs=num_procs)
         sys.argv = original_argv
     else:

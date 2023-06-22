@@ -38,39 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * Compiler workarounds, for compilers which don't include std::isnan (from C99).
+ * Temporary re-creation of this file until I can work out why heart/CMakeFiles/chaste_heart.dir/src/odes/cellml/###.cpp
+ * are generating code with this IsNan.hpp header...
  */
 
-// isnan()
-#if defined(__PGI) || defined(__xlC__)
-namespace std
-{
-    using ::isnan;
-}
-#endif
-
-#ifdef _MSC_VER
-#include <cfloat>
-namespace std
-{
-    /**
-     * @param x  the number to test
-     * @return  whether x is not-a-number
-     */
-    inline int isnan(double x)
-    {
-        return _isnan(x);
-    }
-}
-#endif
-
-// NAN macro
-#ifndef NAN
-#include <limits>
-/**
- * A NAN macro for compilers which don't have this GNU extension.
- */
-#define NAN std::numeric_limits<double>::quiet_NaN()
-#endif
+#include <cmath>
 
 #endif /*ISNAN_HPP_*/
