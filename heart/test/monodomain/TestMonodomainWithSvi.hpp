@@ -567,7 +567,6 @@ public:
         catch (const Exception& e)
         {
             std::string exception_msg = e.GetMessage();
-            std::cout << "\n##### ^" << exception_msg << "$ ###\n" << std::endl;
 #ifndef NDEBUG
             // VerifyStateVariables is only called when debug is on
             const bool ex_specific = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
