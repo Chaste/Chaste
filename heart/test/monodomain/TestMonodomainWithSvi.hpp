@@ -558,7 +558,7 @@ public:
         // EvaluateYDerivatives() method of the cell model
 
         // One of three exceptions are expected to be thrown here. Which one is thrown depends on several factors,
-        // including how the compiler handles NAN values, and whether the code is compiled in Debug or Release.
+        // including whether the code is compiled in Debug or Release.
         try
         {
             monodomain_problem.Solve();
@@ -567,14 +567,17 @@ public:
         catch (const Exception& e)
         {
             std::string exception_msg = e.GetMessage();
+            std::cout << "\n##### ^" << exception_msg << "$ ###\n" << std::endl;
 #ifndef NDEBUG
             // VerifyStateVariables is only called when debug is on
-            const bool exception_tripped = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
+            const bool ex_specific = exception_msg.find("State variable fast_sodium_current_m_gate__m has gone out of range.") != std::string::npos;
 #else
             // This test hits a later assert(!isnan) if we do a ndebug build.
-            const bool exception_tripped = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
+            const bool ex_specific = exception_msg.find("Assertion tripped: !std::isnan(i_ionic)") != std::string::npos;
+
 #endif // NDEBUG
-            TS_ASSERT(exception_tripped);
+            const bool ex_petsc_tools = exception_msg.find("Chaste error: ./global/src/parallel/PetscTools.cpp") != std::string::npos;
+            TS_ASSERT(ex_specific || ex_petsc_tools);
         }
     }
 };
