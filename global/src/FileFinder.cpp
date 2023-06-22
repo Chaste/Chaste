@@ -262,7 +262,7 @@ FileFinder FileFinder::GetParent() const
     fs::path our_path(mAbsPath);
     //EXCEPT_IF_NOT(our_path.has_branch_path()); //Deprecated issue #100
     //return FileFinder(our_path.branch_path().string(), RelativeTo::Absolute);  //Deprecated issue #100  
-    EXCEPT_IF_NOT(our_path.parent_path().empty());
+    EXCEPT_IF_NOT(!our_path.parent_path().empty()); //Double negative - throw if the parent path is empty
     return FileFinder(our_path.parent_path().string(),
                       RelativeTo::Absolute);
 }
