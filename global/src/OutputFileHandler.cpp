@@ -196,12 +196,15 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
     fs::path output_root(GetChasteTestOutputDirectory());
     fs::path rel_path(rDirectory);
 
-    if (!rel_path.empty() && (*(--rel_path.end())) == ".")
+    // Boost filesystem needed this, but std::filesystem is okay
+    //if (!rel_path.empty() && (*(--rel_path.end())) == ".")
+    //{
+    //    // rDirectory has a trailing slash, which gives an unhelpful last component
+    //    rel_path.remove_filename();
+    //}
+    if (!rel_path.empty())
     {
-        // rDirectory has a trailing slash, which gives an unhelpful last component
-        //rel_path.remove_leaf();
-
-        rel_path.remove_filename();
+        assert( (*(--rel_path.end())) != ".");
     }
 
     // Make master wait (because other processes may be checking whether a directory exists)
