@@ -256,7 +256,9 @@ std::string FileFinder::GetExtension() const
 FileFinder FileFinder::GetParent() const
 {
     fs::path our_path(mAbsPath);
-    EXCEPT_IF_NOT(!our_path.parent_path().empty()); //Double negative - throw if the parent path is empty
+    // Assertion will only happen if constructed with an empty string and absolute path.
+    // (Arguably a user could do this, but not accidentally.)
+    assert(!our_path.parent_path().empty());
     return FileFinder(our_path.parent_path().string(),
                       RelativeTo::Absolute);
 }

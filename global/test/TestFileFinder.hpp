@@ -67,7 +67,7 @@ public:
 
             // CWD should be the Chaste source root
             FileFinder file_finder2(file_name, RelativeTo::CWD);
-            std::cout << file_finder2.GetAbsolutePath();
+            //std::cout << file_finder2.GetAbsolutePath();
             TS_ASSERT(file_finder2.Exists());
             TS_ASSERT(file_finder2.IsFile());
             TS_ASSERT(!file_finder2.IsDir());
