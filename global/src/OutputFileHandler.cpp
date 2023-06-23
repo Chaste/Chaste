@@ -304,7 +304,6 @@ FileFinder OutputFileHandler::CopyFileTo(const FileFinder& rSourceFile) const
     }
     fs::path from_path(rSourceFile.GetAbsolutePath());
     fs::path to_path(GetOutputDirectoryFullPath());
-    //to_path /= from_path.leaf(); //Deprecated issue 100
     to_path /= from_path.filename();
     if (PetscTools::AmMaster())
     {

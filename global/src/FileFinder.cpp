@@ -93,7 +93,6 @@ FileFinder::FileFinder(const std::string& rLeafName, const FileFinder& rParentOr
 
 FileFinder::FileFinder(const fs::path& rPath)
 {
-    // SetPath(fs::complete(rPath).string(), RelativeTo::Absolute); //Deprecated issue #100
     SetPath(fs::absolute(rPath).string(), RelativeTo::Absolute);
 }
 
@@ -189,7 +188,6 @@ bool FileFinder::Exists() const
 
 bool FileFinder::IsFile() const
 {
-    //return fs::is_regular(mAbsPath); //Deprecated issue #100
     return fs::is_regular_file(mAbsPath);
 }
 
@@ -247,21 +245,17 @@ std::string FileFinder::GetLeafName() const
 
 std::string FileFinder::GetLeafNameNoExtension() const
 {
-    //return fs::basename(mAbsPath); //Deprecated issue #100
     return fs::path(mAbsPath).stem().string();
 }
 
 std::string FileFinder::GetExtension() const
 {
-    //return fs::extension(mAbsPath); //Deprecated issue #100
     return fs::path(mAbsPath).extension().string();
 }
 
 FileFinder FileFinder::GetParent() const
 {
     fs::path our_path(mAbsPath);
-    //EXCEPT_IF_NOT(our_path.has_branch_path()); //Deprecated issue #100
-    //return FileFinder(our_path.branch_path().string(), RelativeTo::Absolute);  //Deprecated issue #100  
     EXCEPT_IF_NOT(!our_path.parent_path().empty()); //Double negative - throw if the parent path is empty
     return FileFinder(our_path.parent_path().string(),
                       RelativeTo::Absolute);
@@ -291,7 +285,6 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     // If rToPath is a folder, then we're copying to the source name *inside* this folder
     if (fs::is_directory(dest))
     {
-        //dest /= rFromPath.leaf(); //Deprecated issue #100
         dest /= rFromPath.filename();
     }
     // If the source is a folder, it's complicated
@@ -323,7 +316,6 @@ FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
     fs::path to_path(rDest.mAbsPath);
     if (rDest.IsDir())
     {
-        //to_path /= from_path.leaf(); //Deprecated issue #100//
         to_path /= from_path.filename();
     }
     if (fs::exists(to_path))
@@ -412,9 +404,7 @@ void FileFinder::PrivateRemove(bool dangerous) const
             if (IsFile())
             {
                 // We need to look for the signature file in the parent folder
-                //sig_file.remove_leaf(); //Deprecated issue #100
-                
-sig_file.remove_filename();
+                sig_file.remove_filename();
             }
             sig_file /= OutputFileHandler::SIG_FILE_NAME;
             if (!fs::exists(sig_file))
@@ -535,7 +525,6 @@ std::vector<FileFinder> FileFinder::FindMatches(const std::string& rPattern) con
 
 bool FileFinder::IsAbsolutePath(const std::string& rPath)
 {
-    //return fs::path(rPath).is_complete(); //Deprecated issue #100
     return fs::path(rPath).is_absolute();
 }
 
