@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petscvec.h>
 #include <petscmat.h>
 #include <limits>
+#include <string>
 
 #include "PetscSetupAndFinalize.hpp"
 #include "PetscException.hpp"
@@ -99,7 +100,7 @@ public:
          */
         TS_ASSERT_THROWS_CONTAINS( KSPEXCEPT(KSP_DIVERGED_ITS), "DIVERGED_ITS in function \'TestKspExceptionsForCoverage\' on line");
         // The next one is deliberately fragile because it contains the line number in this test suite (to check that the line number is output correctly).
-        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line 103 of file ./global/test/TestPetscSetup.hpp");
+        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line " + std::to_string(__LINE__) + " of file ./global/test/TestPetscSetup.hpp");
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN), Exception& );
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN_BICG), Exception& );
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_NONSYMMETRIC), Exception& );
