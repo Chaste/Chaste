@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define POSIXPATHFIXER_HPP_
 
 #include <string>
-#include "Filesystem.hpp"
+#include <filesystem>
+namespace fs=std::filesystem;
 
 /**
  * A helper class to convert native paths into POSIX syntax.

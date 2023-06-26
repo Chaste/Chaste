@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>     // std::char_traits
 
 #include "Exception.hpp"
-#include "Filesystem.hpp"
 #include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
 #include "GetCurrentWorkingDirectory.hpp"

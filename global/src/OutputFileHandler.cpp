@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #include "ArchiveLocationInfo.hpp"
-#include "Filesystem.hpp"
 #include "Exception.hpp"
 #include "FileFinder.hpp"
 #include "GetCurrentWorkingDirectory.hpp"

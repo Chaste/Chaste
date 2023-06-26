@@ -33,12 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "FileFinder.hpp"
-
 #include <algorithm>
 #include <cassert>
 
-#include "Filesystem.hpp"
+#include "FileFinder.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
 #include "GetCurrentWorkingDirectory.hpp"

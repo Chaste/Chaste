@@ -38,8 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <vector>
-
-#include "Filesystem.hpp"
+#include <filesystem>
+namespace fs = std::filesystem;
 
 /**
  * Structure encapsulating the enumeration of path 'types', i.e. what a path
