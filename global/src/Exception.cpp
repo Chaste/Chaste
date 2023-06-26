@@ -94,22 +94,22 @@ const char* Exception::what() const noexcept {
     return mMessage.c_str();
 }
 
-std::string Exception::CheckShortMessage(std::string expected) const
+std::string Exception::CheckShortMessage(const std::string& rExpected) const
 {
     std::string error;
-    if (mShortMessage != expected && mShortMessage != "Another process threw an exception; bailing out.")
+    if (mShortMessage != rExpected && mShortMessage != "Another process threw an exception; bailing out.")
     {
-        error = "Incorrect exception message thrown: expected (" + expected + "); got (" + mShortMessage + ").";
+        error = "Incorrect exception message thrown: expected (" + rExpected + "); got (" + mShortMessage + ").";
     }
     return error;
 }
 
-std::string Exception::CheckShortMessageContains(std::string expected) const
+std::string Exception::CheckShortMessageContains(const std::string& rExpected) const
 {
     std::string error;
-    if (mShortMessage.find(expected) == std::string::npos && mShortMessage != "Another process threw an exception; bailing out.")
+    if (mShortMessage.find(rExpected) == std::string::npos && mShortMessage != "Another process threw an exception; bailing out.")
     {
-        error = "Incorrect exception message thrown: expected it to contain (" + expected + "); got (" + mShortMessage + ").";
+        error = "Incorrect exception message thrown: expected it to contain (" + rExpected + "); got (" + mShortMessage + ").";
     }
     return error;
 }

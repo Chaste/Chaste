@@ -99,9 +99,9 @@ public:
      * Checks that #mShortMessage matches that given, and
      * a suitable error message string if not.
      *
-     * @param expected  the expected value of #mShortMessage
+     * @param rExpected  the expected value of #mShortMessage
      */
-    std::string CheckShortMessage(std::string expected) const;
+    std::string CheckShortMessage(const std::string& rExpected) const;
 
     /**
      * Helper method for checking we have the right exception.
@@ -110,9 +110,9 @@ public:
      * Checks that #mShortMessage contains the given string, and
      * returns a suitable error message string if not.
      *
-     * @param expected  some expected substring of #mShortMessage
+     * @param rExpected  some expected substring of #mShortMessage
      */
-    std::string CheckShortMessageContains(std::string expected) const;
+    std::string CheckShortMessageContains(const std::string& rExpected) const;
 
     /**
      * Level 4 error (Termination).  Execution cannot continue from this point and hence
