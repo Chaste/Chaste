@@ -33,12 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <filesystem>
 
 #include "GetCurrentWorkingDirectory.hpp"
 #include "Exception.hpp"
 
-namespace fs = std::filesystem;
 
 std::string GetCurrentWorkingDirectory()
 {
