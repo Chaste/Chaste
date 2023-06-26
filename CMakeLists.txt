@@ -288,6 +288,11 @@ endif()
 # Install chaste_codegen in virtual environment
 message (STATUS "Installing chaste_codegen")
 execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${codegen_python3_venv}/chaste_codegen --version
+        OUTPUT_VARIABLE Chaste_CODEGEN_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+message("Codegen version: ${Chaste_CODEGEN_VERSION}")
+
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
