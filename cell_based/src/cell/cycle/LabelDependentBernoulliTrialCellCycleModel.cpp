@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "LabelDependentBernoulliTrialCellCycleModel.hpp"
-#include "RandomNumberGenerator.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 
