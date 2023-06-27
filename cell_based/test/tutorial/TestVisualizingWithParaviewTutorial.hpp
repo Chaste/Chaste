@@ -351,8 +351,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* We also make a pointer to target area modifier and add it to the simulator.
-         * The target area modifier assigns target areas to cells throughout the simulation.
+        /* We also make a pointer to a target area modifier and add it to the simulator.
+         * The target area modifier assigns target areas to cells throughout the simulation, modelling cell growth.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
