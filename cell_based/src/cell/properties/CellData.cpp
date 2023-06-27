@@ -77,6 +77,22 @@ std::vector<std::string> CellData::GetKeys() const
     return keys;
 }
 
+bool CellData::HasItem(const std::string& rVariableName) const
+{
+    /*
+     * Note that mCellData[rVariableName] is not const. If rVariableName is not
+     * a key, then mCellData[rVariableName] will create a new item in the map
+     * and increase the size by one.  Using a const_iterator ensures that the
+     * map remains const.
+     */
+    std::map<std::string, double>::const_iterator it = mCellData.find(rVariableName);
+    if (it == mCellData.end())
+    {
+        return false;
+    }
+    return true;
+}
+
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer
 CHASTE_CLASS_EXPORT(CellData)
