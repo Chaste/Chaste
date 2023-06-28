@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: chaste/runner:jammy.portability-01
+      image: chaste/runner:oldest-boost
       env:
         RUNNER_OFF: 1
       volumes:
