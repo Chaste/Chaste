@@ -2,9 +2,6 @@ name: Regenerate archive
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - regenerate-archive
 
 jobs:
   build-and-test:
