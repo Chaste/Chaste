@@ -27,6 +27,10 @@ reader/TestGmshMeshReader.hpp
 reader/TestMemfemMeshReader.hpp
 reader/TestTrianglesMeshReader.hpp
 reader/TestVtkMeshReader.hpp
+sem/TestSemElement.hpp
+sem/TestSemMesh.hpp
+sem/TestSemMeshReader.hpp
+sem/TestSemMeshWriter.hpp
 utilities/TestDistributedBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 utilities/TestObsoleteBoxCollection.hpp
