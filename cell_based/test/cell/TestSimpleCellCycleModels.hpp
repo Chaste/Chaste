@@ -1476,6 +1476,9 @@ public:
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BernoulliTrialCellCycleModel.arch";
 
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+
         {
             // We must set up SimulationTime to avoid memory leaks
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -1495,6 +1498,9 @@ public:
 
             delete p_model;
             SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -1515,6 +1521,8 @@ public:
             TS_ASSERT_DELTA(static_cast<BernoulliTrialCellCycleModel*>(p_model2)->GetDivisionProbability(), 0.5, 1e-9);
             TS_ASSERT_DELTA(static_cast<BernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.1, 1e-9);
 
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+
             // Avoid memory leaks
             delete p_model2;
         }
@@ -1524,6 +1532,9 @@ public:
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BiasedBernoulliTrialCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
 
         {
             // We must set up SimulationTime to avoid memory leaks
@@ -1544,6 +1555,9 @@ public:
 
             delete p_model;
             SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -1564,6 +1578,8 @@ public:
             TS_ASSERT_DELTA(static_cast<BiasedBernoulliTrialCellCycleModel*>(p_model2)->GetMaxDivisionProbability(), 0.4, 1e-9);
             TS_ASSERT_DELTA(static_cast<BiasedBernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.7, 1e-9);
 
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+
             // Avoid memory leaks
             delete p_model2;
         }
@@ -1573,6 +1589,9 @@ public:
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "LabelDependentBernoulliTrialCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
 
         {
             // We must set up SimulationTime to avoid memory leaks
@@ -1594,6 +1613,9 @@ public:
 
             delete p_model;
             SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -1614,6 +1636,8 @@ public:
             TS_ASSERT_DELTA(static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model2)->GetDivisionProbability(), 0.4, 1e-9);
             TS_ASSERT_DELTA(static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model2)->GetLabelledDivisionProbability(), 0.5, 1e-9);
             TS_ASSERT_DELTA(static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.7, 1e-9);
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Avoid memory leaks
             delete p_model2;

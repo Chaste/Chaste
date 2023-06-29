@@ -168,12 +168,12 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
         std::stringstream  tmp_directory;
         if (getenv("USER")!=NULL)
         {
-            tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/";
+            tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/"; // LCOV_EXCL_LINE
         }
         else
         {
             // No $USER in environment (which may be the case in Docker)
-            tmp_directory << "/tmp/chaste/testoutput/"; // LCOV_EXCL_LINE
+            tmp_directory << "/tmp/chaste/testoutput/";
         }
         directory_root.SetPath(tmp_directory.str(), RelativeTo::AbsoluteOrCwd);
         /* // Former behaviour: default to 'testoutput' folder within the current directory

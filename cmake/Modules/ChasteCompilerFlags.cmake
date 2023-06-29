@@ -6,9 +6,6 @@ if (Chaste_ERROR_ON_WARNING)
     set(default_flags "${default_flags} -Werror")
 endif()
 
-# Set the C++ Standard
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
 set(default_exe_linker_flags "")
 if (UNIX)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -48,7 +45,7 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Cray")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     message(STATUS "\t...for GNU compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-attributes -Wno-unused-parameter -Wvla")
     if (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=2")  # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
     endif (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
@@ -62,7 +59,15 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} ST
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
     if (${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rno-debug-disables-optimization -Wno-unused-but-set-variable")
-    endif()
+        option(Chaste_USE_INTEL_PRECISE_FP_MODEL "Use Intel -fp-model precise" ON)
+        if (Chaste_USE_INTEL_PRECISE_FP_MODEL)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fp-model precise")
+            message(STATUS
+                    "Using Intel floating point model \"precise\". "
+                    "To use the default fast floating point model, set -DChaste_USE_INTEL_PRECISE_FP_MODEL=OFF. "
+                    "Note that this may reduce the precision of calculations and change other behaviour.")
+        endif ()
+    endif ()
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     message(STATUS "\t... for Intel compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")

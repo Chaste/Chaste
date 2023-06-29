@@ -12,6 +12,8 @@ TestException.hpp
 TestExecutableSupport.hpp
 TestFileFinder.hpp
 TestFileComparison.hpp
+TestFloatingPointDivisionByZero.hpp
+TestFloatingPointDivisionByZeroPetsc.hpp
 TestGenericEventHandler.hpp
 TestHeartEventHandler.hpp
 TestHelloWorld.hpp
