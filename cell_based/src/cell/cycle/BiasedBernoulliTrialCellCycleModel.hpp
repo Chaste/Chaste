@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BIASEDBERNOULLITRIALCELLCYCLEMODEL_HPP_
 
 #include "AbstractCellCycleModel.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
  * Simple cell-cycle model where mature non-differentiated cells have a probability of
@@ -63,6 +64,11 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+
+        // Make sure the RandomNumberGenerator singleton gets saved too
+        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & p_wrapper;
+
         archive & mMaxDivisionProbability;
         archive & mMinimumDivisionAge;
     }

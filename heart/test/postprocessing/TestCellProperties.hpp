@@ -97,7 +97,7 @@ public:
 
             //Should throw exceptions because the cached vector of onset times (mOnsets) is empty
             TS_ASSERT_THROWS_THIS(cell_properties.GetLastActionPotentialDuration(90), "AP did not occur, never exceeded threshold voltage.");
-            TS_ASSERT_THROWS_THIS(cell_properties.GetAllActionPotentialDurations(90)[0], "AP did not occur, never exceeded threshold voltage.");
+            TS_ASSERT_THROWS_THIS(cell_properties.GetAllActionPotentialDurations(90), "AP did not occur, never exceeded threshold voltage.");
 
             //Should throw exceptions because upstroke was never crossed
             TS_ASSERT_THROWS_THIS(cell_properties.GetTimeAtLastMaxUpstrokeVelocity(), "AP did not occur, never descended past threshold voltage.");

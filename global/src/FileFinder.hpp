@@ -37,8 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEFINDER_HPP_
 
 #include <string>
-
-#include "BoostFilesystem.hpp"
+#include <vector>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 /**
  * Structure encapsulating the enumeration of path 'types', i.e. what a path
@@ -98,7 +99,7 @@ public:
     FileFinder(const std::string& rLeafName, const FileFinder& rParentOrSibling);
 
     /**
-     * Conversion constructor from a Boost Filesystem path object.
+     * Conversion constructor from a std::filesystem path object.
      * Note that since fs::path has a conversion constructor from std::string,
      * this allows us to be initialised with a string or character constant, too.
      * The path will be interpreted as relative to the current working directory,

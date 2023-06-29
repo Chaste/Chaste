@@ -35,10 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ElectrodesStimulusFactory.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include "IsNan.hpp"
 #include "HeartConfig.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "RegularStimulus.hpp"
+
+#include <cmath>
 
 template<unsigned DIM>
 ElectrodesStimulusFactory<DIM>::ElectrodesStimulusFactory(std::vector<std::pair<AbstractChasteRegion<DIM>*, AbstractChasteRegion<DIM>*> >& rElectrodePairs,

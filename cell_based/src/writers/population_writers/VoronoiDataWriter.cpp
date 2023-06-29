@@ -47,34 +47,41 @@ VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter()
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    [[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
-    assert(SPACE_DIM==2 || SPACE_DIM==3); // LCOV_EXCL_LINE
-    VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
-
-    // Loop over elements of voronoi_tesselation
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
-         elem_iter != voronoi_tesselation->GetElementIteratorEnd();
-         ++elem_iter)
+    if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
-        // Get index of this element in voronoi_tesselation
-        unsigned elem_index = elem_iter->GetIndex();
+        VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
 
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = voronoi_tesselation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-        // Write node index and location to file
-        *this->mpOutStream << node_index << " ";
-        c_vector<double, SPACE_DIM> node_location = pCellPopulation->GetNode(node_index)->rGetLocation();
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        // Loop over elements of voronoi_tesselation
+        for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
+            elem_iter != voronoi_tesselation->GetElementIteratorEnd();
+            ++elem_iter)
         {
-            *this->mpOutStream << node_location[i] << " ";
-        }
+            // Get index of this element in voronoi_tesselation
+            unsigned elem_index = elem_iter->GetIndex();
 
-        double cell_volume = voronoi_tesselation->GetVolumeOfElement(elem_index);
-        double cell_surface_area = voronoi_tesselation->GetSurfaceAreaOfElement(elem_index);
-        *this->mpOutStream << cell_volume << " " << cell_surface_area << " ";
+            // Get the index of the corresponding node in mrMesh
+            unsigned node_index = voronoi_tesselation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+
+            // Write node index and location to file
+            *this->mpOutStream << node_index << " ";
+            c_vector<double, SPACE_DIM> node_location = pCellPopulation->GetNode(node_index)->rGetLocation();
+            for (unsigned i=0; i<SPACE_DIM; i++)
+            {
+                *this->mpOutStream << node_location[i] << " ";
+            }
+
+            double cell_volume = voronoi_tesselation->GetVolumeOfElement(elem_index);
+            double cell_surface_area = voronoi_tesselation->GetSurfaceAreaOfElement(elem_index);
+            *this->mpOutStream << cell_volume << " " << cell_surface_area << " ";
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
