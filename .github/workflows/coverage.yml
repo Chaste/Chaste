@@ -1,6 +1,7 @@
 name: Coverage
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - '**'
@@ -12,57 +13,87 @@ jobs:
   
   build-and-test:
 
-    runs-on: ubuntu-22.04
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
+    runs-on: ubuntu-22.04
+    container:
+      image: chaste/runner:jammy
+      env:
+        RUNNER_OFF: 1
+      volumes:
+        - runner_volume:/home/runner
+      options: --user 0 --cpus 2
+      
     env:
-      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CC: gcc
       CXX: g++
-
+      
+    defaults:
+      run:
+        shell: bash
+      
     steps:
-    - name: checkout repository
-      uses: actions/checkout@v3
+      - name: checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: compiler version
+        run: |
+          ${CXX} --version
+          
+      - name: make build and test directories
+        run: |
+          mkdir -p chaste-build-dir
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
 
-    - name: install dependencies
-      run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
-        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
-        sudo apt update
-        sudo apt install chaste-dependencies
-        sudo apt install lcov
+      - name: create initialisation script
+        run: |
+          echo "source /etc/profile.d/modules.sh" > init.sh
+          echo "module purge" >> init.sh
+          echo "module use /home/runner/modules/modulefiles" >> init.sh
+          echo "module load petsc_hdf5" >> init.sh
+        working-directory: chaste-build-dir
 
-    - name: compiler version
-      run: |
-        ${CXX} --version
+      - name: set runner user privileges
+        run: |
+          chown -R runner:runner .
+          
+      - name: cmake configure
+        run: |
+          source init.sh
+          su -m runner -c "cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 .."
+        working-directory: chaste-build-dir
 
-    - name: make build and test directories
-      run: |
-        mkdir -p chaste-build-dir
-        mkdir -p ${CHASTE_TEST_OUTPUT}
+      - name: build test suites
+        run: |
+          source init.sh
+          su -m runner -c "cmake --build . --target Continuous Parallel --parallel 2"
+        working-directory: chaste-build-dir
 
-    - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 ..
-      working-directory: chaste-build-dir
+      - name: run test suites
+        run: |
+          source init.sh
+          su -m runner -c "ctest -j2 -L Continuous --output-on-failure"
+          su -m runner -c "ctest -L Parallel  --output-on-failure"
+        working-directory: chaste-build-dir
 
-    - name: build test suites
-      run: cmake --build . --target Continuous Parallel --parallel 2
-      working-directory: chaste-build-dir
+      - name: run coverage
+        run: |
+          su -m runner -c "lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info"
+          su -m runner -c "lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info"
+        working-directory: chaste-build-dir
 
-    - name: run test suites
-      run: |
-        ctest -j2 -L Continuous --output-on-failure
-        ctest -L Parallel  --output-on-failure
-      working-directory: chaste-build-dir
+      - name: upload to codecov
+        run: |
+          su -m runner -c "curl -Os https://uploader.codecov.io/latest/linux/codecov"
+          su -m runner -c "chmod +x codecov"
+          su -m runner -c "./codecov"
+        working-directory: chaste-build-dir
 
-    - name: run coverage
-      run: |
-        lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
-        lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
-      working-directory: chaste-build-dir
-
-    - name: upload to codecov
-      run: |
-        curl -Os https://uploader.codecov.io/latest/linux/codecov
-        chmod +x codecov
-        ./codecov
-      working-directory: chaste-build-dir
+      - name: upload as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-info
+          path: chaste-build-dir/coverage.info

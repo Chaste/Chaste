@@ -48,46 +48,52 @@ CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter()
 {
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    [[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
-    assert(SPACE_DIM==2 || SPACE_DIM==3); // LCOV_EXCL_LINE
-
-    VertexMesh<ELEMENT_DIM, SPACE_DIM>* voronoi_tessellation = pCellPopulation->GetVoronoiTessellation();
-
-    assert (voronoi_tessellation != nullptr);
-
-    // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
-    double total_area = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetVolume();
-    double apoptotic_area = 0.0;
-
-    // Loop over elements of mpVoronoiTessellation
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tessellation->GetElementIteratorBegin();
-         elem_iter != voronoi_tessellation->GetElementIteratorEnd();
-         ++elem_iter)
+    if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
-        // Get index of this element in mpVoronoiTessellation
-        unsigned elem_index = elem_iter->GetIndex();
+        VertexMesh<ELEMENT_DIM, SPACE_DIM>* voronoi_tessellation = pCellPopulation->GetVoronoiTessellation();
 
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = voronoi_tessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+        assert(voronoi_tessellation != nullptr);
 
-        // Discount ghost nodes
-        if (!pCellPopulation->IsGhostNode(node_index))
+        // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
+        double total_area = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetVolume();
+        double apoptotic_area = 0.0;
+
+        // Loop over elements of mpVoronoiTessellation
+        for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tessellation->GetElementIteratorBegin();
+            elem_iter != voronoi_tessellation->GetElementIteratorEnd();
+            ++elem_iter)
         {
-            // Get the cell corresponding to this node
-            CellPtr p_cell =  pCellPopulation->GetCellUsingLocationIndex(node_index);
+            // Get index of this element in mpVoronoiTessellation
+            unsigned elem_index = elem_iter->GetIndex();
 
-            // Only bother calculating the area/volume of apoptotic cells
-            bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
-            if (cell_is_apoptotic)
+            // Get the index of the corresponding node in mrMesh
+            unsigned node_index = voronoi_tessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+
+            // Discount ghost nodes
+            if (!pCellPopulation->IsGhostNode(node_index))
             {
-                double cell_volume = voronoi_tessellation->GetVolumeOfElement(elem_index);
-                apoptotic_area += cell_volume;
+                // Get the cell corresponding to this node
+                CellPtr p_cell =  pCellPopulation->GetCellUsingLocationIndex(node_index);
+
+                // Only bother calculating the area/volume of apoptotic cells
+                bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
+                if (cell_is_apoptotic)
+                {
+                    double cell_volume = voronoi_tessellation->GetVolumeOfElement(elem_index);
+                    apoptotic_area += cell_volume;
+                }
             }
         }
+        *this->mpOutStream << total_area << " " << apoptotic_area;
     }
-    *this->mpOutStream << total_area << " " << apoptotic_area;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

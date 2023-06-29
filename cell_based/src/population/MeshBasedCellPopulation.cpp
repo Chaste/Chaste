@@ -108,10 +108,17 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(
+    [[maybe_unused]] bool useAreaBasedDampingConstant) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-    mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
+    if constexpr (SPACE_DIM == 2)
+    {
+        mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -146,28 +153,33 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * where d0, d1 are parameters, A is the cell's area, and old_damping_const
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
-        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+        if constexpr (SPACE_DIM == 2)
+        {
+            double rest_length = 1.0;
+            double d0 = mAreaBasedDampingConstantParameter;
 
-        double rest_length = 1.0;
-        double d0 = mAreaBasedDampingConstantParameter;
+            /**
+             * Compute the parameter d1 such that d0+A*d1=1, where A is the equilibrium area
+             * of a cell (this is equal to sqrt(3.0)/4, which is a third of the area of a regular
+             * hexagon of edge length 1)
+             */
+            double d1 = 2.0*(1.0 - d0)/(sqrt(3.0)*rest_length*rest_length);
 
-        /**
-         * Compute the parameter d1 such that d0+A*d1=1, where A is the equilibrium area
-         * of a cell (this is equal to sqrt(3.0)/4, which is a third of the area of a regular
-         * hexagon of edge length 1)
-         */
-        double d1 = 2.0*(1.0 - d0)/(sqrt(3.0)*rest_length*rest_length);
+            double area_cell = GetVolumeOfVoronoiElement(nodeIndex);
 
-        double area_cell = GetVolumeOfVoronoiElement(nodeIndex);
+            /**
+             * The cell area should not be too large - the next assertion is to avoid
+             * getting an infinite cell area, which may occur if area-based viscosity
+             * is chosen in the absence of ghost nodes.
+             */
+            assert(area_cell < 1000);
 
-        /**
-         * The cell area should not be too large - the next assertion is to avoid
-         * getting an infinite cell area, which may occur if area-based viscosity
-         * is chosen in the absence of ghost nodes.
-         */
-        assert(area_cell < 1000);
-
-        damping_multiplier = d0 + area_cell*d1;
+            damping_multiplier = d0 + area_cell*d1;
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
     }
 
     return damping_multiplier;
@@ -443,68 +455,73 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double springDivisionThreshold)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings([[maybe_unused]] double springDivisionThreshold) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     // Only implemented for 2D elements
-    assert(ELEMENT_DIM == 2); // LCOV_EXCL_LINE
-
-    std::vector<c_vector<unsigned, 5> > new_nodes;
-    new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
-
-    // Add new cells onto new nodes
-    for (unsigned index=0; index<new_nodes.size(); index++)
+    if constexpr (ELEMENT_DIM == 2)
     {
-        // Copy the cell attached to one of the neighbouring nodes onto the new node
-        unsigned new_node_index = new_nodes[index][0];
-        unsigned node_a_index = new_nodes[index][1];
-        unsigned node_b_index = new_nodes[index][2];
+        std::vector<c_vector<unsigned, 5> > new_nodes;
+        new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 
-         CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
-
-        // Create copy of cell property collection to modify for daughter cell
-        CellPropertyCollection daughter_property_collection = p_neighbour_cell->rGetCellPropertyCollection();
-
-        // Remove the CellId from the daughter cell a new one will be assigned in the constructor
-        daughter_property_collection.RemoveProperty<CellId>();
-
-        CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
-                                    p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
-                                    p_neighbour_cell->GetSrnModel()->CreateSrnModel(),
-                                    false,
-                                    daughter_property_collection));
-
-        // Add new cell to cell population
-        this->mCells.push_back(p_new_cell);
-        this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
-
-        // Update rest lengths
-
-        // Remove old node pair // note node_a_index < node_b_index
-        std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(node_a_index, node_b_index);
-        double old_rest_length  = mSpringRestLengths[node_pair];
-
-        std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
-        mSpringRestLengths.erase(iter);
-
-        // Add new pairs
-        node_pair = this->CreateOrderedPair(node_a_index, new_node_index);
-        mSpringRestLengths[node_pair] = 0.5*old_rest_length;
-
-        node_pair = this->CreateOrderedPair(node_b_index, new_node_index);
-        mSpringRestLengths[node_pair] = 0.5*old_rest_length;
-
-        // If necessary add other new spring rest lengths
-        for (unsigned pair_index=3; pair_index<5; pair_index++)
+        // Add new cells onto new nodes
+        for (unsigned index=0; index<new_nodes.size(); index++)
         {
-            unsigned other_node_index = new_nodes[index][pair_index];
+            // Copy the cell attached to one of the neighbouring nodes onto the new node
+            unsigned new_node_index = new_nodes[index][0];
+            unsigned node_a_index = new_nodes[index][1];
+            unsigned node_b_index = new_nodes[index][2];
 
-            if (other_node_index != UNSIGNED_UNSET)
+            CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
+
+            // Create copy of cell property collection to modify for daughter cell
+            CellPropertyCollection daughter_property_collection = p_neighbour_cell->rGetCellPropertyCollection();
+
+            // Remove the CellId from the daughter cell a new one will be assigned in the constructor
+            daughter_property_collection.RemoveProperty<CellId>();
+
+            CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
+                                        p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
+                                        p_neighbour_cell->GetSrnModel()->CreateSrnModel(),
+                                        false,
+                                        daughter_property_collection));
+
+            // Add new cell to cell population
+            this->mCells.push_back(p_new_cell);
+            this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
+
+            // Update rest lengths
+
+            // Remove old node pair // note node_a_index < node_b_index
+            std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(node_a_index, node_b_index);
+            double old_rest_length  = mSpringRestLengths[node_pair];
+
+            std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
+            mSpringRestLengths.erase(iter);
+
+            // Add new pairs
+            node_pair = this->CreateOrderedPair(node_a_index, new_node_index);
+            mSpringRestLengths[node_pair] = 0.5*old_rest_length;
+
+            node_pair = this->CreateOrderedPair(node_b_index, new_node_index);
+            mSpringRestLengths[node_pair] = 0.5*old_rest_length;
+
+            // If necessary add other new spring rest lengths
+            for (unsigned pair_index=3; pair_index<5; pair_index++)
             {
-                node_pair = this->CreateOrderedPair(other_node_index, new_node_index);
-                double new_rest_length = rGetMesh().GetDistanceBetweenNodes(new_node_index, other_node_index);
-                mSpringRestLengths[node_pair] = new_rest_length;
+                unsigned other_node_index = new_nodes[index][pair_index];
+
+                if (other_node_index != UNSIGNED_UNSET)
+                {
+                    node_pair = this->CreateOrderedPair(other_node_index, new_node_index);
+                    double new_rest_length = rGetMesh().GetDistanceBetweenNodes(new_node_index, other_node_index);
+                    mSpringRestLengths[node_pair] = new_rest_length;
+                }
             }
         }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 

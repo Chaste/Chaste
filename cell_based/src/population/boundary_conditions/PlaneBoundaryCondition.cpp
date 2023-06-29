@@ -74,28 +74,29 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetUseJiggledNodesOnPlane()
     return mUseJiggledNodesOnPlane;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
+    [[maybe_unused]] const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
-    ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
+    if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
-        EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-    }
+        ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
+        if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
+        {
+            EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+        }
 
-    assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
-            || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
+        assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
+                || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
 
-    // This is a magic number
-    double max_jiggle = 1e-4;
+        // This is a magic number
+        double max_jiggle = 1e-4;
 
-    if (SPACE_DIM != 1)
-    {
         if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
         {
             for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
-                 cell_iter != this->mpCellPopulation->End();
-                 ++cell_iter)
+                cell_iter != this->mpCellPopulation->End();
+                ++cell_iter)
             {
                 unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
@@ -151,9 +152,7 @@ void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(cons
     }
     else
     {
-        // DIM == 1
         NEVER_REACHED;
-        //PlaneBoundaryCondition::ImposeBoundaryCondition is not implemented in 1D
     }
 }
 

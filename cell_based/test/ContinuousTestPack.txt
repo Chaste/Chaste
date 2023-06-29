@@ -13,6 +13,7 @@ cell/TestOdeBasedCellCycleModels.hpp
 cell/TestOdeBasedSrnModels.hpp
 cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
+cell/TestEdgeInteriorSrn.hpp
 cell_based_pde/TestCellBasedEllipticPdes.hpp
 cell_based_pde/TestCellBasedEllipticPdeSolver.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp
@@ -61,8 +62,15 @@ population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
+population/TestMutableVertexMeshOperationsWithPopulationSrn.hpp
+simulation/TestConstantTargetAreaModifier.hpp
 simulation/TestDeltaNotchModifier.hpp
+simulation/TestExtrinsicPullModifier.hpp
 simulation/TestNumericalMethods.hpp
+simulation/Test2dVertexBasedSimulationWithSrnModels.hpp
+simulation/TestDivisionBiasTrackingModifier.hpp
+simulation/Test2dVertexBasedSimulationWithSrnModels.hpp
+simulation/TestDivisionBiasTrackingModifier.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithBuskeForces.hpp
@@ -95,3 +103,4 @@ tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
 tutorial/TestRunningTumourSpheroidSimulationsTutorial.hpp
 tutorial/TestRunningVertexBasedSimulationsTutorial.hpp
 tutorial/TestVisualizingWithParaviewTutorial.hpp
+
