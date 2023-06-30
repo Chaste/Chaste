@@ -80,6 +80,7 @@ private:
         archive & mNagaiHondaMembraneSurfaceEnergyParameter;
         archive & mNagaiHondaCellCellAdhesionEnergyParameter;
         archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
+        archive & mNagaiHondaTargetAreaParameter;
     }
 
 protected:
@@ -107,6 +108,14 @@ protected:
      */
     double mNagaiHondaCellBoundaryAdhesionEnergyParameter;
 
+    /**
+     * Target area parameter. Has units of (cell size at equilibrium rest length)^2.
+     * 
+     * Note: If a subclass of AbstractTargetAreaModifier is present in the 
+     * cell-based simulation, then we use the CellData item "target area" stored 
+     * in each Cell in the force calculation instead of this parameter value.
+     */
+    double mNagaiHondaTargetAreaParameter;
 
 public:
 
@@ -162,6 +171,11 @@ public:
     double GetNagaiHondaCellBoundaryAdhesionEnergyParameter();
 
     /**
+     * @return mNagaiHondaTargetAreaParameter
+     */
+    double GetNagaiHondaTargetAreaParameter();
+
+    /**
      * Set mNagaiHondaDeformationEnergyParameter.
      *
      * @param nagaiHondaDeformationEnergyParameter the new value of mNagaiHondaDeformationEnergyParameter
@@ -189,6 +203,13 @@ public:
      * @param nagaiHondaCellBoundaryAdhesionEnergyParameter the new value of mNagaiHondaCellBoundaryAdhesionEnergyParameter
      */
     void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double nagaiHondaCellBoundaryAdhesionEnergyParameter);
+
+    /**
+     * Set mNagaiHondaTargetAreaParameter.
+     *
+     * @param nagaiHondaTargetAreaParameter the new value of mNagaiHondaTargetAreaParameter
+     */
+    void SetNagaiHondaTargetAreaParameter(double nagaiHondaTargetAreaParameter);
 
     /**
      * Overridden OutputForceParameters() method.
