@@ -173,7 +173,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     {   
                         double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
                         if (distance < node_clearance)
-                        {
+                        {   
                             node_clear = false;
                             //break;
                         }
@@ -248,18 +248,17 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                         new_node_index++;
                     }
                 }
-            }   
+            }
         }
-
 
         // Loop over all nodes and check they're not outside [0,mWidth]
         for (unsigned i=0; i<nodes.size(); i++)
         {
             CheckNodeLocation(nodes[i]);
         }
-            
+
         Cylindrical2dMesh extended_mesh(mpDelaunayMesh->GetWidth(0),nodes);
-        
+
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
         unsigned num_nodes = extended_mesh.GetNumAllElements();
 
@@ -276,7 +275,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
         // Populate mNodes
         GenerateVerticesFromElementCircumcentres(extended_mesh);
-        
+
         // Loop over all nodes and check the x locations not outside [0,mWidth]
         for (unsigned i=0; i<mNodes.size(); i++)
         {
