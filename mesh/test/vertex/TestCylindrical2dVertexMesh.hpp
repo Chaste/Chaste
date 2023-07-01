@@ -561,7 +561,7 @@ public:
         }
     }
 
-        void TestBoundedTessellationConstructorWithRepeatedImageNode()
+    void TestBoundedTessellationConstructorWithRepeatedImageNode()
     {
         // Create a simple Cylindrical2dMesh, the Delaunay triangulation
         unsigned cells_across = 3;
