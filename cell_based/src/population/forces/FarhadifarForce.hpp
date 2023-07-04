@@ -74,6 +74,7 @@ private:
         archive & mPerimeterContractilityParameter;
         archive & mLineTensionParameter;
         archive & mBoundaryLineTensionParameter;
+        archive & mTargetAreaParameter;
     }
 
 protected:
@@ -94,10 +95,18 @@ protected:
     double mLineTensionParameter;
 
     /**
-     * The strength of the line tension at the boundary. This term does correspond to Lambda_{i,j} in Farhadifar's paper.
+     * The strength of the line tension at the boundary. This term corresponds to Lambda_{i,j} in Farhadifar's paper.
      */
     double mBoundaryLineTensionParameter;
 
+    /**
+     * The target area. This term corresponds to A_0 in Farhadifar's paper.
+     * 
+     * Note: If a subclass of AbstractTargetAreaModifier is present in the 
+     * cell-based simulation, then we use the CellData item "target area" stored 
+     * in each Cell in the force calculation instead of this parameter value.
+     */
+    double mTargetAreaParameter;
 
 public:
 
@@ -153,6 +162,11 @@ public:
     double GetBoundaryLineTensionParameter();
 
     /**
+     * @return mTargetAreaParameter
+     */
+    double GetTargetAreaParameter();
+
+    /**
      * Set mAreaElasticityParameter.
      *
      * @param areaElasticityParameter the new value of mAreaElasticityParameter
@@ -179,6 +193,13 @@ public:
      * @param boundaryLineTensionParameter the new value of mBoundaryLineTensionParameter
      */
     void SetBoundaryLineTensionParameter(double boundaryLineTensionParameter);
+
+    /**
+     * Set mTargetAreaParameter.
+     *
+     * @param targetAreaParameter the new value of mTargetAreaParameter
+     */
+    void SetTargetAreaParameter(double targetAreaParameter);
 
     /**
      * Overridden OutputForceParameters() method.

@@ -73,7 +73,7 @@ double PottsElement<DIM>::GetAspectRatio()
     double eig_min;
 
     // See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
-    switch(DIM)
+    switch (DIM)
     {
     case 2:
     {

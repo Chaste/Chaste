@@ -1,543 +1,150 @@
-# To create a suppression run something like:
-# valgrind --tool=memcheck --track-fds=yes --leak-check=yes --num-callers=50 --suppressions=chaste.supp --gen-suppressions=yes io/build/debug/TestSpiralParametersReaderRunner
+#  To run a regular memory test
+# 1. Configure a cmake
+# $  cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
+# (or similar)
+# 2. Run all tests through Valgrind
+# $  cmake --build . --target memtest
+# (which effectively uses cmake --build . --target memtest --parallel 6 because of the CPUS etting)
+# This takes about 2 hours.  All tests should pass, but a memory report will be given at the end
 
-#################################################
-# Note if memory leaks depend on the context (e.g. 
-# CHASTE_TEST_OUTPUT it may be advisable for Scons
-# to produce suppressions automatically:
-#       python/BuildTypes.py
-#       -    #_valgrind_flags +=" --gen-suppressions=all"
-#       +    _valgrind_flags +=" --gen-suppressions=all"
-#################################################
-
-
-#
-# Suppression a memory checking error caused by Boost's serialization library
-#
-{
-   boost-archive-reset-object-address-cond
-   Memcheck:Cond
-   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
-   fun:_ZN5boost13serialization3stl17archive_input_seqINS_7archive13text_iarchiveESt6vectorIdSaIdEEEclERS4_RS7_
-   fun:_ZN5boost13serialization3stl18rebuild_collectionINS_7archive13text_iarchiveESt6vectorIdSaIdEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization3stl15load_collectionINS_7archive13text_iarchiveESt6vectorIdSaIdEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization4loadINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization11free_loaderINS_7archive13text_iarchiveESt6vectorIdSaIdEEE6invokeERS3_RS6_j
-   fun:_ZN5boost13serialization10split_freeINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZN5boost13serialization9serializeINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization13serialize_adlINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZNK5boost7archive6detail11iserializerINS0_13text_iarchiveESt6vectorIdSaIdEEE16load_object_dataERNS1_14basic_iarchiveEPvj
-   fun:_ZN5boost7archive6detail14basic_iarchive11load_objectEPvRKNS1_17basic_iserializerE
-   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIdSaIdEEE13load_standard6invokeERS3_RS6_
-}
-{
-   boost-archive-reset-object-address-cond-v34-ints
-   Memcheck:Cond
-   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
-   fun:_ZN5boost13serialization3stl17archive_input_seqINS_7archive13text_iarchiveESt6vectorIiSaIiEEEclERS4_RS7_j
-   fun:_ZN5boost13serialization3stl15load_collectionINS_7archive13text_iarchiveESt6vectorIiSaIiEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization4loadINS_7archive13text_iarchiveEiSaIiEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization11free_loaderINS_7archive13text_iarchiveESt6vectorIiSaIiEEE6invokeERS3_RS6_j
-   fun:_ZN5boost13serialization10split_freeINS_7archive13text_iarchiveESt6vectorIiSaIiEEEEvRT_RT0_j
-   fun:_ZN5boost13serialization9serializeINS_7archive13text_iarchiveEiSaIiEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization13serialize_adlINS_7archive13text_iarchiveESt6vectorIiSaIiEEEEvRT_RT0_j
-   fun:_ZNK5boost7archive6detail11iserializerINS0_13text_iarchiveESt6vectorIiSaIiEEE16load_object_dataERNS1_14basic_iarchiveEPvj
-   fun:_ZN5boost7archive6detail14basic_iarchive11load_objectEPvRKNS1_17basic_iserializerE
-   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIiSaIiEEE13load_standard6invokeERS3_RS6_
-}
-
-{
-   boost-archive-reset-object-address-cond-v34-doubles
-   Memcheck:Cond
-   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
-   fun:_ZN5boost13serialization3stl17archive_input_seqINS_7archive13text_iarchiveESt6vectorIdSaIdEEEclERS4_RS7_j
-   fun:_ZN5boost13serialization3stl15load_collectionINS_7archive13text_iarchiveESt6vectorIdSaIdEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization4loadINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization11free_loaderINS_7archive13text_iarchiveESt6vectorIdSaIdEEE6invokeERS3_RS6_j
-   fun:_ZN5boost13serialization10split_freeINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZN5boost13serialization9serializeINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization13serialize_adlINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZNK5boost7archive6detail11iserializerINS0_13text_iarchiveESt6vectorIdSaIdEEE16load_object_dataERNS1_14basic_iarchiveEPvj
-   fun:_ZN5boost7archive6detail14basic_iarchive11load_objectEPvRKNS1_17basic_iserializerE
-   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIdSaIdEEE13load_standard6invokeERS3_RS6_
-}
-
-{
-   boost-archive-reset-object-address-value
-   Memcheck:Value4
-   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
-   fun:_ZN5boost13serialization3stl17archive_input_seqINS_7archive13text_iarchiveESt6vectorIdSaIdEEEclERS4_RS7_
-   fun:_ZN5boost13serialization3stl18rebuild_collectionINS_7archive13text_iarchiveESt6vectorIdSaIdEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization3stl15load_collectionINS_7archive13text_iarchiveESt6vectorIdSaIdEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization4loadINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization11free_loaderINS_7archive13text_iarchiveESt6vectorIdSaIdEEE6invokeERS3_RS6_j
-   fun:_ZN5boost13serialization10split_freeINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZN5boost13serialization9serializeINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization13serialize_adlINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZNK5boost7archive6detail11iserializerINS0_13text_iarchiveESt6vectorIdSaIdEEE16load_object_dataERNS1_14basic_iarchiveEPvj
-   fun:_ZN5boost7archive6detail14basic_iarchive11load_objectEPvRKNS1_17basic_iserializerE
-   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIdSaIdEEE13load_standard6invokeERS3_RS6_
-}
-{
-   boost-archive-reset-object-address-value-64bit
-   Memcheck:Value8
-   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
-   fun:_ZN5boost13serialization3stl17archive_input_seqINS_7archive13text_iarchiveESt6vectorIdSaIdEEEclERS4_RS7_j
-   fun:_ZN5boost13serialization3stl15load_collectionINS_7archive13text_iarchiveESt6vectorIdSaIdEENS1_17archive_input_seqIS4_S7_EENS1_11reserve_impIS7_EEEEvRT_RT0_
-   fun:_ZN5boost13serialization4loadINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization11free_loaderINS_7archive13text_iarchiveESt6vectorIdSaIdEEE6invokeERS3_RS6_j
-   fun:_ZN5boost13serialization10split_freeINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZN5boost13serialization9serializeINS_7archive13text_iarchiveEdSaIdEEEvRT_RSt6vectorIT0_T1_Ej
-   fun:_ZN5boost13serialization13serialize_adlINS_7archive13text_iarchiveESt6vectorIdSaIdEEEEvRT_RT0_j
-   fun:_ZNK5boost7archive6detail11iserializerINS0_13text_iarchiveESt6vectorIdSaIdEEE16load_object_dataERNS1_14basic_iarchiveEPvj
-   fun:_ZN5boost7archive6detail14basic_iarchive11load_objectEPvRKNS1_17basic_iserializerE
-   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIdSaIdEEE13load_standard6invokeERS3_RS6_
-}
-
-#
-# Xerces memory error
-#
-{
-   xerces-reader 
-   Memcheck:Cond
-   fun:_ZN11xercesc_2_717XMLUTF8Transcoder13transcodeFromEPKhjPtjRjPh
-   fun:_ZN11xercesc_2_79XMLReader14xcodeMoreCharsEPtPhj
-   fun:_ZN11xercesc_2_79XMLReader17refreshCharBufferEv
-}
-
-#
-# getpwuid on Debian-based systems
-#
-{
-   get-user-name
-   Memcheck:Leak
-   fun:malloc
-   obj:/lib/libc-2.6.1.so
-   fun:__nss_database_lookup
-   obj:*
-   obj:*
-   fun:getpwuid_r
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcm
-   fun:_Z26PetscErrorPrintfInitializev
-   fun:_Z15PetscInitializePiPPPcPKcS4_
- }
-#
-# getpwuid on Debian-based systems
-#
-{
-   get-user-name-2
-   Memcheck:Addr8
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   obj:/lib/libc-2.6.1.so
-   obj:/lib/ld-2.6.1.so
-   fun:__libc_dlopen_mode
-   fun:__nss_lookup_function
-   obj:/lib/libc-2.6.1.so
-   fun:getpwuid_r
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcm
-   fun:_Z26PetscErrorPrintfInitializev
-   fun:_Z15PetscInitializePiPPPcPKcS4_
-}
-
-#Another getpwuid related suppression
-{
-   get-user-name-3
-   Memcheck:Leak
-   fun:malloc
-   obj:/lib/tls/i686/cmov/libc-2.8.90.so
-   fun:__nss_database_lookup
-   obj:*
-   obj:*
-   fun:getpwuid_r
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcj
-   fun:_ZN7CxxTest20RealWorldDescription5setUpEv
-   fun:_ZN7CxxTest10TestRunner8runWorldEv
-   fun:_ZN7CxxTest10TestRunner11runAllTestsERNS_12TestListenerE
-   fun:_ZN7CxxTest14ErrorFormatter3runEv
-   fun:main
-}
-
-{
-   get-user-name-4
-   Memcheck:Leak
-   fun:malloc
-   fun:nss_parse_service_list
-   fun:__nss_database_lookup
-   obj:*
-   obj:*
-   fun:getpwuid_r@@GLIBC_2.2.5
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcm
-   fun:_Z26PetscErrorPrintfInitializev
-   fun:_Z15PetscInitializePiPPPcPKcS4_
-}
-
-{
-   get-user-name-5
-   Memcheck:Leak
-   fun:malloc
-   fun:nss_parse_service_list
-   fun:__nss_database_lookup
-   obj:*
-   fun:getpwuid_r@@GLIBC_2.2.5
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcm
-   fun:_Z26PetscErrorPrintfInitializev
-   fun:_Z15PetscInitializePiPPPcPKcS4_
-}
-
-# Ubuntu 8.04.2
-{
-   get-user-name-5
-   Memcheck:Leak
-   fun:malloc
-   obj:/lib/libc-2.7.so
-   fun:__nss_database_lookup
-   obj:*
-   obj:*
-   fun:getpwuid_r
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcm
-   fun:_Z26PetscErrorPrintfInitializev
-   fun:_Z15PetscInitializePiPPPcPKcS4_
-}
-{
-   get-user-name-6
-   Memcheck:Addr8
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/ld-2.7.so
-   obj:/lib/libc-2.7.so
-   obj:/lib/ld-2.7.so
-   fun:__libc_dlopen_mode
-   fun:__nss_lookup_function
-   obj:/lib/libc-2.7.so
-   fun:getpwuid_r
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePcm
-   fun:_Z26PetscErrorPrintfInitializev
-   fun:_Z15PetscInitializePiPPPcPKcS4_
-}
-
-# Matches that try to be future-proof
-{
-   get-host-by-name-generic
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libc-*.so
-   obj:/lib/ld-*.so
-   fun:__libc_dlopen_mode
-   fun:__nss_lookup_function
-   fun:__nss_next
-   fun:gethostbyname_r
-   fun:gethostbyname
-}
-{
-   get-user-name-leak-generic
-   Memcheck:Leak
-   fun:malloc
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/libc-*.so
-   fun:__nss_database_lookup
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:*
-   obj:*
-   fun:getpwuid_r*
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePc?
-}
-{
-   get-user-name-addr-generic
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libc-*.so
-   obj:/lib/ld-*.so
-   fun:__libc_dlopen_mode
-   fun:__nss_lookup_function
-   obj:/lib/libc-*.so
-   fun:getpwuid_r*
-   fun:getpwuid
-   fun:_Z16PetscGetUserNamePc?
-}
-
-# dlopen
-{
-   dlopen-addr7
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   fun:dlopen
-}
-{
-   dlopen-addr6
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   fun:dlopen
-}
-{
-   dlopen-addr5
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   fun:dlopen
-}
-{
-   dlopen-addr4
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   fun:dlopen
-}
-{
-   dlopen-addr2
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   fun:dlopen
-}
-
-{
-   dlsym-addr
-   Memcheck:Addr8
-   obj:/lib/ld-*.so
-   # can use "..." with later valgrinds (e.g. 3.5)
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libc-*.so
-   obj:/lib/libdl-*.so
-   obj:/lib/ld-*.so
-   obj:/lib/libdl-*.so
-   fun:dlsym
-}
-
-#
-# HDF5 free lists (see http://hdf.ncsa.uiuc.edu/HDF5/faq/valgrind.html )
+# To run a single test and generate missing suppressions:
+# $  mpiexec -np 1 valgrind --leak-check=full --suppressions=../chaste.supp --suppressions=../chaste-legacy.supp --gen-suppressions=all ./heart/test/Test1dMonodomainShannonCvodeBenchmarks
 #
 
-{
-   HDF5-free-lists-variant1
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:ADIOI_GEN_WriteContig
-   fun:MPIOI_File_write
-   fun:PMPI_File_write_at
-   fun:H5FD_mpio_write
-   fun:H5FD_write
-   fun:H5F_write_superblock
-   fun:H5F_flush
-   fun:H5F_try_close
-   fun:H5F_close
-   fun:H5I_dec_ref
-   fun:H5Fclose
-}
 
-{
-   HDF5-free-lists-variant2
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:ADIOI_GEN_WriteContig
-   fun:MPIOI_File_write
-   fun:PMPI_File_write_at
-   fun:H5FD_mpio_write
-   fun:H5FD_write
-   fun:H5F_block_write
-   fun:H5B_flush
-   fun:H5C_flush_single_entry
-   fun:H5C_flush_cache
-   fun:H5AC_flush
-   fun:H5F_flush
-   fun:H5F_try_close
-   fun:H5F_close
-   fun:H5I_dec_ref
-   fun:H5Fclose
-}
-
-{
-   HDF5 write on closure
-   Memcheck:Param
-   pwritev(vector[...])
-   fun:pwritev64
-   fun:pwritev
-   fun:mca_fbtl_posix_pwritev
-   fun:mca_common_ompio_file_write
-   fun:mca_common_ompio_file_write_at
-   fun:mca_io_ompio_file_write_at
-   fun:PMPI_File_write_at
-   fun:H5FD_mpio_write
-   fun:H5FD_write
-   fun:H5F__accum_write
-   fun:H5PB_write
-   fun:H5F_block_write
-   fun:H5C__flush_single_entry
-   fun:H5C__flush_candidates_in_ring
-   fun:H5C__flush_candidate_entries
-   fun:H5C_apply_candidate_list
-   fun:H5AC__rsp__dist_md_write__flush
-   fun:H5AC__run_sync_point
-   fun:H5AC__flush_entries
-   fun:H5AC_flush
-   fun:H5F__flush_phase2
-   fun:H5F__dest
-   fun:H5F_try_close
-   fun:H5F__close_cb
-   fun:H5I_dec_ref
-   fun:H5I_dec_app_ref
-   fun:H5F__close
-   fun:H5Fclose
-}
-
-{
-   MPICH problem in calls from H5FD_mpio_open
-   Memcheck:Leak
-   fun:malloc
-   fun:ADIOI_Malloc_fn
-   fun:ADIO_Open
-   fun:PMPI_File_open
-   fun:H5FD_mpio_open
-   fun:H5FD_open
-   fun:H5F_open
-   fun:H5Fcreate
-   fun:_ZN14Hdf5DataWriter13EndDefineModeEv
-}
-
-{
-   MPICH problem in calls from H5FD_mpio_open
-   Memcheck:Leak
-   fun:malloc
-   fun:ADIOI_Malloc_fn
-   fun:ADIO_Open
-   fun:PMPI_File_open
-   fun:H5FD_mpio_open
-   fun:H5FD_open
-   fun:H5F_open
-   fun:H5Fopen
-   fun:_ZN14Hdf5DataWriterC1ER24DistributedVectorFactoryRKSsS3_bb
-}
-
+# PETSc/OpenMPI
+###############
 # OpenMPI https://github.com/cpmech/test-openmpi-valgrind
 {
-   OpenMPI/start_thread
-   Memcheck:Leak
-   match-leak-kinds: definite
-   fun:malloc
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:/usr/lib/x86_64-linux-gnu/libevent-2.1.so.7.0.0
-   fun:event_base_loop
-   obj:*
-   fun:start_thread
-   fun:clone
-}
-
-{
-   OpenMPI/PetscInitialize
+   PETSc/OpenMPI "Hello world" leak
    Memcheck:Leak
    match-leak-kinds: definite
    fun:calloc
-   obj:*
-   obj:*
-   obj:*
-   fun:mca_btl_base_select
-   obj:*
-   fun:mca_bml_base_init
-   fun:ompi_mpi_init
-   fun:PMPI_Init_thread
+   ...
+   fun:orte_init
+}
+{
+   PETSc/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:_dl_catch_error
+}
+{
+   PETSc/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:ompi_mpi_finalize
+}
+{
+   PETSc/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:orte_init
+}
+# HDF5
+######
+{
+   H5F: HDF5 write 
+   Memcheck:Param
+   pwrite64(buf)
+   ...
+   fun:H5FD_write
+}
+{
+   H5F: HDF5 write on closure
+   Memcheck:Param
+   pwrite64(buf)
+   ...
+   fun:H5Fclose
+}
+{
+   PetscFinalize/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:PetscFinalize
+}
+{
+   PetscInitialize/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
    fun:PetscInitialize
 }
-
 {
-   Memory problem in Tetgen with quadratic meshes
-   Memcheck:Cond
-   fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
-   fun:_ZN6tetgen10tetgenmesh8outnodesEPNS_8tetgenioE
-   fun:_ZN6tetgen14tetrahedralizeEPNS_14tetgenbehaviorEPNS_8tetgenioES3_S3_S3_
-   fun:_ZN6tetgen14tetrahedralizeEPcPNS_8tetgenioES2_S2_S2_
-   fun:_ZN13QuadraticMeshILj3EE15ConstructCuboidEjjj
-   fun:_ZN23AbstractTetrahedralMeshILj3ELj3EE24ConstructRegularSlabMeshEdddd
+   PetscInitialize    <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   ...
+   fun:PetscInitialize
 }
-
 {
-   Memory problem in Tetgen with quadratic meshes - different entry point
+   PetscInitialize/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize    mpi_init (malloc)
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize/OpenMPI "Hello world" leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize    <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:realloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize/OpenMPI "Hello world" leak
+   Memcheck:Param
+   setsockopt(optlen)
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize/OpenMPI "Hello world" leak
+   Memcheck:Param
+   socketcall.getsockopt(optlen)
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize/OpenMPI "Hello world" leak
+   Memcheck:Param
+   socketcall.getsockopt(optlen_out)
+   ...
+   fun:PetscInitialize
+}
+# Tetgen
+########
+{
+   tetgen    Memory problem in Tetgen with quadratic meshes
    Memcheck:Cond
    fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
-   fun:_ZN6tetgen10tetgenmesh8outnodesEPNS_8tetgenioE
-   fun:_ZN6tetgen14tetrahedralizeEPNS_14tetgenbehaviorEPNS_8tetgenioES3_S3_S3_
-   fun:_ZN6tetgen14tetrahedralizeEPcPNS_8tetgenioES2_S2_S2_
-   fun:_ZN13QuadraticMeshILj3EE29ConstructFromLinearMeshReaderER18AbstractMeshReaderILj3ELj3EE
+   ...
+   fun:main
 }

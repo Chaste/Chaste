@@ -46,19 +46,23 @@ class TestMathsCustomFunctions : public CxxTest::TestSuite
 {
 public:
 
-    void TestSmallPow()
+    void TestSmallPowUnsigned()
     {
         for (unsigned i=0; i<10; i++)
         {
-            TS_ASSERT_DELTA(SmallPow(0.0, i), pow(0.0, double(i)), DBL_EPSILON);
-            //Integer version
-            TS_ASSERT_EQUALS(SmallPow(5u, i), (unsigned)floor(0.5 + pow(5.0, double(i))));
-            TS_ASSERT_DELTA(SmallPow(-1.67e3, i), pow(-1.67e3, double(i)), 1e14);//(1e3)^10/DBL_EPSILON
-            //Note the following should be within DBL_EPSILON on a 64-bit machine.  However,
-            //32-bit floating point accumulated errors push both SmallPow and pow away from integer values.
-            //There also seems to be 32-bit issue within TS_ASSERT_DELTA...
-            double difference = SmallPow(75.0, i) - pow(75.0, double(i));
-            TS_ASSERT_EQUALS(difference, 0.0);
+            TS_ASSERT_EQUALS(SmallPow(5u, i), static_cast<unsigned>(floor(0.5 + std::pow(5.0, i))));
+        }
+    }
+
+    void TestSmallPowFloatingPoint()
+    {
+        // SmallPow is specialised for exponents 0, 1, 2, 3, 4 and the falls back to std::pow, so testing
+        // up to and including an exponent of 5 is necessary to test all of our functionality
+        for (unsigned i=0; i<6; i++)
+        {
+            TS_ASSERT_DELTA(SmallPow(0.0, i), std::pow(0.0, i), 1e-12);
+            TS_ASSERT_DELTA(SmallPow(-1.67e3, i), std::pow(-1.67e3, i), 1e-12);
+            TS_ASSERT_DELTA(SmallPow(75.0, i), std::pow(75.0, i), 1e-12);
         }
     }
 

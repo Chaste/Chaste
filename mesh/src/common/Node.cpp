@@ -446,6 +446,8 @@ unsigned Node<SPACE_DIM>::GetRegion() const
     return region;
 }
 
+
+
 // Explicit instantiation
 template class Node<1>;
 template class Node<2>;

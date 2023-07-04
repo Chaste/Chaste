@@ -99,7 +99,7 @@ string(REGEX REPLACE "\\\\n$" "" licence "${licence}")
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${Chaste_SOURCE_DIR}/global/src/Version_cmake.cpp.in"
+  "${Chaste_SOURCE_DIR}/global/src/Version.cpp.in"
   ${generate_dir}/Version.cpp
   )
 

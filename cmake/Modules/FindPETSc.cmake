@@ -159,6 +159,26 @@ if(NOT DEFINED PETSC_DIR)
       set(PETSC_DIR "/usr/lib/petscdir/petsc3.13" CACHE FILEPATH "PETSc install directory")
       set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
       message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 21.04 and 21.10
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.14/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.14" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 22.04
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.15/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.15" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 22.10
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.16/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.16" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
+    # ... Ubuntu 23.04
+    elseif(IS_DIRECTORY "/usr/lib/petscdir/petsc3.18/x86_64-linux-gnu-real")
+      set(PETSC_DIR "/usr/lib/petscdir/petsc3.18" CACHE FILEPATH "PETSc install directory")
+      set(PETSC_ARCH "x86_64-linux-gnu-real" CACHE STRING "PETSc build architecture")
+      message(STATUS "Found candidate PETSc in default Ubuntu location: ${PETSC_DIR}/${PETSC_ARCH}")
     # ... Anything else with dir /usr/lib/petscdir
     elseif(IS_DIRECTORY "/usr/lib/petscdir")
       # Find a petsc dir that ends in a.b.c

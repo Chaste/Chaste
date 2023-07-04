@@ -119,7 +119,7 @@ public:
 
             // Check properties set correctly
             CellPropertyCollection& final_collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(final_collection.GetSize(), 7u);
+            TS_ASSERT_EQUALS(final_collection.GetSize(), 8u);
             TS_ASSERT_EQUALS(final_collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -139,10 +139,11 @@ public:
                 bool is_ancestor = (*it)->IsType<CellAncestor>();
                 bool is_cellid = (*it)->IsType<CellId>();
                 bool is_data = (*it)->IsType<CellData>();
+                bool is_edge_data = (*it)->IsType<CellEdgeData>();
                 bool is_vec_data = (*it)->IsType<CellVecData>();
                 bool is_stem = (*it)->IsType<StemCellProliferativeType>();
 
-                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_vec_data || is_stem;
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_edge_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
 
@@ -212,7 +213,7 @@ public:
             TS_ASSERT_EQUALS(p_srn_model->GetCell(), p_cell);
 
             CellPropertyCollection& collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(collection.GetSize(), 7u);
+            TS_ASSERT_EQUALS(collection.GetSize(), 8u);
             TS_ASSERT_EQUALS(collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -243,10 +244,11 @@ public:
                 bool is_ancestor = (*it)->IsType<CellAncestor>();
                 bool is_cellid = (*it)->IsType<CellId>();
                 bool is_data = (*it)->IsType<CellData>();
+                bool is_edge_data = (*it)->IsType<CellEdgeData>();
                 bool is_vec_data = (*it)->IsType<CellVecData>();
                 bool is_stem = (*it)->IsType<StemCellProliferativeType>();
 
-                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_vec_data || is_stem;
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_edge_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
 

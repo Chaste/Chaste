@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 #include "AbstractCellBasedTestSuite.hpp"
+#include "AlwaysDivideCellCycleModel.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApoptoticCellProperty.hpp"
@@ -69,6 +70,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformCellCycleModel.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "BiasedBernoulliTrialCellCycleModel.hpp"
+#include "LabelDependentBernoulliTrialCellCycleModel.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -102,6 +105,35 @@ public:
         {
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
+        }
+    }
+
+    void TestAlwaysDivideCellCycleModel()
+    {
+        // Test constructor
+        TS_ASSERT_THROWS_NOTHING(AlwaysDivideCellCycleModel cell_cycle_model);
+
+        // Test methods
+        AlwaysDivideCellCycleModel* p_model = new AlwaysDivideCellCycleModel;
+        TS_ASSERT_DELTA(p_model->GetAverageStemCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_DELTA(p_model->GetAverageTransitCellCycleTime(), DBL_MAX, 1e-6);
+        TS_ASSERT_EQUALS(p_model->ReadyToDivide(), true);
+
+        // Test the cell-cycle model works correctly with a cell
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+
+        CellPtr p_cell(new Cell(p_healthy_state, p_model));
+        p_cell->SetCellProliferativeType(p_stem_type);
+        p_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        for (unsigned i = 0; i < 10; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
         }
     }
 
@@ -396,6 +428,74 @@ public:
 
         TS_ASSERT_DELTA(p_transit_model2->GetAverageTransitCellCycleTime(), 2.0, 1e-9);
         TS_ASSERT_DELTA(p_transit_model2->GetAverageStemCellCycleTime(), 2.0, 1e-9);
+    }
+
+    void TestLabelDepedendentBernoulliTrialCellCycleModel()
+    {
+        TS_ASSERT_THROWS_NOTHING(LabelDependentBernoulliTrialCellCycleModel cell_model);
+
+        LabelDependentBernoulliTrialCellCycleModel* p_diff_model = new LabelDependentBernoulliTrialCellCycleModel;
+        LabelDependentBernoulliTrialCellCycleModel* p_transit_model = new LabelDependentBernoulliTrialCellCycleModel;
+
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(), 0.1, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetLabelledDivisionProbability(), 0.1, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 1.0, 1e-9);
+
+        // Change parameters for this model
+        p_transit_model->SetDivisionProbability(0.2);
+        p_transit_model->SetLabelledDivisionProbability(0.5);
+        p_transit_model->SetMinimumDivisionAge(0.1);
+        TS_ASSERT_DELTA(p_transit_model->GetDivisionProbability(), 0.2, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetLabelledDivisionProbability(), 0.5, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        MAKE_PTR(CellLabel, p_label);
+
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->AddCellProperty(p_label);
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+        p_transit_cell->InitialiseCellCycleModel();
+
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        unsigned num_steps = 100;
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
+
+        for (unsigned i = 0; i < num_steps; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+
+            // The division time below is taken from the first random number generated
+            if (i < 33)
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), true);
+            }
+            TS_ASSERT_EQUALS(p_diff_cell->ReadyToDivide(), false);
+        }
+        TS_ASSERT_DELTA(p_transit_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+        TS_ASSERT_DELTA(p_diff_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+
+        // Check that cell division correctly resets the cell cycle phase
+        CellPtr p_transit_cell2 = p_transit_cell->Divide();
+        LabelDependentBernoulliTrialCellCycleModel* p_transit_model2 = static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_transit_cell2->GetCellCycleModel());
+
+        TS_ASSERT_EQUALS(p_transit_model2->ReadyToDivide(), false);
+        TS_ASSERT_DELTA(p_transit_model2->GetDivisionProbability(), 0.2, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetLabelledDivisionProbability(), 0.5, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageTransitCellCycleTime(), 5.0, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageStemCellCycleTime(), 5.0, 1e-9);
     }
 
     void TestFixedG1GenerationalCellCycleModel()
@@ -1051,6 +1151,72 @@ public:
         TS_ASSERT_EQUALS(p_hepa_one_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
+    void TestBiasedBernoulliTrialCellCycleModel()
+    {
+        BiasedBernoulliTrialCellCycleModel* p_diff_model = new BiasedBernoulliTrialCellCycleModel;
+        p_diff_model->SetDimension(2);
+        p_diff_model->SetBirthTime(0.0);
+        BiasedBernoulliTrialCellCycleModel* p_transit_model = new BiasedBernoulliTrialCellCycleModel;
+        p_transit_model->SetDimension(2);
+        p_transit_model->SetBirthTime(0.0);
+
+        TS_ASSERT_DELTA(p_transit_model->GetMaxDivisionProbability(), 0.1, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 1.0, 1e-9);
+
+        // Change parameters for this model
+        p_transit_model->SetMaxDivisionProbability(1.0);
+        p_transit_model->SetMinimumDivisionAge(0.1);
+        TS_ASSERT_DELTA(p_transit_model->GetMaxDivisionProbability(), 1.0, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+        p_transit_cell->GetCellData()->SetItem("bias", 0.9);
+        p_transit_cell->InitialiseCellCycleModel();
+
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->GetCellData()->SetItem("bias", 0.2);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        unsigned num_steps = 100;
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
+
+        for (unsigned i = 0; i < num_steps; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+            
+            // The division time below is taken from the first random number generated
+            if (i < 16)
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), false);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(p_transit_cell->ReadyToDivide(), true);
+            }
+            TS_ASSERT_EQUALS(p_diff_cell->ReadyToDivide(), false);
+        }
+        TS_ASSERT_DELTA(p_transit_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+        TS_ASSERT_DELTA(p_diff_model->GetAge(), p_simulation_time->GetTime(), 1e-9);
+
+        // Check that cell division correctly resets the cell cycle phase
+        CellPtr p_transit_cell2 = p_transit_cell->Divide();
+        BiasedBernoulliTrialCellCycleModel* p_transit_model2 = static_cast<BiasedBernoulliTrialCellCycleModel*>(p_transit_cell2->GetCellCycleModel());
+
+        TS_ASSERT_EQUALS(p_transit_model2->ReadyToDivide(), false);
+        TS_ASSERT_DELTA(p_transit_model2->GetMaxDivisionProbability(), 1.0, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageTransitCellCycleTime(), 1.0, 1e-9);
+        TS_ASSERT_DELTA(p_transit_model2->GetAverageStemCellCycleTime(), 1.0, 1e-9);
+    }
+
     void TestStochasticOxygenBasedCellCycleModel()
     {
         // Check that mCurrentHypoxiaOnsetTime and mCurrentHypoxicDuration are updated correctly
@@ -1213,6 +1379,52 @@ public:
         TS_ASSERT_DELTA(p_cell_model2->GetG2Duration(), 1e20, 1e-4);
     }
 
+    void TestArchiveAlwaysDivideCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "AlwaysDivideCellCycleModel.arch";
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new AlwaysDivideCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_EQUALS(p_model2->ReadyToDivide(), true);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
     void TestArchiveNoCellCycleModel()
     {
         OutputFileHandler handler("archive", false);
@@ -1264,6 +1476,9 @@ public:
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BernoulliTrialCellCycleModel.arch";
 
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+
         {
             // We must set up SimulationTime to avoid memory leaks
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -1283,6 +1498,9 @@ public:
 
             delete p_model;
             SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
         }
 
         {
@@ -1302,6 +1520,124 @@ public:
             TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
             TS_ASSERT_DELTA(static_cast<BernoulliTrialCellCycleModel*>(p_model2)->GetDivisionProbability(), 0.5, 1e-9);
             TS_ASSERT_DELTA(static_cast<BernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.1, 1e-9);
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
+    void TestArchiveBiasedBernoulliTrialCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BiasedBernoulliTrialCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new BiasedBernoulliTrialCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+            static_cast<BiasedBernoulliTrialCellCycleModel*>(p_model)->SetMaxDivisionProbability(0.4);
+            static_cast<BiasedBernoulliTrialCellCycleModel*>(p_model)->SetMinimumDivisionAge(0.7);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_DELTA(static_cast<BiasedBernoulliTrialCellCycleModel*>(p_model2)->GetMaxDivisionProbability(), 0.4, 1e-9);
+            TS_ASSERT_DELTA(static_cast<BiasedBernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.7, 1e-9);
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+
+            // Avoid memory leaks
+            delete p_model2;
+        }
+    }
+
+    void TestArchiveLabelDependentBernoulliTrialCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "LabelDependentBernoulliTrialCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new LabelDependentBernoulliTrialCellCycleModel;
+
+            p_model->SetDimension(2);
+            p_model->SetBirthTime(-1.0);
+            static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model)->SetDivisionProbability(0.4);
+            static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model)->SetLabelledDivisionProbability(0.5);
+            static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model)->SetMinimumDivisionAge(0.7);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+
+            random_number_test = RandomNumberGenerator::Instance()->ranf();
+            RandomNumberGenerator::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
+            TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
+            TS_ASSERT_EQUALS(p_model2->GetDimension(), 2u);
+            TS_ASSERT_DELTA(static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model2)->GetDivisionProbability(), 0.4, 1e-9);
+            TS_ASSERT_DELTA(static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model2)->GetLabelledDivisionProbability(), 0.5, 1e-9);
+            TS_ASSERT_DELTA(static_cast<LabelDependentBernoulliTrialCellCycleModel*>(p_model2)->GetMinimumDivisionAge(), 0.7, 1e-9);
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
 
             // Avoid memory leaks
             delete p_model2;
@@ -1749,6 +2085,38 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
+        // Test with BiasedBernoulliTrialCellCycleModel
+        BiasedBernoulliTrialCellCycleModel biased_random_division_cell_cycle_model;
+        TS_ASSERT_EQUALS(biased_random_division_cell_cycle_model.GetIdentifier(), "BiasedBernoulliTrialCellCycleModel");
+
+        out_stream biased_random_division_parameter_file = output_file_handler.OpenOutputFile("biased_random_division_results.parameters");
+        biased_random_division_cell_cycle_model.OutputCellCycleModelParameters(biased_random_division_parameter_file);
+        biased_random_division_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("biased_random_division_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/biased_random_division_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+    
+        // Test with LabelDependentBernoulliTrialCellCycleModel
+        LabelDependentBernoulliTrialCellCycleModel label_random_division_cell_cycle_model;
+        TS_ASSERT_EQUALS(label_random_division_cell_cycle_model.GetIdentifier(), "LabelDependentBernoulliTrialCellCycleModel");
+
+        out_stream label_random_division_parameter_file = output_file_handler.OpenOutputFile("label_random_division_results.parameters");
+        label_random_division_cell_cycle_model.OutputCellCycleModelParameters(label_random_division_parameter_file);
+        label_random_division_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("label_random_division_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/label_random_division_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+    
         // Test with FixedG1GenerationalCellCycleModel
         FixedG1GenerationalCellCycleModel fixed_duration_generation_based_cell_cycle_model;
         TS_ASSERT_EQUALS(fixed_duration_generation_based_cell_cycle_model.GetIdentifier(), "FixedG1GenerationalCellCycleModel");
@@ -1894,6 +2262,23 @@ public:
         {
             FileFinder generated_file = output_file_handler.FindFile("fixed_sequence_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/fixed_sequence_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with AlwaysDivideCellCycleModel
+        AlwaysDivideCellCycleModel always_divide_cell_cycle_model;
+        TS_ASSERT_EQUALS(always_divide_cell_cycle_model.GetIdentifier(), "AlwaysDivideCellCycleModel");
+
+        out_stream always_divide_parameter_file = output_file_handler.OpenOutputFile("always_divide_results.parameters");
+        always_divide_cell_cycle_model.OutputCellCycleModelParameters(always_divide_parameter_file);
+        always_divide_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("always_divide_results.parameters");
+            //The model does not have any parameters and therefore it is compared to NoCellCycleModel
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/no_model_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());

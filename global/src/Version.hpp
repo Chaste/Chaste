@@ -67,7 +67,7 @@ public:
      * @return The major number of the "current" Chaste release.
      * If this is a development build, this will be the number of the last release.
      *
-     * @note This must be set manually by modifying Version.cpp.in.
+     * @note This must be set manually by modifying CMakeLists.txt.
      */
     static unsigned GetMajorReleaseNumber();
 
@@ -75,19 +75,18 @@ public:
      * @return The minor number of the "current" Chaste release.
      * If this is a development build, this will be the number of the last release.
      *
-     * @note This must be set manually by modifying Version.cpp.in.
+     * @note This must be set manually by modifying CMakeLists.txt.
      */
     static unsigned GetMinorReleaseNumber();
 
     /**
-     * @return  Get the subversion revision number of the Chaste source tree.
+     * @return  Get the Git revision number of the Chaste source tree.
      *
      * If the file ReleaseVersion.txt exists in the directory given by GetRootDir, then
      * we assume this is not a working copy, and read the version information from there.
      *
-     * Otherwise, we assume this is a checked-out tree, and call svnversion
-     * during the build.  If it returns a range of versions, the upper end of this range
-     * is used.  Whether the working copy is modified is ignored by this method; use
+     * Otherwise, we assume this is a checked-out tree, and get Git revision info via CMake
+     * during the build.  Whether the working copy is modified is ignored by this method; use
      * IsWorkingCopyModified to test that.
      */
     static unsigned long long GetRevisionNumber();

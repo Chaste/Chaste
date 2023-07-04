@@ -88,7 +88,7 @@ void BidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
                 mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
                 break;
 
-            default :
+            default:
                 NEVER_REACHED;
         }
     }

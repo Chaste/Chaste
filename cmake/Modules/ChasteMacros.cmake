@@ -181,7 +181,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
 
     if (Chaste_MEMORY_TESTING AND NOT python)
         set(test_command ${VALGRIND_COMMAND})
-        set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.out") 
+        set(test_args "--tool=memcheck --log-file=${Chaste_MEMORY_TESTING_OUTPUT_DIR}/${_testname}_valgrind.txt") 
         set(test_args "${test_args} --track-fds=yes --leak-check=yes --num-callers=50 ${Chaste_MEMORY_TESTING_SUPPS}")
         set(test_args "${test_args} --gen-suppressions=all $<TARGET_FILE:${exeTargetName}> -malloc_debug -malloc_dump -memory_info")
         set(num_cpus 1)
@@ -196,7 +196,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set(env_var CPUPROFILE)
             set(env_var_value ${profile_file})
         else()
-            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.gmon)
+            set(output_file ${Chaste_PROFILE_OUTPUT_DIR}/${_testname}.txt)
             set(post_command ${GPROF_EXECUTABLE})
             set(post_args $<TARGET_FILE:${exeTargetName}>)
         endif()
@@ -270,18 +270,20 @@ macro(Chaste_DO_COMMON component)
         add_custom_target(${component})
     endif()
 
+    # process cellml dirs for building cellml
+    cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
+    foreach(dir ${Chaste_${component}_CELLML_DIRS})
+        file(RELATIVE_PATH rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${dir})
+        list(APPEND Chaste_${component}_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${rel_dir})
+    endforeach()
+
     # check if include dirs exists yet, and generate it if not
     if (NOT Chaste_${component}_INCLUDE_DIRS)
         set(Chaste_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
         header_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_SOURCE_INCLUDE_DIRS)
-        cellml_dirs(${Chaste_${component}_SOURCE_DIR} Chaste_${component}_CELLML_DIRS)
 
         # generate include dirs
         set(Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_SOURCE_INCLUDE_DIRS})
-        foreach(dir ${Chaste_${component}_CELLML_DIRS})
-            file(RELATIVE_PATH rel_dir ${CMAKE_CURRENT_SOURCE_DIR} ${dir})
-            list(APPEND Chaste_${component}_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${rel_dir})
-        endforeach()
     endif()
 
     # Find source files

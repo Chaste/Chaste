@@ -46,7 +46,7 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a random direction.
+ * A class to generate a division vector of unit length that points in a uniformly random direction.
  */
 template <unsigned SPACE_DIM>
 class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>

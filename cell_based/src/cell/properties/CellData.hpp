@@ -123,6 +123,15 @@ public:
      * According to STL these are sorted in lexicographical/alphabetic order (so that the ordering here is predictable).
      */
     std::vector<std::string> GetKeys() const;
+
+    /**
+     * Check if data with given name is stored.
+     * 
+     * @param rVariableName rVariableName the index of the data required.
+     * 
+     * @return if rVariableName has been stored
+     */
+    bool HasItem(const std::string& rVariableName) const;
 };
 
 #include "SerializationExportWrapper.hpp"
