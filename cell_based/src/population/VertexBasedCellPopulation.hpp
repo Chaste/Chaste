@@ -275,22 +275,26 @@ public:
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
-     *
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     * Given a cell, returns the set of location indices corresponding to 
+     * neighbouring cells.
      *
      * @param pCell a cell
+     * 
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
      * Overridden GetNeighbouringEdgeIndices() method.
-     * Gets the local edge index of the neighbouring element and the element index
+     * Gets the local edge index of the neighbouring element and the element 
+     * index.
+     * 
      * @param pCell  Cell pointer
      * @param pEdgeIndex Local edge index
+     * 
      * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned int, unsigned int>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex) override;
+    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex) override;
 
     /**
      * Overridden AddNode() method.

@@ -44,7 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeRemapInfo.hpp"
 
 /**
- * Class for facilitating the creation and management of unique edges in a vertex mesh.
+ * Class for facilitating the creation and management of unique edges in a 
+ * vertex mesh.
  */
 template <unsigned SPACE_DIM>
 class EdgeHelper
@@ -71,7 +72,7 @@ public:
     /**
      * Default constructor.
      */
-    EdgeHelper() = default;
+    EdgeHelper();
 
     /**
      * Get edge from the node pairs. Construct the edge if it has not been created
@@ -80,7 +81,8 @@ public:
      * 
      * @return the (new) Edge
      */
-    Edge<SPACE_DIM>* GetEdgeFromNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNode1);
+    Edge<SPACE_DIM>* GetEdgeFromNodes(Node<SPACE_DIM>* pNodeA,
+                                      Node<SPACE_DIM>* pNodeB);
 
     /**
      * Get the edge from the node pairs and add it to element with index elementIndex
@@ -90,7 +92,9 @@ public:
      * 
      * @return the Edge
      */
-    Edge<SPACE_DIM>* GetEdgeFromNodes(unsigned elementIndex, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+    Edge<SPACE_DIM>* GetEdgeFromNodes(unsigned elementIndex,
+                                      Node<SPACE_DIM>* pNodeA,
+                                      Node<SPACE_DIM>* pNodeB);
 
     /**
      * @param index a global Edge index
@@ -114,9 +118,9 @@ public:
     void RemoveDeletedEdges();
 
     /**
-     * returns total number of edges
+     * @return total number of edges
      */
     unsigned GetNumEdges() const;
 };
 
-#endif //CHASTE_EDGEHELPER_HPP
+#endif /* CHASTE_EDGEHELPER_HPP_ */

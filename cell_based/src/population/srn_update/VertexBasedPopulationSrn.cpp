@@ -32,90 +32,98 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "CellSrnModel.hpp"
+
 #include "VertexBasedPopulationSrn.hpp"
+#include "CellSrnModel.hpp"
+
 template <unsigned DIM>
 VertexBasedPopulationSrn<DIM>::VertexBasedPopulationSrn()
-:
-mpCellPopulation(nullptr)
-{}
+    : mpCellPopulation(nullptr)
+{
+}
 
 template <unsigned DIM>
 VertexBasedPopulationSrn<DIM>::~VertexBasedPopulationSrn()
-{}
+{
+}
 
 template <unsigned DIM>
-void VertexBasedPopulationSrn<DIM>::SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pVertexPopulation)
+void VertexBasedPopulationSrn<DIM>::SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pCellPopulation)
 {
-    mpCellPopulation = pVertexPopulation;
+    mpCellPopulation = pCellPopulation;
 }
 
 template <unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap)
 {
     // Get recorded edge operations
-    const std::vector<EdgeOperation>& edge_operations = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
-    for (auto operation : edge_operations)
+    const std::vector<EdgeOperation>& r_operations = mpCellPopulation->rGetMesh().GetOperationRecorder()->GetEdgeOperations();
+    for (auto operation : r_operations)
     {
-        // An operation with deleted element may be recorded,
-        // e.g. following a T2 swap, neighbouring element may become triangular due to node merging
-        // and may subsequently be marked for deletion, despite being marked to perform edge operations (e.g. node merging).
-
+        /*
+         * An operation with deleted element may be recorded, e.g. following a 
+         * T2 swap, neighbouring element may become triangular due to node 
+         * merging and may subsequently be marked for deletion, despite being 
+         * marked to perform edge operations (e.g. node merging).
+         */
         switch (operation.GetOperation())
         {
-        // All operations, except cell division, require the same information
-        case EDGE_OPERATION_ADD:
-        case EDGE_OPERATION_NODE_MERGE:
-        case EDGE_OPERATION_SPLIT:
-        case EDGE_OPERATION_MERGE:
-        {
-            const unsigned int stored_index = operation.GetElementIndex();
-            unsigned int location_index = stored_index;
-
-            // If operation is recorded before element indices are changed. For example, if the operations recorded
-            // during T2 swap
-            if (operation.IsElementIndexRemapped())
+            // All operations, except cell division, require the same information
+            case EDGE_OPERATION_ADD:
+            case EDGE_OPERATION_NODE_MERGE:
+            case EDGE_OPERATION_SPLIT:
+            case EDGE_OPERATION_MERGE:
             {
-                // If the element is deleted, then ignore this operation
-                if (rElementMap.IsDeleted(location_index))
+                const unsigned stored_index = operation.GetElementIndex();
+                unsigned location_index = stored_index;
+
+                /*
+                 * If operation is recorded before element indices are changed. 
+                 * For example, if the operations recorded during T2 swap.
+                 */
+                if (operation.IsElementIndexRemapped())
                 {
-                    // LCOV_EXCL_START
-                    break; //This line is difficult to test
-                    // LCOV_EXCL_STOP
+                    // If the element is deleted, then ignore this operation
+                    if (rElementMap.IsDeleted(location_index))
+                    {
+                        // LCOV_EXCL_START
+                        break; // This line is difficult to test
+                        // LCOV_EXCL_STOP
+                    }
+                    else
+                    {
+                        location_index = rElementMap.GetNewIndex(stored_index);
+                    }
                 }
-                else
-                {
-                    location_index = rElementMap.GetNewIndex(stored_index);
-                }
+                // Get the necessary information to perform Remap
+                const EdgeRemapInfo& r_edge_change = operation.rGetRemapInfo();
+                CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
+                auto p_old_model = static_cast<CellSrnModel*>(p_cell->GetSrnModel());
+                std::vector<AbstractSrnModelPtr> old_srn_edges = p_old_model->GetEdges();
+                RemapCellSrn(old_srn_edges, p_old_model, r_edge_change);
+                old_srn_edges.clear();
+                break;
             }
-            // Get the necessary information to perform Remap
-            const EdgeRemapInfo& rEdgeChange = operation.rGetRemapInfo();
-            CellPtr cell = mpCellPopulation->GetCellUsingLocationIndex(location_index);
-            auto old_model = static_cast<CellSrnModel*>(cell->GetSrnModel());
-            std::vector<AbstractSrnModelPtr> old_srn_edges = old_model->GetEdges();
+            case EDGE_OPERATION_DIVIDE:
+            {
+                const unsigned location_index_1 = rElementMap.GetNewIndex(operation.GetElementIndex());
+                const unsigned location_index_2 = rElementMap.GetNewIndex(operation.GetElementIndex2());
 
-            RemapCellSrn(old_srn_edges, old_model, rEdgeChange);
-            old_srn_edges.clear();
-            break;
-        }
-        case EDGE_OPERATION_DIVIDE:
-        {
-            const unsigned int location_index_1 = rElementMap.GetNewIndex(operation.GetElementIndex());
-            const unsigned int location_index_2 = rElementMap.GetNewIndex(operation.GetElementIndex2());
-            const EdgeRemapInfo& rEdgeChange_1 = operation.rGetRemapInfo();
-            const EdgeRemapInfo& rEdgeChange_2 = operation.rGetRemapInfo2();
-            CellPtr cell_1 = mpCellPopulation->GetCellUsingLocationIndex(location_index_1);
-            CellPtr cell_2 = mpCellPopulation->GetCellUsingLocationIndex(location_index_2);
+                const EdgeRemapInfo& r_edge_change_1 = operation.rGetRemapInfo();
+                const EdgeRemapInfo& r_edge_change_2 = operation.rGetRemapInfo2();
 
-            auto old_model_1 = static_cast<CellSrnModel*>(cell_1->GetSrnModel());
-            std::vector<AbstractSrnModelPtr> parent_srn_edges = old_model_1->GetEdges();
-            auto old_model_2 = static_cast<CellSrnModel*>(cell_2->GetSrnModel());
+                CellPtr p_cell_1 = mpCellPopulation->GetCellUsingLocationIndex(location_index_1);
+                CellPtr p_cell_2 = mpCellPopulation->GetCellUsingLocationIndex(location_index_2);
 
-            RemapCellSrn(parent_srn_edges, old_model_1, rEdgeChange_1);
-            RemapCellSrn(parent_srn_edges, old_model_2, rEdgeChange_2);
-            parent_srn_edges.clear();
-            break;
-        }
+                auto p_old_model_1 = static_cast<CellSrnModel*>(p_cell_1->GetSrnModel());
+                std::vector<AbstractSrnModelPtr> parent_srn_edges = p_old_model_1->GetEdges();
+                auto p_old_model_2 = static_cast<CellSrnModel*>(p_cell_2->GetSrnModel());
+
+                RemapCellSrn(parent_srn_edges, p_old_model_1, r_edge_change_1);
+                RemapCellSrn(parent_srn_edges, p_old_model_2, r_edge_change_2);
+                parent_srn_edges.clear();
+                break;
+            }
         }
     }
     mpCellPopulation->rGetMesh().GetOperationRecorder()->ClearEdgeOperations();
@@ -129,94 +137,109 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
     auto edge_mapping = rEdgeChange.GetEdgesMapping();
     std::vector<AbstractSrnModelPtr> new_edge_srn(edge_mapping.size());
     const std::vector<double> split_proportions = rEdgeChange.GetSplitProportions();
-    const unsigned int n_edges = edge_mapping.size();
-    std::vector<unsigned int> shrunk_edges;
+    const unsigned num_edges = edge_mapping.size();
+    std::vector<unsigned> shrunk_edges;
   
-    // Go through the edges, check its status and the index corresponding to the edge status before
-    // rearrangement
-    // Go through the SRN model
-    for (unsigned i = 0; i < n_edges; i++)
+    /*
+     * Go through the edges, check its status and the index corresponding to the 
+     * edge status before rearrangement. Go through the SRN model.
+     */
+    for (unsigned i = 0; i < num_edges; i++)
     {
-        //The remapIndex, if +ve refers to the SRN index of the oldModel, if -ve then it's a new edge
-        const long int remapIndex = edge_mapping[i];
+        // The remap_index, if +ve refers to the SRN index of the oldModel, if -ve then it's a new edge
+        const long remap_index = edge_mapping[i];
 
-        //remapStatus can be the following:
-        //0 - Direct remapping, the edge SRN of the oldModel can be transferred directly to the new model
-        //1 - The edge is a split point between the dividing cells
-        //2 - This is a new edge i.e. the dividing line in the middle of the old and new cells
-        //3 - Edge below or above the edge that was deleted due to node merging
-        //4 - Edge above was merged into this edge
-        const unsigned int remapStatus = rEdgeChange.GetEdgesStatus()[i];
+        /*
+         * remap_status can be the following:
+         * 0 - Direct remapping, the edge SRN of the oldModel can be transferred 
+         *         directly to the new model
+         * 1 - The edge is a split point between the dividing cells
+         * 2 - This is a new edge i.e. the dividing line in the middle of the 
+         *         old and new cells
+         * 3 - Edge below or above the edge that was deleted due to node merging
+         * 4 - Edge above was merged into this edge
+         */
+        const unsigned remap_status = rEdgeChange.GetEdgesStatus()[i];
 
-        //Remap index cannot be negative when it's a direct remap or an edge split
-        assert(!((remapStatus == 0 || remapStatus == 1) && remapIndex < 0));
-        switch(remapStatus)
+        // Remap index cannot be negative when it's a direct remap or an edge split
+        assert(!((remap_status == 0 || remap_status == 1) && remap_index < 0));
+        switch(remap_status)
         {
-        // Edge SRN remains the same
-        case 0:
-            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remapIndex]->CreateSrnModel());
-            break;
-        case 1:
-            //Edge split depends on the relative splitting node position because
-            //currently we assume that edge concentrations are uniform on the edge
-            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remapIndex]->CreateSrnModel());
-            assert(split_proportions[i]>=0);
-            new_edge_srn[i]->SplitEdgeSrn(split_proportions[i]);
-            break;
-        case 2:
-            //The edge is new
-            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[0]->CreateSrnModel());
-            new_edge_srn[i]->SetCell(pCellSrn->GetCell());
-            new_edge_srn[i]->InitialiseDaughterCell();
-            break;
-        case 3:
-        {
-            // If the edge above or below this edge was deleted
-            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remapIndex]->CreateSrnModel());
-
-            const bool isPrevEdge = rEdgeChange.GetEdgesStatus()[(i+1)%n_edges]==3;
-            //Find the shrunk edge
-            unsigned int shrunkEdge = 0;
-            //If this edge is below the shrunk edge
-            if (isPrevEdge)
+            // Edge SRN remains the same
+            case 0:
             {
-                shrunkEdge = (remapIndex+1)%(n_edges+1);
-                shrunk_edges.push_back(shrunkEdge);
+                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                break;
             }
-            else
+            case 1:
             {
-                shrunkEdge = remapIndex==0 ? n_edges : remapIndex-1;
+                /* 
+                 * Edge split depends on the relative splitting node position 
+                 * because currently we assume that edge concentrations are 
+                 * uniform on the edge.
+                 */
+                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                assert(split_proportions[i] >= 0);
+                new_edge_srn[i]->SplitEdgeSrn(split_proportions[i]);
+                break;
             }
-            new_edge_srn[i]->AddShrunkEdgeSrn(parentSrnEdges[shrunkEdge].get());
-            break;
+            case 2:
+            {
+                // The edge is new
+                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[0]->CreateSrnModel());
+                new_edge_srn[i]->SetCell(pCellSrn->GetCell());
+                new_edge_srn[i]->InitialiseDaughterCell();
+                break;
+            }
+            case 3:
+            {
+                // If the edge above or below this edge was deleted
+                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+
+                const bool is_prev_edge = rEdgeChange.GetEdgesStatus()[(i+1)%num_edges]==3;
+
+                // Find the shrunk edge
+                unsigned shrunk_edge = 0;
+
+                // If this edge is below the shrunk edge
+                if (is_prev_edge)
+                {
+                    shrunk_edge = (remap_index+1)%(num_edges+1);
+                    shrunk_edges.push_back(shrunk_edge);
+                }
+                else
+                {
+                    shrunk_edge = remap_index==0 ? num_edges : remap_index-1;
+                }
+                new_edge_srn[i]->AddShrunkEdgeSrn(parentSrnEdges[shrunk_edge].get());
+                break;
+            }
+            case 4:
+            {
+                // Add SRNs from the edge above to this edge
+                new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
+                const unsigned next_edge_index = (remap_index+1)%(num_edges+1);
+                new_edge_srn[i]->AddMergedEdgeSrn(parentSrnEdges[next_edge_index].get());
+                break;
+            }
         }
-        case 4:
-        {
-            // Add SRNs from the edge above to this edge
-            new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remapIndex]->CreateSrnModel());
-            const unsigned int next_edge_index = (remapIndex+1)%(n_edges+1);
-            new_edge_srn[i] -> AddMergedEdgeSrn(parentSrnEdges[next_edge_index].get());
-            break;
-        }
-        }
-        //Setting the new local edge index and the cell
+        // Setting the new local edge index and the cell
         new_edge_srn[i]->SetEdgeLocalIndex(i);
         new_edge_srn[i]->SetCell(pCellSrn->GetCell());
     }
   
     // For the case when edge quantities are returned into interior when edge shrinks due to node merging
-    boost::shared_ptr<AbstractSrnModel> interior_srn
-    =boost::shared_ptr<AbstractSrnModel>(pCellSrn->GetInteriorSrn());
-    if (interior_srn != nullptr)
+    auto p_interior_srn = boost::shared_ptr<AbstractSrnModel>(pCellSrn->GetInteriorSrn());
+    if (p_interior_srn != nullptr)
     {
-        for (unsigned shrunkEdgeIndex:shrunk_edges)
+        for (unsigned shrunk_edge_index : shrunk_edges)
         {
-            interior_srn->AddShrunkEdgeToInterior(parentSrnEdges[shrunkEdgeIndex].get());
+            p_interior_srn->AddShrunkEdgeToInterior(parentSrnEdges[shrunk_edge_index].get());
         }
     }
 
     pCellSrn->AddEdgeSrn(new_edge_srn);
-    assert(n_edges == pCellSrn->GetNumEdgeSrn());
+    assert(num_edges == pCellSrn->GetNumEdgeSrn());
 }
 
 template class VertexBasedPopulationSrn<1>;

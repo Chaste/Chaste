@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned int SPACE_DIM>
+template<unsigned SPACE_DIM>
 class EdgeHelper;
 
 /**

@@ -101,20 +101,20 @@ public:
 
         // Generate a mesh which will automatically build the edges in the constructor
         auto p_mesh = std::make_unique<VertexMesh<2, 2> >(nodes, elements);
-        const EdgeHelper<2>& edge_helper = p_mesh->GetEdgeHelper();
+        const EdgeHelper<2>& edge_helper = p_mesh->rGetEdgeHelper();
         // There are two elements in our mesh
         // We test Edge class methods here
         for (unsigned i = 0; i < 2; i++)
         {
-            VertexElement<2, 2>* element = elements[i];
-            const unsigned int n_edges = element->GetNumEdges();
-            for (unsigned index = 0; index < n_edges; index++)
+            VertexElement<2, 2>* p_element = elements[i];
+            const unsigned num_edges = p_element->GetNumEdges();
+            for (unsigned index = 0; index < num_edges; index++)
             {
-                Edge<2>* p_edge = element->GetEdge(index);
+                Edge<2>* p_edge = p_element->GetEdge(index);
                 TS_ASSERT_EQUALS(p_edge->GetNumNodes(), 2u);
                 TS_ASSERT_DIFFERS(p_edge->GetNode(0), p_edge->GetNode(1));
                 TS_ASSERT(p_edge->GetNumElements() > 0 && p_edge->GetNumElements() <= 2);
-                TS_ASSERT_EQUALS(element->ContainsEdge(p_edge), true);
+                TS_ASSERT_EQUALS(p_element->ContainsEdge(p_edge), true);
             }
         }
         for (unsigned i = 0; i < p_mesh->GetNumEdges(); i++)
@@ -126,9 +126,9 @@ public:
 
         for (unsigned i = 0; i < 2; i++)
         {
-            VertexElement<2, 2>* element = elements[i];
-            element->ClearEdges();
-            TS_ASSERT_EQUALS(element->GetNumEdges(), 0u);
+            VertexElement<2, 2>* p_element = elements[i];
+            p_element->ClearEdges();
+            TS_ASSERT_EQUALS(p_element->GetNumEdges(), 0u);
         }
 
         // Also test constructors in honeycomb mesh (MutableVertexMesh)
@@ -179,25 +179,25 @@ public:
 
         // Generate a mesh which will automatically build the edges in the constructor
         auto p_mesh = std::make_unique<VertexMesh<1, 2> >(nodes, elements);
-        const EdgeHelper<2>& edge_helper = p_mesh->GetEdgeHelper();
+        const EdgeHelper<2>& edge_helper = p_mesh->rGetEdgeHelper();
         // There are two elements in our mesh
         // We test Edge class methods here
         for (unsigned i = 0; i < 2; i++)
         {
-            VertexElement<1, 2>* element = elements[i];
-            const unsigned n_edges = element->GetNumEdges();
-            for (unsigned index = 0; index < n_edges; index++)
+            VertexElement<1, 2>* p_element = elements[i];
+            const unsigned num_edges = p_element->GetNumEdges();
+            for (unsigned index = 0; index < num_edges; index++)
             {
-                Edge<2>* p_edge = element->GetEdge(index);
+                Edge<2>* p_edge = p_element->GetEdge(index);
                 TS_ASSERT_EQUALS(p_edge->GetNumNodes(), 2u);
                 TS_ASSERT_DIFFERS(p_edge->GetNode(0), p_edge->GetNode(1));
                 TS_ASSERT(p_edge->GetNumElements() > 0 && p_edge->GetNumElements() <= 2);
-                TS_ASSERT(element->GetLocalEdgeIndex(p_edge) > 0 && element->GetLocalEdgeIndex(p_edge) < 2);
-                TS_ASSERT_LESS_THAN(element->GetEdgeGlobalIndex(index), 2);
+                TS_ASSERT(p_element->GetLocalEdgeIndex(p_edge) > 0 && p_element->GetLocalEdgeIndex(p_edge) < 2);
+                TS_ASSERT_LESS_THAN(p_element->GetEdgeGlobalIndex(index), 2);
 
-                unsigned edge_local_index = element->GetLocalEdgeIndex(p_edge);
-                TS_ASSERT_EQUALS(element->GetNeighbouringElementAtEdgeIndex(edge_local_index).size(), 0u);
-                TS_ASSERT_EQUALS(element->ContainsEdge(p_edge), true);
+                unsigned edge_local_index = p_element->GetLocalEdgeIndex(p_edge);
+                TS_ASSERT_EQUALS(p_element->GetNeighbouringElementAtEdgeIndex(edge_local_index).size(), 0u);
+                TS_ASSERT_EQUALS(p_element->ContainsEdge(p_edge), true);
             }
         }
 
@@ -210,9 +210,9 @@ public:
 
         for (unsigned i = 0; i < 2; i++)
         {
-            VertexElement<1, 2>* element = elements[i];
-            element->ClearEdges();
-            TS_ASSERT_EQUALS(element->GetNumEdges(), 0u);
+            VertexElement<1, 2>* p_element = elements[i];
+            p_element->ClearEdges();
+            TS_ASSERT_EQUALS(p_element->GetNumEdges(), 0u);
         }
     }
 
@@ -285,17 +285,18 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            Edge<2>* testEdge = new Edge<2>(0);
-            testEdge->AddElement(0);
-            testEdge->AddElement(1);
+            Edge<2>* p_test_edge = new Edge<2>(0);
+            p_test_edge->AddElement(0);
+            p_test_edge->AddElement(1);
 
             Node<2> node0(0, ChastePoint<2>(0, 0.0, 0.0));
             Node<2> node1(1, ChastePoint<2>(1, 1.0, 1.0));
 
-            testEdge->SetNodes(&node0, &node1);
+            p_test_edge->SetNodes(&node0, &node1);
+
             // Write the edge to file
-            output_arch << testEdge;
-            delete testEdge;
+            output_arch << p_test_edge;
+            delete p_test_edge;
         }
 
         {
@@ -303,32 +304,32 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            Edge<2>* testEdge;
-            input_arch >> testEdge;
+            Edge<2>* p_test_edge;
+            input_arch >> p_test_edge;
 
-            Node<2>* node0 = testEdge->GetNode(0);
-            Node<2>* node1 = testEdge->GetNode(1);
+            Node<2>* p_node0 = p_test_edge->GetNode(0);
+            Node<2>* p_node1 = p_test_edge->GetNode(1);
 
-            TS_ASSERT_EQUALS(node0->GetIndex(), 0u);
-            TS_ASSERT_EQUALS(node1->GetIndex(), 1u);
+            TS_ASSERT_EQUALS(p_node0->GetIndex(), 0u);
+            TS_ASSERT_EQUALS(p_node1->GetIndex(), 1u);
 
-            TS_ASSERT_DELTA(node0->rGetLocation()[0], 0.0, 1e-9);
-            TS_ASSERT_DELTA(node0->rGetLocation()[1], 0.0, 1e-9);
-            TS_ASSERT_DELTA(node1->rGetLocation()[0], 1.0, 1e-9);
-            TS_ASSERT_DELTA(node1->rGetLocation()[1], 1.0, 1e-9);
+            TS_ASSERT_DELTA(p_node0->rGetLocation()[0], 0.0, 1e-9);
+            TS_ASSERT_DELTA(p_node0->rGetLocation()[1], 0.0, 1e-9);
+            TS_ASSERT_DELTA(p_node1->rGetLocation()[0], 1.0, 1e-9);
+            TS_ASSERT_DELTA(p_node1->rGetLocation()[1], 1.0, 1e-9);
 
-            std::set<unsigned int> arch_elements = testEdge->GetOtherElements(5);
-            std::set<unsigned int> check_set;
+            std::set<unsigned> arch_elements = p_test_edge->GetOtherElements(5);
+            std::set<unsigned> check_set;
             check_set.insert(0);
             check_set.insert(1);
 
             TS_ASSERT_EQUALS(arch_elements, check_set);
-            TS_ASSERT_EQUALS(testEdge->GetIndex(), 0u);
+            TS_ASSERT_EQUALS(p_test_edge->GetIndex(), 0u);
 
             // Unarchiving has created two new nodes and the edge
-            delete node0;
-            delete node1;
-            delete testEdge;
+            delete p_node0;
+            delete p_node1;
+            delete p_test_edge;
         }
     }
 

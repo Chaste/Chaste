@@ -136,9 +136,9 @@ protected:
 
     /**
      * Build edges from elements. Populates edges in EdgeHelper class
-     * @param elements from which edges are built
+     * @param rElements from which edges are built
      */
-    void GenerateEdgesFromElements(std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> &elements);
+    void GenerateEdgesFromElements(std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>& rElements);
 
     /**
      * Populate mNodes with locations corresponding to the element
@@ -298,18 +298,21 @@ public:
     unsigned GetNumEdges() const;
 
     /**
-     * Fetches an edge
-     * @param Global index of the edge
+     * Fetches an edge.
+     * 
+     * @param index global index of the edge
      * @return Pointer to the edge at the index
      */
     Edge<SPACE_DIM>* GetEdge(unsigned index) const;
 
     /**
-     * Fetches EdgeHelper
+     * Fetches EdgeHelper.
+     * 
      * @param Global index of the edge
+     * 
      * @return Pointer to the edge at the index
      */
-    const EdgeHelper<SPACE_DIM>& GetEdgeHelper() const;
+    const EdgeHelper<SPACE_DIM>& rGetEdgeHelper() const;
 
     /**
      * @return the number of Nodes in the mesh.

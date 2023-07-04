@@ -48,10 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
- * SRN model at the cell level, has representation for edges internally.
- * Also contains cell interior (cytoplasmic) SRN.
- * Mostly serves to coordinate between interior/edge SRNs, in case these are specified. Functionality of SRNs is defined in AbstractSrnModel class
- * and user-defined SRN models.
+ * SRN model at the cell level, has representation for edges internally. Also 
+ * contains cell interior (cytoplasmic) SRN. Mostly serves to coordinate between 
+ * interior/edge SRNs, in case these are specified. Functionality of SRNs is 
+ * defined in AbstractSrnModel class and user-defined SRN models.
  */
 class CellSrnModel : public AbstractSrnModel
 {

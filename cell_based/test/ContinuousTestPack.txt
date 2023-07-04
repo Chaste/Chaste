@@ -64,7 +64,6 @@ population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
 simulation/Test2dVertexBasedSimulationWithSrnModels.hpp
-simulation/TestConstantTargetAreaModifier.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestDivisionBiasTrackingModifier.hpp
 simulation/TestExtrinsicPullModifier.hpp

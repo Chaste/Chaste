@@ -187,18 +187,18 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
     return this->rGetMesh().GetNeighbouringElementIndices(elem_index);
 }
 
-template<unsigned int DIM>
-std::set<std::pair<unsigned int, unsigned int>>
+template<unsigned DIM>
+std::set<std::pair<unsigned, unsigned>>
 VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex)
 {
     std::set<std::pair<unsigned, unsigned>> neighbours;
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
-    auto element = this->GetElement(cellLocationIndex);
-    auto globalEdgeIndex = element->GetEdgeGlobalIndex(EdgeLocalIndex);
-    auto neighbourElementIndices = element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex);
+    auto p_element = this->GetElement(cellLocationIndex);
+    auto global_edge_index = p_element->GetEdgeGlobalIndex(EdgeLocalIndex);
+    auto neighbour_element_indices = p_element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex);
 
     // Normally there is only one neighbouring element
-    for (auto neighbour_element_index : neighbourElementIndices)
+    for (auto neighbour_element_index : neighbour_element_indices)
     {
         auto p_neighbour_element = this->GetElement(neighbour_element_index);
 
@@ -206,7 +206,7 @@ VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsign
         for (unsigned elem_index = 0; elem_index < p_neighbour_element->GetNumEdges(); elem_index++)
         {
             // If the neighbours edge matches EdgeLocalIndex
-            if (p_neighbour_element->GetEdge(elem_index)->GetIndex() == globalEdgeIndex)
+            if (p_neighbour_element->GetEdge(elem_index)->GetIndex() == global_edge_index)
             {
                 neighbours.insert(std::pair<unsigned, unsigned>(neighbour_element_index, elem_index));
             }
@@ -481,7 +481,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     }
 }
 
-template<unsigned int DIM>
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
@@ -570,7 +570,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
 #endif //CHASTE_VTK
 }
 
-template<unsigned int DIM>
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
@@ -693,8 +693,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
             assert(p_cell);
 
             // Write the same property in all the edges
-            auto element = this->GetElement(elem_index);
-            unsigned elem_num_edges = element->GetNumEdges();
+            unsigned elem_num_edges = elem_iter->GetNumEdges();
 
             // Edge data
             for (unsigned e = 0; e < elem_num_edges; ++e)
@@ -711,46 +710,44 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     // and its edges are representative of the population
 
     // Get cell/edge data names
-    const unsigned int n_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    const unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    const unsigned int n_edge_data_items = this->Begin()->GetCellEdgeData()->GetNumItems();
+    const unsigned num_edge_data_items = this->Begin()->GetCellEdgeData()->GetNumItems();
     std::vector<std::string> edge_data_names = this->Begin()->GetCellEdgeData()->GetKeys();
 
-    //Total number of data items. Each data item (edge+interior) has its own value
-    const unsigned int n_data_items = n_edge_data_items + n_cell_data_items;
-    std::vector<std::string> data_names(n_data_items);
-    for (unsigned var=0; var<n_edge_data_items; ++var)
+    // Total number of data items. Each data item (edge+interior) has its own value
+    const unsigned num_data_items = num_edge_data_items + num_cell_data_items;
+    std::vector<std::string> data_names(num_data_items);
+    for (unsigned var=0; var<num_edge_data_items; ++var)
     {
         data_names[var] = edge_data_names[var];
     }
-    for (unsigned var=n_edge_data_items; var<n_data_items; ++var)
+    for (unsigned var=num_edge_data_items; var<num_data_items; ++var)
     {
-        data_names[var] = cell_data_names[var-n_edge_data_items];
+        data_names[var] = cell_data_names[var-num_edge_data_items];
     }
-    std::vector<std::vector<double> > data_values(n_data_items,
+    std::vector<std::vector<double> > data_values(num_data_items,
                                                   std::vector<double>(num_edges + n_cells));
 
     // Writing CellEdgeData values to the edges of the cells
     // Loop over vertex elements ///\todo #2512 - replace with loop over cells
     for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
-            elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
-            ++elem_iter)
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
     {
-        const unsigned int elem_index = elem_iter ->GetIndex();
+        const unsigned elem_index = elem_iter->GetIndex();
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
 
         // Edge data for interior data is set to zero.
-        auto element = this->GetElement(elem_index);
-        unsigned elem_num_edges = element->GetNumEdges();
-        for (unsigned var = 0; var < n_edge_data_items; ++var)
+        unsigned elem_num_edges = elem_iter->GetNumEdges();
+        for (unsigned var = 0; var < num_edge_data_items; ++var)
         {
             // Write the same property in all the edges
             for (unsigned e = 0; e < elem_num_edges; ++e)
             {
-                data_values[var][cell_offset_dist[elem_index]+e]
-                                 = p_cell->GetCellEdgeData()->GetItem(data_names[var])[e];
+                data_values[var][cell_offset_dist[elem_index]+e] = p_cell->GetCellEdgeData()->GetItem(data_names[var])[e];
             }
             // Cell interior is set to zero
             data_values[var][cell_offset_dist[elem_index]+elem_num_edges] = 0.0;
@@ -771,7 +768,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
         assert(p_cell);
 
-        for (unsigned var = n_edge_data_items; var<n_data_items; ++var)
+        for (unsigned var = num_edge_data_items; var<num_data_items; ++var)
         {
             // Data in the edges are set to 0
             for (unsigned e = 0; e < elem_num_edges; ++e)
@@ -783,7 +780,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         }
     }
 
-    for (unsigned var=0; var<n_data_items; var++)
+    for (unsigned var=0; var<num_data_items; var++)
     {
         mesh_writer.AddCellData(data_names[var], data_values[var]);
     }

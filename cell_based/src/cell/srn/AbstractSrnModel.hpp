@@ -53,11 +53,10 @@ class Cell; // Circular definition (cells need to know about SRN models and vice
 typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
- * The AbstractSrnModel contains basic information to all sub-cellular reaction network (SRN) models.
+ * The AbstractSrnModel contains basic information to all sub-cellular reaction 
+ * network (SRN) models.
  *
  * SRN models are noncopyable since cells are noncopyable.
- *
- * \todo #2752 Thoroughly document this class
  */
 class AbstractSrnModel : public Identifiable
 {
@@ -86,9 +85,11 @@ private:
     }
 
     /**
-     * Prevent copy-assignment of this class, or its subclasses.
-     * Note that we do not define this method, therefore statements like "AbstractSrnModel new = old;" will not compile.
-     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateSrnModel.
+     * Prevent copy-assignment of this class, or its subclasses. Note that we do 
+     * not define this method, therefore statements like 
+     * "AbstractSrnModel new = old;" 
+     * will not compile. We do not inherit from boost::noncopyable because we 
+     * *do* define a protected copy-constructor, for use by CreateSrnModel.
      *
      * @return the new SRN model.
      */
@@ -96,35 +97,32 @@ private:
 
 protected:
 
-    /**
-     * The cell that this model is associated with.
-     */
+    /** The cell that this model is associated with. */
     CellPtr mpCell;
 
-    /**
-     * The time the SRN model has been simulated to.
-     */
+    /** The time the SRN model has been simulated to. */
     double mSimulatedToTime;
 
-    /**
-     * The local edge index when used as part of a edge-based SRN.
-     */
+    /** The local edge index when used as part of a edge-based SRN. */
     unsigned mEdgeLocalIndex;
 
-    /**
-     * Indicates if edge model has been introduced. False by default.
-     */
+    /** Indicates if edge model has been introduced. False by default. */
     bool mIsEdgeBasedModel;
 
     /**
-     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
-     * is by calling that method, to ensure that a model of the correct subclass is created.
-     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     * Protected copy-constructor for use by CreateSrnModel(). The only way for 
+     * external code to create a copy of a SRN model is by calling that method, 
+     * to ensure that a model of the correct subclass is created. 
+     * 
+     * This copy-constructor helps subclasses to ensure that all member 
+     * variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
-     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
-     * can be done in InitialiseDaughterCell().
+     * This method is called by child classes to set member variables for a 
+     * daughter cell upon cell division. Note that the parent SRN model will 
+     * have had ResetForDivision() called just before CreateSrnModel() is 
+     * called, so performing an exact copy of the parent is suitable behaviour. 
+     * Any daughter-cell-specific initialisation can be done in 
+     * InitialiseDaughterCell().
      *
      * @param rModel the SRN model to copy.
      */
@@ -143,7 +141,7 @@ public:
      * does not delete mpCell. Instead, the cell takes responsibility for deleting
      * the SRN model when it is destroyed.
      */
-    virtual ~AbstractSrnModel() = default;
+    virtual ~AbstractSrnModel();
 
     /**
      * Gives the SRN model a pointer to its host cell.

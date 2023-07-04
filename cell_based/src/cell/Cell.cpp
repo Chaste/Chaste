@@ -282,15 +282,15 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
 
 boost::shared_ptr<CellEdgeData> Cell::GetCellEdgeData() const
 {
-    CellPropertyCollection cell_edge_data_collection = mCellPropertyCollection.GetPropertiesType<CellEdgeData>();
+    CellPropertyCollection collection = mCellPropertyCollection.GetPropertiesType<CellEdgeData>();
 
     /*
      * Note: In its current form the code requires each cell to have exactly
      * one CellEdgeData object. This is reflected in the assertion below.
      */
-    assert(cell_edge_data_collection.GetSize() <= 1);
+    assert(collection.GetSize() <= 1);
 
-    return boost::static_pointer_cast<CellEdgeData>(cell_edge_data_collection.GetProperty());
+    return boost::static_pointer_cast<CellEdgeData>(collection.GetProperty());
 }
 
 bool Cell::HasCellVecData() const

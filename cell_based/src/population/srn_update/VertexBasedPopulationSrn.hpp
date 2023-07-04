@@ -59,6 +59,10 @@ template <unsigned DIM>
 class VertexBasedPopulationSrn
 {
 private:
+
+    /** Pointer to a VertexBasedCellPopulation. */
+    VertexBasedCellPopulation<DIM>* mpCellPopulation;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -74,10 +78,13 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // DO NOT archive & mpCellPopulation; -- The VertexBasedPopulationSrn is only ever archived from the VertexBasedCellPopulation
-        // which knows this and it is handled in the load_construct of VertexBasedCellPopulation.
+        /*
+         * DO NOT archive & mpCellPopulation: the VertexBasedPopulationSrn is 
+         * only ever archived from the VertexBasedCellPopulation, which knows 
+         * this, and it is handled in the load_construct of VertexBasedCellPopulation.
+         */ 
     }
-    VertexBasedCellPopulation<DIM>* mpCellPopulation;
+
 public:
 
     /**
@@ -93,14 +100,16 @@ public:
     /**
      * Set the cell population.
      * 
-     * @param pVertexPopulation pointer to a VertexBasedCellPopulation
+     * @param pCellPopulation pointer to a VertexBasedCellPopulation
      */
-    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pVertexPopulation);
+    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pCellPopulation);
 
     /**
      * This method iterates over edge operations performed on the mesh and
      * calls on RemapCellSrn() with appropriate arguments
-     * @param rElementMap the element map to take into account that some elements are deleted after an edge operation is recorded
+     * 
+     * @param rElementMap the element map to take into account that some 
+     *                    elements are deleted after an edge operation is recorded
      */
     void UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap);
 
@@ -116,6 +125,8 @@ public:
                              CellSrnModel* pCellSrn,
                              const EdgeRemapInfo& rEdgeChange);
 };
+
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedPopulationSrn)
+
 #endif /* VERTEXBASEDPOPULATIONSRN_HPP_ */

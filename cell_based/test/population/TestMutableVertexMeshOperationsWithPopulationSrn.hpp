@@ -585,24 +585,25 @@ public:
         const unsigned n_operations = edge_operations.size();
         //Two node merging operations in two elements and two new edge operations in the other two elements
         TS_ASSERT_EQUALS(n_operations, 8u);
-        unsigned n_edge_splits= 0, n_new_edges= 0;
-        std::vector<std::vector<unsigned int> > element_to_operations(5);
+        unsigned num_edge_splits = 0;
+        unsigned num_new_edges = 0;
+        std::vector<std::vector<unsigned> > element_to_operations(5);
         for (unsigned i=0; i<n_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
             {
-                n_edge_splits++;
+                num_edge_splits++;
             }
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
             {
-                n_new_edges++;
+                num_new_edges++;
             }
             // Determine operations that an element underwent
             const unsigned elem_index = edge_operations[i].GetElementIndex();
             element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
         }
-        TS_ASSERT_EQUALS(n_edge_splits, 5u);
-        TS_ASSERT_EQUALS(n_new_edges, 3u);
+        TS_ASSERT_EQUALS(num_edge_splits, 5u);
+        TS_ASSERT_EQUALS(num_new_edges, 3u);
 
         // Update population SRNs
         VertexElementMap element_map(5);

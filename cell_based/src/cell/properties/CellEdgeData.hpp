@@ -50,16 +50,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /**
- * Data associated with the cell's edges, for use when cells are physically represented as a VertexMesh.
- * Each data item is an array that has the same size and in the same order as edges in cell's associated VertexElement.
+ * Data associated with the cell's edges, for use when cells are physically 
+ * represented as a VertexMesh. Each data item is an array that has the same 
+ * size and in the same order as edges in cell's associated VertexElement.
  */
 class CellEdgeData : public AbstractCellProperty
 {
 private:
 
-    /**
-     * The cell edge data.
-     */
+    /** The cell edge data. */
     std::map<std::string, std::vector<double>> mCellEdgeData;
 
     /** Needed for serialization. */
@@ -111,7 +110,7 @@ public:
      * 
      * @return A single value in the data array.
      */
-    double GetItemAtIndex(const std::string& rVariableName, const unsigned int index);
+    double GetItemAtIndex(const std::string& rVariableName, const unsigned index);
 
     /**
      * @return number of data items
@@ -130,4 +129,4 @@ public:
 // Declare identifier for the serializer
 CHASTE_CLASS_EXPORT(CellEdgeData)
 
-#endif //CELLEDGEDATA_HPP_
+#endif /* CELLEDGEDATA_HPP_ */

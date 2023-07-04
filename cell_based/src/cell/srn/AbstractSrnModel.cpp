@@ -42,6 +42,10 @@ AbstractSrnModel::AbstractSrnModel()
 {
 }
 
+AbstractSrnModel::~AbstractSrnModel()
+{
+}
+
 void AbstractSrnModel::Initialise()
 {
 }
@@ -96,15 +100,6 @@ double AbstractSrnModel::GetSimulatedToTime() const
 {
     return mSimulatedToTime;
 }
-
-/*
-///\todo - make abstract? (#2752)
-void AbstractSrnModel::SimulateToCurrentTime()
-{
-    // This should be overridden
-    SetSimulatedToTime(SimulationTime::Instance()->GetTime());
-}
-*/
 
 void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 {

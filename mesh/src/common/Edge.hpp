@@ -280,4 +280,4 @@ inline void load_construct_data(
 
 }
 } // namespace ...
-#endif //EDGE_HPP_
+#endif /* EDGE_HPP_ */

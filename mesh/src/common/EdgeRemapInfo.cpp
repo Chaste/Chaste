@@ -43,19 +43,20 @@ EdgeRemapInfo::~EdgeRemapInfo()
 {  
 }
 
-EdgeRemapInfo::EdgeRemapInfo(const std::vector<long int>& edgesMapping, const std::vector<unsigned int>& edgesStatus)
+EdgeRemapInfo::EdgeRemapInfo(const std::vector<long>& rEdgesMapping,
+                             const std::vector<unsigned>& rEdgesStatus)
     : mUnused(false),
-      mEdgesMapping(edgesMapping),
-      mEdgeStatus(edgesStatus)
+      mEdgesMapping(rEdgesMapping),
+      mEdgeStatus(rEdgesStatus)
 {
 }
 
-std::vector<long int> EdgeRemapInfo::GetEdgesMapping() const
+std::vector<long> EdgeRemapInfo::GetEdgesMapping() const
 {
     return mEdgesMapping;
 }
 
-std::vector<unsigned int> EdgeRemapInfo::GetEdgesStatus() const
+std::vector<unsigned> EdgeRemapInfo::GetEdgesStatus() const
 {
     return mEdgeStatus;
 }
@@ -65,13 +66,12 @@ std::vector<double> EdgeRemapInfo::GetSplitProportions() const
     return mSplitProportions;
 }
 
-void EdgeRemapInfo::SetSplitProportions(const std::vector<double> thetas)
+void EdgeRemapInfo::SetSplitProportions(const std::vector<double> proportions)
 {
-    mSplitProportions = thetas;
+    mSplitProportions = proportions;
 }
 
 bool EdgeRemapInfo::GetUnused() const
 {
     return mUnused;
 }
-

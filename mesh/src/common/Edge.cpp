@@ -37,21 +37,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index)
-        : mIndex(index),
-          mIsDeleted(false)
+    : mIndex(index),
+      mIsDeleted(false)
 {
 }
 
 template <unsigned SPACE_DIM>
-Edge<SPACE_DIM>::Edge(unsigned index, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
-        : mIndex(index),
-          mIsDeleted(false)
+Edge<SPACE_DIM>::Edge(unsigned index,
+                      Node<SPACE_DIM>* pNodeA,
+                      Node<SPACE_DIM>* pNodeB)
+    : mIndex(index),
+      mIsDeleted(false)
 {
     this->SetNodes(pNodeA, pNodeB);
 }
 
-template <unsigned int SPACE_DIM>
-std::pair<unsigned, unsigned> Edge<SPACE_DIM>::GenerateMapIndex(unsigned int indexA, unsigned int indexB)
+template <unsigned SPACE_DIM>
+std::pair<unsigned, unsigned> Edge<SPACE_DIM>::GenerateMapIndex(unsigned indexA,
+                                                                unsigned indexB)
 {
     return std::make_pair(std::min(indexA, indexB), std::max(indexA, indexB));
 }
@@ -86,7 +89,6 @@ std::pair<unsigned ,unsigned> Edge<SPACE_DIM>::GetMapIndex()
     assert(mNodes.size() == 2);
     const unsigned index0 = mNodes[0]->GetIndex();
     const unsigned index1 = mNodes[1]->GetIndex();
-
     return Edge<SPACE_DIM>::GenerateMapIndex(index0, index1);
 }
 
@@ -97,7 +99,8 @@ void Edge<SPACE_DIM>::RemoveNodes()
 }
 
 template<unsigned SPACE_DIM>
-void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA,
+                               Node<SPACE_DIM>* pNodeB)
 {
     // Clear the nodes first
     this->RemoveNodes();
@@ -108,7 +111,8 @@ void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 }
 
 template<unsigned SPACE_DIM>
-void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
+void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode,
+                                  Node<SPACE_DIM>* pNewNode)
 {
     for (unsigned i = 0; i < 2; i++)
     {
@@ -164,10 +168,12 @@ std::set<unsigned> Edge<SPACE_DIM>::GetOtherElements(unsigned elementIndex)
 {
     std::set<unsigned> otherElements;
     for (unsigned elem: mElementIndices)
+    {
         if (elem != elementIndex)
         {
             otherElements.insert(elem);
         }
+    }
     return otherElements;
 }
 
