@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2022, University of Oxford.
+# Copyright (c) 2005-2023, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -30,12 +30,11 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# The version that ships with Ubuntu 18.04
-cmake_minimum_required (VERSION 3.10.2)
+# The version that ships with Ubuntu 20.04
+cmake_minimum_required (VERSION 3.16.3)
 
-# Set standard to C++14. Note that CMake < 3.6 does not know how to set the standard flag for the Intel compiler, so
-# the ChasteCompilerFlags.cmake also sets the --std=c++14 flag, too.
-set(CMAKE_CXX_STANDARD 14)
+# Set standard to C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -289,6 +288,11 @@ endif()
 # Install chaste_codegen in virtual environment
 message (STATUS "Installing chaste_codegen")
 execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${codegen_python3_venv}/chaste_codegen --version
+        OUTPUT_VARIABLE Chaste_CODEGEN_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+message("Codegen version: ${Chaste_CODEGEN_VERSION}")
+
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
@@ -447,7 +451,7 @@ if (Chaste_MEMORY_TESTING)
     get_filename_component (openmpi_supp_path ${openmpi_supp_path} PATH)
     set (openmpi_supp_path "${openmpi_supp_path}/share/openmpi/openmpi-valgrind.supp")
     set (Chaste_MEMORY_TESTING_SUPPS "--suppressions=${Chaste_SOURCE_DIR}/chaste.supp")
-    set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${Chaste_SOURCE_DIR}/chaste-lucid.supp")
+    set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${Chaste_SOURCE_DIR}/chaste-legacy.supp")
     if (EXISTS ${openmpi_supp_path})
         set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${openmpi_supp_path}")
     endif ()
@@ -963,7 +967,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
         set (extension svg)
         set (NUM_CPUS ${Chaste_PROFILE_GPERFTOOLS_CPUS})
     else ()
-        set (extension gmon)
+        set (extension txt)
         set (NUM_CPUS ${Chaste_PROFILE_GPROF_CPUS})
     endif ()
 

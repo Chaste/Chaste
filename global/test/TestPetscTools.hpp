@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -131,10 +131,10 @@ public:
 
         // Test SetupMatrix with non-default preallocation
         Mat mat2;
-        PetscTools::SetupMat(mat2, 12, 10, 4, PETSC_DECIDE, PETSC_DECIDE, false, false);
+        PetscTools::SetupMat(mat2, 11, 11, 4, PETSC_DECIDE, PETSC_DECIDE, false, false);
         MatGetSize(mat2, &m, &n);
-        TS_ASSERT_EQUALS(m, 12);
-        TS_ASSERT_EQUALS(n, 10);
+        TS_ASSERT_EQUALS(m, 11);
+        TS_ASSERT_EQUALS(n, 11);
 
         MatGetType(mat2,&type);
         if (PetscTools::IsSequential())
@@ -154,16 +154,23 @@ public:
 
         if (PetscTools::IsSequential())
         {
-            TS_ASSERT_EQUALS( nonzeros_allocated, 4*12u );
+            TS_ASSERT_EQUALS( nonzeros_allocated, 4*11u );
         }
         else
         {
-            // Total number of nozeros that should be allocated is 36 (4*12 (12 = number of rows) in diagonal part,
-            // plus 4*12 in the off-diagonal part. These are then split between the number of processors. So, a
-            // processor that owns n rows should have 8*n nonzeros allocated.
+            /* Maximum number of nonzeros that should be allocated is 44 (11 = number of rows) in diagonal part,
+               plus 4*11 in the off-diagonal part. These are then split between the number of processes. So, a
+               process that owns n rows should have no more than 8*n nonzeros allocated.
+               In PETSc 3.11 onwards the number of non-zeros in the diagonal part is capped to the number of entries
+               in the block diagonal part.  That means a process that owns n rows will allocate at most n*n diagonal non-zero.
+             */
             PetscInt lo, hi;
             MatGetOwnershipRange(mat2, &lo, &hi);
-            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(2*4*(hi-lo)) );
+            unsigned expected_nz_per_row = std::min(4, hi-lo) + 4;
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 10)
+            expected_nz_per_row = 4 + 4; // Older PETSc versions could over-allocate the blockdiagonal
+#endif
+            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(expected_nz_per_row*(hi-lo)) );
         }
 
         PetscTools::Destroy(mat2);

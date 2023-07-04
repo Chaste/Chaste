@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,8 +61,9 @@ public:
 
         SetUseCvodeJacobian(false);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
+
         RunTests(dirname, models, args);
-        SetUseCvodeJacobian(true);
+
 #endif
     }
 };

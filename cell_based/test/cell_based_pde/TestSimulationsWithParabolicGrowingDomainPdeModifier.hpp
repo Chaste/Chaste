@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -144,7 +144,7 @@ public:
         p_pde_modifier->SetDependentVariableName("oxygen");
         simulator.AddSimulationModifier(p_pde_modifier);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 

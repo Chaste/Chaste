@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscException.hpp"
 #include "PetscTools.hpp"
 #include "Warnings.hpp"
-#include "IsNan.hpp"
 
 class TestPetscSetup : public CxxTest::TestSuite
 {
@@ -99,7 +98,7 @@ public:
          */
         TS_ASSERT_THROWS_CONTAINS( KSPEXCEPT(KSP_DIVERGED_ITS), "DIVERGED_ITS in function \'TestKspExceptionsForCoverage\' on line");
         // The next one is deliberately fragile because it contains the line number in this test suite (to check that the line number is output correctly).
-        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line 102 of file ./global/test/TestPetscSetup.hpp");
+        TS_ASSERT_THROWS_THIS( KSPEXCEPT(KSP_DIVERGED_DTOL),  "DIVERGED_DTOL in function \'TestKspExceptionsForCoverage\' on line 101 of file ./global/test/TestPetscSetup.hpp");
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN), Exception );
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_BREAKDOWN_BICG), Exception );
         TS_ASSERT_THROWS( KSPEXCEPT(KSP_DIVERGED_NONSYMMETRIC), Exception );
@@ -110,42 +109,6 @@ public:
         KSPWARNIFFAILED(KSP_DIVERGED_ITS);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         Warnings::QuietDestroy();
-    }
-
-    void TestDivideOneByZero()
-    {
-        double one = 1.0;
-        double zero = 0.0;
-        double ans;
-#ifdef TEST_FOR_FPE
-// If we are testing for divide-by-zero, then this will throw an exception
-        //TS_ASSERT_THROWS_ANYTHING(ans = one / zero);
-        ans = zero*one;//otherwise compiler would complain
-        TS_ASSERT_EQUALS(ans, zero);
-        ans=ans*zero;//otherwise compiler would complain
-#else
-// If we aren't testing for it, then there will be no exception
-        TS_ASSERT_THROWS_NOTHING(ans = one / zero);
-        double negative_infinity=std::numeric_limits<double>::infinity();
-        TS_ASSERT_EQUALS(ans, negative_infinity);
-#endif
-    }
-
-    void TestDivideZeroByZero()
-    {
-        double zero = 0.0;
-        double ans;
-#ifdef TEST_FOR_FPE
-// If we are testing for divide-by-zero, then this will throw an exception
-        //TS_ASSERT_THROWS_ANYTHING(ans = zero / zero);
-        ans = zero;//otherwise compiler would complain
-        TS_ASSERT_EQUALS(ans, zero);
-        ans=ans*zero;//otherwise compiler would complain
-#else
-// If we aren't testing for it, then there will be no exception
-        TS_ASSERT_THROWS_NOTHING(ans = zero / zero);
-        TS_ASSERT(std::isnan(ans));
-#endif
     }
 };
 

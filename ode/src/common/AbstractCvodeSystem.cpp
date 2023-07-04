@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -106,7 +106,9 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void* p
         return -1;
     }
 
-    //    // Something like this might help CVODE when things are a bit unstable...
+    //    Something like this might help CVODE when things are a bit unstable...
+    //    We tried this again in Jan 2023 but now with VerifyStateVariables() returning a recoverable error when values look off. However this didn't improve the situation.
+    //    See: https://github.com/Chaste/Chaste/issues/46
     //    try
     //    {
     //        p_ode_system->VerifyStateVariables();

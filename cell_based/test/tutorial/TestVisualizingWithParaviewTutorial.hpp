@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -351,8 +351,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* We also make a pointer to target area modifier and add it to the simulator.
-         * The target area modifier assigns target areas to cells throughout the simulation.
+        /* We also make a pointer to a target area modifier and add it to the simulator.
+         * The target area modifier assigns target areas to cells throughout the simulation, modelling cell growth.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);

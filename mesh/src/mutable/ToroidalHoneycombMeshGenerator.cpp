@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -93,7 +93,8 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
                 boundary = 1;
             }
 
-            double x = x0 + horizontal_spacing*((double)j + 0.25*(1.0+ SmallPow(-1.0,i+1)));
+            const double adjustment = i % 2 != 0 ? 0.5 : 0.0;
+            double x = x0 + horizontal_spacing*((double)j + adjustment);
             double y = y0 + vertical_spacing*(double)i;
 
             // Avoid floating point errors which upset OffLatticeSimulation

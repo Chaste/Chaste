@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -461,7 +461,7 @@ public:
             cells.push_back(p_cell);
         }
 
-        /* Now that we have defined the mesh and cells, we can define the cell population, forces, areas modifier, and simulation
+        /* Now that we have defined the mesh and cells, we can define the cell population, forces, target area modifier, and simulation
          * in the same way as the other tutorials. */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -589,11 +589,18 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
 
     ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox(rNodes);
 
+    // Note that in circumstances where parts of the bounding box are a long way from the origin then
+    // a hard-coded "swell factor" of 1e-14 will not be noticed.
+    // For example 200*machine_epsilon = 200*2.2e-16 = 4.4e-14 which implies 200+1e-14 == 200.
+
+    double swell_factor = bounding_box.GetWidth(bounding_box.GetLongestAxis()); // Largest dimension
+    swell_factor = (1 + swell_factor) * 1e-14; // Make sure that it's non-zero
+
     c_vector<double, 2*SPACE_DIM> domain_size;
     for (unsigned i=0; i < SPACE_DIM; i++)
     {
-        domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - 1e-14;
-        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + 1e-14;
+        domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - swell_factor;
+        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + swell_factor;
     }
     SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
 }

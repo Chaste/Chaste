@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -292,7 +292,7 @@ public:
         TwoDimCvodeSystem ode2;
         TS_ASSERT_THROWS_THIS(ode2.ComputeDerivedQuantitiesFromCurrentState(0.0),
                               "This ODE system does not define derived quantities.");
-        N_Vector doesnt_matter;
+        N_Vector doesnt_matter{};
         TS_ASSERT_THROWS_THIS(ode2.ComputeDerivedQuantities(0.0, doesnt_matter),
                               "This ODE system does not define derived quantities.");
 

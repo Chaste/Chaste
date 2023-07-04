@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTRANDOMNUMBERGENERATOR_HPP_
 #define TESTRANDOMNUMBERGENERATOR_HPP_
 #include <cxxtest/TestSuite.h>
+
+#include <random>
 
 #include "CheckpointArchiveTypes.hpp"
 
@@ -118,7 +120,7 @@ public:
         // Now reseed, do something else random and then get "the first" random number
         p_gen->Reseed(0);
         std::vector<unsigned> some_vector(10);
-        std::random_shuffle(some_vector.begin(), some_vector.end());
+        std::shuffle(some_vector.begin(), some_vector.end(), std::mt19937(std::random_device()()));
         double ran3 = p_gen->ranf();
         TS_ASSERT_DELTA(ran1, ran3, 1e-7);
 

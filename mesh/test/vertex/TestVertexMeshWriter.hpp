@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
-
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -482,6 +482,17 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
+    }
+
+    void TestTrapezoidEdgeVertexMeshWriter()
+    {
+        // The class is utilised when there are CellEdgeData associated with the mesh
+        // TrapezoidEdgeVertexMeshWriter() only outputs .vtk files for visualisation,
+        // where trapezoids represent edges.
+        // Here we only test for coverage of an implementation of WriteFiles() method
+        TrapezoidEdgeVertexMeshWriter<2,2> mesh_writer("TestTrapezoidEdgeVertexMeshWriter", "vertex_mesh");
+        //For coverage
+        mesh_writer.WriteFiles();
     }
 };
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,7 +105,9 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 {
-    delete mpElementTessellation;
+    // This pointer is always null because PottsBasedCellPopulation::CreateElementTessellation
+    // is not implemented. See #1666 in the trac ticket archive for more information.
+    assert(mpElementTessellation == nullptr);
 
     delete mpMutableMesh;
 

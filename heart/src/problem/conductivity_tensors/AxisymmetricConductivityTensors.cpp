@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,6 +64,10 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::SetConstantConduct
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh)
 {
+    if (SPACE_DIM != 3)
+    {
+        EXCEPTION("Axisymmetric anisotropic conductivity only makes sense in 3D"); // LCOV_EXCL_LINE
+    }
     this->mpMesh = pMesh;
 
     if (!this->mUseNonConstantConductivities && !this->mUseFibreOrientation)

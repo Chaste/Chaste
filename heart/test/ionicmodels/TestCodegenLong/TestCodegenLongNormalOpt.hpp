@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ public:
         args.push_back("--opt");
 
         // Models that need a very small dt
-        std::vector<std::string> small_dt_models = spectail_streatment_models(models, {"li_mouse_2010"});
+        std::vector<std::string> small_dt_models = special_treatment_models(models, {"pandit_clark_giles_demir_2001_epicardial_cell", "ten_tusscher_model_2006_epi", "li_mouse_2010"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.1, 1.0);
         RunTests(dirname, models, args, true);

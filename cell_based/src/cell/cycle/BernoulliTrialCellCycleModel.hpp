@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BERNOULLITRIALCELLCYCLEMODEL_HPP_
 
 #include "AbstractCellCycleModel.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
  * Simple cell-cycle model where mature non-differentiated cells have a specified probability of
@@ -61,6 +62,11 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+
+        // Make sure the RandomNumberGenerator singleton gets saved too
+        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & p_wrapper;
+
         archive & mDivisionProbability;
         archive & mMinimumDivisionAge;
     }

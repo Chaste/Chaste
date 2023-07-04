@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,25 +52,19 @@ double SmallPow(double x, unsigned exponent)
         }
         case 2:
         {
-            return x*x;
+            return x * x;
         }
         case 3:
         {
-            return x*x*x;
+            return x * x * x;
+        }
+        case 4:
+        {
+            return x * x * x * x;
         }
         default:
         {
-            if (exponent % 2 == 0)
-            {
-                // Even power
-                double partial_answer = SmallPow(x, exponent/2);
-                return partial_answer*partial_answer;
-            }
-            else
-            {
-                // Odd power
-                return SmallPow(x, exponent-1)*x;
-            }
+            return std::pow(x, static_cast<double>(exponent));
         }
     }
 }

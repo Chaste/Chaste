@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -385,8 +385,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* A {{{NagaiHondaForce}}} assumes that each cell has a target area assigned to it. In order to
-         * assign target areas to each cell and define how they grow, we add a {{{SimpleTargetAreaModifier}}}
+        /* In order to model cell growth between divisions, we add a {{{SimpleTargetAreaModifier}}}
          * to the simulator.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);

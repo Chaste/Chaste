@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,13 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  *
- *  For example:
- *  scons co=1 projects/you/TestBlah.hpp
- *  ./projects/you/build/debug/TestBlahRunner -myparam 10.4
- *
- *  Alternatively, you can add the arguments to SCons so that you can compile and run in one go:
- *  scons run_time_flags="--verbose true" global/test/TestCommandLineArguments.hpp
- *  This should produce "You have successfully set --verbose to take the value 1." for this test suite.
  *
  * Note: error messages such as
  *   WARNING! There are options you set that were not used!

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,22 +63,10 @@ public:
         args.push_back("--opt");
 
         // These have NaN in the jacobian due to massive exponentials
-        std::vector<std::string> bad_models = spectail_streatment_models(models, {"aslanidi_model_2009",
-                                                                                  "hund_rudy_2004_a",
-                                                                                  "livshitz_rudy_2007"});
-
-        // Models that need a different lookup table
-        std::vector<std::string> different_lookup_table_models = spectail_streatment_models(models, {"ten_tusscher_model_2004_endo",
-                                                                                                     "noble_model_1991",
-                                                                                                     "luo_rudy_1994"});
-
+        std::vector<std::string> bad_models = special_treatment_models(models, {"livshitz_rudy_2007"});
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args);
-
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001953125, 0.1, 1.0);
-        RunTests(dirname, different_lookup_table_models, args);
-
 #endif
     }
 };

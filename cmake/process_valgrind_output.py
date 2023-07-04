@@ -1,5 +1,5 @@
 
-"""Copyright (c) 2005-2022, University of Oxford.
+"""Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -161,7 +161,7 @@ class ProcessValgrind:
         return result
 
 if __name__ == "__main__":
-    files = glob.glob(sys.argv[1]+'/*_valgrind.out')
+    files = glob.glob(sys.argv[1]+'/*_valgrind.txt')
     index_file = open(sys.argv[1]+'/index.html','w')
     procVal = ProcessValgrind()
     ok = True
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     index_file.write('<body>\n')
     for file in files:
         filename = os.path.basename(file)
-        testname = re.match('(.*)_valgrind.out',filename).group(1)
+        testname = re.match('(.*)_valgrind.txt',filename).group(1)
         status = procVal.EncodeStatus(open(file,'r'))
         colour = procVal.StatusColour(status)
         index_file.write('<p> <font color="%s">%s: %s <a href="%s">(test output)</a>\n'%(colour,testname,procVal.DisplayStatus(status),filename))

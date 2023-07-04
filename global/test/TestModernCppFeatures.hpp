@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * There is no real 'testing' in this class; just verification that the compiler can cope with various new language
  * features.
  *
- * Chaste currently uses C++14.
+ * Chaste currently uses C++17.
  */
 class TestModernCppFeatures : public CxxTest::TestSuite
 {

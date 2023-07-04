@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -271,7 +271,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
     {
-        WARNING("PETSc hypre preconditioning library is not installed");
+        WARNING("PETSc hypre preconditioning library is not installed"); // LCOV_EXCL_LINE
     }
     // Stop supressing error
     PetscPopErrorHandler();

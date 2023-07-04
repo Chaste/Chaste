@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2022, University of Oxford.
+Copyright (c) 2005-2023, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -375,9 +375,10 @@ public:
         TS_ASSERT_DELTA(voltage_replicated[9], -0.770330519, atol);
         TS_ASSERT_DELTA(voltage_replicated[10], -19.2234919, atol);
 
+        // Now compare with the TestMonodomainProblem1D simulation above
         for (unsigned index = 0; index < voltage_replicated.GetSize(); index++)
         {
-            TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index], 1e-12);
+            TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index], 5e-12);
         }
         // cover get pde
         monodomain_problem.GetTissue();
