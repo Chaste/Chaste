@@ -110,48 +110,45 @@ public:
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
-        // now loop over all nodes
-        // find the minimal y position
-        double minimal_y_position = p_mesh->GetNode(0)->rGetLocation()[1];
-        for (unsigned node_index=0; node_index<44u; node_index++)
+        // Now loop over all nodes and find the minimum y position
+        double min_y_position = p_mesh->GetNode(0)->rGetLocation()[1];
+        for (unsigned node_index = 0; node_index < 44; node_index++)
         {
             double this_y_position = p_mesh->GetNode(node_index)->rGetLocation()[1];
-            if (this_y_position < minimal_y_position)
+            if (this_y_position < min_y_position)
             {
-                minimal_y_position = this_y_position;
+                min_y_position = this_y_position;
             }
         }
 	
-        // loop over all nodes again, find all nodes with that y position
+        // Loop over all nodes again, find all nodes with that y position
         unsigned num_bottom_nodes = 0;
-        for (unsigned node_index=0; node_index<44u; node_index++)
+        for (unsigned node_index = 0; node_index < 44; node_index++)
         {
             double this_y_position = p_mesh->GetNode(node_index)->rGetLocation()[1];
-            if (this_y_position == minimal_y_position)
+            if (this_y_position == min_y_position)
             {
                 num_bottom_nodes++;
-		//These nodes should be boundary nodes
-                TS_ASSERT(p_mesh->GetNode(node_index)->IsBoundaryNode())            }
+
+		        // This node should be a boundary node
+                TS_ASSERT(p_mesh->GetNode(node_index)->IsBoundaryNode())
+            }
         }
 
         // The total number of bottom nodes should be 5
         TS_ASSERT_EQUALS(num_bottom_nodes, 5u);
 
-        // loop over all elements
-        // count all elements that have five nodes
-        // these should be 4
-
+        // There should be 4 elements with 5 nodes
         unsigned num_five_node_elements = 0;
         for (unsigned element_index=0; element_index<16u; element_index++)
         {
-            double num_nodes = p_mesh->GetElement(element_index)->GetNumNodes();
-            if (num_nodes == 5.0)
+            unsigned num_nodes = p_mesh->GetElement(element_index)->GetNumNodes();
+            if (num_nodes == 5)
             {
                num_five_node_elements++;
             }
         }
-        TS_ASSERT_EQUALS(num_five_node_elements,4u);
-
+        TS_ASSERT_EQUALS(num_five_node_elements, 4u);
     }
 };
 
