@@ -198,8 +198,11 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
 
             std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
-            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.12)\n" <<
-                                      "add_compile_options(-std=c++14)\n" <<
+            cmake_lists_filestream << "cmake_minimum_required(VERSION 3.16.3)\n" <<
+                                      "set(CMAKE_CXX_STANDARD 17)\n" <<
+                                      "set(CMAKE_CXX_STANDARD_REQUIRED ON)\n" <<
+                                      "set(CMAKE_CXX_EXTENSIONS OFF)\n" <<
+                                      "project (ChasteCellMLToSharedLibraryConverter)\n" <<
                                       "find_package(PythonInterp 3.5 REQUIRED)\n" <<
                                       "set(codegen_python3_venv " + chaste_root.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
@@ -209,6 +212,9 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n" <<
                                       "if (${CMAKE_SYSTEM_NAME} MATCHES \"Darwin\")\n" <<
                                       "   target_link_libraries(" << cellml_leaf_name << " \"-Wl,-undefined,dynamic_lookup\")\n" <<
+                                      "endif()\n" <<
+                                      "if (${CMAKE_CXX_COMPILER_ID} STREQUAL \"IntelLLVM\")\n" <<
+                                      "   set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -fp-model precise\")\n" <<
                                       "endif()\n";
             cmake_lists_filestream.close();
             std::string cmake_args = " -DCMAKE_PREFIX_PATH=" + chaste_root.GetAbsolutePath() +

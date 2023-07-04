@@ -2,6 +2,8 @@ TestArchiving.hpp
 TestCwd.hpp
 TestDistributedVector.hpp
 TestException.hpp
+TestFloatingPointDivisionByZero.hpp
+TestFloatingPointDivisionByZeroPetsc.hpp
 TestHeartEventHandler.hpp
 TestLogFile.hpp
 TestOutputFileHandler.hpp
