@@ -670,8 +670,8 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         cell_offset_dist[i] = cell_offset_dist[i-1]+this->GetElement(i-1)->GetNumEdges()+1;
         num_edges += this->GetElement(i)->GetNumEdges();
     }
-    //Total number of edges
-    num_edges+=this->GetElement(0)->GetNumEdges();
+    // Total number of edges
+    num_edges += this->GetElement(0)->GetNumEdges();
 
     // Iterate over any cell writers that are present
     // The data that is written below is associated with the entire cell
@@ -680,6 +680,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     {
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data(num_edges+n_cells);
+
         // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
         for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
              elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();

@@ -103,26 +103,26 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel() override;
+    virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    virtual void Initialise() override;
+    virtual void Initialise();
 
     /**
      * This method is called when a new edge is created (e.g. after cell division or T1 swap)
      */
-    virtual void InitialiseDaughterCell() override;
+    virtual void InitialiseDaughterCell();
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      * Updates parameters (such as neighbour or interior Delta/Notch) and
      * runs the simulation to current time
      */
-    virtual void SimulateToCurrentTime() override;
+    virtual void SimulateToCurrentTime();
 
     /**
      * Update the levels of Delta and Notch of neighbouring edge sensed by this edge
@@ -181,7 +181,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
      * Adds Delta/Notch from the input SRN model to this model.
@@ -191,7 +191,7 @@ public:
      * @param scale scale factor
      */
     virtual void AddSrnQuantities(AbstractSrnModel* pOtherSrn,
-                                  const double scale = 1.0) override;
+                                  const double scale = 1.0);
 
     /**
      * Here we assume that when a neighbouring junctions shrinks, 25% of its Delta/Notch
@@ -200,7 +200,7 @@ public:
      * 
      * @param pShrunkEdgeSrn Pointer to an SRN
      */
-    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn) override;
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn);
 
     /**
      * Here we add Delta/Notch when junctions merge via common vertex deletion
@@ -208,7 +208,7 @@ public:
      * 
      * @param pMergedEdgeSrn Pointer to an SRN
      */
-    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn) override;
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn);
 
     /**
      * By default, Edge concentrations are split according to relative lengths, when an edge is split.
@@ -216,7 +216,7 @@ public:
      * 
      * @param relativePosition relative position to use when splitting Edge concentrations
      */
-    virtual void SplitEdgeSrn(const double relativePosition) override;
+    virtual void SplitEdgeSrn(const double relativePosition);
 };
 
 typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;

@@ -104,10 +104,10 @@ protected:
     double mSimulatedToTime;
 
     /** The local edge index when used as part of a edge-based SRN. */
-    unsigned mEdgeLocalIndex;
+    unsigned mEdgeLocalIndex = UNSIGNED_UNSET;
 
     /** Indicates if edge model has been introduced. False by default. */
-    bool mIsEdgeBasedModel;
+    bool mIsEdgeBasedModel = false;
 
     /**
      * Protected copy-constructor for use by CreateSrnModel(). The only way for 

@@ -46,7 +46,7 @@ CellSrnModel::CellSrnModel(const CellSrnModel &rModel)
      * Copy interior SRN to the new cell. Interior SRN should have custom implementation 
      * of a new interior SRN creation after cell division.
      */
-    if (rModel.mpInteriorSrnModel!=nullptr)
+    if (rModel.mpInteriorSrnModel != nullptr)
     {
         this->SetInteriorSrnModel(boost::shared_ptr<AbstractSrnModel>(rModel.GetInteriorSrn()->CreateSrnModel()));
     }

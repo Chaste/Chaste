@@ -102,25 +102,25 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel() override;
+    virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Overriden ResetForDivision() method for custom cell division mitosis
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system for cell interior.
      */
-    virtual void Initialise() override; // override
+    virtual void Initialise();
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      *
      */
-    virtual void SimulateToCurrentTime() override;
+    virtual void SimulateToCurrentTime();
 
     /**
      * Updates model parameters, such as total edge concnetration of Delta/Notch, via processing data
@@ -163,7 +163,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
      * Sets how much of Delta/Notch is returned back to interior after a junction is shrunk
@@ -171,7 +171,7 @@ public:
      * 
      * @param pShrunkEdgeSrn Pointer to an SRN model
      */
-    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn) override;
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn);
 };
 
 // Declare identifier for the serializer

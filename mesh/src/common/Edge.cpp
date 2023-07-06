@@ -141,7 +141,7 @@ bool Edge<SPACE_DIM>::ContainsNode(Node<SPACE_DIM>* pNode) const
 {
     for (auto p_node : mNodes)
     {
-        if (p_node->GetIndex() == p_node->GetIndex())
+        if (p_node->GetIndex() == pNode->GetIndex())
         {
             return true;
         }

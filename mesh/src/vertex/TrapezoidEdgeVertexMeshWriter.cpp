@@ -128,8 +128,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
     // Coefficient 0<=alpha<=1 represents how thin the trapezoid is
     const double alpha = 0.8;
     typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_end = rMesh.GetElementIteratorEnd();
-    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem = rMesh.GetElementIteratorBegin();
-         elem != elem_end; ++elem)
+    for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
     {
         const unsigned n_elem_nodes = elem->GetNumNodes();
         const c_vector<double, SPACE_DIM> elem_centroid = rMesh.GetCentroidOfElement(elem->GetIndex());
@@ -145,9 +144,8 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
     }
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); // Reference counted
-    unsigned total_n_edges = 0;
-    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem = rMesh.GetElementIteratorBegin();
-         elem != elem_end; ++elem)
+    unsigned total_num_edges = 0;
+    for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
     {
         // First do the trapezoids for each edge
         for (unsigned edge_index = 0; edge_index < elem->GetNumEdges(); ++edge_index)
@@ -160,11 +158,13 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
             p_cell_id_list->SetNumberOfIds(n_trap_nodes);
             auto p_edge = elem->GetEdge(edge_index);
             assert(p_edge->GetNumNodes() == 2);
+
             // See the diagram above for storing pattern
             std::array<unsigned, 2> base_ids = { { p_edge->GetNode(0)->GetIndex(), p_edge->GetNode(1)->GetIndex() } };
             std::array<unsigned, 2> top_ids = { { elem->GetNodeLocalIndex(base_ids[0])
                                                       + cell_offset_dist[elem->GetIndex()],
                                                   elem->GetNodeLocalIndex(base_ids[1]) + cell_offset_dist[elem->GetIndex()] } };
+
             // Assuming counter-clockwise ordering
             p_cell_id_list->SetId(0, base_ids[0]);
             p_cell_id_list->SetId(1, base_ids[1]);
@@ -172,8 +172,9 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
             p_cell_id_list->SetId(3, top_ids[0]);
             mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
             p_cell->Delete(); // Reference counted
-            total_n_edges++;
+            total_num_edges++;
         }
+
         // Now do the internal cell
         vtkCell* p_cell;
         p_cell = vtkPolygon::New();
@@ -189,8 +190,9 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMe
 
         p_cell->Delete(); // Reference counted
     }
+
     // For 2D case. For 3D, we should sum the total number of faces + n_elements
-    assert(total_n_edges + n_elements == mpVtkUnstructedMesh->GetNumberOfCells());
+    assert(total_num_edges + n_elements == mpVtkUnstructedMesh->GetNumberOfCells());
 #endif // CHASTE_VTK
 }
 

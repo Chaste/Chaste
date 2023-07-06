@@ -103,7 +103,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<boost
 {
     // This is not efficient. It should replace the corresponding raw ptr method if SetUpBoxCollection and Chaste Cuboid methods are changed to take shared ptrs.
     std::vector<Node<SPACE_DIM>*> temp_nodes(rNodes.size());
-    for (unsigned idx=0; idx<rNodes.size(); idx++)
+    for (unsigned idx = 0; idx < rNodes.size(); idx++)
     {
         temp_nodes[idx] = rNodes[idx].get();
     }
