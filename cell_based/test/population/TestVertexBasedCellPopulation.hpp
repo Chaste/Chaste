@@ -533,14 +533,14 @@ public:
         // Test if the swap has been recorded properly
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned n_operations = edge_operations.size();
+        const unsigned num_operations = edge_operations.size();
 
         // Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 2u);
+        TS_ASSERT_EQUALS(num_operations, 2u);
         unsigned num_edge_splits = 0;
         unsigned num_divisions = 0;
         std::vector<std::vector<unsigned> > element_to_operations(5);
-        for (unsigned i=0; i<n_operations; ++i)
+        for (unsigned i=0; i<num_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_DIVIDE)
             {

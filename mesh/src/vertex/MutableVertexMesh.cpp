@@ -4153,14 +4153,20 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
     c_vector<double, 2> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
 
-    // Reset the intersection away from vertices A and B to allow enough room for new nodes
     /**
-     * If the intersection is within mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or vertexB move it
-     * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
+     * Reset the intersection away from vertices A and B to allow enough room 
+     * for new nodes.
+     * 
+     * If the intersection is within 
+     * mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or 
+     * vertexB move it mCellRearrangementRatio^2*mCellRearrangementThreshold 
+     * away.
      *
-     * Note: this distance so that there is always enough room for new nodes (if necessary).
-     * \todo currently this assumes a worst case scenario of 3 nodes between A and B; could be less movement for other cases
-     *       (see #2401)
+     * Note: this distance so that there is always enough room for new nodes 
+     * (if necessary).
+     * 
+     * \todo currently this assumes a worst case scenario of 3 nodes between A 
+     *       and B; could be less movement for other cases (see #2401)
      */
     if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
@@ -4186,8 +4192,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshOperationTracking(const b
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetOperationRecorder()
 {
-    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* value(&mOperationRecorder);
-    return value;
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* p_value(&mOperationRecorder);
+    return p_value;
 }
 
 // Explicit instantiation

@@ -45,7 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "EdgeRemapInfo.hpp"
 
-/** \todo document this (issue #106) */
+/**
+ * Possible types of edge operation.
+ */
 enum EDGE_OPERATION {
     EDGE_OPERATION_ADD,
     EDGE_OPERATION_DIVIDE,
@@ -61,22 +63,25 @@ class EdgeOperation
 {
 private:
 
-    /** \todo document member variable (issue #106) */
+    /** Type of edge operation. */
     EDGE_OPERATION mOperation;
 
-    /** \todo document member variable (issue #106) */
+    /** Index of one element sharing the edge. */
     unsigned mElementIndex;
 
-    /** \todo document member variable (issue #106) */
+    /** Index of another element sharing the edge. */
     unsigned mElementIndex2;
 
-    /** \todo document member variable (issue #106) */
+    /** Edge remap info. */
     EdgeRemapInfo mRemapInfo;
 
-    /** \todo document member variable (issue #106) */    
+    /** Edge remap info after cell division. */    
     EdgeRemapInfo mRemapInfo2;
 
-    /** \todo document member variable (issue #106) */
+    /**
+     * If operation is recorded before element indices are changed. For example, 
+     * if the operations recorded during T2 swap.
+     */
     bool mIsElementIndexRemapped;
 
     /** Needed for serialization. */

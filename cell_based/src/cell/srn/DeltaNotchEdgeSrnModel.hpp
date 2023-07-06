@@ -43,12 +43,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSrnModel.hpp"
 
 /**
- * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in the sub-cellular reaction network.
- * This SRN model represents a membrane/cortex of a single junction of a cell. This class of models can be used together
- * with DeltaNotchInteriorSrn models. The ODE model used here is an attempt to use previous work (see DeltaNotchSrnModel class)
- * for more detailed description of Delta-Notch interactions involving edge quantities (this or neighbour edge information) and
- * potentially coupling with cytoplasmic concentrations (DeltaNotchInteriorSrn class).
- * \todo #2987 document this class more thoroughly here
+ * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in 
+ * the sub-cellular reaction network. This SRN model represents a membrane/
+ * cortex of a single junction of a cell. This class of models can be used 
+ * together with DeltaNotchInteriorSrn models. The ODE model used here is an 
+ * attempt to use previous work (see DeltaNotchSrnModel class) for more detailed 
+ * description of Delta-Notch interactions involving edge quantities (this or 
+ * neighbour edge information) and potentially coupling with cytoplasmic 
+ * concentrations (DeltaNotchInteriorSrn class).
  */
 class DeltaNotchEdgeSrnModel : public AbstractOdeSrnModel
 {

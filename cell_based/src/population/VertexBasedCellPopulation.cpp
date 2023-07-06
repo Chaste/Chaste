@@ -655,17 +655,18 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     // Create mesh writer for VTK output
     TrapezoidEdgeVertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
     unsigned num_edges = 0;
-    //here elements are synonymous with cells
-    const unsigned n_cells = this->GetNumElements();
+
+    // Here elements are synonymous with cells
+    const unsigned num_cells = this->GetNumElements();
     //Similarly as in TrapEdgeVerteMeshWriter, but instead of nodes
     //we fill edge arrays
     //The first value MUST be zero
-    std::vector<unsigned> cell_offset_dist(n_cells);
+    std::vector<unsigned> cell_offset_dist(num_cells);
     //The order of stored data is illustrated below:
     // [_____|_][____|_]
     //  ^^^^  ^
     // edge   cell interior
-    for (unsigned i=1; i<n_cells; ++i)
+    for (unsigned i=1; i<num_cells; ++i)
     {
         cell_offset_dist[i] = cell_offset_dist[i-1]+this->GetElement(i-1)->GetNumEdges()+1;
         num_edges += this->GetElement(i)->GetNumEdges();
@@ -679,7 +680,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
     for (auto cell_writer : this->mCellWriters)
     {
         // Create vector to store VTK cell data
-        std::vector<double> vtk_cell_data(num_edges+n_cells);
+        std::vector<double> vtk_cell_data(num_edges+num_cells);
 
         // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
         for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
@@ -729,7 +730,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(const std::st
         data_names[var] = cell_data_names[var-num_edge_data_items];
     }
     std::vector<std::vector<double> > data_values(num_data_items,
-                                                  std::vector<double>(num_edges + n_cells));
+                                                  std::vector<double>(num_edges + num_cells));
 
     // Writing CellEdgeData values to the edges of the cells
     // Loop over vertex elements ///\todo #2512 - replace with loop over cells

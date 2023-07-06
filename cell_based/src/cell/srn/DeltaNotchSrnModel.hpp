@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in 
  * the sub-cellular reaction network.
- *
- * \todo #2752 document this class more thoroughly here
  */
 class DeltaNotchSrnModel : public AbstractOdeSrnModel
 {

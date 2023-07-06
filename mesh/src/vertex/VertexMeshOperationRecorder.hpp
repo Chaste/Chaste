@@ -100,11 +100,21 @@ private:
 
     /**
      * Pointer to edge handler.
-     * \todo don't initialise here? (issue #106)
      */
-    EdgeHelper<SPACE_DIM>* mpEdgeHelper = nullptr;
+    EdgeHelper<SPACE_DIM>* mpEdgeHelper;
 
 public:
+
+    /**
+     * Constructor.
+     */
+    VertexMeshOperationRecorder();
+
+    /**
+     * Destructor.
+     */
+    ~VertexMeshOperationRecorder();
+    
     /**
      * Sets edge helper associated with the vertex mesh.
      * 
