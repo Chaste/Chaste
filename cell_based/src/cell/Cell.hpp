@@ -151,7 +151,7 @@ protected:
     /** Whether the cell is being tracked specially. */
     bool mIsLogged;
 
-    /** Whether the cell has SRN associated to it. */
+    /** Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it. */
     bool mHasSrnModel;
 
 public:
