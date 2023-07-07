@@ -431,7 +431,7 @@ public:
     unsigned GetCellId() const;
 
     /**
-     * @return whether the cell has an SRN model associated to it.
+     * @return Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it
      */
     bool HasSrnModel() const;
 };
