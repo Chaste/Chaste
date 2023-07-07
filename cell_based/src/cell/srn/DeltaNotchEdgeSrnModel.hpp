@@ -213,10 +213,11 @@ public:
     virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn);
 
     /**
-     * By default, Edge concentrations are split according to relative lengths, when an edge is split.
+     * By default, Edge concentrations are split according to the lengths of two new edges , when an edge is split, 
+     * relative to the original edge they are created from.
      * Override the method declared in AbstractSrnModel class
      * 
-     * @param relativePosition relative position to use when splitting Edge concentrations
+     * @param relativePosition position of the node splitting the two new edges relative to the original edge, used when splitting Edge concentrations
      */
     virtual void SplitEdgeSrn(const double relativePosition);
 };
