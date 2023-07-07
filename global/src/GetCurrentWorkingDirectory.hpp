@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GETCURRENTWORKINGDIRECTORY_HPP_
 
 #include <string>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 /**
  * Get the current working directory.

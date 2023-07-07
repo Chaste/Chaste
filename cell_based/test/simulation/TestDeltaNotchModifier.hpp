@@ -412,11 +412,13 @@ public:
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_modifier);
+
+        // Pass a target area modifier to the simulation
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);      
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        //Testing addition of topology update simulation modifier
+        // Testing addition of topology update simulation modifier
         simulator.AddTopologyUpdateSimulationModifier(p_modifier);
         std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetTopologyUpdateSimulationModifiers()->begin();
         TS_ASSERT(boost::static_pointer_cast<DeltaNotchTrackingModifier<2> >(*iter));
@@ -679,7 +681,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // NagaiHondaForce requires a growth modifier
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -826,7 +828,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // NagaiHondaForce requires a growth modifier
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -976,7 +978,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // NagaiHondaForce requires a growth modifier
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 

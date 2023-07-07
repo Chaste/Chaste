@@ -173,7 +173,7 @@ public:
 
         /* A {{{NagaiHondaForce}}} assumes that each cell has a target area. The target areas of cells are used to determine pressure
          * forces on each vertex and eventually determine the size of each cell in the simulation. In order to assign target areas to cells
-         * and update them in each time step we add a {{{SimpleTargetAreaModifier}}} to the simulation, which inherits from
+         * and update them in each time step to model growth, we add a {{{SimpleTargetAreaModifier}}} to the simulation, which inherits from
          *  {{{AbstractTargetAreaModifier}}}.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
@@ -243,7 +243,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* We also make a pointer to the target area modifier and add it to the simulator.
+        /* We also make a pointer to a target area modifier and add it to the simulator.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
