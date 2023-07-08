@@ -106,13 +106,6 @@ public:
     double GetItem(const std::string& rVariableName) const;
 
     /**
-     * @return whether an item exists mCellData
-     *
-     * @param rVariableName the key
-     */
-    bool HasItem(const std::string& rVariableName) const;
-
-    /**
      * @return number of data items
      */
     unsigned GetNumItems() const;

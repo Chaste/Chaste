@@ -60,11 +60,6 @@ double CellData::GetItem(const std::string& rVariableName) const
     return(it->second);
 }
 
-bool CellData::HasItem(const std::string& rVariableName) const
-{
-    return mCellData.find(rVariableName) != mCellData.end();
-}
-
 unsigned CellData::GetNumItems() const
 {
     return mCellData.size();
