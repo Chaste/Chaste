@@ -96,6 +96,59 @@ public:
             TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(elem_index), 2.456, 1e-3);
         }
     }
+
+    void TestFlatBottomMesh()
+    {
+        HoneycombVertexMeshGenerator generator(4, 4, true);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 44u);
+	 
+        VertexMeshWriter<2,2> vertex_mesh_writer_2("TestHoneycombVertexMesh", "honeycombmeshflat");
+        vertex_mesh_writer_2.WriteFilesUsingMesh(*p_mesh);
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
+
+        // Now loop over all nodes and find the minimum y position
+        double min_y_position = p_mesh->GetNode(0)->rGetLocation()[1];
+        for (unsigned node_index = 0; node_index < 44; node_index++)
+        {
+            double this_y_position = p_mesh->GetNode(node_index)->rGetLocation()[1];
+            if (this_y_position < min_y_position)
+            {
+                min_y_position = this_y_position;
+            }
+        }
+	
+        // Loop over all nodes again, find all nodes with that y position
+        unsigned num_bottom_nodes = 0;
+        for (unsigned node_index = 0; node_index < 44; node_index++)
+        {
+            double this_y_position = p_mesh->GetNode(node_index)->rGetLocation()[1];
+            if (this_y_position == min_y_position)
+            {
+                num_bottom_nodes++;
+
+		        // This node should be a boundary node
+                TS_ASSERT(p_mesh->GetNode(node_index)->IsBoundaryNode())
+            }
+        }
+
+        // The total number of bottom nodes should be 5
+        TS_ASSERT_EQUALS(num_bottom_nodes, 5u);
+
+        // There should be 4 elements with 5 nodes
+        unsigned num_five_node_elements = 0;
+        for (unsigned element_index=0; element_index<16u; element_index++)
+        {
+            unsigned num_nodes = p_mesh->GetElement(element_index)->GetNumNodes();
+            if (num_nodes == 5)
+            {
+               num_five_node_elements++;
+            }
+        }
+        TS_ASSERT_EQUALS(num_five_node_elements, 4u);
+    }
 };
 
 #endif /*TESTHONEYCOMBVERTEXMESHGENERATOR_HPP_*/
