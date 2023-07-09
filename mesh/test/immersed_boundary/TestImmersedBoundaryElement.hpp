@@ -75,16 +75,15 @@ public:
         TS_ASSERT_EQUALS(element.GetFluidSource(), &source);
         TS_ASSERT_EQUALS(element.GetFluidSource()->GetIndex(), 0u);
         TS_ASSERT_DELTA(element.GetFluidSource()->GetStrength(), 57.0, 1e-6);
-
         TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), DOUBLE_UNSET, 1e-6);
 
         element.SetAverageNodeSpacing(0.123);
         TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), 0.123, 1e-6);
 
         // Clean up
-        for(auto& p_node : nodes)
+        for (auto& p_node : nodes)
         {
-            delete(p_node);
+            delete p_node;
         }
     }
     

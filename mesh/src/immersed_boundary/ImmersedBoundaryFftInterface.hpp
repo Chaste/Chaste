@@ -66,8 +66,8 @@ protected:
     pocketfft::shape_t mCompDims;
 
     int mNumGridPointsForward;
-    int mHowManyForward;
-    int mHowManyInverse;
+    unsigned mHowManyForward;
+    unsigned mHowManyInverse;
     int mRealSep;
     int mCompSep;
     long int mRealStride;

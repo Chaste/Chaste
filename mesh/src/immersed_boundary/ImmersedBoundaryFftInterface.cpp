@@ -65,7 +65,7 @@ ImmersedBoundaryFftInterface<DIM>::ImmersedBoundaryFftInterface(ImmersedBoundary
     mRealDims = {(long unsigned int)numGridPtsX, (long unsigned int)numGridPtsY};   // Dimensions of each real array
     mCompDims = {(long unsigned int)numGridPtsX, (long unsigned int)reducedY};       // Dimensions of each complex array
 
-    mHowManyForward = 2 + (int)activeSources;      // Number of forward transforms (one more if sources are active)
+    mHowManyForward = 2 + (unsigned)activeSources;      // Number of forward transforms (one more if sources are active)
     mHowManyInverse = 2;                           // Number of inverse transforms (always 2)
 
     mRealSep = numGridPtsX * numGridPtsY;       // How many doubles between start of first array and start of second
@@ -97,8 +97,9 @@ void ImmersedBoundaryFftInterface<DIM>::FftExecuteForward()
     pocketfft::stride_t cStride = {mCompStride*static_cast<long int>(mCompDims[1]), mCompStride};
     pocketfft::shape_t axes = {0, 1};
 
-    for (int i = 0; i < mHowManyForward; i++) {
-      pocketfft::r2c<double>(mRealDims, rStride, cStride, axes, true, mpInputArray + i*mRealSep, mpComplexArray + i*mCompSep, 1.0, 1);
+    for (unsigned i = 0; i < mHowManyForward; i++)
+    {
+        pocketfft::r2c<double>(mRealDims, rStride, cStride, axes, true, mpInputArray + i*mRealSep, mpComplexArray + i*mCompSep, 1.0, 1);
     }
 }
 
@@ -110,9 +111,10 @@ void ImmersedBoundaryFftInterface<DIM>::FftExecuteInverse()
     pocketfft::stride_t cStride = {mCompStride*static_cast<long int>(mCompDims[1]), mCompStride};
     pocketfft::shape_t axes = {0, 1};
 
-    for (int i = 0; i < mHowManyInverse; i++) {
-      // For c2r, output array dims are supplied
-      pocketfft::c2r(mRealDims, cStride, rStride, axes, false, mpComplexArray + i*mCompSep, mpOutputArray + i*mRealSep, 1.0, 1);
+    for (unsigned i = 0; i < mHowManyInverse; i++)
+    {
+        // For c2r, output array dims are supplied
+        pocketfft::c2r(mRealDims, cStride, rStride, axes, false, mpComplexArray + i*mCompSep, mpOutputArray + i*mRealSep, 1.0, 1);
     }
 }
 

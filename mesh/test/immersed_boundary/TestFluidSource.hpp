@@ -133,7 +133,6 @@ public:
         TS_ASSERT_EQUALS(source.IsSourceAssociatedWithElement(), true);
         TS_ASSERT_EQUALS(source.GetAssociatedElementIndex(), 15u);
     }
-    
 };
 
 #endif /*TESTFLUIDSOURCE_HPP_*/

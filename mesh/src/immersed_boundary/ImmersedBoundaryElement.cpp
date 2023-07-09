@@ -44,10 +44,15 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
           mAverageNodeSpacing(DOUBLE_UNSET),
           mIsBoundaryElement(false)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);
-
-    // Ensure number of nodes is at least 3
-    assert(rNodes.size() > 2);
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
+    {
+        // Ensure number of nodes is at least 3
+        assert(rNodes.size() > 2);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
