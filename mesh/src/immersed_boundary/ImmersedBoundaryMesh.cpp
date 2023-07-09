@@ -240,7 +240,8 @@ bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> 
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDistributionAboutAxis(unsigned elemIndex, c_vector<double, SPACE_DIM> axis)
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDistributionAboutAxis(
+    unsigned elemIndex, c_vector<double, SPACE_DIM> axis)
 {
     /*
      * Method outline:
@@ -350,7 +351,8 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
             {
                 unsigned idx = node_idx % num_nodes;
 
-                c_vector<double, SPACE_DIM> to_next = node_locations_original_order[idx] - this_location;
+                c_vector<double, SPACE_DIM> to_next;
+                to_next = node_locations_original_order[idx] - this_location;
 
                 // If the segment between to_previous and to_next intersects the vertical through this_location, the clause
                 // in the if statement below will be triggered
@@ -358,7 +360,8 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
                 {
                     // Find how far between to_previous and to_next the point of intersection is
                     double interp = 0.5;
-                    if (to_previous[0] - to_next[0] != 0.0) {
+                    if (to_previous[0] - to_next[0] != 0.0)
+                    {
                         interp = to_previous[0] / (to_previous[0] - to_next[0]);
                     }
 
@@ -2076,146 +2079,154 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::TagBoundaryElements()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDiagramIfOutOfDate()
 {
-    using boost_point = boost::polygon::point_data<int>;
-
-    /*
-     * The voronoi diagram needs updating only if the node locations have changed (i.e. not more than once per
-     * timestep).  We test a chosen summary of node locations against the cached mSummaryOfNodeLocations to determine
-     * this.
-     */
-    double new_location_summary = this->mNodes.front()->rGetLocation()[0] +
-                                  this->mNodes.front()->rGetLocation()[1] +
-                                  this->mNodes.back()->rGetLocation()[0] +
-                                  this->mNodes.back()->rGetLocation()[1];
-    
-    bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
-
-    /*
-     * Method outline:
-     * - Add all node locations as boost points, correctly scaled
-     * - Add extra locations for any nodes within distance mVoronoiHalo of the domain edge for periodicity
-     * - Calculate the voronoi diagram
-     * - Populate mVoronoiCellIdsIndexedByNodeIndex for efficient mapping between node index and corresponding voronoi
-     *   cell
-     * - Store the corresponding node index in each voronoi cell's "color" variable for efficient reverse-lookup
-     * - Tag boundary elements
-     */
-    if (voronoi_needs_updating)
+    if constexpr (SPACE_DIM == 2)
     {
-        mSummaryOfNodeLocations = new_location_summary;
+        using boost_point = boost::polygon::point_data<int>;
 
-        // Helper c_vectors for halo region
-        const c_vector<double, SPACE_DIM> halo_up = Create_c_vector(0.0, 1.0);
-        const c_vector<double, SPACE_DIM> halo_down = Create_c_vector(0.0, -1.0);
-        const c_vector<double, SPACE_DIM> halo_left = Create_c_vector(-1.0, 0.0);
-        const c_vector<double, SPACE_DIM> halo_right = Create_c_vector(1.0, 0.0);
+        /*
+        * The voronoi diagram needs updating only if the node locations have changed (i.e. not more than once per
+        * timestep).  We test a chosen summary of node locations against the cached mSummaryOfNodeLocations to determine
+        * this.
+        */
+        double new_location_summary = this->mNodes.front()->rGetLocation()[0] +
+                                    this->mNodes.front()->rGetLocation()[1] +
+                                    this->mNodes.back()->rGetLocation()[0] +
+                                    this->mNodes.back()->rGetLocation()[1];
+        
+        bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
 
-        std::vector<std::pair<unsigned, c_vector<double, SPACE_DIM>>> halo_ids_and_locations;
-        std::vector<unsigned> node_ids_in_source_idx_order;
-
-        // We need to translate node locations into boost points, which are scaled to an integer grid
-        std::vector<boost_point> points;
-
-        // First add a point for each node, and calculate any additional locations needed within the halo
-        for (const auto& p_node : this->mNodes)
+        /*
+        * Method outline:
+        * - Add all node locations as boost points, correctly scaled
+        * - Add extra locations for any nodes within distance mVoronoiHalo of the domain edge for periodicity
+        * - Calculate the voronoi diagram
+        * - Populate mVoronoiCellIdsIndexedByNodeIndex for efficient mapping between node index and corresponding voronoi
+        *   cell
+        * - Store the corresponding node index in each voronoi cell's "color" variable for efficient reverse-lookup
+        * - Tag boundary elements
+        */
+        if (voronoi_needs_updating)
         {
-            const double x_pos = p_node->rGetLocation()[0];
-            const double y_pos = p_node->rGetLocation()[1];
+            mSummaryOfNodeLocations = new_location_summary;
 
-            // Put the integer voronoi coordinate in for this node's location
-            points.emplace_back(boost_point(ScaleUpToVoronoiCoordinate(x_pos), ScaleUpToVoronoiCoordinate(y_pos)));
-            node_ids_in_source_idx_order.emplace_back(p_node->GetIndex());
+            // Helper c_vectors for halo region
+            const c_vector<double, SPACE_DIM> halo_up = Create_c_vector(0.0, 1.0);
+            const c_vector<double, SPACE_DIM> halo_down = Create_c_vector(0.0, -1.0);
+            const c_vector<double, SPACE_DIM> halo_left = Create_c_vector(-1.0, 0.0);
+            const c_vector<double, SPACE_DIM> halo_right = Create_c_vector(1.0, 0.0);
 
-            // Now, for this location, decide whether any copies of this location are needed in the halo region
-            const bool needed_up = y_pos < mVoronoiHalo;
-            const bool needed_down = y_pos > 1.0 - mVoronoiHalo;
-            const bool needed_left = x_pos > 1.0 - mVoronoiHalo;
-            const bool needed_right = x_pos < mVoronoiHalo;
+            std::vector<std::pair<unsigned, c_vector<double, SPACE_DIM>>> halo_ids_and_locations;
+            std::vector<unsigned> node_ids_in_source_idx_order;
 
-            if (needed_up)
+            // We need to translate node locations into boost points, which are scaled to an integer grid
+            std::vector<boost_point> points;
+
+            // First add a point for each node, and calculate any additional locations needed within the halo
+            for (const auto& p_node : this->mNodes)
             {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_up));
+                const double x_pos = p_node->rGetLocation()[0];
+                const double y_pos = p_node->rGetLocation()[1];
+
+                // Put the integer voronoi coordinate in for this node's location
+                points.emplace_back(boost_point(ScaleUpToVoronoiCoordinate(x_pos), ScaleUpToVoronoiCoordinate(y_pos)));
+                node_ids_in_source_idx_order.emplace_back(p_node->GetIndex());
+
+                // Now, for this location, decide whether any copies of this location are needed in the halo region
+                const bool needed_up = y_pos < mVoronoiHalo;
+                const bool needed_down = y_pos > 1.0 - mVoronoiHalo;
+                const bool needed_left = x_pos > 1.0 - mVoronoiHalo;
+                const bool needed_right = x_pos < mVoronoiHalo;
+
+                if (needed_up)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_up));
+                }
+                if (needed_down)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_down));
+                }
+                if (needed_left)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_left));
+                }
+                if (needed_right)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_right));
+                }
+                if (needed_up && needed_left)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_up + halo_left));
+                }
+                if (needed_up && needed_right)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_up + halo_right));
+                }
+                if (needed_down && needed_left)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_down + halo_left));
+                }
+                if (needed_down && needed_right)
+                {
+                    halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
+                                                                    p_node->rGetLocation() + halo_down + halo_right));
+                }
             }
-            if (needed_down)
+
+            // Next add the additional points
+            for (const auto& pair : halo_ids_and_locations)
             {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_down));
+                const unsigned node_idx = pair.first;
+                const c_vector<double, SPACE_DIM> location;
+                location = pair.second;
+
+                const int x_coord = ScaleUpToVoronoiCoordinate(location[0]);
+                const int y_coord = ScaleUpToVoronoiCoordinate(location[1]);
+
+                points.emplace_back(boost_point(x_coord, y_coord));
+                node_ids_in_source_idx_order.emplace_back(node_idx);
             }
-            if (needed_left)
+
+            // Construct the voronoi diagram.  This is the costly part of this method.
+            mNodeLocationsVoronoiDiagram.clear();
+            construct_voronoi(std::begin(points), std::end(points), &mNodeLocationsVoronoiDiagram);
+
+            // We need an efficient map from node global index to the voronoi cell representing it, and we can't assume
+            // that the nodes are ordered sequentially.  We first identify the largest node index.
+            const unsigned max_node_idx = GetMaxNodeIndex();
+
+            mVoronoiCellIdsIndexedByNodeIndex.resize(1 + max_node_idx);
+
+            for (unsigned vor_cell_id = 0; vor_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++vor_cell_id)
             {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_left));
+                // Source index is incrementally given to each input point, which is in order of nodes in this->mNodes.
+                // We need to be able to identify each vor_cell_id by the global node index
+
+                auto& r_this_cell = mNodeLocationsVoronoiDiagram.cells()[vor_cell_id];
+                const auto source_idx = r_this_cell.source_index();
+                const unsigned node_idx = node_ids_in_source_idx_order[source_idx];
+
+                r_this_cell.color(node_idx);
+
+                if (source_idx < this->mNodes.size())
+                {
+                    mVoronoiCellIdsIndexedByNodeIndex[node_idx] = vor_cell_id;
+                }
             }
-            if (needed_right)
-            {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_right));
-            }
-            if (needed_up && needed_left)
-            {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_up + halo_left));
-            }
-            if (needed_up && needed_right)
-            {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_up + halo_right));
-            }
-            if (needed_down && needed_left)
-            {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_down + halo_left));
-            }
-            if (needed_down && needed_right)
-            {
-                halo_ids_and_locations.emplace_back(std::make_pair(p_node->GetIndex(),
-                                                                   p_node->rGetLocation() + halo_down + halo_right));
-            }
+
+            // Finally, if the diagram was out-of-date, we will need to re-tag boundary elements.
+            this->TagBoundaryElements();
         }
-
-        // Next add the additional points
-        for (const auto& pair : halo_ids_and_locations)
-        {
-            const unsigned node_idx = pair.first;
-            const c_vector<double, SPACE_DIM> location = pair.second;
-
-            const int x_coord = ScaleUpToVoronoiCoordinate(location[0]);
-            const int y_coord = ScaleUpToVoronoiCoordinate(location[1]);
-
-            points.emplace_back(boost_point(x_coord, y_coord));
-            node_ids_in_source_idx_order.emplace_back(node_idx);
-        }
-
-        // Construct the voronoi diagram.  This is the costly part of this method.
-        mNodeLocationsVoronoiDiagram.clear();
-        construct_voronoi(std::begin(points), std::end(points), &mNodeLocationsVoronoiDiagram);
-
-        // We need an efficient map from node global index to the voronoi cell representing it, and we can't assume
-        // that the nodes are ordered sequentially.  We first identify the largest node index.
-        const unsigned max_node_idx = GetMaxNodeIndex();
-
-        mVoronoiCellIdsIndexedByNodeIndex.resize(1 + max_node_idx);
-
-        for (unsigned vor_cell_id = 0; vor_cell_id < mNodeLocationsVoronoiDiagram.cells().size(); ++vor_cell_id)
-        {
-            // Source index is incrementally given to each input point, which is in order of nodes in this->mNodes.
-            // We need to be able to identify each vor_cell_id by the global node index
-
-            auto& r_this_cell = mNodeLocationsVoronoiDiagram.cells()[vor_cell_id];
-            const auto source_idx = r_this_cell.source_index();
-            const unsigned node_idx = node_ids_in_source_idx_order[source_idx];
-
-            r_this_cell.color(node_idx);
-
-            if (source_idx < this->mNodes.size())
-            {
-                mVoronoiCellIdsIndexedByNodeIndex[node_idx] = vor_cell_id;
-            }
-        }
-
-        // Finally, if the diagram was out-of-date, we will need to re-tag boundary elements.
-        this->TagBoundaryElements();
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
