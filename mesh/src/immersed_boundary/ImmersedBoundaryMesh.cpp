@@ -171,20 +171,23 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
 {
-    std::cout << "In method \n";
-    assert(SPACE_DIM == 2);
+    if constexpr (SPACE_DIM == 2)
+    {
+        c_vector<double, 3> moments = CalculateMomentsOfElement(index);
 
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+        double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
 
-    double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
+        // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
+        double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
+        double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
 
-    // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
-    double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
-    double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
-
-    double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
-    std::cout << "Elongation shape factor is " << elongation_shape_factor << "\n";
-    return elongation_shape_factor;
+        double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
+        return elongation_shape_factor;
+    }
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 bool CustomComparisonForVectorX(c_vector<double, 2> vecA, c_vector<double, 2> vecB)
@@ -195,33 +198,40 @@ bool CustomComparisonForVectorX(c_vector<double, 2> vecA, c_vector<double, 2> ve
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
 {
-    assert(SPACE_DIM == 2);
-
-    double total_length = 0.0;
-
-    // Get the current elements
-    std::vector<c_vector<double, 2> > centroids(mElements.size());
-    for (unsigned elem_it = 0; elem_it < mElements.size(); elem_it++)
+    if constexpr (SPACE_DIM == 2)
     {
-        centroids[elem_it] = this->GetCentroidOfElement(mElements[elem_it]->GetIndex());
+        double total_length = 0.0;
+
+        // Get the current elements
+        std::vector<c_vector<double, 2> > centroids(mElements.size());
+        for (unsigned elem_it = 0; elem_it < mElements.size(); elem_it++)
+        {
+            centroids[elem_it] = this->GetCentroidOfElement(mElements[elem_it]->GetIndex());
+        }
+
+        // Sort centroids by X
+        std::sort(centroids.begin(), centroids.end(), CustomComparisonForVectorX);
+
+        // Calculate piecewise linear length connecting centroids
+        for (unsigned cent_it = 1; cent_it < centroids.size(); cent_it++)
+        {
+            total_length += norm_2(centroids[cent_it - 1] - centroids[cent_it]);
+        }
+
+        double straight_line_length = norm_2(centroids[0] - centroids[centroids.size() - 1]);
+
+        // Avoid division by zero
+        if (straight_line_length < 0.00001)
+        {
+            return 0;
+        }
+
+        return total_length / straight_line_length;
     }
-
-    // Sort centroids by X
-    std::sort(centroids.begin(), centroids.end(), CustomComparisonForVectorX);
-
-    // Calculate piecewise linear length connecting centroids
-    for (unsigned cent_it = 1; cent_it < centroids.size(); cent_it++)
+    else        
     {
-        total_length += norm_2(centroids[cent_it - 1] - centroids[cent_it]);
-    }
-
-    double straight_line_length = norm_2(centroids[0] - centroids[centroids.size() - 1]);
-    // Avoid division by zero
-    if (straight_line_length < 0.00001) {
-        return 0;
-    }
-
-    return total_length / straight_line_length;
+        NEVER_REACHED;
+    }    
 }
 
 bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> > pairA, std::pair<unsigned, c_vector<double, 2> > pairB)
@@ -732,58 +742,63 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index)
 {
     // Only implemented in 2D
-    assert(SPACE_DIM == 2);
-
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-
-    unsigned num_nodes = p_element->GetNumNodes();
-    c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
-
-    double centroid_x = 0;
-    double centroid_y = 0;
-
-    // Note that we cannot use GetVolumeOfElement() below as it returns the absolute, rather than signed, area
-    double element_signed_area = 0.0;
-
-    // Map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
-    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
-
-    // Loop over vertices
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+    if constexpr (SPACE_DIM == 2)
     {
-        c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
-        c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-        double this_x = pos_1[0];
-        double this_y = pos_1[1];
-        double next_x = pos_2[0];
-        double next_y = pos_2[1];
-        //std::cout << "Element " << index << "   node " << local_index << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
-        //std::cout << "Element " << index << "   node " << local_index + 1 << " pos is (" << pos_2[0] << ", " << pos_2[1] << ")" << std::endl;
+        unsigned num_nodes = p_element->GetNumNodes();
+        c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
 
-        double signed_area_term = this_x * next_y - this_y * next_x;
-        //std::cout << "Signed area is " << signed_area_term << std::endl;
+        double centroid_x = 0;
+        double centroid_y = 0;
 
-        centroid_x += (this_x + next_x) * signed_area_term;
-        centroid_y += (this_y + next_y) * signed_area_term;
-        element_signed_area += 0.5 * signed_area_term;
-        //std::cout << "Element signed area is " << element_signed_area << std::endl;
+        // Note that we cannot use GetVolumeOfElement() below as it returns the absolute, rather than signed, area
+        double element_signed_area = 0.0;
 
-        pos_1 = pos_2;
+        // Map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
+        c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+        c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
+
+        // Loop over vertices
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+        {
+            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
+            c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
+
+            double this_x = pos_1[0];
+            double this_y = pos_1[1];
+            double next_x = pos_2[0];
+            double next_y = pos_2[1];
+            //std::cout << "Element " << index << "   node " << local_index << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
+            //std::cout << "Element " << index << "   node " << local_index + 1 << " pos is (" << pos_2[0] << ", " << pos_2[1] << ")" << std::endl;
+
+            double signed_area_term = this_x * next_y - this_y * next_x;
+            //std::cout << "Signed area is " << signed_area_term << std::endl;
+
+            centroid_x += (this_x + next_x) * signed_area_term;
+            centroid_y += (this_y + next_y) * signed_area_term;
+            element_signed_area += 0.5 * signed_area_term;
+            //std::cout << "Element signed area is " << element_signed_area << std::endl;
+
+            pos_1 = pos_2;
+        }
+
+        assert(element_signed_area != 0.0);
+
+        // Finally, map back and employ GetVectorFromAtoB() to allow for periodicity
+        centroid = first_node_location;
+        centroid[0] += centroid_x / (6.0 * element_signed_area);
+        centroid[1] += centroid_y / (6.0 * element_signed_area);
+
+        centroid[0] = centroid[0] < 0 ? centroid[0] + 1.0 : fmod(centroid[0], 1.0);
+        centroid[1] = centroid[1] < 0 ? centroid[1] + 1.0 : fmod(centroid[1], 1.0);
+
+        return centroid;
     }
-
-    assert(element_signed_area != 0.0);
-
-    // Finally, map back and employ GetVectorFromAtoB() to allow for periodicity
-    centroid = first_node_location;
-    centroid[0] += centroid_x / (6.0 * element_signed_area);
-    centroid[1] += centroid_y / (6.0 * element_signed_area);
-
-    centroid[0] = centroid[0] < 0 ? centroid[0] + 1.0 : fmod(centroid[0], 1.0);
-    centroid[1] = centroid[1] < 0 ? centroid[1] + 1.0 : fmod(centroid[1], 1.0);
-
-    return centroid;
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -935,96 +950,110 @@ void ImmersedBoundaryMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
-
-    // Get pointer to this element
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-
-    double element_volume = 0.0;
-
-    // We map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
-    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
-
-    unsigned num_nodes = p_element->GetNumNodes();
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+    if constexpr (SPACE_DIM == 2)
     {
-        c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
-        c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
+        // Get pointer to this element
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-        double this_x = pos_1[0];
-        double this_y = pos_1[1];
-        double next_x = pos_2[0];
-        double next_y = pos_2[1];
+        double element_volume = 0.0;
 
-        element_volume += 0.5 * (this_x * next_y - next_x * this_y);
+        // We map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
+        c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+        c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
 
-        pos_1 = pos_2;
+        unsigned num_nodes = p_element->GetNumNodes();
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+        {
+            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
+            c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
+
+            double this_x = pos_1[0];
+            double this_y = pos_1[1];
+            double next_x = pos_2[0];
+            double next_y = pos_2[1];
+
+            element_volume += 0.5 * (this_x * next_y - next_x * this_y);
+
+            pos_1 = pos_2;
+        }
+
+        // We take the absolute value just in case the nodes were really oriented clockwise
+        return fabs(element_volume);
     }
-
-    // We take the absolute value just in case the nodes were really oriented clockwise
-    return fabs(element_volume);
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
-
-    // Get pointer to this element
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-
-    double surface_area = 0.0;
-    unsigned num_nodes = p_element->GetNumNodes();
-    unsigned this_node_index = p_element->GetNodeGlobalIndex(0);
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+    if constexpr (SPACE_DIM == 2)
     {
-        unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index + 1) % num_nodes);
+        // Get pointer to this element
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-        surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
-        this_node_index = next_node_index;
+        double surface_area = 0.0;
+        unsigned num_nodes = p_element->GetNumNodes();
+        unsigned this_node_index = p_element->GetNodeGlobalIndex(0);
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+        {
+            unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index + 1) % num_nodes);
+            surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
+            this_node_index = next_node_index;
+        }
+
+        return surface_area;
     }
-
-    return surface_area;
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx) noexcept
 {
-    assert(SPACE_DIM == 2);
-
-    UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elemIdx);
-    double surface_area = 0.0;
-
-    // Sum contributions from each node in the element
-    for (unsigned local_idx = 0; local_idx < p_element->GetNumNodes(); local_idx++)
+    if constexpr (SPACE_DIM == 2)
     {
-        const unsigned global_node_idx = p_element->GetNodeGlobalIndex(local_idx);
+        UpdateNodeLocationsVoronoiDiagramIfOutOfDate();
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elemIdx);
+        double surface_area = 0.0;
 
-        // Get the voronoi cell that corresponds to this node
-        const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[global_node_idx];
-        const auto& voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
-
-        // Iterate over the edges of this voronoi cell
-        auto p_edge = voronoi_cell.incident_edge();
-        do
+        // Sum contributions from each node in the element
+        for (unsigned local_idx = 0; local_idx < p_element->GetNumNodes(); local_idx++)
         {
-            // The global node index corresponding to a voronoi cell is encoded in its 'color' variable
-            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
-            const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
+            const unsigned global_node_idx = p_element->GetNodeGlobalIndex(local_idx);
 
-            // Check if the nodes are in different elements
-            if (elemIdx != twin_elem_idx)
+            // Get the voronoi cell that corresponds to this node
+            const unsigned voronoi_cell_id = mVoronoiCellIdsIndexedByNodeIndex[global_node_idx];
+            const auto& voronoi_cell = mNodeLocationsVoronoiDiagram.cells()[voronoi_cell_id];
+
+            // Iterate over the edges of this voronoi cell
+            auto p_edge = voronoi_cell.incident_edge();
+            do
             {
-                surface_area += this->CalculateLengthOfVoronoiEdge(*p_edge);
-            }
+                // The global node index corresponding to a voronoi cell is encoded in its 'color' variable
+                const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+                const unsigned twin_elem_idx = *this->GetNode(twin_node_idx)->ContainingElementsBegin();
 
-            p_edge = p_edge->next();
-        } while (p_edge != voronoi_cell.incident_edge());
+                // Check if the nodes are in different elements
+                if (elemIdx != twin_elem_idx)
+                {
+                    surface_area += this->CalculateLengthOfVoronoiEdge(*p_edge);
+                }
+
+                p_edge = p_edge->next();
+            } while (p_edge != voronoi_cell.incident_edge());
+        }
+
+        return surface_area;
     }
-
-    return surface_area;
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <>
@@ -1094,108 +1123,118 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetElementDivisionSpacing(dou
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 3> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2);
-
-    // Define helper variables
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-    unsigned num_nodes = p_element->GetNumNodes();
-    c_vector<double, 3> moments = zero_vector<double>(3);
-
-    // Since we compute I_xx, I_yy and I_xy about the centroid, we must shift each vertex accordingly
-    c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(index);
-
-    c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> pos_1 = this->GetVectorFromAtoB(centroid, this_node_location);
-
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+    if constexpr (SPACE_DIM == 2)
     {
-        unsigned next_index = (local_index + 1) % num_nodes;
-        c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation(next_index);
-        c_vector<double, SPACE_DIM> pos_2 = this->GetVectorFromAtoB(centroid, next_node_location);
+        // Define helper variables
+        ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
+        unsigned num_nodes = p_element->GetNumNodes();
+        c_vector<double, 3> moments = zero_vector<double>(3);
 
-        double signed_area_term = pos_1(0) * pos_2(1) - pos_2(0) * pos_1(1);
-        // Ixx
-        moments(0) += (pos_1(1) * pos_1(1) + pos_1(1) * pos_2(1) + pos_2(1) * pos_2(1)) * signed_area_term;
+        // Since we compute I_xx, I_yy and I_xy about the centroid, we must shift each vertex accordingly
+        c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(index);
 
-        // Iyy
-        moments(1) += (pos_1(0) * pos_1(0) + pos_1(0) * pos_2(0) + pos_2(0) * pos_2(0)) * signed_area_term;
+        c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(0);
+        c_vector<double, SPACE_DIM> pos_1 = this->GetVectorFromAtoB(centroid, this_node_location);
 
-        // Ixy
-        moments(2) += (pos_1(0) * pos_2(1) + 2 * pos_1(0) * pos_1(1) + 2 * pos_2(0) * pos_2(1) + pos_2(0) * pos_1(1)) * signed_area_term;
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+        {
+            unsigned next_index = (local_index + 1) % num_nodes;
+            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation(next_index);
+            c_vector<double, SPACE_DIM> pos_2 = this->GetVectorFromAtoB(centroid, next_node_location);
 
-        pos_1 = pos_2;
+            double signed_area_term = pos_1(0) * pos_2(1) - pos_2(0) * pos_1(1);
+            // Ixx
+            moments(0) += (pos_1(1) * pos_1(1) + pos_1(1) * pos_2(1) + pos_2(1) * pos_2(1)) * signed_area_term;
+
+            // Iyy
+            moments(1) += (pos_1(0) * pos_1(0) + pos_1(0) * pos_2(0) + pos_2(0) * pos_2(0)) * signed_area_term;
+
+            // Ixy
+            moments(2) += (pos_1(0) * pos_2(1) + 2 * pos_1(0) * pos_1(1) + 2 * pos_2(0) * pos_2(1) + pos_2(0) * pos_1(1)) * signed_area_term;
+
+            pos_1 = pos_2;
+        }
+
+        moments(0) /= 12;
+        moments(1) /= 12;
+        moments(2) /= 24;
+
+        /*
+        * If the nodes owned by the element were supplied in a clockwise rather
+        * than anticlockwise manner, or if this arose as a result of enforcing
+        * periodicity, then our computed quantities will be the wrong sign, so
+        * we need to fix this.
+        */
+        if (moments(0) < 0.0)
+        {
+            moments(0) = -moments(0);
+            moments(1) = -moments(1);
+            moments(2) = -moments(2);
+        }
+        return moments;
     }
-
-    moments(0) /= 12;
-    moments(1) /= 12;
-    moments(2) /= 24;
-
-    /*
-     * If the nodes owned by the element were supplied in a clockwise rather
-     * than anticlockwise manner, or if this arose as a result of enforcing
-     * periodicity, then our computed quantities will be the wrong sign, so
-     * we need to fix this.
-     */
-    if (moments(0) < 0.0)
+    else        
     {
-        moments(0) = -moments(0);
-        moments(1) = -moments(1);
-        moments(2) = -moments(2);
+        NEVER_REACHED;
     }
-    return moments;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
-
-    // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
-
-    // Normalise the moments vector to remove problem of a very small discriminant (see #2874)
-    moments /= norm_2(moments);
-
-    // If the principal moments are equal...
-    double discriminant = (moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2);
-    if (fabs(discriminant) < DBL_EPSILON)
+    if constexpr (SPACE_DIM == 2)
     {
-        // ...then every axis through the centroid is a principal axis, so return a random unit vector
-        short_axis(0) = RandomNumberGenerator::Instance()->ranf();
-        short_axis(1) = sqrt(1.0 - short_axis(0) * short_axis(0));
-    }
-    else
-    {
-        // If the product of inertia is zero, then the coordinate axes are the principal axes
-        if (fabs(moments(2)) < DBL_EPSILON)
+        c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
+
+        // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
+        c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+
+        // Normalise the moments vector to remove problem of a very small discriminant (see #2874)
+        moments /= norm_2(moments);
+
+        // If the principal moments are equal...
+        double discriminant = (moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2);
+        if (fabs(discriminant) < DBL_EPSILON)
         {
-            if (moments(0) < moments(1))
-            {
-                short_axis(0) = 0.0;
-                short_axis(1) = 1.0;
-            }
-            else
-            {
-                short_axis(0) = 1.0;
-                short_axis(1) = 0.0;
-            }
+            // ...then every axis through the centroid is a principal axis, so return a random unit vector
+            short_axis(0) = RandomNumberGenerator::Instance()->ranf();
+            short_axis(1) = sqrt(1.0 - short_axis(0) * short_axis(0));
         }
         else
         {
-            // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
-            double lambda = 0.5 * (moments(0) + moments(1) + sqrt(discriminant));
+            // If the product of inertia is zero, then the coordinate axes are the principal axes
+            if (fabs(moments(2)) < DBL_EPSILON)
+            {
+                if (moments(0) < moments(1))
+                {
+                    short_axis(0) = 0.0;
+                    short_axis(1) = 1.0;
+                }
+                else
+                {
+                    short_axis(0) = 1.0;
+                    short_axis(1) = 0.0;
+                }
+            }
+            else
+            {
+                // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
+                double lambda = 0.5 * (moments(0) + moments(1) + sqrt(discriminant));
 
-            short_axis(0) = 1.0;
-            short_axis(1) = (moments(0) - lambda) / moments(2);
+                short_axis(0) = 1.0;
+                short_axis(1) = (moments(0) - lambda) / moments(2);
 
-            // Normalise the short axis before returning it
-            short_axis /= norm_2(short_axis);
+                // Normalise the short axis before returning it
+                short_axis /= norm_2(short_axis);
+            }
         }
-    }
 
-    return short_axis;
+        return short_axis;
+    }
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1203,69 +1242,76 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
                                                                                    c_vector<double, SPACE_DIM> axisOfDivision,
                                                                                    bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
-    // Get the centroid of the element
-    c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
-
-    // Create a vector perpendicular to the axis of division
-    c_vector<double, SPACE_DIM> perp_axis;
-    perp_axis(0) = -axisOfDivision(1);
-    perp_axis(1) = axisOfDivision(0);
-
-    std::stringstream str;
-    str << "Centroid is " << centroid[0] << ", " << centroid[1] << "\n" << "Axis is " << axisOfDivision(0) << ", " << axisOfDivision(1) << "\n";
-    std::cout << str.str();
-    /*
-     * Find which edges the axis of division crosses by finding any node
-     * that lies on the opposite side of the axis of division to its next
-     * neighbour.
-     */
-    
-    unsigned num_nodes = pElement->GetNumNodes();
-    std::vector<unsigned> intersecting_nodes;
-    bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
-    for (unsigned i = 0; i < num_nodes; i++)
+    if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
     {
-        bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i + 1) % num_nodes), centroid), perp_axis) >= 0);
-        std::stringstream left;
-        std::cout << left.str(); 
-        if (is_current_node_on_left != is_next_node_on_left)
+        // Get the centroid of the element
+        c_vector<double, SPACE_DIM> centroid = this->GetCentroidOfElement(pElement->GetIndex());
+
+        // Create a vector perpendicular to the axis of division
+        c_vector<double, SPACE_DIM> perp_axis;
+        perp_axis(0) = -axisOfDivision(1);
+        perp_axis(1) = axisOfDivision(0);
+
+        std::stringstream str;
+        str << "Centroid is " << centroid[0] << ", " << centroid[1] << "\n" << "Axis is " << axisOfDivision(0) << ", " << axisOfDivision(1) << "\n";
+        std::cout << str.str();
+        /*
+        * Find which edges the axis of division crosses by finding any node
+        * that lies on the opposite side of the axis of division to its next
+        * neighbour.
+        */
+        
+        unsigned num_nodes = pElement->GetNumNodes();
+        std::vector<unsigned> intersecting_nodes;
+        bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
+        for (unsigned i = 0; i < num_nodes; i++)
         {
-            intersecting_nodes.push_back(i);
+            bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i + 1) % num_nodes), centroid), perp_axis) >= 0);
+            std::stringstream left;
+            std::cout << left.str(); 
+            if (is_current_node_on_left != is_next_node_on_left)
+            {
+                intersecting_nodes.push_back(i);
+            }
+            is_current_node_on_left = is_next_node_on_left;
         }
-        is_current_node_on_left = is_next_node_on_left;
-    }
 
-    // If the axis of division does not cross two edges then we cannot proceed
-    if (intersecting_nodes.size() != 2)
+        // If the axis of division does not cross two edges then we cannot proceed
+        if (intersecting_nodes.size() != 2)
+        {
+            EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element"); // LCOV_EXCL_LINE
+        }
+
+        // Now call DivideElement() to divide the element using the nodes found above
+        //unsigned new_element_index = 0;
+        unsigned new_element_index = DivideElement(pElement,
+                                                intersecting_nodes[0],
+                                                intersecting_nodes[1],
+                                                centroid,
+                                                axisOfDivision);
+
+        return new_element_index;
+    }
+    else        
     {
-        EXCEPTION("Cannot proceed with element division: the given axis of division does not cross two edges of the element"); // LCOV_EXCL_LINE
+        NEVER_REACHED;
     }
-
-    // Now call DivideElement() to divide the element using the nodes found above
-    //unsigned new_element_index = 0;
-    unsigned new_element_index = DivideElement(pElement,
-                                               intersecting_nodes[0],
-                                               intersecting_nodes[1],
-                                               centroid,
-                                               axisOfDivision);
-
-    return new_element_index;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                                    bool placeOriginalElementBelow)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
-    c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
-
-    unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
-    return new_element_index;
+    if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
+    {
+        c_vector<double, SPACE_DIM> short_axis = this->GetShortAxisOfElement(pElement->GetIndex());
+        unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
+        return new_element_index;
+    }
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1275,291 +1321,295 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
                                                                      c_vector<double, SPACE_DIM> centroid,
                                                                      c_vector<double, SPACE_DIM> axisOfDivision)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
-    if (mElementDivisionSpacing == DOUBLE_UNSET)
+    if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
     {
-        EXCEPTION("The value of mElementDivisionSpacing has not been set.");
-    }
-
-    /*
-     * Method outline:
-     *
-     *   Each element needs to end up with the same number of nodes as the original element, and those nodes will be
-     *   equally spaced around the outline of each of the two daughter elements.
-     *
-     *   The two elements need to be divided by a distance of mElementDivisionSpacing, where the distance is measured
-     *   perpendicular to the axis of division.
-     *
-     *   To achieve this, we find four 'corner' locations, each of which has a perpendicular distance from the axis of
-     *   half the required spacing, and are found by using the locations from the existing element as a stencil.
-     */
-
-    double half_spacing = 0.5 * mElementDivisionSpacing;
-
-    // Get unit vectors in the direction of the division axis, and the perpendicular
-    c_vector<double, SPACE_DIM> unit_axis = axisOfDivision / norm_2(axisOfDivision);
-    c_vector<double, SPACE_DIM> unit_perp;
-    unit_perp[0] = -unit_axis[1];
-    unit_perp[1] = unit_axis[0];
-
-    unsigned num_nodes = pElement->GetNumNodes();
-
-    /*
-     * We first identify the start and end indices of the nodes which will form the location stencil for each daughter
-     * cell.  Our starting point is the node indices already identified.
-     *
-     * In order to ensure the resulting gap between the elements is the correct size, we remove as many nodes as
-     * necessary until the perpendicular distance between the centroid and the node is at least half the required
-     * spacing.
-     *
-     * Finally, we move the relevant node to be exactly half the required spacing.
-     */
-    unsigned start_a = (nodeAIndex + 1) % num_nodes;
-    unsigned end_a = nodeBIndex;
-
-    unsigned start_b = (nodeBIndex + 1) % num_nodes;
-    unsigned end_b = nodeAIndex;
-
-    // Find correct start_a
-    bool no_node_satisfied_condition_1 = true;
-    for (unsigned i = start_a; i != end_a;)
-    {
-        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
-        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
-
-        std::cout << "perp dist: " << perpendicular_dist << ", half_spacing: " << half_spacing << "\n";
-        if (fabs(perpendicular_dist) >= half_spacing)
+        if (mElementDivisionSpacing == DOUBLE_UNSET)
         {
-            no_node_satisfied_condition_1 = false;
-            start_a = i;
-
-            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
-            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
-
-            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
-            break;
+            EXCEPTION("The value of mElementDivisionSpacing has not been set.");
         }
 
-        // Go to the next node
-        i = (i + 1) % num_nodes;
-    }
+        /*
+        * Method outline:
+        *
+        *   Each element needs to end up with the same number of nodes as the original element, and those nodes will be
+        *   equally spaced around the outline of each of the two daughter elements.
+        *
+        *   The two elements need to be divided by a distance of mElementDivisionSpacing, where the distance is measured
+        *   perpendicular to the axis of division.
+        *
+        *   To achieve this, we find four 'corner' locations, each of which has a perpendicular distance from the axis of
+        *   half the required spacing, and are found by using the locations from the existing element as a stencil.
+        */
 
-    // Find correct end_a
-    bool no_node_satisfied_condition_2 = true;
-    for (unsigned i = end_a; i != start_a;)
-    {
-        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
-        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
+        double half_spacing = 0.5 * mElementDivisionSpacing;
 
-        if (fabs(perpendicular_dist) >= half_spacing)
+        // Get unit vectors in the direction of the division axis, and the perpendicular
+        c_vector<double, SPACE_DIM> unit_axis = axisOfDivision / norm_2(axisOfDivision);
+        c_vector<double, SPACE_DIM> unit_perp;
+        unit_perp[0] = -unit_axis[1];
+        unit_perp[1] = unit_axis[0];
+
+        unsigned num_nodes = pElement->GetNumNodes();
+
+        /*
+        * We first identify the start and end indices of the nodes which will form the location stencil for each daughter
+        * cell.  Our starting point is the node indices already identified.
+        *
+        * In order to ensure the resulting gap between the elements is the correct size, we remove as many nodes as
+        * necessary until the perpendicular distance between the centroid and the node is at least half the required
+        * spacing.
+        *
+        * Finally, we move the relevant node to be exactly half the required spacing.
+        */
+        unsigned start_a = (nodeAIndex + 1) % num_nodes;
+        unsigned end_a = nodeBIndex;
+
+        unsigned start_b = (nodeBIndex + 1) % num_nodes;
+        unsigned end_b = nodeAIndex;
+
+        // Find correct start_a
+        bool no_node_satisfied_condition_1 = true;
+        for (unsigned i = start_a; i != end_a;)
         {
-            no_node_satisfied_condition_2 = false;
-            end_a = i;
+            c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+            double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
-            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+            std::cout << "perp dist: " << perpendicular_dist << ", half_spacing: " << half_spacing << "\n";
+            if (fabs(perpendicular_dist) >= half_spacing)
+            {
+                no_node_satisfied_condition_1 = false;
+                start_a = i;
 
-            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
-            break;
+                // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+                c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+                new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+
+                pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+                break;
+            }
+
+            // Go to the next node
+            i = (i + 1) % num_nodes;
         }
 
-        // Go to the previous node
-        i = (i + num_nodes - 1) % num_nodes; // LCOV_EXCL_LINE
-    }
-
-    // Find correct start_b
-    bool no_node_satisfied_condition_3 = true;
-    for (unsigned i = start_b; i != end_b;)
-    {
-        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
-        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
-
-        if (fabs(perpendicular_dist) >= half_spacing)
+        // Find correct end_a
+        bool no_node_satisfied_condition_2 = true;
+        for (unsigned i = end_a; i != start_a;)
         {
-            no_node_satisfied_condition_3 = false;
-            start_b = i;
+            c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+            double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
-            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+            if (fabs(perpendicular_dist) >= half_spacing)
+            {
+                no_node_satisfied_condition_2 = false;
+                end_a = i;
 
-            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
-            break;
+                // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+                c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+                new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+
+                pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+                break;
+            }
+
+            // Go to the previous node
+            i = (i + num_nodes - 1) % num_nodes; // LCOV_EXCL_LINE
         }
 
-        // Go to the next node
-        i = (i + 1) % num_nodes;
-    }
-
-    // Find correct end_b
-    bool no_node_satisfied_condition_4 = true;
-    for (unsigned i = end_b; i != start_b;)
-    {
-        c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
-        double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
-
-        if (fabs(perpendicular_dist) >= half_spacing)
+        // Find correct start_b
+        bool no_node_satisfied_condition_3 = true;
+        for (unsigned i = start_b; i != end_b;)
         {
-            no_node_satisfied_condition_4 = false;
-            end_b = i;
+            c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+            double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-            // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
-            c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
-            new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+            if (fabs(perpendicular_dist) >= half_spacing)
+            {
+                no_node_satisfied_condition_3 = false;
+                start_b = i;
 
-            pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
-            break;
+                // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+                c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+                new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+
+                pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+                break;
+            }
+
+            // Go to the next node
+            i = (i + 1) % num_nodes;
         }
 
-        // Go to the previous node
-        i = (i + num_nodes - 1) % num_nodes;
-    }
-
-    if (no_node_satisfied_condition_1 || no_node_satisfied_condition_2 || no_node_satisfied_condition_3 || no_node_satisfied_condition_4)
-    {
-        EXCEPTION("Could not space elements far enough apart during cell division.  Cannot currently handle this case");
-    }
-
-    /*
-     * Create location stencils for each of the daughter cells
-     */
-    std::vector<c_vector<double, SPACE_DIM> > daughter_a_location_stencil;
-    for (unsigned node_idx = start_a; node_idx != (end_a + 1) % num_nodes;)
-    {
-        daughter_a_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
-
-        // Go to next node
-        node_idx = (node_idx + 1) % num_nodes;
-    }
-
-    std::vector<c_vector<double, SPACE_DIM> > daughter_b_location_stencil;
-    for (unsigned node_idx = start_b; node_idx != (end_b + 1) % num_nodes;)
-    {
-        daughter_b_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
-
-        // Go to next node
-        node_idx = (node_idx + 1) % num_nodes;
-    }
-
-    assert(daughter_a_location_stencil.size() > 1);
-    assert(daughter_b_location_stencil.size() > 1);
-
-    // To help calculating cumulative distances, add the first location on to the end
-    daughter_a_location_stencil.push_back(daughter_a_location_stencil[0]);
-    daughter_b_location_stencil.push_back(daughter_b_location_stencil[0]);
-
-    // Calculate the cumulative distances around the stencils
-    std::vector<double> cumulative_distances_a;
-    std::vector<double> cumulative_distances_b;
-    cumulative_distances_a.push_back(0.0);
-    cumulative_distances_b.push_back(0.0);
-    for (unsigned loc_idx = 1; loc_idx < daughter_a_location_stencil.size(); loc_idx++)
-    {
-        cumulative_distances_a.push_back(cumulative_distances_a.back() + norm_2(this->GetVectorFromAtoB(daughter_a_location_stencil[loc_idx - 1], daughter_a_location_stencil[loc_idx])));
-    }
-    for (unsigned loc_idx = 1; loc_idx < daughter_b_location_stencil.size(); loc_idx++)
-    {
-        cumulative_distances_b.push_back(cumulative_distances_b.back() + norm_2(this->GetVectorFromAtoB(daughter_b_location_stencil[loc_idx - 1], daughter_b_location_stencil[loc_idx])));
-    }
-
-    // Find the target node spacing for each of the daughter elements
-    double target_spacing_a = cumulative_distances_a.back() / (double)num_nodes;
-    double target_spacing_b = cumulative_distances_b.back() / (double)num_nodes;
-
-    // Move the existing nodes into position to become daughter-A nodes
-    unsigned last_idx_used = 0;
-    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-    {
-        double location_along_arc = (double)node_idx * target_spacing_a;
-
-        while (location_along_arc > cumulative_distances_a[last_idx_used + 1])
+        // Find correct end_b
+        bool no_node_satisfied_condition_4 = true;
+        for (unsigned i = end_b; i != start_b;)
         {
-            last_idx_used++;
+            c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
+            double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
+
+            if (fabs(perpendicular_dist) >= half_spacing)
+            {
+                no_node_satisfied_condition_4 = false;
+                end_b = i;
+
+                // Calculate position so it's exactly 0.5 * elem_spacing perpendicular distance from the centroid
+                c_vector<double, SPACE_DIM> new_location = pElement->GetNode(i)->rGetLocation();
+                new_location -= unit_perp * copysign(fabs(perpendicular_dist) - half_spacing, perpendicular_dist);
+
+                pElement->GetNode(i)->SetPoint(ChastePoint<SPACE_DIM>(new_location));
+                break;
+            }
+
+            // Go to the previous node
+            i = (i + num_nodes - 1) % num_nodes;
         }
 
-        // Interpolant is the extra distance past the last index used divided by the length of the next line segment
-        double interpolant = (location_along_arc - cumulative_distances_a[last_idx_used]) / (cumulative_distances_a[last_idx_used + 1] - cumulative_distances_a[last_idx_used]);
-
-        c_vector<double, SPACE_DIM> this_to_next = this->GetVectorFromAtoB(daughter_a_location_stencil[last_idx_used],
-                                                                           daughter_a_location_stencil[last_idx_used + 1]);
-
-        c_vector<double, SPACE_DIM> new_location_a = daughter_a_location_stencil[last_idx_used] + interpolant * this_to_next;
-
-        pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
-    }
-
-    // Create new nodes at positions around the daughter-B stencil
-    last_idx_used = 0;
-    std::vector<Node<SPACE_DIM>*> new_nodes_vec;
-    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-    {
-        double location_along_arc = (double)node_idx * target_spacing_b;
-
-        while (location_along_arc > cumulative_distances_b[last_idx_used + 1])
+        if (no_node_satisfied_condition_1 || no_node_satisfied_condition_2 || no_node_satisfied_condition_3 || no_node_satisfied_condition_4)
         {
-            last_idx_used++;
+            EXCEPTION("Could not space elements far enough apart during cell division.  Cannot currently handle this case");
         }
 
-        // Interpolant is the extra distance past the last index used divided by the length of the next line segment
-        double interpolant = (location_along_arc - cumulative_distances_b[last_idx_used]) / (cumulative_distances_b[last_idx_used + 1] - cumulative_distances_b[last_idx_used]);
-
-        c_vector<double, SPACE_DIM> this_to_next = this->GetVectorFromAtoB(daughter_b_location_stencil[last_idx_used],
-                                                                           daughter_b_location_stencil[last_idx_used + 1]);
-
-        c_vector<double, SPACE_DIM> new_location_b = daughter_b_location_stencil[last_idx_used] + interpolant * this_to_next;
-
-        unsigned new_node_idx = this->mNodes.size();
-        this->mNodes.push_back(new Node<SPACE_DIM>(new_node_idx, new_location_b, true));
-        new_nodes_vec.push_back(this->mNodes.back());
-    }
-
-    // Copy node attributes
-    for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
-    {
-        new_nodes_vec[node_idx]->SetRegion(pElement->GetNode(node_idx)->GetRegion());
-
-        for (unsigned node_attribute = 0; node_attribute < pElement->GetNode(node_idx)->GetNumNodeAttributes(); node_attribute++)
+        /*
+        * Create location stencils for each of the daughter cells
+        */
+        std::vector<c_vector<double, SPACE_DIM> > daughter_a_location_stencil;
+        for (unsigned node_idx = start_a; node_idx != (end_a + 1) % num_nodes;)
         {
-            new_nodes_vec[node_idx]->AddNodeAttribute(pElement->GetNode(node_idx)->rGetNodeAttributes()[node_attribute]);
+            daughter_a_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
+
+            // Go to next node
+            node_idx = (node_idx + 1) % num_nodes;
         }
+
+        std::vector<c_vector<double, SPACE_DIM> > daughter_b_location_stencil;
+        for (unsigned node_idx = start_b; node_idx != (end_b + 1) % num_nodes;)
+        {
+            daughter_b_location_stencil.push_back(c_vector<double, SPACE_DIM>(pElement->GetNode(node_idx)->rGetLocation()));
+
+            // Go to next node
+            node_idx = (node_idx + 1) % num_nodes;
+        }
+
+        assert(daughter_a_location_stencil.size() > 1);
+        assert(daughter_b_location_stencil.size() > 1);
+
+        // To help calculating cumulative distances, add the first location on to the end
+        daughter_a_location_stencil.push_back(daughter_a_location_stencil[0]);
+        daughter_b_location_stencil.push_back(daughter_b_location_stencil[0]);
+
+        // Calculate the cumulative distances around the stencils
+        std::vector<double> cumulative_distances_a;
+        std::vector<double> cumulative_distances_b;
+        cumulative_distances_a.push_back(0.0);
+        cumulative_distances_b.push_back(0.0);
+        for (unsigned loc_idx = 1; loc_idx < daughter_a_location_stencil.size(); loc_idx++)
+        {
+            cumulative_distances_a.push_back(cumulative_distances_a.back() + norm_2(this->GetVectorFromAtoB(daughter_a_location_stencil[loc_idx - 1], daughter_a_location_stencil[loc_idx])));
+        }
+        for (unsigned loc_idx = 1; loc_idx < daughter_b_location_stencil.size(); loc_idx++)
+        {
+            cumulative_distances_b.push_back(cumulative_distances_b.back() + norm_2(this->GetVectorFromAtoB(daughter_b_location_stencil[loc_idx - 1], daughter_b_location_stencil[loc_idx])));
+        }
+
+        // Find the target node spacing for each of the daughter elements
+        double target_spacing_a = cumulative_distances_a.back() / (double)num_nodes;
+        double target_spacing_b = cumulative_distances_b.back() / (double)num_nodes;
+
+        // Move the existing nodes into position to become daughter-A nodes
+        unsigned last_idx_used = 0;
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+        {
+            double location_along_arc = (double)node_idx * target_spacing_a;
+
+            while (location_along_arc > cumulative_distances_a[last_idx_used + 1])
+            {
+                last_idx_used++;
+            }
+
+            // Interpolant is the extra distance past the last index used divided by the length of the next line segment
+            double interpolant = (location_along_arc - cumulative_distances_a[last_idx_used]) / (cumulative_distances_a[last_idx_used + 1] - cumulative_distances_a[last_idx_used]);
+
+            c_vector<double, SPACE_DIM> this_to_next = this->GetVectorFromAtoB(daughter_a_location_stencil[last_idx_used],
+                                                                            daughter_a_location_stencil[last_idx_used + 1]);
+
+            c_vector<double, SPACE_DIM> new_location_a = daughter_a_location_stencil[last_idx_used] + interpolant * this_to_next;
+
+            pElement->GetNode(node_idx)->SetPoint(ChastePoint<SPACE_DIM>(new_location_a));
+        }
+
+        // Create new nodes at positions around the daughter-B stencil
+        last_idx_used = 0;
+        std::vector<Node<SPACE_DIM>*> new_nodes_vec;
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+        {
+            double location_along_arc = (double)node_idx * target_spacing_b;
+
+            while (location_along_arc > cumulative_distances_b[last_idx_used + 1])
+            {
+                last_idx_used++;
+            }
+
+            // Interpolant is the extra distance past the last index used divided by the length of the next line segment
+            double interpolant = (location_along_arc - cumulative_distances_b[last_idx_used]) / (cumulative_distances_b[last_idx_used + 1] - cumulative_distances_b[last_idx_used]);
+
+            c_vector<double, SPACE_DIM> this_to_next = this->GetVectorFromAtoB(daughter_b_location_stencil[last_idx_used],
+                                                                            daughter_b_location_stencil[last_idx_used + 1]);
+
+            c_vector<double, SPACE_DIM> new_location_b = daughter_b_location_stencil[last_idx_used] + interpolant * this_to_next;
+
+            unsigned new_node_idx = this->mNodes.size();
+            this->mNodes.push_back(new Node<SPACE_DIM>(new_node_idx, new_location_b, true));
+            new_nodes_vec.push_back(this->mNodes.back());
+        }
+
+        // Copy node attributes
+        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+        {
+            new_nodes_vec[node_idx]->SetRegion(pElement->GetNode(node_idx)->GetRegion());
+
+            for (unsigned node_attribute = 0; node_attribute < pElement->GetNode(node_idx)->GetNumNodeAttributes(); node_attribute++)
+            {
+                new_nodes_vec[node_idx]->AddNodeAttribute(pElement->GetNode(node_idx)->rGetNodeAttributes()[node_attribute]);
+            }
+        }
+
+        // Create the new element
+        unsigned new_elem_idx = this->mElements.size();
+        this->mElements.push_back(new ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>(new_elem_idx, new_nodes_vec));
+        this->mElements.back()->RegisterWithNodes();
+
+        // Copy any element attributes
+        for (unsigned elem_attribute = 0; elem_attribute < pElement->GetNumElementAttributes(); elem_attribute++)
+        {
+            this->mElements.back()->AddElementAttribute(pElement->rGetElementAttributes()[elem_attribute]);
+        }
+
+        // Add the necessary corners to keep consistency with the other daughter element
+        for (unsigned corner = 0; corner < pElement->rGetCornerNodes().size(); corner++)
+        {
+            this->mElements.back()->rGetCornerNodes().push_back(pElement->rGetCornerNodes()[corner]);
+        }
+
+        // Update fluid source location for the existing element
+        pElement->GetFluidSource()->rGetModifiableLocation() = this->GetCentroidOfElement(pElement->GetIndex());
+
+        // Add a fluid source for the new element
+        c_vector<double, SPACE_DIM> new_centroid = this->GetCentroidOfElement(new_elem_idx);
+        mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(new_elem_idx, new_centroid));
+
+        // Set source parameters
+        mElementFluidSources.back()->SetAssociatedElementIndex(new_elem_idx);
+        mElementFluidSources.back()->SetStrength(0.0);
+
+        // Associate source with element
+        mElements[new_elem_idx]->SetFluidSource(mElementFluidSources.back());
+
+        return new_elem_idx;
     }
-
-    // Create the new element
-    unsigned new_elem_idx = this->mElements.size();
-    this->mElements.push_back(new ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>(new_elem_idx, new_nodes_vec));
-    this->mElements.back()->RegisterWithNodes();
-
-    // Copy any element attributes
-    for (unsigned elem_attribute = 0; elem_attribute < pElement->GetNumElementAttributes(); elem_attribute++)
+    else        
     {
-        this->mElements.back()->AddElementAttribute(pElement->rGetElementAttributes()[elem_attribute]);
+        NEVER_REACHED;
     }
-
-    // Add the necessary corners to keep consistency with the other daughter element
-    for (unsigned corner = 0; corner < pElement->rGetCornerNodes().size(); corner++)
-    {
-        this->mElements.back()->rGetCornerNodes().push_back(pElement->rGetCornerNodes()[corner]);
-    }
-
-    // Update fluid source location for the existing element
-    pElement->GetFluidSource()->rGetModifiableLocation() = this->GetCentroidOfElement(pElement->GetIndex());
-
-    // Add a fluid source for the new element
-    c_vector<double, SPACE_DIM> new_centroid = this->GetCentroidOfElement(new_elem_idx);
-    mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(new_elem_idx, new_centroid));
-
-    // Set source parameters
-    mElementFluidSources.back()->SetAssociatedElementIndex(new_elem_idx);
-    mElementFluidSources.back()->SetStrength(0.0);
-
-    // Associate source with element
-    mElements[new_elem_idx]->SetFluidSource(mElementFluidSources.back());
-
-    return new_elem_idx;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1588,59 +1638,64 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                  bool randomOrder)
 {
-    assert(SPACE_DIM == 2);
-
-    const unsigned num_nodes = pElement->GetNumNodes();
-
-    // Start at a random location in the vector of element nodes if requested
-    const unsigned start_idx = randomOrder ? RandomNumberGenerator::Instance()->randMod(num_nodes) : 0u;
-
-    // Straighten out locations to a contiguous polygon rather than wrapped around the domain due to periodicity
-    std::vector<c_vector<double, SPACE_DIM>> locations_straightened;
-    locations_straightened.reserve(num_nodes);
-
-    locations_straightened.emplace_back(pElement->GetNodeLocation(start_idx));
-
-    for (unsigned node_idx = 1; node_idx < num_nodes; ++node_idx)
+    if constexpr (SPACE_DIM == 2)
     {
-        const unsigned prev_idx = AdvanceMod(start_idx, node_idx - 1, num_nodes);
-        const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+        const unsigned num_nodes = pElement->GetNumNodes();
 
-        const c_vector<double, SPACE_DIM>& r_last_location_added = locations_straightened.back();
+        // Start at a random location in the vector of element nodes if requested
+        const unsigned start_idx = randomOrder ? RandomNumberGenerator::Instance()->randMod(num_nodes) : 0u;
 
-        const c_vector<double, SPACE_DIM>& r_prev_location = pElement->GetNodeLocation(prev_idx);
-        const c_vector<double, SPACE_DIM>& r_this_location = pElement->GetNodeLocation(this_idx);
+        // Straighten out locations to a contiguous polygon rather than wrapped around the domain due to periodicity
+        std::vector<c_vector<double, SPACE_DIM>> locations_straightened;
+        locations_straightened.reserve(num_nodes);
 
-        locations_straightened.emplace_back(r_last_location_added +
-                                            this->GetVectorFromAtoB(r_prev_location, r_this_location));
+        locations_straightened.emplace_back(pElement->GetNodeLocation(start_idx));
+
+        for (unsigned node_idx = 1; node_idx < num_nodes; ++node_idx)
+        {
+            const unsigned prev_idx = AdvanceMod(start_idx, node_idx - 1, num_nodes);
+            const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+
+            const c_vector<double, SPACE_DIM>& r_last_location_added = locations_straightened.back();
+
+            const c_vector<double, SPACE_DIM>& r_prev_location = pElement->GetNodeLocation(prev_idx);
+            const c_vector<double, SPACE_DIM>& r_this_location = pElement->GetNodeLocation(this_idx);
+
+            locations_straightened.emplace_back(r_last_location_added +
+                                                this->GetVectorFromAtoB(r_prev_location, r_this_location));
+        }
+
+        assert(locations_straightened.size() == num_nodes);
+
+        const bool closed_path = true;
+        const bool permute_order = false;
+        const std::size_t num_pts_to_place = num_nodes;
+
+        std::vector<c_vector<double, SPACE_DIM>> evenly_spaced_locations = EvenlySpaceAlongPath(
+                locations_straightened,
+                closed_path,
+                permute_order,
+                num_pts_to_place
+        );
+
+        assert(evenly_spaced_locations.size() == num_nodes);
+
+        // Conform all locations to geometry
+        for (c_vector<double, SPACE_DIM>& r_loc : evenly_spaced_locations)
+        {
+            ConformToGeometry(r_loc);
+        }
+
+        // Update the node locations
+        for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
+        {
+            const unsigned this_idx = AdvanceMod(node_idx, start_idx, num_nodes);
+            pElement->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
+        }
     }
-
-    assert(locations_straightened.size() == num_nodes);
-
-    const bool closed_path = true;
-    const bool permute_order = false;
-    const std::size_t num_pts_to_place = num_nodes;
-
-    std::vector<c_vector<double, SPACE_DIM>> evenly_spaced_locations = EvenlySpaceAlongPath(
-            locations_straightened,
-            closed_path,
-            permute_order,
-            num_pts_to_place
-    );
-
-    assert(evenly_spaced_locations.size() == num_nodes);
-
-    // Conform all locations to geometry
-    for (c_vector<double, SPACE_DIM>& r_loc : evenly_spaced_locations)
+    else        
     {
-        ConformToGeometry(r_loc);
-    }
-
-    // Update the node locations
-    for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
-    {
-        const unsigned this_idx = AdvanceMod(node_idx, start_idx, num_nodes);
-        pElement->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
+        NEVER_REACHED;
     }
 }
 
@@ -1648,60 +1703,65 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* pLamina,
                                                                 bool randomOrder)
 {
-    assert(SPACE_DIM == 2);
-
-    const unsigned num_nodes = pLamina->GetNumNodes();
-
-    // Start at a random location in the vector of element nodes
-    const unsigned start_idx = randomOrder ? RandomNumberGenerator::Instance()->randMod(num_nodes) : 0u;
-
-    // Straighten out locations to a contiguous line rather than wrapped around the domain due to periodicity
-    std::vector<c_vector<double, SPACE_DIM>> locations_straightened;
-    locations_straightened.reserve(1 + num_nodes);
-
-    locations_straightened.emplace_back(pLamina->GetNodeLocation(start_idx));
-
-    // We go to 1 + num_nodes so that we add on a node in a location congruent to the first location added
-    for (unsigned node_idx = 1; node_idx < 1 + num_nodes; ++node_idx)
+    if constexpr (SPACE_DIM == 2)
     {
-        const unsigned prev_idx = AdvanceMod(start_idx, node_idx - 1, num_nodes);
-        const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+        const unsigned num_nodes = pLamina->GetNumNodes();
 
-        const c_vector<double, SPACE_DIM>& r_last_location_added = locations_straightened.back();
+        // Start at a random location in the vector of element nodes
+        const unsigned start_idx = randomOrder ? RandomNumberGenerator::Instance()->randMod(num_nodes) : 0u;
 
-        const c_vector<double, SPACE_DIM>& r_prev_location = pLamina->GetNodeLocation(prev_idx);
-        const c_vector<double, SPACE_DIM>& r_this_location = pLamina->GetNodeLocation(this_idx);
+        // Straighten out locations to a contiguous line rather than wrapped around the domain due to periodicity
+        std::vector<c_vector<double, SPACE_DIM>> locations_straightened;
+        locations_straightened.reserve(1 + num_nodes);
 
-        locations_straightened.emplace_back(r_last_location_added +
-                                            this->GetVectorFromAtoB(r_prev_location, r_this_location));
+        locations_straightened.emplace_back(pLamina->GetNodeLocation(start_idx));
+
+        // We go to 1 + num_nodes so that we add on a node in a location congruent to the first location added
+        for (unsigned node_idx = 1; node_idx < 1 + num_nodes; ++node_idx)
+        {
+            const unsigned prev_idx = AdvanceMod(start_idx, node_idx - 1, num_nodes);
+            const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+
+            const c_vector<double, SPACE_DIM>& r_last_location_added = locations_straightened.back();
+
+            const c_vector<double, SPACE_DIM>& r_prev_location = pLamina->GetNodeLocation(prev_idx);
+            const c_vector<double, SPACE_DIM>& r_this_location = pLamina->GetNodeLocation(this_idx);
+
+            locations_straightened.emplace_back(r_last_location_added +
+                                                this->GetVectorFromAtoB(r_prev_location, r_this_location));
+        }
+
+        assert(locations_straightened.size() == 1 + num_nodes);
+
+        const bool closed_path = false;
+        const bool permute_order = false;
+        const std::size_t num_pts_to_place = 1 + num_nodes;
+
+        std::vector<c_vector<double, SPACE_DIM>> evenly_spaced_locations = EvenlySpaceAlongPath(
+                locations_straightened,
+                closed_path,
+                permute_order,
+                num_pts_to_place
+        );
+
+        assert(evenly_spaced_locations.size() == 1 + num_nodes);
+
+        // Conform all locations to geometry
+        for (c_vector<double, SPACE_DIM>& r_loc : evenly_spaced_locations)
+        {
+            ConformToGeometry(r_loc);
+        }
+
+        // Update the node locations, ignoring the very last location that was added to make the path spacing even
+        for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
+        {
+            const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
+            pLamina->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
+        }
     }
-
-    assert(locations_straightened.size() == 1 + num_nodes);
-
-    const bool closed_path = false;
-    const bool permute_order = false;
-    const std::size_t num_pts_to_place = 1 + num_nodes;
-
-    std::vector<c_vector<double, SPACE_DIM>> evenly_spaced_locations = EvenlySpaceAlongPath(
-            locations_straightened,
-            closed_path,
-            permute_order,
-            num_pts_to_place
-    );
-
-    assert(evenly_spaced_locations.size() == 1 + num_nodes);
-
-    // Conform all locations to geometry
-    for (c_vector<double, SPACE_DIM>& r_loc : evenly_spaced_locations)
+    else        
     {
-        ConformToGeometry(r_loc);
-    }
-
-    // Update the node locations, ignoring the very last location that was added to make the path spacing even
-    for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
-    {
-        const unsigned this_idx = AdvanceMod(start_idx, node_idx, num_nodes);
-        pLamina->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
+        NEVER_REACHED;
     }
 }
 
@@ -1797,21 +1857,26 @@ std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouring
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygonDistribution()
 {
-    assert(SPACE_DIM == 2);
-
-    std::array<unsigned, 13> polygon_dist = {{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u}};
-
-    for (auto elem_it = this->GetElementIteratorBegin(); elem_it != this->GetElementIteratorEnd(); ++elem_it)
+    if constexpr (SPACE_DIM == 2)
     {
-        if (!elem_it->IsElementOnBoundary())
-        {
-            // Accumulate all 12+ sided shapes
-            unsigned num_neighbours = std::min<unsigned>(12u, GetNeighbouringElementIndices(elem_it->GetIndex()).size());
-            polygon_dist[num_neighbours]++;
-        }
-    }
+        std::array<unsigned, 13> polygon_dist = {{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u}};
 
-    return polygon_dist;
+        for (auto elem_it = this->GetElementIteratorBegin(); elem_it != this->GetElementIteratorEnd(); ++elem_it)
+        {
+            if (!elem_it->IsElementOnBoundary())
+            {
+                // Accumulate all 12+ sided shapes
+                unsigned num_neighbours = std::min<unsigned>(12u, GetNeighbouringElementIndices(elem_it->GetIndex()).size());
+                polygon_dist[num_neighbours]++;
+            }
+        }
+
+        return polygon_dist;
+    }
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

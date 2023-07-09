@@ -191,34 +191,38 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
-    assert(SPACE_DIM == 2);
-    // Create VTK mesh
-    MakeVtkMesh(rMesh);
-    // Now write VTK mesh to file
-    assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
-    vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
-    p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-    p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
-    // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
-    // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(NULL);
-    // **** REMOVE WITH CAUTION *****
-
-    std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
-    if (stamp != "")
+    if constexpr (SPACE_DIM == 2)
     {
-        vtk_file_name += "_" + stamp;
-    }
-    vtk_file_name += ".vtu";
+        // Create VTK mesh
+        MakeVtkMesh(rMesh);
+        // Now write VTK mesh to file
+        assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
+        vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
+#if VTK_MAJOR_VERSION >= 6
+        p_writer->SetInputData(mpVtkUnstructedMesh);
+#else
+        p_writer->SetInput(mpVtkUnstructedMesh);
+#endif
+        // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
+        // **** REMOVE WITH CAUTION *****
+        p_writer->SetCompressor(NULL);
+        // **** REMOVE WITH CAUTION *****
 
-    p_writer->SetFileName(vtk_file_name.c_str());
-    //p_writer->PrintSelf(std::cout, vtkIndent());
-    p_writer->Write();
-    p_writer->Delete(); // Reference counted
-   
+        std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
+        if (stamp != "")
+        {
+            vtk_file_name += "_" + stamp;
+        }
+        vtk_file_name += ".vtu";
+
+        p_writer->SetFileName(vtk_file_name.c_str());
+        p_writer->Write();
+        p_writer->Delete(); // Reference counted
+    }
+    else        
+    {
+        NEVER_REACHED;
+    }  
 #endif //CHASTE_VTK
 }
 
@@ -238,182 +242,184 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
      * Because no node can be present in more than one cell, it is safe to add points to mpVtkUnstructuredMesh as we go
      * through each cell, rather than having to add nodes before cells.
      */
-//#ifdef CHASTE_VTK
     // Assert mesh is 2D to simplify vtk creation
-    assert(SPACE_DIM == 2);
-    
-    FindElementOverlaps(rMesh);
-
-    // Make the Vtk mesh
-    vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
-    p_pts->GetData()->SetName("Vertex positions");
-
-    // Keep a track of the number of extra points that have been added to the purpose of visualisation
-    unsigned num_pts_added = 0;
-
-    // Next, we decide how to output the VTK data for elements depending on the type of overlap
-    for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
+    if constexpr (SPACE_DIM == 2)
     {
-        unsigned elem_idx = iter->GetIndex();
-        unsigned num_nodes = iter->GetNumNodes();
+        FindElementOverlaps(rMesh);
 
-        // Case 1: no overlap
-        if (mElementParts.size() == 0 || mElementParts[elem_idx].empty())
+        // Make the Vtk mesh
+        vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
+        p_pts->GetData()->SetName("Vertex positions");
+
+        // Keep a track of the number of extra points that have been added to the purpose of visualisation
+        unsigned num_pts_added = 0;
+
+        // Next, we decide how to output the VTK data for elements depending on the type of overlap
+        for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
         {
-            vtkCell* p_cell = vtkPolygon::New();
-            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-            p_cell_id_list->SetNumberOfIds(num_nodes);
+            unsigned elem_idx = iter->GetIndex();
+            unsigned num_nodes = iter->GetNumNodes();
 
-            for (unsigned node_local_idx = 0; node_local_idx < num_nodes; ++node_local_idx)
+            // Case 1: no overlap
+            if (mElementParts.size() == 0 || mElementParts[elem_idx].empty())
             {
-                // Get node, index and location
-                unsigned global_idx = iter->GetNode(node_local_idx)->GetIndex();
-                const auto& r_location = iter->GetNode(node_local_idx)->rGetLocation();
-
-                p_pts->InsertPoint(global_idx, r_location[0], r_location[1], 0.0);
-                p_cell_id_list->SetId(node_local_idx, global_idx);
-            }
-
-            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-            p_cell->Delete(); // Reference counted
-        }
-        else  // Case 2: at least one overlap
-        {
-            // Get the node index at the start of each part
-            const std::vector<unsigned>& start_idx_each_part = mElementParts[iter->GetIndex()];
-
-            // Get the number of parts, and put the first index onto the back of the vector for convenience
-            const auto num_parts = start_idx_each_part.size();
-            std::cout << "num_parts: " << num_parts << "\n";
-
-            for (unsigned part = 0; part < num_parts; ++part)
-            {
-                const long this_start = start_idx_each_part[part];
-                std::cout << this_start << "\n";
-                const long next_start = start_idx_each_part[AdvanceMod(part, 1, num_parts)];
-                std::cout << next_start << "\n";
-
-                const long num_nodes_this_part = next_start > this_start ? next_start - this_start : num_nodes + next_start - this_start;
-                std::cout << num_nodes_this_part << "\n";
-
-                // Identify the extra points that need to be added
-                std::vector<c_vector<double, SPACE_DIM>> extra_locations;
-                
-                // Start of the part
-                {
-                    const auto& r_start_pos = iter->GetNode(this_start)->rGetLocation();
-                    const auto& r_end_pos = iter->GetNode(AdvanceMod(this_start, -1, num_nodes))->rGetLocation();
-                    std::cout << "r_start_pos: " << r_start_pos[0] << ", " << r_start_pos[1] << "\n";
-                    std::cout << "r_end_pos: " << r_end_pos[0] << ", " << r_end_pos[1] << "\n";
-
-                    const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
-                    std::cout << "vec_a2b: " << vec_a2b[0] << ", " << vec_a2b[1] << "\n";
-                    extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
-                }
-
-                // End of the part
-                {
-                    const auto& r_start_pos = iter->GetNode(AdvanceMod(next_start, -1, num_nodes))->rGetLocation();
-                    const auto& r_end_pos = iter->GetNode(next_start)->rGetLocation();
-                    std::cout << "r_start_pos: " << r_start_pos[0] << ", " << r_start_pos[1] << "\n";
-                    std::cout << "r_end_pos: " << r_end_pos[0] << ", " << r_end_pos[1] << "\n";
-
-                    const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
-                    extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
-                }
-
-                // If the two additional points are not on the same edge of the boundary, we also need to add a corner
-                if (std::fabs(extra_locations.front()[0] - extra_locations.back()[0]) > DBL_EPSILON &&
-                    std::fabs(extra_locations.front()[1] - extra_locations.back()[1]) > DBL_EPSILON)
-                {
-                    extra_locations.emplace_back(GetNearestCorner(extra_locations.front(), extra_locations.back()));
-                }
-
                 vtkCell* p_cell = vtkPolygon::New();
                 vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-                p_cell_id_list->SetNumberOfIds(num_nodes_this_part + extra_locations.size());
+                p_cell_id_list->SetNumberOfIds(num_nodes);
 
-                for (long idx = 0; idx < num_nodes_this_part; ++idx)
+                for (unsigned node_local_idx = 0; node_local_idx < num_nodes; ++node_local_idx)
                 {
-                    unsigned node_idx = AdvanceMod(idx, this_start, num_nodes);
-
-                    // Get index and location
-                    unsigned global_idx = iter->GetNode(node_idx)->GetIndex();
-                    const auto& r_location = iter->GetNode(node_idx)->rGetLocation();
+                    // Get node, index and location
+                    unsigned global_idx = iter->GetNode(node_local_idx)->GetIndex();
+                    const auto& r_location = iter->GetNode(node_local_idx)->rGetLocation();
 
                     p_pts->InsertPoint(global_idx, r_location[0], r_location[1], 0.0);
-                    p_cell_id_list->SetId(idx, global_idx);
-                }
-
-                // Now add the extra locations
-                if (extra_locations.size() == 2)
-                {
-                    const unsigned global_index = rMesh.GetNumNodes() + num_pts_added;
-
-                    p_pts->InsertPoint(global_index, extra_locations[1][0], extra_locations[1][1], 0.0);      // end
-                    p_pts->InsertPoint(global_index + 1, extra_locations[0][0], extra_locations[0][1], 0.0);  // start
-
-                    p_cell_id_list->SetId(num_nodes_this_part, global_index);
-                    p_cell_id_list->SetId(num_nodes_this_part + 1, global_index + 1);
-
-                    num_pts_added += 2;
-                }
-                else if (extra_locations.size() == 3)
-                {
-                    const unsigned global_index = rMesh.GetNumNodes() + num_pts_added;
-
-                    p_pts->InsertPoint(global_index, extra_locations[1][0], extra_locations[1][1], 0.0);      // end
-                    p_pts->InsertPoint(global_index + 1, extra_locations[2][0], extra_locations[2][1], 0.0);  // corner
-                    p_pts->InsertPoint(global_index + 2, extra_locations[0][0], extra_locations[0][1], 0.0);  // start
-
-                    p_cell_id_list->SetId(num_nodes_this_part, global_index);
-                    p_cell_id_list->SetId(num_nodes_this_part + 1, global_index + 1);
-                    p_cell_id_list->SetId(num_nodes_this_part + 2, global_index + 2);
-
-                    num_pts_added += 3;
-                }
-                else
-                {
-                    NEVER_REACHED;
+                    p_cell_id_list->SetId(node_local_idx, global_idx);
                 }
 
                 mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
                 p_cell->Delete(); // Reference counted
             }
+            else  // Case 2: at least one overlap
+            {
+                // Get the node index at the start of each part
+                const std::vector<unsigned>& start_idx_each_part = mElementParts[iter->GetIndex()];
+
+                // Get the number of parts, and put the first index onto the back of the vector for convenience
+                const auto num_parts = start_idx_each_part.size();
+                std::cout << "num_parts: " << num_parts << "\n";
+
+                for (unsigned part = 0; part < num_parts; ++part)
+                {
+                    const long this_start = start_idx_each_part[part];
+                    std::cout << this_start << "\n";
+                    const long next_start = start_idx_each_part[AdvanceMod(part, 1, num_parts)];
+                    std::cout << next_start << "\n";
+
+                    const long num_nodes_this_part = next_start > this_start ? next_start - this_start : num_nodes + next_start - this_start;
+                    std::cout << num_nodes_this_part << "\n";
+
+                    // Identify the extra points that need to be added
+                    std::vector<c_vector<double, SPACE_DIM>> extra_locations;
+                    
+                    // Start of the part
+                    {
+                        const auto& r_start_pos = iter->GetNode(this_start)->rGetLocation();
+                        const auto& r_end_pos = iter->GetNode(AdvanceMod(this_start, -1, num_nodes))->rGetLocation();
+                        std::cout << "r_start_pos: " << r_start_pos[0] << ", " << r_start_pos[1] << "\n";
+                        std::cout << "r_end_pos: " << r_end_pos[0] << ", " << r_end_pos[1] << "\n";
+
+                        const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
+                        std::cout << "vec_a2b: " << vec_a2b[0] << ", " << vec_a2b[1] << "\n";
+                        extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
+                    }
+
+                    // End of the part
+                    {
+                        const auto& r_start_pos = iter->GetNode(AdvanceMod(next_start, -1, num_nodes))->rGetLocation();
+                        const auto& r_end_pos = iter->GetNode(next_start)->rGetLocation();
+                        std::cout << "r_start_pos: " << r_start_pos[0] << ", " << r_start_pos[1] << "\n";
+                        std::cout << "r_end_pos: " << r_end_pos[0] << ", " << r_end_pos[1] << "\n";
+
+                        const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
+                        extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
+                    }
+
+                    // If the two additional points are not on the same edge of the boundary, we also need to add a corner
+                    if (std::fabs(extra_locations.front()[0] - extra_locations.back()[0]) > DBL_EPSILON &&
+                        std::fabs(extra_locations.front()[1] - extra_locations.back()[1]) > DBL_EPSILON)
+                    {
+                        extra_locations.emplace_back(GetNearestCorner(extra_locations.front(), extra_locations.back()));
+                    }
+
+                    vtkCell* p_cell = vtkPolygon::New();
+                    vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+                    p_cell_id_list->SetNumberOfIds(num_nodes_this_part + extra_locations.size());
+
+                    for (long idx = 0; idx < num_nodes_this_part; ++idx)
+                    {
+                        unsigned node_idx = AdvanceMod(idx, this_start, num_nodes);
+
+                        // Get index and location
+                        unsigned global_idx = iter->GetNode(node_idx)->GetIndex();
+                        const auto& r_location = iter->GetNode(node_idx)->rGetLocation();
+
+                        p_pts->InsertPoint(global_idx, r_location[0], r_location[1], 0.0);
+                        p_cell_id_list->SetId(idx, global_idx);
+                    }
+
+                    // Now add the extra locations
+                    if (extra_locations.size() == 2)
+                    {
+                        const unsigned global_index = rMesh.GetNumNodes() + num_pts_added;
+
+                        p_pts->InsertPoint(global_index, extra_locations[1][0], extra_locations[1][1], 0.0);      // end
+                        p_pts->InsertPoint(global_index + 1, extra_locations[0][0], extra_locations[0][1], 0.0);  // start
+
+                        p_cell_id_list->SetId(num_nodes_this_part, global_index);
+                        p_cell_id_list->SetId(num_nodes_this_part + 1, global_index + 1);
+
+                        num_pts_added += 2;
+                    }
+                    else if (extra_locations.size() == 3)
+                    {
+                        const unsigned global_index = rMesh.GetNumNodes() + num_pts_added;
+
+                        p_pts->InsertPoint(global_index, extra_locations[1][0], extra_locations[1][1], 0.0);      // end
+                        p_pts->InsertPoint(global_index + 1, extra_locations[2][0], extra_locations[2][1], 0.0);  // corner
+                        p_pts->InsertPoint(global_index + 2, extra_locations[0][0], extra_locations[0][1], 0.0);  // start
+
+                        p_cell_id_list->SetId(num_nodes_this_part, global_index);
+                        p_cell_id_list->SetId(num_nodes_this_part + 1, global_index + 1);
+                        p_cell_id_list->SetId(num_nodes_this_part + 2, global_index + 2);
+
+                        num_pts_added += 3;
+                    }
+                    else
+                    {
+                        NEVER_REACHED;
+                    }
+
+                    mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+                    p_cell->Delete(); // Reference counted
+                }
+            }
         }
-    }
 
-    // Finally, output the VTK data for laminas
-    for (typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator iter = rMesh.GetLaminaIteratorBegin();
-         iter != rMesh.GetLaminaIteratorEnd();
-         ++iter)
-    {
-        unsigned num_nodes = iter->GetNumNodes();
-
-        vtkCell* p_cell = vtkPolygon::New();
-        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        p_cell_id_list->SetNumberOfIds(num_nodes);
-
-        for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+        // Finally, output the VTK data for laminas
+        for (typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator iter = rMesh.GetLaminaIteratorBegin();
+            iter != rMesh.GetLaminaIteratorEnd();
+            ++iter)
         {
-            // Get node, index and location
-            Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
-            unsigned global_idx = p_node->GetIndex();
-            c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
+            unsigned num_nodes = iter->GetNumNodes();
 
-            p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
+            vtkCell* p_cell = vtkPolygon::New();
+            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+            p_cell_id_list->SetNumberOfIds(num_nodes);
 
-            p_cell_id_list->SetId(node_idx, global_idx);
+            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            {
+                // Get node, index and location
+                Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
+                unsigned global_idx = p_node->GetIndex();
+                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
+
+                p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
+
+                p_cell_id_list->SetId(node_idx, global_idx);
+            }
+
+            mpVtkUnstructedMesh->InsertNextCell(3, p_cell_id_list);
+            p_cell->Delete(); // Reference counted
         }
 
-        mpVtkUnstructedMesh->InsertNextCell(3, p_cell_id_list);
-        p_cell->Delete(); // Reference counted
+        mpVtkUnstructedMesh->SetPoints(p_pts);
+        p_pts->Delete(); // Reference counted
     }
-
-    mpVtkUnstructedMesh->SetPoints(p_pts);
-    p_pts->Delete(); // Reference counted
-
-//#endif //CHASTE_VTK
+    else        
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <>
@@ -636,36 +642,41 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::FindElementOverlaps(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
-    assert(SPACE_DIM == 2);
-
-    // Resize and initialise the vector of overlaps (bools; whether each element has an overlap)
-    mElementParts.resize(rMesh.GetNumAllElements());
-    for (auto& parts : mElementParts)
+    if constexpr (SPACE_DIM == 2)
     {
-        parts.clear();
-    }
-    
-    std::cerr << "Looking for overlaps...\n";
-
-    // We loop over each element and the node index at each discontinuity due to periodic boundaries
-    for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
-    {
-        std::cerr << "New element\n";
-        for (unsigned node_idx = 0; node_idx < iter->GetNumNodes(); ++node_idx)
+        // Resize and initialise the vector of overlaps (bools; whether each element has an overlap)
+        mElementParts.resize(rMesh.GetNumAllElements());
+        for (auto& parts : mElementParts)
         {
-            const unsigned prev_idx = AdvanceMod(node_idx, -1, iter->GetNumNodes());
+            parts.clear();
+        }
+        
+        std::cerr << "Looking for overlaps...\n";
 
-            const auto& this_location = iter->GetNode(node_idx)->rGetLocation();
-            std::cerr << "this_location: " << this_location[0] << ", " << this_location[1] << "\n";
-            const auto& prev_location = iter->GetNode(prev_idx)->rGetLocation();
-            std::cerr << "prev_location: " << prev_location[0] << ", " << prev_location[1] << "\n";
-
-            if (norm_inf(this_location - prev_location) > 0.5)
+        // We loop over each element and the node index at each discontinuity due to periodic boundaries
+        for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
+        {
+            std::cerr << "New element\n";
+            for (unsigned node_idx = 0; node_idx < iter->GetNumNodes(); ++node_idx)
             {
-                mElementParts[iter->GetIndex()].emplace_back(node_idx);
-                std::cerr << "Overlap found\n";
+                const unsigned prev_idx = AdvanceMod(node_idx, -1, iter->GetNumNodes());
+
+                const auto& this_location = iter->GetNode(node_idx)->rGetLocation();
+                std::cerr << "this_location: " << this_location[0] << ", " << this_location[1] << "\n";
+                const auto& prev_location = iter->GetNode(prev_idx)->rGetLocation();
+                std::cerr << "prev_location: " << prev_location[0] << ", " << prev_location[1] << "\n";
+
+                if (norm_inf(this_location - prev_location) > 0.5)
+                {
+                    mElementParts[iter->GetIndex()].emplace_back(node_idx);
+                    std::cerr << "Overlap found\n";
+                }
             }
         }
+    }
+    else        
+    {
+        NEVER_REACHED;
     }
 }
 
