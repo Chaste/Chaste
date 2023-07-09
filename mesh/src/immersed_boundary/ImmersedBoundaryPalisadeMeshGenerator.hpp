@@ -100,7 +100,6 @@ public:
      * @return a 2D honeycomb mesh based on a 2D plane
      */
     ImmersedBoundaryMesh<2,2>* GetMesh();
-
 };
 
 #endif /*IMMERSEDBOUNDARYPALISADEMESHGENERATOR_HPP_*/

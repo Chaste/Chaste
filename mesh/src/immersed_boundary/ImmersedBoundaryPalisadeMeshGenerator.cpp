@@ -48,7 +48,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
                                                                              bool leakyLaminas,
                                                                              unsigned numFluidMeshPoints,
                                                                              double absoluteGap)
-        : mpMesh(NULL)
+    : mpMesh(NULL)
 {
     // Check for sensible input
     assert(numCellsWide > 0);
@@ -89,8 +89,6 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     // Generate a reference superellipse
     std::unique_ptr<SuperellipseGenerator> p_gen(new SuperellipseGenerator(numNodesPerCell, ellipseExponent, cell_width, cell_height, 0.0, 0.0));
     std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
-
-
 
     /*
      * The top and bottom heights are the heights at which there is maximum curvature in the superellipse.

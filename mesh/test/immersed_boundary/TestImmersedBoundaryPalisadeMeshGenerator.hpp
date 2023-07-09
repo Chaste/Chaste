@@ -55,29 +55,35 @@ public:
 
     void TestApicalLamina()
     {
-      try {
-        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, false, true, false);
-        auto mesh = gen.GetMesh();
-        TS_ASSERT(mesh->GetNumLaminas() > 0);
-      } catch (Exception& e) {
-        TS_TRACE(e.GetMessage());
-      }
+        try
+        {
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, false, true, false);
+            auto mesh = gen.GetMesh();
+            TS_ASSERT(mesh->GetNumLaminas() > 0);
+        }
+        catch (Exception& e)
+        {
+            TS_TRACE(e.GetMessage());
+        }
     }
     
-    void TestLeakyLaminasWithOverideNodesPerCell() {
-      try {
-        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, false, true, 100);
-        auto mesh = gen.GetMesh();
-        TS_ASSERT(mesh->GetNumLaminas() > 0);
-      } catch (Exception& e) {
-        TS_TRACE(e.GetMessage());
-      }
+    void TestLeakyLaminasWithOverideNodesPerCell()
+    {
+        try
+        {
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.0, true, false, true, 100);
+            auto mesh = gen.GetMesh();
+            TS_ASSERT(mesh->GetNumLaminas() > 0);
+        }
+        catch (Exception& e)
+        {
+            TS_TRACE(e.GetMessage());
+        }
     }
 
-    void TestCellGenerationExceptions() {
-      {
+    void TestCellGenerationExceptions()
+    {
         TS_ASSERT_THROWS_ANYTHING(ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.01, 2.0, 0.5, true, true));
-      }
     }
 };
 
