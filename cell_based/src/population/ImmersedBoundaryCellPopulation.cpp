@@ -287,7 +287,8 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
+void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
+    [[maybe_unused]] double dt) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     if constexpr (DIM == 2)
     {
