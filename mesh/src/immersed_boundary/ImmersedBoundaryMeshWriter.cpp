@@ -229,6 +229,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
+#ifdef CHASTE_VTK
     /**
      * To allow viewing in Paraview, we have to treat differently cells which overlap the boundaries, as there is no
      * support for periodicity in Paraview.
@@ -420,6 +421,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
     {
         NEVER_REACHED;
     }
+#endif //CHASTE_VTK
 }
 
 template <>
