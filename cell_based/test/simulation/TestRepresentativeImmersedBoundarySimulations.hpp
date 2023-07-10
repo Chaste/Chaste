@@ -57,9 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ForwardEulerNumericalMethod.hpp"
 #include <boost/make_shared.hpp>
 
-#include "Debug.hpp"
-
-
 // Simulation does not run in parallel
 #include "FakePetscSetup.hpp"
 
@@ -227,6 +224,5 @@ public:
         simulator.Solve();
     }
 };
-
 
 #endif /*TESTREPRESENTATIVEIMMERSEDBOUNDARYSIMULATIONS_HPP_*/

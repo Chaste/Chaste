@@ -92,25 +92,25 @@ public:
         // Expected values of sin(x) and sin(2x), used below
         std::vector<double> sin_x;
         std::vector<double> sin_2x;
-        for (unsigned i = 0; i < 128; i++)
+        for (unsigned i = 0; i < 128; ++i)
         {
             sin_x.push_back(sin(M_PI * (double) i / 128));
             sin_2x.push_back(sin(2 * M_PI * (double) i / 128));
         }
 
         // Test that mSin2x and mSin2y are correctly initialised
-        for (unsigned i=0; i<128; i++)
+        for (unsigned i = 0; i < 128; ++i)
         {
             TS_ASSERT_DELTA(arrays.rGetSin2x()[i], sin_2x[i], 1e-4);
         }
-        for (unsigned j=0; j<65; j++)
+        for (unsigned j = 0; j < 65; ++j)
         {
             TS_ASSERT_DELTA(arrays.rGetSin2y()[j], sin_2x[j], 1e-4);
         }
 
-        for (unsigned i=0; i<128; i++)
+        for (unsigned i = 0; i < 128; ++i)
         {
-            for (unsigned j=0; j<65; j++)
+            for (unsigned j = 0; j < 65; ++j)
             {
                 TS_ASSERT_DELTA(arrays.rGetOperator1()[i][j], 0.5*128*128*(sin_2x[i]*sin_2x[i] + sin_2x[j]*sin_2x[j]), 1e-4);
                 TS_ASSERT_DELTA(arrays.rGetOperator2()[i][j], 1.0 + 2.0*128*128*(sin_x[i]*sin_x[i] + sin_x[j]*sin_x[j]), 1e-4);

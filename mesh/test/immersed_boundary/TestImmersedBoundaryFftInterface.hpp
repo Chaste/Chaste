@@ -92,7 +92,7 @@ public:
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
         std::vector<double> in;
-        for (unsigned i = 0; i < 49152; i++)
+        for (unsigned i = 0; i < 49152; ++i)
         {
             in.push_back(0.0);
         }
@@ -124,7 +124,7 @@ public:
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
         std::vector<double> in;
-        for (unsigned i = 0; i < 49152; i++)
+        for (unsigned i = 0; i < 49152; ++i)
         {
             in.push_back(0.0);
         }

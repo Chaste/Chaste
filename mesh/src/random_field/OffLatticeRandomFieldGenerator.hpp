@@ -108,7 +108,7 @@ private:
                               const c_vector<double, SPACE_DIM>& rLocation2) const;
 
     /**
-     * \todo Document this
+     * \todo Document this. Why isn't it a member variable, e.g. mOpenSimplex?
      */
     OpenSimplex2S os;
 

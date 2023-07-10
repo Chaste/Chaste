@@ -323,14 +323,14 @@ public:
         TS_ASSERT_EQUALS(modifier.GetNoiseStrength(), 1.0);
         
         // Noise skip
-        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 1);
+        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 1u);
         modifier.SetNoiseSkip(4);
-        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 4);
+        TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 4u);
         
         // Noise length scale
-        TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 0.1000);
+        TS_ASSERT_DELTA(modifier.GetNoiseLengthScale(), 0.1, 1e-6);
         modifier.SetNoiseLengthScale(4);
-        TS_ASSERT_EQUALS(modifier.GetNoiseLengthScale(), 4);
+        TS_ASSERT_DELTA(modifier.GetNoiseLengthScale(), 4.0, 1e-6);
 
         // Noise zero field sums
         TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), false);
@@ -357,14 +357,18 @@ public:
         modifier.SetupConstantMemberVariables(cell_population);
         modifier.SetNoiseStrength(0.1);
 
-        auto& rForceGrids = modifier.mpArrays->rGetModifiableForceGrids();
+        auto& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids();
 
         // Helper function to sum absolute values in force grids
-        auto sumForceGridAbsoluteValues = [](multi_array<double, 3>& rForceGrid) {
+        auto sum_force_grid_abs_values = [](multi_array<double, 3>& rForceGrid)
+        {
             double total = 0.0;
-            for (unsigned dim = 0; dim < rForceGrid.shape()[0]; dim++) {
-                for (unsigned x = 0; x < rForceGrid.shape()[1]; x += 1) {
-                    for (unsigned y = 0; y < rForceGrid.shape()[2]; y += 1) {
+            for (unsigned dim = 0; dim < rForceGrid.shape()[0]; ++dim)
+            {
+                for (unsigned x = 0; x < rForceGrid.shape()[1]; ++x)
+                {
+                    for (unsigned y = 0; y < rForceGrid.shape()[2]; ++y)
+                    {
                         total += abs(rForceGrid[dim][x][y]);
                     }
                 }
@@ -373,16 +377,15 @@ public:
         };
         
         // Test total forces pre and post noise
-        double totalForcePreNoise = sumForceGridAbsoluteValues(rForceGrids);
+        double totalForcePreNoise = sum_force_grid_abs_values(r_force_grids);
         modifier.AddNormalNoise();
-        double totalForcePostNoise = sumForceGridAbsoluteValues(rForceGrids);
+        double totalForcePostNoise = sum_force_grid_abs_values(r_force_grids);
 
         TS_ASSERT_DIFFERS(totalForcePreNoise, totalForcePostNoise);
     }
     
     void TestZeroFieldSums()
-    {
-        
+    {        
         // Set up SimulationTime - needed by SetupConstantMemberVariables()
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
@@ -398,39 +401,48 @@ public:
         ImmersedBoundarySimulationModifier<2> modifier;
         modifier.SetupConstantMemberVariables(cell_population);
 
-        auto& rForceGrids = modifier.mpArrays->rGetModifiableForceGrids();
+        auto& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids();
 
         // Helper function to initialise values in force grids
-        auto initialiseForceGrid = [](multi_array<double, 3>& rForceGrid) {
-            for (unsigned dim = 0; dim < rForceGrid.shape()[0]; dim++) {
-                for (unsigned x = 0; x < rForceGrid.shape()[1]; x += 1) {
-                    for (unsigned y = 0; y < rForceGrid.shape()[2]; y += 1) {
+        auto initialise_force_grid = [](multi_array<double, 3>& rForceGrid)
+        {
+            for (unsigned dim = 0; dim < rForceGrid.shape()[0]; ++dim)
+            {
+                for (unsigned x = 0; x < rForceGrid.shape()[1]; ++x)
+                {
+                    for (unsigned y = 0; y < rForceGrid.shape()[2]; ++y)
+                    {
                         rForceGrid[dim][x][y] = 1.0;
                     }
                 }
             }
         };
         
-        auto checkWholeGridEquals = [](multi_array<double, 3>& grid, double value) {
-            bool allEqual = true;
-            for (unsigned dim = 0; dim < grid.shape()[0]; dim++) {
-                for (unsigned x = 0; x < grid.shape()[1]; x += 1) {
-                    for (unsigned y = 0; y < grid.shape()[2]; y += 1) {
-                        if (grid[dim][x][y] != value) {
-                            allEqual = false;
+        auto checkWholeGridEquals = [](multi_array<double, 3>& grid, double value)
+        {
+            bool all_equal = true;
+            for (unsigned dim = 0; dim < grid.shape()[0]; ++dim)
+            {
+                for (unsigned x = 0; x < grid.shape()[1]; ++x)
+                {
+                    for (unsigned y = 0; y < grid.shape()[2]; ++y1)
+                    {
+                        if (grid[dim][x][y] != value)
+                        {
+                            all_equal = false;
                             break;
                         }
                     }
                 }
             }
-            return allEqual;
+            return all_equal;
         };
         
         // Test total forces pre and post noise
-        initialiseForceGrid(rForceGrids);
-        TS_ASSERT(checkWholeGridEquals(rForceGrids, 1.0));
-        modifier.ZeroFieldSums(rForceGrids);
-        TS_ASSERT(checkWholeGridEquals(rForceGrids, 0.0));
+        initialise_force_grid(r_force_grids);
+        TS_ASSERT(checkWholeGridEquals(r_force_grids, 1.0));
+        modifier.ZeroFieldSums(r_force_grids);
+        TS_ASSERT(checkWholeGridEquals(r_force_grids, 0.0));
     }
 };
 

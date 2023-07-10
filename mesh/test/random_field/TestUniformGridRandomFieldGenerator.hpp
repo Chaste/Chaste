@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 #include "UniformGridRandomFieldGenerator.hpp"
 
-#include "Debug.hpp"
 // These tests do not run in parallel
 //#include "FakePetscSetup.hpp"
 
@@ -76,7 +75,6 @@ private:
             NEVER_REACHED;
         }
     }
-
 
 public:
 
@@ -108,29 +106,35 @@ public:
     
     void TestSampleRandomField()
     {
-        { // Correct sample numbers
-            { // 1D
+        // Correct sample numbers
+        {
+            // 1D
+            {
                 const unsigned n = 12u;
                 UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{n}}, {{true}}, 0.03);
                 auto samples = gen.SampleRandomField();
                 TS_ASSERT_EQUALS(samples.size(), n);
             }
-            { // 2D
+
+            // 2D
+            {
                 const unsigned n = 12u;
                 UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{n, n}}, {{true, true}}, 0.03);
                 auto samples = gen.SampleRandomField();
                 TS_ASSERT_EQUALS(samples.size(), n * n);
             }
-            { // 3D
+
+            // 3D
+            {
                 const unsigned n = 12u;
                 UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{n, n, n}}, {{true, true, true}}, 0.03);
                 auto samples = gen.SampleRandomField();
                 TS_ASSERT_EQUALS(samples.size(), n * n * n);
             }
         }
-        
-        { // Length scale
-            
+
+        // Length scale
+        {            
             const unsigned n = 4;
             UniformGridRandomFieldGenerator<1> gen1({{0.0}}, {{1.0}}, {{n}}, {{true}}, 1.00);
             gen1.SetRandomSeed(123);
@@ -146,7 +150,7 @@ public:
 
     void TestGetLinearIndex()
     {
-        // 1d
+        // 1D
         {
             UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
 
@@ -155,29 +159,26 @@ public:
             TS_ASSERT_EQUALS(gen.GetLinearIndex({-50l}), -50l);
         }
 
-        // 2d
+        // 2D
         {
             UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.3);
 
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 0l}), 0l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({15l, 0l}), 15l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({-50l, 0l}), -50l);
-
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 1l}), 4l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({3l, 2l}), 11l);
         }
 
-        // 3d
+        // 3D
         {
             UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.3);
 
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 0l, 0l}), 0l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({15l, 0l, 0l}), 15l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({-50l, 0l, 0l}), -50l);
-
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 1l, 0l}), 4l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({3l, 2l, 0l}), 11l);
-
             TS_ASSERT_EQUALS(gen.GetLinearIndex({0l, 1l, 2l}), 36l);
             TS_ASSERT_EQUALS(gen.GetLinearIndex({3l, 2l, 3l}), 59l);
         }
@@ -185,7 +186,7 @@ public:
 
     void TestGetPositionUsingGridIndex()
     {
-        // 1d
+        // 1D
         {
             UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
 
@@ -194,7 +195,7 @@ public:
             TestEqualityOfArrays<double, 1>(gen.GetPositionUsingGridIndex({6l}), {{6.0 / 8.0}});
         }
 
-        // 2d
+        // 2D
         {
             UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.3);
 
@@ -203,7 +204,7 @@ public:
             TestEqualityOfArrays<double, 2>(gen.GetPositionUsingGridIndex({3l, 3l}), {{0.75, 0.75}});
         }
 
-        // 3d
+        // 3D
         {
             UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.3);
 
@@ -215,7 +216,7 @@ public:
 
     void TestInterpolate()
     {
-        // 1d
+        // 1D
         {
             UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
 
@@ -243,7 +244,7 @@ public:
             }
         }
 
-        // 2d
+        // 2D
         {
             UniformGridRandomFieldGenerator<2> gen({{0.0, 0.0}}, {{1.0, 1.0}}, {{4, 4}}, {{true, true}}, 0.3);
 
@@ -287,11 +288,10 @@ public:
                 TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.375, 0.375)), 5.0, 1e-6); // inside
                 TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.4, 0.3)), 3.64, 1e-6); // inside
                 TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.3, 0.4)), 4.84, 1e-6); // inside
-
             }
         }
 
-        // 3d
+        // 3D
         {
             UniformGridRandomFieldGenerator<3> gen({{0.0, 0.0, 0.0}}, {{1.0, 1.0, 1.0}}, {{4, 4, 4}}, {{true, true, true}}, 0.3);
 

@@ -46,34 +46,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
-#include "Debug.hpp"
-
 template <unsigned SPACE_DIM>
-UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
-                                                                            std::array<double, SPACE_DIM> upperCorner,
-                                                                            std::array<unsigned, SPACE_DIM> numGridPts,
-                                                                            std::array<bool, SPACE_DIM> periodicity,
-                                                                            double lengthScale)
-        : mLowerCorner(lowerCorner),
-          mUpperCorner(upperCorner),
-          mNumGridPts(numGridPts),
-          mPeriodicity(periodicity),
-          mLengthScale(lengthScale),
-          mCacheDir("CachedRandomFields/")
+UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(
+    std::array<double, SPACE_DIM> lowerCorner,
+    std::array<double, SPACE_DIM> upperCorner,
+    std::array<unsigned, SPACE_DIM> numGridPts,
+    std::array<bool, SPACE_DIM> periodicity,
+    double lengthScale)
+    : mLowerCorner(lowerCorner),
+      mUpperCorner(upperCorner),
+      mNumGridPts(numGridPts),
+      mPeriodicity(periodicity),
+      mLengthScale(lengthScale),
+      mCacheDir("CachedRandomFields/")
 {
     // Calculate the total number of grid points
-    mNumTotalGridPts = std::accumulate(mNumGridPts.begin(), mNumGridPts.end(), 1u, std::multiplies<unsigned>());
+    mNumTotalGridPts = std::accumulate(mNumGridPts.begin(),
+                                       mNumGridPts.end(),
+                                       1u,
+                                       std::multiplies<unsigned>());
 
     // Check parameters are sensible
+    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
-        for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
-        {
-            assert(mLowerCorner[dim] < mUpperCorner[dim]);
-            assert(mNumGridPts[dim] > 0);
-        }
-
-        assert(mLengthScale > 0.0);
+        assert(mLowerCorner[dim] < mUpperCorner[dim]);
+        assert(mNumGridPts[dim] > 0);
     }
+    assert(mLengthScale > 0.0);
 
     // Calculate the grid spacings
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
@@ -86,7 +85,8 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(std:
 }
 
 template <unsigned SPACE_DIM>
-void UniformGridRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned int seed) {
+void UniformGridRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned seed)
+{
     os = OpenSimplex2S(seed);
 }
 
@@ -123,7 +123,7 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
     std::stringstream name;
     name << std::fixed << std::setprecision(3);
 
-    switch(SPACE_DIM)
+    switch (SPACE_DIM)
     {
         case 1:
         {
@@ -173,8 +173,9 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time)
 { 
-    // TODO: randomise seed
-    auto reshape = [](const double val) {
+    ///\todo randomise seed
+    auto reshape = [](const double val)
+    {
         double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
         double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
         return val * (1.0 - 0.18 * strength);
@@ -182,39 +183,49 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 
     std::vector<double> samples(mNumTotalGridPts);
     
-    switch(SPACE_DIM) {
+    switch(SPACE_DIM)
+    {
         case 1:
-            for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
+        {
+            for (unsigned x = 0; x < mNumGridPts[0]; x++)
+            {
                 samples[x] = reshape(reshape(os.noise2_XBeforeY(x * mLengthScale, time)));
             }
             break;
-        
+        }        
         case 2:
-            for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
-                for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
+        {
+            for (unsigned x = 0; x < mNumGridPts[0]; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPts[1]; y++)
+                {
                     samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time)));
                 }
             }
             break;
-
+        }
         case 3:
-            for (unsigned int x = 0; x < mNumGridPts[0]; x++) {
-                for (unsigned int y = 0; y < mNumGridPts[1]; y++) {
-                    for (unsigned int z = 0; z < mNumGridPts[2]; z++) {
+        {
+            for (unsigned x = 0; x < mNumGridPts[0]; x++)
+            {
+                for (unsigned y = 0; y < mNumGridPts[1]; y++)
+                {
+                    for (unsigned z = 0; z < mNumGridPts[2]; z++)
+                    {
                         samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(os.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time)));
                     }
                 }
             }
             break;
-            
+        }
         default:
             NEVER_REACHED;
             break;
-
     }
     
     return samples;
 }
+
 template <unsigned SPACE_DIM>
 double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector<double>& rRandomField,
                                                                const c_vector<double, SPACE_DIM>& rLocation) const
@@ -311,7 +322,7 @@ long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long,
 {
     long linear_index;
 
-    // \todo: double check I'm not calculating the transpose of each point
+    ///\todo: double check I'm not calculating the transpose of each point
     switch(SPACE_DIM)
     {
         case 1:

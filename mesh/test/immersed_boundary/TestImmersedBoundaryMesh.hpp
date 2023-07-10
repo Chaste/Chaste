@@ -90,6 +90,7 @@ public:
     void Test3DVelocityGrids()
     {
         /*
+        ///\todo
         //Should these methods exist? There is no implementation for 4D nodes
         // Why do the 3D grid methods return 4D arrays? Ditto for 2D 
         // Create a square test mesh
@@ -166,7 +167,7 @@ public:
         {
             // Make a few nodes
             std::vector<std::vector<Node<2>*>> nodes;
-            for (unsigned i = 0; i < 6; i++)
+            for (unsigned i = 0; i < 6; ++i)
             {
                 nodes.emplace_back();
                 nodes.back().push_back(new Node<2>(0, true, 0.1, 0.1));
@@ -303,7 +304,7 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
-            for (unsigned i = 0; i < 16; i++)
+            for (unsigned i = 0; i < 16; ++i)
             {
                 double theta = 2.0 * M_PI * (double)i / 17.0;
 
@@ -457,7 +458,7 @@ public:
 
         // Make a copy of the node locations prior to ReMesh
         std::vector<c_vector<double, 2> > old_locations;
-        for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); node_idx++)
+        for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); ++node_idx)
         {
             old_locations.push_back(mesh.GetNode(node_idx)->rGetLocation());
         }
@@ -466,7 +467,7 @@ public:
         mesh.ReMesh();
 
         // Verify everything's still the same
-        for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); node_idx++)
+        for (unsigned node_idx = 0; node_idx < mesh.GetNumNodes(); ++node_idx)
         {
             TS_ASSERT_DELTA(old_locations[node_idx][0], mesh.GetNode(node_idx)->rGetLocation()[0], 1e-12);
             TS_ASSERT_DELTA(old_locations[node_idx][1], mesh.GetNode(node_idx)->rGetLocation()[1], 1e-12);
@@ -492,7 +493,7 @@ public:
 
             // Get locations before ReMesh
             std::vector<double> old_pos;
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 old_pos.push_back(norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()));
             }
@@ -500,7 +501,7 @@ public:
             // Remesh fixing the first location
             mesh.ReMesh(false);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 TS_ASSERT_DELTA(old_pos[node_idx], norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
             }
@@ -508,7 +509,7 @@ public:
             // Remesh starting from a random location
             mesh.ReMesh(true);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 TS_ASSERT_DELTA(old_pos[node_idx], norm_2(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()), 1e-12);
             }
@@ -531,7 +532,7 @@ public:
 
             // Get locations before ReMesh
             std::vector<c_vector<double, 2>> old_pos;
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 old_pos.push_back(mesh.GetElement(0)->GetNode(node_idx)->rGetLocation());
             }
@@ -539,7 +540,7 @@ public:
             // Remesh with random location
             mesh.ReMesh(true);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 TS_ASSERT_DELTA(old_pos[node_idx][0], mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()[0], 1e-12);
                 TS_ASSERT_DELTA(old_pos[node_idx][1], mesh.GetElement(0)->GetNode(node_idx)->rGetLocation()[1], 1e-12);
@@ -635,7 +636,7 @@ public:
 
             // Get locations before ReMesh
             std::vector<c_vector<double, 2>> old_pos;
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 old_pos.push_back(mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation());
             }
@@ -643,7 +644,7 @@ public:
             // Should make no different at all which node is selected
             mesh.ReMesh(true);
 
-            for (unsigned node_idx = 0; node_idx < num_nodes; node_idx++)
+            for (unsigned node_idx = 0; node_idx < num_nodes; ++node_idx)
             {
                 TS_ASSERT_DELTA(old_pos[node_idx][0], mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation()[0], 1e-12);
                 TS_ASSERT_DELTA(old_pos[node_idx][1], mesh.GetLamina(0)->GetNode(node_idx)->rGetLocation()[1], 1e-12);
@@ -703,7 +704,7 @@ public:
         nodes.push_back(new Node<2>(10, true, 0.2, 0.1));
         nodes.push_back(new Node<2>(11, true, 0.2, 0.2));
 
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes[i]->SetRegion(LAMINA_REGION);
         }
@@ -765,7 +766,8 @@ public:
 
     void TestGeometricMethods()
     {
-        { // Test moments
+        // Test moments
+        {
             // Make six nodes
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
@@ -776,7 +778,7 @@ public:
 
             // Make one element out of these nodes
             std::vector<Node<2>*> nodes_elem;
-            for (unsigned i=0; i<5; i++)
+            for (unsigned i = 0; i < 5; ++i)
             {
                 nodes_elem.push_back(nodes[i]);
             }
@@ -805,8 +807,9 @@ public:
             TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
             TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
         }
-        { // Test zero-valued product of inertia
 
+        // Test zero-valued product of inertia
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.5, 0.6));
             nodes.push_back(new Node<2>(1, true, 0.7, 0.5));
@@ -815,7 +818,7 @@ public:
 
             // Make one element out of these nodes
             std::vector<Node<2>*> nodes_elem;
-            for (unsigned i=0; i<4; i++)
+            for (unsigned i = 0; i < 4; ++i)
             {
                 nodes_elem.push_back(nodes[i]);
             }
@@ -839,8 +842,9 @@ public:
             TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-4);
             TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-4);
         }
-        { // Test zero-valued product of inertia - opposite longer axis
 
+        // Test zero-valued product of inertia - opposite longer axis
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.5, 0.7));
             nodes.push_back(new Node<2>(1, true, 0.6, 0.5));
@@ -849,7 +853,7 @@ public:
 
             // Make one element out of these nodes
             std::vector<Node<2>*> nodes_elem;
-            for (unsigned i=0; i<4; i++)
+            for (unsigned i = 0; i < 4; ++i)
             {
                 nodes_elem.push_back(nodes[i]);
             }
@@ -1088,7 +1092,8 @@ public:
     
     void TestBoundingBoxCalculation()
     {
-        { // Top right 
+        // Top right
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -1100,20 +1105,21 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             
-            ChasteCuboid<2> boundingBox = mesh.CalculateBoundingBoxOfElement(0);
-            auto p1 = boundingBox.rGetLowerCorner();
-            auto p2 = boundingBox.rGetUpperCorner();
+            ChasteCuboid<2> bounding_box = mesh.CalculateBoundingBoxOfElement(0);
+            auto p1 = bounding_box.rGetLowerCorner();
+            auto p2 = bounding_box.rGetUpperCorner();
 
-            ChastePoint<2> expectedP1 = {0.0, 0.0};
-            ChastePoint<2> expectedP2 = {0.1, 0.1};
+            ChastePoint<2> expected_p1 = {0.0, 0.0};
+            ChastePoint<2> expected_p2 = {0.1, 0.1};
             
-            TS_ASSERT_EQUALS(p1[0], expectedP1[0]);
-            TS_ASSERT_EQUALS(p1[1], expectedP1[1]);
-            TS_ASSERT_EQUALS(p2[0], expectedP2[0]);
-            TS_ASSERT_EQUALS(p2[1], expectedP2[1]);
+            TS_ASSERT_EQUALS(p1[0], expected_p1[0]);
+            TS_ASSERT_EQUALS(p1[1], expected_p1[1]);
+            TS_ASSERT_EQUALS(p2[0], expected_p2[0]);
+            TS_ASSERT_EQUALS(p2[1], expected_p2[1]);
         }
 
-        { // Top right 
+        // Top right
+        { 
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
             nodes.push_back(new Node<2>(1, true, 0.0, 0.1));
@@ -1125,23 +1131,24 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             
-            ChasteCuboid<2> boundingBox = mesh.CalculateBoundingBoxOfElement(0);
-            auto p1 = boundingBox.rGetLowerCorner();
-            auto p2 = boundingBox.rGetUpperCorner();
+            ChasteCuboid<2> bounding_box = mesh.CalculateBoundingBoxOfElement(0);
+            auto p1 = bounding_box.rGetLowerCorner();
+            auto p2 = bounding_box.rGetUpperCorner();
 
-            ChastePoint<2> expectedP1 = {0.0, 0.0};
-            ChastePoint<2> expectedP2 = {0.1, 0.1};
+            ChastePoint<2> expected_p1 = {0.0, 0.0};
+            ChastePoint<2> expected_p2 = {0.1, 0.1};
             
-            TS_ASSERT_EQUALS(p1[0], expectedP1[0]);
-            TS_ASSERT_EQUALS(p1[1], expectedP1[1]);
-            TS_ASSERT_EQUALS(p2[0], expectedP2[0]);
-            TS_ASSERT_EQUALS(p2[1], expectedP2[1]);
+            TS_ASSERT_EQUALS(p1[0], expected_p1[0]);
+            TS_ASSERT_EQUALS(p1[1], expected_p1[1]);
+            TS_ASSERT_EQUALS(p2[0], expected_p2[0]);
+            TS_ASSERT_EQUALS(p2[1], expected_p2[1]);
         }
     }
     
     void TestVoronoiSurfaceArea()
     {
-        { // Single element should return 0 
+        // Single element should return 0
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -1153,12 +1160,14 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
-            TS_ASSERT_EQUALS(mesh.GetVoronoiCellIdsIndexedByNodeIndex().size(), 0);
-            TS_ASSERT_EQUALS(mesh.rGetNodeLocationsVoronoiDiagram(false).num_vertices(), 0);
-            TS_ASSERT_EQUALS(mesh.rGetNodeLocationsVoronoiDiagram(true).num_vertices(), 4);
-            TS_ASSERT_EQUALS(mesh.GetVoronoiSurfaceAreaOfElement(0), 0.0);
+            TS_ASSERT_EQUALS(mesh.GetVoronoiCellIdsIndexedByNodeIndex().size(), 0u);
+            TS_ASSERT_EQUALS(mesh.rGetNodeLocationsVoronoiDiagram(false).num_vertices(), 0u);
+            TS_ASSERT_EQUALS(mesh.rGetNodeLocationsVoronoiDiagram(true).num_vertices(), 4u);
+            TS_ASSERT_DELTA(mesh.GetVoronoiSurfaceAreaOfElement(0), 0.0, 1e-12);
         }
-        { // Should fail for an element with laminas
+
+        // Should fail for an element with laminas
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -1177,7 +1186,8 @@ public:
             TS_ASSERT_THROWS_ANYTHING(mesh.rGetNodeLocationsVoronoiDiagram(true));
         }
 
-        { // Test halo region
+        // Test halo region
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.05, 0.05));
             nodes.push_back(new Node<2>(1, true, 0.95, 0.05));
@@ -1197,10 +1207,11 @@ public:
             ImmersedBoundaryHoneycombMeshGenerator gen(6u, 6u, 6u, 0.05, 0.2);
             auto p_mesh = gen.GetMesh();
             std::cout << p_mesh->GetVoronoiSurfaceAreaOfElement(10) << "\n";
-            // TODO: Fix this test
-
+            ///\todo Fix this test
         }
-        { // Single element  
+
+        // Single element
+        {  
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -1233,7 +1244,7 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-        TS_ASSERT_DELTA(mesh.GetElongationShapeFactorOfElement(0), 1.0, 0.001);
+        TS_ASSERT_DELTA(mesh.GetElongationShapeFactorOfElement(0), 1.0, 1e-3);
     }
 
     void TestTortuosity()
@@ -1288,7 +1299,7 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(1, right_nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(all_nodes, elems);
-            TS_ASSERT_EQUALS(mesh.GetTortuosityOfMesh(), 1.0);
+            TS_ASSERT_DELTA(mesh.GetTortuosityOfMesh(), 1.0, 1e-6);
         } 
     }
 
@@ -1316,7 +1327,7 @@ public:
             mesh.SetElementDivisionSpacing(0.01);
 
             mesh.DivideElementAlongShortAxis(elems[0], true); 
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
         }
 
         // Successful division - find start_a
@@ -1326,7 +1337,8 @@ public:
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
-            for (double angle = 359.0; angle > 0.0; angle -= (360.0 / nodes_to_generate)) {
+            for (double angle = 359.0; angle > 0.0; angle -= (360.0 / nodes_to_generate))
+            {
                 nodes.push_back(new Node<2>(node_index, true, 0.5 + 0.1 * cos(angle * M_PI / 180.0), 0.5 + 0.2 * sin(angle * M_PI / 180.0)));
                 nodes.back()->AddNodeAttribute(1.0);
                 node_index++;
@@ -1344,7 +1356,7 @@ public:
             mesh.SetElementDivisionSpacing(0.2);
 
             mesh.DivideElement(elems[0], 20, 25, mesh.GetCentroidOfElement(0), axis);
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
         }
         
         // ElementDivisonSpacing not set
@@ -1375,7 +1387,8 @@ public:
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
-            for (double angle = 0.0; angle < 20.0; angle += (360.0 / nodes_to_generate)) {
+            for (double angle = 0.0; angle < 20.0; angle += (360.0 / nodes_to_generate))
+            {
                 nodes.push_back(new Node<2>(node_index, true, 0.5 + 0.2 * cos(angle * M_PI / 180.0), 0.5 + 0.2 * sin(angle * M_PI / 180.0)));
                 node_index++;
             }
@@ -1388,6 +1401,7 @@ public:
 
             TS_ASSERT_THROWS_ANYTHING(mesh.DivideElementAlongShortAxis(elems[0], true));
         }
+
         // No intersection with axis - should be impossible to have two intersections with three coindident nodes
         {
             std::vector<Node<2>*> nodes;
@@ -1409,7 +1423,9 @@ public:
 
             TS_ASSERT_THROWS_ANYTHING(mesh.DivideElementAlongGivenAxis(elems[0], axis, true));
         }
-        { // Divide element with corner nodes
+
+        // Divide element with corner nodes
+        {
             std::vector<Node<2>*> nodes;
             
             // Generate nodes
@@ -1445,25 +1461,24 @@ public:
     
     void TestElementIteratorElementNotAllowed()
     {
-        { // Three elements
-            std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+        // Three elements
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
 
-            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
-            elems[0]->MarkAsDeleted();
-            
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
+        
+        elems[0]->MarkAsDeleted();
+        
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
-            auto iter = mesh.GetElementIteratorBegin(true);
-            TS_ASSERT_EQUALS(&(*iter), elems[1]);
-        }
+        auto iter = mesh.GetElementIteratorBegin(true);
+        TS_ASSERT_EQUALS(&(*iter), elems[1]);
     }
     
     void TestLaminaIteratorLaminaNotAllowed()

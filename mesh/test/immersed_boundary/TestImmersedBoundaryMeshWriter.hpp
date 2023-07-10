@@ -163,6 +163,7 @@ public:
     
     void TestImmersedBoundaryMeshWriterVTKCornerOverlap()
     {
+#ifdef CHASTE_VTK
         // Overlap top right
         {
             std::vector<Node<2>*> nodes;
@@ -206,6 +207,10 @@ public:
             FileFinder vtk_file(results_file, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
+#else
+        std::cout << "This test ran, but did not test VTK-dependent functions as VTK visualization is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
     }
 };
 

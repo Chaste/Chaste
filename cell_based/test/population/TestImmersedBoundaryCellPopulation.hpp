@@ -78,8 +78,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-#include "Debug.hpp"
-
 ///\todo Vary the cell population geometry across tests
 class TestImmersedBoundaryCellPopulation : public AbstractCellBasedTestSuite
 {

@@ -70,17 +70,17 @@ public:
             auto p_mesh = gen.GetMesh();
 
             // Only element with idx 4 should be non-boundary
-            TS_ASSERT(!p_mesh->GetElement(4)->IsElementOnBoundary());
+            TS_ASSERT_EQUALS(p_mesh->GetElement(4)->IsElementOnBoundary(), false);
 
             // All other elements are on the boundary
-            TS_ASSERT(p_mesh->GetElement(0)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(1)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(2)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(3)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(5)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(6)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(7)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(8)->IsElementOnBoundary());
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(1)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(2)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(3)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(5)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(6)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(7)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(8)->IsElementOnBoundary(), true);
         }
 
         // 3x4 mesh
@@ -89,20 +89,20 @@ public:
             auto p_mesh = gen.GetMesh();
 
             // Only elements with ids 5 and 6 should be non-boundary
-            TS_ASSERT(!p_mesh->GetElement(5)->IsElementOnBoundary());
-            TS_ASSERT(!p_mesh->GetElement(6)->IsElementOnBoundary());
+            TS_ASSERT_EQUALS(p_mesh->GetElement(5)->IsElementOnBoundary(), false);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(6)->IsElementOnBoundary(), false);
 
             // All other elements are on the boundary
-            TS_ASSERT(p_mesh->GetElement(0)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(1)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(2)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(3)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(4)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(7)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(8)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(9)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(10)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(11)->IsElementOnBoundary());
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(1)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(2)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(3)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(4)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(7)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(8)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(9)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(10)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(11)->IsElementOnBoundary(), true);
         }
 
         // 5x3 mesh
@@ -111,23 +111,23 @@ public:
             auto p_mesh = gen.GetMesh();
 
             // Only elements with ids 4, 7, and 10 should be non-boundary
-            TS_ASSERT(!p_mesh->GetElement(4)->IsElementOnBoundary());
-            TS_ASSERT(!p_mesh->GetElement(7)->IsElementOnBoundary());
-            TS_ASSERT(!p_mesh->GetElement(10)->IsElementOnBoundary());
+            TS_ASSERT_EQUALS(p_mesh->GetElement(4)->IsElementOnBoundary(), false);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(7)->IsElementOnBoundary(), false);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(10)->IsElementOnBoundary(), false);
 
             // All other elements are on the boundary
-            TS_ASSERT(p_mesh->GetElement(0)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(1)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(2)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(3)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(5)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(6)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(8)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(9)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(11)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(12)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(13)->IsElementOnBoundary());
-            TS_ASSERT(p_mesh->GetElement(14)->IsElementOnBoundary());
+            TS_ASSERT_EQUALS(p_mesh->GetElement(0)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(1)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(2)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(3)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(5)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(6)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(8)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(9)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(11)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(12)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(13)->IsElementOnBoundary(), true);
+            TS_ASSERT_EQUALS(p_mesh->GetElement(14)->IsElementOnBoundary(), true);
         }
     }
 };

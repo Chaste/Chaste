@@ -70,37 +70,52 @@ private:
     friend class TestSamplesFromCachedRandomField;
     friend class TestUniformGridRandomFieldGenerator;
 
-    /** Coordinates of the lower corner of the grid */
+    /** Coordinates of the lower corner of the grid. */
     std::array<double, SPACE_DIM> mLowerCorner;
 
-    /** Coordinates of the upper corner of the grid */
+    /** Coordinates of the upper corner of the grid. */
     std::array<double, SPACE_DIM> mUpperCorner;
 
-    /** Number of grid points required in each dimension */
+    /** Number of grid points required in each dimension. */
     std::array<unsigned, SPACE_DIM> mNumGridPts;
 
-    /** Whether the grid is periodic in each dimension */
+    /** Whether the grid is periodic in each dimension. */
     std::array<bool, SPACE_DIM> mPeriodicity;
 
-    /** Length scale over which the noise is to be correlated */
+    /** Length scale over which the noise is to be correlated. */
     double mLengthScale;
 
-    /** Matrix storing the eigenvectors of the covariance matrix */
+    /** Matrix storing the eigenvectors of the covariance matrix. */
     Eigen::MatrixXd mScaledEigenvecs;
 
-    /** The product of mNumGridPts; the total number of grid points in the cuboid */
+    /**
+     * The product of mNumGridPts; the total number of grid points in the 
+     * cuboid.
+     */
     unsigned mNumTotalGridPts;
 
-    /** Store the calculated grid spacings to avoid recalculation during interpolation */
+    /**
+     * Store the calculated grid spacings to avoid recalculation during 
+     * interpolation.
+     */
     std::array<double, SPACE_DIM> mGridSpacing;
 
-    /** Store the calculated one over grid spacings to avoid recalculation during interpolation */
+    /**
+     * Store the calculated one over grid spacings to avoid recalculation during 
+     * interpolation.
+     */
     std::array<double, SPACE_DIM> mOneOverGridSpacing;
 
-    /** The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached random fields will be saved */
+    /**
+     * The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached 
+     * random fields will be saved.
+     */
     const std::string mCacheDir;
 
-    /** Number of eigenvalues calculated, such that their sum minimally exceeds mTraceProportion * mNumTotalGridPts */
+    /**
+     * Number of eigenvalues calculated, such that their sum minimally exceeds 
+     * mTraceProportion * mNumTotalGridPts.
+     */
     unsigned mNumEigenvals;
 
     /**
@@ -112,7 +127,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // Todo: how can we serialize Eigen arrays/matrices?
+        ///\todo how can we serialize Eigen arrays/matrices?
         archive & mLowerCorner;
         archive & mUpperCorner;
         archive & mNumGridPts;
@@ -121,40 +136,50 @@ private:
     }
 
     /**
-     * Get the squared distance between two points, which is needed to calculate the covariance matrix.
-     * This function takes into account possible periodicity in the mesh.
+     * Get the squared distance between two points, which is needed to calculate 
+     * the covariance matrix. This function takes into account possible 
+     * periodicity in the mesh.
+     * 
      * @param rLocation1 the first location
      * @param rLocation2 the second location
+     * 
      * @return the squared distance between rLocation1 and rLocation2
      */
     double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
                               const c_vector<double, SPACE_DIM>& rLocation2) const;
 
     /**
-     * Helper method for Interpolate()
-     * Get the linear index (along the flat vector representing a random field instance) given the grid index
+     * Helper method for Interpolate(). Get the linear index (along the flat 
+     * vector representing a random field instance) given the grid index
      * (x,y,z).
+     * 
      * @param gridIndex the (x,y,z) coordinate to translate into a linear index
-     * @return the linear index along the flat vector representing the (x,y,z) grid coordinate
+     * 
+     * @return the linear index along the flat vector representing the (x,y,z) 
+     *         grid coordinate
      */
     long GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const;
 
     /**
-     * Helper method for Interpolate()
-     * Get the position in space of the grid point with (x,y,z) grid index gridIndex.
+     * Helper method for Interpolate(). Get the position in space of the grid 
+     * point with (x,y,z) grid index gridIndex.
+     * 
      * @param gridIndex the (x,y,z) coordinate to calculate the position of
+     * 
      * @return the position in space of the (x,y,z) coordinate
      */
     std::array<double, SPACE_DIM> GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const;
 
     /**
-     * Get a unique representation of the parameters that can be used as a filename when saving or loading fields.
+     * Get a unique representation of the parameters that can be used as a 
+     * filename when saving or loading fields.
+     * 
      * @return A unique filename based on the parameters.
      */
     std::string GetFilenameFromParams() const;
 
     /**
-     * \todo Document this
+     * \todo Document this. Why isn't it a member variable, e.g. mOpenSimplex?
      */
     OpenSimplex2S os;
 
@@ -163,8 +188,9 @@ public:
     /**
      * Constructor that takes all parameters as arguments.
      *
-     * This constructor will check whether a cached field matching the parameters exists.  If so, it will be loaded
-     * from file, but will otherwise be calculated.
+     * This constructor will check whether a cached field matching the 
+     * parameters exists.  If so, it will be loaded from file, but will 
+     * otherwise be calculated.
      *
      * @param lowerCorner the lower corner of the rectangular grid
      * @param upperCorner the upper corner of the rectangular grid
@@ -179,38 +205,48 @@ public:
                                     std::array<bool, SPACE_DIM> periodicity,
                                     double lengthScale);
 
-
     /**
-     * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
-     * create an appropriate linear combination of the eigenvectors.
+     * Sample an instance of the random field. 
+     * 
+     * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from 
+     * 0 to 1.
+     * 
+     * @param rNodes a vector nodes at which to sample the random field
      *
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomField();
     
     /**
-     * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
-     * create an appropriate linear combination of the eigenvectors.
+     * Sample an instance of the random field at a given time. First, draw 
+     * mNumTotalGridPts random numbers from N(0,1), and then create an 
+     * appropriate linear combination of the eigenvectors.
+     * 
+     * @param time time at which to sample the random field
      *
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomFieldAtTime(double time);
 
     /**
-     * Interpolate from the random field by returning the value at the node of the random field closest to the given
-     * location.
+     * Interpolate from the random field by returning the value at the node of 
+     * the random field closest to the given location.
      *
-     * @param rRandomField the random field, assumed obtained from SampleRandomField()
-     * @param rLocation the location to which we identify the value at the closest node in the random field
+     * @param rRandomField the random field, assumed obtained from 
+     *                     SampleRandomField()
+     * @param rLocation the location to which we identify the value at the 
+     *                  closest node in the random field
      * @return the value of the random field closest to rLocation
      */
-    double Interpolate(const std::vector<double>& rRandomField, const c_vector<double, SPACE_DIM>& rLocation) const;
+    double Interpolate(const std::vector<double>& rRandomField, 
+                       const c_vector<double, SPACE_DIM>& rLocation) const;
 
     /**
-     * Save the calculated random field to cache.  Throws if the file cannot be opened.
+     * Save the calculated random field to cache. Throws if the file cannot be 
+     * opened.
      *
-     * The file will be saved in $CHASTE_TEST_OUTPUT/file_name
-     * where file_name is generated by the private member GetFilenameFromParams().
+     * The file will be saved in $CHASTE_TEST_OUTPUT/file_name where file_name 
+     * is generated by the private member GetFilenameFromParams().
      *
      * The cache format is as follows:
      *
@@ -221,8 +257,12 @@ public:
      */
     const std::string SaveToCache() const;
     
-    void SetRandomSeed(const unsigned int seed);
+    /**
+     * Set the random seed used for the generator.
+     *
+     * @param seed the new seed
+     */
+    void SetRandomSeed(const unsigned seed);
 };
-
 
 #endif /*UNIFORM_GRID_RANDOM_FIELD_GENERATOR_HPP_*/

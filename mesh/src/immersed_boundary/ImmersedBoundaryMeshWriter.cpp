@@ -425,7 +425,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 }
 
 template <>
-void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<1, 1>& rMesh) {
+void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<1, 1>& rMesh)
+{
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -90,7 +90,6 @@ public:
     void TestStrengthMethods()
     {
         FluidSource<2> source(1, 0.1, -5.0);
-
         TS_ASSERT_DELTA(source.GetStrength(), 0.0, 1e-6);
 
         source.SetStrength(18.4);
