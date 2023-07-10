@@ -289,7 +289,7 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(double dt)
 {
-    if constexpr (SPACE_DIM == 2)
+    if constexpr (DIM == 2)
     {
         // Helper variables, pre-declared for efficiency
         unsigned num_grid_pts_x = this->rGetMesh().GetNumGridPtsX();
