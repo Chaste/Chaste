@@ -73,16 +73,28 @@ private:
         archive & mLaminaRestLengthMult;
     }
 
-    /** The basic spring constant associated with interactions */
+    /**
+     * The basic spring constant associated with interactions. Initialised to 
+     * 1e3 in constructor.
+     */
     double mSpringConst;
 
-    /** The basic rest length associated with interactions, as a fraction of cell population's interaction distance */
+    /**
+     * The basic rest length associated with interactions, as a fraction of cell 
+     * population's interaction distance. Initialised to 0.25 in constructor.
+     */
     double mRestLength;
 
-    /** Multiplicative factor to change strength of interactions involving a lamina node */
+    /**
+     * Multiplicative factor to change strength of interactions involving a 
+     * lamina node. Initialised to 1.0 in constructor.
+     */
     double mLaminaSpringConstMult;
 
-    /** Multiplicative factor to change equilibrium length of interactions involving a lamina node */
+    /**
+     * Multiplicative factor to change equilibrium length of interactions 
+     * involving a lamina node. Initialised to 1.0 in constructor.
+     */
     double mLaminaRestLengthMult;
 
 public:
@@ -99,16 +111,20 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
+     * Calculates the force on each node in the immersed boundary cell 
+     * population as a result of cell-cell interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which 
+     *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
+     * 
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -116,25 +132,41 @@ public:
     /** @return mSpringConst */
     double GetSpringConst() const;
 
-    /** @param springConst the new value of mSpringConst */
+    /**
+     * Set mSpringConst.
+     * 
+     * @param springConst the new value of mSpringConst
+     */
     void SetSpringConst(double springConst);
 
     /** @return mRestLength */
     double GetRestLength() const;
 
-    /** @param restLength the new value of mRestLength */
+    /**
+     * Set mRestLength.
+     * 
+     * @param restLength the new value of mRestLength
+     */
     void SetRestLength(double restLength);
 
     /** @return mLaminaSpringConstMult */
     double GetLaminaSpringConstMult() const;
 
-    /** @param laminaSpringConstMult the new value of mLaminaSpringConstMult */
+    /**
+     * Set mLaminaSpringConstMult.
+     * 
+     * @param laminaSpringConstMult the new value of mLaminaSpringConstMult
+     */
     void SetLaminaSpringConstMult(double laminaSpringConstMult);
 
     /** @return mLaminaRestLengthMult */
     double GetLaminaRestLengthMult() const;
 
-    /** @param laminaRestLengthMult the new value of mLaminaRestLengthMult */
+    /**
+     * Set mLaminaRestLengthMult.
+     * 
+     * @param laminaRestLengthMult the new value of mLaminaRestLengthMult
+     */
     void SetLaminaRestLengthMult(double laminaRestLengthMult);
 };
 

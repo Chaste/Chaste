@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "RandomNumberGenerator.hpp"
 
-#include "Debug.hpp"
-
 /**
  * An abstract immersed boundary force class, for use in 
  * immersed boundary cell-based simulations.
@@ -113,8 +111,9 @@ public:
      * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
      * @param rCellPopulation an immersed boundary cell population
      */
-    virtual void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-            ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)=0;
+    virtual void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
      * Outputs the name of the immersed boundary force used in 

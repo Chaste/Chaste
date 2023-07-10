@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 AbstractImmersedBoundaryForce<DIM>::AbstractImmersedBoundaryForce()
-        : mAdditiveNormalNoise(false),
-          mNormalNoiseMean(1.0),
-          mNormalNoiseStdDev(0.0)
+    : mAdditiveNormalNoise(false),
+      mNormalNoiseMean(1.0),
+      mNormalNoiseStdDev(0.0)
 {
 }
 
@@ -82,18 +82,22 @@ void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(ImmersedBoundaryC
                 random_force[dim] = p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
             }
 
-            double avg_magnitude = 0.5 * (norm_2(rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_a)->rGetAppliedForce()) +
-                                          norm_2(rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_b)->rGetAppliedForce()));
+            Node<DIM>* p_node_a = rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_a);
+            Node<DIM>* p_node_b = rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_b);
+
+            double avg_magnitude = 0.5 * (norm_2(p_node_a->rGetAppliedForce()) +
+                                          norm_2(p_node_b->rGetAppliedForce()));
 
             random_force *= avg_magnitude;
-            rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_a)->AddAppliedForceContribution(random_force);
+            p_node_a->AddAppliedForceContribution(random_force);
 
             random_force *= -1.0;
-            rCellPopulation.GetElement(elem_idx)->GetNode(rand_node_b)->AddAppliedForceContribution(random_force);
+            p_node_b->AddAppliedForceContribution(random_force);
         }
     }
 
-    // Do the same for laminas todo do we want different lamina behaviour?
+    // Do the same for laminas
+    ///\todo do we want different lamina behaviour?
     for (unsigned lam_idx = 0; lam_idx < rCellPopulation.GetNumLaminas(); ++lam_idx)
     {
         unsigned num_nodes_this_elem = rCellPopulation.GetLamina(lam_idx)->GetNumNodes();
@@ -122,14 +126,17 @@ void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(ImmersedBoundaryC
                 random_force[dim] = p_gen->NormalRandomDeviate(mNormalNoiseMean, mNormalNoiseStdDev);
             }
 
-            double avg_magnitude = 0.5 * (norm_2(rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_a)->rGetAppliedForce()) +
-                                          norm_2(rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_b)->rGetAppliedForce()));
+            Node<DIM>* p_node_a = rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_a);
+            Node<DIM>* p_node_b = rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_b);
+
+            double avg_magnitude = 0.5 * (norm_2(p_node_a->rGetAppliedForce()) +
+                                          norm_2(p_node_b->rGetAppliedForce()));
 
             random_force *= avg_magnitude;
-            rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_a)->AddAppliedForceContribution(random_force);
+            p_node_a->AddAppliedForceContribution(random_force);
 
             random_force *= -1.0;
-            rCellPopulation.GetLamina(lam_idx)->GetNode(rand_node_b)->AddAppliedForceContribution(random_force);
+            p_node_b->AddAppliedForceContribution(random_force);
         }
     }
 }

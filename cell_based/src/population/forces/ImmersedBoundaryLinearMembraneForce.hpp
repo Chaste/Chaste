@@ -68,30 +68,45 @@ private:
         archive& mLaminaRestLength;
     }
 
-    /** The spring constant associated with each element */
+    /**
+     * The spring constant associated with each element. Initialised to 1e6 in 
+     * constructor.
+     */
     double mElementSpringConst;
 
-    /** The rest length associated with each element as a fraction of the average node spacing */
+    /**
+     * The rest length associated with each element as a fraction of the average 
+     * node spacing. Initialised to 0.5 in constructor.
+     */
     double mElementRestLength;
 
-    /** The spring constant associated with each lamina */
+    /**
+     * The spring constant associated with each lamina. Initialised to 1e6 in 
+     * constructor.
+     */ */
     double mLaminaSpringConst;
 
-    /** The rest length associated with each lamina as a fraction of the average node spacing */
+    /**
+     * The rest length associated with each lamina as a fraction of the average 
+     * node spacing. Initialised to 0.5 in constructor.
+     */
     double mLaminaRestLength;
 
     /**
      * Helper method for AddImmersedBoundaryForceContribution.
      * Calculates forces, and can accept either an element or a lamina
      *
-     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an element or a lamina
+     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an 
+     *         element or a lamina
      * @param rElement the element or lamina add forces to
      * @param rCellPopulation the immersed boundary cell population
+     * @param intrinsicSpacingSquared the intrinsic node spacing
      */
     template <unsigned ELEMENT_DIM>
-    void CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
-                                  ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
-                                  double intrinsicSpacingSquared);
+    void CalculateForcesOnElement(
+        ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
+        double intrinsicSpacingSquared);
 
 public:
     /** Constructor */
@@ -102,9 +117,11 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates basic elasticity in the membrane of each immersed boundary as a result of interactions.
+     * Calculates basic elasticity in the membrane of each immersed boundary as 
+     * a result of interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which 
+     *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
     void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
@@ -119,25 +136,41 @@ public:
     /** @return mElementSpringConst */
     double GetElementSpringConst() const;
 
-    /** @param elementSpringConst the new value of mElementSpringConst */
+    /**
+     * Set mElementSpringConst.
+     * 
+     * @param elementSpringConst the new value of mElementSpringConst
+     */
     void SetElementSpringConst(double elementSpringConst);
 
     /** @return mElementRestLength */
     double GetElementRestLength() const;
 
-    /** @param elementRestLength the new value of mElementRestLength */
+    /**
+     * Set mElementRestLength
+     * 
+     * @param elementRestLength the new value of mElementRestLength
+     */
     void SetElementRestLength(double elementRestLength);
 
     /** @return mLaminaSpringConst */
     double GetLaminaSpringConst() const;
 
-    /** @param laminaSpringConst the new value of mLaminaSpringConst */
+    /**
+     * Set mLaminaSpringConst.
+     * 
+     * @param laminaSpringConst the new value of mLaminaSpringConst
+     */
     void SetLaminaSpringConst(double laminaSpringConst);
 
     /** @return mLaminaRestLength */
     double GetLaminaRestLength() const;
 
-    /** @param laminaRestLength the new value of mLaminaRestLength */
+    /**
+     * Set mLaminaRestLength.
+     * 
+     * @param laminaRestLength the new value of mLaminaRestLength
+     */
     void SetLaminaRestLength(double laminaRestLength);
 };
 

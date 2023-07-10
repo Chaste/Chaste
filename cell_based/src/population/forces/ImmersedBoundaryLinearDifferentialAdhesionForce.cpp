@@ -39,11 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::ImmersedBoundaryLinearDifferentialAdhesionForce()
-        : AbstractImmersedBoundaryForce<DIM>(),
-          mLabelledCellToLabelledCellSpringConst(1e3),
-          mLabelledCellToCellSpringConst(1e3),
-          mCellToCellSpringConst(1e3),
-          mRestLength(0.25)
+    : AbstractImmersedBoundaryForce<DIM>(),
+      mLabelledCellToLabelledCellSpringConst(1e3),
+      mLabelledCellToCellSpringConst(1e3),
+      mCellToCellSpringConst(1e3),
+      mRestLength(0.25)
 {
 }
 
@@ -115,7 +115,6 @@ void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::AddImmersedBoundaryFo
         }
     }
 }
-
 
 template<unsigned DIM>
 void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)

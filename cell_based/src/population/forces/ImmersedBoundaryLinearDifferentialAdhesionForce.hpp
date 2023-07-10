@@ -73,16 +73,28 @@ private:
         archive & mRestLength;
     }
 
-    /** The cell-cell spring constant between nodes in two labelled cells */
+    /**
+     * The cell-cell spring constant between nodes in two labelled cells. 
+     * Initialised to 1e3 in constructor.
+     */
     double mLabelledCellToLabelledCellSpringConst;
 
-    /** The cell-cell spring constant between nodes in a labelled cell - regular cell pair */
+    /**
+     * The cell-cell spring constant between nodes in a labelled cell - regular 
+     * cell pair. Initialised to 1e3 in constructor.
+     */
     double mLabelledCellToCellSpringConst;
 
-    /** The cell-cell spring constant between nodes in two regular cells */
+    /**
+     * The cell-cell spring constant between nodes in two regular cells.
+     * Initialised to 1e3 in constructor.
+     */
     double mCellToCellSpringConst;
 
-    /** The basic rest length associated with interactions, as a fraction of cell population's interaction distance */
+    /**
+     * The basic rest length associated with interactions, as a fraction of cell 
+     * population's interaction distance Initialised to 0.25 in constructor.
+     */
     double mRestLength;
 
 public:
@@ -99,16 +111,20 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
+     * Calculates the force on each node in the immersed boundary cell 
+     * population as a result of cell-cell interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which 
+     *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
+     * 
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -116,25 +132,43 @@ public:
     /** @return mLabelledCellToLabelledCellSpringConst */
     double GetLabelledCellToLabelledCellSpringConst() const;
 
-    /** @param labelledCellToLabelledCellSpringConst the new value of mLabelledCellToLabelledCellSpringConst */
+    /**
+     * Set mLabelledCellToLabelledCellSpringConst.
+     * 
+     * @param labelledCellToLabelledCellSpringConst the new value of 
+     *            mLabelledCellToLabelledCellSpringConst
+     */
     void SetLabelledCellToLabelledCellSpringConst(double labelledCellToLabelledCellSpringConst);
 
     /** @return mLabelledCellToCellSpringConst */
     double GetLabelledCellToCellSpringConst() const;
 
-    /** @param labelledCellToCellSpringConst the new value of mLabelledCellToCellSpringConst */
+    /**
+     * Set mLabelledCellToCellSpringConst.
+     * 
+     * @param labelledCellToCellSpringConst the new value of 
+     *     mLabelledCellToCellSpringConst
+     */
     void SetLabelledCellToCellSpringConst(double labelledCellToCellSpringConst);
 
     /** @return mCellToCellSpringConst */
     double GetCellToCellSpringConst() const;
 
-    /** @param cellToCellSpringConst the new value of mCellToCellSpringConst */
+    /**
+     * Set mCellToCellSpringConst.
+     * 
+     * @param cellToCellSpringConst the new value of mCellToCellSpringConst
+     */
     void SetCellToCellSpringConst(double cellToCellSpringConst);
 
     /** @return mRestLength */
     double GetRestLength() const;
 
-    /** @param restLength the new value of mRestLength */
+    /**
+     * Set mRestLength.
+     * 
+     * @param restLength the new value of mRestLength
+     */
     void SetRestLength(double restLength);
 };
 

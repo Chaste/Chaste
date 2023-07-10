@@ -75,19 +75,33 @@ private:
         archive& mWellWidth;
     }
 
-    /** The basic interaction strength */
+    /**
+     * The basic interaction strength. Initialised to 1e3 in constructor.
+     */
     double mWellDepth;
 
-    /** The basic rest length associated with interactions, as a fraction of cell population's interaction distance */
+    /**
+     * The basic rest length associated with interactions, as a fraction of cell 
+     * population's interaction distance. Initialised to 0.25 in constructor.
+     */
     double mRestLength;
 
-    /** Multiplicative factor to change strength of interactions involving a lamina node */
+    /**
+     * Multiplicative factor to change strength of interactions involving a 
+     * lamina node. Initialised to 1.0 in constructor.
+     */
     double mLaminaWellDepthMult;
 
-    /** Multiplicative factor to change equilibrium length of interactions involving a lamina node */
+    /**
+     * Multiplicative factor to change equilibrium length of interactions 
+     * involving a lamina node. Initialised to 1.0 in constructor.
+     */
     double mLaminaRestLengthMult;
 
-    /** The well width as a fraction of the cell population's interaction distance */
+    /**
+     * The well width as a fraction of the cell population's interaction 
+     * distance. Initialised to 0.25 in constructor.
+     */
     double mWellWidth;
 
 public:
@@ -104,13 +118,16 @@ public:
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
      *
-     * Calculates the force on each node in the immersed boundary cell population as a result of cell-cell interactions.
+     * Calculates the force on each node in the immersed boundary cell 
+     * population as a result of cell-cell interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which 
+     *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
@@ -122,31 +139,50 @@ public:
     /** @return mWellDepth */
     double GetWellDepth() const;
 
-    /** @param wellDepth the new value of mWellDepth */
+    /**
+     * Set mWellDepth.
+     * 
+     * @param wellDepth the new value of mWellDepth
+     */
     void SetWellDepth(double wellDepth);
 
     /** @return mRestLength */
     double GetRestLength() const;
 
-    /** @param restLength the new value of mRestLength */
+    /**
+     * Set mRestLength.
+     * 
+     * @param restLength the new value of mRestLength
+     */
     void SetRestLength(double restLength);
 
     /** @return mLaminaWellDepthMult */
     double GetLaminaWellDepthMult() const;
 
-    /** @param laminaWellDepthMult the new value of mLaminaWellDepthMult */
+    /**
+     * Set mLaminaWellDepthMult.
+     * 
+     * @param laminaWellDepthMult the new value of mLaminaWellDepthMult
+     */
     void SetLaminaWellDepthMult(double laminaWellDepthMult);
 
     /** @return mLaminaRestLengthMult */
     double GetLaminaRestLengthMult() const;
 
-    /** @param laminaRestLengthMult the new value of mLaminaRestLengthMult */
+    /**Set mLaminaRestLengthMult.
+     * 
+     * @param laminaRestLengthMult the new value of mLaminaRestLengthMult
+     */
     void SetLaminaRestLengthMult(double laminaRestLengthMult);
 
     /** @return mWellWidth */
     double GetWellWidth() const;
 
-    /** @param wellWidth the new value of mWellWidth */
+    /**
+     * Set mWellWidth.
+     * 
+     * @param wellWidth the new value of mWellWidth
+     */
     void SetWellWidth(double wellWidth);
 };
 

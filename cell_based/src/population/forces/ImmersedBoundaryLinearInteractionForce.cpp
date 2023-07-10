@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 ImmersedBoundaryLinearInteractionForce<DIM>::ImmersedBoundaryLinearInteractionForce()
-        : AbstractImmersedBoundaryForce<DIM>(),
-          mSpringConst(1e3),
-          mRestLength(0.25),
-          mLaminaSpringConstMult(1.0),
-          mLaminaRestLengthMult(1.0)
+    : AbstractImmersedBoundaryForce<DIM>(),
+       mSpringConst(1e3),
+       mRestLength(0.25),
+       mLaminaSpringConstMult(1.0),
+       mLaminaRestLengthMult(1.0)
 {
 }
 

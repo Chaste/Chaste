@@ -37,11 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 ImmersedBoundaryLinearMembraneForce<DIM>::ImmersedBoundaryLinearMembraneForce()
-        : AbstractImmersedBoundaryForce<DIM>(),
-          mElementSpringConst(1e6),
-          mElementRestLength(0.5),
-          mLaminaSpringConst(1e6),
-          mLaminaRestLength(0.5)
+    : AbstractImmersedBoundaryForce<DIM>(),
+      mElementSpringConst(1e6),
+      mElementRestLength(0.5),
+      mLaminaSpringConst(1e6),
+      mLaminaRestLength(0.5)
 {
 }
 
@@ -55,14 +55,14 @@ void ImmersedBoundaryLinearMembraneForce<DIM>::AddImmersedBoundaryForceContribut
                                                                                     ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     // Data common across the entire cell population
-    double intrinsicSpacingSquared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
+    double intrinsic_spacing_squared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
 
     // Loop over all elements ( <DIM, DIM> )
     for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = rCellPopulation.rGetMesh().GetElementIteratorBegin();
          elem_it != rCellPopulation.rGetMesh().GetElementIteratorEnd();
          ++elem_it)
     {
-        CalculateForcesOnElement(*elem_it, rCellPopulation, intrinsicSpacingSquared);
+        CalculateForcesOnElement(*elem_it, rCellPopulation, intrinsic_spacing_squared);
     }
 
     // Loop over all laminas ( <DIM-1, DIM> )
@@ -70,7 +70,7 @@ void ImmersedBoundaryLinearMembraneForce<DIM>::AddImmersedBoundaryForceContribut
          lam_it != rCellPopulation.rGetMesh().GetLaminaIteratorEnd();
          ++lam_it)
     {
-        CalculateForcesOnElement(*lam_it, rCellPopulation, intrinsicSpacingSquared);
+        CalculateForcesOnElement(*lam_it, rCellPopulation, intrinsic_spacing_squared);
     }
 
     if (this->mAdditiveNormalNoise)

@@ -39,20 +39,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 ImmersedBoundaryKinematicFeedbackForce<DIM>::ImmersedBoundaryKinematicFeedbackForce()
-        : AbstractImmersedBoundaryForce<DIM>(),
-          mSpringConst(1e3),
-          mPreviousLocations()
+    : AbstractImmersedBoundaryForce<DIM>(),
+      mSpringConst(1e3),
+      mPreviousLocations()
 {
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                                                                       ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContribution(
+    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     // Allocate memory the first time this method is called
     if (mPreviousLocations.empty())
     {
-        // \todo this assumes the number of nodes in the simulation does not change over time
+        ///\todo this assumes the number of nodes in the simulation does not change over time
         mPreviousLocations.resize(rCellPopulation.GetNumNodes());
         UpdatePreviousLocations(rCellPopulation);
     }
@@ -127,9 +128,9 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
 
 template <unsigned DIM>
 double ImmersedBoundaryKinematicFeedbackForce<DIM>::CalculateRelativeVelocityComponent(
-        const c_vector<double, DIM>& previousDisp,
-        const c_vector<double, DIM>& currentDisp,
-        c_vector<double, DIM>& unitPerp)
+    const c_vector<double, DIM>& previousDisp,
+    const c_vector<double, DIM>& currentDisp,
+    c_vector<double, DIM>& unitPerp)
 {
     // Get a unit vector perpendicular to the line joining the nodes at the previous time step
     unitPerp = Create_c_vector(-previousDisp[1], previousDisp[0]);
@@ -142,7 +143,7 @@ double ImmersedBoundaryKinematicFeedbackForce<DIM>::CalculateRelativeVelocityCom
 template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    // \todo this assumes the number of nodes in the simulation does not change over time
+    ///\todo this assumes the number of nodes in the simulation does not change over time
     EXCEPT_IF_NOT(mPreviousLocations.size() == rCellPopulation.GetNumNodes());
 
     // Populate the mPreviousLocations vector with the current location of nodes, so it's ready for next time step

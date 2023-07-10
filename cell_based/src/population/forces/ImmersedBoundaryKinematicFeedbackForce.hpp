@@ -72,28 +72,40 @@ private:
         archive & mSpringConst;
     }
 
-    /** The basic spring constant associated with interactions */
+    /**
+     * The basic spring constant associated with interactions.
+     * Initialised to 1e3 in constructor.
+     */
     double mSpringConst;
 
-    /** Vector to contain the location of each node at the previous time step */
+    /**
+     * Vector to contain the location of each node at the previous time step.
+     */
     std::vector<c_vector<double, DIM>> mPreviousLocations;
 
     /**
-     * Helper function for AddImmersedBoundaryForceContribution().  Repopulate mPreviousLocations with new values.
+     * Helper function for AddImmersedBoundaryForceContribution().
+     * Repopulate mPreviousLocations with new values.
+     * 
      * @param rCellPopulation the cell population
      */
     void UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Helper function for AddImmersedBoundaryForceContribution().  Calculates the component of their relative velocity
-     * in the direction perpendicular to the line joining the two nodes at the previous time step.
+     * Helper function for AddImmersedBoundaryForceContribution(). Calculates 
+     * the component of their relative velocity in the direction perpendicular 
+     * to the line joining the two nodes at the previous time step.
      *
-     * This relative velocity is a measure of shear between two boundaries, which this force class amplifies.
+     * This relative velocity is a measure of shear between two boundaries, 
+     * which this force class amplifies.
      *
-     * @param previousDisp displacement between a pair of interacting nodes at the previous time step
-     * @param currentDisp displacement between the same pair of interacting nodes at the current time step
+     * @param previousDisp displacement between a pair of interacting nodes at 
+     *                     the previous time step
+     * @param currentDisp displacement between the same pair of interacting 
+     *                    nodes at the current time step
      * @param unitPerp filled in as a unit vector perpendicular to previousDisp
-     * @return the component of the relative velocity of the nodes in the direction of unitPerp
+     * @return the component of the relative velocity of the nodes in the 
+     *         direction of unitPerp
      */
     double CalculateRelativeVelocityComponent(const c_vector<double, DIM>& previousDisp,
                                               const c_vector<double, DIM>& currentDisp,
@@ -113,16 +125,20 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates the force on each node in the immersed boundary cell population as a result of kinematic feedback.
+     * Calculates the force on each node in the immersed boundary cell 
+     * population as a result of kinematic feedback.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which 
+     *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
+     * 
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -130,7 +146,11 @@ public:
     /** @return mSpringConst */
     double GetSpringConst() const;
 
-    /** @param springConst the new value of mSpringConst */
+    /**
+     * Set mSpringConst.
+     *  
+     * @param springConst the new value of mSpringConst
+     */
     void SetSpringConst(double springConst);
 };
 

@@ -38,12 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 ImmersedBoundaryMorseInteractionForce<DIM>::ImmersedBoundaryMorseInteractionForce()
-        : AbstractImmersedBoundaryForce<DIM>(),
-          mWellDepth(1e3),
-          mRestLength(0.25),
-          mLaminaWellDepthMult(1.0),
-          mLaminaRestLengthMult(1.0),
-          mWellWidth(0.25)
+    : AbstractImmersedBoundaryForce<DIM>(),
+      mWellDepth(1e3),
+      mRestLength(0.25),
+      mLaminaWellDepthMult(1.0),
+      mLaminaRestLengthMult(1.0),
+      mWellWidth(0.25)
 {
 }
 

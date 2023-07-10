@@ -71,19 +71,33 @@ private:
         archive& mWellWidth;
     }
 
-    /** The basic interaction strength */
+    /**
+     * The basic interaction strength. Initialised to 1e6 in constructor.
+     */
     double mElementWellDepth;
 
-    /** The rest length associated with each element as a fraction of the average node spacing */
+    /**
+     * The rest length associated with each element as a fraction of the average 
+     * node spacing. Initialised to 0.5 in constructor.
+     */
     double mElementRestLength;
 
-    /** The spring constant associated with each lamina */
+    /**
+     * The spring constant associated with each lamina. Initialised to 1e6 in 
+     * constructor.
+     */
     double mLaminaWellDepth;
 
-    /** The rest length associated with each lamina as a fraction of the average node spacing */
+    /**
+     * The rest length associated with each lamina as a fraction of the average 
+     * node spacing. Initialised to 0.5 in constructor.
+     */
     double mLaminaRestLength;
 
-    /** The well width as a fraction of the average node spacing in either an element or lamina */
+    /**
+     * The well width as a fraction of the average node spacing in either an 
+     * element or lamina. Initialised to 0.25 in constructor.
+     */
     double mWellWidth;
 
     /**
@@ -125,31 +139,51 @@ public:
     /** @return mElementWellDepth */
     double GetElementWellDepth() const;
 
-    /** @param elementWellDepth the new value of mElementWellDepth */
+    /**
+     * Set mElementWellDepth.
+     * 
+     * @param elementWellDepth the new value of mElementWellDepth
+     */
     void SetElementWellDepth(double elementWellDepth);
 
     /** @return mElementRestLength */
     double GetElementRestLength() const;
 
-    /** @param elementRestLength the new value of mElementRestLength */
+    /**
+     * Set mElementRestLength/
+     * 
+     * @param elementRestLength the new value of mElementRestLength
+     */
     void SetElementRestLength(double elementRestLength);
 
     /** @return mLaminaWellDepth */
     double GetLaminaWellDepth() const;
 
-    /** @param laminaWellDepth the new value of mLaminaWellDepth */
+    /**
+     * Set mLaminaWellDepth.
+     * 
+     * @param laminaWellDepth the new value of mLaminaWellDepth
+     */
     void SetLaminaWellDepth(double laminaWellDepth);
 
     /** @return mLaminaRestLength */
     double GetLaminaRestLength() const;
 
-    /** @param laminaRestLength the new value of mLaminaRestLength */
+    /**
+     * Set mLaminaRestLength/
+     * 
+     * @param laminaRestLength the new value of mLaminaRestLength
+     */
     void SetLaminaRestLength(double laminaRestLength);
 
     /** @return mWellWidth */
     double GetWellWidth() const;
 
-    /** @param wellWidth the new value of mWellWidth */
+    /**
+     * Set mWellWidth.
+     * 
+     * @param wellWidth the new value of mWellWidth
+     */
     void SetWellWidth(double wellWidth);
 };
 
