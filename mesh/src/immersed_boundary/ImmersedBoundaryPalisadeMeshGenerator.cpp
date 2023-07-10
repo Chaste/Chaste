@@ -199,7 +199,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     if (basalLamina)
     {
         // The height of the lamina is offset by a proportion of the cell height
-        double lam_hight = absoluteGap == DOUBLE_UNSET ? y_offset[1] - 0.05 * cell_height : y_offset[1] - absoluteGap;
+        double lam_height = absoluteGap == DOUBLE_UNSET ? y_offset[1] - 0.05 * cell_height : y_offset[1] - absoluteGap;
 
         unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / lamina_node_spacing));
 
@@ -208,7 +208,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         for (unsigned node_idx = 0; node_idx < num_lamina_nodes; node_idx++)
         {
             // Calculate location of node
-            c_vector<double, 2> location = lam_hight * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
+            c_vector<double, 2> location = lam_height * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
             Node<2>* p_node = new Node<2>(nodes.size(), location, true);
@@ -231,7 +231,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         }
 
         // The height of the lamina is offset by a proportion of the cell height
-        double lam_hight = y_offset[1] + cell_height;
+        double lam_height = y_offset[1] + cell_height;
 
         unsigned num_lamina_nodes = static_cast<unsigned>(floor(1.0 / lamina_node_spacing));
 
@@ -240,7 +240,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
         for (unsigned node_idx = 0; node_idx < num_lamina_nodes; node_idx++)
         {
             // Calculate location of node
-            c_vector<double, 2> location = lam_hight * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
+            c_vector<double, 2> location = lam_height * y_unit + ( 0.5 / num_lamina_nodes + double(node_idx) / num_lamina_nodes ) * x_unit;
 
             // Create the new node
             Node<2>* p_node = new Node<2>(nodes.size(), location, true);

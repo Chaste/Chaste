@@ -169,7 +169,8 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(
+    [[maybe_unused]] unsigned index) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -241,7 +242,8 @@ bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDistributionAboutAxis(
-    unsigned elemIndex, c_vector<double, SPACE_DIM> axis)
+    [[maybe_unused]] unsigned elemIndex, // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
+    c_vector<double, SPACE_DIM> axis)
 {
     /*
      * Method outline:
@@ -747,7 +749,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNeighbourDist(double neigh
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index)
+c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(
+    [[maybe_unused]] unsigned index) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     // Only implemented in 2D
     if constexpr (SPACE_DIM == 2)
