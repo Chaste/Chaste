@@ -172,7 +172,7 @@ py_lgpl_notice = """# This library is free software; you can redistribute it and
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details."""
-
+opensimplex_notice = """* K.jpg's OpenSimplex 2, smooth variant ("SuperSimplex")"""
 
 def CheckForCopyrightNotice(findStrOrRe, fileIn):
     """Test if the (possibly multi-line) string/regexp findStr is contained anywhere in fileIn."""
@@ -246,7 +246,8 @@ def InspectFile(fileName):
         CheckForCopyrightNotice(triangle_notice, file_in) or
         CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
-            CheckForCopyrightNotice(py_lgpl_notice, file_in)):
+        CheckForCopyrightNotice(py_lgpl_notice, file_in) or 
+        CheckForCopyrightNotice(opensimplex_notice, file_in)):
         # print('Found 3rd party notice in %s' % file_name)
         if valid_notice:
             print("Multiple notices on %s" % file_name)
