@@ -260,12 +260,12 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         std::vector<Node<2>*> nodes_this_elem;
         double random_variation = p_rand_gen->ranf() * randomYMult;
+        c_vector<double, 2> scaled_location;
 
         for (unsigned location = 0; location < locations.size(); location++)
         {
             unsigned node_index = nodes.size();
-            c_vector<double, 2> scaled_location = width_scale_fac * locations[location] + x_offset * (elem_idx + 0.5);
-
+            scaled_location = width_scale_fac * locations[location] + x_offset * (elem_idx + 0.5);
             scaled_location[0] = fmod(scaled_location[0], 1.0);
             scaled_location[1] *= (1.0 + random_variation);
             scaled_location[1] += y_offset[1];
