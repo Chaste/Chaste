@@ -44,23 +44,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
-
 template <unsigned SPACE_DIM>
-OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
-                                                                          std::array<double, SPACE_DIM> upperCorner,
-                                                                          std::array<bool, SPACE_DIM> periodicity,
-                                                                          double lengthScale,
-                                                                          double boxWidth)
-        : mLowerCorner(lowerCorner),
-          mUpperCorner(upperCorner),
-          mPeriodicity(periodicity),
-          mLengthScale(lengthScale),
-          mpBoxCollection(nullptr)
+OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
+    std::array<double, SPACE_DIM> lowerCorner,
+    std::array<double, SPACE_DIM> upperCorner,
+    std::array<bool, SPACE_DIM> periodicity,
+    double lengthScale,
+    double boxWidth)
+    : mLowerCorner(lowerCorner),
+      mUpperCorner(upperCorner),
+      mPeriodicity(periodicity),
+      mLengthScale(lengthScale),
+      mpBoxCollection(nullptr)
 {
     // Reset the box width if the default value is being used
     if (boxWidth == DOUBLE_UNSET)
     {
-        // \todo: can we remove the magic number here?
+        ///\todo: can we remove the magic number here?
         boxWidth = std::min(4.0 * lengthScale, upperCorner[0] - lowerCorner[0]);
     }
 
@@ -72,21 +72,20 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(std::a
         domain_size[2 * dim + 1] = upperCorner[dim];
     }
 
-    // \todo: Obsolete box collection should take a std::array<bool, DIM>
+    ///\todo: Obsolete box collection should take a std::array<bool, DIM>
     bool periodic_x = periodicity[0];
     bool periodic_y = SPACE_DIM > 1 ? periodicity[1] : false;
     bool periodic_z = SPACE_DIM > 2 ? periodicity[2] : false;
 
     mpBoxCollection = std::make_unique<ObsoleteBoxCollection<SPACE_DIM>>(
-            boxWidth,
-            domain_size,
-            periodic_x,
-            periodic_y,
-            periodic_z
+        boxWidth,
+        domain_size,
+        periodic_x,
+        periodic_y,
+        periodic_z
     );
 
-    mpBoxCollection->SetupLocalBoxesHalfOnly();
-    
+    mpBoxCollection->SetupLocalBoxesHalfOnly();    
     os = OpenSimplex2S(rand());
 }
 
@@ -107,7 +106,6 @@ double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
         if (mPeriodicity[dim])
         {
             const double domain_width_this_dim = mUpperCorner[dim] - mLowerCorner[dim];
-
             delta_this_dim = std::min(delta_this_dim, domain_width_this_dim - delta_this_dim);
         }
 
@@ -118,46 +116,58 @@ double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
 }
 
 template <unsigned SPACE_DIM>
-void OffLatticeRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned int seed) {
+void OffLatticeRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(
+    const unsigned seed)
+{
     os = OpenSimplex2S(seed);
 }
 
-// TODO: Check what this method actually should be doing - should presumably be sampling at node locations?
+///\todo: Check what this method actually should be doing - should presumably be sampling at node locations?
 template <unsigned SPACE_DIM>
-std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept
+std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(
+    const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept
 {
     return this->SampleRandomFieldAtTime(rNodes, rand());
 }
 
 template <unsigned SPACE_DIM>
-std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) noexcept
+std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(
+    const std::vector<Node<SPACE_DIM>*>& rNodes,
+    const double time) noexcept
 {
-    // TODO: randomise seed
-    auto reshape = [](const double val) {
-        double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
-        double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
+    ///\todo: randomise seed
+    auto reshape = [](const double val)
+    {
+        double dist_from_half = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
+        double strength = (1.0 - std::abs(val)) + dist_from_half * 0.2;
         return val * (1.0 - 0.18 * strength);
     };
 
     std::vector<double> samples(rNodes.size());
-    for (unsigned int i = 0; i < samples.size(); i++) {
-        auto nodeLocation = rNodes[i]->rGetLocation();
-        switch(SPACE_DIM) {
+    c_vector<double, SPACE_DIM> node_location;
+    for (unsigned i = 0; i < samples.size(); ++i)
+    {
+        node_location = rNodes[i]->rGetLocation();
+        switch (SPACE_DIM)
+        {
             case 1:
-                samples[i] = reshape(reshape(os.noise2_XBeforeY(nodeLocation[0] * mLengthScale, time + 0.5)));
+            {
+                samples[i] = reshape(reshape(os.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5)));
                 break;
-            
+            }            
             case 2:
-                samples[i] = reshape(reshape(os.noise3_XYBeforeZ(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, time)));
+            {
+                samples[i] = reshape(reshape(os.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time)));
                 break;
-
+            }
             case 3:
-                samples[i] = reshape(reshape(os.noise4_XYBeforeZW(nodeLocation[0] * mLengthScale, nodeLocation[1] * mLengthScale, nodeLocation[2] * mLengthScale, time)));
+            {
+                samples[i] = reshape(reshape(os.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time)));
                 break;
-                
+            }                
             default:
+                // This can't happen
                 NEVER_REACHED;
-                break;
         }
     }
 

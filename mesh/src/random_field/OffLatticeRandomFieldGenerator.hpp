@@ -58,22 +58,25 @@ private:
     friend class boost::serialization::access;
     friend class TestOffLatticeRandomFieldGenerator;
 
-    /** Coordinates of the lower corner of the grid */
+    /** Coordinates of the lower corner of the grid. */
     std::array<double, SPACE_DIM> mLowerCorner;
 
-    /** Coordinates of the upper corner of the grid */
+    /** Coordinates of the upper corner of the grid. */
     std::array<double, SPACE_DIM> mUpperCorner;
 
-    /** Whether the grid is periodic in each dimension */
+    /** Whether the grid is periodic in each dimension. */
     std::array<bool, SPACE_DIM> mPeriodicity;
 
-    /** Length scale over which the noise is to be correlated */
+    /** Length scale over which the noise is to be correlated. */
     double mLengthScale;
 
-    /** An owning pointer to a box collection for efficiently keeping track of nearby nodes */
+    /**
+     * An owning pointer to a box collection for efficiently keeping track of 
+     * nearby nodes.
+     */
     std::unique_ptr<ObsoleteBoxCollection<SPACE_DIM>> mpBoxCollection;
 
-    /** The number of nodes passed in at the most recent Update() */
+    /** The number of nodes passed in at the most recent Update(). */
     unsigned mNumNodesAtLastUpdate;
 
     /**
@@ -85,7 +88,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // Todo: how can we serialize Eigen arrays/matrices?
+        ///\todo: how can we serialize Eigen arrays/matrices?
         archive & mLowerCorner;
         archive & mUpperCorner;
         archive & mPeriodicity;
@@ -93,8 +96,9 @@ private:
     }
 
     /**
-     * Get the squared distance between two points, which is needed to calculate the covariance matrix.
-     * This function takes into account possible periodicity in the mesh.
+     * Get the squared distance between two points, which is needed to calculate 
+     * the covariance matrix. This function takes into account possible 
+     * periodicity in the mesh.
      *
      * @param rLocation1 the first location
      * @param rLocation2 the second location
@@ -108,14 +112,17 @@ private:
 public:
 
     /**
-     * Constructor that takes all parameters as arguments, and sets up an appropriate box collection.
+     * Constructor that takes all parameters as arguments, and sets up an 
+     * appropriate box collection.
      *
      * @param lowerCorner the lower corner of the rectangular grid
      * @param upperCorner the upper corner of the rectangular grid
      * @param periodicity whether the grid is periodic in each dimension
      * @param numEigenvals the number of eigenvalues to calculate
-     * @param lengthScale the length scale of the correlation when calculating the covariance matrix
-     * @param boxWidth the box size for the box collection. Defaults to DOUBLE_UNSET in which case it is reset appropriately.
+     * @param lengthScale the length scale of the correlation when calculating 
+     *                    the covariance matrix
+     * @param boxWidth the box size for the box collection. Defaults to 
+     *                 DOUBLE_UNSET in which case it is reset appropriately.
      */
     OffLatticeRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
                                    std::array<double, SPACE_DIM> upperCorner,
@@ -123,25 +130,46 @@ public:
                                    double lengthScale,
                                    double boxWidth=DOUBLE_UNSET);
 
-
     /**
-     * Default constructor
+     * Default constructor.
      */
     virtual ~OffLatticeRandomFieldGenerator() = default;
 
     /**
-     * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
-     * create an appropriate linear combination of the eigenvectors.
-     *
-     * This method returns early if mLengthScale = 0 (noise is not spatially correlated at all).
+     * Sample an instance of the random field. 
+     * 
+     * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from 
+     * 0 to 1.
+     * 
+     * @param rNodes a vector nodes at which to sample the random field
      *
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept;
+
+    /**
+     * Sample an instance of the random field at a given time. First, draw 
+     * mNumTotalGridPts random numbers from N(0,1), and then create an 
+     * appropriate linear combination of the eigenvectors.
+     *
+     * \todo the statement below doesn't appear to be correct:
+     * 
+     * This method returns early if mLengthScale = 0 (noise is not spatially 
+     * correlated at all).
+     *
+     * @param rNodes a vector nodes at which to sample the random field
+     * @param time time at which to sample the random field
+     * 
+     * @return A vector representing an instance of the random field.
+     */
     std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) noexcept;
 
-    void SetRandomSeed(const unsigned int seed);
+    /**
+     * Set the random seed used for the generator.
+     *
+     * @param seed the new seed
+     */
+    void SetRandomSeed(const unsigned seed);
 };
-
 
 #endif /*OFF_LATTICE_RANDOM_FIELD_GENERATOR_HPP_*/
