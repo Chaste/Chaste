@@ -83,7 +83,7 @@ private:
     /**
      * The spring constant associated with each lamina. Initialised to 1e6 in 
      * constructor.
-     */ */
+     */
     double mLaminaSpringConst;
 
     /**
