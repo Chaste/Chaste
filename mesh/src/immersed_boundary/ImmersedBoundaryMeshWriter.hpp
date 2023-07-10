@@ -118,7 +118,7 @@ private:
      * @return the coordinates of the nearest corner of [0,1]x[0,1]
      */
     c_vector<double, SPACE_DIM> GetNearestCorner(const c_vector<double, SPACE_DIM>& rA,
-                                                 const c_vector<double, SPACE_DIM>& rB) const noexcept;
+                                                 const c_vector<double, SPACE_DIM>& rB) const;
 
 #ifdef CHASTE_VTK
 //Requires  "sudo aptitude install libvtk5-dev" or similar

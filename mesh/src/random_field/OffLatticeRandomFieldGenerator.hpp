@@ -105,8 +105,11 @@ private:
      * @return the squared distance between rLocation1 and rLocation2
      */
     double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
-                              const c_vector<double, SPACE_DIM>& rLocation2) const noexcept;
+                              const c_vector<double, SPACE_DIM>& rLocation2) const;
 
+    /**
+     * \todo Document this
+     */
     OpenSimplex2S os;
 
 public:
@@ -145,7 +148,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept;
+    std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes);
 
     /**
      * Sample an instance of the random field at a given time. First, draw 
@@ -162,7 +165,7 @@ public:
      * 
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time) noexcept;
+    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time);
 
     /**
      * Set the random seed used for the generator.

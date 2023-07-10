@@ -128,7 +128,7 @@ private:
      * @return the squared distance between rLocation1 and rLocation2
      */
     double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
-                              const c_vector<double, SPACE_DIM>& rLocation2) const noexcept;
+                              const c_vector<double, SPACE_DIM>& rLocation2) const;
 
     /**
      * Helper method for Interpolate()
@@ -137,7 +137,7 @@ private:
      * @param gridIndex the (x,y,z) coordinate to translate into a linear index
      * @return the linear index along the flat vector representing the (x,y,z) grid coordinate
      */
-    long GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept;
+    long GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const;
 
     /**
      * Helper method for Interpolate()
@@ -145,17 +145,18 @@ private:
      * @param gridIndex the (x,y,z) coordinate to calculate the position of
      * @return the position in space of the (x,y,z) coordinate
      */
-    std::array<double, SPACE_DIM> GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept;
-
+    std::array<double, SPACE_DIM> GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const;
 
     /**
      * Get a unique representation of the parameters that can be used as a filename when saving or loading fields.
      * @return A unique filename based on the parameters.
      */
-    std::string GetFilenameFromParams() const noexcept;
-    
-    OpenSimplex2S os;
+    std::string GetFilenameFromParams() const;
 
+    /**
+     * \todo Document this
+     */
+    OpenSimplex2S os;
 
 public:
 
@@ -185,7 +186,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomField() noexcept;
+    std::vector<double> SampleRandomField();
     
     /**
      * Sample an instance of the random field.  First, draw mNumTotalGridPts random numbers from N(0,1), and then
@@ -193,7 +194,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomFieldAtTime(double time) noexcept;
+    std::vector<double> SampleRandomFieldAtTime(double time);
 
     /**
      * Interpolate from the random field by returning the value at the node of the random field closest to the given
@@ -203,7 +204,7 @@ public:
      * @param rLocation the location to which we identify the value at the closest node in the random field
      * @return the value of the random field closest to rLocation
      */
-    double Interpolate(const std::vector<double>& rRandomField, const c_vector<double, SPACE_DIM>& rLocation) const noexcept;
+    double Interpolate(const std::vector<double>& rRandomField, const c_vector<double, SPACE_DIM>& rLocation) const;
 
     /**
      * Save the calculated random field to cache.  Throws if the file cannot be opened.

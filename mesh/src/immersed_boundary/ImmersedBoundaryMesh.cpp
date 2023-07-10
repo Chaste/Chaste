@@ -1024,7 +1024,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx) noexcept
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx)
 {
     if constexpr (SPACE_DIM == 2)
     {
@@ -1068,7 +1068,8 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
 }
 
 template <>
-double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx) noexcept {
+double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx)
+{
     return 0.0;
 }
 
@@ -1777,7 +1778,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ConformToGeometry(c_vector<double, SPACE_DIM>& rLocation) noexcept
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ConformToGeometry(c_vector<double, SPACE_DIM>& rLocation)
 {
     for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
     {
@@ -1891,7 +1892,7 @@ std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygo
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge) noexcept
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge)
 {
     assert(rEdge.is_finite());
 
@@ -1902,7 +1903,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateLengthOfVoronoiEdg
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex() const noexcept
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex() const
 {
     if (this->mNodes.begin() == this->mNodes.end())
     {
@@ -1921,7 +1922,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex() const n
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxElementIndex() const noexcept
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxElementIndex() const
 {
     if (this->mElements.begin() == this->mElements.end())
     {
@@ -1942,7 +1943,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxElementIndex() cons
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxLaminaIndex() const noexcept
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetMaxLaminaIndex() const
 {
     if (this->mLaminas.begin() == this->mLaminas.end())
     {
@@ -2234,7 +2235,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-int ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleUpToVoronoiCoordinate(const double location) const noexcept
+int ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleUpToVoronoiCoordinate(const double location) const
 {
     assert(location >= -mVoronoiHalo);
     assert(location <= 1.0 + mVoronoiHalo);
@@ -2250,7 +2251,7 @@ int ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleUpToVoronoiCoordinate(con
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleDistanceDownFromVoronoi(const double distance) const noexcept
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ScaleDistanceDownFromVoronoi(const double distance) const
 {
     constexpr auto DBL_INT_RANGE = static_cast<double>(INT_MAX) - static_cast<double>(INT_MIN);
     constexpr double scale_factor = (1.0 + 2.0 * mVoronoiHalo) / DBL_INT_RANGE;

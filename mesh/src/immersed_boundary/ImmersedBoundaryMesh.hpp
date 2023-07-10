@@ -324,17 +324,17 @@ public:
     /**
      * @return the maximum node index (nodes may not be indexed consecutively), or UINT_MAX if there are none
      */
-    unsigned GetMaxNodeIndex() const noexcept;
+    unsigned GetMaxNodeIndex() const;
 
     /**
      * @return the maximum element index (elements may not be indexed consecutively), or UINT_MAX if there are none
      */
-    unsigned GetMaxElementIndex() const noexcept;
+    unsigned GetMaxElementIndex() const;
 
     /**
      * @return the maximum lamina index (laminas may not be indexed consecutively), or UINT_MAX if there are none
      */
-    unsigned GetMaxLaminaIndex() const noexcept;
+    unsigned GetMaxLaminaIndex() const;
 
     /**
      * Overridden GetVectorFromAtoB() method.
@@ -363,7 +363,7 @@ public:
      *
      * @param rLocation the location to transform
      */
-    void ConformToGeometry(c_vector<double, SPACE_DIM>& rLocation) noexcept;
+    void ConformToGeometry(c_vector<double, SPACE_DIM>& rLocation);
 
     /**
      * @return reference to non-modifiable 2d fluid velocity grids.
@@ -488,7 +488,7 @@ public:
      * @param index  the global index of a specified immersed boundary element
      * @return the voronoi surface area of the element
      */
-    double GetVoronoiSurfaceAreaOfElement(unsigned elemIdx) noexcept;
+    double GetVoronoiSurfaceAreaOfElement(unsigned elemIdx);
 
     /**
      * Compute the average node spacing of an element.
@@ -706,7 +706,7 @@ public:
      * @param rEdge the edge to calculate the length of
      * @return the length of rEdge
      */
-    double CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge) noexcept;
+    double CalculateLengthOfVoronoiEdge(const boost::polygon::voronoi_diagram<double>::edge_type& rEdge);
 
     /**
      * Calculate the polygon distribution for the mesh: number of {0, 1, 2, 3, 4, 5,..., 12+}-gons.
@@ -734,7 +734,7 @@ public:
      * @param location a location in [-mVoronoiHalo, 1.0 + mVoronoiHalo]
      * @return a corresponding integer location scaled to [INT_MIN, INT_MAX]
      */
-    int ScaleUpToVoronoiCoordinate(double location) const noexcept;
+    int ScaleUpToVoronoiCoordinate(double location) const;
 
     /**
      * Helper method for voronoi functions.  Scale a distance down from the voronoi coordinates.
@@ -742,7 +742,7 @@ public:
      * @param distance a distance in the voronoi diagram
      * @return a distance in the immersed boundary domain
      */
-    double ScaleDistanceDownFromVoronoi(const double distance) const noexcept;
+    double ScaleDistanceDownFromVoronoi(const double distance) const;
 
 
     /**

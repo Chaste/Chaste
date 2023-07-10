@@ -752,7 +752,7 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForce(boost::sh
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::AddNormalNoise() const noexcept
+void ImmersedBoundarySimulationModifier<DIM>::AddNormalNoise() const
 {
     auto& r_force_grids = mpArrays->rGetModifiableForceGrids();
 

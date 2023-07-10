@@ -92,7 +92,7 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
 template <unsigned SPACE_DIM>
 double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
     const c_vector<double, SPACE_DIM>& rLocation1,
-    const c_vector<double, SPACE_DIM>& rLocation2) const noexcept
+    const c_vector<double, SPACE_DIM>& rLocation2) const
 {
     double dist_squared = 0.0;
 
@@ -125,7 +125,7 @@ void OffLatticeRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(
 ///\todo: Check what this method actually should be doing - should presumably be sampling at node locations?
 template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(
-    const std::vector<Node<SPACE_DIM>*>& rNodes) noexcept
+    const std::vector<Node<SPACE_DIM>*>& rNodes)
 {
     return this->SampleRandomFieldAtTime(rNodes, rand());
 }
@@ -133,7 +133,7 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
 template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(
     const std::vector<Node<SPACE_DIM>*>& rNodes,
-    const double time) noexcept
+    const double time)
 {
     ///\todo: randomise seed
     auto reshape = [](const double val)

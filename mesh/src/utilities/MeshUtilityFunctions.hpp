@@ -65,8 +65,6 @@ std::vector<c_vector<double, DIM>> EvenlySpaceAlongPath(
         bool permuteOrder,
         std::size_t numPointsToPlace,
         double targetSpacing = DBL_MAX
-) noexcept;
-
-
+);
 
 #endif /*MESHUTILITYFUNCTIONS_HPP_*/

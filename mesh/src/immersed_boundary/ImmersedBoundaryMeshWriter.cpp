@@ -719,7 +719,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNearestCorner(
-        const c_vector<double, SPACE_DIM>& rA, const c_vector<double, SPACE_DIM>& rB) const noexcept
+        const c_vector<double, SPACE_DIM>& rA, const c_vector<double, SPACE_DIM>& rB) const
 {
     // Identify the nearest corner to the average location of the two vectors
     const double x = 0.5 * (rA[0] + rB[0]) < 0.5 ? 0.0 : 1.0;

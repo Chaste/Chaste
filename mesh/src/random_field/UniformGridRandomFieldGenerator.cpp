@@ -93,7 +93,7 @@ void UniformGridRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned in
 template <unsigned SPACE_DIM>
 double UniformGridRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
     const c_vector<double, SPACE_DIM>& rLocation1,
-    const c_vector<double, SPACE_DIM>& rLocation2) const noexcept
+    const c_vector<double, SPACE_DIM>& rLocation2) const
 {
     double dist_squared = 0.0;
 
@@ -118,7 +118,7 @@ double UniformGridRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
 }
 
 template <unsigned SPACE_DIM>
-std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() const noexcept
+std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() const
 {
     std::stringstream name;
     name << std::fixed << std::setprecision(3);
@@ -165,13 +165,13 @@ std::string UniformGridRandomFieldGenerator<SPACE_DIM>::GetFilenameFromParams() 
 }
 
 template <unsigned SPACE_DIM>
-std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField() noexcept
+std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomField()
 { 
     return this->SampleRandomFieldAtTime(rand());
 }
 
 template <unsigned SPACE_DIM>
-std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time) noexcept
+std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time)
 { 
     // TODO: randomise seed
     auto reshape = [](const double val) {
@@ -217,7 +217,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 }
 template <unsigned SPACE_DIM>
 double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector<double>& rRandomField,
-                                                               const c_vector<double, SPACE_DIM>& rLocation) const noexcept
+                                                               const c_vector<double, SPACE_DIM>& rLocation) const
 {
     assert(mNumTotalGridPts == rRandomField.size());
 
@@ -307,7 +307,7 @@ double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector
 }
 
 template <unsigned SPACE_DIM>
-long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept
+long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const
 {
     long linear_index;
 
@@ -340,7 +340,7 @@ long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long,
 }
 
 template <unsigned SPACE_DIM>
-std::array<double, SPACE_DIM> UniformGridRandomFieldGenerator<SPACE_DIM>::GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const noexcept
+std::array<double, SPACE_DIM> UniformGridRandomFieldGenerator<SPACE_DIM>::GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const
 {
     std::array<double, SPACE_DIM> position = {{}};
 

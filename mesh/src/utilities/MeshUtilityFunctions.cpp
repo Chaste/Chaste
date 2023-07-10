@@ -47,7 +47,7 @@ std::vector<c_vector<double, DIM>> EvenlySpaceAlongPath(
         const bool permuteOrder,
         std::size_t numPointsToPlace,
         const double targetSpacing
-) noexcept
+)
 {
     assert(!path.empty());
     assert(numPointsToPlace > 0 || targetSpacing < DBL_MAX);
@@ -121,6 +121,6 @@ std::vector<c_vector<double, DIM>> EvenlySpaceAlongPath(
 }
 
 // Explicit instantiation
-template std::vector<c_vector<double, 1>> EvenlySpaceAlongPath(std::vector<c_vector<double, 1>>&, bool, bool, std::size_t, double) noexcept;
-template std::vector<c_vector<double, 2>> EvenlySpaceAlongPath(std::vector<c_vector<double, 2>>&, bool, bool, std::size_t, double) noexcept;
-template std::vector<c_vector<double, 3>> EvenlySpaceAlongPath(std::vector<c_vector<double, 3>>&, bool, bool, std::size_t, double) noexcept;
+template std::vector<c_vector<double, 1>> EvenlySpaceAlongPath(std::vector<c_vector<double, 1>>&, bool, bool, std::size_t, double);
+template std::vector<c_vector<double, 2>> EvenlySpaceAlongPath(std::vector<c_vector<double, 2>>&, bool, bool, std::size_t, double);
+template std::vector<c_vector<double, 3>> EvenlySpaceAlongPath(std::vector<c_vector<double, 3>>&, bool, bool, std::size_t, double);
