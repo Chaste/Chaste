@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <random>
+
 #include "AbstractImmersedBoundaryForce.hpp"
 
 template <unsigned DIM>
@@ -67,7 +69,7 @@ void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(ImmersedBoundaryC
         }
 
         // Shuffle the vector
-        std::shuffle(random_node_order.begin(), random_node_order.end());
+        std::shuffle(random_node_order.begin(), random_node_order.end(), std::mt19937(std::random_device()()));
 
         // Only go to half way (rounded down - forget about the very last node for now)
         unsigned half_way = num_nodes_this_elem / 2;
