@@ -348,12 +348,12 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
             // i.e. check whether each other edge crosses the vertical through this_location/current node
             unsigned next_idx = (this_idx + 1) % num_nodes;
             c_vector<double, SPACE_DIM> to_previous = node_locations_original_order[next_idx] - this_location;
+            c_vector<double, SPACE_DIM> to_next;
 
             for (unsigned node_idx = this_idx + 2; node_idx < this_idx + num_nodes; node_idx++)
             {
                 unsigned idx = node_idx % num_nodes;
 
-                c_vector<double, SPACE_DIM> to_next;
                 to_next = node_locations_original_order[idx] - this_location;
 
                 // If the segment between to_previous and to_next intersects the vertical through this_location, the clause
