@@ -105,7 +105,7 @@ public:
     /**
      * Retrieves the data of rVariableName at index
      *
-     * @param rVariableName the name of the data to be set.
+     * @param rVariableName the name of the data to get.
      * @param index the index of the data of rVariableName
      * 
      * @return A single value in the data array.
