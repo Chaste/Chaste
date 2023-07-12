@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Records information about a T1 swap.
  */
-template <unsigned int SPACE_DIM>
+template<unsigned SPACE_DIM>
 struct T1SwapInfo
 {
     /** Needed for serialization. */

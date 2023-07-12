@@ -695,23 +695,23 @@ public:
         simulator.Solve();
 
         // Check some results
-        PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(0u);
-        TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
+        PottsElement<2>* p_element_0 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(0u);
+        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 16u);
         mNodes[0] = 33;
         mNodes[1] = 36;
         mNodes[2] = 63;
-        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), mNodes[0]);
-        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), mNodes[1]);
-        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), mNodes[2]);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(0)->GetIndex(), mNodes[0]);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(8)->GetIndex(), mNodes[1]);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(15)->GetIndex(), mNodes[2]);
 
         mNodes[3] = 55;
         mNodes[4] = 83;
         mNodes[5] = 94;
-        PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(1u);
-        TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), mNodes[3]);
-        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), mNodes[4]);
-        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), mNodes[5]);
+        PottsElement<2>* p_element_1 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(1u);
+        TS_ASSERT_EQUALS(p_element_1->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(p_element_1->GetNode(0)->GetIndex(), mNodes[3]);
+        TS_ASSERT_EQUALS(p_element_1->GetNode(8)->GetIndex(), mNodes[4]);
+        TS_ASSERT_EQUALS(p_element_1->GetNode(15)->GetIndex(), mNodes[5]);
     }
 
     void TestSave()
@@ -771,17 +771,17 @@ public:
         p_simulator2->Solve();
 
         // These results are from time 20.0 in TestStandardResultForArchivingTestsBelow()
-        PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(0u);
-        TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), mNodes[0]);
-        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), mNodes[1]);
-        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), mNodes[2]);
+        PottsElement<2>* p_element_0 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(0u);
+        TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(0)->GetIndex(), mNodes[0]);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(8)->GetIndex(), mNodes[1]);
+        TS_ASSERT_EQUALS(p_element_0->GetNode(15)->GetIndex(), mNodes[2]);
 
-        PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(1u);
-        TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), mNodes[3]);
-        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), mNodes[4]);
-        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), mNodes[5]);
+        PottsElement<2>* p_element_1 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(1u);
+        TS_ASSERT_EQUALS(p_element_1->GetNumNodes(), 16u);
+        TS_ASSERT_EQUALS(p_element_1->GetNode(0)->GetIndex(), mNodes[3]);
+        TS_ASSERT_EQUALS(p_element_1->GetNode(8)->GetIndex(), mNodes[4]);
+        TS_ASSERT_EQUALS(p_element_1->GetNode(15)->GetIndex(), mNodes[5]);
 
         // Tidy up
         delete p_simulator1;

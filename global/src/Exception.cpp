@@ -37,10 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <string>
-
 #include <petsc.h>
-#include "BoostFilesystem.hpp"
 
+#include "Exception.hpp"
+#include "FileFinder.hpp"
+#include "PosixPathFixer.hpp"
+#include "GetCurrentWorkingDirectory.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "PosixPathFixer.hpp"
 

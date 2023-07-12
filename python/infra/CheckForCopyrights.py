@@ -318,7 +318,7 @@ if __name__ == '__main__':
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
     named_files = ['SConstruct', 'CMakeLists.txt', './LICENSE',
-                   'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
+                   'output.chaste', 'Version.cpp.in']
 
     exclusions = []
 

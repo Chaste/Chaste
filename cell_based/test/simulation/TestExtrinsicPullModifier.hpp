@@ -56,7 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FarhadifarForce.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "SimpleTargetAreaModifier.hpp"
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 #include "FileComparison.hpp"
