@@ -65,7 +65,7 @@ struct T2SwapInfo
     }
 
     /** The ID of the cell associated with the element undergoing a T2 swap */
-    unsigned int mCellId;
+    unsigned mCellId;
 
     /** The centroid the element undergoing a T2 swap */
     c_vector<double, SPACE_DIM> mLocation;

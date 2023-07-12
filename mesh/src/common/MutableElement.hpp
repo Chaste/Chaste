@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-template<unsigned int SPACE_DIM>
+template<unsigned SPACE_DIM>
 class EdgeHelper;
 
 /**
@@ -161,12 +161,12 @@ public:
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
     /**
-     * Informs all edges forming this element that they are in this element.
+     * Inform all edges forming this element that they are in this element.
      */
     void RegisterWithEdges();
 
     /**
-     * Rebuilds edges in this element
+     * Rebuild edges in this element.
      */
     void RebuildEdges();
 
@@ -178,10 +178,11 @@ public:
     virtual bool IsElementOnBoundary() const;
 
     /**
-     * Sets edge helper
-     * @param edgeHelper
+     * Sets edge helper.
+     * 
+     * @param pEdgeHelper pointer to an edge helper
      */
-    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* edgeHelper);
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
 
     /**
      * Clear edges from element
@@ -220,18 +221,22 @@ public:
     std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
 
     /**
-     * Checks if the element contains edge
-     * @param edge
-     * @return
+     * Checks if the element contains an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return whether the element contains pEdge
      */
-    bool ContainsEdge(const Edge<SPACE_DIM> *edge) const;
+    bool ContainsEdge(const Edge<SPACE_DIM>* pEdge) const;
 
     /**
-     * returns the local index of edge
-     * @param edge
-     * @return -1 if an edge was not found
+     * Return the local index of an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return -1 if pEdge was not found, else the local index of pEdge
      */
-    long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
+    long GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -324,18 +329,21 @@ public:
     void AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
 
     /**
-     * Gets the edge at localIndex
-     * @param localIndex local index of the edge in this element
-     * @return
+     * Get the edge at localIndex.
+     * 
+     * @param localIndex local index of an edge in this element
+     * @return pointer to the edge with given local index
      */
     Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
 
      /**
-     * Checks if the element contains edge
-     * @param edge
-     * @return
+     * Check if the element contains an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return whether the element contains pEdge
      */
-    bool ContainsEdge(const Edge<SPACE_DIM> *edge) const;
+    bool ContainsEdge(const Edge<SPACE_DIM>* pEdge) const;
 
     /**
      * @return Number of edges associated with this element
@@ -343,10 +351,11 @@ public:
     unsigned GetNumEdges() const;
 
     /**
-     * Sets edge helper
-     * @param edgeHelper
+     * Sets edge helper.
+     * 
+     * @param pEdgeHelper pointer to an edge helper
      */
-    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* edgeHelper);
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
 
     /**
      * Builds edges from element nodes
@@ -381,10 +390,15 @@ public:
      */
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
+    /**
+     * Inform all edges forming this element that they are in this element.
+     */
     void RegisterWithEdges();
 
+    /**
+     * Rebuild edges in this element.
+     */
     void RebuildEdges();
-
 
     /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
@@ -394,11 +408,13 @@ public:
     virtual bool IsElementOnBoundary() const;
 
     /**
-     * returns the local index of edge
-     * @param edge
-     * @return -1 if an edge was not found
+     * Return the local index of an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return -1 if an edge was not found, else the local index of pEdge
      */
-    long GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const;
+    long GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const;
 };
 
 #endif /*MUTABLEELEMENT_HPP_*/
