@@ -1,7 +1,0 @@
-population/TestImmersedBoundaryCellPopulation.hpp
-population/TestImmersedBoundaryDivisionRules.hpp
-population/TestImmersedBoundaryForces.hpp
-simulation/TestImmersedBoundaryPdeSolveMethods.hpp
-simulation/TestImmersedBoundarySimulationModifier.hpp
-simulation/TestRepresentativeImmersedBoundarySimulations.hpp
-tutorial/TestRunningImmersedBoundarySimulationsTutorial.hpp
