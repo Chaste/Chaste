@@ -185,7 +185,10 @@ public:
         ///\todo With this mesh generator, does cell 0 correspond to the basement lamina?
 
         // Test SetNode() works correctly
-        c_vector<double, 2> new_location = cell_population.GetNode(0)->rGetLocation();
+        c_vector<double, 2> new_location;
+        new_location[0] = 0.0;
+        new_location[1] = 0.0;
+        new_location = cell_population.GetNode(0)->rGetLocation();
         new_location[0] += 1e-2;
         new_location[1] += 1e-2;
         ChastePoint<2> new_location_point(new_location);
