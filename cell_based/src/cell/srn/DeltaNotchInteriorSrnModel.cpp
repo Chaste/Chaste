@@ -75,8 +75,10 @@ DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(const DeltaNotchInteriorS
     assert(rModel.GetOdeSystem());
     AbstractOdeSystem* p_parent_system(rModel.GetOdeSystem());
     SetOdeSystem(new DeltaNotchInteriorOdeSystem(p_parent_system->rGetStateVariables()));
-    for (unsigned int i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
+    for (unsigned i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
+    {
         mpOdeSystem->SetParameter(i, p_parent_system->GetParameter(i));
+    }
 }
 
 AbstractSrnModel* DeltaNotchInteriorSrnModel::CreateSrnModel()
@@ -163,13 +165,12 @@ void DeltaNotchInteriorSrnModel::OutputSrnModelParameters(out_stream& rParamsFil
     AbstractOdeSrnModel::OutputSrnModelParameters(rParamsFile);
 }
 
-void DeltaNotchInteriorSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
+void DeltaNotchInteriorSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn)
 {
     // Half of junctional Delta/Notch is endocytosed back to the cytoplasm
-    auto shrunk_srn
-        = static_cast<DeltaNotchEdgeSrnModel*>(p_shrunk_edge_srn);
-    const double edge_notch = shrunk_srn->GetNotch();
-    const double edge_delta = shrunk_srn->GetDelta();
+    auto p_shrunk_srn = static_cast<DeltaNotchEdgeSrnModel*>(pShrunkEdgeSrn);
+    const double edge_notch = p_shrunk_srn->GetNotch();
+    const double edge_delta = p_shrunk_srn->GetDelta();
     const double this_notch = GetNotch();
     const double this_delta = GetDelta();
 

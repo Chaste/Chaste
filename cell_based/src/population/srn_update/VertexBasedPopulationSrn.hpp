@@ -51,7 +51,7 @@ class VertexBasedCellPopulation;
 
 /**
  * After topological rearrangments, e.g. T1-3, node merges, or edge splits due to mitosis,
- * junctional srns must be updated accordingly. For example, after edge split due to mitosis
+ * junctional SRNs must be updated accordingly. For example, after edge split due to mitosis
  * a new SRN must be created that inherits modified model variables.
  * This class deals with Cell SRN update after a topological change occurs to the cell.
  */
@@ -59,6 +59,10 @@ template <unsigned DIM>
 class VertexBasedPopulationSrn
 {
 private:
+
+    /** Pointer to a VertexBasedCellPopulation. */
+    VertexBasedCellPopulation<DIM>* mpCellPopulation;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -74,41 +78,55 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // DO NOT archive & mpCellPopulation; -- The VertexBasedPopulationSrn is only ever archived from the VertexBasedCellPopulation
-        // which knows this and it is handled in the load_construct of VertexBasedCellPopulation.
+        /*
+         * DO NOT archive & mpCellPopulation: the VertexBasedPopulationSrn is 
+         * only ever archived from the VertexBasedCellPopulation, which knows 
+         * this, and it is handled in the load_construct of VertexBasedCellPopulation.
+         */ 
     }
-    VertexBasedCellPopulation<DIM>* mpCellPopulation;
+
 public:
+
     /**
-     * Default constructor/destructor
+     * Default constructor.
      */
     VertexBasedPopulationSrn();
+
+    /**
+     * Destructor.
+     */
     ~VertexBasedPopulationSrn();
 
     /**
-     * Set the cell population
-     * @param p_vertex_population
+     * Set the cell population.
+     * 
+     * @param pCellPopulation pointer to a VertexBasedCellPopulation
      */
-    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* p_vertex_population);
+    void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pCellPopulation);
 
     /**
      * This method iterates over edge operations performed on the mesh and
      * calls on RemapCellSrn() with appropriate arguments
-     * @param rElementMap the element map to take into account that some elements are deleted after an edge operation is recorded
+     * 
+     * @param rElementMap the element map to take into account that some 
+     *                    elements are deleted after an edge operation is recorded
      */
     void UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap);
 
     /**
      * Remaps cell SRN. If an edge has not been modified, the old edge SRN is mapped to its junction.
      * Otherwise, edge SRNs are updated according to the operation performed.
-     * @param parent_srn_edges Edge SRNs before topology is changed
-     * @param pCellSrn CellSrnModel of the cell
-     * @param pEdgeChange Contains information about which edge changes occurred
+     * 
+     * @param parentSrnEdges Edge SRNs before topology is changed
+     * @param pCellSrn pointer to CellSrnModel
+     * @param rEdgeChange Contains information about which edge changes occurred
      */
-    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parent_srn_edges,
+    void RemapCellSrn(std::vector<AbstractSrnModelPtr> parentSrnEdges,
                              CellSrnModel* pCellSrn,
                              const EdgeRemapInfo& rEdgeChange);
 };
+
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexBasedPopulationSrn)
+
 #endif /* VERTEXBASEDPOPULATIONSRN_HPP_ */

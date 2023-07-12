@@ -151,8 +151,9 @@ protected:
     /** Whether the cell is being tracked specially. */
     bool mIsLogged;
 
-    /**Whether the cell has SRN associated to it*/
+    /** Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it. */
     bool mHasSrnModel;
+
 public:
 
     /**
@@ -412,7 +413,7 @@ public:
     bool IsLogged();
 
     /**
-     * Give the Cell an index which it passes to its children.
+     * Give the cell an index which it passes to its children.
      *
      * @param pCellAncestor the cell's ancestor
      */
@@ -430,7 +431,7 @@ public:
     unsigned GetCellId() const;
 
     /**
-     * @return True if cell has SRN model associated to it
+     * @return Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it
      */
     bool HasSrnModel() const;
 };

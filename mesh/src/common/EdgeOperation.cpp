@@ -35,16 +35,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EdgeOperation.hpp"
 
-#include <utility>
+EdgeOperation::EdgeOperation()
+{
+}
 
-EdgeOperation::EdgeOperation(EDGE_OPERATION operation, unsigned elementIndex,
-                             EdgeRemapInfo remapInfo, const bool isIndexRemapped)
-        : mOperation(operation),
-          mElementIndex(elementIndex),
-          mElementIndex2(0),
-          mRemapInfo(std::move(remapInfo)),
-          mRemapInfo2(),
-          mIsElementIndexRemapped(isIndexRemapped)
+EdgeOperation::EdgeOperation(EDGE_OPERATION operation,
+                             unsigned elementIndex,
+                             EdgeRemapInfo remapInfo,
+                             const bool isIndexRemapped)
+    : mOperation(operation),
+      mElementIndex(elementIndex),
+      mElementIndex2(0),
+      mRemapInfo(std::move(remapInfo)),
+      mRemapInfo2(),
+      mIsElementIndexRemapped(isIndexRemapped)
 {
 }
 
@@ -52,12 +56,12 @@ EdgeOperation::EdgeOperation(unsigned elementIndex,
                              unsigned elementIndex2,
                              EdgeRemapInfo remapInfo,
                              EdgeRemapInfo remapInfo2)
-        : mOperation(EDGE_OPERATION_DIVIDE),
-          mElementIndex(elementIndex),
-          mElementIndex2(elementIndex2),
-          mRemapInfo(std::move(remapInfo)),
-          mRemapInfo2(std::move(remapInfo2)),
-          mIsElementIndexRemapped(false)
+    : mOperation(EDGE_OPERATION_DIVIDE),
+      mElementIndex(elementIndex),
+      mElementIndex2(elementIndex2),
+      mRemapInfo(std::move(remapInfo)),
+      mRemapInfo2(std::move(remapInfo2)),
+      mIsElementIndexRemapped(false)
 {
 }
 
@@ -71,7 +75,7 @@ unsigned EdgeOperation::GetElementIndex() const
     return this->mElementIndex;
 }
 
-void EdgeOperation::SetElementIndex(const unsigned int index)
+void EdgeOperation::SetElementIndex(const unsigned index)
 {
     this->mElementIndex  = index;
 }
@@ -81,9 +85,9 @@ unsigned EdgeOperation::GetElementIndex2() const
     return this->mElementIndex2;
 }
 
-void EdgeOperation::SetElementIndex2(const unsigned int index)
+void EdgeOperation::SetElementIndex2(const unsigned index)
 {
-    this->mElementIndex2  = index;
+    this->mElementIndex2 = index;
 }
 
 const EdgeRemapInfo& EdgeOperation::rGetRemapInfo() const
