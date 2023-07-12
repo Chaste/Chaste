@@ -425,7 +425,7 @@ public:
             {
                 for (unsigned x = 0; x < grid.shape()[1]; ++x)
                 {
-                    for (unsigned y = 0; y < grid.shape()[2]; ++y1)
+                    for (unsigned y = 0; y < grid.shape()[2]; ++y)
                     {
                         if (grid[dim][x][y] != value)
                         {
