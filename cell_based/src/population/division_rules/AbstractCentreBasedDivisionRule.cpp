@@ -46,17 +46,18 @@ AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::~AbstractCentreBasedDiv
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBasedDivisionRuleInfo(out_stream& rParamsFile)
+void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBasedDivisionRuleInfo(
+    out_stream& rParamsFile)
 {
     std::string cell_division_rule_type = GetIdentifier();
-
     *rParamsFile << "\t\t\t<" << cell_division_rule_type << ">\n";
     OutputCellCentreBasedDivisionRuleParameters(rParamsFile);
     *rParamsFile << "\t\t\t</" << cell_division_rule_type << ">\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBasedDivisionRuleParameters(out_stream& rParamsFile)
+void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBasedDivisionRuleParameters(
+    out_stream& rParamsFile)
 {
 }
 

@@ -49,7 +49,8 @@ RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::RadialCellDataDistribu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(
+    AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Calculate the centre of the cell population
     c_vector<double, SPACE_DIM> centre = pCellPopulation->GetCentroidOfCellPopulation();
@@ -57,7 +58,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
     // Calculate the distance between each node and the centre of the cell population, as well as the maximum of these
     std::map<double, CellPtr> radius_cell_map;
     double max_distance_from_centre = 0.0;
-    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -105,7 +106,8 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Calculate the centre of the cell population
     c_vector<double, SPACE_DIM> centre = pCellPopulation->GetCentroidOfCellPopulation();
@@ -113,7 +115,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCe
     // Calculate the distance between each node and the centre of the cell population, as well as the maximum of these
     std::map<double, CellPtr> radius_cell_map;
     double max_distance_from_centre = 0.0;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -128,7 +130,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCe
 
     // Create vector of radius intervals
     std::vector<double> radius_intervals;
-    for (unsigned i=0; i<mNumRadialBins; i++)
+    for (unsigned i = 0; i < mNumRadialBins; ++i)
     {
         double upper_radius = max_distance_from_centre*((double) i+1)/((double) mNumRadialBins);
         radius_intervals.push_back(upper_radius);
@@ -136,7 +138,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCe
 
     // Calculate PDE solution in each radial interval
     double lower_radius = 0.0;
-    for (unsigned i=0; i<mNumRadialBins; i++)
+    for (unsigned i = 0; i < mNumRadialBins; ++i)
     {
         unsigned counter = 0;
         double average_solution = 0.0;
@@ -161,13 +163,15 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCe
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
@@ -179,13 +183,15 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetVariableName(std::string variableName)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetVariableName(
+    std::string variableName)
 {
     mVariableName = variableName;
 }
@@ -197,7 +203,8 @@ std::string RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::GetVariabl
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetNumRadialBins(unsigned numRadialBins)
+void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::SetNumRadialBins(
+    unsigned numRadialBins)
 {
     mNumRadialBins = numRadialBins;
 }

@@ -53,12 +53,12 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 {
     if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
-        VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
+        VertexMesh<ELEMENT_DIM, SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
 
         // Loop over elements of voronoi_tesselation
-        for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
-            elem_iter != voronoi_tesselation->GetElementIteratorEnd();
-            ++elem_iter)
+        for (auto elem_iter = voronoi_tesselation->GetElementIteratorBegin();
+             elem_iter != voronoi_tesselation->GetElementIteratorEnd();
+             ++elem_iter)
         {
             // Get index of this element in voronoi_tesselation
             unsigned elem_index = elem_iter->GetIndex();
@@ -69,7 +69,7 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
             // Write node index and location to file
             *this->mpOutStream << node_index << " ";
             c_vector<double, SPACE_DIM> node_location = pCellPopulation->GetNode(node_index)->rGetLocation();
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
                 *this->mpOutStream << node_location[i] << " ";
             }
@@ -86,25 +86,29 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("VoronoiDataWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("VoronoiDataWriter cannot be used with a NodeBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("VoronoiDataWriter cannot be used with a PottsBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("VoronoiDataWriter cannot be used with a VertexBasedCellPopulation");
 }

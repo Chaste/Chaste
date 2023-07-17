@@ -48,34 +48,39 @@ VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexIntersectio
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     std::vector< c_vector<double, SPACE_DIM> > intersection_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfIntersectionSwaps();
 
     *this->mpOutStream << intersection_swap_locations.size() << "\t";
-    for (unsigned index = 0;  index < intersection_swap_locations.size(); index++)
+    for (unsigned index = 0;  index < intersection_swap_locations.size(); ++index)
     {
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             *this->mpOutStream << intersection_swap_locations[index][i] << "\t";
         }

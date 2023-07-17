@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Honda (who denote the parameter by nu) take the value 0.01.
  */
 template<unsigned DIM>
-class NagaiHondaDifferentialAdhesionForce  : public NagaiHondaForce<DIM>
+class NagaiHondaDifferentialAdhesionForce : public NagaiHondaForce<DIM>
 {
 private:
 
@@ -122,7 +122,10 @@ public:
      *
      * @return the adhesion parameter for this edge.
      */
-    virtual double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+    virtual double GetAdhesionParameter(
+        Node<DIM>* pNodeA,
+        Node<DIM>* pNodeB,
+        VertexBasedCellPopulation<DIM>& rVertexCellPopulation) override;
 
     /**
      * @return mNagaiHondaLabelledCellCellAdhesionEnergyParameter
@@ -142,21 +145,24 @@ public:
     /**
      * Set mNagaiHondaLabelledCellCellAdhesionEnergyParameter.
      *
-     * @param labelledCellCellAdhesionEnergyParameter the new value of mNagaiHondaLabelledCellCellAdhesionEnergyParameter
+     * @param labelledCellCellAdhesionEnergyParameter the new value of 
+     *     mNagaiHondaLabelledCellCellAdhesionEnergyParameter
      */
     void SetNagaiHondaLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter);
 
     /**
      * Set mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter.
      *
-     * @param labelledCellLabelledCellAdhesionEnergyParameter the new value of mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter
+     * @param labelledCellLabelledCellAdhesionEnergyParameter the new value of 
+     *     mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter
      */
     void SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter);
 
     /**
      * Set mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter.
      *
-     * @param labelledCellBoundaryAdhesionEnergyParameter the new value of mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter
+     * @param labelledCellBoundaryAdhesionEnergyParameter the new value of 
+     *     mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter
      */
     void SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter);
 
@@ -165,7 +171,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

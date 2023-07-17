@@ -153,7 +153,7 @@ template<class SUBCLASS>
 boost::shared_ptr<AbstractCellProperty> CellPropertyRegistry::Get()
 {
     boost::shared_ptr<AbstractCellProperty> p_property;
-    for (unsigned i=0; i<mCellProperties.size(); i++)
+    for (unsigned i = 0; i < mCellProperties.size(); ++i)
     {
         if (mCellProperties[i]->IsType<SUBCLASS>())
         {

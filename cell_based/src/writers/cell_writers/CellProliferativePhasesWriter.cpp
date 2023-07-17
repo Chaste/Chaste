@@ -45,14 +45,18 @@ CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesWr
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double phase = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel())->GetCurrentCellCyclePhase();
     return phase;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double phase = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel())->GetCurrentCellCyclePhase();
     *this->mpOutStream << phase << " ";

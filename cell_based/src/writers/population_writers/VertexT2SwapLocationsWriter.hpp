@@ -73,57 +73,67 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     * This is an empty dummy function, since this class is defined for use with 
+     * a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     * This is an empty dummy function, since this class is defined for use with 
+     * a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        CaBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     * This is an empty dummy function, since this class is defined for use with 
+     * a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     * This is an empty dummy function, since this class is defined for use with 
+     * a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
-     * Visit the VertexBasedCellPopulation and write the location of any T2 swaps at the present
-     * simulation time.
+     * Visit the VertexBasedCellPopulation and write the location of any T2 
+     * swaps at the present simulation time.
      *
      * Outputs a line of tab-separated values of the form:
-     * [num T2 swaps] [T2 swap 0 x-pos] [T2 swap 0 y-pos] [T2 swap 0 z-pos] [T2 swap 1 x-pos] [T2 swap 1 y-pos] [T2 swap 1 z-pos] ...
+     * [num T2 swaps] [T2 swap 0 x-pos] [T2 swap 0 y-pos] [T2 swap 0 z-pos] 
+     * [T2 swap 1 x-pos] [T2 swap 1 y-pos] [T2 swap 1 z-pos] ...
      *
-     * where [num T2 swaps] denotes the number of T2 swaps at the present time, and
-     * [T2 swap 0 x-pos] denotes the x-coordinate of the T2 swap with index 0 in
-     * the MutableVertexMesh member mLocationsOfT2Swaps, and so on, with [z-pos]
-     * included for 3-dimensional simulations.
+     * where [num T2 swaps] denotes the number of T2 swaps at the present time, 
+     * and [T2 swap 0 x-pos] denotes the x-coordinate of the T2 swap with index 
+     * 0 in the MutableVertexMesh member mLocationsOfT2Swaps, and so on, with 
+     * [z-pos] included for 3-dimensional simulations.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

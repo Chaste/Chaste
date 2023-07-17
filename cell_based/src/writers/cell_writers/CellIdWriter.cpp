@@ -44,21 +44,25 @@ CellIdWriter<ELEMENT_DIM, SPACE_DIM>::CellIdWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellIdWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellIdWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double cell_id = pCell->GetCellId();
     return cell_id;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellIdWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellIdWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned cell_id = pCell->GetCellId();
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     *this->mpOutStream << " " << cell_id << " " << location_index;
 
     c_vector<double, SPACE_DIM> coords = pCellPopulation->GetLocationOfCellCentre(pCell);
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << " " << coords[i];
     }

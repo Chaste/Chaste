@@ -47,28 +47,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * Run an off-lattice 2D or 3D cell-based simulation using an off-lattice
- * cell population.
+ * Run an off-lattice 2D or 3D cell-based simulation using an off-lattice cell 
+ * population.
  *
- * In cell-centre-based cell populations, each cell is represented by a
- * single node (corresponding to its centre), and connectivity is defined
- * either by a Delaunay triangulation or a radius of influence. In vertex-
- * based cell populations, each cell is represented by a polytope
- * (corresponding to its membrane) with a variable number of vertices.
- * Alternative cell populations may be defined by the user.
+ * In cell-centre-based cell populations, each cell is represented by a single 
+ * node (corresponding to its centre), and connectivity is defined either by a 
+ * Delaunay triangulation or a radius of influence. In vertex-based cell 
+ * populations, each cell is represented by a polytope (corresponding to its 
+ * membrane) with a variable number of vertices. Alternative cell populations 
+ * may be defined by the user.
  *
- * The OffLatticeSimulation is constructed with a CellPopulation, which
- * updates the correspondence between each Cell and its spatial representation
- * and handles cell division (governed by the CellCycleModel associated
- * with each cell). Once constructed, one or more Force laws may be passed
- * to the OffLatticeSimulation object, to define the mechanical properties
- * of the CellPopulation. Similarly, one or more CellKillers may be passed
- * to the OffLatticeSimulation object to specify conditions in which Cells
- * may die, and one or more CellPopulationBoundaryConditions to specify
- * regions in space beyond which Cells may not move.
+ * The OffLatticeSimulation is constructed with a CellPopulation, which updates 
+ * the correspondence between each Cell and its spatial representation and 
+ * handles cell division (governed by the CellCycleModel associated with each 
+ * cell). Once constructed, one or more Force laws may be passed to the 
+ * OffLatticeSimulation object, to define the mechanical properties of the 
+ * CellPopulation. Similarly, one or more CellKillers may be passed to the 
+ * OffLatticeSimulation object to specify conditions in which Cells may die, and 
+ * one or more CellPopulationBoundaryConditions to specify regions in space 
+ * beyond which Cells may not move.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class OffLatticeSimulation : public AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>
+class OffLatticeSimulation : public AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -86,7 +86,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mForceCollection;
         archive & mBoundaryConditions;
         archive & mpNumericalMethod;
@@ -94,13 +94,19 @@ private:
 
 protected:
 
-    /** The mechanics used to determine the new location of the cells, a list of the forces. */
+    /**
+     * The mechanics used to determine the new location of the cells, a list of 
+     * the forces.
+     */
     std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > > mForceCollection;
 
     /** List of boundary conditions. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
+    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > > mBoundaryConditions;
 
-    /** The numerical method to use in this simulation. Defaults to the explicit forward Euler method. */
+    /**
+     * The numerical method to use in this simulation. Defaults to the explicit 
+     * forward Euler method. 
+     */
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
     /**
@@ -108,32 +114,34 @@ protected:
      *
      * Calculate forces and update node positions.
      */
-    virtual void UpdateCellLocationsAndTopology();
+    virtual void UpdateCellLocationsAndTopology() override;
 
     /**
-     * Sends nodes back to the positions given in the input map. Used after a failed step
-     * when adaptivity is turned on.
+     * Sends nodes back to the positions given in the input map. Used after a 
+     * failed step when adaptivity is turned on.
      *
      * @param oldNodeLoctions A map linking nodes to their old positions.
      */
-    void RevertToOldLocations(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
+    void RevertToOldLocations(std::map<Node<SPACE_DIM>*, 
+                              c_vector<double, SPACE_DIM> > oldNodeLoctions);
 
     /**
      * Applies any boundary conditions.
      *
      * @param oldNodeLoctions Mapping between node indices and old node locations
      */
-    void ApplyBoundaries(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > oldNodeLoctions);
+    void ApplyBoundaries(std::map<Node<SPACE_DIM>*,
+                         c_vector<double, SPACE_DIM> > oldNodeLoctions);
 
     /**
      * Overridden SetupSolve() method to clear the forces applied to the nodes.
      */
-    virtual void SetupSolve();
+    virtual void SetupSolve() override;
 
     /**
      * Overridden WriteVisualizerSetupFile() method.
      */
-    virtual void WriteVisualizerSetupFile();
+    virtual void WriteVisualizerSetupFile() override;
 
 public:
 
@@ -141,21 +149,22 @@ public:
      * Constructor.
      *
      * @param rCellPopulation Reference to a cell population object
-     * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
-     *     free up memory (defaults to false)
-     * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
-     *     from an archive)
+     * @param deleteCellPopulationInDestructor Whether to delete the cell 
+     *     population on destruction to free up memory (defaults to false)
+     * @param initialiseCells Whether to initialise cells (defaults to true, set 
+     *     to false when loading from an archive)
      */
-    OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
+    OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
                          bool deleteCellPopulationInDestructor=false,
                          bool initialiseCells=true);
 
     /**
-     * Add a force to be used in this simulation (use this to set the mechanics system).
+     * Add a force to be used in this simulation (use this to set the mechanics 
+     * system).
      *
      * @param pForce pointer to a force law
      */
-    void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM,SPACE_DIM> > pForce);
+    void AddForce(boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > pForce);
 
     /**
      * Remove all the forces.
@@ -167,7 +176,8 @@ public:
      *
      * @param pBoundaryCondition pointer to a boundary condition
      */
-    void AddCellPopulationBoundaryCondition(boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> >  pBoundaryCondition);
+    void AddCellPopulationBoundaryCondition(
+        boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > pBoundaryCondition);
 
     /**
      * Method to remove all the cell population boundary conditions
@@ -175,11 +185,13 @@ public:
     void RemoveAllCellPopulationBoundaryConditions();
 
     /**
-     * Set the numerical method to be used in this simulation (use this to solve the mechanics system).
+     * Set the numerical method to be used in this simulation (use this to solve 
+     * the mechanics system).
      *
      * @param pNumericalMethod pointer to a numerical method object
      */
-    void SetNumericalMethod(boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
+    void SetNumericalMethod(
+        boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > pNumericalMethod);
 
     /**
      * @return the current numerical method.
@@ -193,19 +205,20 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
+    void OutputAdditionalSimulationSetup(out_stream& rParamsFile) override;
 
     /**
      * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSimulationParameters(out_stream& rParamsFile);
+    virtual void OutputSimulationParameters(out_stream& rParamsFile) override;
 
     /**
-     * Directly access the forces attached to this simulation, to allow their manipulation after archiving.
+     * Directly access the forces attached to this simulation, to allow their 
+     * manipulation after archiving.
      *
-     * @return mForceCollection the vector of pointers to forces attached to this simulation
+     * @return the vector of pointers to forces attached to this simulation
      */
     const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& rGetForceCollection() const;
 };
@@ -223,10 +236,10 @@ namespace serialization
  */
 template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM> * t, const unsigned int file_version)
+    Archive & ar, const OffLatticeSimulation<ELEMENT_DIM, SPACE_DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
@@ -235,15 +248,18 @@ inline void save_construct_data(
  */
 template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void load_construct_data(
-    Archive & ar, OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM> * t, const unsigned int file_version)
+    Archive & ar, OffLatticeSimulation<ELEMENT_DIM, SPACE_DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_cell_population;
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_cell_population;
     ar >> p_cell_population;
 
-    // Invoke inplace constructor to initialise instance, middle two variables set extra
-    // member variables to be deleted as they are loaded from archive and to not initialise cells.
-    ::new(t)OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>(*p_cell_population, true, false);
+    /*
+     * Invoke inplace constructor to initialise instance, middle two variables 
+     * set extra member variables to be deleted as they are loaded from archive 
+     * and to not initialise cells.
+     */
+    ::new(t)OffLatticeSimulation<ELEMENT_DIM, SPACE_DIM>(*p_cell_population, true, false);
 }
 }
 } // namespace

@@ -41,8 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Concrete Van Leeuwen 2009 cell-cycle model, using hypothesis two (see paper).
  */
-class VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo
-    : public AbstractVanLeeuwen2009WntSwatCellCycleModel
+class VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo : public AbstractVanLeeuwen2009WntSwatCellCycleModel
 {
 private:
 

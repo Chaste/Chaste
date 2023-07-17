@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 
 /**
- * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
+ * Abstract class for a writer that takes data from an AbstractCellPopulation 
+ * and writes it to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellBasedWriter : public Identifiable

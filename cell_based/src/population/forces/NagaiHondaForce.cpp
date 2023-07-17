@@ -79,7 +79,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     std::vector<double> element_areas(num_elements);
     std::vector<double> element_perimeters(num_elements);
     std::vector<double> target_areas(num_elements);
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
+    for (auto elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
          elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -98,7 +98,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     }
 
     // Iterate over vertices in the cell population
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
         Node<DIM>* p_this_node = p_cell_population->GetNode(node_index);
 
@@ -122,7 +122,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         std::set<unsigned> containing_elem_indices = p_cell_population->GetNode(node_index)->rGetContainingElementIndices();
 
         // Iterate over these elements
-        for (std::set<unsigned>::iterator iter = containing_elem_indices.begin();
+        for (auto iter = containing_elem_indices.begin();
              iter != containing_elem_indices.end();
              ++iter)
         {
@@ -169,7 +169,10 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
 }
 
 template<unsigned DIM>
-double NagaiHondaForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
+double NagaiHondaForce<DIM>::GetAdhesionParameter(
+    Node<DIM>* pNodeA,
+    Node<DIM>* pNodeB,
+    VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
     // Find the indices of the elements owned by each node
     std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
@@ -228,31 +231,36 @@ double NagaiHondaForce<DIM>::GetNagaiHondaTargetAreaParameter()
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::SetNagaiHondaDeformationEnergyParameter(double deformationEnergyParameter)
+void NagaiHondaForce<DIM>::SetNagaiHondaDeformationEnergyParameter(
+    double deformationEnergyParameter)
 {
     mNagaiHondaDeformationEnergyParameter = deformationEnergyParameter;
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::SetNagaiHondaMembraneSurfaceEnergyParameter(double membraneSurfaceEnergyParameter)
+void NagaiHondaForce<DIM>::SetNagaiHondaMembraneSurfaceEnergyParameter(
+    double membraneSurfaceEnergyParameter)
 {
     mNagaiHondaMembraneSurfaceEnergyParameter = membraneSurfaceEnergyParameter;
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::SetNagaiHondaCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyParameter)
+void NagaiHondaForce<DIM>::SetNagaiHondaCellCellAdhesionEnergyParameter(
+    double cellCellAdhesionEnergyParameter)
 {
     mNagaiHondaCellCellAdhesionEnergyParameter = cellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter)
+void NagaiHondaForce<DIM>::SetNagaiHondaCellBoundaryAdhesionEnergyParameter(
+    double cellBoundaryAdhesionEnergyParameter)
 {
     mNagaiHondaCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::SetNagaiHondaTargetAreaParameter(double nagaiHondaTargetAreaParameter)
+void NagaiHondaForce<DIM>::SetNagaiHondaTargetAreaParameter(
+    double nagaiHondaTargetAreaParameter)
 {
     mNagaiHondaTargetAreaParameter = nagaiHondaTargetAreaParameter;
 }

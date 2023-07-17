@@ -55,7 +55,7 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
     }
 
     // Loop over cells, find which coarse element it is in, and add volume to the mSourceTermOnCoarseElements[elem_index];
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+    for (auto cell_iter = this->mrCellPopulation.Begin();
          cell_iter != this->mrCellPopulation.End();
          ++cell_iter)
     {

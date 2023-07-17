@@ -49,15 +49,17 @@ double BuskeElasticForce<DIM>::GetDeformationEnergyParameter()
 }
 
 template<unsigned DIM>
-void BuskeElasticForce<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
+void BuskeElasticForce<DIM>::SetDeformationEnergyParameter(
+    double deformationEnergyParameter)
 {
     mDeformationEnergyParameter = deformationEnergyParameter;
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                             unsigned nodeBGlobalIndex,
-                                                                             AbstractCellPopulation<DIM>& rCellPopulation)
+c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(
+    unsigned nodeAGlobalIndex,
+    unsigned nodeBGlobalIndex,
+    AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr);
@@ -105,15 +107,18 @@ c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigne
 }
 
 template<unsigned DIM>
-double BuskeElasticForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
+double BuskeElasticForce<DIM>::GetMagnitudeOfForce(
+    double distanceBetweenNodes,
+    double radiusOfCellOne,
+    double radiusOfCellTwo)
 {
     // Calculate contribution from deformation interaction energy
     double dWDdd;
 
     if (distanceBetweenNodes < radiusOfCellOne + radiusOfCellTwo)
     {
-        dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes,1.5)
-                *pow(radiusOfCellOne*radiusOfCellTwo/(radiusOfCellOne+radiusOfCellTwo),0.5)
+        dWDdd = -pow(radiusOfCellOne + radiusOfCellTwo - distanceBetweenNodes, 1.5)
+                *pow(radiusOfCellOne*radiusOfCellTwo/(radiusOfCellOne+radiusOfCellTwo), 0.5)
                 /mDeformationEnergyParameter;
     }
     else  // no deformation energy contribution as too far apart
@@ -121,7 +126,7 @@ double BuskeElasticForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, 
         dWDdd = 0.0;
     }
 
-    return dWDdd; //
+    return dWDdd;
 }
 
 template<unsigned DIM>

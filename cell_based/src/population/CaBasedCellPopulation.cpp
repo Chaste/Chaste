@@ -144,7 +144,7 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
 
     // Create nodes at the centre of the cells
     unsigned cell_index = 0;
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (auto cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -795,7 +795,7 @@ double CaBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     double dirichletBoundaryValue)
 {
     unsigned counter = 0;
-    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    auto cell_iter = this->Begin();
     while (counter != pdeNodeIndex)
     {
         ++cell_iter;
@@ -811,7 +811,7 @@ template<unsigned DIM>
 bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
 {
     // pdeNodeIndex corresponds to the 'position' of the cell to interrogate in the vector of cells
-    typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    auto cell_iter = this->Begin();
 
     assert(pdeNodeIndex < this->GetNumRealCells());
     for (unsigned i=0; i<pdeNodeIndex; i++)

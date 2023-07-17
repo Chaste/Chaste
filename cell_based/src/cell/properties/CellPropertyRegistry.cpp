@@ -79,7 +79,7 @@ void CellPropertyRegistry::SpecifyOrdering(const std::vector<boost::shared_ptr<A
     }
 
     std::vector<boost::shared_ptr<AbstractCellProperty> > temp_vector = rOrdering;
-    for (unsigned i=0; i<mCellProperties.size(); i++)
+    for (unsigned i = 0; i < mCellProperties.size(); ++i)
     {
         std::vector<boost::shared_ptr<AbstractCellProperty> >::const_iterator it
             = find(rOrdering.begin(), rOrdering.end(), mCellProperties[i]);

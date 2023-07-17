@@ -37,13 +37,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned SPACE_DIM>
-ApoptoticCellKiller<SPACE_DIM>::ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+ApoptoticCellKiller<SPACE_DIM>::ApoptoticCellKiller(
+    AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
     : AbstractCellKiller<SPACE_DIM>(pCellPopulation)
 {
 }
 
 template<unsigned SPACE_DIM>
-void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
+void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(
+    CellPtr pCell)
 {
     if (pCell->HasCellProperty<ApoptoticCellProperty>() && !(pCell->HasApoptosisBegun()))
     {
@@ -55,7 +57,7 @@ void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr
 template<unsigned SPACE_DIM>
 void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (auto cell_iter = this->mpCellPopulation->Begin();
         cell_iter != this->mpCellPopulation->End();
         ++cell_iter)
     {

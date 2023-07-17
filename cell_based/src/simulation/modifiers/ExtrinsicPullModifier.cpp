@@ -49,7 +49,8 @@ ExtrinsicPullModifier<DIM>::~ExtrinsicPullModifier()
 }
 
 template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     double epsilon = 0.8;
 
@@ -89,12 +90,15 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DI
 }
 
 template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void ExtrinsicPullModifier<DIM>::SetupSolve(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    std::string outputDirectory)
 {
 }
 
 template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::SetApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes)
+void ExtrinsicPullModifier<DIM>::SetApplyExtrinsicPullToAllNodes(
+    bool applyExtrinsicPullToAllNodes)
 {
     mApplyExtrinsicPullToAllNodes = applyExtrinsicPullToAllNodes;
 }
@@ -118,7 +122,8 @@ double ExtrinsicPullModifier<DIM>::GetSpeed()
 }
 
 template<unsigned DIM>
-void ExtrinsicPullModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void ExtrinsicPullModifier<DIM>::OutputSimulationModifierParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<ApplyExtrinsicPullToAllNodes>" << mApplyExtrinsicPullToAllNodes << "</ApplyExtrinsicPullToAllNodes>\n";
     *rParamsFile << "\t\t\t<Speed>" << mSpeed << "</Speed>\n";

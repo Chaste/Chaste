@@ -44,20 +44,24 @@ CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::CellAgesWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     return pCell->GetAge();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Write location index corresponding to cell
     *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
 
     // Write cell location
     c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << cell_location[i] << " ";
     }

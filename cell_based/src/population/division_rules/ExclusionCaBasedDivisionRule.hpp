@@ -80,16 +80,21 @@ public:
     virtual ~ExclusionCaBasedDivisionRule(){};
 
     /**
+     * Overridden IsRoomToDivide() method.
+     * 
      * Return whether there is room to divide at all.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The CA-based cell population
      * @return if the site is available.
      */
-    virtual bool IsRoomToDivide(CellPtr pParentCell,
-                                CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual bool IsRoomToDivide(
+        CellPtr pParentCell,
+        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 
     /**
+     * Overridden CalculateDaughterNodeIndex() method.
+     * 
      * Return the index for the Daughter node.
      * This method can be used to move cells out of the way as necessary.
      *
@@ -98,9 +103,10 @@ public:
      * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
-    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
-                                                CellPtr pParentCell,
-                                                CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual unsigned CalculateDaughterNodeIndex(
+        CellPtr pNewCell,
+        CellPtr pParentCell,
+        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

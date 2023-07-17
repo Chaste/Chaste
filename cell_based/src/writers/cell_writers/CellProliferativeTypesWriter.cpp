@@ -48,18 +48,20 @@ CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesWrit
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double colour = pCell->GetCellProliferativeType()->GetColour();
-
     return colour;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned colour = pCell->GetCellProliferativeType()->GetColour();
-
     *this->mpOutStream << colour << " ";
 }
 

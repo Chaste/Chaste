@@ -48,11 +48,11 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
  * A class to generate the short axis of a cell for vertex-based cell
- * populations, to be used in cell division. This is the default rule that
- * is used in most of the vertex-based simulations.
+ * populations, to be used in cell division. This is the default rule that is 
+ * used in most of the vertex-based simulations.
  *
- * The short axis is the eigenvector associated with the largest eigenvalue
- * of the moment of inertia of the cell's polygon.
+ * The short axis is the eigenvector associated with the largest eigenvalue of 
+ * the moment of inertia of the cell's polygon.
  */
 template <unsigned SPACE_DIM>
 class ShortAxisVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
@@ -97,8 +97,9 @@ public:
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
+        CellPtr pParentCell,
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -44,11 +44,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 /**
- * This killer performs T2Swaps and kills the corresponding cells. In contrast to other
- * cell killers it carries out vertex rearrangements. The killer is automatically added
- * to OffLatticeSimulations that use a VertexBasedCellPopulation. To inhibit T2 swaps
- * from happening in a simulation the user needs to set the threshold for T2 swaps in
- * the MutableVertexMesh to 0, using the method SetT2Threshold().
+ * This killer performs T2Swaps and kills the corresponding cells. In contrast 
+ * to other cell killers it carries out vertex rearrangements. The killer is 
+ * automatically added to OffLatticeSimulations that use a 
+ * VertexBasedCellPopulation. To inhibit T2 swaps from happening in a simulation 
+ * the user needs to set the threshold for T2 swaps in the MutableVertexMesh to 
+ * 0, using the method SetT2Threshold().
  */
 template<unsigned DIM>
 class T2SwapCellKiller : public AbstractCellKiller<DIM>
@@ -86,14 +87,14 @@ public:
      *
      * Loop over cells and kill them if they are ready for a T2 swap.
      */
-    void CheckAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

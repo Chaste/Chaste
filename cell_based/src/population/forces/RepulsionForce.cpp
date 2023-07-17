@@ -42,7 +42,8 @@ RepulsionForce<DIM>::RepulsionForce()
 }
 
 template<unsigned DIM>
-void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void RepulsionForce<DIM>::AddForceContribution(
+    AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a NodeBasedCellPopulation
     if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
@@ -52,7 +53,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
 
     std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
 
-    for (typename std::vector< std::pair<Node<DIM>*, Node<DIM>* > >::iterator iter = r_node_pairs.begin();
+    for (auto iter = r_node_pairs.begin();
         iter != r_node_pairs.end();
         iter++)
     {
@@ -82,7 +83,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
             // Calculate the force between nodes
             c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
             c_vector<double, DIM> negative_force = -1.0 * force;
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 assert(!std::isnan(force[j]));
             }

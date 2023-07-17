@@ -36,18 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ForwardEulerNumericalMethod.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ForwardEulerNumericalMethod()
-    : AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>()
+ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::ForwardEulerNumericalMethod()
+    : AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~ForwardEulerNumericalMethod()
+ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::~ForwardEulerNumericalMethod()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt)
+void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::UpdateAllNodePositions(
+    double dt)
 {
     if (!this->mUseUpdateNodeLocation)
     {
@@ -55,7 +56,7 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
         std::vector<c_vector<double, SPACE_DIM> > forces = this->ComputeForcesIncludingDamping();
 
         unsigned index = 0;
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
              ++node_iter, ++index)
         {
@@ -83,10 +84,11 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
+void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
-    AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(rParamsFile);
+    AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(rParamsFile);
 }
 
 // Explicit instantiation

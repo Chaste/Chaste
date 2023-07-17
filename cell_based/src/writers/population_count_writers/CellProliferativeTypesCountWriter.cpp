@@ -48,13 +48,14 @@ CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeType
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(
+    AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
 
     if (PetscTools::AmMaster())
     {
-        for (unsigned i=0; i<proliferative_type_count.size(); i++)
+        for (unsigned i = 0; i < proliferative_type_count.size(); ++i)
         {
             *this->mpOutStream << proliferative_type_count[i] << "\t";
         }
@@ -62,12 +63,13 @@ void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulati
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
     if (PetscTools::AmMaster())
     {
-        for (unsigned i=0; i<proliferative_type_count.size(); i++)
+        for (unsigned i = 0; i < proliferative_type_count.size(); ++i)
         {
             *this->mpOutStream << proliferative_type_count[i] << "\t";
         }
@@ -75,25 +77,29 @@ void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

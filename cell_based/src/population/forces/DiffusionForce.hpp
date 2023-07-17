@@ -103,16 +103,14 @@ public :
     ~DiffusionForce();
 
     /**
-     * Set the absolute temperature, which affects the
-     * diffusion constant.
+     * Set the absolute temperature, which affects the diffusion constant.
      *
      * @param absoluteTemperature the temperature in Kelvin
      */
     void SetAbsoluteTemperature(double absoluteTemperature);
 
     /**
-      * Set the media viscosity (dynamic), which affects the
-      * diffusion constant.
+      * Set the media viscosity (dynamic), which affects the diffusion constant.
       *
       * @param viscosity the viscosity
       */
@@ -133,7 +131,7 @@ public :
     double GetViscosity();
 
     /**
-     * Calculate the scaling of the diffusion constant
+     * Calculate the scaling of the diffusion constant.
      *
      * @return the scaled diffusion constant.
      */
@@ -145,14 +143,15 @@ public :
      *
      * @param rCellPopulation reference to the tissue
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(
+        AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

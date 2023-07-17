@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * Simple cell killer, which at the first timestep kills any cell
- * whose corresponding location index is a given number.
+ * Simple cell killer, which at the first timestep kills any cell whose 
+ * corresponding location index is a given number.
  */
 template<unsigned DIM>
 class TargetedCellKiller : public AbstractCellKiller<DIM>
@@ -51,13 +51,13 @@ class TargetedCellKiller : public AbstractCellKiller<DIM>
 private:
 
     /**
-     * The index of the cell to kill
+     * The index of the cell to kill.
      */
     unsigned mTargetIndex;
 
     /**
-     * Variable to reack when the cell has been killed.
-     * Once the cell has been called mBloodLust will stop the killer killing more cells.
+     * Variable to reack when the cell has been killed. Once the cell has been 
+     * called mBloodLust will stop the killer killing more cells.
      */
     bool mBloodLust;
 
@@ -84,9 +84,12 @@ public:
      *
      * @param pCellPopulation pointer to the cell population
      * @param targetedIndex The index of the cell to kill
-     * @param bloodLust Wether to kill cells or not defaults to true (used by load methods)
+     * @param bloodLust Whether to kill cells or not defaults to true (defaults 
+     *                  to true; used by load methods)
      */
-    TargetedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust = true);
+    TargetedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
+                       unsigned targetedIndex,
+                       bool bloodLust = true);
 
     /**
      * @return mTargetIndex.
@@ -99,17 +102,19 @@ public:
     unsigned GetBloodLust() const;
 
     /**
+     * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.
+     * 
      * Loop over cells and start apoptosis randomly, based on the user-set
      * probability.
      */
-    void CheckAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

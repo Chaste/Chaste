@@ -40,7 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 
 /**
- * A class for calculating the force and stress on each node in a mesh-based cell population.
+ * A class for calculating the force and stress on each node in a mesh-based 
+ * cell population.
  */
 class DiscreteSystemForceCalculator
 {
@@ -76,8 +77,9 @@ private:
     std::vector<double> CalculateFtAndFn(unsigned index, double theta);
 
     /**
-     * Given a node index, returns a vector of sampling angles in the range (-pi,pi]
-     * that can be used by GetExtremalAngles() to find the locations of local extrema
+     * Given a node index, returns a vector of sampling angles in the range 
+     * (-pi,pi] that can be used by GetExtremalAngles() to find the locations of 
+     * local extrema
      * of the normal force.
      *
      * @param index
@@ -87,9 +89,9 @@ private:
     std::vector<double> GetSamplingAngles(unsigned index);
 
     /**
-     * Given a node index and two sampling angles, finds the location of
-     * the root of the tangential force in the interval between the two
-     * angles. There is no guarantee that this will lie in (-pi,pi].
+     * Given a node index and two sampling angles, finds the location of the 
+     * root of the tangential force in the interval between the two angles. 
+     * There is no guarantee that this will lie in (-pi,pi].
      *
      * @param index the node index
      * @param angle1 the first sampling angle
@@ -101,8 +103,8 @@ private:
 
     /**
      * Given a vector of sampling angles in the range (-pi,pi], returns a vector
-     * of extremal angles, i.e. angles at which local extrema of the normal force
-     * occur, again in the range (-pi,pi].
+     * of extremal angles, i.e. angles at which local extrema of the normal 
+     * force occur, again in the range (-pi,pi].
      *
      * @param index the node index
      * @param samplingAngles the vector of sampling angles
@@ -119,7 +121,9 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param forceCollection vector of force laws present
      */
-    DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation, std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection);
+    DiscreteSystemForceCalculator(
+        MeshBasedCellPopulation<2>& rCellPopulation,
+        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection);
 
     /**
      * @return the extremal normal forces on each node in the cell population.
@@ -129,7 +133,8 @@ public:
     /**
      * Write results to file.
      *
-     * @param simulationOutputDirectory the output directory, relative to where Chaste output is stored
+     * @param simulationOutputDirectory the output directory, relative to where 
+     *        Chaste output is stored
      */
     void WriteResultsToFile(std::string simulationOutputDirectory);
 

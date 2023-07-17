@@ -102,15 +102,20 @@ public:
     void SetDeformationEnergyParameter(double deformationEnergyParameter);
 
     /**
-     * @return the force between two nodes.
+     * Overridden CalculateForceBetweenNodes() method.
      *
      * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode()
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node
      * @param rCellPopulation the cell population
+     * 
+     * @return the force between two nodes.
      */
-    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<DIM>& rCellPopulation);
+    c_vector<double, DIM> CalculateForceBetweenNodes(
+        unsigned nodeAGlobalIndex,
+        unsigned nodeBGlobalIndex,
+        AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * @return calculated magnitude of the force between two nodes that are a given distance apart and
@@ -127,7 +132,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    virtual void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

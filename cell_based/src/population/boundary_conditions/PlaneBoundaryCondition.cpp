@@ -38,38 +38,40 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::PlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation,
-                                                    c_vector<double, SPACE_DIM> point,
-                                                    c_vector<double, SPACE_DIM> normal)
-        : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>(pCellPopulation),
-          mPointOnPlane(point),
-          mUseJiggledNodesOnPlane(false)
+PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::PlaneBoundaryCondition(
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
+    c_vector<double, SPACE_DIM> point,
+    c_vector<double, SPACE_DIM> normal)
+    : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>(pCellPopulation),
+        mPointOnPlane(point),
+        mUseJiggledNodesOnPlane(false)
 {
     assert(norm_2(normal) > 0.0);
     mNormalToPlane = normal/norm_2(normal);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::rGetPointOnPlane() const
+const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::rGetPointOnPlane() const
 {
     return mPointOnPlane;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::rGetNormalToPlane() const
+const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::rGetNormalToPlane() const
 {
     return mNormalToPlane;
 }
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
+void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::SetUseJiggledNodesOnPlane(
+    bool useJiggledNodesOnPlane)
 {
     mUseJiggledNodesOnPlane = useJiggledNodesOnPlane;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetUseJiggledNodesOnPlane()
+bool PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::GetUseJiggledNodesOnPlane()
 {
     return mUseJiggledNodesOnPlane;
 }
@@ -81,22 +83,22 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
     if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
         ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-        if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
+        if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
         {
             EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
         }
 
-        assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
+        assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
                 || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
 
         // This is a magic number
         double max_jiggle = 1e-4;
 
-        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
+        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
         {
-            for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
-                cell_iter != this->mpCellPopulation->End();
-                ++cell_iter)
+            for (auto cell_iter = this->mpCellPopulation->Begin();
+                 cell_iter != this->mpCellPopulation->End();
+                 ++cell_iter)
             {
                 unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
@@ -127,7 +129,7 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
 
             // Iterate over all nodes and update their positions according to the boundary conditions
             unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
-            for (unsigned node_index=0; node_index<num_nodes; node_index++)
+            for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
             {
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
                 c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
@@ -157,7 +159,7 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
+bool PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
 
@@ -167,7 +169,7 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
     }
     else
     {
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (auto cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
              ++cell_iter)
         {
@@ -185,17 +187,17 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
+void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<PointOnPlane>";
-    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != SPACE_DIM-1U; ++index) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mPointOnPlane[index] << ",";
     }
     *rParamsFile << mPointOnPlane[SPACE_DIM-1] << "</PointOnPlane>\n";
 
     *rParamsFile << "\t\t\t<NormalToPlane>";
-    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != SPACE_DIM-1U; ++index) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mNormalToPlane[index] << ",";
     }
@@ -203,7 +205,7 @@ void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundary
     *rParamsFile << "\t\t\t<UseJiggledNodesOnPlane>" << mUseJiggledNodesOnPlane << "</UseJiggledNodesOnPlane>\n";
 
     // Call method on direct parent class
-    AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
+    AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
 // Explicit instantiation

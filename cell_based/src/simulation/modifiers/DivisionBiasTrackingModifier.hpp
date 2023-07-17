@@ -100,7 +100,8 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -110,7 +111,9 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+        std::string outputDirectory) override;
 
     /**
      * Helper method to calculate the normalised distance of each cell in the population 
@@ -118,7 +121,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -126,7 +129,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -145,7 +148,7 @@ inline void save_construct_data(
 {
     // Archive c_vector one component at a time
     c_vector<double, DIM> point = t->rGetDivisionBiasVector();
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar << point[i];
     }
@@ -160,7 +163,7 @@ inline void load_construct_data(
 {
     // Retrieve c_vector one component at a time
     c_vector<double, DIM> point;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar >> point[i];
     }

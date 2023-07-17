@@ -84,7 +84,7 @@ void Alarcon2004OxygenBasedCellCycleModel::ResetForDivision()
     // This model needs the protein concentrations and phase resetting to G0/G1.
     // Keep the oxygen concentration the same but reset everything else
     std::vector<double> init_conds = mpOdeSystem->GetInitialConditions();
-    for (unsigned i=0; i<5; i++)
+    for (unsigned i = 0; i < 5; ++i)
     {
         mpOdeSystem->rGetStateVariables()[i] = init_conds[i];
     }

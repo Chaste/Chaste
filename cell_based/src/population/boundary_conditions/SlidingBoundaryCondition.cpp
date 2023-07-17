@@ -38,10 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-SlidingBoundaryCondition<DIM>::SlidingBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
-                                                    double threshold)
-        : AbstractCellPopulationBoundaryCondition<DIM>(pCellPopulation),
-          mThreshold(threshold)
+SlidingBoundaryCondition<DIM>::SlidingBoundaryCondition(
+    AbstractCellPopulation<DIM>* pCellPopulation,
+    double threshold)
+    : AbstractCellPopulationBoundaryCondition<DIM>(pCellPopulation),
+      mThreshold(threshold)
 {
 }
 
@@ -52,7 +53,9 @@ double SlidingBoundaryCondition<DIM>::GetThreshold() const
 }
 
 template<unsigned DIM>
-void SlidingBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
+void SlidingBoundaryCondition<DIM>::ImposeBoundaryCondition(
+    const std::map<Node<DIM>*,
+    c_vector<double, DIM> >& rOldLocations)
 {
     ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
     if (dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(this->mpCellPopulation) == nullptr)
@@ -64,7 +67,7 @@ void SlidingBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<
     double x_min = bounds.rGetLowerCorner()[0];
 
     // Loop over every node
-    for (unsigned node_index=0; node_index<this->mpCellPopulation->GetNumNodes(); node_index++)
+    for (unsigned node_index = 0; node_index < this->mpCellPopulation->GetNumNodes(); ++node_index)
     {
         Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
@@ -90,7 +93,8 @@ bool SlidingBoundaryCondition<DIM>::VerifyBoundaryCondition()
 }
 
 template<unsigned DIM>
-void SlidingBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
+void SlidingBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<Threshold>" << mThreshold << "</Threshold>\n";
 

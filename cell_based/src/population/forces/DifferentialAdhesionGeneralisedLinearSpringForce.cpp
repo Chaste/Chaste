@@ -38,9 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::DifferentialAdhesionGeneralisedLinearSpringForce()
-   : GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>(),
-     mHomotypicLabelledSpringConstantMultiplier(1.0),
-     mHeterotypicSpringConstantMultiplier(1.0)
+    : GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>(),
+      mHomotypicLabelledSpringConstantMultiplier(1.0),
+      mHeterotypicSpringConstantMultiplier(1.0)
 {
 }
 
@@ -93,7 +93,8 @@ double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>:
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier)
+void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHomotypicLabelledSpringConstantMultiplier(
+    double labelledSpringConstantMultiplier)
 {
     assert(labelledSpringConstantMultiplier > 0.0);
     mHomotypicLabelledSpringConstantMultiplier = labelledSpringConstantMultiplier;
@@ -106,14 +107,16 @@ double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>:
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier)
+void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetHeterotypicSpringConstantMultiplier(
+    double heterotypicSpringConstantMultiplier)
 {
     assert(heterotypicSpringConstantMultiplier > 0.0);
     mHeterotypicSpringConstantMultiplier = heterotypicSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<HomotypicLabelledSpringConstantMultiplier>" << mHomotypicLabelledSpringConstantMultiplier << "</HomotypicLabelledSpringConstantMultiplier>\n";
     *rParamsFile << "\t\t\t<HeterotypicSpringConstantMultiplier>" << mHeterotypicSpringConstantMultiplier << "</HeterotypicSpringConstantMultiplier>\n";

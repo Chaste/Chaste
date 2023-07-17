@@ -37,7 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned SPACE_DIM>
-bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
+    CellPtr pParentCell,
+    CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
     bool is_room = false;
 
@@ -48,7 +50,7 @@ bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell
     std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
 
     // Iterate through the neighbours to see if there are any available sites
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+    for (auto neighbour_iter = neighbouring_node_indices.begin();
          neighbour_iter != neighbouring_node_indices.end();
          ++neighbour_iter)
     {
@@ -88,7 +90,7 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(Cel
     double total_propensity = 0.0;
 
     // Select neighbour at random
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+    for (auto neighbour_iter = neighbouring_node_indices.begin();
          neighbour_iter != neighbouring_node_indices.end();
          ++neighbour_iter)
     {
@@ -119,7 +121,7 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(Cel
     unsigned daughter_node_index = UNSIGNED_UNSET;
 
     unsigned counter;
-    for (counter=0; counter < num_neighbours; counter++)
+    for (counter = 0; counter < num_neighbours; ++counter)
     {
         total_probability += neighbouring_node_propensities[counter];
         if (total_probability >= random_number)

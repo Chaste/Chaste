@@ -94,8 +94,8 @@ private:
     void TestSmallMeshBasedCellPopulation(std::string meshFilename)
     {
         // Create a simple mesh
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(meshFilename);
-        MutableMesh<ELEMENT_DIM,SPACE_DIM> mesh;
+        TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(meshFilename);
+        MutableMesh<ELEMENT_DIM, SPACE_DIM> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
@@ -106,7 +106,7 @@ private:
 
         // Create the cell population
         unsigned num_cells = cells.size();
-        MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM> cell_population(mesh, cells);
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM> cell_population(mesh, cells);
 
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumNodes(), mesh.GetNumNodes());
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), num_cells);
@@ -123,7 +123,7 @@ private:
         cell_population.SetMeinekeDivisionSeparation(0.5);
 
         unsigned counter = 0;
-        for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = cell_population.Begin();
+        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

@@ -41,9 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 
 /**
- * A simple force law used to test node location updates across the off lattice population test files.
+ * A simple force law used to test node location updates across the off-lattice 
+ * population test files.
  */
-
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class PopulationTestingForce : public AbstractForce<ELEMENT_DIM, SPACE_DIM>
 {
@@ -64,14 +64,15 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mWithPositionDependence;
     }
 
     /**
-     * Whether the applied force should depend on the position of the node, or only its index
-     * Defaults to true, since that's better for testing a variety of numerical methods.
-     * Crypt tests require a position independent test force though.
+     * Whether the applied force should depend on the position of the node, or 
+     * only its index. Defaults to true, since that's better for testing a 
+     * variety of numerical methods. Crypt tests require a position independent 
+     * test force though.
      */
     bool mWithPositionDependence;
 
@@ -80,7 +81,8 @@ public:
     /**
      * Constructor.
      *
-     * @param hasPositionDependence specifys which testing force to use (defaults to true)
+     * @param hasPositionDependence specifys which testing force to use 
+     *     (defaults to true)
      */
     PopulationTestingForce(bool hasPositionDependence = true);
 
@@ -89,7 +91,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      *
-     * THis has two forces depending on the member variable mWithPositionDependence
+     * This has two forces depending on the member variable mWithPositionDependence
      *
      * If true then
      *
@@ -103,7 +105,8 @@ public:
      * F[j] = 0.01 (j+1) i
      *
      */
-    void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
+    void AddForceContribution(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation) override;
 
     /**
      * Helper method to return the expected step location for ForwardEulerNumericalMethod.
@@ -112,65 +115,72 @@ public:
      *
      * @param nodeIndex the index of the node
      * @param damping the damping constant
-     * @param oldLocation the old location of the node
+     * @param rOldLocation the old location of the node
      * @param dt the step size
      */
-    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationFE(unsigned nodeIndex,
-                                                           double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation,
-                                                           double dt);
+    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationFE(
+        unsigned nodeIndex,
+        double damping,
+        c_vector<double, SPACE_DIM>& rOldLocation,
+        double dt);
 
     /**
-     * Helper method to return the expected step location for RK4NumericalMethod.
+     * Helper method to return the expected step location for 
+     * RK4NumericalMethod.
      *
      * @return the expected location after one step
      *
      * @param nodeIndex the index of the node
      * @param damping the damping constant
-     * @param oldLocation the old location of the node
+     * @param rOldLocation the old location of the node
      * @param dt the step size
      */
-    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationRK4(unsigned nodeIndex,
-                                                           double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation,
-                                                           double dt);
+    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationRK4(
+        unsigned nodeIndex,
+        double damping,
+        c_vector<double, SPACE_DIM>& rOldLocation,
+        double dt);
 
     /**
-     * Helper method to return the expected step location for AdamsMoultonNumericalMethod.
+     * Helper method to return the expected step location for 
+     * AdamsMoultonNumericalMethod.
      *
      * @return the expected location after one step
      *
      * @param nodeIndex the index of the node
      * @param damping the damping constant
-     * @param oldLocation the old location of the node
+     * @param rOldLocation the old location of the node
      * @param dt the step size
      */
-    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationAM2(unsigned nodeIndex,
-                                                           double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation,
-                                                           double dt);
+    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationAM2(
+        unsigned nodeIndex,
+        double damping,
+        c_vector<double, SPACE_DIM>& rOldLocation,
+        double dt);
 
     /**
-     * Helper method to return the expected step location for BackwardEulerNumericalMethod.
+     * Helper method to return the expected step location for
+     * BackwardEulerNumericalMethod.
      *
      * @return the expected location after one step
      *
      * @param nodeIndex the index of the node
      * @param damping the damping constant
-     * @param oldLocation the old location of the node
+     * @param rOldLocation the old location of the node
      * @param dt the step size
      */
-    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationBE(unsigned nodeIndex,
-                                                           double damping,
-                                                           c_vector<double, SPACE_DIM>& oldLocation,
-                                                           double dt);
+    c_vector<double, SPACE_DIM> GetExpectedOneStepLocationBE(
+        unsigned nodeIndex,
+        double damping,
+        c_vector<double, SPACE_DIM>& rOldLocation,
+        double dt);
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    virtual void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

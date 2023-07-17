@@ -138,10 +138,11 @@ public:
      *
      * @return the multiplication factor.
      */
-    virtual double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
-                                                              unsigned nodeBGlobalIndex,
-                                                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                                              bool isCloserThanRestLength);
+    virtual double VariableSpringConstantMultiplicationFactor(
+        unsigned nodeAGlobalIndex,
+        unsigned nodeBGlobalIndex,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
+        bool isCloserThanRestLength);
 
     /**
      * Overridden CalculateForceBetweenNodes() method.
@@ -155,9 +156,11 @@ public:
      * @param rCellPopulation the cell population
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                     unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
+    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(
+        unsigned nodeAGlobalIndex,
+        unsigned nodeBGlobalIndex,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation) override;
+
     /**
      * @return mMeinekeSpringStiffness
      */
@@ -199,7 +202,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    virtual void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

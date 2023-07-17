@@ -51,7 +51,8 @@ HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::HeterotypicBoundaryLeng
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Initialise helper variables
     double heterotypic_boundary_length = 0.0;
@@ -64,7 +65,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCel
     pCellPopulation->CreateVoronoiTessellation();
 
     // Iterate over cells
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -78,7 +79,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCel
         std::set<unsigned> neighbour_indices = pCellPopulation->GetNeighbouringNodeIndices(index);
 
         // Iterate over these neighbours
-        for (std::set<unsigned>::iterator neighbour_iter = neighbour_indices.begin();
+        for (auto neighbour_iter = neighbour_indices.begin();
              neighbour_iter != neighbour_indices.end();
              ++neighbour_iter)
         {
@@ -120,7 +121,8 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCel
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Initialise helper variables
     double heterotypic_boundary_length = 0.0;
@@ -129,7 +131,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
     double total_num_pairs = 0.0;
 
     // Iterate over cells
-    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -143,7 +145,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
         std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);
 
         // Iterate over these neighbours
-        for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+        for (auto neighbour_iter = neighbour_node_indices.begin();
              neighbour_iter != neighbour_node_indices.end();
              ++neighbour_iter)
         {
@@ -185,7 +187,8 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Make sure the cell population is updated so that mNodeNeighbours is set up
     ///\todo #2273 - check if this call to Update() is needed
@@ -198,7 +201,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCel
     double total_num_pairs = 0.0;
 
     // Loop over cells
-    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -215,7 +218,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCel
         if (!neighbour_indices.empty())
         {
             // Iterate over these neighbours
-            for (std::set<unsigned>::iterator neighbour_iter = neighbour_indices.begin();
+            for (auto neighbour_iter = neighbour_indices.begin();
                  neighbour_iter != neighbour_indices.end();
                  ++neighbour_iter)
             {
@@ -268,7 +271,8 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCel
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     ///\todo #2273 - investigate whether there is a hard-coded assumption that neighbouring nodes in Potts simulations are unit distance apart
 
@@ -279,7 +283,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
     double total_num_pairs = 0.0;
 
     // Iterate over cells
-    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -297,7 +301,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
             std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(global_index);
 
             // Iterate over these neighbours
-            for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+            for (auto neighbour_iter = neighbour_node_indices.begin();
                  neighbour_iter != neighbour_node_indices.end();
                  ++neighbour_iter)
             {
@@ -335,7 +339,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
         std::set<unsigned> neighbour_node_indices = pCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
 
         // Iterate over these neighbours
-        for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+        for (auto neighbour_iter = neighbour_node_indices.begin();
              neighbour_iter != neighbour_node_indices.end();
              ++neighbour_iter)
         {
@@ -365,7 +369,8 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Make sure the cell population is updated
     ///\todo #2273 - check if this call to Update() is needed
@@ -378,7 +383,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedC
     double total_num_pairs = 0.0;
 
     // Iterate over cells
-    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -390,7 +395,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedC
         std::set<unsigned> neighbour_elem_indices = pCellPopulation->rGetMesh().GetNeighbouringElementIndices(elem_index);
 
         // Iterate over these neighbours
-        for (std::set<unsigned>::iterator neighbour_iter = neighbour_elem_indices.begin();
+        for (auto neighbour_iter = neighbour_elem_indices.begin();
              neighbour_iter != neighbour_elem_indices.end();
              ++neighbour_iter)
         {

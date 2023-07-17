@@ -84,12 +84,12 @@ public:
     virtual ~AbstractCellKiller();
 
     /**
-     * Pure virtual; method which should call StartApoptosisOnCell() on the population
-     * passing the cell which should be about to undergo programmed death,
-     * or KillCell() on the population passing the cell which should die immediately.
+     * Pure virtual; method which should call StartApoptosisOnCell() on the 
+     * population passing the cell which should be about to undergo programmed
+     * death, or KillCell() on the population passing the cell which should die 
+     * immediately.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual void CheckAndLabelCellsForApoptosisOrDeath() = 0;
 
@@ -111,8 +111,7 @@ public:
     /**
      * Outputs cell killer parameters to file
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

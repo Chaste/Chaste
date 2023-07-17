@@ -185,7 +185,7 @@ bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAssociated
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
 {
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
     return this->GetNeighbouringNodeIndices(node_index);
@@ -257,7 +257,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetMeinekeDivisi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWritersAcrossPopulation()
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWritersAcrossPopulation()
 {
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
          node_iter != this->rGetMesh().GetNodeIteratorEnd();

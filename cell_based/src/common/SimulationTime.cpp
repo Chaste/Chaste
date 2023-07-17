@@ -80,7 +80,7 @@ double SimulationTime::GetTimeStep() const
 void SimulationTime::IncrementTimeOneStep()
 {
     assert(mpTimeStepper);
-    mpTimeStepper->AdvanceOneTimeStep(); //This can now throw if the end time has been reached
+    mpTimeStepper->AdvanceOneTimeStep(); // This can now throw if the end time has been reached
 }
 
 unsigned SimulationTime::GetTimeStepsElapsed() const
@@ -93,12 +93,12 @@ double SimulationTime::GetTime() const
 {
     // NOTE: if this assertion fails, it may be because Destroy() wasn't called in the previous test
     assert(mStartTime != DOUBLE_UNSET);
-    //Check if the time stepping has started
+    // Check if the time stepping has started
     if (mpTimeStepper)
     {
         return mpTimeStepper->GetTime();
     }
-    //If time stepping hasn't started then we are still at start time
+    // If time stepping hasn't started then we are still at start time
     return mStartTime;
 }
 
@@ -155,4 +155,3 @@ bool SimulationTime::IsFinished() const
     // assert(mpTimeStepper);
     return(mpTimeStepper->IsTimeAtEnd());
 }
-

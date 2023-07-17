@@ -116,7 +116,7 @@ private:
         boost::shared_ptr<CellPropertyRegistry> p_population_registry = node_based_cell_population.GetCellPropertyRegistry();
 
         unsigned counter = 0;
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = node_based_cell_population.Begin();
+        for (auto cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {

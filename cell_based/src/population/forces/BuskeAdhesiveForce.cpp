@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 BuskeAdhesiveForce<DIM>::BuskeAdhesiveForce()
    : AbstractTwoBodyInteractionForce<DIM>(),
-     mAdhesionEnergyParameter(0.2)        // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     mAdhesionEnergyParameter(0.2) // Denoted by epsilon in Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
 {
 }
 
@@ -55,9 +55,10 @@ void BuskeAdhesiveForce<DIM>::SetAdhesionEnergyParameter(double adhesionEnergyPa
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                          unsigned nodeBGlobalIndex,
-                                                                          AbstractCellPopulation<DIM>& rCellPopulation)
+c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(
+    unsigned nodeAGlobalIndex,
+    unsigned nodeBGlobalIndex,
+AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr);
@@ -104,7 +105,10 @@ c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsign
 }
 
 template<unsigned DIM>
-double BuskeAdhesiveForce<DIM>::GetMagnitudeOfForce(double distanceBetweenNodes, double radiusOfCellOne, double radiusOfCellTwo)
+double BuskeAdhesiveForce<DIM>::GetMagnitudeOfForce(
+    double distanceBetweenNodes,
+    double radiusOfCellOne,
+    double radiusOfCellTwo)
 {
     double dWAdd = 0.0;
 

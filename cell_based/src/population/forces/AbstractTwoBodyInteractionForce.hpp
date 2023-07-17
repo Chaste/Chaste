@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractForce.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
+
 /**
  * An abstract class for two-body force laws.
  */
@@ -58,7 +59,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractForce<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mUseCutOffLength;
         archive & mMechanicsCutOffLength;
     }
@@ -86,8 +87,8 @@ public:
     bool GetUseCutOffLength();
 
     /**
-     * Use a cutoff point, ie specify zero force if two cells are greater
-     * than the cutoff distance apart.
+     * Use a cutoff point, ie specify zero force if two cells are greater than 
+     * the cutoff distance apart.
      *
      * @param cutOffLength the cutoff to use
      */
@@ -103,7 +104,8 @@ public:
     /**
      * Calculates the force between two nodes.
      *
-     * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode().
+     * Note that this assumes they are connected and is called by 
+     * rCalculateVelocitiesOfEachNode().
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
@@ -121,23 +123,24 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    virtual void OutputForceParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
-     * Write any data necessary to a visualization setup file.
-     * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
+     * 
+     * Write any data necessary to a visualization setup file. Used by 
+     * AbstractCellBasedSimulation::WriteVisualizerSetupFile().
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 };
 
 #endif /*ABSTRACTTWOBODYINTERACTIONFORCE_HPP_*/

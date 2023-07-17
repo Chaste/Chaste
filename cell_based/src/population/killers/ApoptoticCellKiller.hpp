@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A cell killer object that kills cells that have been specified using the ApoptoticCellProperty.
+ * A cell killer object that kills cells that have been specified using the 
+ * ApoptoticCellProperty.
  */
 template<unsigned SPACE_DIM>
 class ApoptoticCellKiller : public AbstractCellKiller<SPACE_DIM>
@@ -80,16 +81,18 @@ public:
     void CheckAndLabelSingleCellForApoptosis(CellPtr pCell);
 
     /**
+     * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.
+     * 
      * Loop over cells and call CheckAndLabelSingleCellForApoptosis() on each cell.
      */
-    virtual void CheckAndLabelCellsForApoptosisOrDeath();
+    virtual void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

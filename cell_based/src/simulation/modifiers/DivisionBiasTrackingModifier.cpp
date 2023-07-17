@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-DivisionBiasTrackingModifier<DIM>::DivisionBiasTrackingModifier(c_vector<double, DIM> divisionBiasVector)
+DivisionBiasTrackingModifier<DIM>::DivisionBiasTrackingModifier(
+    c_vector<double, DIM> divisionBiasVector)
     : AbstractCellBasedSimulationModifier<DIM>(),
       mDivisionBiasVector(divisionBiasVector)
 {
@@ -57,13 +58,16 @@ const c_vector<double, DIM>& DivisionBiasTrackingModifier<DIM>::rGetDivisionBias
 }
 
 template<unsigned DIM>
-void DivisionBiasTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DivisionBiasTrackingModifier<DIM>::UpdateAtEndOfTimeStep(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
-void DivisionBiasTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void DivisionBiasTrackingModifier<DIM>::SetupSolve(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -73,17 +77,19 @@ void DivisionBiasTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 }
 
 template<unsigned DIM>
-void DivisionBiasTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DivisionBiasTrackingModifier<DIM>::UpdateCellData(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Make sure the cell population is updated
     rCellPopulation.Update();
 
     /**
-     * This hack is needed because in the case of a MeshBasedCellPopulation in which
-     * multiple cell divisions have occurred over one time step, the Voronoi tessellation
-     * (while existing) is out-of-date. Thus, if we did not regenerate the Voronoi
-     * tessellation here, an assertion may trip as we try to access a Voronoi element
-     * whose index exceeds the number of elements in the out-of-date tessellation.
+     * This hack is needed because in the case of a MeshBasedCellPopulation in 
+     * which multiple cell divisions have occurred over one time step, the 
+     * Voronoi tessellation (while existing) is out-of-date. Thus, if we did not 
+     * regenerate the Voronoi tessellation here, an assertion may trip as we try 
+     * to access a Voronoi element whose index exceeds the number of elements in 
+     * the out-of-date tessellation.
      *
      * \todo work out how to properly fix this (#1986)
      */
@@ -96,12 +102,12 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     c_vector<double, DIM> centroid = rCellPopulation.GetCentroidOfCellPopulation();
 
     /**
-     * Iterate over cell population and store each cell's signed distance along mDivisionBiasVector
-     * through the centroid of the cell population, where zero corresponds to a cell located at the 
-     * centroid of the cell population.
+     * Iterate over cell population and store each cell's signed distance along 
+     * mDivisionBiasVector through the centroid of the cell population, where 
+     * zero corresponds to a cell located at the centroid of the cell population.
      */
     std::vector<double> biases;
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -119,7 +125,7 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
     // Iterate over cell population
     unsigned i = 0;
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -130,10 +136,11 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 }
 
 template<unsigned DIM>
-void DivisionBiasTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void DivisionBiasTrackingModifier<DIM>::OutputSimulationModifierParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DivisionBiasVector>";
-    for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != DIM-1U; ++index) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mDivisionBiasVector[index] << ",";
     }
@@ -151,4 +158,3 @@ template class DivisionBiasTrackingModifier<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(DivisionBiasTrackingModifier)
-

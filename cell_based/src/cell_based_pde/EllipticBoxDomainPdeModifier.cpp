@@ -109,7 +109,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
     {
         // Get the set of coarse element indices that contain cells
         std::set<unsigned> coarse_element_indices_in_map;
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+        for (auto cell_iter = rCellPopulation.Begin();
              cell_iter != rCellPopulation.End();
              ++cell_iter)
         {

@@ -48,13 +48,16 @@ DeltaNotchTrackingModifier<DIM>::~DeltaNotchTrackingModifier()
 }
 
 template<unsigned DIM>
-void DeltaNotchTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchTrackingModifier<DIM>::UpdateAtEndOfTimeStep(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
-void DeltaNotchTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void DeltaNotchTrackingModifier<DIM>::SetupSolve(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -64,13 +67,14 @@ void DeltaNotchTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>
 }
 
 template<unsigned DIM>
-void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchTrackingModifier<DIM>::UpdateCellData(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Make sure the cell population is updated
     rCellPopulation.Update();
 
     // First recover each cell's Notch and Delta concentrations from the ODEs and store in CellData
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -84,7 +88,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
     }
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -95,7 +99,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         if (!neighbour_indices.empty())
         {
             double mean_delta = 0.0;
-            for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
+            for (auto iter = neighbour_indices.begin();
                  iter != neighbour_indices.end();
                  ++iter)
             {

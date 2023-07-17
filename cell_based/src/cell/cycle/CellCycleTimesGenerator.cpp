@@ -89,7 +89,7 @@ void CellCycleTimesGenerator::GenerateCellCycleTimeSequence()
         RandomNumberGenerator* p_random_number_generator = RandomNumberGenerator::Instance();
         p_random_number_generator->Reseed(mRandomSeed);
 
-        for (unsigned index = 0; index < 15000u; index++)
+        for (unsigned index = 0; index < 15000; ++index)
         {
             mCellCycleTimes.push_back( p_random_number_generator->ExponentialRandomDeviate(mRate) );
         }

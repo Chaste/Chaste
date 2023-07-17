@@ -51,7 +51,8 @@ CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAdjac
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(
+    AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Make sure the cell population is updated
     ///\todo #2645 - if efficiency is an issue, check if this is really needed
@@ -63,7 +64,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
     std::map<unsigned,unsigned> local_cell_id_location_index_map;
 
     unsigned local_cell_id = 0;
-    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -74,12 +75,12 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
     std::vector<double> adjacency_matrix(num_cells*num_cells);
-    for (unsigned i=0; i<num_cells*num_cells; i++)
+    for (unsigned i = 0; i < num_cells*num_cells; ++i)
     {
         adjacency_matrix[i] = 0;
     }
 
-    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -97,7 +98,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
         {
             unsigned local_cell_index = local_cell_id_location_index_map[index];
 
-            for (std::set<unsigned>::iterator neighbour_iter = neighbour_indices.begin();
+            for (auto neighbour_iter = neighbour_indices.begin();
                  neighbour_iter != neighbour_indices.end();
                  ++neighbour_iter)
             {
@@ -135,7 +136,8 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Make sure the cell population is updated
     ///\todo #2645 - if efficiency is an issue, check if this is really needed
@@ -147,7 +149,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
     std::map<unsigned,unsigned> local_cell_id_location_index_map;
 
     unsigned local_cell_id = 0;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -158,12 +160,12 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
 
     // Iterate over cells and calculate the adjacency matrix (stored as a long vector)
     std::vector<double> adjacency_matrix(num_cells*num_cells);
-    for (unsigned i=0; i<num_cells*num_cells; i++)
+    for (unsigned i = 0; i < num_cells*num_cells; ++i)
     {
         adjacency_matrix[i] = 0;
     }
 
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -181,7 +183,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
         {
             unsigned local_cell_index = local_cell_id_location_index_map[index];
 
-            for (std::set<unsigned>::iterator neighbour_iter = neighbour_indices.begin();
+            for (auto neighbour_iter = neighbour_indices.begin();
                  neighbour_iter != neighbour_indices.end();
                  ++neighbour_iter)
             {
@@ -212,7 +214,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBase
 
     // Output the number of cells and the elements of the adjacency matrix
     *this->mpOutStream << num_cells << "\t";
-    for (unsigned i=0; i<num_cells*num_cells; i++)
+    for (unsigned i = 0; i < num_cells*num_cells; ++i)
     {
         *this->mpOutStream << adjacency_matrix[i] << "\t";
     }

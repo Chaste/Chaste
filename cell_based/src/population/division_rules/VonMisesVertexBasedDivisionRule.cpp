@@ -68,7 +68,8 @@ void VonMisesVertexBasedDivisionRule<DIM>::SetMeanParameter(double meanParameter
 }
 
 template<unsigned DIM>
-void VonMisesVertexBasedDivisionRule<DIM>::SetConcentrationParameter(double concentrationParameter)
+void VonMisesVertexBasedDivisionRule<DIM>::SetConcentrationParameter(
+    double concentrationParameter)
 {
     assert(concentrationParameter > 0);
     mConcentrationParameter = concentrationParameter;

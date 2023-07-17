@@ -83,7 +83,8 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(
+        AbstractCellPopulation<DIM,DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -91,12 +92,16 @@ public:
      * Specify what to do in the simulation before the start of the time loop.
      *
      * @param rCellPopulation reference to the cell population
-     * @param outputDirectory the output directory, relative to where Chaste output is stored
+     * @param outputDirectory the output directory, relative to where Chaste 
+     *                        output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(
+        AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+        std::string outputDirectory) override;
 
     /**
-     * Helper method to compute the volume of each cell in the population and store these in the CellData.
+     * Helper method to compute the volume of each cell in the population and 
+     * store these in the CellData.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -108,7 +113,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

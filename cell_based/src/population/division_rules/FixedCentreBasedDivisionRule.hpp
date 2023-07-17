@@ -48,9 +48,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivisionRule;
 
 /**
- * A class to generate two daughter cell positions, one given by the
- * position of the dividing cell and the other specified in the
- * class constructor.
+ * A class to generate two daughter cell positions, one given by the position of 
+ * the dividing cell and the other specified in the class constructor.
  *
  * This helper class is used in TestMeshBasedCellPopulation.hpp and
  * TestNodeBasedCellPopulation.hpp.
@@ -108,8 +107,9 @@ public:
      *
      * @return the two daughter cell positions.
      */
-    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
-        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
+    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(
+        CellPtr pParentCell,
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

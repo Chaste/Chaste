@@ -35,8 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DiscreteSystemForceCalculator.hpp"
 
-DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(MeshBasedCellPopulation<2>& rCellPopulation,
-                                                             std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection)
+DiscreteSystemForceCalculator::DiscreteSystemForceCalculator(
+    MeshBasedCellPopulation<2>& rCellPopulation,
+    std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > forceCollection)
     : mrCellPopulation(rCellPopulation),
       mForceCollection(forceCollection),
       mEpsilon(0.01)
@@ -51,7 +52,7 @@ std::vector< std::vector<double> > DiscreteSystemForceCalculator::CalculateExtre
     std::vector<double> minimum_normal_forces(num_nodes);
     std::vector<double> maximum_normal_forces(num_nodes);
 
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         std::vector<double> sampling_angles = GetSamplingAngles(i);
         std::vector<double> extremal_angles = GetExtremalAngles(i, sampling_angles);
@@ -59,7 +60,7 @@ std::vector< std::vector<double> > DiscreteSystemForceCalculator::CalculateExtre
         double minimum_normal_force_for_node_i = DBL_MAX;
         double maximum_normal_force_for_node_i = -DBL_MAX;
 
-        for (unsigned j=0; j<extremal_angles.size(); j++)
+        for (unsigned j = 0; j < extremal_angles.size(); ++j)
         {
             double current_normal_force = CalculateFtAndFn(i, extremal_angles[j])[1];
 
@@ -85,7 +86,8 @@ std::vector< std::vector<double> > DiscreteSystemForceCalculator::CalculateExtre
     return extremal_normal_forces;
 }
 
-void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOutputDirectory)
+void DiscreteSystemForceCalculator::WriteResultsToFile(
+    std::string simulationOutputDirectory)
 {
     double time = SimulationTime::Instance()->GetTime();
     std::ostringstream time_string;
@@ -105,9 +107,9 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOut
 
     TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
-    std::vector< std::vector<double> > extremal_normal_forces = CalculateExtremalNormalForces();
+    std::vector<std::vector<double> > extremal_normal_forces = CalculateExtremalNormalForces();
 
-    for (unsigned i=0; i<r_mesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < r_mesh.GetNumNodes(); ++i)
     {
         global_index = (double) i;
 
@@ -124,7 +126,9 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(std::string simulationOut
     mpVizStressResultsFile->close();
 }
 
-std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned index, double theta)
+std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
+    unsigned index,
+    double theta)
 {
     TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
@@ -136,7 +140,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
 
     c_vector<double,2> unit_vec_between_nodes(2);
 
-    for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+    for (auto iter = neighbouring_node_indices.begin();
          iter != neighbouring_node_indices.end();
          ++iter)
     {
@@ -152,7 +156,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
             c_vector<double,2> force_between_nodes = zero_vector<double>(2);
 
             // Iterate over vector of forces present and add up forces between nodes
-            for (std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > >::iterator force_iter = mForceCollection.begin();
+            for (auto force_iter = mForceCollection.begin();
                  force_iter != mForceCollection.end();
                  ++force_iter)
             {
@@ -175,7 +179,8 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(unsigned ind
     return ret;
 }
 
-std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned index)
+std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(
+    unsigned index)
 {
     TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
 
@@ -185,7 +190,7 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
 
     unsigned i=0;
 
-    for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+    for (auto iter = neighbouring_node_indices.begin();
          iter != neighbouring_node_indices.end();
          ++iter)
     {
@@ -243,10 +248,15 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(unsigned in
     return sampling_angles;
 }
 
-double DiscreteSystemForceCalculator::GetLocalExtremum(unsigned index, double angle1, double angle2)
+double DiscreteSystemForceCalculator::GetLocalExtremum(
+    unsigned index,
+    double angle1,
+    double angle2)
 {
-    // We always pass in angle1 and angle2 such that angle1<angle2,
-    // but note that angle1 may be <M_PI
+    /*
+     * We always pass in angle1 and angle2 such that angle1 < angle2,but note 
+     * that angle1 may be < M_PI
+     */
     assert(angle1 < angle2);
 
     double tolerance = 1e-5;
@@ -274,13 +284,15 @@ double DiscreteSystemForceCalculator::GetLocalExtremum(unsigned index, double an
     return current_angle;
 }
 
-std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned index, std::vector<double> samplingAngles)
+std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(
+    unsigned index,
+    std::vector<double> samplingAngles)
 {
     std::vector<double> extremal_angles;
     std::vector<double> ft_and_fn(2);
     std::vector<double> tangential_force(samplingAngles.size());
 
-    for (unsigned i=0; i<samplingAngles.size(); i++)
+    for (unsigned i = 0; i < samplingAngles.size(); ++i)
     {
         ft_and_fn = CalculateFtAndFn(index, samplingAngles[i]);
         tangential_force[i] = ft_and_fn[0];
@@ -288,7 +300,7 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
 
     unsigned n = samplingAngles.size()-1;
 
-    for (unsigned i=0; i<n; i++)
+    for (unsigned i = 0; i < n; ++i)
     {
         if ((tangential_force[i%n]>0 && tangential_force[(i+1)%n]<0)
             || (tangential_force[i%n]<0 && tangential_force[(i+1)%n]>0))
@@ -297,7 +309,7 @@ std::vector<double> DiscreteSystemForceCalculator::GetExtremalAngles(unsigned in
 
             // If we are in the interval that crosses the branch line at pi,
             // then subtract 2*pi from the positive angle
-            if (i==n-1)
+            if (i == n-1)
             {
                 samplingAngles[i%n] -= 2*M_PI;
             }

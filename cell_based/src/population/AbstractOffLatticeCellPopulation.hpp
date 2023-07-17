@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * vertex-based) cell population.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class AbstractOffLatticeCellPopulation : public AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>
+class AbstractOffLatticeCellPopulation : public AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 

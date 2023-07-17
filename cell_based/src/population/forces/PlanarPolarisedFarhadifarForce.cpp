@@ -54,13 +54,17 @@ double PlanarPolarisedFarhadifarForce<DIM>::GetPlanarPolarisedLineTensionMultipl
 }
 
 template<unsigned DIM>
-void PlanarPolarisedFarhadifarForce<DIM>::SetPlanarPolarisedLineTensionMultiplier(double planarPolarisedLineTensionMultiplier)
+void PlanarPolarisedFarhadifarForce<DIM>::SetPlanarPolarisedLineTensionMultiplier(
+    double planarPolarisedLineTensionMultiplier)
 {
     mPlanarPolarisedLineTensionMultiplier = planarPolarisedLineTensionMultiplier;
 }
 
 template<unsigned DIM>
-double PlanarPolarisedFarhadifarForce<DIM>::GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
+double PlanarPolarisedFarhadifarForce<DIM>::GetLineTensionParameter(
+    Node<DIM>* pNodeA,
+    Node<DIM>* pNodeB,
+    VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
     // Find the indices of the elements owned by each node
     std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
@@ -77,9 +81,11 @@ double PlanarPolarisedFarhadifarForce<DIM>::GetLineTensionParameter(Node<DIM>* p
     // Check that the nodes have a common edge
     assert(!shared_elements.empty());
 
-    // Since each internal edge is visited twice in the loop above, we have to use half the line tension parameter
-    // for each visit.
-    double line_tension_parameter_in_calculation = this->mLineTensionParameter/2.0;
+    /*
+     * Since each internal edge is visited twice in the loop above, we have to 
+     * use half the line tension parameter for each visit.
+     */
+    double line_tension_parameter_in_calculation = 0.5*this->mLineTensionParameter;
 
     // If the edge corresponds to a single element, then the cell is on the boundary
     if (shared_elements.size() == 1)
@@ -113,7 +119,8 @@ double PlanarPolarisedFarhadifarForce<DIM>::GetBoundaryLineTensionParameter()
 
 
 template<unsigned DIM>
-void PlanarPolarisedFarhadifarForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void PlanarPolarisedFarhadifarForce<DIM>::OutputForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<PlanarPolarisedLineTensionMultiplier>" << mPlanarPolarisedLineTensionMultiplier << "</PlanarPolarisedLineTensionMultiplier>\n";
 

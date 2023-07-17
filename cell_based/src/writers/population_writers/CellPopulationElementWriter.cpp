@@ -48,16 +48,17 @@ CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    for (typename MutableMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorBegin();
-         elem_iter != static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorEnd();
+    for (auto elem_iter = static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorBegin();
+         elem_iter != static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorEnd();
          ++elem_iter)
     {
         bool element_contains_dead_cells_or_deleted_nodes = false;
 
         // Hack that covers the case where the element contains a node that is associated with a cell that has just been killed (#1129)
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        for (unsigned i = 0; i < ELEMENT_DIM + 1; ++i)
         {
             unsigned node_index = elem_iter->GetNodeGlobalIndex(i);
 
@@ -77,7 +78,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
         }
         if (!element_contains_dead_cells_or_deleted_nodes)
         {
-            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+            for (unsigned i = 0; i < ELEMENT_DIM + 1; ++i)
             {
                 *this->mpOutStream << elem_iter->GetNodeGlobalIndex(i) << " ";
             }
@@ -86,22 +87,25 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("CellPopulationElementWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("CellPopulationElementWriter cannot be used with a NodeBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -125,7 +129,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
             *this->mpOutStream << num_nodes_in_element << " ";
 
             // Then write the global index of each Node in this element
-            for (unsigned i=0; i<num_nodes_in_element; i++)
+            for (unsigned i = 0; i < num_nodes_in_element; ++i)
             {
                 *this->mpOutStream << p_element->GetNodeGlobalIndex(i) << " ";
             }
@@ -134,10 +138,11 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {
@@ -161,7 +166,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
             *this->mpOutStream << num_nodes_in_element << " ";
 
             // Then write the global index of each Node in this element
-            for (unsigned i=0; i<num_nodes_in_element; i++)
+            for (unsigned i = 0; i < num_nodes_in_element; ++i)
             {
                 *this->mpOutStream << p_element->GetNodeGlobalIndex(i) << " ";
             }

@@ -103,7 +103,7 @@ public:
      *
      * @param pCell pointer to the cell
      */
-    virtual void UpdateTargetAreaOfCell(const CellPtr pCell);
+    virtual void UpdateTargetAreaOfCell(const CellPtr pCell) override;
 
     /**
      * @return #mGrowthDuration
@@ -123,7 +123,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

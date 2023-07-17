@@ -36,10 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TargetedCellKiller.hpp"
 
 template<unsigned DIM>
-TargetedCellKiller<DIM>::TargetedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, unsigned targetedIndex, bool bloodLust)
-: AbstractCellKiller<DIM>(pCellPopulation),
-  mTargetIndex(targetedIndex),
-  mBloodLust(bloodLust)
+TargetedCellKiller<DIM>::TargetedCellKiller(
+    AbstractCellPopulation<DIM>* pCellPopulation,
+    unsigned targetedIndex,
+    bool bloodLust)
+    : AbstractCellKiller<DIM>(pCellPopulation),
+      mTargetIndex(targetedIndex),
+      mBloodLust(bloodLust)
 {
 }
 
@@ -62,6 +65,7 @@ void TargetedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     {
         return;
     }
+
     // Mark the cell as killed and store removal information if required.
     this->mpCellPopulation->KillCell(this->mpCellPopulation->GetCellUsingLocationIndex(mTargetIndex), "TargetedCellKiller");
     mBloodLust = false;

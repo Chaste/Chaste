@@ -46,7 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
 
 /**
- * An abstract class for a writer that visits individual cells of a population and writes their data.
+ * An abstract class for a writer that visits individual cells of a population 
+ * and writes their data.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
@@ -74,10 +75,16 @@ private:
 
 protected:
 
-    /** Whether to output scalar data for VTK using GetCellDataForVtkOutput(). Default true. */
+    /**
+     * Whether to output scalar data for VTK using GetCellDataForVtkOutput(). 
+     * Default true.
+     */
     bool mOutputScalarData;
 
-    /** Whether to output scalar data for VTK using GetVectorCellDataForVtkOutput(). Default false. */
+    /**
+     * Whether to output scalar data for VTK using 
+     * GetVectorCellDataForVtkOutput(). Default false.
+     */
     bool mOutputVectorData;
 
     /** The name of the cell data used in VTK output. */
@@ -98,38 +105,45 @@ public:
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
      *
-     * By default this method returns a DOUBLE_UNSET, but it may be overridden in subclasses
-     *
-     * @param pCell a cell
-     * @param pCellPopulation a pointer to the cell population owning the cell.
-     *
-     * @return data associated with the cell
-     */
-    virtual double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Get a c_vector associated with a cell. This method reduces duplication
-     * of code between the methods VisitCell() and AddVtkData().
-     *
-     * By default this method returns a c_vector of DOUBLE_UNSET, but it may be overridden in subclasses
-     *
-     * @param pCell a cell
-     * @param pCellPopulation a pointer to the cell population owning the cell.
-     *
-     * @return data associated with the cell
-     */
-    virtual c_vector<double, SPACE_DIM> GetVectorCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Visit a cell and write its data.
-     *
-     * As this method is pure virtual, it must be overridden
+     * By default this method returns a DOUBLE_UNSET, but it may be overridden 
      * in subclasses.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell.
+     *
+     * @return data associated with the cell
      */
-    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
+    virtual double GetCellDataForVtkOutput(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Get a c_vector associated with a cell. This method reduces duplication of 
+     * code between the methods VisitCell() and AddVtkData().
+     *
+     * By default this method returns a c_vector of DOUBLE_UNSET, but it may be 
+     * overridden in subclasses
+     *
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell.
+     *
+     * @return data associated with the cell
+     */
+    virtual c_vector<double, SPACE_DIM> GetVectorCellDataForVtkOutput(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit a cell and write its data.
+     *
+     * As this method is pure virtual, it must be overridden in subclasses.
+     *
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell.
+     */
+    virtual void VisitCell(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Get whether to invoke GetCellDataForVtkOutput()
@@ -146,20 +160,18 @@ public:
     bool GetOutputVectorData();
 
     /**
-     * Set the name of the scalar cell data used in VTK output.
-     * This method allows the user to change mVtkCellDataName from
-     * its default value, which is set in each subclass's
-     * constructor.
+     * Set the name of the scalar cell data used in VTK output. This method 
+     * allows the user to change mVtkCellDataName from its default value, which 
+     * is set in each subclass's constructor.
      *
      * @param vtkCellDataName the name of the VTK field
      */
     void SetVtkCellDataName(std::string vtkCellDataName);
 
     /**
-     * Set the name of the vector cell data used in VTK output.
-     * This method allows the user to change mVtkCellDataName from
-     * its default value, which is set in each subclass's
-     * constructor.
+     * Set the name of the vector cell data used in VTK output. This method 
+     * allows the user to change mVtkCellDataName from its default value, which 
+     * is set in each subclass's constructor.
      *
      * @param vtkCellDataName the name of the VTK field
      */

@@ -48,10 +48,10 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length specified in
- * the class constructor.
+ * A class to generate a division vector of unit length specified in the class 
+ * constructor.
  *
- * This helper class is used in TestVertexhBasedCellPopulation.hpp.
+ * This helper class is used in TestVertexBasedCellPopulation.hpp.
  */
 template<unsigned SPACE_DIM>
 class FixedVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
@@ -105,8 +105,9 @@ public:
      * @param rCellPopulation  The vertex-based cell population
      * @return mDivisionVector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
+        CellPtr pParentCell,
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -125,7 +126,7 @@ inline void save_construct_data(
 {
     // Archive c_vector one component at a time
     c_vector<double, SPACE_DIM> vector = t->rGetDivisionVector();
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar << vector[i];
     }
@@ -140,7 +141,7 @@ inline void load_construct_data(
 {
     // Archive c_vector one component at a time
     c_vector<double, SPACE_DIM> vector;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar >> vector[i];
     }

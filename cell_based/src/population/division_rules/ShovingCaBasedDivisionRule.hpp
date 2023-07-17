@@ -51,7 +51,7 @@ template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
  * that direction.
  */
 template <unsigned SPACE_DIM>
-class ShovingCaBasedDivisionRule  : public AbstractCaBasedDivisionRule<SPACE_DIM>
+class ShovingCaBasedDivisionRule : public AbstractCaBasedDivisionRule<SPACE_DIM>
 {
 private:
 
@@ -81,24 +81,29 @@ public:
     virtual ~ShovingCaBasedDivisionRule(){};
 
     /**
-     * Helper method to see if cells are on the boundary of the domain.
-     * Throws exception if cells boundary of the domain.
+     * Helper method to see if cells are on the boundary of the domain. Throws 
+     * exception if cells boundary of the domain.
      *
      * @param numNeighbours the number of neighbours of the node.
      */
     void IsNodeOnBoundary(unsigned numNeighbours);
 
     /**
+     * Overridden IsRoomToDivide() method.
+     * 
      * Return whether there is room to divide at all.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The CA-based cell population
      * @return if the site is available.
      */
-    virtual bool IsRoomToDivide(CellPtr pParentCell,
-                                CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual bool IsRoomToDivide(
+        CellPtr pParentCell,
+        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 
     /**
+     * Overridden CalculateDaughterNodeIndex() method.
+     * 
      * Return the index for the daughter node.
      * This method can be used to move cells out of the way as necessary.
      *
@@ -107,9 +112,10 @@ public:
      * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
-    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
-                                                CellPtr pParentCell,
-                                                CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual unsigned CalculateDaughterNodeIndex(
+        CellPtr pNewCell,
+        CellPtr pParentCell,
+        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

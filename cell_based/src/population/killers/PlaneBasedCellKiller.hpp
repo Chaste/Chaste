@@ -43,9 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * A cell killer that kills cells if they are outside the domain.
- * defined by a point, mPointOnPlane, and an outward pointing normal, mNormalToPlane.
- * Works for all CellPopulations.
+ * A cell killer that kills cells if they are outside the domain. Defined by a 
+ * point, mPointOnPlane, and an outward pointing normal, mNormalToPlane. Works 
+ * for all CellPopulations.
  */
 template<unsigned DIM>
 class PlaneBasedCellKiller : public AbstractCellKiller<DIM>
@@ -100,16 +100,18 @@ public:
     const c_vector<double, DIM>& rGetNormalToPlane() const;
 
     /**
+     * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.
+     * 
      * Loops over cells and kills cells outside boundary.
      */
-    virtual void CheckAndLabelCellsForApoptosisOrDeath();
+    virtual void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

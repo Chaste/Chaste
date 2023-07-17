@@ -45,14 +45,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Run an on-lattice 2D or 3D cell-based simulation.
  *
- * The OnLatticeSimulation is constructed with a CellPopulation, which
- * updates the correspondence between each Cell and its spatial representation
- * and handles cell division (governed by the CellCycleModel associated
- * with each cell). Once constructed, one or more Update rules may be passed
- * to the OnLatticeSimulation object, to define the processes which update
- * cells in the CellPopulation. Similarly, one or more CellKillers may be passed
- * to the OnLatticeSimulation object to specify conditions in which Cells
- * may die.
+ * The OnLatticeSimulation is constructed with a CellPopulation, which updates 
+ * the correspondence between each Cell and its spatial representation and 
+ * handles cell division (governed by the CellCycleModel associated with each 
+ * cell). Once constructed, one or more Update rules may be passed to the 
+ * OnLatticeSimulation object, to define the processes which update cells in the 
+ * CellPopulation. Similarly, one or more CellKillers may be passed to the 
+ * OnLatticeSimulation object to specify conditions in which Cells may die.
  */
 template<unsigned DIM>
 class OnLatticeSimulation : public AbstractCellBasedSimulation<DIM>
@@ -78,17 +77,18 @@ protected:
     /**
      * Overridden UpdateCellPopulation() method.
      *
-     * If using a CaBasedCellPopulation, this method does nothing if at the start of a simulation that
-     * has just been loaded, to ensure consistency in random number generation.
+     * If using a CaBasedCellPopulation, this method does nothing if at the 
+     * start of a simulation that has just been loaded, to ensure consistency in 
+     * random number generation.
      */
-    void UpdateCellPopulation();
+    void UpdateCellPopulation() override;
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
      *
      * If using a PottsBasedCellPopulation, this method performs Monte Carlo sampling.
      */
-    void UpdateCellLocationsAndTopology();
+    void UpdateCellLocationsAndTopology() override;
 
 public:
 
@@ -96,10 +96,10 @@ public:
      * Constructor.
      *
      * @param rCellPopulation A cell population object
-     * @param deleteCellPopulationInDestructor Whether to delete the cell population on destruction to
-     *     free up memory (defaults to false)
-     * @param initialiseCells Whether to initialise cells (defaults to true, set to false when loading
-     * from an archive)
+     * @param deleteCellPopulationInDestructor Whether to delete the cell 
+     *           population on destruction to free up memory (defaults to false)
+     * @param initialiseCells Whether to initialise cells (defaults to true, set 
+     *           to false when loading from an archive)
      */
     OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
                         bool deleteCellPopulationInDestructor=false,
@@ -113,24 +113,25 @@ public:
     void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
-     * Remove any update rules that have previously been passed to the cell population.
+     * Remove any update rules that have previously been passed to the cell 
+     * population.
      */
     void RemoveAllUpdateRules();
 
     /**
-     * Overridden OutputAdditionalSimulationSetup() method to output the force and cell
-     * population boundary condition information.
+     * Overridden OutputAdditionalSimulationSetup() method to output the force 
+     * and cell population boundary condition information.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputAdditionalSimulationSetup(out_stream& rParamsFile);
+    void OutputAdditionalSimulationSetup(out_stream& rParamsFile) override;
 
     /**
      * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationParameters(out_stream& rParamsFile);
+    void OutputSimulationParameters(out_stream& rParamsFile) override;
 };
 
 // Serialization for Boost >= 1.36
@@ -164,8 +165,11 @@ inline void load_construct_data(
     AbstractCellPopulation<DIM>* p_cell_population;
     ar >> p_cell_population;
 
-    // Invoke inplace constructor to initialise instance, last two variables set extra
-    // member variables to be deleted as they are loaded from archive and to not initialise sells.
+    /*
+     * Invoke inplace constructor to initialise instance, last two variables set 
+     * extra member variables to be deleted as they are loaded from archive and 
+     * to not initialise sells.
+     */
     ::new(t)OnLatticeSimulation<DIM>(*p_cell_population, true, false);
 }
 }

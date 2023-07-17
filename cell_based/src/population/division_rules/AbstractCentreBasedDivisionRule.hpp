@@ -47,8 +47,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedCell
 /**
  * An abstract cell division rule for use in centre-based simulations.
  *
- * The purpose of this class is to return the locations of the two
- * daughters of a dividing cell.
+ * The purpose of this class is to return the locations of the two daughters of 
+ * a dividing cell.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCentreBasedDivisionRule : public Identifiable
@@ -70,9 +70,9 @@ private:
 protected:
 
     /**
-     * Output any parameters associated with the division rule.
-     * Currently empty since this class has no member variables. Should
-     * be overridden by any child classes that have parameters.
+     * Output any parameters associated with the division rule. Currently empty 
+     * since this class has no member variables. Should be overridden by any 
+     * child classes that have parameters.
      *
      * @param rParamsFile  The stream of the parameter file
      */
@@ -93,19 +93,20 @@ public:
     /**
      * Return a pair of vectors used to position the daughters of a dividing cell.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The centre-based cell population
      *
      * @return the two daughter cell positions.
      */
-    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
+    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(
+        CellPtr pParentCell,
         AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)=0;
 
     /**
-     * Output the name of the concrete class and call OutputCellCentreBasedDivisionRuleParameters().
+     * Output the name of the concrete class and call 
+     * OutputCellCentreBasedDivisionRuleParameters().
      *
      * @param rParamsFile  The stream of the parameter file
      */

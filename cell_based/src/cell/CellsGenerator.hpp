@@ -113,7 +113,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasic(std::vector<CellPtr>& r
     rCells.reserve(numCells);
 
     // Create cells
-    for (unsigned i=0; i<numCells; i++)
+    for (unsigned i = 0; i < numCells; ++i)
     {
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
@@ -155,7 +155,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateBasicRandom(std::vector<CellP
     rCells.reserve(numCells);
 
     // Create cells
-    for (unsigned i=0; i<numCells; i++)
+    for (unsigned i = 0; i < numCells; ++i)
     {
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);
@@ -197,7 +197,7 @@ void CellsGenerator<CELL_CYCLE_MODEL,DIM>::GenerateGivenLocationIndices(std::vec
     rCells.reserve(num_cells);
     CellPropertyRegistry::Instance()->Clear();
 
-    for (unsigned i=0; i<num_cells; i++)
+    for (unsigned i = 0; i < num_cells; ++i)
     {
         CELL_CYCLE_MODEL* p_cell_cycle_model = new CELL_CYCLE_MODEL;
         p_cell_cycle_model->SetDimension(DIM);

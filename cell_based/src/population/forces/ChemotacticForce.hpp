@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A chemotactic force class.
  */
 template<unsigned DIM>
-class ChemotacticForce  : public AbstractForce<DIM>
+class ChemotacticForce : public AbstractForce<DIM>
 {
 friend class TestForces;
 
@@ -55,7 +55,8 @@ private:
      * @return the magnitude of the chemotactic force.
      *
      * @param concentration the local nutrient concentration
-     * @param concentrationGradientMagnitude the magnitude of the local nutrient concentration gradient
+     * @param concentrationGradientMagnitude the magnitude of the local 
+     *        nutrient concentration gradient
      */
     double GetChemotacticForceMagnitude(const double concentration, const double concentrationGradientMagnitude);
 
@@ -93,14 +94,15 @@ public:
      * Fc = chi(C,|gradC|) gradC/|gradC|  (if |gradC|>0, else Fc = 0)
      *
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(
+        AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

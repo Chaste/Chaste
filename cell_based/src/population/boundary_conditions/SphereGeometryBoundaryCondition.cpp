@@ -37,10 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-SphereGeometryBoundaryCondition<DIM>::SphereGeometryBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
-                                                                      c_vector<double, DIM> centre,
-                                                                      double radius,
-                                                                      double distance)
+SphereGeometryBoundaryCondition<DIM>::SphereGeometryBoundaryCondition(
+    AbstractCellPopulation<DIM>* pCellPopulation,
+    c_vector<double, DIM> centre,
+    double radius,
+    double distance)
     : AbstractCellPopulationBoundaryCondition<DIM>(pCellPopulation),
       mCentreOfSphere(centre),
       mRadiusOfSphere(radius),
@@ -75,7 +76,7 @@ template<unsigned DIM>
 void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
 {
     // Iterate over the cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (auto cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {
@@ -105,7 +106,7 @@ bool SphereGeometryBoundaryCondition<DIM>::VerifyBoundaryCondition()
     bool condition_satisfied = true;
 
     // Iterate over the cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (auto cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {
@@ -128,7 +129,7 @@ template<unsigned DIM>
 void SphereGeometryBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<CentreOfSphere>";
-    for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != DIM-1U; ++index) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mCentreOfSphere[index] << ",";
     }

@@ -75,15 +75,15 @@ public:
     /**
      * Calculates the force on each node.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)=0;
+    virtual void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)=0;
 
     /**
-     * Outputs force used in the simulation to file and then calls OutputForceParameters to output all relevant parameters.
+     * Outputs force used in the simulation to file and then calls 
+     * OutputForceParameters to output all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -92,8 +92,7 @@ public:
     /**
      * Outputs force parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

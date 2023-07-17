@@ -38,7 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 
 template<unsigned DIM>
-IsolatedLabelledCellKiller<DIM>::IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation)
+IsolatedLabelledCellKiller<DIM>::IsolatedLabelledCellKiller(
+    AbstractCellPopulation<DIM>* pCellPopulation)
     : AbstractCellKiller<DIM>(pCellPopulation)
 {
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(pCellPopulation) == nullptr)
@@ -58,7 +59,7 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     if (num_labelled_cells > 1)
     {
         // Iterate over cell population
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (auto cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
              ++cell_iter)
         {
@@ -73,7 +74,7 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 
                 // Check if any of the corresponding cells have the CellLabel property...
                 unsigned num_labelled_neighbours = 0;
-                for (std::set<unsigned>::iterator elem_iter = neighbouring_elem_indices.begin();
+                for (auto elem_iter = neighbouring_elem_indices.begin();
                      elem_iter != neighbouring_elem_indices.end();
                      ++elem_iter)
                 {

@@ -52,8 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * CellBasedSimulationArchiver handles the checkpointing (saving and loading)
- * of all the various AbstractCellBasedSimulation objects. It has no explicit constructor
- * (just uses a default one) and no member variables.
+ * of all the various AbstractCellBasedSimulation objects. It has no explicit 
+ * constructor (just uses a default one) and no member variables.
  */
 template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class CellBasedSimulationArchiver
@@ -69,7 +69,8 @@ public:
      * @param rTimeStamp  the time at which to load the simulation (this must
      *   be one of the times at which simulation.Save() was called)
      */
-    static SIM* Load(const std::string& rArchiveDirectory, const double& rTimeStamp);
+    static SIM* Load(const std::string& rArchiveDirectory, 
+                     const double& rTimeStamp);
 
     /**
      * Saves the whole cell-based simulation for restarting later.
@@ -87,12 +88,15 @@ public:
 };
 
 template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
-SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
+SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(
+    const std::string& rArchiveDirectory,
+    const double& rTimeStamp)
 {
     /**
-     * Find the right archive (and mesh) to load.  The files are contained within
+     * Find the right archive (and mesh) to load. The files are contained within
      * the 'archive' folder in rArchiveDirectory, with the archive itself called
-     * 'cell_population_sim_at_time_`rTimeStamp`.arch'.  The path to this file is returned.
+     * 'cell_population_sim_at_time_`rTimeStamp`.arch'. The path to this file is 
+     * returned.
      *
      * The path to the mesh is stored in ArchiveLocationInfo for use by the
      * CellPopulation de-serialization routines.

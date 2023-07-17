@@ -48,9 +48,10 @@ NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::NodeVelocityWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -75,7 +76,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
 
             // Write this node's position to file
             const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
                 *this->mpOutStream << position[i] << " ";
             }
@@ -84,7 +85,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
             double time_step = SimulationTime::Instance()->GetTimeStep(); ///\todo correct time step? (#2404)
             double damping_constant = pCellPopulation->GetDampingConstant(node_index);
             c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
                 *this->mpOutStream << velocity[i] << " ";
             }
@@ -93,15 +94,17 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("NodeVelocityWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -126,7 +129,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
 
             // Write this node's position to file
             const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
                 *this->mpOutStream << position[i] << " ";
             }
@@ -135,7 +138,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
             double time_step = SimulationTime::Instance()->GetTimeStep(); ///\todo correct time step? (#2404)
             double damping_constant = pCellPopulation->GetDampingConstant(node_index);
             c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
                 *this->mpOutStream << velocity[i] << " ";
             }
@@ -144,15 +147,17 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("NodeVelocityWriter cannot be used with a PottsBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -165,7 +170,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
 
         // Write this node's position to file
         const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             *this->mpOutStream << position[i] << " ";
         }
@@ -174,7 +179,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
         double time_step = SimulationTime::Instance()->GetTimeStep(); ///\todo correct time step? (#2404)
         double damping_constant = pCellPopulation->GetDampingConstant(node_index);
         c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             *this->mpOutStream << velocity[i] << " ";
         }

@@ -46,9 +46,9 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a direction 
- * randomly sampled from a von Mises distribution parameterised by mu (mean parameter) 
- * and kappa (concentration parameter).
+ * A class to generate a division vector of unit length that points in a 
+ * direction randomly sampled from a von Mises distribution parameterised by mu
+ * (mean parameter) and kappa (concentration parameter).
  */
 template <unsigned SPACE_DIM>
 class VonMisesVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
@@ -58,7 +58,10 @@ private:
     /** Mean parameter. Initialised to 0 in the constructor. */
     double mMeanParameter;
 
-    /** Concentration parameter. Must be positive. Initialised to 1 in the constructor.  */
+    /**
+     * Concentration parameter. Must be positive. Initialised to 1 in the 
+     * constructor.
+     */
     double mConcentrationParameter;
 
     friend class boost::serialization::access;
@@ -114,14 +117,16 @@ public:
     /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return a unit vector that points in a direction randomly sampled from a von Mises distribution, i.e the arguments are redundant for this division rule.
+     * Return a unit vector that points in a direction randomly sampled from a 
+     * von Mises distribution, i.e the arguments are redundant for this division 
+     * rule.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

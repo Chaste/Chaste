@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 
 /**
- * An abstract cell population boundary condition class, for use in cell-based simulations.
+ * An abstract cell population boundary condition class, for use in cell-based 
+ * simulations.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCellPopulationBoundaryCondition : public Identifiable
@@ -67,7 +68,7 @@ private:
 protected:
 
     /** The cell population. */
-    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* mpCellPopulation;
 
 public:
 
@@ -76,7 +77,8 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    AbstractCellPopulationBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation);
+    AbstractCellPopulationBoundaryCondition(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Destructor.
@@ -86,20 +88,21 @@ public:
     /**
      * Impose the boundary condition on each node.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
-     * @param rOldLocations the node locations prior to being updated in UpdateNodePositions()
+     * @param rOldLocations the node locations prior to being updated in 
+     *     UpdateNodePositions()
      */
-    virtual void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)=0;
+    virtual void ImposeBoundaryCondition(
+        const std::map<Node<SPACE_DIM>*,
+        c_vector<double, SPACE_DIM> >& rOldLocations)=0;
 
     /**
      * Pure method which should verify the boundary condition has been applied.
      * This is called after ImposeBoundaryCondition() to ensure the condition is
      * still satisfied.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @return whether the boundary condition is satisfied.
      */
@@ -110,11 +113,12 @@ public:
      *
      * @return A const pointer to the mpCellPopulation
      */
-    const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* GetCellPopulation() const;
+    const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* GetCellPopulation() const;
 
     /**
-     * Output cell population boundary condition used in the simulation to file and then call
-     * OutputCellPopulationBoundaryConditionParameters() to output all relevant parameters.
+     * Output cell population boundary condition used in the simulation to file 
+     * and then call OutputCellPopulationBoundaryConditionParameters() to output 
+     * all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -123,8 +127,7 @@ public:
     /**
      * Output cell population boundary condition parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

@@ -47,7 +47,9 @@ CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::CellAppliedForceWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::GetVectorCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+c_vector<double, SPACE_DIM> CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::GetVectorCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     c_vector<double, SPACE_DIM> applied_force = scalar_vector<double>(SPACE_DIM, DOUBLE_UNSET);
 
@@ -61,7 +63,9 @@ c_vector<double, SPACE_DIM> CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::GetV
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     unsigned cell_id = pCell->GetCellId();
@@ -69,11 +73,11 @@ void CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Ab
     c_vector<double, SPACE_DIM> applied_force = GetVectorCellDataForVtkOutput(pCell, pCellPopulation);
 
     *this->mpOutStream << location_index << " " << cell_id << " ";
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << cell_location[i] << " ";
     }
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << applied_force[i] << " ";
     }

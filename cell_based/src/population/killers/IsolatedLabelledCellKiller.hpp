@@ -80,16 +80,19 @@ public:
     IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
 
     /**
-     * Kills any isolated cells with the CellLabel property (unless there is only one such cell in the population).
+     * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.
+     * 
+     * Kills any isolated cells with the CellLabel property (unless there is 
+     * only one such cell in the population).
      */
-    void CheckAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

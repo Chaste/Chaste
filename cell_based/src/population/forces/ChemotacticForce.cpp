@@ -50,19 +50,22 @@ ChemotacticForce<DIM>::~ChemotacticForce()
 }
 
 template<unsigned DIM>
-double ChemotacticForce<DIM>::GetChemotacticForceMagnitude(const double concentration, const double concentrationGradientMagnitude)
+double ChemotacticForce<DIM>::GetChemotacticForceMagnitude(
+    const double concentration,
+    const double concentrationGradientMagnitude)
 {
     return concentration; // temporary force law - can be changed to something realistic
                           // without tests failing
 }
 
 template<unsigned DIM>
-void ChemotacticForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void ChemotacticForce<DIM>::AddForceContribution(
+    AbstractCellPopulation<DIM>& rCellPopulation)
 {
     CellwiseDataGradient<DIM> gradients;
     gradients.SetupGradients(rCellPopulation, "nutrient");
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -91,9 +94,7 @@ void ChemotacticForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rC
 template<unsigned DIM>
 void ChemotacticForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    // No parameters to include
-
-    // Call method on direct parent class
+    // No parameters to include, so just call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 

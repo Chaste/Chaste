@@ -42,23 +42,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::AbstractNumericalMethod()
+AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::AbstractNumericalMethod()
     : mpCellPopulation(nullptr),
       mpForceCollection(nullptr),
       mUseAdaptiveTimestep(false),
       mUseUpdateNodeLocation(false),
       mGhostNodeForcesEnabled(true)
 {
-    // mpCellPopulation, mpForceCollection and mpBoundaryConditions are initialized by the OffLatticeSimulation constructor
+    /*
+     * mpCellPopulation, mpForceCollection and mpBoundaryConditions are 
+     * initialized by the OffLatticeSimulation constructor.
+     */
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::~AbstractNumericalMethod()
+AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::~AbstractNumericalMethod()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* pPopulation)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SetCellPopulation(
+    AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>* pPopulation)
 {
     mpCellPopulation = pPopulation;
 
@@ -80,37 +84,40 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetCellPopulation(AbstractO
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetForceCollection(std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SetForceCollection(
+    std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* pForces)
 {
     mpForceCollection = pForces;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetBoundaryConditions(std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SetBoundaryConditions(
+    std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> > >* pBoundaryConditions)
 {
     mpBoundaryConditions = pBoundaryConditions;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseAdaptiveTimestep(bool useAdaptiveTimestep)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SetUseAdaptiveTimestep(
+    bool useAdaptiveTimestep)
 {
     mUseAdaptiveTimestep = useAdaptiveTimestep;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::HasAdaptiveTimestep()
+bool AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::HasAdaptiveTimestep()
 {
     return mUseAdaptiveTimestep;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SaveCurrentNodeLocations()
+std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SaveCurrentNodeLocations()
 {
     std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > node_locations;
 
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-            node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+    for (auto node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
     }
@@ -119,10 +126,11 @@ std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > AbstractNumericalMethod
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryConditions(
+    std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations)
 {
     // Apply any boundary conditions
-    for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mpBoundaryConditions->begin();
+    for (auto bcs_iter = mpBoundaryConditions->begin();
          bcs_iter != mpBoundaryConditions->end();
          ++bcs_iter)
     {
@@ -131,27 +139,30 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryConditions(st
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::ComputeForcesIncludingDamping()
+std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::ComputeForcesIncludingDamping()
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::FORCE);
 
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-         node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd(); ++node_iter)
+    for (auto node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         node_iter->ClearAppliedForce();
     }
 
-    for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mpForceCollection->begin();
-        iter != mpForceCollection->end(); ++iter)
+    for (auto iter = mpForceCollection->begin();
+        iter != mpForceCollection->end();
+        ++iter)
     {
         (*iter)->AddForceContribution(*mpCellPopulation);
     }
 
     /**
-     * Here we deal with the special case forces on ghost nodes. Note that 'particles'
-     * are dealt with like normal cells.
+     * Here we deal with the special case forces on ghost nodes. Note that 
+     * 'particles' are dealt with like normal cells.
      *
-     * \todo #2087 Consider removing dynamic_cast and instead adding a virtual method ApplyForcesToNonCellNodes()
+     * \todo #2087 Consider removing dynamic_cast and instead adding a virtual 
+     * method ApplyForcesToNonCellNodes()
      */
     if (mGhostNodeForcesEnabled)
     {
@@ -162,8 +173,9 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
     std::vector<c_vector<double, SPACE_DIM> > forces_as_vector;
     forces_as_vector.reserve(mpCellPopulation->GetNumNodes());
 
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
-         node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd(); ++node_iter)
+    for (auto node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         double damping = mpCellPopulation->GetDampingConstant(node_iter->GetIndex());
         forces_as_vector.push_back(node_iter->rGetAppliedForce()/damping);
@@ -175,12 +187,12 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SaveCurrentLocations()
+std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SaveCurrentLocations()
 {
     std::vector<c_vector<double, SPACE_DIM> > current_locations;
     current_locations.reserve(mpCellPopulation->GetNumNodes());
 
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -191,14 +203,18 @@ std::vector<c_vector<double, SPACE_DIM> > AbstractNumericalMethod<ELEMENT_DIM,SP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SafeNodePositionUpdate( unsigned nodeIndex, c_vector<double, SPACE_DIM> newPosition)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SafeNodePositionUpdate(
+    unsigned nodeIndex,
+    c_vector<double, SPACE_DIM> newPosition)
 {
     ChastePoint<SPACE_DIM> new_point(newPosition);
     mpCellPopulation->SetNode(nodeIndex, new_point);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::DetectStepSizeExceptions(
+    unsigned nodeIndex,
+    c_vector<double,SPACE_DIM>& displacement, double dt)
 {
     try
     {
@@ -209,9 +225,10 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
         if (!(e.IsTerminal()) && (mUseAdaptiveTimestep==false))
         {
             /*
-             * If adaptivity is turned off but the simulation can continue, just produce a warning.
-             * Only the case for vertex-based cell populations, which can alter node displacement directly
-             * to avoid cell rearrangement problems.
+             * If adaptivity is turned off but the simulation can continue, just 
+             * produce a warning. Only the case for vertex-based cell 
+             * populations, which can alter node displacement directly to avoid 
+             * cell rearrangement problems.
              */
             WARN_ONCE_ONLY(e.what());
         }
@@ -223,29 +240,31 @@ void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::DetectStepSizeExceptions(un
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::SetUseUpdateNodeLocation(bool useUpdateNodeLocation)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SetUseUpdateNodeLocation(
+    bool useUpdateNodeLocation)
 {
     mUseUpdateNodeLocation = useUpdateNodeLocation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::GetUseUpdateNodeLocation()
+bool AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::GetUseUpdateNodeLocation()
 {
     return mUseUpdateNodeLocation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodInfo(out_stream& rParamsFile)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodInfo(
+    out_stream& rParamsFile)
 {
     std::string numerical_method_type = GetIdentifier();
-
     *rParamsFile << "\t\t<" << numerical_method_type << ">\n";
     OutputNumericalMethodParameters(rParamsFile);
     *rParamsFile << "\t\t</" << numerical_method_type << ">\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>::OutputNumericalMethodParameters(out_stream& rParamsFile)
+void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<UseAdaptiveTimestep>" << mUseAdaptiveTimestep << "</UseAdaptiveTimestep> \n";
     *rParamsFile << "\t\t\t<UseUpdateNodeLocation>" << mUseUpdateNodeLocation << "</UseUpdateNodeLocation> \n";

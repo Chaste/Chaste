@@ -52,7 +52,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * CryptSimulation2d.
  */
 template <unsigned SPACE_DIM>
-class CryptVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
+class CryptVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;

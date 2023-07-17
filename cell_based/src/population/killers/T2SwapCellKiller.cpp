@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRemovalLocationsWriter.hpp"
 
 template<unsigned DIM>
-T2SwapCellKiller<DIM>::T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopulation)
+T2SwapCellKiller<DIM>::T2SwapCellKiller(
+    AbstractCellPopulation<DIM>* pCellPopulation)
     : AbstractCellKiller<DIM>(pCellPopulation)
 {
     // Throw an exception if the population is not a VertexBasedCellPopulation
@@ -51,12 +52,12 @@ template<unsigned DIM>
 void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
     /*
-     * This killer is different to other killers: it does not only check and label
-     * cells for apoptosis or death, it actually carries out vertex rearrangements
-     * and removes elements from the vertex mesh.
+     * This killer is different to other killers: it does not only check and 
+     * label cells for apoptosis or death, it actually carries out vertex 
+     * rearrangements and removes elements from the vertex mesh.
      *
-     * We start with carrying out T2 swaps. Get the mesh and an element map.
-     * The static_cast will work since we already know it's a VertexBasedCellPopulation.
+     * We start with carrying out T2 swaps. Get the mesh and an element map. The 
+     * static_cast will work since we already know it's a VertexBasedCellPopulation.
      */
     MutableVertexMesh<DIM,DIM>& mesh = static_cast<MutableVertexMesh<DIM,DIM>&>(this->mpCellPopulation->rGetMesh());
     VertexBasedCellPopulation<DIM>* p_vertex_population = static_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation);
@@ -72,7 +73,7 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
          * mesh but the associated cell is still there. Here we check whether a new cell
          * underwent a T2 swap and label it as dead as well as record its location and ID.
          */
-        for (unsigned elem_index = 0; elem_index < element_map.Size(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < element_map.Size(); ++elem_index)
         {
             CellPtr p_cell = this->mpCellPopulation->GetCellUsingLocationIndex(elem_index);
             if (element_map.IsDeleted(elem_index) && !(p_cell->IsDead()))
@@ -106,7 +107,6 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
             }
         }
     }
-
 }
 
 template<unsigned DIM>

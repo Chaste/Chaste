@@ -46,8 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A cell killer that randomly kills cells based on the user set probability.
  *
- * The probability passed into the constructor will be the probability
- * of any cell dying whenever CheckAndLabelCellsForApoptosis() is called.
+ * The probability passed into the constructor will be the probability of any 
+ * cell dying whenever CheckAndLabelCellsForApoptosis() is called.
  *
  * Note this does take into account time steps - the input probability is the
  * probability that in an hour's worth of trying, the cell killer will have
@@ -56,8 +56,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * at a given time step.
  *
  * We assume a constant time step and that there are an integer number (n = 1/dt)
- * of time steps per hour. We also assume that this method is called every time step
- * and that the probabilities of dying at different times are independent.
+ * of time steps per hour. We also assume that this method is called every time 
+ * step and that the probabilities of dying at different times are independent.
  */
 template<unsigned DIM>
 class RandomCellKiller : public AbstractCellKiller<DIM>
@@ -65,9 +65,9 @@ class RandomCellKiller : public AbstractCellKiller<DIM>
 private:
 
     /**
-     * Probability that in an hour's worth of trying, the cell killer
-     * will have successfully killed a given cell.
-      */
+     * Probability that in an hour's worth of trying, the cell killer will have 
+     * successfully killed a given cell.
+     */
      double mProbabilityOfDeathInAnHour;
 
     /** Needed for serialization. */
@@ -94,9 +94,11 @@ public:
      * Default constructor.
      *
      * @param pCellPopulation pointer to the cell population
-     * @param probabilityOfDeathInAnHour probability that a cell is labelled for apoptosis in one hour's worth of trying
+     * @param probabilityOfDeathInAnHour probability that a cell is labelled for 
+     *     apoptosis in one hour's worth of trying
      */
-    RandomCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, double probabilityOfDeathInAnHour);
+    RandomCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
+                     double probabilityOfDeathInAnHour);
 
     /**
      * @return mProbabilityOfDeathInAnHour.
@@ -104,24 +106,26 @@ public:
     double GetDeathProbabilityInAnHour() const;
 
     /**
-     * Overridden method to test a given cell for apoptosis.
+     * Mthod to test a given cell for apoptosis.
      *
      * @param pCell the cell to test for apoptosis
      */
     void CheckAndLabelSingleCellForApoptosis(CellPtr pCell);
 
     /**
+     * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.
+     * 
      * Loop over cells and start apoptosis randomly, based on the user-set
      * probability.
      */
-    void CheckAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

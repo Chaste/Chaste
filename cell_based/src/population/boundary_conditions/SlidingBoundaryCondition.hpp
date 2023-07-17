@@ -43,9 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * A boundary condition class that prevents nodes lying with a threshold distance from the 
- * left-hand boundary to move in the x direction, but which allows them to 'slide' along 
- * this boundary.
+ * A boundary condition class that prevents nodes lying with a threshold 
+ * distance from the left-hand boundary to move in the x direction, but which 
+ * allows them to 'slide' along this boundary.
  */
 template<unsigned DIM>
 class SlidingBoundaryCondition : public AbstractCellPopulationBoundaryCondition<DIM>
@@ -78,7 +78,8 @@ public:
      * Constructor.
      *
      * @param pCellPopulation pointer to the cell population
-     * @param threshold maximum distance from left-hand boundary at which condition is imposed on nodes (defaults to 0.8)
+     * @param threshold maximum distance from left-hand boundary at which 
+     *     condition is imposed on nodes (defaults to 0.8)
      */
     SlidingBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
                              double threshold=0.8);
@@ -95,16 +96,19 @@ public:
      *
      * @param rOldLocations the node locations before the boundary condition are applied
      */
-    void ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(
+        const std::map<Node<DIM>*,
+        c_vector<double, DIM> >& rOldLocations) override;
 
     /**
      * Overridden VerifyBoundaryCondition() method.
-     * Verify the boundary condition has been applied.
-     * This is called after ImposeBoundaryCondition() to ensure the condition is still satisfied.
+     * 
+     * Verify the boundary condition has been applied. This is called after 
+     * ImposeBoundaryCondition() to ensure the condition is still satisfied.
      *
      * @return whether the boundary conditions are satisfied.
      */
-    bool VerifyBoundaryCondition();
+    bool VerifyBoundaryCondition() override;
 
     /**
      * Overridden OutputCellPopulationBoundaryConditionParameters() method.
@@ -112,7 +116,8 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile);
+    void OutputCellPopulationBoundaryConditionParameters(
+        out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

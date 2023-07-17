@@ -45,7 +45,9 @@ CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::CellRosetteRankWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // We first need to test that the cell population is vertex-based
     VertexBasedCellPopulation<SPACE_DIM>* p_vbcp = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(pCellPopulation);
@@ -62,7 +64,9 @@ double CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(Ce
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     unsigned cell_id = pCell->GetCellId();
@@ -71,7 +75,7 @@ void CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abs
     double rosette_rank = this->GetCellDataForVtkOutput(pCell, pCellPopulation);
 
     *this->mpOutStream << location_index << " " << cell_id << " ";
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << centre_location[i] << " ";
     }

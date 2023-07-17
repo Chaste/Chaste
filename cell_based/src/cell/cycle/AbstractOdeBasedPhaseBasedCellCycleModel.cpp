@@ -104,7 +104,7 @@ void AbstractOdeBasedPhaseBasedCellCycleModel::UpdateCellCyclePhase()
             this->mFinishedRunningOdes = SolveOdeToTime(current_time);
 
             // Check no concentrations have gone negative
-            for (unsigned i=0; i<mpOdeSystem->GetNumberOfStateVariables(); i++)
+            for (unsigned i = 0; i < mpOdeSystem->GetNumberOfStateVariables(); ++i)
             {
                 if (mpOdeSystem->rGetStateVariables()[i] < -DBL_EPSILON)
                 {

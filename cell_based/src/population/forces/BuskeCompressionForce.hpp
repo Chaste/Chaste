@@ -46,10 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A force law employed by Buske et al (2011) in their overlapping spheres
  * model of the intestinal crypt (doi:10.1371/journal.pcbi.1001045).
  *
- * Length is scaled by natural length. \todo does this mean natural radius of a cell? If so at what age? (#1764)
+ * Length is scaled by natural length. \todo does this mean natural radius of a 
+ * cell? If so at what age? (#1764)
  * Time is in hours.
  *
- * This class specifically calculates the compression force which forms part of equation (A6) in the Buske paper.
+ * This class specifically calculates the compression force which forms part of 
+ * equation (A6) in the Buske paper.
  */
 template<unsigned DIM>
 class BuskeCompressionForce : public AbstractForce<DIM>
@@ -107,14 +109,14 @@ public:
      *
      * @param rCellPopulation a cell population object
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

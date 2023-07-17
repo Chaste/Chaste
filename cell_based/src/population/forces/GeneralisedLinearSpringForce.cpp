@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GeneralisedLinearSpringForce()
-   : AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>(),
+GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GeneralisedLinearSpringForce()
+   : AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>(),
      mMeinekeSpringStiffness(15.0),        // denoted by mu in Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
      mMeinekeDivisionRestingSpringLength(0.5),
      mMeinekeSpringGrowthDuration(1.0)
@@ -49,23 +49,25 @@ GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GeneralisedLinearSpringForc
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
-                                                                                     unsigned nodeBGlobalIndex,
-                                                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                                                                     bool isCloserThanRestLength)
+double GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::VariableSpringConstantMultiplicationFactor(
+    unsigned nodeAGlobalIndex,
+    unsigned nodeBGlobalIndex,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
+    bool isCloserThanRestLength)
 {
     return 1.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::~GeneralisedLinearSpringForce()
+GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::~GeneralisedLinearSpringForce()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                                    unsigned nodeBGlobalIndex,
-                                                                                    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::CalculateForceBetweenNodes(
+    unsigned nodeAGlobalIndex,
+    unsigned nodeBGlobalIndex,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
 {
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
@@ -122,9 +124,9 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
      */
     double rest_length_final = 1.0;
 
-    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation)))
     {
-        rest_length_final = static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
+        rest_length_final = static_cast<MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
     }
     else if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
     {
@@ -149,7 +151,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
      */
     if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
     {
-        AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation);
 
         std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
 
@@ -204,7 +206,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
     double spring_stiffness = mMeinekeSpringStiffness;
 
-    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation)))
     {
         return multiplication_factor * spring_stiffness * unit_difference * overlap;
     }
@@ -228,32 +230,32 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeSpringStiffness()
+double GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetMeinekeSpringStiffness()
 {
     return mMeinekeSpringStiffness;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeDivisionRestingSpringLength()
+double GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetMeinekeDivisionRestingSpringLength()
 {
     return mMeinekeDivisionRestingSpringLength;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GetMeinekeSpringGrowthDuration()
+double GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::GetMeinekeSpringGrowthDuration()
 {
     return mMeinekeSpringGrowthDuration;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeSpringStiffness(double springStiffness)
+void GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetMeinekeSpringStiffness(double springStiffness)
 {
     assert(springStiffness > 0.0);
     mMeinekeSpringStiffness = springStiffness;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeDivisionRestingSpringLength(double divisionRestingSpringLength)
+void GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetMeinekeDivisionRestingSpringLength(double divisionRestingSpringLength)
 {
     assert(divisionRestingSpringLength <= 1.0);
     assert(divisionRestingSpringLength >= 0.0);
@@ -262,7 +264,7 @@ void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeDivisionRest
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeSpringGrowthDuration(double springGrowthDuration)
+void GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::SetMeinekeSpringGrowthDuration(double springGrowthDuration)
 {
     assert(springGrowthDuration >= 0.0);
 
@@ -270,14 +272,14 @@ void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::SetMeinekeSpringGrowth
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<MeinekeSpringStiffness>" << mMeinekeSpringStiffness << "</MeinekeSpringStiffness>\n";
     *rParamsFile << "\t\t\t<MeinekeDivisionRestingSpringLength>" << mMeinekeDivisionRestingSpringLength << "</MeinekeDivisionRestingSpringLength>\n";
     *rParamsFile << "\t\t\t<MeinekeSpringGrowthDuration>" << mMeinekeSpringGrowthDuration << "</MeinekeSpringGrowthDuration>\n";
 
     // Call method on direct parent class
-    AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
+    AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

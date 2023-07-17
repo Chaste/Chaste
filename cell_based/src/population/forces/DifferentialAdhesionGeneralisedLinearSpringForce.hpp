@@ -46,7 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Designed for use in node and mesh-based simulations.
  *
  * \todo #2266 - throw exceptions if using other cell population objects?
- * \todo #2266 - override CalculateForceBetweenNodes() to use a default rest length of 1.0 for all springs?
+ * \todo #2266 - override CalculateForceBetweenNodes() to use a default rest 
+ * length of 1.0 for all springs?
  */
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class DifferentialAdhesionGeneralisedLinearSpringForce : public GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>
@@ -114,10 +115,11 @@ public :
      *
      * @return the multiplication factor.
      */
-    double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
-                                                      unsigned nodeBGlobalIndex,
-                                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                                      bool isCloserThanRestLength);
+    double VariableSpringConstantMultiplicationFactor(
+        unsigned nodeAGlobalIndex,
+        unsigned nodeBGlobalIndex,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
+        bool isCloserThanRestLength) override;
 
     /**
      * @return #mHomotypicLabelledSpringConstantMultiplier.
@@ -127,9 +129,11 @@ public :
     /**
      * Set mHomotypicLabelledSpringConstantMultiplier.
      *
-     * @param labelledSpringConstantMultiplier the new value of mHomotypicLabelledSpringConstantMultiplier
+     * @param labelledSpringConstantMultiplier the new value of 
+     *        mHomotypicLabelledSpringConstantMultiplier
      */
-    void SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier);
+    void SetHomotypicLabelledSpringConstantMultiplier(
+        double labelledSpringConstantMultiplier);
 
     /**
      * @return #mHeterotypicSpringConstantMultiplier.
@@ -139,16 +143,18 @@ public :
     /**
      * Set mHeterotypicSpringConstantMultiplier.
      *
-     * @param heterotypicSpringConstantMultiplier the new value of mHeterotypicSpringConstantMultiplier
+     * @param heterotypicSpringConstantMultiplier the new value of 
+     *        mHeterotypicSpringConstantMultiplier
      */
-    void SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier);
+    void SetHeterotypicSpringConstantMultiplier(
+        double heterotypicSpringConstantMultiplier);
 
     /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

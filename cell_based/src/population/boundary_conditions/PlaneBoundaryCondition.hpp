@@ -43,13 +43,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * A plane cell population boundary condition class, which stops nodes moving through
- * a specified plane in the domain. Although the name of this class suggests it is
- * specific to 3D, it is actually also implemented in 2D, for which it is
- * really a 'line' boundary condition. It's not currently implemented in 1D
+ * A plane cell population boundary condition class, which stops nodes moving 
+ * through a specified plane in the domain. Although the name of this class 
+ * suggests it is specific to 3D, it is actually also implemented in 2D, for 
+ * which it is really a 'line' boundary condition. It's not currently 
+ * implemented in 1D.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class PlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>
+class PlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -93,9 +94,10 @@ public:
      * @param point a point on the boundary plane
      * @param normal the outward-facing unit normal vector to the boundary plane
      */
-    PlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
-                           c_vector<double, SPACE_DIM> point,
-                           c_vector<double, SPACE_DIM> normal);
+    PlaneBoundaryCondition(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
+        c_vector<double, SPACE_DIM> point,
+        c_vector<double, SPACE_DIM> normal);
 
     /**
      * @return #mPointOnPlane.
@@ -110,7 +112,8 @@ public:
     /**
      * Set method for mUseJiggledNodesOnPlane
      *
-     * @param useJiggledNodesOnPlane whether to jiggle the nodes on the surface of the plane, can help stop overcrowding on plane.
+     * @param useJiggledNodesOnPlane whether to jiggle the nodes on the surface 
+     *     of the plane, can help stop overcrowding on plane.
      */
     void SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane);
 
@@ -122,18 +125,22 @@ public:
      *
      * Apply the cell population boundary conditions.
      *
-     * @param rOldLocations the node locations before any boundary conditions are applied
+     * @param rOldLocations the node locations before any boundary conditions 
+     *     are applied
      */
-    void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(
+        const std::map<Node<SPACE_DIM>*,
+        c_vector<double, SPACE_DIM> >& rOldLocations) override;
 
     /**
      * Overridden VerifyBoundaryCondition() method.
-     * Verify the boundary conditions have been applied.
-     * This is called after ImposeBoundaryCondition() to ensure the condition is still satisfied.
+     * 
+     * Verify the boundary conditions have been applied. This is called after 
+     * ImposeBoundaryCondition() to ensure the condition is still satisfied.
      *
      * @return whether the boundary conditions are satisfied.
      */
-    bool VerifyBoundaryCondition();
+    bool VerifyBoundaryCondition() override;
 
     /**
      * Overridden OutputCellPopulationBoundaryConditionParameters() method.
@@ -141,7 +148,8 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile);
+    void OutputCellPopulationBoundaryConditionParameters(
+        out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -164,12 +172,12 @@ inline void save_construct_data(
 
     // Archive c_vectors one component at a time
     c_vector<double, SPACE_DIM> point = t->rGetPointOnPlane();
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar << point[i];
     }
     c_vector<double, SPACE_DIM> normal = t->rGetNormalToPlane();
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar << normal[i];
     }
@@ -188,12 +196,12 @@ inline void load_construct_data(
 
     // Archive c_vectors one component at a time
     c_vector<double, SPACE_DIM> point;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar >> point[i];
     }
     c_vector<double, SPACE_DIM> normal;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar >> normal[i];
     }

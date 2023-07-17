@@ -59,11 +59,11 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         assert(voronoi_tessellation != nullptr);
 
         // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
-        double total_area = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetVolume();
+        double total_area = static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetVolume();
         double apoptotic_area = 0.0;
 
         // Loop over elements of mpVoronoiTessellation
-        for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tessellation->GetElementIteratorBegin();
+        for (auto elem_iter = voronoi_tessellation->GetElementIteratorBegin();
             elem_iter != voronoi_tessellation->GetElementIteratorEnd();
             ++elem_iter)
         {
@@ -97,25 +97,29 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("CellPopulationAreaWriter cannot be used with a CaBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("CellPopulationAreaWriter cannot be used with a NodeBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("CellPopulationAreaWriter cannot be used with a PottsBasedCellPopulation");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     EXCEPTION("CellPopulationAreaWriter cannot be used with a VertexBasedCellPopulation");
 }

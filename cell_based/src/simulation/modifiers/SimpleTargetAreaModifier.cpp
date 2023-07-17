@@ -58,7 +58,6 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     double growth_duration = mGrowthDuration;
     if (growth_duration == DOUBLE_UNSET)
     {
-
         if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == nullptr)
         {
             EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
@@ -135,7 +134,8 @@ void SimpleTargetAreaModifier<DIM>::SetGrowthDuration(double growthDuration)
 }
 
 template<unsigned DIM>
-void SimpleTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void SimpleTargetAreaModifier<DIM>::OutputSimulationModifierParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<GrowthDuration>" << mGrowthDuration << "</GrowthDuration>\n";
 

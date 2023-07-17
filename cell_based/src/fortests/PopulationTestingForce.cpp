@@ -36,28 +36,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PopulationTestingForce.hpp"
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::PopulationTestingForce(bool hasPositionDependence)
-    :AbstractForce<ELEMENT_DIM, SPACE_DIM>(),
-     mWithPositionDependence(hasPositionDependence)
+PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::PopulationTestingForce(
+    bool hasPositionDependence)
+    : AbstractForce<ELEMENT_DIM, SPACE_DIM>(),
+      mWithPositionDependence(hasPositionDependence)
 {
 }
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-void PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+void PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::AddForceContribution(
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
 {
-    for (unsigned i=0; i<rCellPopulation.GetNumNodes(); i++)
+    for (unsigned i = 0; i < rCellPopulation.GetNumNodes(); ++i)
     {
         c_vector<double, SPACE_DIM> force;
 
-        for (unsigned j=0; j<SPACE_DIM; j++)
+        for (unsigned j = 0; j < SPACE_DIM; ++j)
         {
             if (mWithPositionDependence)
             {
-              force[j] = (j+1)*i*0.01*rCellPopulation.GetNode(i)->rGetLocation()[j];
+              force[j] = (j + 1)*i*0.01*rCellPopulation.GetNode(i)->rGetLocation()[j];
             }
             else
             {
-                force[j] = (j+1)*i*0.01;
+                force[j] = (j + 1)*i*0.01;
             }
         }
         rCellPopulation.GetNode(i)->ClearAppliedForce();
@@ -66,68 +68,72 @@ void PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::AddForceContribution(Abstra
 }
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationFE(unsigned nodeIndex,
-                                                                                       double damping,
-                                                                                       c_vector<double, SPACE_DIM>& oldLocation,
-                                                                                       double dt)
+c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationFE(
+    unsigned nodeIndex,
+    double damping,
+    c_vector<double, SPACE_DIM>& rOldLocation,
+    double dt)
 {
     c_vector<double, SPACE_DIM> result;
-    for (unsigned j = 0; j < SPACE_DIM; j++)
+    for (unsigned j = 0; j < SPACE_DIM; ++j)
     {
         if (mWithPositionDependence)
         {
-            result[j] = oldLocation[j] + dt * (j+1)*0.01*nodeIndex * oldLocation[j] / damping;
+            result[j] = rOldLocation[j] + dt * (j+1)*0.01*nodeIndex * rOldLocation[j] / damping;
         }
         else
         {
-            result[j] = oldLocation[j] + dt * (j+1)*0.01*nodeIndex/damping;
+            result[j] = rOldLocation[j] + dt * (j+1)*0.01*nodeIndex/damping;
         }
     }
     return result;
 }
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationRK4(unsigned nodeIndex,
-                                                                                      double damping,
-                                                                                      c_vector<double, SPACE_DIM>& oldLocation,
-                                                                                      double dt)
+c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationRK4(
+    unsigned nodeIndex,
+    double damping,
+    c_vector<double, SPACE_DIM>& rOldLocation,
+    double dt)
 {
     c_vector<double, SPACE_DIM> result;
-    for (unsigned j = 0; j < SPACE_DIM; j++)
+    for (unsigned j = 0; j < SPACE_DIM; ++j)
     {
-        double k1 = (j+1)*0.01*nodeIndex * oldLocation[j] / damping;
-        double k2 = (j+1)*0.01*nodeIndex * (oldLocation[j] + (dt/2.0)*k1) / damping;
-        double k3 = (j+1)*0.01*nodeIndex * (oldLocation[j] + (dt/2.0)*k2) / damping;
-        double k4 = (j+1)*0.01*nodeIndex * (oldLocation[j] + dt*k3) / damping;
-        result[j] = oldLocation[j] + (1.0/6.0)*dt*(k1 + 2*k2 + 2*k3 + k4);
+        double k1 = (j+1)*0.01*nodeIndex * rOldLocation[j] / damping;
+        double k2 = (j+1)*0.01*nodeIndex * (rOldLocation[j] + (dt/2.0)*k1) / damping;
+        double k3 = (j+1)*0.01*nodeIndex * (rOldLocation[j] + (dt/2.0)*k2) / damping;
+        double k4 = (j+1)*0.01*nodeIndex * (rOldLocation[j] + dt*k3) / damping;
+        result[j] = rOldLocation[j] + (1.0/6.0)*dt*(k1 + 2*k2 + 2*k3 + k4);
     }
     return result;
 }
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationAM2(unsigned nodeIndex,
-                                                                                    double damping,
-                                                                                    c_vector<double, SPACE_DIM>& oldLocation,
-                                                                                    double dt)
+c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationAM2(
+    unsigned nodeIndex,
+    double damping,
+    c_vector<double, SPACE_DIM>& rOldLocation,
+    double dt)
 {
     c_vector<double, SPACE_DIM> result;
-    for (unsigned j = 0; j < SPACE_DIM; j++)
+    for (unsigned j = 0; j < SPACE_DIM; ++j)
     {
-        result[j] = oldLocation[j] * (1 + 0.5*dt*0.01*(j+1)*nodeIndex / damping) / (1 - 0.5*dt*0.01*(j+1)*nodeIndex / damping);
+        result[j] = rOldLocation[j] * (1 + 0.5*dt*0.01*(j + 1)*nodeIndex / damping) / (1 - 0.5*dt*0.01*(j+1)*nodeIndex / damping);
     }
     return result;
 }
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationBE(unsigned nodeIndex,
-                                                                                      double damping,
-                                                                                      c_vector<double, SPACE_DIM>& oldLocation,
-                                                                                      double dt)
+c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetExpectedOneStepLocationBE(
+    unsigned nodeIndex,
+    double damping,
+    c_vector<double, SPACE_DIM>& rOldLocation,
+    double dt)
 {
     c_vector<double, SPACE_DIM> result;
-    for (unsigned j = 0; j < SPACE_DIM; j++)
+    for (unsigned j = 0; j < SPACE_DIM; ++j)
     {
-        result[j] = oldLocation[j] / (1 - dt*0.01*(j+1)*nodeIndex/damping);
+        result[j] = rOldLocation[j] / (1 - dt*0.01*(j+1)*nodeIndex/damping);
     }
     return result;
 }

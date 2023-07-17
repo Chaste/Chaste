@@ -42,6 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 
+/**
+ * \todo document class
+ */
 template<unsigned DIM>
 class DeltaNotchEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
@@ -58,7 +61,7 @@ class DeltaNotchEdgeTrackingModifier : public AbstractCellBasedSimulationModifie
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
     }
 
 public:
@@ -80,7 +83,8 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -90,7 +94,9 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+        std::string outputDirectory) override;
 
     /**
      * Helper method to compute the mean level of Delta in each cell's neighbours and store these in the CellData.
@@ -101,7 +107,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -109,7 +115,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

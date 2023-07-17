@@ -43,26 +43,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 /**
- * A target area modifier class in which the target area of a cell grows linearly,
- * starting from mReferenceTargetArea, over a prescribed duration.
+ * A target area modifier class in which the target area of a cell grows 
+ * linearly, starting from mReferenceTargetArea, over a prescribed duration.
  *
- * If used with a phase-based cell-cycle model (such as FixedG1GenerationalCellCycleModel),
- * the target area of a cell doubles from the value mReferenceTargetArea over the course of
- * the cell's G2 phase. This rule is based on the description of cell growth and division
- * proposed by Farhadifar et al (The influence of cell mechanics, cell-cell interactions,
- * and proliferation on epithelial packing, Current Biology 17(24):2095-2104, 2007,
- * http://dx.doi.org/10.1016/j.cub.2007.11.049).
+ * If used with a phase-based cell-cycle model (such as 
+ * FixedG1GenerationalCellCycleModel), the target area of a cell doubles from 
+ * the value mReferenceTargetArea over the course of the cell's G2 phase. This 
+ * rule is based on the description of cell growth and division proposed by 
+ * Farhadifar et al (The influence of cell mechanics, cell-cell interactions,
+ * and proliferation on epithelial packing, Current Biology 17(24):2095-2104, 
+ * 2007, http://dx.doi.org/10.1016/j.cub.2007.11.049).
  *
- * If used with a non-phase-based cell-cycle model, the target area of a cell increases
- * linearly at a rate mGrowthRate as soon as the cell's age exceeds mAgeToStartGrowing.
+ * If used with a non-phase-based cell-cycle model, the target area of a cell 
+ * increases linearly at a rate mGrowthRate as soon as the cell's age exceeds 
+ * mAgeToStartGrowing.
  *
- * Here mReferenceTargetArea, mAgeToStartGrowing and mGrowthRate are settable member
- * variables. The default value of mReferenceTargetArea is 1.0 and the default value of
- * mAgeToStartGrowing and mGrowthRate is DOUBLE_UNSET.
+ * Here mReferenceTargetArea, mAgeToStartGrowing and mGrowthRate are settable 
+ * member variables. The default value of mReferenceTargetArea is 1.0 and the 
+ * default value of mAgeToStartGrowing and mGrowthRate is DOUBLE_UNSET.
  *
- * If mAgeToStartGrowing is set by the user, then mGrowthRate must also be set; note that
- * in this case, these values are used to prescribe target area growth as described earlier,
- * regardless of whether a phase-based cell-cycle model is present.
+ * If mAgeToStartGrowing is set by the user, then mGrowthRate must also be set; 
+ * note that in this case, these values are used to prescribe target area growth 
+ * as described earlier, regardless of whether a phase-based cell-cycle model is 
+ * present.
  */
 template<unsigned DIM>
 class TargetAreaLinearGrowthModifier : public AbstractTargetAreaModifier<DIM>
@@ -85,16 +88,17 @@ class TargetAreaLinearGrowthModifier : public AbstractTargetAreaModifier<DIM>
     }
 
     /**
-     * The age of a proliferating cell at which its target area should start growing.
-     * Defaults to DOUBLE_UNSET. If this variable is set using SetAgeToStartGrowing(),
-     * then it is used regardless of whether a phase-based cell-cycle model is used.
+     * The age of a proliferating cell at which its target area should start 
+     * growing. Defaults to DOUBLE_UNSET. If this variable is set using 
+     * SetAgeToStartGrowing(), then it is used regardless of whether a phase-
+     * based cell-cycle model is used.
      */
     double mAgeToStartGrowing;
 
     /**
-     * The growth rate of a proliferating cell's target area, when it is growing.
-     * Defaults to DOUBLE_UNSET. This variable must be set if mAgeToStartGrowing is set,
-     * otherwise an exception is thrown.
+     * The growth rate of a proliferating cell's target area, when it is 
+     * growing. Defaults to DOUBLE_UNSET. This variable must be set if 
+     * mAgeToStartGrowing is set, otherwise an exception is thrown.
      */
     double mGrowthRate;
 
@@ -111,11 +115,13 @@ public:
     virtual ~TargetAreaLinearGrowthModifier();
 
     /**
+     * Overridden UpdateTargetAreaOfCell() method.
+     * 
      * Helper method to update the target area property of an individual cell.
      *
      * @param pCell pointer to a cell
      */
-    void UpdateTargetAreaOfCell(const CellPtr pCell);
+    void UpdateTargetAreaOfCell(const CellPtr pCell) override;
 
     /**
      * @return #mAgeToStartGrowing.
@@ -147,7 +153,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

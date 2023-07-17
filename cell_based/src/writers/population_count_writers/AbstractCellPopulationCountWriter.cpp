@@ -38,13 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationCountWriter(const std::string& rFileName)
+AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationCountWriter(
+    const std::string& rFileName)
     : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
 }
 

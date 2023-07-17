@@ -97,7 +97,8 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -105,12 +106,16 @@ public:
      * Specifies what to do in the simulation before the start of the time loop.
      *
      * @param rCellPopulation reference to the cell population
-     * @param outputDirectory the output directory, relative to where Chaste output is stored
+     * @param outputDirectory the output directory, relative to where Chaste 
+     *                        output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+        std::string outputDirectory) override;
 
     /**
-     * @param applyExtrinsicPullToAllNodes whether to apply the extrinsic pull to all nodes in the tissue
+     * @param applyExtrinsicPullToAllNodes whether to apply the extrinsic pull 
+     *                                     to all nodes in the tissue
      */
     void SetApplyExtrinsicPullToAllNodes(bool applyExtrinsicPullToAllNodes);
 
@@ -135,7 +140,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

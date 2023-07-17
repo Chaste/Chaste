@@ -48,37 +48,42 @@ VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexT2SwapLocationsWriter
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     std::vector<T2SwapInfo<SPACE_DIM> > t2_swap_info
         = pCellPopulation->rGetMesh().GetOperationRecorder()->GetT2SwapsInfo();
 
     *this->mpOutStream << t2_swap_info.size() << "\t";
 
-    for (unsigned index = 0;  index < t2_swap_info.size(); index++)
+    for (unsigned index = 0;  index < t2_swap_info.size(); ++index)
     {
         *this->mpOutStream << t2_swap_info[index].mCellId << "\t";
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             *this->mpOutStream <<  t2_swap_info[index].mLocation[i] << "\t";
         }

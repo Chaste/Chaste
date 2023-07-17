@@ -44,9 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in vertex-based simulations. This force is based on the
- * energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104, 
- * but with a planar polarised line tension parameter, similar to that proposed by 
- * Rauzi et al in Nat. Cell Biol., 2008, 10, 1401-1410.
+ * energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 
+ * 2095-2104, but with a planar polarised line tension parameter, similar to 
+ * that proposed by Rauzi et al in Nat. Cell Biol., 2008, 10, 1401-1410.
  */
 template<unsigned DIM>
 class PlanarPolarisedFarhadifarForce : public FarhadifarForce<DIM>
@@ -73,11 +73,11 @@ private:
 protected:
 
     /**
-     * A scalar that multiplies the strength of the line tension term in the model for edges 
-     * whose angle relative to the x axis are between 45 degrees and 135 degrees.
+     * A scalar that multiplies the strength of the line tension term in the 
+     * model for edges whose angle relative to the x axis are between 45 degrees 
+     * and 135 degrees.
      */
     double mPlanarPolarisedLineTensionMultiplier;
-
 
 public:
 
@@ -102,7 +102,10 @@ public:
      *
      * @return the line tension parameter for this edge.
      */
-    virtual double GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+    virtual double GetLineTensionParameter(
+        Node<DIM>* pNodeA,
+        Node<DIM>* pNodeB,
+        VertexBasedCellPopulation<DIM>& rVertexCellPopulation) override;
 
     /**
      * @return mPlanarPolarisedLineTensionMultiplier
@@ -112,9 +115,11 @@ public:
     /**
      * Set mPlanarPolarisedLineTensionMultiplier.
      *
-     * @param planarPolarisedLineTensionMultiplier the new value of mPlanarPolarisedLineTensionMultiplier
+     * @param planarPolarisedLineTensionMultiplier the new value of 
+     *     mPlanarPolarisedLineTensionMultiplier
      */
-    void SetPlanarPolarisedLineTensionMultiplier(double planarPolarisedLineTensionMultiplier);
+    void SetPlanarPolarisedLineTensionMultiplier(
+        double planarPolarisedLineTensionMultiplier);
 
     /**
      * @return mLineTensionParameter
@@ -131,7 +136,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

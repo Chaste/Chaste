@@ -134,7 +134,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -207,7 +207,7 @@ void AbstractBoxDomainPdeModifier<DIM>::InitialiseCellPdeElementMap(AbstractCell
     mCellPdeElementMap.clear();
 
     // Find the element of mpFeMesh that contains each cell and populate mCellPdeElementMap
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -221,7 +221,7 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Find the element of mpCoarsePdeMesh that contains each cell and populate mCellPdeElementMap
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {

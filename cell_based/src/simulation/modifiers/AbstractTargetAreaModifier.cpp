@@ -48,13 +48,16 @@ AbstractTargetAreaModifier<DIM>::~AbstractTargetAreaModifier()
 }
 
 template<unsigned DIM>
-void AbstractTargetAreaModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractTargetAreaModifier<DIM>::UpdateAtEndOfTimeStep(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     UpdateTargetAreas(rCellPopulation);
 }
 
 template<unsigned DIM>
-void AbstractTargetAreaModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void AbstractTargetAreaModifier<DIM>::SetupSolve(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -64,10 +67,14 @@ void AbstractTargetAreaModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>
 }
 
 template<unsigned DIM>
-void AbstractTargetAreaModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractTargetAreaModifier<DIM>::UpdateTargetAreas(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
-    // Loop over the list of cells, rather than using the population iterator, so as to include dead cells
-    for (std::list<CellPtr>::iterator cell_iter = rCellPopulation.rGetCells().begin();
+    /*
+     * Loop over the list of cells, rather than using the population iterator, 
+     * so as to include dead cells.
+     */
+    for (auto cell_iter = rCellPopulation.rGetCells().begin();
          cell_iter != rCellPopulation.rGetCells().end();
          ++cell_iter)
     {

@@ -79,7 +79,7 @@ private:
 protected:
 
     /** Pointer to the cell population being updated by this method*/
-    AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* mpCellPopulation;
+    AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>* mpCellPopulation;
 
     /** Pointer to the force collection to apply*/
     std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >* mpForceCollection;
@@ -161,19 +161,19 @@ public:
      * the simulation. The cell population and force collection pointers are then set by the simulation in
      * its constructor.
      */
-    AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
+    AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM>();
+    virtual ~AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>();
 
     /**
      * Sets the pointer to the cell population updated by this method
      *
      * @param pPopulation Pointer to an AbstractOffLattice cell population
      */
-    void SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>* pPopulation);
+    void SetCellPopulation(AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>* pPopulation);
 
     /**
      * Sets the pointer to the force collection applied by this method

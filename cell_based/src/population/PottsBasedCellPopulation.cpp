@@ -49,7 +49,7 @@ void PottsBasedCellPopulation<DIM>::Validate()
     // Check each element has only one cell associated with it
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (auto cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -135,7 +135,7 @@ TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForP
     std::vector<Node<DIM>*> temp_nodes;
 
     // Create nodes at the centre of the cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (auto cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {

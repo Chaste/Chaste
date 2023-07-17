@@ -46,7 +46,8 @@ AbstractForce<ELEMENT_DIM, SPACE_DIM>::~AbstractForce()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceInfo(out_stream& rParamsFile)
+void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceInfo(
+    out_stream& rParamsFile)
 {
     std::string force_type = GetIdentifier();
 
@@ -56,13 +57,15 @@ void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceInfo(out_stream& rParamsF
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(
+    out_stream& rParamsFile)
 {
     // No parameters to output
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractForce<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+void AbstractForce<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisualizerSetupFile(
+    out_stream& pVizSetupFile)
 {
     // Nothing to output
 }

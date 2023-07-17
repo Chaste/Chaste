@@ -54,7 +54,7 @@ template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
  * model of steady‐state proliferation in the crypt. Cell Proliferation
  * 19(6):627-645.
  */
-class CryptShovingCaBasedDivisionRule  : public AbstractCaBasedDivisionRule<2>
+class CryptShovingCaBasedDivisionRule : public AbstractCaBasedDivisionRule<2>
 {
 private:
 

@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned SPACE_DIM>
-void ShovingCaBasedDivisionRule<SPACE_DIM>::IsNodeOnBoundary(unsigned numNeighbours)
+void ShovingCaBasedDivisionRule<SPACE_DIM>::IsNodeOnBoundary(
+    unsigned numNeighbours)
 {
     // This logic currently only works for Moore neighbourhood in 2D
     bool is_central_node = false;
@@ -59,13 +60,16 @@ void ShovingCaBasedDivisionRule<SPACE_DIM>::IsNodeOnBoundary(unsigned numNeighbo
 }
 
 template<unsigned SPACE_DIM>
-bool ShovingCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+bool ShovingCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
+    CellPtr pParentCell,
+    CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
     return true;
 }
 
 template<unsigned SPACE_DIM>
-unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellPtr pNewCell,
+unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
+    CellPtr pNewCell,
     CellPtr pParentCell,
     CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
@@ -87,7 +91,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
     double total_propensity = 0.0;
 
     // Select neighbour at random
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+    for (auto neighbour_iter = neighbouring_node_indices.begin();
          neighbour_iter != neighbouring_node_indices.end();
          ++neighbour_iter)
     {
@@ -98,9 +102,9 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
         neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
         total_propensity += propensity_dividing_into_neighbour;
     }
-    assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
+    assert(total_propensity > 0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
 
-    for (unsigned i=0; i<num_neighbours; i++)
+    for (unsigned i = 0; i < num_neighbours; ++i)
     {
         neighbouring_node_propensities[i] /= total_propensity;
     }
@@ -113,7 +117,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
     unsigned daughter_node_index = UNSIGNED_UNSET;
 
     unsigned counter;
-    for (counter=0; counter < num_neighbours; counter++)
+    for (counter=0; counter < num_neighbours; ++counter)
     {
         total_probability += neighbouring_node_propensities[counter];
         if (total_probability >= random_number)
@@ -150,7 +154,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
 
             // Select the appropriate neighbour
             std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            for (unsigned i=0; i<counter; i++)
+            for (unsigned i = 0; i < counter; ++i)
             {
                 ++neighbour_iter;
             }
@@ -175,7 +179,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellP
         assert(move_number<max_moves);
 
         // Do moves to free up the daughter node index
-        for (std::list<std::pair<unsigned, unsigned> >::reverse_iterator reverse_iter = cell_moves.rbegin();
+        for (auto reverse_iter = cell_moves.rbegin();
              reverse_iter != cell_moves.rend();
              ++reverse_iter)
         {

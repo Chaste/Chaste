@@ -42,7 +42,7 @@ FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::FixedCentreBasedDivisionRu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const c_vector<double, SPACE_DIM>& FixedCentreBasedDivisionRule<ELEMENT_DIM,SPACE_DIM>::rGetDaughterLocation() const
+const c_vector<double, SPACE_DIM>& FixedCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::rGetDaughterLocation() const
 {
     return mDaughterLocation;
 }

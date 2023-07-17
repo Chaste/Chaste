@@ -36,21 +36,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractTwoBodyInteractionForce.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AbstractTwoBodyInteractionForce()
-   : AbstractForce<ELEMENT_DIM,SPACE_DIM>(),
+AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AbstractTwoBodyInteractionForce()
+   : AbstractForce<ELEMENT_DIM, SPACE_DIM>(),
      mUseCutOffLength(false),
      mMechanicsCutOffLength(DBL_MAX)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetUseCutOffLength()
+bool AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::GetUseCutOffLength()
 {
     return mUseCutOffLength;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetCutOffLength(double cutOffLength)
+void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::SetCutOffLength(
+    double cutOffLength)
 {
     assert(cutOffLength > 0.0);
     mUseCutOffLength = true;
@@ -58,27 +59,28 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetCutOffLength(dou
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetCutOffLength()
+double AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::GetCutOffLength()
 {
     return mMechanicsCutOffLength;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AddForceContribution(
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a subclass of AbstractCentreBasedCellPopulation
-    if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation) == nullptr)
+    if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation) == nullptr)
     {
         EXCEPTION("Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractCentreBasedCellPopulation only");
     }
 
     ///\todo this could be tidied by using the rGetNodePairs for all populations and moving the below calculation into the MutableMesh.
-    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation)))
     {
-        MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation);
 
         // Iterate over all springs and add force contributions
-        for (typename MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator spring_iterator = p_static_cast_cell_population->SpringsBegin();
+        for (auto spring_iterator = p_static_cast_cell_population->SpringsBegin();
              spring_iterator != p_static_cast_cell_population->SpringsEnd();
              ++spring_iterator)
         {
@@ -96,13 +98,13 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
     }
     else    // This is a NodeBasedCellPopulation
     {
-        AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation);
 
         std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& r_node_pairs = p_static_cast_cell_population->rGetNodePairs();
 
-        for (typename std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >::iterator iter = r_node_pairs.begin();
-            iter != r_node_pairs.end();
-            iter++)
+        for (auto iter = r_node_pairs.begin();
+             iter != r_node_pairs.end();
+             iter++)
         {
             std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > pair = *iter;
 
@@ -111,7 +113,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
 
             // Calculate the force between nodes
             c_vector<double, SPACE_DIM> force = CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
-            for (unsigned j=0; j<SPACE_DIM; j++)
+            for (unsigned j = 0; j < SPACE_DIM; ++j)
             {
                 assert(!std::isnan(force[j]));
             }
@@ -125,17 +127,19 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<UseCutOffLength>" << mUseCutOffLength << "</UseCutOffLength>\n";
     *rParamsFile << "\t\t\t<CutOffLength>" << mMechanicsCutOffLength << "</CutOffLength>\n";
 
     // Call method on direct parent class
-    AbstractForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
+    AbstractForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
+void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisualizerSetupFile(
+    out_stream& pVizSetupFile)
 {
     *pVizSetupFile << "Cutoff\t" << mMechanicsCutOffLength << "\n";
 }

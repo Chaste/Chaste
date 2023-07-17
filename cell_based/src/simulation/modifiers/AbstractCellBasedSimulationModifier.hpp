@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 
 /**
- * An abstract modifier class (to implement setup, update and finalise methods), for use in cell-based simulations.
+ * An abstract modifier class (to implement setup, update and finalise methods), 
+ * for use in cell-based simulations.
  */
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCellBasedSimulationModifier : public Identifiable
@@ -75,12 +76,12 @@ public:
     /**
      * Specify what to do in the simulation at the end of each timestep.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)=0;
+    virtual void UpdateAtEndOfTimeStep(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)=0;
 
     /**
      * Specify what to do in the simulation at the end of each output timestep,
@@ -88,27 +89,30 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+    virtual void UpdateAtEndOfOutputTimeStep(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
     {
     }
 
     /**
      * Specify what to do in the simulation before the start of the time loop.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, std::string outputDirectory)=0;
+    virtual void SetupSolve(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation, 
+        std::string outputDirectory)=0;
 
     /**
      * Specify what to do in the simulation at the end of each time loop.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfSolve(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+    virtual void UpdateAtEndOfSolve(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
     {
     }
 

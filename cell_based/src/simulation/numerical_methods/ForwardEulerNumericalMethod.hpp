@@ -44,13 +44,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Implements forward Euler time stepping.
  *
- * Solves the equations of motion dr/dt = F
- * Using the scheme
+ * Solves the equations of motion dr/dt = F using the scheme
  *
  * r^(t+1) = r^t + dt F^t.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class ForwardEulerNumericalMethod : public AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> {
+class ForwardEulerNumericalMethod : public AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> {
 
 private:
 
@@ -66,7 +65,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractNumericalMethod<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
@@ -86,14 +85,14 @@ public:
      *
      * @param dt Time step size
      */
-    void UpdateAllNodePositions(double dt);
+    void UpdateAllNodePositions(double dt) override;
 
     /**
      * Overridden OutputNumericalMethodParameters() method.
      *
      * @param rParamsFile Reference to the parameter output filestream
      */
-    virtual void OutputNumericalMethodParameters(out_stream& rParamsFile);
+    virtual void OutputNumericalMethodParameters(out_stream& rParamsFile) override;
 };
 
 // Serialization for Boost >= 1.36

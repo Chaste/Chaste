@@ -177,7 +177,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      */
     if (mUseVariableRadii)
     {
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+        for (auto cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {

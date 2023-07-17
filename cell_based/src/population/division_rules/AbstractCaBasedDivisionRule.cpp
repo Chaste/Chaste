@@ -46,17 +46,18 @@ AbstractCaBasedDivisionRule<SPACE_DIM>::~AbstractCaBasedDivisionRule()
 }
 
 template<unsigned SPACE_DIM>
-void AbstractCaBasedDivisionRule<SPACE_DIM>::OutputCellCaBasedDivisionRuleInfo(out_stream& rParamsFile)
+void AbstractCaBasedDivisionRule<SPACE_DIM>::OutputCellCaBasedDivisionRuleInfo(
+    out_stream& rParamsFile)
 {
     std::string cell_division_rule_type = GetIdentifier();
-
     *rParamsFile << "\t\t\t<" << cell_division_rule_type << ">\n";
     OutputCellCaBasedDivisionRuleParameters(rParamsFile);
     *rParamsFile << "\t\t\t</" << cell_division_rule_type << ">\n";
 }
 
 template<unsigned SPACE_DIM>
-void AbstractCaBasedDivisionRule<SPACE_DIM>::OutputCellCaBasedDivisionRuleParameters(out_stream& rParamsFile)
+void AbstractCaBasedDivisionRule<SPACE_DIM>::OutputCellCaBasedDivisionRuleParameters(
+    out_stream& rParamsFile)
 {
 }
 

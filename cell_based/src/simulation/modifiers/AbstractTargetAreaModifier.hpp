@@ -66,7 +66,8 @@ class AbstractTargetAreaModifier : public AbstractCellBasedSimulationModifier<DI
 protected:
 
     /**
-     * A reference area. Usually this is the target area of mature cells in the population.
+     * A reference area. Usually this is the target area of mature cells in the 
+     * population.
      */
     double mReferenceTargetArea;
 
@@ -89,7 +90,8 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfTimeStep(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden SetupSolve() method.
@@ -99,7 +101,9 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+        std::string outputDirectory) override;
 
     /**
      * Get the reference target area.
@@ -120,7 +124,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateTargetAreas(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Helper method to update the target area property of an individual cell.
@@ -138,7 +142,8 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    virtual void OutputSimulationModifierParameters(
+        out_stream& rParamsFile) override;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractTargetAreaModifier)

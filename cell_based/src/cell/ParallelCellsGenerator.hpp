@@ -84,7 +84,7 @@ void ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GenerateParallelCells(std::s
     c_vector<double, 2*DIM> base_bounding_box = GetArchiveBoundingBox(archivePath);
 
     // Add small factor to make sure the box is big enough to contain the initial population.
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         base_bounding_box[2*i] -= 1e-14;
         base_bounding_box[2*i + 1] += 1e-14;
@@ -107,7 +107,7 @@ void ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GenerateParallelCells(std::s
 
         // Extract a location.
         c_vector<double, DIM> location;
-        for (unsigned k=0; k<DIM; k++)
+        for (unsigned k = 0; k < DIM; ++k)
         {
             iss >> location[k];
         }
@@ -144,7 +144,7 @@ template<class CELL_CYCLE_MODEL, unsigned DIM>
 c_vector<double, 2*DIM> ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GetArchiveBoundingBox(std::string archivePath)
 {
     c_vector<double, 2*DIM> bounding_box;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         bounding_box[2*i] = DBL_MAX;
         bounding_box[2*i + 1] = -DBL_MAX;
@@ -171,7 +171,7 @@ c_vector<double, 2*DIM> ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GetArchiv
     while (std::getline(infile, line))
     {
         std::stringstream new_iss(line);
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             double point;
             new_iss >> point;

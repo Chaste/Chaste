@@ -73,7 +73,7 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     {
         case 1:
         {
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            for (auto cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {
@@ -89,7 +89,7 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
         }
         case 2:
         {
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            for (auto cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {

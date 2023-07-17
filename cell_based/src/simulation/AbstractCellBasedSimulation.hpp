@@ -279,7 +279,7 @@ public:
      *     free up memory (defaults to false)
      * @param initialiseCells Whether to initialise cells (defaults to true; set to false when loading from an archive)
      */
-    AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
+    AbstractCellBasedSimulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
                                 bool deleteCellPopulationInDestructor=false,
                                 bool initialiseCells=true);
 
@@ -393,7 +393,7 @@ public:
      *
      * @param pSimulationModifier pointer to a SimulationModifier
      */
-    void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+    void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > pSimulationModifier);
 
     /**
      * @return a pointer to the vector of SimulationModifiers used in this simulation.
@@ -406,7 +406,7 @@ public:
      * This can be useful when a topology update (e.g. cell division) influences movement of cells.
      * @param pSimulationModifier pointer to a SimulationModifier
      */
-    void AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+    void AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > pSimulationModifier);
 
     /**
      * @return a pointer to the vector of SimulationModifiers that influence topology update in this simulation.
@@ -472,12 +472,12 @@ public:
     /**
      * @return reference to the cell population.
      */
-    AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rGetCellPopulation();
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rGetCellPopulation();
 
     /**
      * @return const reference to the cell population (used in archiving).
      */
-    const AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rGetCellPopulation() const;
+    const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rGetCellPopulation() const;
 
     /**
      * @return mOutputDivisionLocations

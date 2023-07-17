@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * set in the constructor.
  */
 template<unsigned DIM>
-class VertexCryptBoundaryForce  : public AbstractForce<DIM>
+class VertexCryptBoundaryForce : public AbstractForce<DIM>
 {
 friend class TestVertexCryptBoundaryForce;
 

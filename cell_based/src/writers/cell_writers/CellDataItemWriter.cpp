@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::CellDataItemWriter(std::string cellDataVariableName)
+CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::CellDataItemWriter(
+    std::string cellDataVariableName)
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("celldata_"+cellDataVariableName+".dat"),
       mCellDataVariableName(cellDataVariableName)
 {
@@ -45,14 +46,18 @@ CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::CellDataItemWriter(std::string cellD
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double value = pCell->GetCellData()->GetItem(mCellDataVariableName);
     return value;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // Output the location index corresponding to this cell
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
@@ -64,7 +69,7 @@ void CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abstra
 
     // Output the position of this cell's centre
     c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << centre_location[i] << " ";
     }

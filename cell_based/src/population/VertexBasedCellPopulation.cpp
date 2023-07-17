@@ -382,7 +382,7 @@ void VertexBasedCellPopulation<DIM>::Validate()
 {
     // Check each element has only one cell attached
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (auto cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {

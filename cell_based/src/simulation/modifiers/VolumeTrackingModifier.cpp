@@ -48,13 +48,16 @@ VolumeTrackingModifier<DIM>::~VolumeTrackingModifier()
 }
 
 template<unsigned DIM>
-void VolumeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void VolumeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     UpdateCellData(rCellPopulation);
 }
 
 template<unsigned DIM>
-void VolumeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void VolumeTrackingModifier<DIM>::SetupSolve(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
@@ -64,17 +67,19 @@ void VolumeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rC
 }
 
 template<unsigned DIM>
-void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void VolumeTrackingModifier<DIM>::UpdateCellData(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Make sure the cell population is updated
     rCellPopulation.Update();
 
     /**
-     * This hack is needed because in the case of a MeshBasedCellPopulation in which
-     * multiple cell divisions have occurred over one time step, the Voronoi tessellation
-     * (while existing) is out-of-date. Thus, if we did not regenerate the Voronoi
-     * tessellation here, an assertion may trip as we try to access a Voronoi element
-     * whose index exceeds the number of elements in the out-of-date tessellation.
+     * This hack is needed because in the case of a MeshBasedCellPopulation in 
+     * which multiple cell divisions have occurred over one time step, the 
+     * Voronoi tessellation (while existing) is out-of-date. Thus, if we did not 
+     * regenerate the Voronoi tessellation here, an assertion may trip as we try 
+     * to access a Voronoi element whose index exceeds the number of elements in 
+     * the out-of-date tessellation.
      *
      * \todo work out how to properly fix this (#1986)
      */
@@ -84,7 +89,7 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
     }
 
     // Iterate over cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -97,7 +102,8 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
 }
 
 template<unsigned DIM>
-void VolumeTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void VolumeTrackingModifier<DIM>::OutputSimulationModifierParameters(
+    out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);

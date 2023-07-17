@@ -36,9 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBasedCellKiller.hpp"
 
 template<unsigned DIM>
-PlaneBasedCellKiller<DIM>::PlaneBasedCellKiller(AbstractCellPopulation<DIM>* pCellPopulation,
-                                                  c_vector<double, DIM> point,
-                                                  c_vector<double, DIM> normal)
+PlaneBasedCellKiller<DIM>::PlaneBasedCellKiller(
+    AbstractCellPopulation<DIM>* pCellPopulation,
+    c_vector<double, DIM> point,
+    c_vector<double, DIM> normal)
     : AbstractCellKiller<DIM>(pCellPopulation),
       mPointOnPlane(point)
 {
@@ -61,7 +62,7 @@ const c_vector<double, DIM>& PlaneBasedCellKiller<DIM>::rGetNormalToPlane() cons
 template<unsigned DIM>
 void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (auto cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {
@@ -76,17 +77,18 @@ void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 }
 
 template<unsigned DIM>
-void PlaneBasedCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
+void PlaneBasedCellKiller<DIM>::OutputCellKillerParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<PointOnPlane>";
-    for (unsigned index=0; index != DIM-1U; index++) //Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != DIM-1U; ++index) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mPointOnPlane[index] << ",";
     }
     *rParamsFile << mPointOnPlane[DIM-1] << "</PointOnPlane>\n";
 
     *rParamsFile << "\t\t\t<NormalToPlane>";
-     for (unsigned index=0; index != DIM-1U; index++) //Note: inequality avoids testing index < 0U when DIM=1
+     for (unsigned index = 0; index != DIM-1U; ++index) // Note: inequality avoids testing index < 0U when DIM=1
      {
          *rParamsFile << mNormalToPlane[index] << ",";
      }

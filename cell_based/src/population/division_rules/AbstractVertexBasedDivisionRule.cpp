@@ -46,17 +46,18 @@ AbstractVertexBasedDivisionRule<SPACE_DIM>::~AbstractVertexBasedDivisionRule()
 }
 
 template<unsigned SPACE_DIM>
-void AbstractVertexBasedDivisionRule<SPACE_DIM>::OutputCellVertexBasedDivisionRuleInfo(out_stream& rParamsFile)
+void AbstractVertexBasedDivisionRule<SPACE_DIM>::OutputCellVertexBasedDivisionRuleInfo(
+  out_stream& rParamsFile)
 {
     std::string cell_division_rule_type = GetIdentifier();
-
     *rParamsFile << "\t\t\t<" << cell_division_rule_type << ">\n";
     OutputCellVertexBasedDivisionRuleParameters(rParamsFile);
     *rParamsFile << "\t\t\t</" << cell_division_rule_type << ">\n";
 }
 
 template<unsigned SPACE_DIM>
-void AbstractVertexBasedDivisionRule<SPACE_DIM>::OutputCellVertexBasedDivisionRuleParameters(out_stream& rParamsFile)
+void AbstractVertexBasedDivisionRule<SPACE_DIM>::OutputCellVertexBasedDivisionRuleParameters(
+    out_stream& rParamsFile)
 {
 }
 

@@ -43,17 +43,61 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TimeStepper.hpp"
 
 /**
- * Simulation time object stores the simulation time.
- * It uses the singleton pattern to provide a globally consistent time.
+ * Simulation time object stores the simulation time. It uses the singleton 
+ * pattern to provide a globally consistent time.
  *
- * Note that the start time, end time and number of time steps must
- * be set before time can be incremented and returned.
+ * Note that the start time, end time and number of time steps must be set 
+ * before time can be incremented and returned.
  *
- * You should generally use the calls
- * IncrementTimeOneStep() and GetTime() when using this class.
+ * You should generally use the calls IncrementTimeOneStep() and GetTime() when 
+ * using this class.
  */
 class SimulationTime : public SerializableSingleton<SimulationTime>
 {
+private:
+
+    /**
+     * A pointer to the singleton instance of this class.
+     */
+    static SimulationTime* mpInstance;
+
+    /**
+     * Delegate all time stepping to a TimeStepper class.
+     */
+    static boost::shared_ptr<TimeStepper> mpTimeStepper;
+
+    /**
+     * Stores the time at which the simulation started
+     */
+    double mStartTime;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+
+    /**
+     * Serialization of a SimulationTime object must be done with care. Do not 
+     * serialize this singleton directly. Instead, serialize the object returned 
+     * by GetSerializationWrapper.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mStartTime;
+        archive & mpTimeStepper;
+    }
+
+protected:
+    /**
+     * Default simulation time constructor.
+     *
+     * Set up time, you must set the start time, end time and number of time 
+     * steps before using the object.
+     */
+    SimulationTime();
+
 public:
 
     /**
@@ -63,37 +107,44 @@ public:
     static SimulationTime* Instance();
 
     /**
-     * Sets the end time and the number of time steps.
-     * This must be called after SetStartTime() but before using any other methods.
+     * Set the end time and the number of time steps. This must be called after 
+     * SetStartTime() but before using any other methods.
      *
      * @param endTime time at which to end this run of the simulation
-     * @param totalTimeStepsInSimulation  the number of time steps into which the above will be divided
+     * @param totalTimeStepsInSimulation the number of time steps into which 
+     *     the above will be divided
      */
-    void SetEndTimeAndNumberOfTimeSteps(double endTime, unsigned totalTimeStepsInSimulation);
+    void SetEndTimeAndNumberOfTimeSteps(
+        double endTime,
+        unsigned totalTimeStepsInSimulation);
 
     /**
-     * Reset method for the end time and the number of time steps, to run the simulation
-     * further after a first initial run.
+     * Reset method for the end time and the number of time steps, to run the 
+     * simulation further after a first initial run.
      *
-     * @param rEndTime the new end time for this simulation (the simulation will run from
-     *      the current time to this new end time, NOT from 0 to this end time)
-     * @param rNumberOfTimeStepsInThisRun the number of time steps into which the next run is split
+     * @param rEndTime the new end time for this simulation (the simulation will 
+     *     run from the current time to this new end time, NOT from 0 to this 
+     *     end time)
+     * @param rNumberOfTimeStepsInThisRun the number of time steps into which 
+     *     the next run is split
      */
-    void ResetEndTimeAndNumberOfTimeSteps(const double& rEndTime, const unsigned& rNumberOfTimeStepsInThisRun);
+    void ResetEndTimeAndNumberOfTimeSteps(
+        const double& rEndTime,
+        const unsigned& rNumberOfTimeStepsInThisRun);
 
     /**
      * Get the simulation time step, set in earlier calls.
      *
-     * Warning: Use of this method may result in round errors; generally use GetTime() instead.
+     * Warning: Use of this method may result in round errors; generally use 
+     * GetTime() instead.
      *
      * @return time step for this run of the simulation
      */
     double GetTimeStep() const;
 
     /**
-     * Increment the simulation time by one time step.
-     *
-     * GetTime() will return an updated current time after this call.
+     * Increment the simulation time by one time step. GetTime() will return an 
+     * updated current time after this call.
      */
     void IncrementTimeOneStep();
 
@@ -112,9 +163,9 @@ public:
     double GetTime() const;
 
     /**
-     * Destroy the current SimulationTime instance.  The next call to
-     * Instance will create a new instance, on which
-     * SetEndTimeAndNumberOfTimeSteps must be called again to reset time.
+     * Destroy the current SimulationTime instance. The next call to Instance 
+     * will create a new instance, on which SetEndTimeAndNumberOfTimeSteps must 
+     * be called again to reset time.
      *
      * This method *must* be called before program exit, to avoid a memory
      * leak.
@@ -122,16 +173,19 @@ public:
     static void Destroy();
 
     /**
-     * Allows lower classes to check whether the simulation time class has been set up before using it
+     * Allows lower classes to check whether the simulation time class has been 
+     * set up before using it.
      *
      * @return whether the start time of the simulation has been set.
      */
     bool IsStartTimeSetUp() const;
 
     /**
-     * Allows lower classes to check whether the simulation time class has been set up before using it
+     * Allows lower classes to check whether the simulation time class has been 
+     * set up before using it.
      *
-     * @return whether the end time of the simulation and the number of timesteps has been set.
+     * @return whether the end time of the simulation and the number of 
+     *         timesteps has been set.
      */
     bool IsEndTimeAndNumberOfTimeStepsSetUp() const;
 
@@ -141,54 +195,11 @@ public:
     bool IsFinished() const;
 
     /**
-     * Set the start time of the simulation
+     * Set the start time of the simulation.
      *
      * @param startTime the time at which the simulation begins (usually 0.0 hours)
      */
     void SetStartTime(double startTime);
-
-protected:
-    /**
-     * Default simulation time constructor
-     *
-     * Sets up time, you must set the start time,
-     * end time and number of time steps before using the object.
-     */
-    SimulationTime();
-
-private:
-    /**
-     * A pointer to the singleton instance of this class.
-     */
-    static SimulationTime* mpInstance;
-
-    /**
-     * Delegate all time stepping to a TimeStepper class
-     */
-    static boost::shared_ptr<TimeStepper> mpTimeStepper;
-
-    /**
-     * Stores the time at which the simulation started
-     */
-    double mStartTime;
-
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-
-    /**
-     * Serialization of a SimulationTime object must be done with care.
-     * Do not serialize this singleton directly.  Instead, serialize
-     * the object returned by GetSerializationWrapper.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & mStartTime;
-        archive & mpTimeStepper;
-    }
 };
 
 #endif /*SIMULATIONTIME_HPP_*/

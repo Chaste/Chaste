@@ -51,9 +51,10 @@ NagaiHondaDifferentialAdhesionForce<DIM>::~NagaiHondaDifferentialAdhesionForce()
 }
 
 template<unsigned DIM>
-double NagaiHondaDifferentialAdhesionForce<DIM>::GetAdhesionParameter(Node<DIM>* pNodeA,
-                                                                      Node<DIM>* pNodeB,
-                                                                      VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
+double NagaiHondaDifferentialAdhesionForce<DIM>::GetAdhesionParameter(
+    Node<DIM>* pNodeA,
+    Node<DIM>* pNodeB,
+    VertexBasedCellPopulation<DIM>& rVertexCellPopulation)
 {
     // Find the indices of the elements owned by each node
     std::set<unsigned> elements_containing_nodeA = pNodeA->rGetContainingElementIndices();
@@ -93,7 +94,7 @@ double NagaiHondaDifferentialAdhesionForce<DIM>::GetAdhesionParameter(Node<DIM>*
     {
         // Work out the number of labelled cells: 0,1 or 2
         unsigned num_labelled_cells = 0;
-        for (std::set<unsigned>::iterator iter = shared_elements.begin();
+        for (auto iter = shared_elements.begin();
              iter != shared_elements.end();
              ++iter)
         {
@@ -146,19 +147,22 @@ double NagaiHondaDifferentialAdhesionForce<DIM>::GetNagaiHondaLabelledCellBounda
 }
 
 template<unsigned DIM>
-void NagaiHondaDifferentialAdhesionForce<DIM>::SetNagaiHondaLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter)
+void NagaiHondaDifferentialAdhesionForce<DIM>::SetNagaiHondaLabelledCellCellAdhesionEnergyParameter(
+    double labelledCellCellAdhesionEnergyParameter)
 {
     mNagaiHondaLabelledCellCellAdhesionEnergyParameter = labelledCellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void NagaiHondaDifferentialAdhesionForce<DIM>::SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter)
+void NagaiHondaDifferentialAdhesionForce<DIM>::SetNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter(
+    double labelledCellLabelledCellAdhesionEnergyParameter)
 {
     mNagaiHondaLabelledCellLabelledCellAdhesionEnergyParameter = labelledCellLabelledCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void NagaiHondaDifferentialAdhesionForce<DIM>::SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter)
+void NagaiHondaDifferentialAdhesionForce<DIM>::SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(
+    double labelledCellBoundaryAdhesionEnergyParameter)
 {
     mNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter = labelledCellBoundaryAdhesionEnergyParameter;
 }

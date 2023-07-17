@@ -49,7 +49,8 @@ CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellMutationStatesCountWr
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     if (PetscTools::AmMaster())
     {
@@ -72,13 +73,14 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(Abstract
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(
+    AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
     if (PetscTools::AmMaster())
     {
-        for (unsigned i=0; i<mutation_state_count.size(); i++)
+        for (unsigned i = 0; i < mutation_state_count.size(); ++i)
         {
             *this->mpOutStream << mutation_state_count[i] << "\t";
         }
@@ -86,13 +88,14 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(A
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
     if (PetscTools::AmMaster())
     {
-        for (unsigned i=0; i<mutation_state_count.size(); i++)
+        for (unsigned i = 0; i < mutation_state_count.size(); ++i)
         {
             *this->mpOutStream << mutation_state_count[i] << "\t";
         }
@@ -100,25 +103,29 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

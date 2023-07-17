@@ -157,7 +157,8 @@ void TargetAreaLinearGrowthModifier<DIM>::SetGrowthRate(double growthRate)
 }
 
 template<unsigned DIM>
-void TargetAreaLinearGrowthModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void TargetAreaLinearGrowthModifier<DIM>::OutputSimulationModifierParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<AgeToStartGrowing>" << mAgeToStartGrowing << "</AgeToStartGrowing>\n";
     *rParamsFile << "\t\t\t<GrowthRate>" << mGrowthRate << "</GrowthRate>\n";

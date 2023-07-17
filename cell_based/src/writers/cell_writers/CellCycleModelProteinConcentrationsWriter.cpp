@@ -45,7 +45,9 @@ CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::CellCycleMode
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     /*
      * At present it is not possible to output all cell variables via this method, we just return zero.
@@ -57,7 +59,9 @@ double CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::GetCel
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     CellCycleModelOdeHandler* p_model = dynamic_cast<CellCycleModelOdeHandler*>(pCell->GetCellCycleModel());
 
@@ -68,7 +72,7 @@ void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCel
 
         // Write cell variables
         std::vector<double> proteins = p_model->GetProteinConcentrations();
-        for (unsigned i=0; i<proteins.size(); i++)
+        for (unsigned i = 0; i < proteins.size(); ++i)
         {
             *this->mpOutStream << proteins[i] << " ";
         }

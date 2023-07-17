@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter(const std::string& rFileName)
+AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter(
+    const std::string& rFileName)
     : mFileName(rFileName)
 {
 }
@@ -53,13 +54,15 @@ void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::CloseFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile(OutputFileHandler& rOutputFileHandler)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile(
+    OutputFileHandler& rOutputFileHandler)
 {
     mpOutStream = rOutputFileHandler.OpenOutputFile(mFileName);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend(OutputFileHandler& rOutputFileHandler)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend(
+    OutputFileHandler& rOutputFileHandler)
 {
     mpOutStream = rOutputFileHandler.OpenOutputFile(mFileName, std::ios::app);
 }
@@ -77,7 +80,8 @@ void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::SetFileName(std::string fileName)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::SetFileName(
+    std::string fileName)
 {
     mFileName = fileName;
 }

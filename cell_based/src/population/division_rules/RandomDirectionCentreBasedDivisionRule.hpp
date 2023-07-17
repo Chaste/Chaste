@@ -47,9 +47,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
 
 /**
  * A class to generate two daughter cell positions, located a distance
- * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation apart,
- * along a random axis. The midpoint between the two daughter cell
- * positions corresponds to the parent cell's position.
+ * AbstractCentreBasedCellPopulation::mMeinekeDivisionSeparation apart, along a 
+ * random axis. The midpoint between the two daughter cell positions corresponds 
+ * to the parent cell's position.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class RandomDirectionCentreBasedDivisionRule : public AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>
@@ -92,8 +92,9 @@ public:
      *
      * @return the two daughter cell positions.
      */
-    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(CellPtr pParentCell,
-        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
+    virtual std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CalculateCellDivisionVector(
+        CellPtr pParentCell,
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -43,9 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class written using the visitor pattern for writing cell ancestors to file.
  *
- * The output file is called results.vizancestors by default. If VTK is switched on,
- * then the writer also specifies the VTK output for each cell, which is stored in
- * the VTK cell data "Ancestors" by default.
+ * The output file is called results.vizancestors by default. If VTK is switched 
+ * on, then the writer also specifies the VTK output for each cell, which is 
+ * stored in the VTK cell data "Ancestors" by default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellAncestorWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
@@ -83,7 +83,9 @@ public:
      *
      * @return data associated with the cell
      */
-    double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    double GetCellDataForVtkOutput(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Overridden VisitCell() method.
@@ -94,13 +96,15 @@ public:
      * [cell 0 ancestor] [cell 1 ancestor] [cell 2 ancestor]...
      * where -1 is used to denote a cell whose ancestor is not set.
      *
-     * This is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This is appended to the output written by AbstractCellBasedWriter, which 
+     * is a single value [present simulation time], followed by a tab.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
      */
-    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void VisitCell(
+        CellPtr pCell,
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

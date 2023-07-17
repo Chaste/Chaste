@@ -111,7 +111,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
     }
 
     // Divide to obtain average gradient
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = pCellPopulation->Begin();
+    for (auto cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
          ++cell_iter)
     {

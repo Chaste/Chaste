@@ -37,11 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _STEPSIZEEXCEPTION_HPP_
 
 /**
- * Exception class to handle the adaptive time stepping in off-lattice simulations.
+ * Exception class to handle the adaptive time stepping in off-lattice 
+ * simulations.
  *
- * We use this object since we are using it to signal to parent code that it needs
- * to adapt the time step, rather than being an error for presentation to the user
- * (for which we would use an Exception object).
+ * We use this object since we are using it to signal to parent code that it 
+ * needs to adapt the time step, rather than being an error for presentation to 
+ * the user (for which we would use an Exception object).
  */
 class StepSizeException : public std::exception
 {
@@ -63,27 +64,34 @@ public:
      *
      * @param suggestedNewStep a suggestion for an updated timestep
      * @param message the error message to display
-     * @param isTerminal whether the error is terminal if true the the simulation stops
+     * @param isTerminal whether the error is terminal if true the the 
+     *                   simulation stops
      */
-    StepSizeException(double suggestedNewStep, const std::string message, bool isTerminal):
-        std::exception(),
-        mSuggestedNewStep(suggestedNewStep),
-        mMessage(message),
-        mIsTerminal(isTerminal)
+    StepSizeException(double suggestedNewStep,
+                      const std::string message,
+                      bool isTerminal)
+        : std::exception(),
+          mSuggestedNewStep(suggestedNewStep),
+          mMessage(message),
+          mIsTerminal(isTerminal)
     {
     }
 
     /**
-     * Overidden what() method to return the message specific to this error handler.
+     * Overidden what() method to return the message specific to this error 
+     * handler.
      *
      * @return the exception message
      */
-    virtual const char* what() const throw() {
+    virtual const char* what() const throw() override
+    {
         return mMessage.c_str();
     }
 
     /** Destructor. */
-    ~StepSizeException() throw() {}
+    ~StepSizeException() throw()
+    {
+    }
 
     /**
      * @return mSuggestedNewStep.

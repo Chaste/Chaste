@@ -48,9 +48,10 @@ BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(
+    AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
-    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
          node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -62,11 +63,12 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
-            node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+    for (auto node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         if (!node_iter->IsDeleted())
         {
@@ -76,25 +78,29 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
+    VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

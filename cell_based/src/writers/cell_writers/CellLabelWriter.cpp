@@ -45,7 +45,9 @@ CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::CellLabelWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double label = 0.0;
     if (pCell->HasCellProperty<CellLabel>())
@@ -58,7 +60,9 @@ double CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr 
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned label = 0;
     if (pCell->HasCellProperty<CellLabel>())
@@ -74,7 +78,7 @@ void CellLabelWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractC
     *this->mpOutStream << " " << location_index;
 
     c_vector<double, SPACE_DIM> coords = pCellPopulation->GetLocationOfCellCentre(pCell);
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << " " << coords[i];
     }

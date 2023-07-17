@@ -91,7 +91,7 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
     double dt = SimulationTime::Instance()->GetTimeStep();
 
     // Iterate over the nodes
-    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
          node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -120,7 +120,7 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         double diffusion_constant = diffusion_const_scaling/node_radius;
 
         c_vector<double, DIM> force_contribution;
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             /*
              * The force on this cell is scaled with the timestep such that when it is

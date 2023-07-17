@@ -44,7 +44,9 @@ CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::CellRadiusWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double cell_radius = 0.0;
     if (dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(pCellPopulation))
@@ -56,7 +58,9 @@ double CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     unsigned cell_id = pCell->GetCellId();
@@ -70,7 +74,7 @@ void CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abstract
     }
 
     *this->mpOutStream << location_index << " " << cell_id << " ";
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         *this->mpOutStream << cell_location[i] << " ";
     }

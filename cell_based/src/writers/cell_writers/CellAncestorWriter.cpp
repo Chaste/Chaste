@@ -44,14 +44,18 @@ CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::CellAncestorWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double ancestor_index = (pCell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)pCell->GetAncestor();
     return ancestor_index;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double ancestor_index = (pCell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)pCell->GetAncestor();
     *this->mpOutStream << ancestor_index << " ";

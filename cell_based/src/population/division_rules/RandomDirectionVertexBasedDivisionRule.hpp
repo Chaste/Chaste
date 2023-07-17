@@ -46,7 +46,8 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a uniformly random direction.
+ * A class to generate a division vector of unit length that points in a 
+ * uniformly random direction.
  */
 template <unsigned SPACE_DIM>
 class RandomDirectionVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
@@ -83,14 +84,16 @@ public:
     /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
+     * Return a unit vector in a random direction, i.e the arguments are 
+     * redundant for this division rule.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
+        CellPtr pParentCell,
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)  override;
 };
 
 #include "SerializationExportWrapper.hpp"

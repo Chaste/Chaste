@@ -49,12 +49,14 @@ template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 
 /**
- * Abstract class for a writer that takes information from an AbstractCellPopulation and writes it to file.
+ * Abstract class for a writer that takes information from an 
+ * AbstractCellPopulation and writes it to file.
  *
- * The key difference between this class and AbstractCellPopulationCountWriter is that writers inheriting
- * from this class ARE compatible with a RoundRobin loop. For such writers, each process can write its part
- * of the information without knowing anything about the other processes as long as they are not interfering
- * with the writing itself.
+ * The key difference between this class and AbstractCellPopulationCountWriter 
+ * is that writers inheriting from this class ARE compatible with a RoundRobin 
+ * loop. For such writers, each process can write its part of the information 
+ * without knowing anything about the other processes as long as they are not 
+ * interfering with the writing itself.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellPopulationWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
@@ -87,23 +89,23 @@ public:
      *
      * @param pCellPopulation a pointer to the population to be written.
      */
-    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void WriteHeader(
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
+    virtual void Visit(
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
@@ -112,8 +114,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
@@ -122,8 +123,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
@@ -132,8 +132,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

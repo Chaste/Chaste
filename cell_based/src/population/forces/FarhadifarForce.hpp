@@ -47,10 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in Vertex-based simulations. This force is based on the
- * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104.
+ * Energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 
+ * 2095-2104.
  */
-
-
 template<unsigned DIM>
 class FarhadifarForce : public AbstractForce<DIM>
 {
@@ -80,22 +79,26 @@ private:
 protected:
 
     /**
-     * The strength of the area term in the model. Corresponds to K_alpha in Farhadifar's paper.
+     * The strength of the area term in the model. Corresponds to K_alpha in 
+     * Farhadifar's paper.
      */
     double mAreaElasticityParameter;
 
     /**
-     * The strength of the perimeter term in the model. Corresponds to Gamma_alpha in Farhadifar's paper.
+     * The strength of the perimeter term in the model. Corresponds to 
+     * Gamma_alpha in Farhadifar's paper.
      */
     double mPerimeterContractilityParameter;
 
     /**
-     * The strength of the line tension term in the model. Lambda_{i,j} in Farhadifar's paper.
+     * The strength of the line tension term in the model. Lambda_{i,j} in 
+     * Farhadifar's paper.
      */
     double mLineTensionParameter;
 
     /**
-     * The strength of the line tension at the boundary. This term corresponds to Lambda_{i,j} in Farhadifar's paper.
+     * The strength of the line tension at the boundary. This term corresponds 
+     * to Lambda_{i,j} in Farhadifar's paper.
      */
     double mBoundaryLineTensionParameter;
 
@@ -123,12 +126,13 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based cell population based on the energy function
-     * Farhadifar's model.
+     * Calculates the force on each node in the vertex-based cell population 
+     * based on the energy function in Farhadifar's model.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(
+        AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Get the line tension parameter for the edge between two given nodes.
@@ -139,7 +143,10 @@ public:
      *
      * @return the line tension parameter for this edge.
      */
-    virtual double GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+    virtual double GetLineTensionParameter(
+        Node<DIM>* pNodeA,
+        Node<DIM>* pNodeB,
+        VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
 
     /**
      * @return mAreaElasticityParameter
@@ -206,7 +213,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

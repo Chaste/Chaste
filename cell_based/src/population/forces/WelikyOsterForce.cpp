@@ -49,7 +49,8 @@ WelikyOsterForce<DIM>::~WelikyOsterForce()
 }
 
 template <unsigned DIM>
-void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPopulation<DIM>& rCellPopulation)
+void WelikyOsterForce<DIM>::AddForceContribution(
+    [[maybe_unused]] AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This method only works in 2D at present
     if constexpr (DIM == 2)
@@ -69,9 +70,9 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
             */
 
         // Iterate over elements in the cell population
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator element_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-                    element_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
-                    ++element_iter)
+        for (auto element_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
+             element_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
+             ++element_iter)
         {
             unsigned element_index = element_iter->GetIndex();
 
@@ -94,7 +95,7 @@ void WelikyOsterForce<DIM>::AddForceContribution([[maybe_unused]] AbstractCellPo
             /******** End of membrane force calculation **********/
 
             unsigned num_nodes = element_iter->GetNumNodes();
-            for (unsigned node_local_index = 0; node_local_index < num_nodes; node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < num_nodes; ++node_local_index)
             {
                 unsigned node_global_index = element_iter->GetNodeGlobalIndex(node_local_index);
 
@@ -141,13 +142,15 @@ double WelikyOsterForce<DIM>::GetWelikyOsterPerimeterParameter()
 }
 
 template<unsigned DIM>
-void WelikyOsterForce<DIM>::SetWelikyOsterAreaParameter(double welikyOsterAreaParameter)
+void WelikyOsterForce<DIM>::SetWelikyOsterAreaParameter(
+    double welikyOsterAreaParameter)
 {
     mWelikyOsterAreaParameter = welikyOsterAreaParameter;
 }
 
 template<unsigned DIM>
-void WelikyOsterForce<DIM>::SetWelikyOsterPerimeterParameter(double welikyOsterPerimeterParameter)
+void WelikyOsterForce<DIM>::SetWelikyOsterPerimeterParameter(
+    double welikyOsterPerimeterParameter)
 {
     mWelikyOsterPerimeterParameter = welikyOsterPerimeterParameter;
 }

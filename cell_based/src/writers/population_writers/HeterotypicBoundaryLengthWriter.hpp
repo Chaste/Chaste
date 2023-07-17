@@ -42,16 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A class written using the visitor pattern for writing the length of the
- * boundaries between labelled and unlabelled cells (as determined by the
- * cell property CellLabel) in a cell population to file. This is a measure
- * of how mixed the populations are.
+ * boundaries between labelled and unlabelled cells (as determined by the cell 
+ * property CellLabel) in a cell population to file. This is a measure of how 
+ * mixed the populations are.
  *
  * The output file is called heterotypicboundary.dat by default.
  *
- * For usage of this measure for cell sorting, see for example the
- * heterotypic boundary length described in Zhang et al (2011). Computer
- * simulations of cell sorting due to differential adhesion. PLOS ONE
- * 6(10):e24999. doi:10.1371/journal.pone.0024999
+ * For usage of this measure for cell sorting, see for example the heterotypic 
+ * boundary length described in Zhang et al (2011). Computer simulations of cell 
+ * sorting due to differential adhesion. PLOS ONE 6(10):e24999. 
+ * doi:10.1371/journal.pone.0024999
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class HeterotypicBoundaryLengthWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
@@ -86,21 +86,24 @@ public:
      *
      * Here the indexing of nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is not defined for use with a CaBasedCellPopulation.
+     * This is an empty dummy function, since this class is not defined for use 
+     * with a CaBasedCellPopulation.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        CaBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the labelled boundary length data.
@@ -110,12 +113,13 @@ public:
      *
      * Here the indexing of nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the labelled boundary length data.
@@ -125,12 +129,13 @@ public:
      *
      * Here the indexing of nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the labelled boundary length data.
@@ -140,12 +145,13 @@ public:
      *
      * Here the indexing of nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

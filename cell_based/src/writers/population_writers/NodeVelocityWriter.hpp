@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A class written using the visitor pattern for writing the velocities of the nodes
- * associated with a cell population to file.
+ * A class written using the visitor pattern for writing the velocities of the 
+ * nodes associated with a cell population to file.
  *
  * The output file is called nodevelocities.dat by default.
  *
@@ -77,67 +77,77 @@ public:
      * Visit the population and write the location of each Node.
      *
      * Outputs a line of space-separated values of the form:
-     * ... [node index] [node x-pos] [node y-pos] [node z-pos] [node x-vel] [node y-vel] [node z-vel]...
+     * ... [node index] [node x-pos] [node y-pos] [node z-pos] [node x-vel] 
+     * [node y-vel] [node z-vel]...
      *
-     * where z-pos and z-vel are used in 3 dimensions.
-     * Here the indexing of nodes is as given by the NodeIterator.
+     * where z-pos and z-vel are used in 3 dimensions. Here the indexing of 
+     * nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is not defined for use with a CaBasedCellPopulation.
+     * This is an empty dummy function, since this class is not defined for use 
+     * with a CaBasedCellPopulation.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        CaBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the location of each Node.
      *
      * Outputs a line of space-separated values of the form:
-     * ... [node index] [node x-pos] [node y-pos] [node z-pos] [node x-vel] [node y-vel] [node z-vel]...
+     * ... [node index] [node x-pos] [node y-pos] [node z-pos] [node x-vel] 
+     * [node y-vel] [node z-vel]...
      *
-     * where z-pos and z-vel are used in 3 dimensions.
-     * Here the indexing of nodes is as given by the NodeIterator.
+     * where z-pos and z-vel are used in 3 dimensions. Here the indexing of 
+     * nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the data.
      *
-     * This is an empty dummy function, since this class is not defined for use with a PottsBasedCellPopulation.
+     * This is an empty dummy function, since this class is not defined for use 
+     * with a PottsBasedCellPopulation.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the location of each Node.
      *
      * Outputs a line of space-separated values of the form:
-     * ... [node index] [node x-pos] [node y-pos] [node z-pos] [node x-vel] [node y-vel] [node z-vel]...
+     * ... [node index] [node x-pos] [node y-pos] [node z-pos] [node x-vel] 
+     * [node y-vel] [node z-vel]...
      *
-     * where z-pos and z-vel are used in 3 dimensions.
-     * Here the indexing of nodes is as given by the NodeIterator.
+     * where z-pos and z-vel are used in 3 dimensions. Here the indexing of 
+     * nodes is as given by the NodeIterator.
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

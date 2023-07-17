@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string& rFileName)
+AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(
+    const std::string& rFileName)
     : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName),
       mOutputScalarData(true),
       mOutputVectorData(false),
@@ -59,13 +60,15 @@ bool AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetOutputVectorData()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkCellDataName(std::string vtkCellDataName)
+void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkCellDataName(
+    std::string vtkCellDataName)
 {
     mVtkCellDataName = vtkCellDataName;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkVectorCellDataName(std::string vtkCellDataName)
+void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkVectorCellDataName(
+    std::string vtkCellDataName)
 {
     mVtkVectorCellDataName = vtkCellDataName;
 }
@@ -80,8 +83,8 @@ double AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVectorCellDataForVtkOutput(
-        CellPtr pCell,
-        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     return scalar_vector<double>(SPACE_DIM, DOUBLE_UNSET);
 }

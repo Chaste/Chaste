@@ -48,7 +48,9 @@ LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::LegacyCellProliferat
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     double colour = pCell->GetCellProliferativeType()->GetColour();
 
@@ -73,7 +75,9 @@ double LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataFo
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned colour = pCell->GetCellProliferativeType()->GetColour();
 

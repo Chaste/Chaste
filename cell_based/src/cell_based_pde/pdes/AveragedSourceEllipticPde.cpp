@@ -63,13 +63,13 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
-    for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index < mCellDensityOnCoarseElements.size(); ++elem_index)
     {
         mCellDensityOnCoarseElements[elem_index] = 0.0;
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    for (auto cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {
@@ -97,7 +97,7 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
     // Then divide each entry of mSourceTermOnCoarseElements by the element's area
     c_matrix<double, DIM, DIM> jacobian;
     double det;
-    for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index < mCellDensityOnCoarseElements.size(); ++elem_index)
     {
         rCoarseMesh.GetElement(elem_index)->CalculateJacobian(jacobian, det);
         mCellDensityOnCoarseElements[elem_index] /= rCoarseMesh.GetElement(elem_index)->GetVolume(det);

@@ -36,9 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCellKiller.hpp"
 
 template<unsigned DIM>
-RandomCellKiller<DIM>::RandomCellKiller(AbstractCellPopulation<DIM>* pCellPopulation, double probabilityOfDeathInAnHour)
-        : AbstractCellKiller<DIM>(pCellPopulation),
-          mProbabilityOfDeathInAnHour(probabilityOfDeathInAnHour)
+RandomCellKiller<DIM>::RandomCellKiller(
+    AbstractCellPopulation<DIM>* pCellPopulation,
+    double probabilityOfDeathInAnHour)
+    : AbstractCellKiller<DIM>(pCellPopulation),
+      mProbabilityOfDeathInAnHour(probabilityOfDeathInAnHour)
 {
     if ((mProbabilityOfDeathInAnHour<0) || (mProbabilityOfDeathInAnHour>1))
     {
@@ -56,11 +58,13 @@ template<unsigned DIM>
 void RandomCellKiller<DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
 {
     /*
-     * We assume a constant time step and that there are an integer number (n = 1/dt)
-     * of time steps per hour. We also assume that this method is called every time step
-     * and that the probabilities of dying at different times are independent.
+     * We assume a constant time step and that there are an integer number 
+     * (n = 1/dt) of time steps per hour. We also assume that this method is 
+     * called every time step and that the probabilities of dying at different 
+     * times are independent.
      *
-     * Let q=mProbabilityOfDeathInAnHour and p="probability of death in a given time step".
+     * Let q=mProbabilityOfDeathInAnHour and p="probability of death in a given 
+     * time step".
      *
      * Probability of not dying in an hour:
      * (1-q) = (1-p)^n = (1-p)^(1/dt).
@@ -81,7 +85,7 @@ void RandomCellKiller<DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
 template<unsigned DIM>
 void RandomCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (auto cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {

@@ -71,9 +71,9 @@ private:
 protected:
 
     /**
-     * Output any parameters associated with the division rule.
-     * Currently empty since this class has no member variables. Should
-     * be overridden by any child classes that have parameters.
+     * Output any parameters associated with the division rule. Currently empty 
+     * since this class has no member variables. Should be overridden by any 
+     * child classes that have parameters.
      *
      * @param rParamsFile  The stream of the parameter file
      */
@@ -102,11 +102,13 @@ public:
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
+        CellPtr pParentCell,
         VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
 
     /**
-     * Output the name of the concrete class and call OutputCellVertexBasedDivisionRuleParameters().
+     * Output the name of the concrete class and call 
+     * OutputCellVertexBasedDivisionRuleParameters().
      *
      * @param rParamsFile  The stream of the parameter file
      */

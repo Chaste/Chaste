@@ -935,7 +935,7 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOrderedPair(unsigned index1, unsigned index2)
+std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOrderedPair(unsigned index1, unsigned index2)
 {
     assert(index1 != index2);
 

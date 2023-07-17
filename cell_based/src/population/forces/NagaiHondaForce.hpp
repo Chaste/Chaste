@@ -47,18 +47,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in vertex-based simulations, based on a mechanical
- * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
- * of epithelial tissues", Philosophical Magazine Part B 81:699-719). In contrast to the force proposed
- * by Nagai and Honda this force has an additional force term implemented that scales with the perimeter
- * of a cell to simulate the surface membrane energy. This particular perimeter force term in turn differs from the one
- * proposed by Farhadifar et al (2007) in the sense that it employs a target perimeter.
+ * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the 
+ * formation of epithelial tissues", Philosophical Magazine Part B 81:699-719). 
+ * In contrast to the force proposed by Nagai and Honda this force has an 
+ * additional force term implemented that scales with the perimeter of a cell to 
+ * simulate the surface membrane energy. This particular perimeter force term in 
+ * turn differs from the one proposed by Farhadifar et al (2007) in the sense 
+ * that it employs a target perimeter.
  *
- * Each of the model parameter member variables are rescaled such that mDampingConstantNormal
- * takes the default value 1, whereas Nagai and Honda (who denote the parameter by
- * nu) take the value 0.01.
+ * Each of the model parameter member variables are rescaled such that 
+ * mDampingConstantNormal takes the default value 1, whereas Nagai and Honda 
+ * (who denote the parameter by nu) take the value 0.01.
  */
 template<unsigned DIM>
-class NagaiHondaForce  : public AbstractForce<DIM>
+class NagaiHondaForce : public AbstractForce<DIM>
 {
 friend class TestForces;
 
@@ -86,30 +88,36 @@ private:
 protected:
 
     /**
-     * Cell deformation energy parameter. Has units of kg s^-2 (cell size at equilibrium rest length)^-1.
+     * Cell deformation energy parameter. Has units of kg s^-2 (cell size at 
+     * equilibrium rest length)^-1.
      */
     double mNagaiHondaDeformationEnergyParameter;
 
     /**
-     * Cell membrane energy parameter. Has units of kg (cell size at equilibrium rest length) s^-2.
+     * Cell membrane energy parameter. Has units of kg (cell size at equilibrium 
+     * rest length) s^-2.
      */
     double mNagaiHondaMembraneSurfaceEnergyParameter;
 
     /**
-     * Cell-cell adhesion energy parameter. Has has units of kg (cell size at equilibrium rest length)^2 s^-2.
-     * This parameter corresponds to 1/2 of the sigma parameter introduced in the original paper.
-     * This slight difference comes from the fact that when we apply the forces to a particular node, each
-     * edge is visited twice - and hence the force originating from that edge is applied twice.
+     * Cell-cell adhesion energy parameter. Has has units of kg (cell size at 
+     * equilibrium rest length)^2 s^-2. This parameter corresponds to 1/2 of the 
+     * sigma parameter introduced in the original paper. This slight difference 
+     * comes from the fact that when we apply the forces to a particular node, 
+     * each edge is visited twice - and hence the force originating from that 
+     * edge is applied twice.
      */
     double mNagaiHondaCellCellAdhesionEnergyParameter;
 
     /**
-     * Cell-boundary adhesion energy parameter. Has units of kg (cell size at equilibrium rest length)^2 s^-2.
+     * Cell-boundary adhesion energy parameter. Has units of kg (cell size at 
+     * equilibrium rest length)^2 s^-2.
      */
     double mNagaiHondaCellBoundaryAdhesionEnergyParameter;
 
     /**
-     * Target area parameter. Has units of (cell size at equilibrium rest length)^2.
+     * Target area parameter. Has units of (cell size at equilibrium rest 
+     * length)^2.
      * 
      * Note: If a subclass of AbstractTargetAreaModifier is present in the 
      * cell-based simulation, then we use the CellData item "target area" stored 
@@ -132,12 +140,13 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * Calculates the force on each node in the vertex-based cell population based on the
-     * Nagai Honda model.
+     * Calculates the force on each node in the vertex-based cell population 
+     * based on the Nagai Honda model.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(
+        AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.
@@ -148,7 +157,10 @@ public:
      *
      * @return the adhesion parameter for this edge.
      */
-    virtual double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+    virtual double GetAdhesionParameter(
+        Node<DIM>* pNodeA,
+        Node<DIM>* pNodeB,
+        VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
 
     /**
      * @return mNagaiHondaDeformationEnergyParameter
@@ -178,36 +190,46 @@ public:
     /**
      * Set mNagaiHondaDeformationEnergyParameter.
      *
-     * @param nagaiHondaDeformationEnergyParameter the new value of mNagaiHondaDeformationEnergyParameter
+     * @param nagaiHondaDeformationEnergyParameter the new value of 
+     *     mNagaiHondaDeformationEnergyParameter
      */
-    void SetNagaiHondaDeformationEnergyParameter(double nagaiHondaDeformationEnergyParameter);
+    void SetNagaiHondaDeformationEnergyParameter(
+        double nagaiHondaDeformationEnergyParameter);
 
     /**
      * Set mNagaiHondaMembraneSurfaceEnergyParameter.
      *
-     * @param nagaiHondaMembraneSurfaceEnergyParameter the new value of mNagaiHondaMembraneSurfaceEnergyParameter
+     * @param nagaiHondaMembraneSurfaceEnergyParameter the new value of 
+     *     mNagaiHondaMembraneSurfaceEnergyParameter
      */
-    void SetNagaiHondaMembraneSurfaceEnergyParameter(double nagaiHondaMembraneSurfaceEnergyParameter);
+    void SetNagaiHondaMembraneSurfaceEnergyParameter(
+        double nagaiHondaMembraneSurfaceEnergyParameter);
 
     /**
-     * Set mNagaiHondaCellCellAdhesionEnergyParameter. This parameter corresponds to 1/2 of the sigma parameter in the forces by
-     * Nagai et al. (2007).
+     * Set mNagaiHondaCellCellAdhesionEnergyParameter. This parameter 
+     * corresponds to 1/2 of the sigma parameter in the forces by Nagai et al. 
+     * (2007).
      *
-     * @param nagaiHondaCellCellAdhesionEnergyEnergyParameter the new value of mNagaiHondaCellCellAdhesionEnergyParameter
+     * @param nagaiHondaCellCellAdhesionEnergyEnergyParameter the new value of 
+     * mNagaiHondaCellCellAdhesionEnergyParameter
      */
-    void SetNagaiHondaCellCellAdhesionEnergyParameter(double nagaiHondaCellCellAdhesionEnergyEnergyParameter);
+    void SetNagaiHondaCellCellAdhesionEnergyParameter(
+        double nagaiHondaCellCellAdhesionEnergyEnergyParameter);
 
     /**
      * Set mNagaiHondaCellBoundaryAdhesionEnergyParameter.
      *
-     * @param nagaiHondaCellBoundaryAdhesionEnergyParameter the new value of mNagaiHondaCellBoundaryAdhesionEnergyParameter
+     * @param nagaiHondaCellBoundaryAdhesionEnergyParameter the new value of 
+     * mNagaiHondaCellBoundaryAdhesionEnergyParameter
      */
-    void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double nagaiHondaCellBoundaryAdhesionEnergyParameter);
+    void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(
+        double nagaiHondaCellBoundaryAdhesionEnergyParameter);
 
     /**
      * Set mNagaiHondaTargetAreaParameter.
      *
-     * @param nagaiHondaTargetAreaParameter the new value of mNagaiHondaTargetAreaParameter
+     * @param nagaiHondaTargetAreaParameter the new value of
+     *     mNagaiHondaTargetAreaParameter
      */
     void SetNagaiHondaTargetAreaParameter(double nagaiHondaTargetAreaParameter);
 
@@ -216,7 +238,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

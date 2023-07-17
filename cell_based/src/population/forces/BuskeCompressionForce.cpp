@@ -50,13 +50,15 @@ double BuskeCompressionForce<DIM>::GetCompressionEnergyParameter()
 }
 
 template<unsigned DIM>
-void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(double compressionEnergyParameter)
+void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(
+    double compressionEnergyParameter)
 {
     mCompressionEnergyParameter = compressionEnergyParameter;
 }
 
 template<unsigned DIM>
-void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void BuskeCompressionForce<DIM>::AddForceContribution(
+    AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr);
@@ -66,7 +68,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
     c_vector<double, DIM> unit_vector;
 
     // Loop over cells in the population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -88,7 +90,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
         std::set<unsigned> neighbouring_node_indices = p_static_cast_cell_population->GetNeighbouringNodeIndices(node_index);
 
         // Loop over this set
-        for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+        for (auto iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
              ++iter)
         {

@@ -41,8 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A class written using the visitor pattern for writing the average radial distribution of a
- * given CellData item, from the centroid of the cell population outward, to file.
+ * A class written using the visitor pattern for writing the average radial 
+ * distribution of a given CellData item, from the centroid of the cell 
+ * population outward, to file.
  *
  * The output file is called radial_dist.dat by default.
  */
@@ -81,81 +82,93 @@ public:
     RadialCellDataDistributionWriter();
 
     /**
-     * Visit any population and write the data. This is the same structure for any population.
+     * Visit any population and write the data. This is the same structure for 
+     * any population.
      *
      * @param pCellPopulation a pointer to the population to visit
      */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
+    void VisitAnyPopulation(
+        AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item,
-     * from the centroid of the cell population outward, in the prescribed number of bins.
+     * Visit the population and write the average radial distribution of the 
+     * CellData item, from the centroid of the cell population outward, in the 
+     * prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
      * [smaller radius of interval i] [average value]
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item,
-     * from the centroid of the cell population outward, in the prescribed number of bins.
+     * Visit the population and write the average radial distribution of the 
+     * CellData item, from the centroid of the cell population outward, in the 
+     * prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
      * [smaller radius of interval i] [average value]
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        CaBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item,
-     * from the centroid of the cell population outward, in the prescribed number of bins.
+     * Visit the population and write the average radial distribution of the 
+     * CellData item, from the centroid of the cell population outward, in the 
+     * prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
      * [smaller radius of interval i] [average value]
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item,
-     * from the centroid of the cell population outward, in the prescribed number of bins.
+     * Visit the population and write the average radial distribution of the 
+     * CellData item, from the centroid of the cell population outward, in the 
+     * prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
      * [smaller radius of interval i] [average value]
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
-     * Visit the population and write the average radial distribution of the CellData item,
-     * from the centroid of the cell population outward, in the prescribed number of bins.
+     * Visit the population and write the average radial distribution of the 
+     * CellData item, from the centroid of the cell population outward, in the 
+     * prescribed number of bins.
      *
      * Outputs a line of space-separated values of the form:
      * [smaller radius of interval i] [average value]
      *
-     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [present simulation time], followed by a tab.
+     * This line is appended to the output written by AbstractCellBasedWriter, 
+     * which is a single value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(
+        VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Set mVariableName.

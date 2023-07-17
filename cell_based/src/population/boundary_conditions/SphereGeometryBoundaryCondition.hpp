@@ -43,10 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * A spherical cell population boundary condition class, which restricts nodes to lie
- * on the surface of a sphere in the domain. Although the name of this class suggests
- * it is specific to 3D, it is actually also implemented in 2D, for which it is really
- * a circle geometry boundary condition.
+ * A spherical cell population boundary condition class, which restricts nodes 
+ * to lie on the surface of a sphere in the domain. Although the name of this 
+ * class suggests it is specific to 3D, it is actually also implemented in 2D, 
+ * for which it is really a circle geometry boundary condition.
  */
 template<unsigned DIM>
 class SphereGeometryBoundaryCondition : public AbstractCellPopulationBoundaryCondition<DIM>
@@ -107,18 +107,22 @@ public:
      *
      * Apply the cell population boundary conditions.
      *
-     * @param rOldLocations the node locations before any boundary conditions are applied
+     * @param rOldLocations the node locations before any boundary conditions 
+     *     are applied
      */
-    void ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(
+        const std::map<Node<DIM>*,
+        c_vector<double, DIM> >& rOldLocations) override;
 
     /**
      * Overridden VerifyBoundaryCondition() method.
-     * Verify the boundary conditions have been applied.
-     * This is called after ImposeBoundaryCondition() to ensure the condition is still satisfied.
+     * 
+     * Verify the boundary conditions have been applied. This is called after 
+     * ImposeBoundaryCondition() to ensure the condition is still satisfied.
      *
      * @return whether the boundary conditions are satisfied.
      */
-    bool VerifyBoundaryCondition();
+    bool VerifyBoundaryCondition() override;
 
     /**
      * Overridden OutputCellPopulationBoundaryConditionParameters() method.
@@ -126,7 +130,8 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile);
+    void OutputCellPopulationBoundaryConditionParameters(
+        out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -172,7 +177,7 @@ inline void load_construct_data(
 
     // Retrieve c_vectors one component at a time
     c_vector<double, DIM> point;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar >> point[i];
     }
