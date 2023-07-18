@@ -163,15 +163,15 @@ void Cylindrical2dMesh::CreateHaloNodes()
     mTopHaloNodes.clear();
     mBottomHaloNodes.clear();
 
-    unsigned num_halo_nodes = (unsigned)(floor(mWidth*mHaloScalingFactor));
-    double halo_node_separation = mWidth/((double)(num_halo_nodes));
+    unsigned num_halo_nodes = static_cast<unsigned>(floor(mWidth * mHaloScalingFactor));
+    double halo_node_separation = mWidth / (static_cast<double>(num_halo_nodes));
     double y_top_coordinate = mTop + mHaloOffset*halo_node_separation;
     double y_bottom_coordinate = mBottom - mHaloOffset*halo_node_separation;
 
     c_vector<double, 2> location;
     for (unsigned i=0; i<num_halo_nodes; i++)
     {
-       double x_coordinate = 0.5*halo_node_separation + (double)(i)*halo_node_separation;
+       double x_coordinate = 0.5*halo_node_separation + static_cast<double>(i) * halo_node_separation;
 
        // Inserting top halo node in mesh
        location[0] = x_coordinate;
@@ -847,7 +847,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
     return corresponding_node_index;
 }
 
-double Cylindrical2dMesh::GetHaloScalingFactor()
+double Cylindrical2dMesh::GetHaloScalingFactor() const
 {
     return mHaloScalingFactor;
 }
@@ -858,7 +858,7 @@ void Cylindrical2dMesh::SetHaloScalingFactor(double haloScalingFactor)
     mHaloScalingFactor = haloScalingFactor;
 }
 
-double Cylindrical2dMesh::GetHaloOffset()
+double Cylindrical2dMesh::GetHaloOffset() const
 {
     return mHaloOffset;
 }

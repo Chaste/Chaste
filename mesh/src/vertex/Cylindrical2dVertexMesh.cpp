@@ -163,9 +163,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                      */
                     
                     double ratio = 0.5;
-                    c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio*edge;
+                    c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio * edge;
                     
-                    // Check if near other nodes (TODO look at this as could be ineficient)
+                    // Check if near other nodes
                     bool node_clear = true;
                     double node_clearance = 0.01; 
 
@@ -175,7 +175,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                         if (distance < node_clearance)
                         {   
                             node_clear = false;
-                            //break;
+                            break;
                         }
                     }
                 
@@ -242,7 +242,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                         normal_vector /= dij;
 
                         double bound_offset = 1.0; //TODO Make setable variable!
-                        c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5*edge;
+                        c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5 * edge;
                 
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
                         new_node_index++;
@@ -363,11 +363,11 @@ c_vector<double, 2> Cylindrical2dVertexMesh::GetVectorFromAtoB(const c_vector<do
     vector[0] = fmod(vector[0], mWidth);
 
     // If the points are more than halfway around the cylinder apart, measure the other way
-    if (vector[0] > 0.5*mWidth)
+    if (vector[0] > 0.5 * mWidth)
     {
         vector[0] -= mWidth;
     }
-    else if (vector[0] < -0.5*mWidth)
+    else if (vector[0] < -0.5 * mWidth)
     {
         vector[0] += mWidth;
     }
@@ -445,7 +445,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 {
     unsigned num_nodes = GetNumNodes();
 
-    std::vector<Node<2>*> temp_nodes(3*num_nodes);
+    std::vector<Node<2>*> temp_nodes(3 * num_nodes);
     std::vector<VertexElement<2, 2>*> elements;
 
     // Create three copies of each node
@@ -463,7 +463,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         temp_nodes[num_nodes + index] = p_node;
 
         // Node copy shifted left
-        p_node = new Node<2>(2*num_nodes + index, false, location[0] - mWidth, location[1]);
+        p_node = new Node<2>(2 * num_nodes + index, false, location[0] - mWidth, location[1]);
         temp_nodes[2*num_nodes + index] = p_node;
     }
 
@@ -487,7 +487,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
             c_vector<double, 2> vector;
             vector = r_next_node_location - r_this_node_location;
 
-            if (fabs(vector[0]) > 0.5*mWidth)
+            if (fabs(vector[0]) > 0.5 * mWidth)
             {
                 element_straddles_left_right_boundary = true;
             }
@@ -501,7 +501,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         {
                 unsigned delaunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
                 double element_centre_x_location = this->mpDelaunayMesh->GetNode(delaunay_index)->rGetLocation()[0];
-                if (element_centre_x_location < 0.5*mWidth)
+                if (element_centre_x_location < 0.5 * mWidth)
                 {
                     element_centre_on_right = false;
                 }
@@ -516,7 +516,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
             if (element_straddles_left_right_boundary)
             {
                 // ...and this node is located to the left of the centre of the mesh...
-                bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5*mWidth > 0);
+                bool node_is_right_of_centre = (elem_iter->GetNode(local_index)->rGetLocation()[0] - 0.5 * mWidth > 0);
                 if (!node_is_right_of_centre && element_centre_on_right)
                 {
                     // ...then choose the equivalent node to the right
@@ -525,7 +525,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
                 else if (node_is_right_of_centre && !element_centre_on_right)
                 {
                     // ...then choose the equivalent node to the left
-                    this_node_index += 2*num_nodes;
+                    this_node_index += 2 * num_nodes;
                 }
             }
 

@@ -291,18 +291,18 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension) const;
-
-    /**
-     * @return mHaloScalingFactor
-     */
-    double GetHaloScalingFactor();
-    
+ 
     /**
      * Set mHaloScalingFactor
      *
      * @param haloScalingFactor the new value of mHaloScalingFactor
      */
     void SetHaloScalingFactor(double haloScalingFactor);
+
+    /**
+     * @return mHaloScalingFactor
+     */
+    double GetHaloScalingFactor() const;
 
     /**
      * Set mHaloOffset
@@ -314,7 +314,7 @@ public:
     /**
      * @return mHaloOffset
      */
-    double GetHaloOffset();
+    double GetHaloOffset() const;
 
     
     /**
