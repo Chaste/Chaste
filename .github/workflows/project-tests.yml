@@ -35,8 +35,8 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
-        sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu/ jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/ubuntu//ChasteTeam.asc
         sudo apt update
         sudo apt install chaste-dependencies
     
