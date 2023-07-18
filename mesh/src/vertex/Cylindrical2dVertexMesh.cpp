@@ -194,7 +194,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             ++elem_iter)
         {   
             bool bad_element = false;
-            double edge_threshold = 1.5; //TODO Make setable variable!
+            double edge_threshold = 1.5; //TODO think about making this a setable variable!
 
             for (unsigned j=0; j<3; j++)
             {
@@ -241,7 +241,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                         assert(dij>1e-5); //Sanity check
                         normal_vector /= dij;
 
-                        double bound_offset = 1.0; //TODO Make setable variable!
+                        double bound_offset = 1.0; //TODO Think about makeing this a setable variable!
                         c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5 * edge;
                 
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
@@ -251,7 +251,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             }
         }
 
-        // Loop over all nodes and check they're not outside [0,mWidth]
+        // Loop over all nodes and check they're not outside [0,mWidth)
         for (unsigned i=0; i<nodes.size(); i++)
         {
             CheckNodeLocation(nodes[i]);
