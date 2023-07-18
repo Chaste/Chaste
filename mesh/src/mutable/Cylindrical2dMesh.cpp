@@ -165,13 +165,13 @@ void Cylindrical2dMesh::CreateHaloNodes()
 
     unsigned num_halo_nodes = static_cast<unsigned>(floor(mWidth * mHaloScalingFactor));
     double halo_node_separation = mWidth / (static_cast<double>(num_halo_nodes));
-    double y_top_coordinate = mTop + mHaloOffset*halo_node_separation;
-    double y_bottom_coordinate = mBottom - mHaloOffset*halo_node_separation;
+    double y_top_coordinate = mTop + mHaloOffset * halo_node_separation;
+    double y_bottom_coordinate = mBottom - mHaloOffset * halo_node_separation;
 
     c_vector<double, 2> location;
     for (unsigned i=0; i<num_halo_nodes; i++)
     {
-       double x_coordinate = 0.5*halo_node_separation + static_cast<double>(i) * halo_node_separation;
+       double x_coordinate = 0.5 * halo_node_separation + static_cast<double>(i) * halo_node_separation;
 
        // Inserting top halo node in mesh
        location[0] = x_coordinate;
@@ -836,7 +836,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
                 std::vector<unsigned>::iterator left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
                 if (left_im_iter != mLeftImages.end())
                 {
-                    corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
+                     corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
                 }
             }
         }
