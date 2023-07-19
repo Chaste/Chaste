@@ -64,7 +64,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(
     {
         // Pull on all nodes, with a constant strain rate
         double width = x_max - x_min;
-        for (unsigned node_index=0; node_index<num_nodes; node_index++)
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
         {
             Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
             double speed = mSpeed * (p_node->rGetLocation()[0] - x_min) / width;
@@ -78,7 +78,7 @@ void ExtrinsicPullModifier<DIM>::UpdateAtEndOfTimeStep(
     else
     {
         // Pull on the right-most nodes only, with a constant speed
-        for (unsigned node_index=0; node_index<num_nodes; node_index++)
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
         {
             Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
             if (fabs(p_node->rGetLocation()[0] - x_max) < 0.1)

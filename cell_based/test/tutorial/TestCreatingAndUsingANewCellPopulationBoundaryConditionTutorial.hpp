@@ -138,7 +138,7 @@ public:
      */
     void ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
     {
-        for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (auto cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
              ++cell_iter)
         {
@@ -166,7 +166,7 @@ public:
     {
         bool condition_satisfied = true;
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (auto cell_iter = this->mpCellPopulation->Begin();
              cell_iter != this->mpCellPopulation->End();
              ++cell_iter)
         {

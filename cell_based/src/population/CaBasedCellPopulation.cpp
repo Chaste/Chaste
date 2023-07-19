@@ -398,7 +398,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             p_gen->Shuffle(mSwitchingUpdateRuleCollection);
         }
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             unsigned node_index;
 
@@ -423,7 +423,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
                 std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-                for (unsigned j=0; j<chosen_neighbour; j++)
+                for (unsigned j = 0; j<chosen_neighbour; ++j)
                 {
                     neighbour_iter++;
                 }
@@ -437,7 +437,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     double probability_of_switch = 0.0;
 
                     // Now add contributions to the probability from each CA switching update rule
-                    for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = mSwitchingUpdateRuleCollection.begin();
+                    for (auto iter_rule = mSwitchingUpdateRuleCollection.begin();
                          iter_rule != mSwitchingUpdateRuleCollection.end();
                          ++iter_rule)
                     {
@@ -781,7 +781,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 
     // Tidy up
-    for (unsigned i=0; i<nodes.size(); i++)
+    for (unsigned i = 0; i < nodes.size(); ++i)
     {
         delete nodes[i];
     }

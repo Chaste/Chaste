@@ -123,7 +123,7 @@ public:
         p_other_cell->InitialiseCellCycleModel();
 
         // Test the cell is ready to divide at the right time
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -182,7 +182,7 @@ public:
         TS_ASSERT_EQUALS(p_cell_model2->ReadyToDivide(),false);
 
         // Test the cell is ready to divide at the right time
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -214,14 +214,14 @@ public:
 
         // Coverage of AbstractOdeBasedCellCycleModel::SetProteinConcentrationsForTestsOnly()
         std::vector<double> test_results(6);
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             test_results[i] = (double)i;
         }
         p_cell_model->SetProteinConcentrationsForTestsOnly(1.0, test_results);
         proteins = p_cell_model->GetProteinConcentrations();
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             TS_ASSERT_DELTA(proteins[i], test_results[i], 1e-6);
         }
@@ -255,13 +255,13 @@ public:
         // Run through the cell-cycle model for a certain duration
         // and test how many times it has stopped for division
         unsigned num_divisions = 0;
-        for (unsigned i=0; i<num_timesteps; i++)
+        for (unsigned i = 0; i < num_timesteps; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             bool result = p_repeating_cell_model->ReadyToDivide();
 //                std::vector<double> proteins = p_repeating_cell_model->GetProteinConcentrations();
 //                out << SimulationTime::Instance()->GetTime() << "\t";
-//                for (unsigned j=0; j<proteins.size(); j++)
+//                for (unsigned j = 0; j < proteins.size(); ++j)
 //                {
 //                    out << proteins[j] << "\t";
 //                }

@@ -81,11 +81,11 @@ public:
         // Create a simple 3D NodeBasedCellPopulation consisting of cells evenly spaced in a regular grid
         std::vector<Node<3>*> nodes;
         unsigned index = 0;
-        for (unsigned i=0; i<cells_across; i++)
+        for (unsigned i = 0; i < cells_across; ++i)
         {
-            for (unsigned j=0; j<cells_across; j++)
+            for (unsigned j = 0; j < cells_across; ++j)
             {
-                for (unsigned k=0; k<cells_across; k++)
+                for (unsigned k = 0; k < cells_across; ++k)
                 {
                     nodes.push_back(new Node<3>(index, false,  (double) i * scaling , (double) j * scaling, (double) k * scaling));
                     index++;
@@ -150,7 +150,7 @@ public:
 
         AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
 
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             ++cell_iter;
         }
@@ -160,7 +160,7 @@ public:
         TS_ASSERT_DELTA(node_location[2],4.2807, 1e-4);
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

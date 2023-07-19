@@ -372,8 +372,8 @@ public:
                             location_indices_set.begin(), location_indices_set.end(),
                             std::inserter(ghost_node_indices, ghost_node_indices.begin()));
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter=simulator.rGetCellPopulation().Begin();
-             cell_iter!=simulator.rGetCellPopulation().End();
+        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
+             cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
             unsigned index = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
@@ -534,7 +534,7 @@ public:
         simulator.Solve();
 
         // All fully differentiated cells have sloughed off
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
@@ -1042,7 +1042,7 @@ public:
         simulator.Solve();
 
         // Check that nothing has moved below y=0
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {

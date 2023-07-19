@@ -93,7 +93,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
 
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_EQUALS(*cell_iter, cells[i]);
             ++cell_iter;
@@ -110,7 +110,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIterateRandomlyOverUpdateRuleCollection(), false);
 
         // For coverage of GetVolumeOfCell()
-        for (AbstractCellPopulation<2>::Iterator cell_iter2 = cell_population.Begin();
+        for (auto cell_iter2 = cell_population.Begin();
              cell_iter2 != cell_population.End();
              ++cell_iter2)
         {
@@ -143,7 +143,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells, false, false);
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -172,7 +172,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements()-1);
 
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cell_location_indices.push_back(i);
         }
@@ -209,7 +209,7 @@ public:
             std::set<unsigned> expected_node_indices;
             unsigned expected_index = iter->GetIndex();
 
-            for (unsigned i=0; i<iter->GetNumNodes(); i++)
+            for (unsigned i = 0; i < iter->GetNumNodes(); ++i)
             {
                 expected_node_indices.insert(iter->GetNodeGlobalIndex(i));
             }
@@ -220,7 +220,7 @@ public:
             PottsElement<2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
             unsigned actual_index = p_actual_element->GetIndex();
 
-            for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_actual_element->GetNumNodes(); ++i)
             {
                 actual_node_indices.insert(p_actual_element->GetNodeGlobalIndex(i));
             }
@@ -239,7 +239,7 @@ public:
         cells_generator2.GenerateBasic(cells2, p_mesh2->GetNumElements()+1);
 
         std::vector<unsigned> cell_location_indices2;
-        for (unsigned i=0; i<cells2.size(); i++)
+        for (unsigned i = 0; i < cells2.size(); ++i)
         {
             cell_location_indices2.push_back(i%p_mesh2->GetNumElements()); // Element 0 will have 2 cells
         }
@@ -530,7 +530,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 16u);
 
         // Test GetNode()
-        for (unsigned index=0; index<cell_population.GetNumNodes(); index++)
+        for (unsigned index = 0; index < cell_population.GetNumNodes(); ++index)
         {
             Node<2>* p_node = cell_population.GetNode(index);
             TS_ASSERT_EQUALS(p_node->GetIndex(), index);
@@ -545,7 +545,7 @@ public:
         }
 
         // Test GetElement()
-        for (unsigned index=0; index<cell_population.GetNumElements(); index++)
+        for (unsigned index = 0; index < cell_population.GetNumElements(); ++index)
         {
             PottsElement<2>* p_element = cell_population.GetElement(index);
             TS_ASSERT_EQUALS(p_element->GetIndex(), index);
@@ -585,7 +585,7 @@ public:
         // Test GetLocationOfCellCentre()
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
 
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             c_vector<double, 2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
 
@@ -659,7 +659,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {

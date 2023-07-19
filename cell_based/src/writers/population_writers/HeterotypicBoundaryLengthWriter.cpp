@@ -294,7 +294,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         unsigned num_nodes_in_elem = pCellPopulation->rGetMesh().GetElement(elem_index)->GetNumNodes();
 
         // Iterate over nodes contained in the element corresponding to this cell
-        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        for (unsigned local_index = 0; local_index < num_nodes_in_elem; ++local_index)
         {
             // Get this node's von Neumann neighbours (not Moore neighbours, since they must share an edge)
             unsigned global_index = pCellPopulation->rGetMesh().GetElement(elem_index)->GetNodeGlobalIndex(local_index);

@@ -76,7 +76,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             p_model->SetMaxTransitGenerations(UINT_MAX);

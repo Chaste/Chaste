@@ -210,7 +210,7 @@ public:
          * cells to move inwards towards the origin. Note that this will currently only work with subclasses of {{{AbstractCentreBasedCellPopulation}}}s as
          * we associate cells with nodes in the force calculation. However, this could easily be modified to make it work for {{{VertexBasedCellPopulation}}}s.
          */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+        for (auto cell_iter = rCellPopulation.Begin();
              cell_iter != rCellPopulation.End();
              ++cell_iter)
         {
@@ -373,7 +373,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             /* For each node we create a cell with our cell-cycle model and the wild-type cell mutation state.
              * We then add the property {{{MotileCellProperty}}} to a random selection of the cells, as follows. */

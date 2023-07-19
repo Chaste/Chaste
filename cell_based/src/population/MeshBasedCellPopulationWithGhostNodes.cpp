@@ -122,7 +122,7 @@ template<unsigned DIM>
 std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetGhostNodeIndices()
 {
     std::set<unsigned> ghost_node_indices;
-    for (unsigned i=0; i<this->mIsGhostNode.size(); i++)
+    for (unsigned i = 0; i < this->mIsGhostNode.size(); ++i)
     {
         if (this->mIsGhostNode[i])
         {
@@ -140,7 +140,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(
     this->mIsGhostNode = std::vector<bool>(this->mrMesh.GetNumNodes(), false);
 
     // Update mIsGhostNode
-    for (std::set<unsigned>::iterator iter=rGhostNodeIndices.begin(); iter!=rGhostNodeIndices.end(); ++iter)
+    for (auto iter = rGhostNodeIndices.begin();
+         iter != rGhostNodeIndices.end();
+         ++iter)
     {
         this->mIsGhostNode[*iter] = true;
     }
@@ -217,7 +219,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
         validated_node[node_index] = true;
     }
 
-    for (unsigned i=0; i<validated_node.size(); i++)
+    for (unsigned i = 0; i < validated_node.size(); ++i)
     {
         if (!validated_node[i])
         {
@@ -247,7 +249,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(
     mIsGhostNode.resize(this->GetNumNodes());
 
     // Update mIsGhostNode using the node map
-    for (unsigned old_index=0; old_index<rMap.GetSize(); old_index++)
+    for (unsigned old_index = 0; old_index < rMap.GetSize(); ++old_index)
     {
         if (!rMap.IsDeleted(old_index))
         {

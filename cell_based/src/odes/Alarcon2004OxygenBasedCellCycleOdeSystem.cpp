@@ -36,9 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Alarcon2004OxygenBasedCellCycleOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
 
-Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration,
-                                                                                   bool isLabelled,
-                                                                                   std::vector<double> stateVariables)
+Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSystem(
+    double oxygenConcentration,
+    bool isLabelled,
+    std::vector<double> stateVariables)
     : AbstractOdeSystem(6),
       mOxygenConcentration(oxygenConcentration),
       mIsLabelled(isLabelled)
@@ -85,7 +86,6 @@ Alarcon2004OxygenBasedCellCycleOdeSystem::Alarcon2004OxygenBasedCellCycleOdeSyst
 
 Alarcon2004OxygenBasedCellCycleOdeSystem::~Alarcon2004OxygenBasedCellCycleOdeSystem()
 {
-    // Do nothing
 }
 
 void Alarcon2004OxygenBasedCellCycleOdeSystem::Init()
@@ -106,7 +106,10 @@ void Alarcon2004OxygenBasedCellCycleOdeSystem::Init()
     mB = 0.01;
 }
 
-void Alarcon2004OxygenBasedCellCycleOdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+void Alarcon2004OxygenBasedCellCycleOdeSystem::EvaluateYDerivatives(
+    double time,
+    const std::vector<double>& rY,
+    std::vector<double>& rDY)
 {
     double x = rY[0];
     double y = rY[1];
@@ -155,7 +158,9 @@ void Alarcon2004OxygenBasedCellCycleOdeSystem::EvaluateYDerivatives(double time,
     rDY[5] = 0.0; // do not change the oxygen concentration
 }
 
-bool Alarcon2004OxygenBasedCellCycleOdeSystem::CalculateStoppingEvent(double time, const std::vector<double>& rY)
+bool Alarcon2004OxygenBasedCellCycleOdeSystem::CalculateStoppingEvent(
+    double time,
+    const std::vector<double>& rY)
 {
     return (rY[0] < mxThreshold && rY[1] > myThreshold);
 }

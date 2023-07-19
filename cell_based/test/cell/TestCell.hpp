@@ -589,7 +589,7 @@ public:
         TS_ASSERT(typeid(p_daughter_cell1->GetCellCycleModel()) == typeid(p_stem_cell->GetCellCycleModel()));
 
         // Go to large time to ensure that differentiated cells can not divide
-        for (unsigned i=0; i<990; i++)
+        for (unsigned i = 0; i < 990; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
         }
@@ -603,7 +603,7 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(54.0, 5400);
 
-        for (unsigned i=0; i<600; i++)
+        for (unsigned i = 0; i < 600; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
         }
@@ -625,7 +625,7 @@ public:
         TS_ASSERT_DELTA(p_transit_model->GetTransitCellG1Duration(), 2.0, 1e-12);
         TS_ASSERT_DELTA(p_transit_model->GetSG2MDuration(), 10.0, 1e-12);
 
-        for (unsigned i=0; i<1199; i++)
+        for (unsigned i = 0; i < 1199; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
         }
@@ -641,7 +641,7 @@ public:
         p_transit_cell->InitialiseCellCycleModel();
 
         TS_ASSERT_EQUALS(p_transit_cell->GetCellCycleModel(), p_cell_cycle_model);
-        for (unsigned i=0; i<1399; i++)
+        for (unsigned i = 0; i < 1399; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
         }
@@ -671,7 +671,7 @@ public:
         double transit_cell_mean = 0.0;
         double differentiated_cell_mean = 0.0;
 
-        for (unsigned simulation_number=0; simulation_number<number_of_simulations; simulation_number++)
+        for (unsigned simulation_number = 0; simulation_number < number_of_simulations; ++simulation_number)
         {
             SimulationTime::Destroy();
             SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -880,7 +880,7 @@ public:
         p_tn_cell->InitialiseCellCycleModel();
         p_cell_model->SetDt(0.1/60.0);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -904,7 +904,7 @@ public:
 
         TS_ASSERT_DELTA(time_of_birth, time_of_birth2, 1e-9);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();

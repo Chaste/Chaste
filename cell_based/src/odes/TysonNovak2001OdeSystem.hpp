@@ -151,7 +151,8 @@ public:
     /**
      * Constructor.
      *
-     * @param stateVariables optional initial conditions for state variables (only used in archiving)
+     * @param stateVariables optional initial conditions for state variables 
+     *     (only used in archiving)
      */
     TysonNovak2001OdeSystem(std::vector<double> stateVariables=std::vector<double>());
 
@@ -166,40 +167,50 @@ public:
     void Init();
 
     /**
-     * Compute the RHS of the Alarcon et al. (2004) system of ODEs.
+     * Overridden EvaluateYDerivatives() method.
+     * 
+     * Compute the RHS of the Tyson & Novak (2001) system of ODEs.
      *
-     * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
-     * An ODE solver will call this function repeatedly to solve for y = [y1 ... yn].
+     * Returns a vector representing the RHS of the ODEs at each time step, 
+     * y' = [y1' ... yn']. An ODE solver will call this function repeatedly to 
+     * solve for y = [y1 ... yn].
      *
      * @param time used to evaluate the RHS.
      * @param rY value of the solution vector used to evaluate the RHS.
-     * @param rDY filled in with the resulting derivatives (using Alarcons et al. (2004) system of equations).
+     * @param rDY filled in with the resulting derivatives (using Tyson & Novak 
+     *     (2001) system of equations).
      */
-    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY) override;
 
     /**
-     * Calculate whether the conditions for the cell cycle to finish have been met.
-     * (Used by Chaste solvers to find whether or not to stop solving)
+     * Overridden CalculateStoppingEvent() method.
+     * 
+     * Calculate whether the conditions for the cell cycle to finish have been 
+     * met. (Used by Chaste solvers to find whether or not to stop solving)
      *
      * @param time at which to calculate whether the stopping event has occurred
      * @param rY value of the solution vector used to evaluate the RHS.
      *
      * @return whether or not stopping conditions have been met
      */
-    bool CalculateStoppingEvent(double time, const std::vector<double>& rY);
+    bool CalculateStoppingEvent(double time, const std::vector<double>& rY) override;
 
     /**
-     * Calculate whether the conditions for the cell cycle to finish have been met.
-     * (Used by CVODE solver to find exact stopping position)
+     * Overridden CalculateRootFunction() method.
+     * 
+     * Calculate whether the conditions for the cell cycle to finish have been 
+     * met. (Used by CVODE solver to find exact stopping position)
      *
      * @param time at which to calculate whether the stopping event has occurred
      * @param rY value of the solution vector used to evaluate the RHS.
      *
      * @return How close we are to the root of the stopping condition
      */
-    double CalculateRootFunction(double time, const std::vector<double>& rY);
+    double CalculateRootFunction(double time, const std::vector<double>& rY) override;
 
     /**
+     * Overridden AnalyticJacobian() method.
+     * 
      * Compute the Jacobian of the ODE system.
      *
      * @param rSolutionGuess initial guess for the solution vector.
@@ -207,7 +218,11 @@ public:
      * @param time at which to calculate the Jacobian.
      * @param timeStep used to calculate the Jacobian.
      */
-    virtual void AnalyticJacobian(const std::vector<double>& rSolutionGuess, double** jacobian, double time, double timeStep);
+    virtual void AnalyticJacobian(
+        const std::vector<double>& rSolutionGuess,
+        double** jacobian,
+        double time,
+        double timeStep);
 };
 
 // Declare identifier for the serializer

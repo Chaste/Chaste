@@ -83,7 +83,7 @@ public:
         TS_ASSERT_EQUALS(sloughing_cell_killer.GetIdentifier(), "SloughingCellKiller-2");
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -102,7 +102,7 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -136,7 +136,7 @@ public:
         sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -153,7 +153,7 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -185,7 +185,7 @@ public:
         sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<1>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
@@ -203,7 +203,7 @@ public:
         // Check that dead cells were correctly removed
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<1>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -308,7 +308,7 @@ public:
         radial_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -328,7 +328,7 @@ public:
         cell_population.RemoveDeadCells();
 
         // Check that we are correctly left with cells inside the circle of death
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

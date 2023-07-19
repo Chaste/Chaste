@@ -49,7 +49,7 @@ AbstractCryptStatistics::~AbstractCryptStatistics()
 
 void AbstractCryptStatistics::LabelSPhaseCells()
 {
-    for (AbstractCellPopulation<2>::Iterator cell_iter = mrCrypt.Begin();
+    for (auto cell_iter = mrCrypt.Begin();
          cell_iter != mrCrypt.End();
          ++cell_iter)
     {
@@ -75,7 +75,7 @@ void AbstractCryptStatistics::LabelSPhaseCells()
 
 void AbstractCryptStatistics::LabelAllCellsAsHealthy()
 {
-    for (AbstractCellPopulation<2>::Iterator cell_iter = mrCrypt.Begin();
+    for (auto cell_iter = mrCrypt.Begin();
          cell_iter != mrCrypt.End();
          ++cell_iter)
     {

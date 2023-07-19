@@ -189,7 +189,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, location_indices.size(), location_indices, p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -430,7 +430,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Need to set this up for the chemotactic force.
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
@@ -825,7 +825,7 @@ public:
         unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
         cells.reserve(num_cells);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             unsigned generation;
             double y = 0.0;
@@ -1099,7 +1099,7 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Set up cells so that cell 10 divides at time t=0.5, cell 9 at time t=1.5, etc
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-13.5 - i);
         }
@@ -1305,7 +1305,7 @@ public:
 
         std::vector<CellPtr> cells;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             UniformCellCycleModel* p_model = new UniformCellCycleModel();
             p_model->SetDimension(2);

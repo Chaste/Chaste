@@ -128,7 +128,7 @@ inline void save_construct_data(
 {
     // Archive c_vector one component at a time
     c_vector<double, SPACE_DIM> location = t->rGetDaughterLocation();
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar << location[i];
     }
@@ -143,7 +143,7 @@ inline void load_construct_data(
 {
     // Archive c_vector one component at a time
     c_vector<double, SPACE_DIM> location;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         ar >> location[i];
     }

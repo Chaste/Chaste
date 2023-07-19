@@ -118,12 +118,12 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
 
         // Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map
         std::set<unsigned> coarse_mesh_boundary_node_indices;
-        for (unsigned i=0; i<this->mpFeMesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < this->mpFeMesh->GetNumElements(); ++i)
         {
             if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
             {
                 Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(i);
-                for (unsigned j=0; j<DIM+1; j++)
+                for (unsigned j = 0; j < DIM + 1; ++j)
                 {
                     unsigned node_index = p_element->GetNodeGlobalIndex(j);
                     coarse_mesh_boundary_node_indices.insert(node_index);
@@ -132,7 +132,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
         }
 
         // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
-        for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
+        for (auto iter = coarse_mesh_boundary_node_indices.begin();
              iter != coarse_mesh_boundary_node_indices.end();
              ++iter)
         {
@@ -141,7 +141,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
     }
     else // Apply BC at boundary nodes of box domain FE mesh
     {
-        for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+        for (auto node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
              node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {

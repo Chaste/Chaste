@@ -116,7 +116,7 @@ public:
         unsigned counter = 0;
 
         // Test VertexBasedCellPopulation::Iterator
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -145,7 +145,7 @@ public:
         TS_ASSERT_DELTA(width_y, 2.8867, 1e-4);
 
         // For coverage of GetVolumeOfCell()
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -153,7 +153,7 @@ public:
         }
 
         // For coverage of GetRosetteRankOfCell()
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -184,7 +184,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements()-1);
 
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cell_location_indices.push_back(i);
         }
@@ -221,7 +221,7 @@ public:
             std::set<unsigned> expected_node_indices;
             unsigned expected_index = iter->GetIndex();
 
-            for (unsigned i=0; i<iter->GetNumNodes(); i++)
+            for (unsigned i = 0; i < iter->GetNumNodes(); ++i)
             {
                 expected_node_indices.insert(iter->GetNodeGlobalIndex(i));
             }
@@ -232,7 +232,7 @@ public:
             VertexElement<2,2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
             unsigned actual_index = p_actual_element->GetIndex();
 
-            for (unsigned i=0; i<p_actual_element->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_actual_element->GetNumNodes(); ++i)
             {
                 actual_node_indices.insert(p_actual_element->GetNodeGlobalIndex(i));
             }
@@ -251,7 +251,7 @@ public:
         cells_generator2.GenerateBasic(cells2, p_mesh2->GetNumElements()+1);
 
         std::vector<unsigned> cell_location_indices2;
-        for (unsigned i=0; i<cells2.size(); i++)
+        for (unsigned i = 0; i < cells2.size(); ++i)
         {
             cell_location_indices2.push_back(i%p_mesh2->GetNumElements()); // Element 0 will have 2 cells
         }
@@ -540,7 +540,7 @@ public:
         unsigned num_edge_splits = 0;
         unsigned num_divisions = 0;
         std::vector<std::vector<unsigned> > element_to_operations(5);
-        for (unsigned i=0; i<num_operations; ++i)
+        for (unsigned i = 0; i < num_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_DIVIDE)
             {
@@ -586,7 +586,7 @@ public:
         nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
 
         std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem.push_back(nodes[i]);
         }
@@ -672,7 +672,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -740,7 +740,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], 1.0247, 1e-4);
 
         // Now test the nodes in each element
-        for (unsigned i=0; i<cell_population.GetNumElements(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumElements(); ++i)
         {
             if (i==4 || i==9)
             {
@@ -820,7 +820,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells, false, false);
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -888,7 +888,7 @@ public:
 
         // We expect the cell element indices to be {0,11,...,23}
         std::set<unsigned> expected_elem_indices;
-        for (unsigned i=0; i<cell_population.GetNumRealCells(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumRealCells(); ++i)
         {
             expected_elem_indices.insert(i);
         }
@@ -896,7 +896,7 @@ public:
         // Get actual cell element indices
         std::set<unsigned> element_indices;
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -929,7 +929,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         std::vector<CellPtr> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
@@ -994,7 +994,7 @@ public:
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Coverage of writing CellData to VTK
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1104,7 +1104,7 @@ public:
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -1151,7 +1151,7 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -1172,7 +1172,7 @@ public:
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
 
-            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
                 Node<2>* p_node = mesh.GetNode(node_index);
                 Node<2>* p_node2 = loaded_mesh.GetNode(node_index);
@@ -1184,7 +1184,7 @@ public:
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), true);
                 TS_ASSERT_EQUALS(p_node2->IsBoundaryNode(), true);
 
-                for (unsigned dimension=0; dimension<2; dimension++)
+                for (unsigned dimension = 0; dimension < 2; ++dimension)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
@@ -1192,12 +1192,12 @@ public:
 
             TS_ASSERT_EQUALS(mesh.GetNumElements(), loaded_mesh.GetNumElements());
 
-            for (unsigned elem_index=0; elem_index < mesh.GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < mesh.GetNumElements(); ++elem_index)
             {
                 TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNumNodes(),
                                  loaded_mesh.GetElement(elem_index)->GetNumNodes());
 
-                for (unsigned local_index=0; local_index<mesh.GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index < mesh.GetElement(elem_index)->GetNumNodes(); ++local_index)
                 {
                     unsigned this_index = mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index);
                     unsigned loaded_index = loaded_mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index);
@@ -1266,19 +1266,19 @@ public:
         nodes_faces[9].push_back(nodes[7]);
 
         std::vector<VertexElement<2,3>*> faces;
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
         }
 
         std::vector<VertexElement<2,3>*> faces_element_0, faces_element_1;
         std::vector<bool> orientations_0, orientations_1;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             faces_element_0.push_back(faces[i]);
             orientations_0.push_back(true);
         }
-        for (unsigned i=6; i<10; i++)
+        for (unsigned i=6; i<10; ++i)
         {
             faces_element_1.push_back(faces[i]);
             orientations_1.push_back(true);
@@ -1315,7 +1315,7 @@ public:
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
-            for (AbstractCellPopulation<3>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -1359,7 +1359,7 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (AbstractCellPopulation<3>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -1380,7 +1380,7 @@ public:
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
 
-            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
             {
                 Node<3>* p_node = mesh.GetNode(node_index);
                 Node<3>* p_node2 = loaded_mesh.GetNode(node_index);
@@ -1390,7 +1390,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned dimension=0; dimension<2; dimension++)
+                for (unsigned dimension = 0; dimension < 2; ++dimension)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
@@ -1398,12 +1398,12 @@ public:
 
             TS_ASSERT_EQUALS(mesh.GetNumElements(), loaded_mesh.GetNumElements());
 
-            for (unsigned elem_index=0; elem_index < mesh.GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < mesh.GetNumElements(); ++elem_index)
             {
                 TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNumNodes(),
                                  loaded_mesh.GetElement(elem_index)->GetNumNodes());
 
-                for (unsigned local_index=0; local_index<mesh.GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index < mesh.GetElement(elem_index)->GetNumNodes(); ++local_index)
                 {
                     TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index),
                                      loaded_mesh.GetElement(elem_index)->GetNodeGlobalIndex(local_index));
@@ -1475,7 +1475,7 @@ public:
         TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumBoundaryElements(), 4u);
 
         // The first 5 Nodes of the TetrahedralMesh should overlap with those of the VertexMesh and have the same boundaryness.
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i);
             Node<2>* p_vertex_node = p_vertex_mesh->GetNode(i);
@@ -1488,7 +1488,7 @@ public:
         }
 
         // The last 3 Nodes of the TetrahedralMesh should be located at the centroids of the 3 VertexElements and will all be non boundary nodes.
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i+5);
             c_vector<double,2> tetrahedral_node_location;
@@ -1540,14 +1540,14 @@ public:
             "The item foo is not stored");
 
         // Set the cell data item "foo" on each cell
-        for (unsigned index=0; index<cell_population.GetNumElements(); index++)
+        for (unsigned index = 0; index < cell_population.GetNumElements(); ++index)
         {
             double value = (double)index;
             cell_population.GetCellUsingLocationIndex(index)->GetCellData()->SetItem(var_name, value);
         }
 
         // The PDE mesh nodes 48 to 60 coincide with the cell centroids
-        for (unsigned index=48; index<60; index++)
+        for (unsigned index=48; index<60; ++index)
         {
             double expected_value = (double)index - 48.0;
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(index,var_name), expected_value, 1e-6);
@@ -1576,7 +1576,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
         {
             auto p_element = p_mesh->GetElement(elem_index);
             const unsigned num_edges = p_element->GetNumEdges();
@@ -1646,7 +1646,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
         {
             auto p_element = p_mesh->GetElement(elem_index);
             const unsigned num_edges = p_element->GetNumEdges();
@@ -1715,7 +1715,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
         {
             cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
         }

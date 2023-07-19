@@ -87,7 +87,10 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     if (!mCellPropertyCollection.HasPropertyType<CellId>())
     {
-        // Set cell identifier this will be called all the time unless the constructor is called through archiving
+        /*
+         * Set cell identifier this will be called all the time unless the 
+         * constructor is called through archiving.
+         */
         MAKE_PTR(CellId, p_cell_id);
         p_cell_id->AssignCellId();
         mCellPropertyCollection.AddProperty(p_cell_id);
@@ -118,12 +121,11 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     }
 
     /*
-     * If a cell proliferative type was not passed in via the input
-     * argument cellPropertyCollection (for example as in the case
-     * of a daughter cell being created following division) then add
-     * add a 'default' cell proliferative type to the cell property
-     * collection. This ensures that the method GetCellProliferativeType()
-     * always returns a valid proliferative type.
+     * If a cell proliferative type was not passed in via the input argument 
+     * cellPropertyCollection (for example as in the case of a daughter cell 
+     * being created following division) then add a 'default' cell proliferative 
+     * type to the cell property collection. This ensures that the method 
+     * GetCellProliferativeType() always returns a valid proliferative type.
      */
     if (!mCellPropertyCollection.HasPropertyType<AbstractCellProliferativeType>())
     {
@@ -133,7 +135,7 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     if (!archiving)
     {
         // Increment cell count for each cell property in mCellPropertyCollection
-        for (CellPropertyCollection::Iterator property_iter = mCellPropertyCollection.Begin();
+        for (auto property_iter = mCellPropertyCollection.Begin();
              property_iter != mCellPropertyCollection.End();
              ++property_iter)
         {
@@ -172,8 +174,8 @@ boost::shared_ptr<AbstractCellProliferativeType> Cell::GetCellProliferativeType(
     CellPropertyCollection proliferative_type_collection = mCellPropertyCollection.GetPropertiesType<AbstractCellProliferativeType>();
 
     /*
-     * Note: In its current form the code requires each cell to have exactly
-     * one proliferative type. This is reflected in the assertion below. If a user
+     * Note: In its current form the code requires each cell to have exactly one 
+     * proliferative type. This is reflected in the assertion below. If a user
      * wishes to include cells with multiple proliferative types, each possible
      * combination must be created as a separate proliferative type class.
      */
@@ -411,7 +413,7 @@ bool Cell::IsDead()
 void Cell::Kill()
 {
     // Decrement cell count for each cell property in mCellPropertyCollection
-    for (CellPropertyCollection::Iterator property_iter = mCellPropertyCollection.Begin();
+    for (auto property_iter = mCellPropertyCollection.Begin();
          property_iter != mCellPropertyCollection.End();
          ++property_iter)
     {

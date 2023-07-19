@@ -132,7 +132,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -187,7 +187,7 @@ public:
         simulator.Solve();
 
         // Check the correct solution was obtained
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -225,7 +225,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -323,7 +323,7 @@ public:
         MAKE_PTR(ApoptoticCellProperty, p_apoptotic_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -402,7 +402,7 @@ public:
         MAKE_PTR(ApoptoticCellProperty, p_apoptotic_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -482,7 +482,7 @@ public:
         MAKE_PTR(ApoptoticCellProperty, p_apoptotic_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -542,7 +542,7 @@ public:
 
         // Just check that we do indeed have three apoptotic cells
         unsigned num_apoptotic_cells = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -586,7 +586,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -654,7 +654,7 @@ public:
 
         TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
-        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
@@ -675,7 +675,7 @@ public:
         TS_ASSERT_EQUALS(pde_solution0.GetSize(), pde_solution1.GetSize());
 
         // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
-        for (unsigned i=0; i<pde_solution0.GetSize(); i++)
+        for (unsigned i = 0; i < pde_solution0.GetSize(); ++i)
         {
             c_vector<double,2> centre;
             centre(0) = 2.5; // assuming 5 by 5 honeycomb mesh
@@ -697,7 +697,7 @@ public:
          * check the interpolated PDE solution is between the min and max of
          * the PDE solution on the nodes of that element.
          */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
@@ -741,7 +741,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cell_location_indices.push_back(i);
         }
@@ -780,7 +780,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -802,7 +802,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -894,7 +894,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -970,7 +970,7 @@ public:
         generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Set some model parameters for the cell-cycle model
-        for (unsigned index=0; index < cells.size(); index++)
+        for (unsigned index=0; index < cells.size(); ++index)
         {
             static_cast<FixedG1GenerationalCellCycleModel*>(cells[index]->GetCellCycleModel())->SetTransitCellG1Duration(8.0);
             static_cast<FixedG1GenerationalCellCycleModel*>(cells[index]->GetCellCycleModel())->SetStemCellG1Duration(8.0);
@@ -1027,7 +1027,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -1067,7 +1067,7 @@ public:
         simulator.Solve();
 
         // Check the correct solution was obtained
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1144,7 +1144,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
@@ -1190,7 +1190,7 @@ public:
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1202,7 +1202,7 @@ public:
         // Find centre of cell population
         c_vector<double,2> centre_of_cell_population = zero_vector<double>(2);
 
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             centre_of_cell_population += simulator.rGetCellPopulation().GetNode(i)->rGetLocation();
         }
@@ -1211,7 +1211,7 @@ public:
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
         TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
-        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
@@ -1270,7 +1270,7 @@ public:
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
         TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
-        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
@@ -1287,7 +1287,7 @@ public:
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1309,7 +1309,7 @@ public:
         mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set some cell radius
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             mesh.GetNode(i)->SetRadius( 0.9);
         }
@@ -1319,7 +1319,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
@@ -1364,13 +1364,13 @@ public:
         // Check the correct cell density is in each element
         unsigned num_elements_in_coarse_mesh = p_coarse_mesh->GetNumElements();
         std::vector<unsigned> cells_in_each_coarse_element(num_elements_in_coarse_mesh);
-        for (unsigned i=0; i<num_elements_in_coarse_mesh; i++)
+        for (unsigned i = 0; i < num_elements_in_coarse_mesh; ++i)
         {
             cells_in_each_coarse_element[i] = 0;
         }
 
         // Find out how many cells lie in each element
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
@@ -1379,7 +1379,7 @@ public:
             cells_in_each_coarse_element[containing_element_index] += 1;
         }
 
-        for (unsigned i=0; i<num_elements_in_coarse_mesh; i++)
+        for (unsigned i = 0; i < num_elements_in_coarse_mesh; ++i)
         {
             c_matrix<double, 2, 2> jacobian;
             double det;
@@ -1407,7 +1407,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(1);
@@ -1447,7 +1447,7 @@ public:
         simulator.Solve();
 
         // When the mesh goes out of scope, then it's a different set of nodes that get destroyed
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1469,7 +1469,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
@@ -1531,7 +1531,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(3);

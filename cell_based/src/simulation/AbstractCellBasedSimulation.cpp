@@ -345,7 +345,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::Solve()
      * 
      * \todo Should we over-write the value of mDt, or change this behaviour? (see #2159)
      */
-    unsigned num_time_steps = (unsigned) ((mEndTime-current_time)/mDt + 0.5);
+    unsigned num_time_steps = static_cast<unsigned>((mEndTime - current_time)/mDt + 0.5);
     if (current_time > 0) // use the reset function if necessary
     {
         p_simulation_time->ResetEndTimeAndNumberOfTimeSteps(mEndTime, num_time_steps);
@@ -474,16 +474,17 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::Solve()
         bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
 
         /*
-         * If required, store the current locations of cell centres. Note that we need to
-         * use a std::map between cells and locations, rather than (say) a std::vector with
-         * location indices corresponding to cells, since once we call UpdateCellLocations()
-         * the location index of each cell may change. This is especially true in the case
-         * of a CaBasedCellPopulation.
+         * If required, store the current locations of cell centres. Note that 
+         * we need to use a std::map between cells and locations, rather than 
+         * (say) a std::vector with location indices corresponding to cells, 
+         * since once we call UpdateCellLocations() the location index of each 
+         * cell may change. This is especially true in the case of a 
+         * CaBasedCellPopulation.
          */
         std::map<CellPtr, c_vector<double, SPACE_DIM> > old_cell_locations;
         if (mOutputCellVelocities && at_sampling_timestep)
         {
-            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+            for (auto cell_iter = mrCellPopulation.Begin();
                  cell_iter != mrCellPopulation.End();
                  ++cell_iter)
             {

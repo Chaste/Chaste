@@ -79,9 +79,9 @@ public:
 
         double initial_target_area = 1.0;
 
-        for (typename AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+        for (auto cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
             // target areas
             cell_iter->GetCellData()->SetItem("target area", initial_target_area);

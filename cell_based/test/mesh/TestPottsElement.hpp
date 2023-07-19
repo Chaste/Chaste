@@ -56,7 +56,7 @@ public:
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 1u);
         }
@@ -102,13 +102,13 @@ public:
         // Test MarkAsDeleted()
         element.MarkAsDeleted();
 
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 0u);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -126,7 +126,7 @@ public:
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 1u);
         }
@@ -208,13 +208,13 @@ public:
         // Test MarkAsDeleted()
         element.MarkAsDeleted();
 
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 0u);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -233,7 +233,7 @@ public:
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
         {
            TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 1u);
         }
@@ -297,13 +297,13 @@ public:
         // Test MarkAsDeleted()
         element.MarkAsDeleted();
 
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
         {
            TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 0u);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
            delete nodes[i];
         }

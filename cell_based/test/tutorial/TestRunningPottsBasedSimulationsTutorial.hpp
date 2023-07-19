@@ -266,7 +266,7 @@ public:
         /* Before we make a {{{CellPopulation}}} we make a boost shared pointer to a cell label and then assign this
          * label to some randomly chosen cells. */
         MAKE_PTR(CellLabel, p_label);
-        for (unsigned i = 0; i<cells.size(); i++)
+        for (unsigned i = 0; i<cells.size(); ++i)
         {
             if (RandomNumberGenerator::Instance()->ranf() < 0.5)
             {
@@ -365,7 +365,7 @@ public:
         /* As for the 2D case before we make a {{{CellPopulation}}} we make a pointer to a cell label and then assign this
          * label to some randomly chosen cells. */
         MAKE_PTR(CellLabel, p_label);
-        for (unsigned i = 0; i<cells.size(); i++)
+        for (unsigned i = 0; i<cells.size(); ++i)
         {
             if (RandomNumberGenerator::Instance()->ranf() < 0.5)
             {

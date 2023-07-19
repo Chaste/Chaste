@@ -120,7 +120,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -153,7 +153,7 @@ public:
         // Output data for each cell to file
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -172,7 +172,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Ages");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -226,7 +226,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -249,7 +249,7 @@ public:
         CellAncestorWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -268,7 +268,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Ancestors");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -318,7 +318,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
 
@@ -350,7 +350,7 @@ public:
         CellDeltaNotchWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -414,7 +414,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -436,7 +436,7 @@ public:
         CellDataItemWriter<2,2> cell_writer("test_variable");
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -514,7 +514,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -537,7 +537,7 @@ public:
         CellIdWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -557,7 +557,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell IDs");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -611,7 +611,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -632,7 +632,7 @@ public:
         CellLabelWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -651,7 +651,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell labels");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -716,7 +716,7 @@ public:
         CellLocationIndexWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -785,7 +785,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -810,7 +810,7 @@ public:
         CellMutationStatesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -829,7 +829,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Mutation states");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -883,7 +883,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -903,7 +903,7 @@ public:
         CellProliferativePhasesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -922,7 +922,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cycle phases");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -980,7 +980,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -1011,7 +1011,7 @@ public:
         CellProliferativeTypesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
+        for (auto other_cell_iter = cell_population.Begin();
              other_cell_iter != cell_population.End();
              ++other_cell_iter)
         {
@@ -1030,7 +1030,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Prolif Cell types");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1090,7 +1090,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -1121,7 +1121,7 @@ public:
         LegacyCellProliferativeTypesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
+        for (auto other_cell_iter = cell_population.Begin();
              other_cell_iter != cell_population.End();
              ++other_cell_iter)
         {
@@ -1140,7 +1140,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Legacy Cell types");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1201,7 +1201,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TysonNovakCellCycleModel* p_cell_model = new TysonNovakCellCycleModel(p_solver);
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -1221,7 +1221,7 @@ public:
         CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1240,7 +1240,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Protein concentrations");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1265,7 +1265,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -1290,7 +1290,7 @@ public:
             "CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from CellCycleModelOdeHandler");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1352,7 +1352,7 @@ public:
         CellVolumesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1432,7 +1432,7 @@ public:
             CellRosetteRankWriter<2, 2> cell_writer;
             cell_writer.OpenOutputFile(output_file_handler);
             cell_writer.WriteTimeStamp();
-            for (AbstractCellPopulation<2, 2>::Iterator cell_iter = cell_population.Begin();
+            for (auto cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
@@ -1482,7 +1482,7 @@ public:
             CellRosetteRankWriter<2, 2> cell_writer;
             cell_writer.OpenOutputFile(output_file_handler);
             cell_writer.WriteTimeStamp();
-            for (AbstractCellPopulation<2, 2>::Iterator cell_iter = cell_population.Begin();
+            for (auto cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
             {
@@ -1541,7 +1541,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_cell_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -1561,7 +1561,7 @@ public:
         CellRadiusWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1580,7 +1580,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell radii");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

@@ -89,14 +89,13 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
      * This is as they are ordered in node index and that moves from south west to north east.
      */
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-    unsigned direction = p_gen->randMod(3)+ (unsigned) is_not_on_base;
+    unsigned direction = p_gen->randMod(3)+ static_cast<unsigned>(is_not_on_base);
 
     // Stem Cells only divide vertically
     if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
         direction = 2;
     }
-
 
     std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
 

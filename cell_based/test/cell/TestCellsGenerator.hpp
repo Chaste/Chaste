@@ -71,7 +71,7 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(i), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
@@ -108,7 +108,7 @@ public:
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Test that cells were generated correctly
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(location_indices[i]), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
@@ -131,7 +131,7 @@ public:
                                                      CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
 
         // Test that cells were generated correctly
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(location_indices[i]), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
@@ -154,12 +154,12 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
             TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
             // Should lie between -24 and 0
-            double birth_time=cells[i]->GetBirthTime();
+            double birth_time = cells[i]->GetBirthTime();
             ///\todo Breaks Intel 10? TS_ASSERT_LESS_THAN_EQUALS(birth_time, 0.0);
             TS_ASSERT_LESS_THAN_EQUALS(-24.0, birth_time);
         }
@@ -181,7 +181,7 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             // Should lie between -24 and 0
             TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);
@@ -212,7 +212,7 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumElements());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             // Shold lie between -24 and 0
             TS_ASSERT_LESS_THAN_EQUALS(cells[i]->GetBirthTime(), 0.0);

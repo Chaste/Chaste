@@ -143,9 +143,9 @@ public:
         // Check that nothing's gone badly wrong by testing that nodes aren't too close together
         double min_distance_between_cells = 1.0;
 
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
-            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); j++)
+            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); ++j)
             {
                 double distance = norm_2(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()-simulator.rGetCellPopulation().GetNode(j)->rGetLocation());
 
@@ -159,7 +159,7 @@ public:
         TS_ASSERT(min_distance_between_cells > 0.999);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -230,7 +230,7 @@ public:
         simulator_2.Solve();
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -278,7 +278,7 @@ public:
         simulator.Solve();
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             TS_ASSERT_LESS_THAN_EQUALS(0,simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0]);
             TS_ASSERT_LESS_THAN_EQUALS(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],periodic_width);
@@ -351,7 +351,7 @@ public:
 
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
             double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
@@ -417,7 +417,7 @@ public:
         simulator.Solve();
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             TS_ASSERT_LESS_THAN_EQUALS(0,simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1]);
             TS_ASSERT_LESS_THAN_EQUALS(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],periodic_width[1]);
@@ -490,7 +490,7 @@ public:
 
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             double y_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
             double y_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
@@ -558,7 +558,7 @@ public:
         simulator.Solve();
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             TS_ASSERT_LESS_THAN_EQUALS(0,simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1]);
             TS_ASSERT_LESS_THAN_EQUALS(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],periodic_width[0]);
@@ -606,7 +606,7 @@ public:
         RandomNumberGenerator::Instance()->Reseed(0);
 
         // Check that nothing's gone badly wrong by testing that nodes aren't outside the domain
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
             double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
@@ -694,7 +694,7 @@ public:
         }
 
         // Clean up memory
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -759,7 +759,7 @@ public:
             TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
 
             // Now set all the Radii to 2.0 Note this could be done inside a cell cycle model.
-            for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+            for (auto cell_iter = simulator.rGetCellPopulation().Begin();
                  cell_iter != simulator.rGetCellPopulation().End();
                  ++cell_iter)
             {
@@ -769,7 +769,7 @@ public:
             simulator.SetEndTime(12.0);
             simulator.Solve();
 
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(mesh.GetNode(i)->GetRadius(), 2.0, 1e-6);
             }
@@ -781,7 +781,7 @@ public:
         }
 
         // Clean up memory
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -824,9 +824,9 @@ public:
         // Check that nothing's gone badly wrong by testing that nodes aren't too close together
         double min_distance_between_cells = 1.0;
 
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
-            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); j++)
+            for (unsigned j=i+1; j<simulator.rGetCellPopulation().GetNumNodes(); ++j)
             {
                 double distance = norm_2(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()-simulator.rGetCellPopulation().GetNode(j)->rGetLocation());
                 if (distance < min_distance_between_cells)
@@ -1205,11 +1205,11 @@ public:
 
         if (PetscTools::AmMaster())
         {
-            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                    node_iter != mesh.GetNodeIteratorEnd();
-                    ++node_iter)
+            for (auto node_iter = mesh.GetNodeIteratorBegin();
+                 node_iter != mesh.GetNodeIteratorEnd();
+                 ++node_iter)
             {
-                for (unsigned d=0; d<2; d++)
+                for (unsigned d = 0; d < 2; ++d)
                 {
                     TS_ASSERT_DELTA(node_iter->rGetAppliedForce()[d], 0.0, 1e-15);
                 }
@@ -1244,7 +1244,7 @@ public:
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
-            for (unsigned i=0; i<cells.size(); i++)
+            for (unsigned i = 0; i < cells.size(); ++i)
             {
                 cells[i]->SetBirthTime(-23.49999);  // These cells divide every 24 hours so here we set them to divide just after the archive/restore
             }

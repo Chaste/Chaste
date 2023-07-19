@@ -175,7 +175,7 @@ public:
         c_vector<double, 2> axis_variance = zero_vector<double>(2);
         double average_angle = 0.0;
         double angle_variance = 0.0;
-        for (unsigned iteration = 0; iteration < 10000; iteration++)
+        for (unsigned iteration = 0; iteration < 10000; ++iteration)
         {
             c_vector<double, 2> random_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             TS_ASSERT_DELTA(norm_2(random_axis), 1.0,1e-6);
@@ -300,7 +300,7 @@ public:
         // Get 10000 division vectors, check each length, their mean and their variance
         c_vector<double, 2> average_axis = zero_vector<double>(2);
         unsigned N = 100;
-        for (unsigned iteration = 0; iteration < N; iteration++)
+        for (unsigned iteration = 0; iteration < N; ++iteration)
         {
             c_vector<double, 2> division_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             TS_ASSERT_DELTA(norm_2(division_axis), 1.0, 1e-6);

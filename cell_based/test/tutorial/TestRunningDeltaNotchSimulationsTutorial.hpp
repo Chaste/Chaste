@@ -144,7 +144,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -231,7 +231,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);

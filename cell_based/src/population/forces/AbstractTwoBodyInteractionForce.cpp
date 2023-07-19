@@ -104,7 +104,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AddForceContributi
 
         for (auto iter = r_node_pairs.begin();
              iter != r_node_pairs.end();
-             iter++)
+             ++iter)
         {
             std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > pair = *iter;
 

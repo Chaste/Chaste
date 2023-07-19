@@ -134,12 +134,12 @@ inline void save_construct_data(
 
     // Archive c_vectors one component at a time
     c_vector<double, DIM> point = t->rGetPointOnPlane();
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar << point[i];
     }
     c_vector<double, DIM> normal = t->rGetNormalToPlane();
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar << normal[i];
     }
@@ -158,12 +158,12 @@ inline void load_construct_data(
 
     // Archive c_vectors one component at a time
     c_vector<double, DIM> point;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar >> point[i];
     }
     c_vector<double, DIM> normal;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar >> normal[i];
     }

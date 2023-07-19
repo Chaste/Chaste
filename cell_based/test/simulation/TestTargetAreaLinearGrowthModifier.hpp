@@ -134,7 +134,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         // The cells have varying ages
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             double birth_time;
             if (i > 3)
@@ -307,7 +307,7 @@ public:
         TS_ASSERT_EQUALS(num_cells_at_division, 2u);
 
         // Iterate over the cells, checking their target areas
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -323,7 +323,7 @@ public:
         unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
         TS_ASSERT_EQUALS(num_cells_after_division, 2u);
 
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

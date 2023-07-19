@@ -120,7 +120,7 @@ public:
             p_pde_modifier->GenerateFeMesh(mesh_cell_population);
 
             // Check that the meshes have the same nodes
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0], 1e-5);
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1], 1e-5);
@@ -144,7 +144,7 @@ public:
             p_pde_modifier->GenerateFeMesh(node_cell_population);
 
             // Check that the meshes have the same nodes
-            for (unsigned i=0; i<node_mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i < node_mesh.GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], node_mesh.GetNode(i)->rGetLocation()[0],1e-5);
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], node_mesh.GetNode(i)->rGetLocation()[1],1e-5);
@@ -165,7 +165,7 @@ public:
             p_pde_modifier->GenerateFeMesh(vertex_cell_population);
 
             // Check that the meshes have the same nodes
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0],1e-5);
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1],1e-5);
@@ -173,7 +173,7 @@ public:
                 TS_ASSERT_EQUALS(p_pde_modifier->mpFeMesh->GetNode(i)->IsBoundaryNode(), p_mesh->GetNode(i)->IsBoundaryNode());
             }
             // New node at every element centre
-            for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
             {
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i+p_mesh->GetNumNodes())->rGetLocation()[0], p_mesh->GetCentroidOfElement(i)[0],1e-5);
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i+p_mesh->GetNumNodes())->rGetLocation()[1], p_mesh->GetCentroidOfElement(i)[1],1e-5);
@@ -196,7 +196,7 @@ public:
             p_pde_modifier->GenerateFeMesh(potts_cell_population);
 
             // Check that the meshes have the same nodes
-            for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
             {
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], p_mesh->GetCentroidOfElement(i)[0],1e-5);
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], p_mesh->GetCentroidOfElement(i)[1],1e-5);
@@ -210,9 +210,9 @@ public:
 
             // Specify the location of each cell
             std::vector<unsigned> location_indices;
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
-                for (unsigned j=0; j<10; j++)
+                for (unsigned j = 0; j < 10; ++j)
                 {
                     unsigned offset = (50+1) * (50-10)/2;
                     location_indices.push_back(offset + j + i * 50);
@@ -229,8 +229,8 @@ public:
             p_pde_modifier->GenerateFeMesh(ca_cell_population);
 
             // Check that the mesh has nodes at the centre of the cells
-            unsigned i=0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = ca_cell_population.Begin();
+            unsigned i = 0;
+            for (auto cell_iter = ca_cell_population.Begin();
                  cell_iter != ca_cell_population.End();
                  ++cell_iter)
             {
@@ -258,7 +258,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
@@ -301,7 +301,7 @@ public:
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE
             std::vector<double> data(10);
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 data[i] = i + 0.45;
             }
@@ -336,7 +336,7 @@ public:
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
             }
@@ -382,9 +382,9 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnDisk");
 
         // Test the solution against the exact solution
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+        for (auto cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
             c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
@@ -422,7 +422,7 @@ public:
         // Make cells with r<1/2 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = mesh.GetNode(i)->rGetLocation();
@@ -449,11 +449,10 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnHeterogeneousDisk");
 
         // Test the solution against the exact solution
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+        for (auto cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-
             c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
 
@@ -487,7 +486,7 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -535,7 +534,7 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -589,7 +588,7 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
@@ -642,7 +641,7 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
@@ -688,7 +687,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<400; i++)
+        for (unsigned i = 0; i < 400; ++i)
         {
             location_indices.push_back(i);
         }
@@ -701,7 +700,7 @@ public:
         // Make cells with x<10.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -780,7 +779,7 @@ public:
         TS_ASSERT_DELTA(p_cell_2->GetCellData()->GetItem("variable_grad_x"), 0.0, 1e-2);
 
         // Clear memory
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

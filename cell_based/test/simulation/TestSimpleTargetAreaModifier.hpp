@@ -126,7 +126,7 @@ public:
         cells[0]->SetCellProliferativeType(p_diff_type);
         cells[4]->SetCellProliferativeType(p_diff_type);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             double birth_time = 0.0 - 2*i;
             cells[i]->SetBirthTime(birth_time);
@@ -291,7 +291,7 @@ public:
         TS_ASSERT_EQUALS(num_cells_at_division, 2u);
 
         // Iterate over the cells, checking their target areas
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -307,7 +307,7 @@ public:
         unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
         TS_ASSERT_EQUALS(num_cells_after_division, 2u);
 
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

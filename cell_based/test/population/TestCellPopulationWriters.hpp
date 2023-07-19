@@ -345,7 +345,7 @@ public:
             "CellPopulationAreaWriter cannot be used with a NodeBasedCellPopulation");
 
         // Tidy up
-        for (unsigned i=0; i<node_based_nodes.size(); i++)
+        for (unsigned i = 0; i < node_based_nodes.size(); ++i)
         {
             delete node_based_nodes[i];
         }
@@ -464,7 +464,7 @@ public:
         TS_ASSERT_THROWS_THIS(element_writer.Visit(&node_based_cell_population),
             "CellPopulationElementWriter cannot be used with a NodeBasedCellPopulation");
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -570,9 +570,9 @@ public:
         {
             // Create a simple 2D cell population
             std::vector<Node<2>* > nodes;
-            for (unsigned j=0; j<4; j++)
+            for (unsigned j = 0; j < 4; ++j)
             {
-                for (unsigned i=0; i<6; i++)
+                for (unsigned i = 0; i < 6; ++i)
                 {
                     unsigned node_index = i + 6*j;
                     nodes.push_back(new Node<2>(node_index, false, (double)i, (double)j));
@@ -580,7 +580,7 @@ public:
             }
             NodesOnlyMesh<2> mesh;
             mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-            for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+            for (unsigned index = 0; index < mesh.GetNumNodes(); ++index)
             {
                 mesh.GetNode(index)->SetRadius(0.6);
             }
@@ -637,7 +637,7 @@ public:
             FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_node").CompareFiles();
 
             // Avoid memory leak
-            for (unsigned i=0; i<nodes.size(); i++)
+            for (unsigned i = 0; i < nodes.size(); ++i)
             {
                 delete nodes[i];
             }
@@ -704,7 +704,7 @@ public:
             PottsMesh<2>* p_mesh = generator.GetMesh();
 
             std::vector<unsigned> location_indices;
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
             {
                 location_indices.push_back(i);
             }
@@ -1156,8 +1156,8 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         double value = 0.0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter=cell_population.Begin();
-             cell_iter!=cell_population.End();
+        for (auto cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
              ++cell_iter)
         {
             cell_iter->GetCellData()->SetItem("this average", value);
@@ -1199,8 +1199,8 @@ public:
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
             MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
-            for (AbstractCellPopulation<2>::Iterator cell_iter=mesh_based_cell_population.Begin();
-                 cell_iter!=mesh_based_cell_population.End();
+            for (auto cell_iter = mesh_based_cell_population.Begin();
+                 cell_iter != mesh_based_cell_population.End();
                  ++cell_iter)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
@@ -1222,8 +1222,8 @@ public:
             location_indices.push_back(13);
             location_indices.push_back(17);
             CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
-            for (AbstractCellPopulation<2>::Iterator cell_iter=ca_based_cell_population.Begin();
-                 cell_iter!=ca_based_cell_population.End();
+            for (auto cell_iter = ca_based_cell_population.Begin();
+                 cell_iter != ca_based_cell_population.End();
                  ++cell_iter)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
@@ -1242,8 +1242,8 @@ public:
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
             node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
-            for (AbstractCellPopulation<2>::Iterator cell_iter=node_based_cell_population.Begin();
-                 cell_iter!=node_based_cell_population.End();
+            for (auto cell_iter = node_based_cell_population.Begin();
+                 cell_iter != node_based_cell_population.End();
                  ++cell_iter)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
@@ -1263,8 +1263,8 @@ public:
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
-            for (AbstractCellPopulation<2>::Iterator cell_iter=potts_based_cell_population.Begin();
-                 cell_iter!=potts_based_cell_population.End();
+            for (auto cell_iter = potts_based_cell_population.Begin();
+                 cell_iter != potts_based_cell_population.End();
                  ++cell_iter)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
@@ -1855,7 +1855,7 @@ public:
             "VoronoiDataWriter cannot be used with a NodeBasedCellPopulation");
 
         // Tidy up
-        for (unsigned i=0; i<node_based_nodes.size(); i++)
+        for (unsigned i = 0; i < node_based_nodes.size(); ++i)
         {
             delete node_based_nodes[i];
         }

@@ -170,7 +170,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                 cell_iter != p_cell_population->End();
                 ++cell_iter)
             {
@@ -212,7 +212,7 @@ public:
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
 
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {

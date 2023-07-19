@@ -85,7 +85,7 @@ public:
         MPI_Allreduce(&num_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
         TS_ASSERT_EQUALS(total_cells, 2u);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT(cells[i]->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>());
         }
@@ -120,7 +120,7 @@ public:
         MPI_Allreduce(&num_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
         TS_ASSERT_EQUALS(total_cells, 4u);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT(cells[i]->GetCellProliferativeType()->IsType<TransitCellProliferativeType>());
         }
@@ -157,7 +157,7 @@ public:
         MPI_Allreduce(&num_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
         TS_ASSERT_EQUALS(total_cells, 8u);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT(cells[i]->GetCellProliferativeType()->IsType<TransitCellProliferativeType>());
         }

@@ -138,14 +138,14 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::pair<CellPtr,CellPtr> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateCellPair(
+std::pair<CellPtr, CellPtr> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateCellPair(
     CellPtr pCell1,
     CellPtr pCell2)
 {
     assert(pCell1);
     assert(pCell2);
 
-    std::pair<CellPtr,CellPtr> cell_pair;
+    std::pair<CellPtr, CellPtr> cell_pair;
 
     if (pCell1->GetCellId() < pCell2->GetCellId())
     {

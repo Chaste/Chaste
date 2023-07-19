@@ -163,7 +163,7 @@ public:
         /*
          * Next, we iterate over the cell population...
          */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+        for (auto cell_iter = rCellPopulation.Begin();
              cell_iter != rCellPopulation.End();
              ++cell_iter)
         {

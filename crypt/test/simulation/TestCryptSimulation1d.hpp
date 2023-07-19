@@ -646,7 +646,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count[2], 3u);
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);
 
-        for (AbstractCellPopulation<1>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
@@ -741,7 +741,7 @@ public:
         simulator.Solve();
 
         // Check that nothing has moved below y=0
-        for (AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {

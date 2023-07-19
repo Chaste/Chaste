@@ -136,13 +136,13 @@ void CellwiseDataGradient<DIM>::SetupGradients(
             //real_adjacent_nodes.clear();
             //
             //// First loop over containing elements
-            //for (typename Node<DIM>::ContainingElementIterator element_iter = this_node.ContainingElementsBegin();
+            //for (auto element_iter = this_node.ContainingElementsBegin();
             //     element_iter != this_node.ContainingElementsEnd();
             //     ++element_iter)
             //{
             //    // Then loop over nodes therein
             //    Element<DIM,DIM>& r_adjacent_elem = *(r_mesh.GetElement(*element_iter));
-            //    for (unsigned local_node_index=0; local_node_index<DIM+1; local_node_index++)
+            //    for (unsigned local_node_index = 0; local_node_index < DIM + 1; ++local_node_index)
             //    {
             //        unsigned adjacent_node_global_index = r_adjacent_elem.GetNodeGlobalIndex(local_node_index);
             //
@@ -150,7 +150,6 @@ void CellwiseDataGradient<DIM>::SetupGradients(
             //        if (!(pCellPopulation->IsGhostNode(adjacent_node_global_index))
             //             && adjacent_node_global_index != node_global_index )
             //        {
-            //
             //            // Calculate the contribution of gradient from this node
             //            Node<DIM>& adjacent_node = *(r_mesh.GetNode(adjacent_node_global_index));
             //

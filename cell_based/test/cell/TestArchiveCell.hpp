@@ -130,7 +130,7 @@ public:
             TS_ASSERT_EQUALS(final_collection.HasPropertyType<CellId>(), true);
             TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
-            for (CellPropertyCollection::Iterator it = final_collection.Begin(); it != final_collection.End(); ++it)
+            for (auto it = final_collection.Begin(); it != final_collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(final_collection.HasProperty(*it), true);
 
@@ -235,7 +235,7 @@ public:
             ReplicatableVector rep_item_1(p_cell_vec_data->GetItem("item 1"));
             TS_ASSERT_DELTA(rep_item_1[0], -17.3, 2e-14);
 
-            for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
+            for (auto it = collection.Begin(); it != collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
 

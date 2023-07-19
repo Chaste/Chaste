@@ -90,7 +90,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             dynamic_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
             cells[i]->SetBirthTime(0.0);
@@ -118,7 +118,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             dynamic_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
             cells[i]->SetBirthTime(0.0);
@@ -167,7 +167,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             dynamic_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->SetGeneration(0);
         }
@@ -222,7 +222,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             c_vector<double, 3> node_location = p_mesh->GetNode(i)->rGetLocation();
 

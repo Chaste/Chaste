@@ -99,7 +99,7 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cell_location_indices.push_back(i);
         }
@@ -163,11 +163,11 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> particle_indices;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             node_indices.insert(mesh.GetNode(i)->GetIndex());
         }
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             location_indices_set.insert(location_indices[i]);
         }
@@ -177,9 +177,9 @@ public:
                             std::inserter(particle_indices, particle_indices.begin()));
 
         std::vector<bool> is_particle(mesh.GetNumNodes(), false);
-        for (std::set<unsigned>::iterator it=particle_indices.begin();
-             it!=particle_indices.end();
-             it++)
+        for (auto it = particle_indices.begin();
+             it != particle_indices.end();
+             ++it)
         {
             TS_ASSERT_EQUALS(cell_population.GetNode(*it)->IsParticle(), true)
         }
@@ -190,7 +190,7 @@ public:
 
         // Check the iterator doesn't loop over particles
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -236,7 +236,7 @@ public:
 
         // Iterate over cell population and check there is a single cell
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -255,7 +255,7 @@ public:
 
         // Iterate over cell population and check there are now no cells
         counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -283,7 +283,7 @@ public:
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); ++i)
         {
             if (i != 80)
             {
@@ -342,7 +342,7 @@ public:
 
         // We expect the cell node indices to be {10,11,...,79}
         std::set<unsigned> expected_node_indices;
-        for (unsigned i=0; i<cell_population_with_particles.GetNumRealCells(); i++)
+        for (unsigned i = 0; i < cell_population_with_particles.GetNumRealCells(); ++i)
         {
             if (i!=27)
             {
@@ -353,7 +353,7 @@ public:
         // Get actual cell node indices
         std::set<unsigned> node_indices_with_particles;
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population_with_particles.Begin();
+        for (auto cell_iter = cell_population_with_particles.Begin();
              cell_iter != cell_population_with_particles.End();
              ++cell_iter)
         {
@@ -383,7 +383,7 @@ public:
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); ++i)
         {
             if (i != 80)
             {
@@ -474,7 +474,7 @@ public:
 
         // Specify the node indices corresponding to cells (the others correspond to particles)
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<5; index++)
+        for (unsigned index = 0; index < 5; ++index)
         {
             location_indices.push_back(index);
         }
@@ -492,7 +492,7 @@ public:
         NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
 
         // Coverage of writing CellData to VTK
-        for (NodeBasedCellPopulationWithParticles<3>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -556,7 +556,7 @@ public:
         // Compare output with saved files of what they should look like
         FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.parameters").CompareFiles();
 
-        for (unsigned i=0; i<nodes.size();i++)
+        for (unsigned i = 0; i < nodes.size();++i)
         {
             delete nodes[i];
         }
@@ -595,7 +595,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                 cell_iter != p_cell_population->End();
                 ++cell_iter)
             {
@@ -637,7 +637,7 @@ public:
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
 
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {

@@ -80,18 +80,18 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
      * nodes. On each interior row we have numNodesAcross nodes, the first and last nodes
      * are boundary nodes.
      */
-    for (unsigned k=0; k<numNodesDeep; k++)
+    for (unsigned k = 0; k < numNodesDeep; ++k)
     {
-        for (unsigned j=0; j<numNodesUp; j++)
+        for (unsigned j = 0; j < numNodesUp; ++j)
         {
-            for (unsigned i=0; i<numNodesAcross; i++)
+            for (unsigned i = 0; i < numNodesAcross; ++i)
             {
-                bool is_boundary_node=false;
-                if (DIM==2)
+                bool is_boundary_node = false;
+                if (DIM == 2)
                 {
                     is_boundary_node = (j==0 || j==numNodesUp-1 || (i==0 && !isPeriodicInX) || (i==numNodesAcross-1 && !isPeriodicInX) ) ? true : false;
                 }
-                if (DIM==3)
+                if (DIM == 3)
                 {
                     is_boundary_node = (j==0 || j==numNodesUp-1 || (i==0 && !isPeriodicInX) || (i==numNodesAcross-1 && !isPeriodicInX) || k==0 || k==numNodesDeep-1) ? true : false;
                 }
@@ -107,17 +107,17 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
      * Create the elements. The array node_indices contains the
      * global node indices, in increasing order.
      */
-    for (unsigned n=0; n<numElementsDeep; n++)
+    for (unsigned n = 0; n < numElementsDeep; ++n)
     {
-        for (unsigned j=0; j<numElementsUp; j++)
+        for (unsigned j = 0; j < numElementsUp; ++j)
         {
-            for (unsigned i=0; i<numElementsAcross; i++)
+            for (unsigned i = 0; i < numElementsAcross; ++i)
             {
-                for (unsigned m=0; m<elementDepth; m++)
+                for (unsigned m = 0; m < elementDepth; ++m)
                 {
-                    for (unsigned l=0; l<elementHeight; l++)
+                    for (unsigned l = 0; l < elementHeight; ++l)
                     {
-                        for (unsigned k=0; k<elementWidth; k++)
+                        for (unsigned k = 0; k < elementWidth; ++k)
                         {
                             node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*elementDepth*numNodesUp*numNodesAcross +
                                                                                               j*elementHeight*numNodesAcross +
@@ -129,7 +129,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     }
                 }
                 std::vector<Node<DIM>*> element_nodes;
-                for (unsigned k=0; k<elementDepth*elementHeight*elementWidth; k++)
+                for (unsigned k = 0; k < elementDepth*elementHeight*elementWidth; ++k)
                 {
                    element_nodes.push_back(nodes[node_indices[k]]);
                 }
@@ -144,21 +144,18 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     /*
      * Create the neighborhoods of each node
      */
-
     moore_neighbours.resize(num_nodes);
     von_neumann_neighbours.resize(num_nodes);
 
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
         // Clear the set of neighbouring node indices
-
         moore_neighbours[node_index].clear();
 
         switch (DIM)
         {
             case 2:
             {
-                assert(DIM == 2);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *
@@ -264,7 +261,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 available_neighbours[7] = !(on_north_edge || on_east_edge);
 
                 // Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-                for (unsigned i=0; i<8; i++)
+                for (unsigned i = 0; i < 8; ++i)
                 {
                     if (available_neighbours[i])
                     {
@@ -276,7 +273,6 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             }
             case 3:
             {
-                assert(DIM ==3);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *                      FRONT           BACK
@@ -300,12 +296,12 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 moore_neighbour_indices_vector[6] += 1;
                 moore_neighbour_indices_vector[7] += numNodesAcross + 1;
                 moore_neighbour_indices_vector[8] -= numNodesAcross*numNodesUp;
-                for (unsigned i=9; i<17; i++)
+                for (unsigned i = 9; i < 17; ++i)
                 {
                     moore_neighbour_indices_vector[i] = moore_neighbour_indices_vector[i-9]-numNodesAcross*numNodesUp;
                 }
                 moore_neighbour_indices_vector[17] += numNodesAcross*numNodesUp;
-                for (unsigned i=18; i<26; i++)
+                for (unsigned i = 18; i < 26; ++i)
                 {
                     moore_neighbour_indices_vector[i]=moore_neighbour_indices_vector[i-18]+numNodesAcross*numNodesUp;
                 }
@@ -525,18 +521,18 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 available_neighbours[6] = !on_east_edge;
                 available_neighbours[7] = !(on_north_edge || on_east_edge);
                 available_neighbours[8] = !(on_front_edge);
-                for (unsigned i=9; i<17; i++)
+                for (unsigned i = 9; i < 17; ++i)
                 {
                     available_neighbours[i] = (available_neighbours[i-9] && !(on_front_edge));
                 }
                 available_neighbours[17] = !(on_back_edge);
-                for (unsigned i=18; i<26; i++)
+                for (unsigned i = 18; i < 26; ++i)
                 {
                     available_neighbours[i] = (available_neighbours[i-18] && !(on_back_edge));
                 }
 
                 // Using neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-                for (unsigned i=0; i<26; i++)
+                for (unsigned i = 0; i < 26; ++i)
                 {
                     if (available_neighbours[i] && moore_neighbour_indices_vector[i] < numNodesAcross*numNodesUp*numNodesDeep)
                     {
@@ -621,7 +617,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 available_neighbours[3] = !on_east_edge;
 
                 // Using von_neumann_neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-                for (unsigned i=0; i<4; i++)
+                for (unsigned i = 0; i < 4; ++i)
                 {
                     if (available_neighbours[i])
                     {
@@ -719,7 +715,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 available_neighbours[5] = !on_back_edge;
 
                 // Using von_neumann_neighbour_indices_vector and available_neighbours, store the indices of all available neighbours to the set all_neighbours
-                for (unsigned i=0; i<6; i++)
+                for (unsigned i = 0; i < 6; ++i)
                 {
                     if (available_neighbours[i] && von_neumann_neighbour_indices_vector[i]<numNodesAcross*numNodesUp*numNodesDeep)
                     {

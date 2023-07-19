@@ -61,7 +61,7 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(
         const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
             pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
 
-        for (unsigned i=0; i<r_cell_properties.size(); i++)
+        for (unsigned i = 0; i < r_cell_properties.size(); ++i)
         {
             if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
             {

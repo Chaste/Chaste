@@ -149,7 +149,7 @@ public:
         c_vector<double, 2> force = zero_vector<double>(2);
         force(1) = -mStrength;
 
-        for (unsigned node_index=0; node_index<rCellPopulation.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < rCellPopulation.GetNumNodes(); ++node_index)
         {
             rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
         }
@@ -224,7 +224,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* Initialise all node forces to zero */
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
              cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -236,7 +236,7 @@ public:
         /* We test that the force calculation is correct. */
         force.AddForceContribution(cell_population);
 
-        for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[1], -5.0, 1e-4);

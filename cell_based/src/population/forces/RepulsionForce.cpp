@@ -53,9 +53,7 @@ void RepulsionForce<DIM>::AddForceContribution(
 
     std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
 
-    for (auto iter = r_node_pairs.begin();
-        iter != r_node_pairs.end();
-        iter++)
+    for (auto iter = r_node_pairs.begin(); iter != r_node_pairs.end(); ++iter)
     {
         std::pair<Node<DIM>*, Node<DIM>* > pair = *iter;
 

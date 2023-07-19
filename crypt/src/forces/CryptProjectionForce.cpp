@@ -61,7 +61,7 @@ void CryptProjectionForce::UpdateNode3dLocationMap(AbstractCellPopulation<2>& rC
     c_vector<double, 3> node_location_3d;
 
     // Only consider nodes corresponding to real cells
-    for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+    for (auto cell_iter = rCellPopulation.Begin();
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
@@ -117,7 +117,7 @@ double CryptProjectionForce::CalculateCryptSurfaceDerivativeAtPoint(const c_vect
 
 c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation)
 {
-    MeshBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
+    MeshBasedCellPopulation<2>* p_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
@@ -172,8 +172,8 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
          * The spring rest length increases from a predefined small parameter
          * to a normal rest length of 1.0, over a period of one hour.
          */
-        std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
-        if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
+        std::pair<CellPtr, CellPtr> cell_pair = p_population->CreateCellPair(p_cell_A, p_cell_B);
+        if (p_population->IsMarkedSpring(cell_pair))
         {
             double lambda = mMeinekeDivisionRestingSpringLength;
             rest_length = lambda + (1.0 - lambda) * ageA/mMeinekeSpringGrowthDuration;
@@ -181,7 +181,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
         if (ageA+SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
         {
             // This spring is about to go out of scope
-            p_static_cast_cell_population->UnmarkSpring(cell_pair);
+            p_population->UnmarkSpring(cell_pair);
         }
     }
 
@@ -280,7 +280,7 @@ void CryptProjectionForce::AddForceContribution(AbstractCellPopulation<2>& rCell
     {
         assert(WntConcentration<2>::Instance()->IsWntSetUp());
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+        for (auto cell_iter = rCellPopulation.Begin();
              cell_iter != rCellPopulation.End();
              ++cell_iter)
         {

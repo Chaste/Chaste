@@ -71,10 +71,10 @@ public:
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        c_matrix<double, 2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)
@@ -156,9 +156,9 @@ public:
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)
@@ -255,9 +255,9 @@ public:
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)
@@ -281,7 +281,7 @@ public:
 
         // Now test SetupSourceTerms() when a map between cells and coarse mesh elements is supplied
         std::map<CellPtr, unsigned> cell_pde_element_map;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -391,7 +391,7 @@ public:
 
         // Now test SetupSourceTerms() when a map between cells and coarse mesh elements is supplied
         std::map<CellPtr, unsigned> cell_pde_element_map;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

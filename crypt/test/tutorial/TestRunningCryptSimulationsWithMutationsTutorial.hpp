@@ -189,7 +189,7 @@ public:
          * Now we have run the simulation to a steady state (where the initial regular configuration is lost) we select a cell to become mutant.
          * We select one of the cells and set the mutation state to {{{ApcTwoHitCellMutationState}}} (i.e. p_state).
          */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

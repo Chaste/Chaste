@@ -66,15 +66,18 @@ DeltaNotchOdeSystem::~DeltaNotchOdeSystem()
 {
 }
 
-void DeltaNotchOdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+void DeltaNotchOdeSystem::EvaluateYDerivatives(
+    double time,
+    const std::vector<double>& rY,
+    std::vector<double>& rDY)
 {
     double notch = rY[0];
     double delta = rY[1];
     double mean_delta = this->mParameters[0]; // Shorthand for "this->mParameter("Mean Delta");"
 
     // The next two lines define the ODE system by Collier et al. (1996)
-    rDY[0] = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;  // d[Notch]/dt
-    rDY[1] = 1.0/(1.0 + 100.0*notch*notch) - delta;                   // d[Delta]/dt
+    rDY[0] = mean_delta*mean_delta/(0.01 + mean_delta*mean_delta) - notch;
+    rDY[1] = 1.0/(1.0 + 100.0*notch*notch) - delta;
 }
 
 template<>

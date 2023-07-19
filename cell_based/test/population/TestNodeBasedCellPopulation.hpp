@@ -279,7 +279,7 @@ public:
             TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(cells[1]), PetscTools::GetNumProcs());
         }
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -542,7 +542,7 @@ public:
 
             // Test that each cell's location index is correct.
             unsigned index = 0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+            for (auto cell_iter = node_based_cell_population.Begin();
                  cell_iter != node_based_cell_population.End();
                  ++cell_iter)
             {
@@ -1002,7 +1002,7 @@ public:
         cell_population.SetCellAncestorsToLocationIndices();
 
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1016,7 +1016,7 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), mesh.GetNumNodes());
 
         // Reallocate ancestors
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1027,7 +1027,7 @@ public:
 
         // Test that the cell population now shares a common ancestor
         remaining_ancestors = cell_population.GetCellAncestors();
-        TS_ASSERT_EQUALS(remaining_ancestors.size(), (unsigned)(mesh.GetNumNodes() > 0));
+        TS_ASSERT_EQUALS(remaining_ancestors.size(), static_cast<unsigned>(mesh.GetNumNodes() > 0));
     }
 
     void TestGetLocationOfCellCentreAndGetWidth()
@@ -1050,7 +1050,7 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         // Loop over nodes
-        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+        for (auto cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
@@ -1099,7 +1099,7 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         node_based_cell_population.Update(); // so cell neighbours are calculated
-        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+        for (auto cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
@@ -1130,7 +1130,7 @@ public:
         node_based_cell_population.AddCellWriter<CellIdWriter>();
 
         // Coverage of writing CellData to VTK
-        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+        for (auto cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
@@ -1229,7 +1229,7 @@ public:
 
         vtk_reader.GetPointData("Mutation states", mutation_states_data);
         TS_ASSERT_EQUALS(mutation_states_data.size(), 4u);
-        for (unsigned i=0; i<mutation_states_data.size(); i++)
+        for (unsigned i = 0; i < mutation_states_data.size(); ++i)
         {
             TS_ASSERT_DELTA(mutation_states_data[i], saved_mutation_states_data[i], 1e-9);
         }
@@ -1256,7 +1256,7 @@ public:
         std::vector<double> cycle_phases_data;
         vtk_reader.GetPointData("Cycle phases", cycle_phases_data);
         TS_ASSERT_EQUALS(cycle_phases_data.size(), 4u);
-        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        for (unsigned i = 0; i < cycle_phases_data.size(); ++i)
         {
             TS_ASSERT_DELTA(cycle_phases_data[i], 4.0, 1e-9);
         }
@@ -1361,7 +1361,7 @@ public:
         std::vector<double> mutation_states_data;
         vtk_reader.GetPointData("Mutation states", mutation_states_data);
         TS_ASSERT_EQUALS(mutation_states_data.size(), 51u);
-        for (unsigned i=0; i<mutation_states_data.size(); i++)
+        for (unsigned i = 0; i < mutation_states_data.size(); ++i)
         {
             TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
         }
@@ -1370,7 +1370,7 @@ public:
         std::vector<double> cycle_phases_data;
         vtk_reader.GetPointData("Cycle phases", cycle_phases_data);
         TS_ASSERT_EQUALS(cycle_phases_data.size(), 51u);
-        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        for (unsigned i = 0; i < cycle_phases_data.size(); ++i)
         {
             TS_ASSERT_DELTA(cycle_phases_data[i], 4.0, 1e-9);
         }
@@ -1379,7 +1379,7 @@ public:
         std::vector<double> ages_data;
         vtk_reader.GetPointData("Ages", ages_data);
         TS_ASSERT_EQUALS(ages_data.size(), 51u);
-        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        for (unsigned i = 0; i < cycle_phases_data.size(); ++i)
         {
             TS_ASSERT_DELTA(ages_data[i], i, 1e-9);
         }
@@ -1388,7 +1388,7 @@ public:
         std::vector<double> ancestors_data;
         vtk_reader.GetPointData("Ancestors", ancestors_data);
         TS_ASSERT_EQUALS(ancestors_data.size(), 51u);
-        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        for (unsigned i = 0; i < cycle_phases_data.size(); ++i)
         {
             TS_ASSERT_DELTA(ancestors_data[i], i, 1e-9);
         }
@@ -1430,7 +1430,7 @@ public:
         TS_ASSERT_EQUALS(node_based_cell_population.GetIdentifier(), "NodeBasedCellPopulation-2");
 
         // Loop over cells to run to time 0
-        for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+        for (auto cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
@@ -1502,7 +1502,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                 cell_iter != p_cell_population->End();
                 ++cell_iter)
             {
@@ -1546,7 +1546,7 @@ public:
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
 
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -1623,7 +1623,7 @@ public:
         }
 
         // Clean up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

@@ -456,7 +456,7 @@ public:
         // As there is no cell-based simulation we must explicitly initialise the cells
         crypt.InitialiseCells();
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {

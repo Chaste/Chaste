@@ -659,7 +659,7 @@ public:
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
         expected_neighbouring_sites.clear();
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             if (i != 4)
             {
@@ -877,10 +877,10 @@ public:
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites, expected_neighbouring_sites);
 
         // Test all nodes for fully periodic mesh
-        for (unsigned node_index = 0; node_index<27; node_index++)
+        for (unsigned node_index = 0; node_index<27; ++node_index)
         {
             expected_neighbouring_sites.clear();
-            for (unsigned i=0; i<27; i++)
+            for (unsigned i = 0; i < 27; ++i)
             {
                 if (i != node_index)
                 {
@@ -1369,7 +1369,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[3] = {0, 1, 3};
         unsigned node_indices_elem_1[3] = {2, 4, 5};
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1831,7 +1831,7 @@ public:
 
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
 
-            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index < p_mesh_original->GetNumNodes(); ++node_index)
             {
                 Node<2>* p_node = p_mesh_original->GetNode(node_index);
                 Node<2>* p_node2 = p_mesh2->GetNode(node_index);
@@ -1841,7 +1841,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned dimension=0; dimension<2; dimension++)
+                for (unsigned dimension = 0; dimension < 2; ++dimension)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
@@ -1852,12 +1852,12 @@ public:
 
             TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
 
-            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < p_mesh_original->GetNumElements(); ++elem_index)
             {
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
 
-                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index < p_mesh_original->GetElement(elem_index)->GetNumNodes(); ++local_index)
                 {
                     TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
                                      p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
@@ -1896,7 +1896,7 @@ public:
 
         // Check Neighbours are not defined see #1932
         std::set<unsigned> empty_set;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetVonNeumannNeighbouringNodeIndices(i), empty_set);
         }

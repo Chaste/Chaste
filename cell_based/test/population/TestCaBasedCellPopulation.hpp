@@ -100,7 +100,7 @@ public:
         ///\todo this doesn't do anything as there aren't any cells!
         TS_ASSERT_EQUALS(cells.size(), 0u);
         AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_EQUALS(*cell_iter, cells[i]);
             TS_ASSERT_EQUALS(*cell_iter, cell_population.GetCellUsingLocationIndex(location_indices[i]));
@@ -116,7 +116,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIterateRandomlyOverUpdateRuleCollection(), false);
 
         // For coverage of GetVolumeOfCell()
-        for (AbstractCellPopulation<2>::Iterator cell_iter2 = cell_population.Begin();
+        for (auto cell_iter2 = cell_population.Begin();
              cell_iter2 != cell_population.End();
              ++cell_iter2)
         {
@@ -287,9 +287,9 @@ public:
         bool foundother = false;
 
         // This set iterator is iterator in pointer order (the order of addresses in memory); this order can be arbitrary
-        for (std::set<CellPtr>::iterator iter = cells_on_lattice.begin();
+        for (auto iter = cells_on_lattice.begin();
              iter != cells_on_lattice.end();
-             iter++)
+             ++iter)
         {
             if ((*iter)->GetCellId() == 0)
             {
@@ -343,7 +343,7 @@ public:
 
         // Coverage of writing CellData to VTK
         double index = 0.0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -409,7 +409,7 @@ public:
         vtk_reader.GetPointData("Mutation states", mutation_states_data);
         TS_ASSERT_EQUALS(mutation_states_data.size(), 5u);
         TS_ASSERT_DELTA(mutation_states_data[0], 5.0, 1e-9);
-        for (unsigned i=1; i<mutation_states_data.size(); i++)
+        for (unsigned i=1; i<mutation_states_data.size(); ++i)
         {
             TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
         }
@@ -419,7 +419,7 @@ public:
         vtk_reader.GetPointData("Legacy Cell types", proliferative_types_data);
         TS_ASSERT_EQUALS(proliferative_types_data.size(), 5u);
         TS_ASSERT_DELTA(proliferative_types_data[0], 5.0, 1e-9);
-        for (unsigned i=1; i<proliferative_types_data.size(); i++)
+        for (unsigned i=1; i<proliferative_types_data.size(); ++i)
         {
             TS_ASSERT_DELTA(proliferative_types_data[i], 0.0, 1e-9);
         }
@@ -428,7 +428,7 @@ public:
         std::vector<double> cell_volumes_data;
         vtk_reader.GetPointData("Cell volumes", cell_volumes_data);
         TS_ASSERT_EQUALS(cell_volumes_data.size(), 5u);
-        for (unsigned i=0; i<cell_volumes_data.size(); i++)
+        for (unsigned i = 0; i < cell_volumes_data.size(); ++i)
         {
             TS_ASSERT_DELTA(cell_volumes_data[i], 1.0, 1e-9);
         }
@@ -437,7 +437,7 @@ public:
         std::vector<double> cycle_phases_data;
         vtk_reader.GetPointData("Cycle phases", cycle_phases_data);
         TS_ASSERT_EQUALS(cycle_phases_data.size(), 5u);
-        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        for (unsigned i = 0; i < cycle_phases_data.size(); ++i)
         {
             TS_ASSERT_DELTA(cycle_phases_data[i], 4.0, 1e-9);
         }
@@ -621,7 +621,7 @@ public:
         cells_generator.GenerateBasic(cells, 25);
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<25; i++)
+        for (unsigned i = 0; i < 25; ++i)
         {
             location_indices.push_back(i);
         }
@@ -694,7 +694,7 @@ public:
         cells_generator.GenerateBasic(cells, 9);
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<9; i++)
+        for (unsigned i = 0; i < 9; ++i)
         {
             location_indices.push_back(i);
         }
@@ -703,7 +703,7 @@ public:
         CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
         unsigned location_index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -715,7 +715,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.UpdateCellLocations(0.1));
 
         location_index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -796,7 +796,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, 40, p_diff_type);
 
             std::vector<unsigned> location_indices;
-            for (unsigned index=0; index<10; index++)
+            for (unsigned index = 0; index < 10; ++index)
             {
                 location_indices.push_back(index);
                 location_indices.push_back(index);
@@ -808,7 +808,7 @@ public:
                 new CaBasedCellPopulation<2>(*p_mesh, cells, location_indices, 4);
 
             // Run each cell to time 0
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -862,11 +862,11 @@ public:
             TS_ASSERT_EQUALS(p_static_population->GetNumNodes(), 100u);
 
             std::vector<unsigned> available_space = p_static_population->rGetAvailableSpaces();
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 TS_ASSERT_EQUALS(available_space[i], 0u);
             }
-            for (unsigned i=10; i<100; i++)
+            for (unsigned i=10; i<100; ++i)
             {
                 TS_ASSERT_EQUALS(available_space[i], 4u);
             }
@@ -898,7 +898,7 @@ public:
         cells_generator.GenerateBasic(cells, 9);
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<9; i++)
+        for (unsigned i = 0; i < 9; ++i)
         {
             location_indices.push_back(i);
         }

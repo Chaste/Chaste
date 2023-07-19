@@ -89,7 +89,7 @@ private:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
 
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -358,9 +358,9 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<M_NUM_CELLS_ACROSS; i++)
+        for (unsigned i = 0; i < M_NUM_CELLS_ACROSS; ++i)
         {
-            for (unsigned j=0; j<M_NUM_CELLS_ACROSS; j++)
+            for (unsigned j = 0; j < M_NUM_CELLS_ACROSS; ++j)
             {
                 unsigned offset = (domain_wide+1) * (domain_wide-M_NUM_CELLS_ACROSS)/2;
                 location_indices.push_back(offset + j + i * domain_wide );

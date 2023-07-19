@@ -118,7 +118,7 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(
     // Map signed distances into [0,1]
     double min_distance = *std::min_element(biases.begin(), biases.end());
     double max_distance = *std::max_element(biases.begin(), biases.end());
-    for (unsigned i = 0; i < biases.size(); i++)
+    for (unsigned i = 0; i < biases.size(); ++i)
     {
         biases[i] = (biases[i] - min_distance) / (max_distance - min_distance);
     }
@@ -131,7 +131,7 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(
     {
         // Store the cell's volume in CellData
         cell_iter->GetCellData()->SetItem("bias", biases[i]);
-        i++;
+        ++i;
     }
 }
 

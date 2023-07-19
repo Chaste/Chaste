@@ -90,7 +90,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -135,7 +135,7 @@ public:
         TS_ASSERT(generated.Exists());
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -148,7 +148,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -170,7 +170,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -207,7 +207,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -220,7 +220,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -243,7 +243,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -280,7 +280,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -293,7 +293,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -316,7 +316,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
 
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -356,7 +356,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
           cell_iter != cell_population.End();
           ++cell_iter)
         {
@@ -369,7 +369,7 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
           cell_iter != cell_population.End();
           ++cell_iter)
         {
@@ -391,7 +391,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);

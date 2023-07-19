@@ -116,7 +116,7 @@ public:
 
 //        OutputFileHandler handler("");
 //        out_stream file=handler.OpenOutputFile("tyson_novak.dat");
-//        for (unsigned i=0; i<=end; i++)
+//        for (unsigned i = 0; i < =end; ++i)
 //        {
 //            (*file) << solutions.rGetTimes()[i]<< "\t" << solutions.rGetSolutions()[i][0] << "\t" << solutions.rGetSolutions()[i][1] << "\t" << solutions.rGetSolutions()[i][2] << "\t" << solutions.rGetSolutions()[i][3] << "\t" << solutions.rGetSolutions()[i][4] << "\t" << solutions.rGetSolutions()[i][5] << "\n" << std::flush;
 //        }
@@ -129,7 +129,7 @@ public:
             int time_var_id = writer.DefineUnlimitedDimension("Time", "s");
 
             std::vector<int> var_ids;
-            for (unsigned i=0; i<tyson_novak_system.rGetStateVariableNames().size(); i++)
+            for (unsigned i = 0; i < tyson_novak_system.rGetStateVariableNames().size(); ++i)
             {
                 var_ids.push_back(writer.DefineVariable(tyson_novak_system.rGetStateVariableNames()[i],
                                                         tyson_novak_system.rGetStateVariableUnits()[i]));
@@ -139,7 +139,7 @@ public:
             for (unsigned i = 0; i < solutions.rGetSolutions().size(); i+=step_per_row)
             {
                 writer.PutVariable(time_var_id, solutions.rGetTimes()[i]);
-                for (unsigned j=0; j<var_ids.size(); j++)
+                for (unsigned j = 0; j < var_ids.size(); ++j)
                 {
                     writer.PutVariable(var_ids[j], solutions.rGetSolutions()[i][j]);
                 }

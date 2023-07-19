@@ -251,12 +251,12 @@ public:
 
         /* Now we construct and initialise a large number of {{{MyCellCycleModel}}}s and
          * associated cells: */
-        unsigned num_cells = (unsigned) 1e5;
+        unsigned num_cells = 1e5;
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             MyCellCycleModel* p_cell_cycle_model = new MyCellCycleModel;
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
@@ -274,7 +274,7 @@ public:
         double expected_mean_g1_duration = static_cast<MyCellCycleModel*>(cells[0]->GetCellCycleModel())->GetStemCellG1Duration();
         double sample_mean_g1_duration = 0.0;
 
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             sample_mean_g1_duration += static_cast<MyCellCycleModel*>(cells[i]->GetCellCycleModel())->GetG1Duration()/ (double) num_cells;
         }
@@ -295,7 +295,7 @@ public:
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(mean_cell_cycle_time, num_steps);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
 
@@ -396,7 +396,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         /* Then we loop over the nodes. */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             /* For each node we create a cell with our cell-cycle model. */
             MyCellCycleModel* p_model = new MyCellCycleModel();

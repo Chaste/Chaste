@@ -131,7 +131,7 @@ void CryptSimulation2d::SetBottomCellAncestors()
     }
 
     unsigned index = 0;
-    for (AbstractCellPopulation<2>::Iterator cell_iter = mrCellPopulation.Begin();
+    for (auto cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {

@@ -197,7 +197,7 @@ public:
         TS_ASSERT_EQUALS(new_locations.size(), saved_locations.size());
 
         // Check the bcs has been imposed
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(new_locations[cell_population.GetNode(node_index)](0), saved_locations[cell_population.GetNode(node_index)](0), 1e-3);
 
@@ -243,7 +243,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -252,7 +252,7 @@ public:
         // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
 
@@ -295,7 +295,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -305,7 +305,7 @@ public:
         p_fe_method->UpdateAllNodePositions(dt);
 
         //Check the answer (for cell associated nodes only)
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
@@ -353,7 +353,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -362,7 +362,7 @@ public:
         // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
 
@@ -408,7 +408,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -418,7 +418,7 @@ public:
         // Currently this throws an error as not set up correctly as it is in a simulation #2087
         TS_ASSERT_THROWS_THIS(p_fe_method->UpdateAllNodePositions(dt),"You must provide a rowPreallocation argument for a large sparse system");
 
-        // for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        // for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         // {
         //     c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
 
@@ -467,7 +467,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -476,7 +476,7 @@ public:
         // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
 
@@ -521,7 +521,7 @@ public:
 
         // Save starting positions
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
             old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
@@ -530,7 +530,7 @@ public:
         // Update positions and check the answer
         p_fe_method->UpdateAllNodePositions(dt);
 
-        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
             c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
 

@@ -106,7 +106,7 @@ public:
         std::vector<unsigned> ghost_node_indices, real_node_indices;
         unsigned node_index = 0;
 
-        for (unsigned k=0; k<2*nodes_up-1; k++)        // Each layer going up
+        for (unsigned k = 0; k < 2*nodes_up - 1; ++k) // Each layer going up
         {
             z_coordinate = (double)k/2.0;
 
@@ -115,12 +115,12 @@ public:
             if (is_even_layer)
             {
                 // Want the nodes that sit at x=0,2,4,...
-                for (unsigned j=0; j<nodes_depth; j++)
+                for (unsigned j = 0; j < nodes_depth; ++j)
                 {
                     y_coordinate = (double)j;
                     x_coordinate = 0.0;
 
-                    for (unsigned i=0; i<nodes_across; i++)
+                    for (unsigned i = 0; i < nodes_across; ++i)
                     {
                         nodes.push_back(new Node<3>(node_index,  false,  x_coordinate, y_coordinate, z_coordinate));
 
@@ -143,12 +143,12 @@ public:
             else
             {
                 // Want the nodes that sit at x=1,3,5,...
-                for (unsigned j=0; j<nodes_depth-1; j++)
+                for (unsigned j = 0; j < nodes_depth-1; ++j)
                 {
                     y_coordinate = (double)j + 0.5;
                     x_coordinate = 0.5;
 
-                    for (unsigned i=0; i<nodes_across-1; i++)
+                    for (unsigned i = 0; i < nodes_across-1; ++i)
                     {
                         nodes.push_back(new Node<3>(node_index,  false,  x_coordinate, y_coordinate, z_coordinate));
 
@@ -189,9 +189,9 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (std::vector<unsigned>::iterator real_node_iter=real_node_indices.begin();
-                                            real_node_iter != real_node_indices.end();
-                                            ++real_node_iter)
+        for (auto real_node_iter = real_node_indices.begin();
+             real_node_iter != real_node_indices.end();
+             ++real_node_iter)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));

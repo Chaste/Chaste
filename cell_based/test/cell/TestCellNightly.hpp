@@ -90,7 +90,7 @@ public:
                 divisions++;
             }
         }
-        TS_ASSERT_DELTA(divisions, (unsigned)(end_time/1.26), 1);
+        TS_ASSERT_DELTA(divisions, static_cast<unsigned>(end_time/1.26), 1);
     }
 
     void Test0DBucketWithTysonNovak()

@@ -129,7 +129,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
 
     // Output the number of cells and the elements of the adjacency matrix
     *this->mpOutStream << num_cells << "\t";
-    for (unsigned i=0; i<num_cells*num_cells; i++)
+    for (unsigned i = 0; i < num_cells*num_cells; ++i)
     {
         *this->mpOutStream << adjacency_matrix[i] << "\t";
     }

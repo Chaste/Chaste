@@ -170,11 +170,11 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
             assert(mpFeMesh != nullptr);
             assert(mDependentVariableName != "");
 
-            for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
+            for (unsigned i = 0; i < mpFeMesh->GetNumNodes(); ++i)
             {
                 (*mpVizPdeSolutionResultsFile) << i << " ";
                 const c_vector<double,DIM>& r_location = mpFeMesh->GetNode(i)->rGetLocation();
-                for (unsigned k=0; k<DIM; k++)
+                for (unsigned k = 0; k < DIM; ++k)
                 {
                     (*mpVizPdeSolutionResultsFile) << r_location[k] << " ";
                 }
@@ -197,7 +197,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 
         ReplicatableVector solution_repl(mSolution);
         std::vector<double> pde_solution;
-        for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < mpFeMesh->GetNumNodes(); ++i)
         {
            pde_solution.push_back(solution_repl[i]);
         }

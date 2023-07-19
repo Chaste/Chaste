@@ -242,7 +242,7 @@ public:
         FileComparison( results_file2, "crypt/test/data/MakeMeinekeGraphs/results.vizcelltypes").CompareFiles();
 
         // Next, test LabelSPhaseCells()
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
@@ -252,7 +252,7 @@ public:
 
         // Iterate over cells checking for correct labels
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
@@ -274,7 +274,7 @@ public:
 
         // Iterate over cells checking for correct labels
         counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
@@ -298,7 +298,7 @@ public:
 
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
@@ -356,7 +356,7 @@ public:
         unsigned num_simulations = 2;
 
         // Guess of maximum number of cells a crypt section may contain
-        unsigned max_length_of_crypt_section = 5 * (unsigned)sqrt(pow(cells_across/2.0+1,2.0) + pow((double)cells_up,2.0));
+        unsigned max_length_of_crypt_section = 5 * static_cast<unsigned>(sqrt(pow(cells_across/2.0+1,2.0) + pow((double)cells_up,2.0)));
 
         std::vector<unsigned> labelled_cells_counter(max_length_of_crypt_section);
 

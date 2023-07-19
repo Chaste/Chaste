@@ -131,7 +131,7 @@ public:
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE
             std::vector<double> data(10);
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 data[i] = i + 0.45;
             }
@@ -167,7 +167,7 @@ public:
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
             }
@@ -189,7 +189,7 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -225,7 +225,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithMeshOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -263,7 +263,7 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
             cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -300,7 +300,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNeumannWithMeshOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -332,7 +332,7 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -368,7 +368,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -400,7 +400,7 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
@@ -437,7 +437,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
 
         // Run for 10 timesteps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -468,7 +468,7 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
@@ -505,7 +505,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
 
         // Run for 10 timesteps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
            {
             SimulationTime::Instance()->IncrementTimeOneStep();
                p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -532,7 +532,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             location_indices.push_back(i);
         }
@@ -545,7 +545,7 @@ public:
         // Make cells with x<5.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
             cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -581,7 +581,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestAveragedParabolicPdeWithNodeOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);

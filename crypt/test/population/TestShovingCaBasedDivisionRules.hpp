@@ -94,7 +94,7 @@ public:
         // Check the cell locations
         unsigned cell_locations[9] = {6, 7, 8, 11, 12, 13, 16, 17, 18};
         unsigned index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -136,7 +136,7 @@ public:
         // Note the cell originally on node 13 has been shoved to node 14 and the new cell is on node 13
         unsigned new_cell_locations[10] = {6, 7, 8, 11, 12, 14, 16, 17, 18, 13};
         index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -257,7 +257,7 @@ public:
         // Check the cell locations
         unsigned cell_locations[6] = {0,1,2,3,4,5};
         unsigned index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -299,7 +299,7 @@ public:
         // Note the cell on node 3 has been shoved to node 6 and the new cell is on node 3
         unsigned new_cell_locations[7] = {0,1,2,6,4,5,3};
         index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -328,7 +328,7 @@ public:
         // Note the cell on node 4 has been shoved to node 7 and the new cell is on node 4
         unsigned new_cell_locations_2[8] = {0,1,2,6,7,5,3,4};
         index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

@@ -151,11 +151,13 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>
      */
     if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
     {
-        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation);
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_population 
+            = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(&rCellPopulation);
 
-        std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
+        std::pair<CellPtr, CellPtr> cell_pair = 
+            p_population->CreateCellPair(p_cell_A, p_cell_B);
 
-        if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
+        if (p_population->IsMarkedSpring(cell_pair))
         {
             // Spring rest length increases from a small value to the normal rest length over 1 hour
             double lambda = mMeinekeDivisionRestingSpringLength;
@@ -164,7 +166,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>
         if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
         {
             // This spring is about to go out of scope
-            p_static_cast_cell_population->UnmarkSpring(cell_pair);
+            p_population->UnmarkSpring(cell_pair);
         }
     }
 

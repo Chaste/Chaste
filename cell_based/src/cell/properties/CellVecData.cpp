@@ -45,7 +45,7 @@ CellVecData::CellVecData(const CellVecData& rAnotherCellVecData)
 {
     std::vector<std::string> keys = rAnotherCellVecData.GetKeys();
 
-    for (std::vector<std::string>::iterator iter = keys.begin(); iter != keys.end(); ++iter)
+    for (auto iter = keys.begin(); iter != keys.end(); ++iter)
     {
         std::string map_key = *iter;
         Vec map_value = rAnotherCellVecData.GetItem(map_key);
@@ -69,7 +69,7 @@ CellVecData::~CellVecData()
     // If the object was loaded from a checkpoint, the Vecs in the map need freeing. Otherwise is the user's responsibility.
     if (mFreeVecs)
     {
-        for (std::map<std::string, Vec>::iterator iter = mCellVecData.begin(); iter != mCellVecData.end(); ++iter)
+        for (auto iter = mCellVecData.begin(); iter != mCellVecData.end(); ++iter)
         {
             PetscTools::Destroy(iter->second);
         }

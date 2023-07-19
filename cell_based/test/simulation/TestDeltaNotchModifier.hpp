@@ -95,7 +95,7 @@ public:
         initial_conditions.push_back(1.0);
         initial_conditions.push_back(1.0);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -260,7 +260,7 @@ public:
 
 
         // Avoid memory leaks
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -363,7 +363,7 @@ public:
         TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
 
         // Avoid memory leaks
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -387,7 +387,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -459,7 +459,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -521,7 +521,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -592,7 +592,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             UniformCellCycleModel* p_cc_model = new UniformCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -650,7 +650,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -767,7 +767,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -782,13 +782,13 @@ public:
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
             double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 total_edge_length += p_element->GetEdge(i)->rGetLength();
             }
 
             /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 auto p_elem_edge = p_element->GetEdge(i);
                 auto p_edge_length = p_elem_edge->rGetLength();
@@ -913,7 +913,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); ++elem_index)
         {
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
             p_cc_model->SetDimension(2);
@@ -928,13 +928,13 @@ public:
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
             double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 total_edge_length += p_element->GetEdge(i)->rGetLength();
             }
 
             /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 auto p_elem_edge = p_element->GetEdge(i);
                 auto p_edge_length = p_elem_edge->rGetLength();

@@ -185,7 +185,7 @@ public:
         *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
 
         c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             *this->mpOutStream << cell_location[i] << " ";
         }
@@ -244,7 +244,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 

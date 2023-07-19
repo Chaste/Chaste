@@ -44,12 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * An element class for use in the PottsMesh class.
  *
- * The main difference between this and the Element class is that a
- * PottsElement can have a variable number of nodes associated with
- * it and these represent the lattice sites contained in the element.
- * As they are just a collection of sites there is no concept of
- * Element Dimension.
- *
+ * The main difference between this and the Element class is that a PottsElement 
+ * can have a variable number of nodes associated with it and these represent 
+ * the lattice sites contained in the element. As they are just a collection of 
+ * sites there is no concept of Element dimension.
  */
 template<unsigned DIM>
 class PottsElement : public MutableElement<DIM, DIM>
@@ -96,7 +94,7 @@ public:
      * @param pNode is a pointer to the new node
      * @param rIndex the location in this->mNodes to place node. Defaults to the end.
      */
-    void AddNode(Node<DIM>* pNode,  const unsigned& rIndex = UINT_MAX);
+    void AddNode(Node<DIM>* pNode, const unsigned& rIndex = UINT_MAX);
 
     /**
      * Method to calculate the aspect ratio of the element. Currently only works on 2D

@@ -447,7 +447,7 @@ void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 //    ///\todo this code would need to be extended if the domain were required to be periodic
 //
 //  std::vector<Node<2>*> nodes;
-//  for (unsigned node_index=0; node_index<mrMesh.GetNumNodes(); node_index++)
+//  for (unsigned node_index = 0; node_index < mrMesh.GetNumNodes(); ++node_index)
 //  {
 //      Node<2>* p_temp_node = mrMesh.GetNode(node_index);
 //      nodes.push_back(p_temp_node);
@@ -610,7 +610,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             }
         }
     }
-    for (unsigned var=0; var<cell_data.size(); var++)
+    for (unsigned var = 0; var < cell_data.size(); ++var)
     {
         mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
     }

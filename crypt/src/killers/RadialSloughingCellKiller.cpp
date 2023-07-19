@@ -54,7 +54,7 @@ double RadialSloughingCellKiller::GetRadius() const
 
 void RadialSloughingCellKiller::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
+    for (auto cell_iter = this->mpCellPopulation->Begin();
          cell_iter != this->mpCellPopulation->End();
          ++cell_iter)
     {

@@ -160,7 +160,7 @@ inline void save_construct_data(
 
     std::vector<std::string> keys = t->GetKeys();
 
-    for (std::vector<std::string>::iterator iter = keys.begin(); iter != keys.end(); ++iter)
+    for (auto iter = keys.begin(); iter != keys.end(); ++iter)
     {
         std::string key = *iter;
         ar << key;

@@ -144,7 +144,7 @@ public:
         /* We now create a cell-cycle (only contact inhibited) model for these cells and loop over the
          * nodes of the mesh to create as many elements in the vector of cell pointers as there are
          * in the initial mesh. */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -245,7 +245,7 @@ public:
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             if (i==1)
             {
@@ -353,7 +353,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);

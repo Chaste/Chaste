@@ -90,7 +90,7 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
                 {
                     std::stringstream removal_info;
                     removal_info << SimulationTime::Instance()->GetTime() << "\t";
-                    for (unsigned i = 0; i < DIM; i++)
+                    for (unsigned i = 0; i < DIM; ++i)
                     {
                         removal_info << mesh.GetLastT2SwapLocation()[i] << "\t";
                     }

@@ -74,7 +74,7 @@ std::vector<CellPtr> CryptProjectionStatistics::GetCryptSection(double angle)
 
     // Loop over cells and add to the store if they are within a cell's radius of the
     // specified line
-    for (AbstractCellPopulation<2>::Iterator cell_iter = mrCrypt.Begin();
+    for (auto cell_iter = mrCrypt.Begin();
          cell_iter != mrCrypt.End();
          ++cell_iter)
     {
@@ -91,9 +91,7 @@ std::vector<CellPtr> CryptProjectionStatistics::GetCryptSection(double angle)
 
     // Copy to a vector
     std::vector<CellPtr> ordered_cells;
-    for (std::list<std::pair<CellPtr, double> >::iterator iter = cells_list.begin();
-         iter != cells_list.end();
-         ++iter)
+    for (auto iter = cells_list.begin(); iter != cells_list.end(); ++iter)
     {
         ordered_cells.push_back(iter->first);
     }

@@ -88,7 +88,7 @@ private:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
 
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             SimpleOxygenBasedCellCycleModel* p_cycle_model = new SimpleOxygenBasedCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -362,9 +362,9 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<M_NUM_CELLS_ACROSS; i++)
+        for (unsigned i = 0; i < M_NUM_CELLS_ACROSS; ++i)
         {
-            for (unsigned j=0; j<M_NUM_CELLS_ACROSS; j++)
+            for (unsigned j = 0; j < M_NUM_CELLS_ACROSS; ++j)
             {
                 unsigned offset = (domain_wide+1) * (domain_wide-M_NUM_CELLS_ACROSS)/2;
                 location_indices.push_back(offset + j + i * domain_wide );
@@ -432,7 +432,7 @@ public:
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->GetCellData()->SetItem("oxygen", 1.0);
         }
@@ -458,7 +458,7 @@ public:
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "The number of nodes must exceed the spatial dimension.");
 
         // Avoid memory leaks
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

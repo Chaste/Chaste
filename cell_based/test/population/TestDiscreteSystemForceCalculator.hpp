@@ -107,7 +107,7 @@ public:
         expected_sampling_angles.push_back(-M_PI +epsilon);
         expected_sampling_angles.push_back(-M_PI +epsilon);
 
-        for (unsigned i=1; i<6; i++)
+        for (unsigned i=1; i<6; ++i)
         {
             expected_sampling_angles.push_back(-M_PI +((double) i)*M_PI/3.0 - epsilon);
             expected_sampling_angles.push_back(-M_PI +((double) i)*M_PI/3.0 - epsilon);
@@ -118,7 +118,7 @@ public:
         expected_sampling_angles.push_back(M_PI - epsilon);
 
         std::vector<double> sampling_angles = calculator.GetSamplingAngles(node_index);
-        for (unsigned i=0; i<sampling_angles.size(); i++)
+        for (unsigned i = 0; i < sampling_angles.size(); ++i)
         {
             // the sampling angles lie in the range (pi,pi]
             if (expected_sampling_angles[i] > M_PI)
@@ -176,7 +176,7 @@ public:
         double expected_minimum_interior = spring_stiffness*( 2.0*sin(M_PI/3.0) );
         double expected_maximum_interior = spring_stiffness*( sin(M_PI/6.0) + sin(M_PI/2.0) + sin(5.0*M_PI/6.0) );
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             if (!(p_mesh->GetNode(i)->IsBoundaryNode()))
             {

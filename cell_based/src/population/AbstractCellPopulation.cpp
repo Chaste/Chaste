@@ -285,7 +285,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyclePhaseCount()
 {
     std::vector<unsigned> cell_cycle_phase_count(5);
-    for (unsigned i = 0; i < 5; i++)
+    for (unsigned i = 0; i < 5; ++i)
     {
         cell_cycle_phase_count[i] = 0;
     }

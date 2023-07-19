@@ -72,7 +72,7 @@ public:
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
@@ -91,7 +91,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -130,7 +130,7 @@ public:
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
@@ -149,7 +149,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -189,7 +189,7 @@ public:
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
@@ -208,7 +208,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -303,7 +303,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             if (i == 12)
             {
@@ -375,7 +375,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-(double)i - 19.0);
         }
@@ -509,7 +509,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[4] = { 0, 1, 4, 5 };
         unsigned node_indices_elem_1[4] = { 1, 2, 3, 4 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -565,7 +565,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_transit_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-2.0);
         }
@@ -623,7 +623,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-2.0);
         }
@@ -674,7 +674,7 @@ public:
         // Construct a 2D vertex mesh consisting of a single element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
@@ -692,7 +692,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumElements(), std::vector<unsigned>(), p_diff_type);
 
-        for (unsigned i = 0; i < cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-1.0);
         }
@@ -784,7 +784,7 @@ public:
         CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
 
         // Now save and reload to find where it breaks!
-        for (unsigned i = 0; i < 40; i++)
+        for (unsigned i = 0; i < 40; ++i)
         {
             start_time = end_time;
             end_time = end_time + 10.0;

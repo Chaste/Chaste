@@ -166,7 +166,7 @@ public:
         location_indices.push_back(1u);
 
         // Then other cells are added to the lattice to check if the probabilities are still the same
-        for (unsigned i=4; i<10; i++)
+        for (unsigned i=4; i<10; ++i)
         {
             location_indices.push_back(i);
         }
@@ -295,7 +295,7 @@ public:
         // Specify where cells lie here we have cells on the bottom two rows
         std::vector<unsigned> location_indices;
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             location_indices.push_back(i);
         }

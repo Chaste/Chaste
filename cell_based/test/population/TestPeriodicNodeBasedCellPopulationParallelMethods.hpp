@@ -82,7 +82,7 @@ private:
         {
             std::vector<Node<3>*> nodes;
             unsigned num_processors = PetscTools::GetNumProcs();
-            for (unsigned i = 0; i < num_processors; i++)
+            for (unsigned i = 0; i < num_processors; ++i)
             {
                 nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5 + (double)i));
             }
@@ -99,7 +99,7 @@ private:
 
             mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpPeriodicNodesOnlyMesh, cells);
 
-            for (unsigned i = 0; i < nodes.size(); i++)
+            for (unsigned i = 0; i < nodes.size(); ++i)
             {
                 delete nodes[i];
             }

@@ -159,7 +159,7 @@ public:
         /*
          * Now we loop over the nodes...
          */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             /*
              * ...then create a cell, giving it a {{{SimpleOxygenBasedCellCycleModel}}}.

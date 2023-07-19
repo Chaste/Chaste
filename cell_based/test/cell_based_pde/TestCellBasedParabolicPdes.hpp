@@ -85,9 +85,9 @@ public:
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)
@@ -148,9 +148,9 @@ public:
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
             c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
-            for (unsigned i=0; i<2; i++)
+            for (unsigned i = 0; i < 2; ++i)
             {
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j < 2; ++j)
                 {
                     double value = 0.0;
                     if (i == j)
@@ -180,9 +180,9 @@ public:
         TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)
@@ -270,7 +270,7 @@ public:
 
         // Now test SetupSourceTerms() when a map between cells and FE mesh elements is supplied
         std::map<CellPtr, unsigned> cell_pde_element_map;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -293,9 +293,9 @@ public:
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
 
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)
@@ -355,9 +355,9 @@ public:
             TS_ASSERT_DELTA(p_static_cast_pde->mSourceCoefficient, 0.3 , 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
             c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
-            for (unsigned i=0; i<2; i++)
+            for (unsigned i = 0; i < 2; ++i)
             {
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j < 2; ++j)
                 {
                     double value = 0.0;
                     if (i == j)

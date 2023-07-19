@@ -134,7 +134,7 @@ void AbstractOdeSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 void AbstractOdeSrnModel::ScaleSrnVariables(const double theta)
 {
     assert(mpOdeSystem != nullptr);
-    for (unsigned i=0; i<mpOdeSystem->GetNumberOfStateVariables(); ++i)
+    for (unsigned i = 0; i < mpOdeSystem->GetNumberOfStateVariables(); ++i)
     {
         const double old_value = mpOdeSystem->GetStateVariable(i);
         const double new_value = theta*old_value;

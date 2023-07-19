@@ -52,7 +52,7 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abs
 {
     std::vector<std::string> divisions_information = pCellPopulation->GetDivisionsInformation();
 
-    for (unsigned index = 0; index < divisions_information.size(); index++)
+    for (unsigned index = 0; index < divisions_information.size(); ++index)
     {
         *this->mpOutStream << divisions_information[index] << "\n";
     }
@@ -66,7 +66,7 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
 {
     std::vector<std::string> divisions_information = pCellPopulation->GetDivisionsInformation();
 
-    for (unsigned index = 0; index < divisions_information.size(); index++)
+    for (unsigned index = 0; index < divisions_information.size(); ++index)
     {
         *this->mpOutStream << divisions_information[index] << "\n";
     }

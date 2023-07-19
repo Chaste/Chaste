@@ -99,7 +99,7 @@ public:
         TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellMutationState>(), true);
         //TS_ASSERT_EQUALS(!collection.HasProperty<AbstractCellMutationState>(), false); <-- This won't compile (yet)
         // ..by iteration
-        for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
+        for (auto it = collection.Begin(); it != collection.End(); ++it)
         {
             TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
             TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<ApcOneHitCellMutationState>());
@@ -183,7 +183,7 @@ public:
             TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellProperty>(), true);
             TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellMutationState>(), true);
 
-            for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
+            for (auto it = collection.Begin(); it != collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
                 TS_ASSERT((*it)->IsType<BetaCateninOneHitCellMutationState>() || (*it)->IsType<ApcOneHitCellMutationState>());

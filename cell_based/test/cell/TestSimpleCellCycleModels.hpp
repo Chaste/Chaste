@@ -101,7 +101,7 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
-        for (unsigned i = 0; i < 10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), false);
@@ -130,7 +130,7 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
-        for (unsigned i = 0; i < 10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
@@ -218,7 +218,7 @@ public:
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
-        for (unsigned i = 0; i < 100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -336,7 +336,7 @@ public:
 
         std::vector<double> random_sequence;
 
-        for (unsigned index = 0u; index < 10; index++)
+        for (unsigned index = 0; index < 10; ++index)
         {
             double next_random_number = CellCycleTimesGenerator::Instance()->GetNextCellCycleTime();
             random_sequence.push_back(next_random_number);
@@ -356,7 +356,7 @@ public:
 
         RandomNumberGenerator::Instance()->Reseed(13u);
 
-        for (unsigned index = 0u; index < 10; index++)
+        for (unsigned index = 0; index < 10; ++index)
         {
             unsigned my_seed = 13u * index;
             RandomNumberGenerator::Instance()->Reseed(my_seed);
@@ -400,7 +400,7 @@ public:
         unsigned num_steps = 100;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -467,7 +467,7 @@ public:
         unsigned num_steps = 100;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -551,7 +551,7 @@ public:
         TS_ASSERT_EQUALS(p_diff_model->GetGeneration(), 0u);
 
         // First cycle
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -577,7 +577,7 @@ public:
         p_hepa_one_cell->InitialiseCellCycleModel();
 
         // Second cycle
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -644,7 +644,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(
             4.0 * (p_stem_model->GetStemCellG1Duration() + p_stem_model->GetSG2MDuration()), 2 * num_steps);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -664,7 +664,7 @@ public:
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 3.86076);
@@ -711,7 +711,7 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(
             4.0 * (p_stem_model->GetAverageStemCellCycleTime()), 2 * num_steps);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -733,7 +733,7 @@ public:
         p_hepa_one_cell->SetCellProliferativeType(p_stem_type);
         p_hepa_one_cell->InitialiseCellCycleModel();
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideIsUpdated(p_hepa_one_model, 15.43038);
@@ -780,7 +780,7 @@ public:
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
-        for (unsigned i = 0; i < 100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -873,7 +873,7 @@ public:
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
-        for (unsigned i = 0; i < 100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -986,7 +986,7 @@ public:
         TS_ASSERT_EQUALS(p_diff_model->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(), G_ZERO_PHASE);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -1021,7 +1021,7 @@ public:
         p_apoptotic_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
 
         // Force the cell to be apoptotic
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             TS_ASSERT(!(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>())
                       || p_simulation_time->GetTime() >= p_cell_model->GetCriticalHypoxicDuration());
@@ -1129,7 +1129,7 @@ public:
         TS_ASSERT_EQUALS(p_diff_model->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(), G_ZERO_PHASE);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -1187,7 +1187,7 @@ public:
         unsigned num_steps = 100;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, num_steps);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             
@@ -1312,7 +1312,7 @@ public:
         TS_ASSERT_EQUALS(p_diff_model->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_diff_model->GetCurrentCellCyclePhase(), G_ZERO_PHASE);
 
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -1351,7 +1351,7 @@ public:
         p_apoptotic_cell->InitialiseCellCycleModel();
 
         // Force the cell to be apoptotic
-        for (unsigned i = 0; i < num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             TS_ASSERT(!(p_apoptotic_cell->HasCellProperty<ApoptoticCellProperty>())
                       || p_simulation_time->GetTime() >= p_cell_model->GetCriticalHypoxicDuration());

@@ -237,12 +237,12 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::RemoveDeadCells()
         if ((*it)->IsDead())
         {
             // Check if this cell is in a marked spring
-            std::vector<const std::pair<CellPtr,CellPtr>*> pairs_to_remove; // Pairs that must be purged
+            std::vector<const std::pair<CellPtr, CellPtr>*> pairs_to_remove; // Pairs that must be purged
             for (auto it1 = this->mMarkedSprings.begin();
                  it1 != this->mMarkedSprings.end();
                  ++it1)
             {
-                const std::pair<CellPtr,CellPtr>& r_pair = *it1;
+                const std::pair<CellPtr, CellPtr>& r_pair = *it1;
 
                 for (unsigned i = 0; i < 2; ++i)
                 {
@@ -398,7 +398,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(
     }
 
     // Purge any marked springs that are no longer springs
-    std::vector<const std::pair<CellPtr,CellPtr>*> springs_to_remove;
+    std::vector<const std::pair<CellPtr, CellPtr>*> springs_to_remove;
     for (auto spring_it = this->mMarkedSprings.begin();
          spring_it != this->mMarkedSprings.end();
          ++spring_it)
@@ -564,7 +564,7 @@ CellPtr MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(
     assert(p_created_cell == pNewCell);
 
     // Mark spring between parent cell and new cell
-    std::pair<CellPtr,CellPtr> cell_pair = this->CreateCellPair(pParentCell, p_created_cell);
+    std::pair<CellPtr, CellPtr> cell_pair = this->CreateCellPair(pParentCell, p_created_cell);
     this->MarkSpring(cell_pair);
 
     // Return pointer to new cell
@@ -695,7 +695,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(
                 cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
-        for (unsigned var=0; var<num_cell_data_items; var++)
+        for (unsigned var = 0; var < num_cell_data_items; ++var)
         {
             cells_writer.AddPointData(cell_data_names[var], cell_data[var]);
         }
@@ -1134,7 +1134,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckCellPointers()
          it1 != this->mMarkedSprings.end();
          ++it1)
     {
-        const std::pair<CellPtr,CellPtr>& r_pair = *it1;
+        const std::pair<CellPtr, CellPtr>& r_pair = *it1;
 
         for (unsigned i = 0; i < 2; ++i)
         {

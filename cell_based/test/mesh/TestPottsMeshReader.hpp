@@ -109,7 +109,7 @@ public:
        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
        mesh_reader.Reset();
-       for (unsigned i=1; i<mesh_reader.GetNumElements(); i++)
+       for (unsigned i=1; i<mesh_reader.GetNumElements(); ++i)
        {
            ElementData data = mesh_reader.GetNextElementData();
            TS_ASSERT_EQUALS(data.AttributeValue, 0u);
@@ -146,7 +146,7 @@ public:
         TS_ASSERT_DELTA(next_node[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_node = mesh_reader.GetNextNode());
         }

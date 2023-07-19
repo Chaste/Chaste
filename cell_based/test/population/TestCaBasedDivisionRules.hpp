@@ -73,7 +73,7 @@ public:
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<6; index++)
+        for (unsigned index = 0; index < 6; ++index)
         {
             location_indices.push_back(index);
         }
@@ -171,11 +171,11 @@ public:
 
         // Create 9 cells in the central nodes
         std::vector<unsigned> location_indices;
-        for (unsigned row=1; row<4; row++)
+        for (unsigned row = 1; row < 4; ++row)
         {
-            location_indices.push_back(1+row*5);
-            location_indices.push_back(2+row*5);
-            location_indices.push_back(3+row*5);
+            location_indices.push_back(1 + row*5);
+            location_indices.push_back(2 + row*5);
+            location_indices.push_back(3 + row*5);
         }
 
         std::vector<CellPtr> cells;
@@ -188,7 +188,7 @@ public:
         // Check the cell locations
         unsigned cell_locations[9] = {6, 7, 8, 11, 12, 13, 16, 17, 18};
         unsigned index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -230,7 +230,7 @@ public:
         // Note the cell originally on node 13 has been shoved to node 14 and the new cell is on node 13
         unsigned new_cell_locations[10] = {6, 7, 8, 11, 12, 14, 16, 17, 18, 13};
         index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -253,7 +253,7 @@ public:
 
         // Create 25 cells, one for each node
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<25; index++)
+        for (unsigned index = 0; index < 25; ++index)
         {
             location_indices.push_back(index);
         }

@@ -107,7 +107,7 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cell_location_indices.push_back(i);
         }
@@ -166,11 +166,11 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             location_indices_set.insert(location_indices[i]);
         }
@@ -180,9 +180,9 @@ public:
                             std::inserter(ghost_node_indices, ghost_node_indices.begin()));
 
         std::vector<bool> is_ghost_node(p_mesh->GetNumNodes(), false);
-        for (std::set<unsigned>::iterator it=ghost_node_indices.begin();
-             it!=ghost_node_indices.end();
-             it++)
+        for (auto it = ghost_node_indices.begin();
+             it != ghost_node_indices.end();
+             ++it)
         {
             is_ghost_node[*it] = true;
         }
@@ -197,7 +197,7 @@ public:
 
         // Check the iterator doesn't loop over ghost nodes
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -248,7 +248,7 @@ public:
 
         // Iterate over cell population and check there is a single cell
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -267,7 +267,7 @@ public:
 
         // Iterate over cell population and check there are now no cells
         counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -301,7 +301,7 @@ public:
         unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
         cells.reserve(num_cells);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             unsigned generation;
             double y = 0.0;
@@ -381,7 +381,7 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetVoronoiTessellation()->GetNumElements(), p_mesh->GetNumNodes());
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -403,7 +403,7 @@ public:
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); ++i)
         {
             if (i!=80)
             {
@@ -454,7 +454,7 @@ public:
 
         // Nodes 0-9 should not been renumbered so are still ghost nodes.
         // the ghost node at node 80 is now at 79 as node 27 was deleted.
-        for (unsigned i=0; i<mesh.GetNumAllNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumAllNodes(); ++i)
         {
             // True (ie should be a ghost) if i<10 or i==79, else false
             TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.IsGhostNode(i), ((i<10)||(i==79)));
@@ -464,7 +464,7 @@ public:
 
         // We expect the cell node indices to be {10,11,...,79}
         std::set<unsigned> expected_node_indices;
-        for (unsigned i=0; i<cell_population_with_ghost_nodes.GetNumRealCells(); i++)
+        for (unsigned i = 0; i < cell_population_with_ghost_nodes.GetNumRealCells(); ++i)
         {
             expected_node_indices.insert(i+10);
         }
@@ -472,7 +472,7 @@ public:
         // Get actual cell node indices
         std::set<unsigned> node_indices_with_ghost_nodes;
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population_with_ghost_nodes.Begin();
+        for (auto cell_iter = cell_population_with_ghost_nodes.Begin();
              cell_iter != cell_population_with_ghost_nodes.End();
              ++cell_iter)
         {
@@ -496,7 +496,7 @@ public:
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); ++i)
         {
             if (i!=80)
             {
@@ -580,7 +580,7 @@ public:
                                                 6,10,
                                                 9,10 };
 
-        for (unsigned i=0; i<10; i=i+2)
+        for (unsigned i = 0; i < 10; i=i+2)
         {
             std::set < unsigned > node_pair;
             node_pair.insert(expected_node_pairs_array[i]);
@@ -640,7 +640,7 @@ public:
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); ++i)
         {
             cell_location_indices.push_back(i);
         }
@@ -676,12 +676,12 @@ public:
 
         // Set up expected node pairs
         std::set< std::set<unsigned> > expected_node_pairs;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i < mesh.GetNumElements(); ++i)
         {
             Element<3,3>* p_element = mesh.GetElement(i);
-            for (unsigned j=0; j<4; j++)
+            for (unsigned j = 0; j < 4; ++j)
             {
-                for (unsigned k=0; k<4; k++)
+                for (unsigned k = 0; k < 4; ++k)
                 {
                     unsigned node_A = p_element->GetNodeGlobalIndex(j);
                     unsigned node_B = p_element->GetNodeGlobalIndex(k);
@@ -725,7 +725,7 @@ public:
         std::vector<unsigned> location_indices;
 
         std::vector<CellPtr> cells;
-        for (unsigned node_index=0; node_index<4; node_index++)
+        for (unsigned node_index = 0; node_index < 4; ++node_index)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
@@ -781,7 +781,7 @@ public:
         cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -864,7 +864,7 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i = 0; i < files_to_compare.size(); ++i)
         {
             FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestMeshBasedCellPopulationWithGhostNodesWriteResultsToFile/" + files_to_compare[i]);
             TS_ASSERT(comparer.CompareFiles());
@@ -920,7 +920,7 @@ public:
         MutableMesh<3,3> mesh(nodes);
 
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<5; index++)
+        for (unsigned index = 0; index < 5; ++index)
         {
             location_indices.push_back(index);
         }
@@ -1018,7 +1018,7 @@ public:
         cell_population.CreateVoronoiTessellation();
 
         // The Voronoi element corresponding to each real cell should be a regular hexagon
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1041,7 +1041,7 @@ public:
         mesh.ConstructRectangularMesh(6, 6);
 
         c_vector<double, 2> mesh_centre = zero_vector<double>(2);
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             mesh_centre += mesh.GetNode(node_index)->rGetLocation() / mesh.GetNumNodes();
         }
@@ -1053,7 +1053,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
         // Loop over nodes
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             // If this node is sufficiently close to the centre of the mesh, then create a cell for it
             c_vector<double, 2> node_location;
@@ -1103,7 +1103,7 @@ public:
         mesh.ConstructCuboid(6, 6, 6);
 
         c_vector<double, 3> mesh_centre = zero_vector<double>(3);
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             mesh_centre += mesh.GetNode(node_index)->rGetLocation() / mesh.GetNumNodes();
         }
@@ -1115,7 +1115,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
         // Loop over nodes
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             // If this node is sufficiently close to the centre of the mesh, then create a cell for it
             c_vector<double, 3> node_location;
@@ -1179,7 +1179,7 @@ public:
         cell_population.SetDataOnAllCells("variable", 100.0);
 
         // Check that the data made it there and that copies of the data are independent
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
         {
@@ -1188,7 +1188,7 @@ public:
         }
 
         cell_population.SetDataOnAllCells("added variable", 200.0);
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
         {
@@ -1231,12 +1231,12 @@ public:
 
         std::vector<unsigned> location_indices;
 
-        for (unsigned i=0u; i<9u; i++)
+        for (unsigned i=0u; i<9u; ++i)
         {
             location_indices.push_back(i);
         }
 
-        for (unsigned i=18u; i<21u; i++)
+        for (unsigned i=18u; i<21u; ++i)
         {
             location_indices.push_back(i);
         }

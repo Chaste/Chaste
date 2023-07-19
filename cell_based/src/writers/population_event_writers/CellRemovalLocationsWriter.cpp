@@ -52,7 +52,7 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abst
 {
     std::vector<std::string> removals_information = pCellPopulation->GetRemovalsInformation();
 
-    for (unsigned index = 0; index < removals_information.size(); index++)
+    for (unsigned index = 0; index < removals_information.size(); ++index)
     {
         *this->mpOutStream << removals_information[index] << "\n";
     }
@@ -65,7 +65,7 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopu
 {
     std::vector<std::string> removals_information = pCellPopulation->GetRemovalsInformation();
 
-    for (unsigned index = 0; index < removals_information.size(); index++)
+    for (unsigned index = 0; index < removals_information.size(); ++index)
     {
         *this->mpOutStream << removals_information[index] << "\n";
     }

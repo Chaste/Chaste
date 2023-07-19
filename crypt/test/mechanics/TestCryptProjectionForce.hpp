@@ -111,7 +111,7 @@ public:
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        std::pair<CellPtr,CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
+        std::pair<CellPtr, CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
         cell_population.MarkSpring(cell_pair_4_5);
 
         // Create a spring system with crypt surface z = 2*r
@@ -282,7 +282,7 @@ public:
 
         // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        std::pair<CellPtr,CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
+        std::pair<CellPtr, CellPtr> cell_pair_4_5 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(4), cell_population.GetCellUsingLocationIndex(5));
         cell_population.MarkSpring(cell_pair_4_5);
 
         WntConcentration<2>::Instance()->SetType(RADIAL);
@@ -435,20 +435,20 @@ private:
     void DoTestZeroForces(MeshBasedCellPopulationWithGhostNodes<2>& rCellPopulation,
                           std::vector<AbstractForce<2>* >& rForces)
     {
-        for (unsigned i=0; i<rCellPopulation.GetNumNodes(); i++)
+        for (unsigned i = 0; i < rCellPopulation.GetNumNodes(); ++i)
         {
              rCellPopulation.GetNode(i)->ClearAppliedForce();
         }
 
         // Add force contributions
-        for (std::vector<AbstractForce<2>* >::iterator iter = rForces.begin();
+        for (auto iter = rForces.begin();
              iter != rForces.end();
              ++iter)
         {
              (*iter)->AddForceContribution(rCellPopulation);
         }
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
+        for (auto cell_iter = rCellPopulation.Begin();
              cell_iter != rCellPopulation.End();
              ++cell_iter)
         {
@@ -505,13 +505,13 @@ public:
         }
 
         {
-            for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+            for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
             {
                  cell_population.GetNode(i)->ClearAppliedForce();
             }
 
             // Add force contributions
-            for (std::vector<AbstractForce<2>* >::iterator iter = forces.begin();
+            for (auto iter = forces.begin();
                  iter != forces.end();
                  ++iter)
             {

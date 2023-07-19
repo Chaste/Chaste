@@ -81,7 +81,7 @@ void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     *this->mpOutStream << t3_swap_info.size() << "\t";
     for (unsigned index = 0;  index < t3_swap_info.size(); ++index)
     {
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             *this->mpOutStream << t3_swap_info[index].mLocation[i] << "\t";
         }

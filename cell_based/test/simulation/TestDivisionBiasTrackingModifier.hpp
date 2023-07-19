@@ -83,7 +83,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             BiasedBernoulliTrialCellCycleModel* p_cycle_model = new BiasedBernoulliTrialCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -122,7 +122,7 @@ public:
         // Test that the cell data are correct at the first timestep
         double y_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[1];
         double y_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[1];
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -140,7 +140,7 @@ public:
         // Test that the cell data are correct at the end time
         y_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[1];
         y_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[1];
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
           cell_iter != cell_population.End();
           ++cell_iter)
         {
@@ -164,7 +164,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             BiasedBernoulliTrialCellCycleModel* p_cycle_model = new BiasedBernoulliTrialCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -201,7 +201,7 @@ public:
         // Test that the cell data are correct at the first timestep
         double x_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[0];
         double x_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[0];
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -219,7 +219,7 @@ public:
         // Test that the cell data are correct at the end time
         x_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[0];
         x_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[0];
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -244,7 +244,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             BiasedBernoulliTrialCellCycleModel* p_cycle_model = new BiasedBernoulliTrialCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -279,7 +279,7 @@ public:
         simulator.Solve();
 
         // Test that the cell data are in the correct interval in CellData at the first timestep
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -292,7 +292,7 @@ public:
         simulator.Solve();
 
         // Test that the cell data are in the correct interval in CellData at the end time
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -314,7 +314,7 @@ public:
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
 
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             BiasedBernoulliTrialCellCycleModel* p_cycle_model = new BiasedBernoulliTrialCellCycleModel();
             p_cycle_model->SetDimension(2);
@@ -355,7 +355,7 @@ public:
         // Test that the cell data are correct at the first timestep
         double y_min = 100;
         double y_max = -100;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -369,7 +369,7 @@ public:
                 y_min = y;
             }
         }
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -387,7 +387,7 @@ public:
         // Test that the cell data are correct at the end time
         y_min = 100;
         y_max = -100;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -401,7 +401,7 @@ public:
                 y_min = y;
             }
         }
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -425,7 +425,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             BiasedBernoulliTrialCellCycleModel* p_cycle_model = new BiasedBernoulliTrialCellCycleModel();
             p_cycle_model->SetDimension(2);

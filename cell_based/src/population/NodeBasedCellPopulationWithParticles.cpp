@@ -185,7 +185,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
 
     for (auto map_iter = validated_nodes.begin();
          map_iter != validated_nodes.end();
-         map_iter++)
+         ++map_iter)
     {
         if (!map_iter->second)
         {

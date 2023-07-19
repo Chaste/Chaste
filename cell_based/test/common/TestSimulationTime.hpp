@@ -129,7 +129,7 @@ public:
         double time_step = p_simulation_time->GetTimeStep();
         TS_ASSERT_DELTA(time_step, 1.0, 1e-6);
 
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             TS_ASSERT_LESS_THAN_EQUALS(p_simulation_time->GetTime(), 10);
@@ -151,7 +151,7 @@ public:
         double second_end = 20.0;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(first_end, num_steps);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             double time_should_be = i*first_end/(double)num_steps;
             TS_ASSERT_DELTA(p_simulation_time->GetTime(), time_should_be, 1e-9);
@@ -162,7 +162,7 @@ public:
         num_steps = 20;
         p_simulation_time->ResetEndTimeAndNumberOfTimeSteps(second_end, num_steps);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             double time_should_be = first_end + i*(second_end-first_end)/(double)num_steps;
             TS_ASSERT_DELTA(p_simulation_time->GetTime(), time_should_be, 1e-9);
@@ -181,7 +181,7 @@ public:
         double end = 0.5;
         double dt = 0.0083333333333333332177;
         //As in the abstract simulation classes...
-        unsigned num_time_steps = (unsigned) ((end-start)/dt+0.5);
+        unsigned num_time_steps = static_cast<unsigned>((end-start)/dt + 0.5);
         TS_ASSERT_EQUALS(num_time_steps, 29U);
         p_simulation_time->SetStartTime(start);
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end, num_time_steps);

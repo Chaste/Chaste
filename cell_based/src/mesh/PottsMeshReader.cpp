@@ -115,7 +115,7 @@ std::vector<double> PottsMeshReader<SPACE_DIM>::GetNextNode()
     }
 
     double node_value;
-    for (unsigned i=0; i<SPACE_DIM+1; i++)
+    for (unsigned i = 0; i < SPACE_DIM + 1; ++i)
     {
         buffer_stream >> node_value;
         node_data.push_back(node_value);
@@ -150,7 +150,7 @@ ElementData PottsMeshReader<SPACE_DIM>::GetNextElementData()
 
     // Store node indices owned by this element
     unsigned node_index;
-    for (unsigned i=0; i<num_nodes_in_element; i++)
+    for (unsigned i = 0; i < num_nodes_in_element; ++i)
     {
         buffer_stream >> node_index;
         element_data.NodeIndices.push_back(node_index - offset);

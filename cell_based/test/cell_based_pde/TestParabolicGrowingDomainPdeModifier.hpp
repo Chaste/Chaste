@@ -114,7 +114,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             p_model->SetDimension(2);
@@ -157,7 +157,7 @@ public:
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE
             std::vector<double> data(10);
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 data[i] = i + 0.45;
             }
@@ -192,7 +192,7 @@ public:
             ReplicatableVector solution_repl(solution);
 
             TS_ASSERT_EQUALS(solution_repl.GetSize(), 10u);
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 TS_ASSERT_DELTA(solution_repl[i], i + 0.45, 1e-6);
             }
@@ -213,7 +213,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
         // Set initial condition for PDE
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->GetCellData()->SetItem("variable",1.0);
         }
@@ -234,7 +234,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnDisk");
 
         // Run for 4 time steps
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -248,7 +248,7 @@ public:
          *
          * where J0 is the zeroth order Bessel function.
          */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -275,7 +275,7 @@ public:
         // Make cells with r<1/2 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = mesh.GetNode(i)->rGetLocation();
@@ -305,7 +305,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnHeterogeneousDisk");
 
         // Run for 5 time steps
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -321,7 +321,7 @@ public:
          *
          *  where J0 is the zeroth order Bessel function and C and A are constants.
          */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -356,7 +356,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
 
         // Set initial condition for PDE
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->GetCellData()->SetItem("variable", 1.0);
         }
@@ -377,7 +377,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshNeumanBcs");
 
         // Run for 5 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -385,7 +385,7 @@ public:
          }
 
         // Test the solution against the approximate spatially uniform solution
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -408,7 +408,7 @@ public:
         // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -437,7 +437,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -466,7 +466,7 @@ public:
         // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -495,7 +495,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithNodeOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -530,7 +530,7 @@ public:
         // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
@@ -560,7 +560,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithVertexOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -594,7 +594,7 @@ public:
         // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
@@ -623,7 +623,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithPottsOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -650,7 +650,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<36; i++)
+        for (unsigned i = 0; i < 36; ++i)
         {
             location_indices.push_back(i);
         }
@@ -663,7 +663,7 @@ public:
         // Make cells with x < 3.0 apoptotic (so no source term)
         boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             c_vector<double,2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
@@ -692,7 +692,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithCaOnSquare");
 
         // Run for 10 time steps
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);

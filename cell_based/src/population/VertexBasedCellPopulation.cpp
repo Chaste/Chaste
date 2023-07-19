@@ -1111,7 +1111,7 @@ bool VertexBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(uns
 
         for (auto iter = containing_element_indices.begin();
              iter != containing_element_indices.end();
-             iter++)
+             ++iter)
         {
             if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
             {

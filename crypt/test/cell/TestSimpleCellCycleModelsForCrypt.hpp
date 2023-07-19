@@ -88,7 +88,7 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
         double end_time = 60.0;
-        unsigned num_timesteps = 1000*(unsigned)end_time;
+        unsigned num_timesteps = 100 * static_cast<unsigned>(end_time);
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(2*end_time, 2*num_timesteps);
 
         // Set up the Wnt concentration

@@ -49,7 +49,7 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
 {
     // Allocate memory
     this->mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
-    for (unsigned elem_index=0; elem_index<this->mCellDensityOnCoarseElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index < this->mCellDensityOnCoarseElements.size(); ++elem_index)
     {
         this->mCellDensityOnCoarseElements[elem_index] = 0.0;
     }
@@ -89,7 +89,7 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
     // Then divide each entry of mSourceTermOnCoarseElements by the element's area
     c_matrix<double, DIM, DIM> jacobian;
     double det;
-    for (unsigned elem_index=0; elem_index<this->mCellDensityOnCoarseElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index < this->mCellDensityOnCoarseElements.size(); ++elem_index)
     {
         rCoarseMesh.GetElement(elem_index)->CalculateJacobian(jacobian, det);
         this->mCellDensityOnCoarseElements[elem_index] /= rCoarseMesh.GetElement(elem_index)->GetVolume(det);

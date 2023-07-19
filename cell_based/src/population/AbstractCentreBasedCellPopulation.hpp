@@ -83,7 +83,7 @@ protected:
      * Currently used to track cells in the process of dividing
      * (which are represented as two cells joined by a shorter spring).
      */
-    std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
+    std::set<std::pair<CellPtr, CellPtr> > mMarkedSprings;
 
     /**
      * A pointer to a division rule that is used to generate the locations of 
@@ -196,28 +196,28 @@ public:
      * @param pCell1 a Cell
      * @param pCell2 a Cell
      */
-    std::pair<CellPtr,CellPtr> CreateCellPair(CellPtr pCell1, CellPtr pCell2);
+    std::pair<CellPtr, CellPtr> CreateCellPair(CellPtr pCell1, CellPtr pCell2);
 
     /**
      * @param rCellPair a set of pointers to Cells
      *
      * @return whether the spring between two given cells is marked.
      */
-    bool IsMarkedSpring(const std::pair<CellPtr,CellPtr>& rCellPair);
+    bool IsMarkedSpring(const std::pair<CellPtr, CellPtr>& rCellPair);
 
     /**
      * Mark the spring between the given cells.
      *
      * @param rCellPair a set of pointers to Cells
      */
-    void MarkSpring(std::pair<CellPtr,CellPtr>& rCellPair);
+    void MarkSpring(std::pair<CellPtr, CellPtr>& rCellPair);
 
     /**
      * Stop marking the spring between the given cells.
      *
      * @param rCellPair a set of pointers to Cells
      */
-    void UnmarkSpring(std::pair<CellPtr,CellPtr>& rCellPair);
+    void UnmarkSpring(std::pair<CellPtr, CellPtr>& rCellPair);
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.

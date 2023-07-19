@@ -243,7 +243,7 @@ c_vector<double, DIM> WntConcentration<DIM>::GetWntGradient(c_vector<double, DIM
                 dwdr = -mWntConcentrationParameter*GetCryptLength()*pow(r, b-1.0)/a;
             }
 
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
                 wnt_gradient[i] = rLocation[i]*dwdr/r;
             }

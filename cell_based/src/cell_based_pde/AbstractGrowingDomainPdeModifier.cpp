@@ -139,11 +139,11 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                 LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
 
                 // Add the contribution from this element
-                for (unsigned node_index=0; node_index<DIM+1; node_index++)
+                for (unsigned node_index = 0; node_index < DIM + 1; ++node_index)
                 {
                     double nodal_value = solution_repl[this->mpFeMesh->GetElement(*element_iter)->GetNodeGlobalIndex(node_index)];
 
-                    for (unsigned j=0; j<DIM; j++)
+                    for (unsigned j = 0; j < DIM; ++j)
                     {
                         solution_gradient(j) += nodal_value* grad_phi(j, node_index);
                     }
@@ -156,17 +156,23 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             switch (DIM)
             {
                 case 1:
+                {
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     break;
+                }
                 case 2:
+                {
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
                     break;
+                }
                 case 3:
+                {
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
                     break;
+                }
                 default:
                     NEVER_REACHED;
             }

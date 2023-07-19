@@ -102,7 +102,10 @@ private:
     /** The oxygen concentration (this affects the ODE system). */
     double mOxygenConcentration;
 
-    /** Whether the cell associated with this cell cycle ODE system is labelled (this affects the ODE system). */
+    /**
+     * Whether the cell associated with this cell cycle ODE system is labelled 
+     * (this affects the ODE system).
+     */
     bool mIsLabelled;
 
     friend class boost::serialization::access;
@@ -123,13 +126,17 @@ public:
     /**
      * Constructor.
      *
-     * @param oxygenConcentration is a non-dimensional oxygen concentration value between 0 and 1
-     * @param isLabelled whether the cell associated with this cell cycle ODE system is labelled (this affects the ODE system)
-     * @param stateVariables optional initial conditions for state variables (only used in archiving)
+     * @param oxygenConcentration is a non-dimensional oxygen concentration 
+     *     value between 0 and 1
+     * @param isLabelled whether the cell associated with this cell cycle ODE 
+     *     system is labelled (this affects the ODE system)
+     * @param stateVariables optional initial conditions for state variables 
+     *     (only used in archiving)
      */
-    Alarcon2004OxygenBasedCellCycleOdeSystem(double oxygenConcentration,
-                                             bool isLabelled,
-                                             std::vector<double> stateVariables=std::vector<double>());
+    Alarcon2004OxygenBasedCellCycleOdeSystem(
+        double oxygenConcentration,
+        bool isLabelled,
+        std::vector<double> stateVariables=std::vector<double>());
 
     /**
      * Destructor.
@@ -142,31 +149,44 @@ public:
     void Init();
 
     /**
+     * Overridden EvaluateYDerivatives() method.
+     * 
      * Compute the RHS of the Alarcon et al. (2004) system of ODEs.
      *
-     * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
-     * An ODE solver will call this function repeatedly to solve for y = [y1 ... yn].
+     * Returns a vector representing the RHS of the ODEs at each time step, 
+     * y' = [y1' ... yn']. An ODE solver will call this function repeatedly to 
+     * solve for y = [y1 ... yn].
      *
      * @param time used to evaluate the RHS.
      * @param rY value of the solution vector used to evaluate the RHS.
-     * @param rDY filled in with the resulting derivatives (using Alarcons et al. (2004) system of equations).
+     * @param rDY filled in with the resulting derivatives (using Alarcon et al. 
+     *     (2004) system of equations).
      */
-    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
+    void EvaluateYDerivatives(
+        double time,
+        const std::vector<double>& rY,
+        std::vector<double>& rDY) override;
 
     /**
-     * Calculate whether the conditions for the cell cycle to finish have been met.
+     * Overridden CalculateStoppingEvent() method.
+     * 
+     * Calculate whether the conditions for the cell cycle to finish have been 
+     * met.
      *
      * @param time at which to calculate whether the stopping event has occurred
      * @param rY value of the solution vector used to evaluate the RHS.
      *
      * @return whether or not stopping conditions have been met
      */
-    bool CalculateStoppingEvent(double time, const std::vector<double>& rY);
+    bool CalculateStoppingEvent(
+        double time,
+        const std::vector<double>& rY) override;
 
     /**
      * Set #mIsLabelled.
      *
-     * @param isLabelled whether the cell associated with this cell cycle ODE system is labelled (this affects the ODE system)
+     * @param isLabelled whether the cell associated with this cell cycle ODE 
+     *     system is labelled (this affects the ODE system)
      */
     void SetIsLabelled(bool isLabelled);
 

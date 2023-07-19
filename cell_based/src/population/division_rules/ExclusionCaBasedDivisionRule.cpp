@@ -108,7 +108,7 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(Cel
     }
     assert(total_propensity > 0); // If this trips the cell can't divide, so we need to include this in the IsSiteAvailable() method
 
-    for (unsigned i=0; i<num_neighbours; i++)
+    for (unsigned i = 0; i < num_neighbours; ++i)
     {
         neighbouring_node_propensities[i] /= total_propensity;
     }

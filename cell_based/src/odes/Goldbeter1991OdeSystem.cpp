@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Goldbeter1991OdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
 
-Goldbeter1991OdeSystem::Goldbeter1991OdeSystem(std::vector<double> stateVariables)
+Goldbeter1991OdeSystem::Goldbeter1991OdeSystem(
+    std::vector<double> stateVariables)
     : AbstractOdeSystem(3)
 {
     mpSystemInfo.reset(new CellwiseOdeSystemInformation<Goldbeter1991OdeSystem>);
@@ -48,11 +49,6 @@ Goldbeter1991OdeSystem::Goldbeter1991OdeSystem(std::vector<double> stateVariable
      * 1 - M (CDC-2 Kinase)
      * 2 - X (Cyclin Protease)
      */
-
-//    SetDefaultInitialCondition(0, 0.01); // soon overwritten
-//    SetDefaultInitialCondition(1, 0.01); // soon overwritten
-//    SetDefaultInitialCondition(2, 0.01); // soon overwritten
-
     if (stateVariables != std::vector<double>())
     {
         SetStateVariables(stateVariables);
@@ -63,7 +59,10 @@ Goldbeter1991OdeSystem::~Goldbeter1991OdeSystem()
 {
 }
 
-void Goldbeter1991OdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+void Goldbeter1991OdeSystem::EvaluateYDerivatives(
+    double time,
+    const std::vector<double>& rY,
+    std::vector<double>& rDY)
 {
     // state values
     double C = rY[0]; // cyclin
@@ -84,8 +83,8 @@ void Goldbeter1991OdeSystem::EvaluateYDerivatives(double time, const std::vector
     double reaction7 = cell * 0.5 * X * pow(0.005 + X, -1);
     double V3 = M * VM3;
     double V1 = C * VM1 * pow(C + Kc, -1);
-    double reaction6 = cell * V3 * (1 + -1 * X) * pow(0.005 + -1 * X + 1, -1);
-    double reaction4 = cell * (1 + -1 * M) * V1 * pow(0.005 + -1 * M + 1, -1);
+    double reaction6 = cell * V3 * (1 - X) * pow(0.005 - X + 1, -1);
+    double reaction4 = cell * (1 - M) * V1 * pow(0.005 - M + 1, -1);
 
     // ODEs
     rDY[0] = (reaction1 - reaction2 - reaction3) / cell; // dC/dt

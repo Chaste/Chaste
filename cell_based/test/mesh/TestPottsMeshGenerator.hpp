@@ -71,7 +71,7 @@ public:
 
         // Check that each node under 36 is contained in only one element and the rest aren't
         // in any elements
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
@@ -132,7 +132,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNode(38)->rGetContainingElementIndices(), temp_list_3);
 
         // The edges of the mesh should be boundary nodes
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             bool is_boundary_node = (node_index <= 9 || node_index==17 || node_index==18 || node_index==26 || node_index==27 || node_index>=35) ? true : false;
             TS_ASSERT_EQUALS(p_mesh->GetNode(node_index)->IsBoundaryNode(), is_boundary_node);
@@ -158,7 +158,7 @@ public:
 
         // Check that each node on the left right and top aren't in any elements and the rest
         // are in only one element
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
@@ -220,7 +220,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNode(30)->rGetContainingElementIndices(), temp_list_3);
 
         // The edges of the mesh should be boundary nodes
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             bool is_boundary_node = (node_index <= 5 || node_index>=36 || node_index % 6 == 0 || (node_index % 6 == 5)) ? true : false;
             TS_ASSERT_EQUALS(p_mesh->GetNode(node_index)->IsBoundaryNode(), is_boundary_node);
@@ -248,7 +248,7 @@ public:
 
         // Check that each node under 36 is contained in only one element and the rest aren't
         // in any elements
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
@@ -315,7 +315,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNode(65)->rGetContainingElementIndices(), temp_list_3);
 
         // The edges of the mesh should be boundary nodes
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             bool is_boundary_node = (node_index%16==0 || node_index%16==1 || node_index%16==2 || node_index%16==3 ||
                                      node_index%16==4 || node_index%16==7 || node_index==9 || node_index==10 || node_index==5 || node_index==6 ||
@@ -346,7 +346,7 @@ public:
 
         // Check that each node under 36 is contained in only one element and the rest aren't
         // in any elements
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
@@ -407,7 +407,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNode(72)->rGetContainingElementIndices(), temp_list_3);
 
         // The edges of the mesh should be boundary nodes
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             bool is_boundary_node = ( (p_mesh->GetNode(node_index)->rGetLocation()[0] <= 0.0) ||
                                       (p_mesh->GetNode(node_index)->rGetLocation()[0] >= 5.0) ||
@@ -435,7 +435,7 @@ public:
 
         // Check that each node on the boundary is in no element and the rest
         // are in one elements.
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();

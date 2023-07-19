@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseOdeSystemInformation.hpp"
 #include "DeltaNotchInteriorOdeSystem.hpp"
 
-DeltaNotchInteriorOdeSystem::DeltaNotchInteriorOdeSystem(std::vector<double> stateVariables)
+DeltaNotchInteriorOdeSystem::DeltaNotchInteriorOdeSystem(
+    std::vector<double> stateVariables)
     : AbstractOdeSystem(2)
 {
     mpSystemInfo.reset(new CellwiseOdeSystemInformation<DeltaNotchInteriorOdeSystem>);
@@ -67,7 +68,10 @@ DeltaNotchInteriorOdeSystem::~DeltaNotchInteriorOdeSystem()
 {
 }
 
-void DeltaNotchInteriorOdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+void DeltaNotchInteriorOdeSystem::EvaluateYDerivatives(
+    double time,
+    const std::vector<double>& rY,
+    std::vector<double>& rDY)
 {
     const double notch = rY[0];
     const double delta = rY[1];
@@ -75,11 +79,17 @@ void DeltaNotchInteriorOdeSystem::EvaluateYDerivatives(double time, const std::v
     // Total edge delta/notch used to regulate expression/decay of cytoplasmic delta/notch
     const double edge_delta = this->mParameters[0];
     const double edge_notch = this->mParameters[1];
-    // The next two lines define the DeltaNotch ODE system
-    // The decay rate is modified to reflect recruitment into membrane
-    // Here, Notch production is activated by total edge delta and Delta production inhibitied by total edge Notch
-    rDY[0] = edge_delta*edge_delta/(0.01 + edge_delta*edge_delta) - notch*(1.0+0.1);  // d[Notch]/dt
-    rDY[1] = 1.0/(1.0 + 100.0*edge_notch*edge_notch) - delta*(1.0+0.1);                   // d[Delta]/dt
+
+    /*
+     * The next two lines define the DeltaNotch ODE system. The decay rate is 
+     * modified to reflect recruitment into membrane. Here, Notch production is 
+     * activated by total edge Delta and Delta production inhibitied by total 
+     * edge Notch.
+     * 
+     * \todo make ODE system parameters settable
+     */
+    rDY[0] = edge_delta*edge_delta/(0.01 + edge_delta*edge_delta) - notch*(1.0 + 0.1);
+    rDY[1] = 1.0/(1.0 + 100.0*edge_notch*edge_notch) - delta*(1.0 + 0.1);
 }
 
 template<>

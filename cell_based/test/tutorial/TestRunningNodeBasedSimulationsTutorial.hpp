@@ -246,7 +246,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
 
         /* To avoid memory leaks, we conclude by deleting any pointers that we created in the test.*/
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -336,7 +336,7 @@ public:
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
 
         /* To avoid memory leaks, we conclude by deleting any pointers that we created in the test.*/
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

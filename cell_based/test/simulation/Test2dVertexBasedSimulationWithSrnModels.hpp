@@ -85,7 +85,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
         {
             /* Initalise cell cycle */
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -99,13 +99,13 @@ public:
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
             double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 total_edge_length += p_element->GetEdge(i)->rGetLength();
             }
 
             /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 auto p_elem_edge = p_element->GetEdge(i);
                 auto p_edge_length = p_elem_edge->rGetLength();
@@ -178,7 +178,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_diff_type);
 
-        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
         {
             /* Initalise cell cycle */
             UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
@@ -194,13 +194,13 @@ public:
             auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
 
             double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 total_edge_length += p_element->GetEdge(i)->rGetLength();
             }
 
             /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i++)
+            for (unsigned i = 0; i < p_element->GetNumEdges(); ++i)
             {
                 auto p_elem_edge = p_element->GetEdge(i);
                 auto p_edge_length = p_elem_edge->rGetLength();

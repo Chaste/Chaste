@@ -85,7 +85,7 @@ public:
         unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -180,7 +180,7 @@ public:
         unsigned node_indices_element_0[3] = {1, 2, 6};
         unsigned node_indices_element_1[3] = {2, 0, 6};
         unsigned node_indices_element_2[3] = {0, 1, 6};
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -219,7 +219,7 @@ public:
         unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -304,7 +304,7 @@ public:
         unsigned node_indices_element_0[3] = {1, 2, 3};
         unsigned node_indices_element_1[3] = {2, 0, 3};
         unsigned node_indices_element_2[3] = {0, 1, 3};
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -364,7 +364,7 @@ public:
         unsigned node_indices_elem_4[3] = {4, 5, 6};
         unsigned node_indices_elem_5[3] = {7, 8, 9};
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -458,7 +458,7 @@ public:
         unsigned node_indices_element_1[4] = {2, 3, 10, 6};
         unsigned node_indices_element_2[3] = {1, 2, 6};
         unsigned node_indices_element_3[3] = {0, 10, 3};
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -514,7 +514,7 @@ public:
         unsigned node_indices_elem_4[3] = {4, 5, 6};
         unsigned node_indices_elem_5[3] = {7, 8, 9};
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -587,7 +587,7 @@ public:
         unsigned node_indices_element_1[4] = {2, 3, 5, 4};
         unsigned node_indices_element_2[3] = {1, 2, 4};
         unsigned node_indices_element_3[3] = {0, 5, 3};
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -815,7 +815,7 @@ public:
         unsigned node_indices_elem_2[4] = {2, 3, 7, 6};
         unsigned node_indices_elem_3[4] = {0, 4, 7, 3};
         unsigned node_indices_elem_4[4] = {4, 5, 6, 7};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -874,7 +874,7 @@ public:
         unsigned node_indices_element_2[4] = {2, 3, 7, 6};
         unsigned node_indices_element_3[5] = {0, 4, 5, 7, 3};
         unsigned node_indices_element_4[3] = {5, 6, 7};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             if (i < 3)
             {
@@ -935,7 +935,7 @@ public:
         unsigned new_node_indices_element_1[4] = {1, 2, 8, 4};
         unsigned new_node_indices_element_2[3] = {2, 3, 8};
         unsigned new_node_indices_element_3[4] = {0, 4, 8, 3};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {

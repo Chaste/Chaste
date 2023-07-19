@@ -73,7 +73,7 @@ class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBase
 {
     void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
-        for (unsigned i=0; i<rCells.size(); i++)
+        for (unsigned i = 0; i < rCells.size(); ++i)
         {
             if (RandomNumberGenerator::Instance()->ranf() < labelledRatio)
             {
@@ -147,7 +147,7 @@ public:
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
         simulator.AddUpdateRule(p_diffusion_update_rule);
 
-        for (unsigned i=1; i<=num_runs; i++)
+        for (unsigned i=1; i<=num_runs; ++i)
         {
             simulator.SetEndTime(delta_t*i);
 
@@ -175,7 +175,7 @@ public:
 
         ///\todo Check that the cell is moving correctly
         double probability_of_occupation[9];
-        for (unsigned i=0; i<9; i++)
+        for (unsigned i = 0; i < 9; ++i)
         {
             probability_of_occupation[i] = (double) location_of_cell[i]/(double) num_runs;
         }
@@ -283,7 +283,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        for (unsigned index = 0; index < p_mesh->GetNumNodes(); ++index)
         {
             location_indices.push_back(index);
         }
@@ -318,7 +318,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 50u);
 
         // Check that cells above y=5.5 (i.e. above index 50) have been killed and removed
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             if (i < 50)
             {
@@ -351,7 +351,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        for (unsigned index = 0; index < p_mesh->GetNumNodes(); ++index)
         {
             location_indices.push_back(index);
         }
@@ -415,7 +415,7 @@ public:
             // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
             vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
             unsigned counter = 0;
-            for (CaBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+            for (auto cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
             {
                 unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
                 TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));
@@ -445,7 +445,7 @@ public:
 
         // Specify some cells on the bottom row
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<8u; index++)
+        for (unsigned index = 0; index < 8u; ++index)
         {
             location_indices.push_back(index);
         }
@@ -485,7 +485,7 @@ public:
         // Loop over the cells and check their new positions
         unsigned cell_locations[8]= {0u, 10u, 11u, 3u, 4u, 2u, 1u, 6u};
         unsigned index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
@@ -512,7 +512,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
 
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        for (unsigned index = 0; index < p_mesh->GetNumNodes(); ++index)
         {
             location_indices.push_back(index);
         }
@@ -547,7 +547,7 @@ public:
 
         // Loop over the cells and check their new positions
         unsigned node_index = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
@@ -595,7 +595,7 @@ public:
 
         // Specify where cells lie: four cells in each of the first ten sites
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<10; index++)
+        for (unsigned index = 0; index < 10; ++index)
         {
             location_indices.push_back(index);
             location_indices.push_back(index);
@@ -640,7 +640,7 @@ public:
 
         // Specify where cells lie: four cells in each of the first ten sites
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<10u; index++)
+        for (unsigned index = 0; index < 10u; ++index)
         {
             location_indices.push_back(index);
             location_indices.push_back(index);
@@ -757,7 +757,7 @@ public:
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        for (unsigned index = 0; index < p_mesh->GetNumNodes(); ++index)
         {
           //adding two cells per lattice site
           location_indices.push_back(index);
@@ -794,7 +794,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 100u);
 
         // Check cells above y=5.5 (i.e. above index 50) have been killed and removed.
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             if (i < 50)
             {
@@ -820,7 +820,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
 
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<10; index++)
+        for (unsigned index = 0; index < 10; ++index)
         {
             location_indices.push_back(index);
         }
@@ -868,7 +868,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, 10, p_diff_type);
 
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<10; index++)
+        for (unsigned index = 0; index < 10; ++index)
         {
             location_indices.push_back(index);
         }

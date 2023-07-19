@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSystemInformation.hpp"
 #include "MathsCustomFunctions.hpp"
 
-TysonNovak2001OdeSystem::TysonNovak2001OdeSystem(std::vector<double> stateVariables)
+TysonNovak2001OdeSystem::TysonNovak2001OdeSystem(
+    std::vector<double> stateVariables)
     : AbstractOdeSystemWithAnalyticJacobian(6)
 {
     mpSystemInfo = OdeSystemInformation<TysonNovak2001OdeSystem>::Instance();
@@ -52,7 +53,6 @@ TysonNovak2001OdeSystem::TysonNovak2001OdeSystem(std::vector<double> stateVariab
 
 TysonNovak2001OdeSystem::~TysonNovak2001OdeSystem()
 {
-    // Do nothing
 }
 
 void TysonNovak2001OdeSystem::Init()
@@ -98,7 +98,10 @@ void TysonNovak2001OdeSystem::Init()
     mMstar = 10.0;
 }
 
-void TysonNovak2001OdeSystem::EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
+void TysonNovak2001OdeSystem::EvaluateYDerivatives(
+    double time,
+    const std::vector<double>& rY,
+    std::vector<double>& rDY)
 {
     double x1 = rY[0];
     double x2 = rY[1];
@@ -158,7 +161,11 @@ void TysonNovak2001OdeSystem::EvaluateYDerivatives(double time, const std::vecto
     rDY[5] = dx6*60.0;
 }
 
-void TysonNovak2001OdeSystem::AnalyticJacobian(const std::vector<double>& rSolutionGuess, double** jacobian, double time, double timeStep)
+void TysonNovak2001OdeSystem::AnalyticJacobian(
+    const std::vector<double>& rSolutionGuess,
+    double** jacobian,
+    double time,
+    double timeStep)
 {
     timeStep *= 60.0; // to scale Jacobian so in hours not minutes
     double x1 = rSolutionGuess[0];
@@ -221,17 +228,21 @@ void TysonNovak2001OdeSystem::AnalyticJacobian(const std::vector<double>& rSolut
     jacobian[5][5] = 1-timeStep*df6_dx6;
 }
 
-bool TysonNovak2001OdeSystem::CalculateStoppingEvent(double time, const std::vector<double>& rY)
+bool TysonNovak2001OdeSystem::CalculateStoppingEvent(
+    double time,
+    const std::vector<double>& rY)
 {
     std::vector<double> dy(rY.size());
     EvaluateYDerivatives(time, rY, dy);
 
     // Only call this a stopping condition if the mass of the cell is over 0.6
     // (normally cycles from 0.5-1.0 ish!)
-    return ( (rY[5] > 0.6 ) && (rY[0] < mCycB_threshold) && dy[0] < 0.0 );
+    return ((rY[5] > 0.6) && (rY[0] < mCycB_threshold) && (dy[0] < 0.0));
 }
 
-double TysonNovak2001OdeSystem::CalculateRootFunction(double time, const std::vector<double>& rY)
+double TysonNovak2001OdeSystem::CalculateRootFunction(
+    double time,
+    const std::vector<double>& rY)
 {
     std::vector<double> dy(rY.size());
     EvaluateYDerivatives(time, rY, dy);

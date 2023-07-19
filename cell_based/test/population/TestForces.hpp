@@ -125,7 +125,7 @@ public:
         linear_force.SetCutOffLength(DBL_MAX);
 
         // Initialise a vector of node forces
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
              cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -134,7 +134,7 @@ public:
         linear_force.AddForceContribution(cell_population);
 
         // Test forces on non-ghost nodes
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -153,7 +153,7 @@ public:
 
         p_mesh->SetNode(59, new_point, false);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -221,7 +221,7 @@ public:
         // Create force law object
         GeneralisedLinearSpringForce<1> linear_force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -230,14 +230,14 @@ public:
         linear_force.AddForceContribution(cell_population);
 
         // Test that all springs are in equilibrium
-        for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-6);
         }
 
         // Scale entire mesh and check that forces are correctly calculated
         double scale_factor = 1.5;
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
             c_vector<double,1> old_point;
@@ -248,13 +248,13 @@ public:
             mesh.SetNode(node_index, new_point, false);
         }
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
         linear_force.AddForceContribution(cell_population);
 
-        for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
         {
             if (node_index == 0)
             {
@@ -291,7 +291,7 @@ public:
         c_vector<double,1> force_between_2_and_3 = linear_force2.CalculateForceBetweenNodes(2, 3, cell_population2);
         TS_ASSERT_DELTA(force_between_2_and_3[0], -linear_force.GetMeinekeSpringStiffness()*0.5, 1e-6);
 
-        for (unsigned i=0; i<cell_population2.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population2.GetNumNodes(); ++i)
         {
              cell_population2.GetNode(i)->ClearAppliedForce();
         }
@@ -313,7 +313,7 @@ public:
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-50.0);
         }
@@ -328,21 +328,21 @@ public:
         c_vector<double, 3> force = linear_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(nodeA),
                                                                             p_element->GetNodeGlobalIndex(nodeB),
                                                                             cell_population);
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_DELTA(force[i], 0.0, 1e-6);
         }
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         linear_force.AddForceContribution(cell_population);
 
-        for (unsigned j=0; j<4; j++)
+        for (unsigned j = 0; j < 4; ++j)
         {
-            for (unsigned k=0; k<3; k++)
+            for (unsigned k = 0; k < 3; ++k)
             {
                 TS_ASSERT_DELTA(cell_population.GetNode(j)->rGetAppliedForce()[k], 0.0, 1e-6);
             }
@@ -351,7 +351,7 @@ public:
         // Scale entire mesh and check that forces are correctly calculated
         double scale_factor = 1.5;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             c_vector<double,3> old_point;
             old_point = mesh.GetNode(i)->rGetLocation();
@@ -362,15 +362,15 @@ public:
             mesh.SetNode(i, new_point, false);
         }
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
         linear_force.AddForceContribution(cell_population);
 
-        for (unsigned j=0; j<4; j++)
+        for (unsigned j = 0; j < 4; ++j)
         {
-            for (unsigned k=0; k<3; k++)
+            for (unsigned k = 0; k < 3; ++k)
             {
                 TS_ASSERT_DELTA(fabs(cell_population.GetNode(j)->rGetAppliedForce()[k]), linear_force.GetMeinekeSpringStiffness()*(scale_factor-1)*sqrt(2.0),1e-6);
             }
@@ -396,19 +396,19 @@ public:
                                                                              p_element2->GetNodeGlobalIndex(nodeB2),
                                                                              cell_population2);
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_DELTA(fabs(force2[i]),linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3.0)/(2*sqrt(2.0)))/sqrt(3.0),1e-6);
         }
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population2.GetNode(i)->ClearAppliedForce();
         }
 
         linear_force2.AddForceContribution(cell_population2);
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_DELTA(cell_population2.GetNode(0)->rGetAppliedForce()[i],linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3.0)/(2*sqrt(2.0)))/sqrt(3.0),1e-6);
         }
@@ -450,7 +450,7 @@ public:
         TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 4.0, 1e-6);
 
         // Initialise a vector of node forces
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
              cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -466,7 +466,7 @@ public:
         double spring_stiffness = force.GetMeinekeSpringStiffness();
 
         // Test the case where node 59 and its neighbours are unlabelled
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -480,7 +480,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Next, test the case where node 59 is labelled but its neighbours are not...
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -499,12 +499,12 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Finally, test the case where node 59 and its neighbours are labelled...
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -799,7 +799,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MAKE_PTR(CellLabel, p_label);
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-10);
             cells[i]->AddCellProperty(p_label);
@@ -808,7 +808,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up cell data on the cell population
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             double x = p_mesh->GetNode(i)->rGetLocation()[0];
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
@@ -818,13 +818,13 @@ public:
 
         ChemotacticForce<2> chemotactic_force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
         chemotactic_force.AddForceContribution(cell_population);
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -972,7 +972,7 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1027,7 +1027,7 @@ public:
         unsigned num_nodes = 20;
         std::vector<double> angles = std::vector<double>(num_nodes);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
@@ -1084,7 +1084,7 @@ public:
         force.SetNagaiHondaTargetAreaParameter(1.0);
 
         // Calculate force on each node
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1092,7 +1092,7 @@ public:
 
         // The force on each node should be radially inward, with the same magnitude for all nodes
         double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
@@ -1107,14 +1107,14 @@ public:
         cell_population.GetCellUsingLocationIndex(0)->StartApoptosis();
 
         // Reset force vector
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
         force.AddForceContribution(cell_population);
 
         // The force on each node should not yet be affected by setting the cell to be apoptotic
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
@@ -1130,7 +1130,7 @@ public:
 
         TS_ASSERT_DELTA(cell_population.GetCellUsingLocationIndex(0)->GetTimeUntilDeath(), 0.125, 1e-6);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1142,7 +1142,7 @@ public:
         // Now the forces should be affected
         double apoptotic_force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
         TS_ASSERT_LESS_THAN(force_magnitude, apoptotic_force_magnitude);
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), apoptotic_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -apoptotic_force_magnitude*cos(angles[i]), 1e-4);
@@ -1222,7 +1222,7 @@ public:
         force.SetNagaiHondaCellCellAdhesionEnergyParameter(6.4);
         force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1257,7 +1257,7 @@ public:
         TS_ASSERT_DELTA(adhesion_parameter_nodes_10_14, 9.1, 1e-6);
 
         // Test the case where the nodes are shared by 2 labelled cells
-        for (unsigned i=0; i<cell_population.GetNumElements(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumElements(); ++i)
         {
             cell_population.GetCellUsingLocationIndex(i)->AddCellProperty(p_label);
         }
@@ -1314,7 +1314,7 @@ public:
         unsigned num_nodes = 20;
         std::vector<double> angles = std::vector<double>(num_nodes);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
@@ -1358,7 +1358,7 @@ public:
         force.SetWelikyOsterAreaParameter(1.0);
         force.SetWelikyOsterPerimeterParameter(1.0);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1368,7 +1368,7 @@ public:
         // The force on each node should be radially inward, with the same magnitude for all nodes
         double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
@@ -1424,7 +1424,7 @@ public:
         unsigned num_nodes = 20;
         std::vector<double> angles = std::vector<double>(num_nodes);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
@@ -1481,7 +1481,7 @@ public:
         force.SetTargetAreaParameter(1.0);
 
         // Calculate force on each node
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1490,7 +1490,7 @@ public:
         // The force on each node should be radially inward, with the same magnitude for all nodes
         double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
@@ -1505,7 +1505,7 @@ public:
         cell_population.GetCellUsingLocationIndex(0)->StartApoptosis();
 
         // Reset force vector
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1513,7 +1513,7 @@ public:
         force.AddForceContribution(cell_population);
 
         // The force on each node should not yet be affected by setting the cell to be apoptotic
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
@@ -1529,7 +1529,7 @@ public:
 
         TS_ASSERT_DELTA(cell_population.GetCellUsingLocationIndex(0)->GetTimeUntilDeath(), 0.125, 1e-6);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1541,7 +1541,7 @@ public:
         // Now the forces should be affected
         double apoptotic_force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
         TS_ASSERT_LESS_THAN(force_magnitude, apoptotic_force_magnitude);
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), apoptotic_force_magnitude, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -apoptotic_force_magnitude*cos(angles[i]), 1e-4);
@@ -1555,7 +1555,7 @@ public:
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 9;
         std::vector<double> angles = std::vector<double>(num_nodes);
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
@@ -1595,7 +1595,7 @@ public:
         force.SetPlanarPolarisedLineTensionMultiplier(4.0);
         TS_ASSERT_DELTA(force.GetPlanarPolarisedLineTensionMultiplier(), 4.0, 1e-12);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -1606,7 +1606,7 @@ public:
         c_vector<double, 2> applied_force_1;
         applied_force_1 = cell_population.rGetMesh().GetNode(1)->rGetAppliedForce();
 
-        for (unsigned node_idx = 0; node_idx < cell_population.GetNumNodes(); node_idx++)
+        for (unsigned node_idx = 0; node_idx < cell_population.GetNumNodes(); ++node_idx)
         {
             Node<2>* p_node_A = cell_population.GetNode(node_idx);
             Node<2>* p_node_B = cell_population.GetNode((node_idx + 1) % cell_population.GetNumNodes());
@@ -1647,7 +1647,7 @@ public:
         unsigned node_indices_elem_0[4] = {0, 1, 4, 5};
         unsigned node_indices_elem_1[4] = {1, 2, 3, 4};
 
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1670,7 +1670,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // Set the birth time to -5 such that the target area modifier assigns mature cell target areas
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
                 cell_iter != cell_population.End();
                 ++cell_iter)
         {
@@ -1723,7 +1723,7 @@ public:
         unsigned node_indices_elem_0[4] = {0, 1, 4, 5};
         unsigned node_indices_elem_1[4] = {1, 2, 3, 4};
 
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1746,7 +1746,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // Set the birth time to -5 such that the target area modifier assigns mature cell target areas
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
                 cell_iter != cell_population.End();
                 ++cell_iter)
         {
@@ -1890,7 +1890,7 @@ public:
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 20;
         std::vector<double> angles = std::vector<double>(num_nodes);
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
@@ -1930,7 +1930,7 @@ public:
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 10;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             double x = (double)(i);
             double y = (double)(i);
@@ -1963,7 +1963,7 @@ public:
                 "FarhadifarForce is to be used with a VertexBasedCellPopulation only");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -2054,7 +2054,7 @@ public:
             // Loop over time iterations
             double variance = 0.0;
             unsigned num_iterations = 1000;
-            for (unsigned i=0; i<num_iterations; i++)
+            for (unsigned i = 0; i < num_iterations; ++i)
             {
                 // Re-initialize the force on node zero
                 mesh.GetNodeIteratorBegin()->ClearAppliedForce();
@@ -2074,7 +2074,7 @@ public:
         }
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -2232,7 +2232,7 @@ public:
         if (mesh.GetNumNodes() > 0)
         {
             unsigned num_iterations = 1000;
-            for (unsigned i=0; i<num_iterations; i++)
+            for (unsigned i = 0; i < num_iterations; ++i)
             {
                 // Re-initialize the force on node zero
                 mesh.GetNodeIteratorBegin()->ClearAppliedForce();
@@ -2251,7 +2251,7 @@ public:
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
         }
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

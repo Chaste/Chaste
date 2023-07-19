@@ -73,7 +73,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
 
     // Create vector of radius intervals
     std::vector<double> radius_intervals;
-    for (unsigned i=0; i<mNumRadialBins; i++)
+    for (unsigned i = 0; i < mNumRadialBins; ++i)
     {
         double upper_radius = max_distance_from_centre*((double) i+1)/((double) mNumRadialBins);
         radius_intervals.push_back(upper_radius);
@@ -81,12 +81,12 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
 
     // Calculate PDE solution in each radial interval
     double lower_radius = 0.0;
-    for (unsigned i=0; i<mNumRadialBins; i++)
+    for (unsigned i = 0; i < mNumRadialBins; ++i)
     {
         unsigned counter = 0;
         double average_solution = 0.0;
 
-        for (std::map<double, CellPtr>::iterator iter = radius_cell_map.begin(); iter != radius_cell_map.end(); ++iter)
+        for (auto iter = radius_cell_map.begin(); iter != radius_cell_map.end(); ++iter)
         {
             if (iter->first > lower_radius && iter->first <= radius_intervals[i])
             {
@@ -143,7 +143,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         unsigned counter = 0;
         double average_solution = 0.0;
 
-        for (std::map<double, CellPtr>::iterator iter = radius_cell_map.begin(); iter != radius_cell_map.end(); ++iter)
+        for (auto iter = radius_cell_map.begin(); iter != radius_cell_map.end(); ++iter)
         {
             if (iter->first > lower_radius && iter->first <= radius_intervals[i])
             {

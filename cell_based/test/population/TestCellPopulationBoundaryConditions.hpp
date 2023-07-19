@@ -102,7 +102,7 @@ public:
 
         // Impose boundary condition
         std::map<Node<2>*, c_vector<double,2> > old_locations;
-        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+        for (auto cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
         {
@@ -113,7 +113,7 @@ public:
         boundary_condition.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the boundary condition
-        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+        for (auto cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
         {
@@ -170,7 +170,7 @@ public:
 
         // Impose boundary condition
         std::map<Node<2>*, c_vector<double,2> > old_locations;
-        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+        for (auto cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
         {
@@ -331,7 +331,7 @@ public:
         TS_ASSERT_THROWS_THIS(plane_bc_1d.VerifyBoundaryCondition(),
             "PlaneBoundaryCondition is not implemented in 1D");
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -407,7 +407,7 @@ public:
         // Store the location of each node prior to imposing the boundary condition
         std::map<Node<3>*, c_vector<double,3> > old_locations;
 
-        for (std::list<CellPtr>::iterator cell_iter = population_3d.rGetCells().begin();
+        for (auto cell_iter = population_3d.rGetCells().begin();
              cell_iter != population_3d.rGetCells().end();
              ++cell_iter)
         {
@@ -419,7 +419,7 @@ public:
 
         bc_3d.ImposeBoundaryCondition(old_locations);
 
-        for (std::list<CellPtr>::iterator cell_iter = population_3d.rGetCells().begin();
+        for (auto cell_iter = population_3d.rGetCells().begin();
              cell_iter != population_3d.rGetCells().end();
              ++cell_iter)
         {

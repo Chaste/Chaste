@@ -62,9 +62,9 @@ public:
         SimulationTime* p_simulation_time = SimulationTime::Instance();
 
         // run until 100, with dt=0.01
-        double t1=100;
-        double dt=0.01;
-        unsigned num_steps=(unsigned) t1/dt;
+        double t1 = 100;
+        double dt = 0.01;
+        unsigned num_steps = static_cast<unsigned>(t1 / dt);
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(t1, num_steps+1);
 
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());

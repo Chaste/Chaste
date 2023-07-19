@@ -74,7 +74,7 @@ class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellB
 private:
     void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
-        for (unsigned i = 0; i<rCells.size(); i++)
+        for (unsigned i = 0; i<rCells.size(); ++i)
         {
             if (RandomNumberGenerator::Instance()->ranf() < labelledRatio)
             {

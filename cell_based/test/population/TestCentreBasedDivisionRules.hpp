@@ -96,7 +96,7 @@ public:
         c_vector<double, 2> axis_variance = zero_vector<double>(2);
         double average_angle = 0.0;
         double angle_variance = 0.0;
-        for (unsigned iteration = 0; iteration < 10000; iteration++)
+        for (unsigned iteration = 0; iteration < 10000; ++iteration)
         {
             std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             c_vector<double, 2> random_axis = positions.second - positions.first;

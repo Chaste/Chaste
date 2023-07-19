@@ -154,7 +154,7 @@ inline void save_construct_data(
 
     // Archive c_vectors one component at a time
     c_vector<double, DIM> point = t->rGetCentreOfSphere();
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ar << point[i];
     }

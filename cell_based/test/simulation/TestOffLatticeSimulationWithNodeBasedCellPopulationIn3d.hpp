@@ -143,7 +143,7 @@ public:
         simulator.Solve();
 
         // Check some results
-        for (AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
@@ -174,7 +174,7 @@ public:
         TS_ASSERT_EQUALS(cell_cycle_phase_count[4], 0u);
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -232,7 +232,7 @@ public:
         simulator.Solve();
 
         // Check some results
-        for (AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
              cell_iter != simulator.rGetCellPopulation().End();
              ++cell_iter)
         {
@@ -243,7 +243,7 @@ public:
         }
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -335,7 +335,7 @@ public:
         {
             // Check that cells are in the same place in each simulation
             // Note the way we do this only works on 1 processor
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
                 double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
@@ -393,7 +393,7 @@ public:
             simulator_3.Solve();
 
             // Check that cells are in the same place in each simulation
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
@@ -402,7 +402,7 @@ public:
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -493,7 +493,7 @@ public:
         {
             // Check that cells are in the same place in each simulation
             // Note the way we do this only works on 1 processor
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 double y_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
                 double y_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1];
@@ -550,7 +550,7 @@ public:
             simulator_3.Solve();
 
             // Check that cells are in the same place in each simulation
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
@@ -559,7 +559,7 @@ public:
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -650,7 +650,7 @@ public:
         {
             // Check that cells are in the same place in each simulation
             // Note the way we do this only works on 1 processor
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 double z_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
                 double z_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[2];
@@ -707,7 +707,7 @@ public:
             simulator_3.Solve();
 
             // Check that cells are in the same place in each simulation
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
@@ -716,7 +716,7 @@ public:
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -811,7 +811,7 @@ public:
         {
             // Check that cells are in the same place in each simulation
             // Note the way we do this only works on 1 processor
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
                 double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
@@ -878,7 +878,7 @@ public:
             simulator_3.Solve();
 
             // Check that cells are in the same place in each simulation
-            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
                 TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_3.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
@@ -888,7 +888,7 @@ public:
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

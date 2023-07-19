@@ -203,7 +203,7 @@ void OffLatticeSimulation<ELEMENT_DIM, SPACE_DIM>::WriteVisualizerSetupFile()
 {
     if (PetscTools::AmMaster())
     {
-        for (unsigned i=0; i<this->mForceCollection.size(); i++)
+        for (unsigned i = 0; i < this->mForceCollection.size(); ++i)
         {
             this->mForceCollection[i]->WriteDataToVisualizerSetupFile(this->mpVizSetupFile);
         }

@@ -117,7 +117,7 @@ public:
         }
 
         // Store 'locations' of cells which are not dead
-        for (std::list<CellPtr>::iterator cell_iter = r_cells.begin();
+        for (auto cell_iter = r_cells.begin();
              cell_iter != r_cells.end();
              ++cell_iter)
         {
@@ -135,7 +135,7 @@ public:
 
         // Check that dead cells are removed from the mesh
         std::set< double > new_locations;
-        for (std::list<CellPtr>::iterator cell_iter = r_cells.begin();
+        for (auto cell_iter = r_cells.begin();
              cell_iter != r_cells.end();
              ++cell_iter)
         {
@@ -222,9 +222,9 @@ public:
         p_simulation_time->IncrementTimeOneStep();
 
         // Store 'locations' of cells which are not dead
-        for (std::list<CellPtr>::iterator cell_iter = r_cells.begin();
-            cell_iter != r_cells.end();
-            ++cell_iter)
+        for (auto cell_iter = r_cells.begin();
+             cell_iter != r_cells.end();
+             ++cell_iter)
         {
             if (!(*cell_iter)->IsDead())
             {
@@ -240,9 +240,9 @@ public:
 
         // Check that dead cells are removed from the mesh
         std::set< double > new_locations;
-        for (std::list<CellPtr>::iterator cell_iter = r_cells.begin();
-            cell_iter != r_cells.end();
-            ++cell_iter)
+        for (auto cell_iter = r_cells.begin();
+             cell_iter != r_cells.end();
+             ++cell_iter)
         {
             TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
@@ -258,7 +258,7 @@ public:
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         double end_time = 1.0;
-        unsigned num_timesteps = 100*(unsigned)end_time; // ensure the time step is not too small
+        unsigned num_timesteps = 100*static_cast<unsigned>(end_time); // ensure the time step is not too small
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_timesteps);
 
         // Create mesh
@@ -274,7 +274,7 @@ public:
         double lo_oxygen_concentration = 0.0;
 
         // Set the oxygen level for the cells
-        for (unsigned index=0; index < cells.size(); index++)
+        for (unsigned index=0; index < cells.size(); ++index)
         {
             cells[index]->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         }
@@ -288,7 +288,7 @@ public:
         std::list<CellPtr>& r_cells = cell_population.rGetCells();
 
         // Reset each cell to have a StemCellProliferativeType
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -313,7 +313,7 @@ public:
 
         // Store 'locations' of cells which are not dead
         std::set< double > old_locations;
-        for (std::list<CellPtr>::iterator cell_iter = r_cells.begin();
+        for (auto cell_iter = r_cells.begin();
              cell_iter != r_cells.end();
              ++cell_iter)
         {
@@ -331,7 +331,7 @@ public:
 
         // Check that dead cells are removed from the mesh
         std::set< double > new_locations;
-        for (std::list<CellPtr>::iterator cell_iter = r_cells.begin();
+        for (auto cell_iter = r_cells.begin();
              cell_iter != r_cells.end();
              ++cell_iter)
         {
@@ -367,7 +367,7 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<1>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
             cell_iter != cell_population.End();
             ++cell_iter)
         {
@@ -385,7 +385,7 @@ public:
         // Check that dead cells were correctly removed
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<1>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -415,7 +415,7 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -432,7 +432,7 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -461,7 +461,7 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -478,7 +478,7 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -525,7 +525,7 @@ public:
         IsolatedLabelledCellKiller<2> cell_killer(&cell_population);
 
         // No cells should yet have been killed
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -536,7 +536,7 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Cell 3 should have been killed
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -555,7 +555,7 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Although isolated, cell 0 should not have been killed, since it is the only labelled cell
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

@@ -80,7 +80,7 @@ private:
         AbstractCellBasedTestSuite::setUp();
 
         std::vector<Node<3>* > nodes;
-        for (unsigned i=0; i<PetscTools::GetNumProcs(); i++)
+        for (unsigned i = 0; i < PetscTools::GetNumProcs(); ++i)
         {
             nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5+(double)i));
         }
@@ -94,7 +94,7 @@ private:
 
         mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpNodesOnlyMesh, cells);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -294,7 +294,7 @@ public:
 
         // Create a simple mesh
         std::vector<Node<2>* > nodes;
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes.push_back(new Node<2>(i, false, 0.0, 0.75*i));
         }
@@ -308,7 +308,7 @@ public:
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(0.0);
         }
@@ -388,7 +388,7 @@ public:
         }
 #endif //CHASTE_VTK
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

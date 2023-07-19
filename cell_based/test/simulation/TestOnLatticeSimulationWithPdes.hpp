@@ -148,7 +148,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -160,7 +160,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Find centre of cell population
         c_vector<double,2> centre_of_cell_population = zero_vector<double>(2);
 
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+        for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
             centre_of_cell_population += simulator.rGetCellPopulation().GetNode(i)->rGetLocation();
         }
@@ -169,7 +169,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
         TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
-        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
@@ -194,7 +194,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         cells_generator.GenerateBasic(cells, 100);
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             location_indices.push_back(i);
         }
@@ -232,7 +232,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -248,7 +248,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0), p_mesh->GetWidth(0), 1e-8);
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1), p_mesh->GetWidth(1), 1e-8);
 
-        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0], 1e-8);
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1], 1e-8);
@@ -265,7 +265,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=3; i<6; i++)
+        for (unsigned i=3; i<6; ++i)
         {
             location_indices.push_back(i+30);
             location_indices.push_back(i+40);
@@ -299,7 +299,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -318,7 +318,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=2; i<8; i++)
+        for (unsigned i=2; i<8; ++i)
         {
             location_indices.push_back(i+20);
             location_indices.push_back(i+30);
@@ -355,7 +355,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -379,7 +379,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         cells_generator.GenerateBasic(cells, 100);
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             location_indices.push_back(i);
         }
@@ -412,7 +412,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test that PDE solver is working correctly
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -437,7 +437,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         cells_generator.GenerateBasic(cells, 100);
 
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             location_indices.push_back(i);
         }
@@ -500,7 +500,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centre_of_potts_mesh = zero_vector<double>(2);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             centre_of_potts_mesh += p_mesh->GetNode(i)->rGetLocation();
         }
@@ -527,7 +527,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -539,7 +539,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
         TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
-        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
@@ -550,7 +550,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -617,7 +617,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -703,7 +703,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0), p_mesh->GetWidth(0), 1e-8);
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1), p_mesh->GetWidth(1), 1e-8);
 
-        for (unsigned i=0; i< p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i <  p_coarse_mesh->GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0], p_mesh->GetNode(i)->rGetLocation()[0], 1e-8);
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1], p_mesh->GetNode(i)->rGetLocation()[1], 1e-8);

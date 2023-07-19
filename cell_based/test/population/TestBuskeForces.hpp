@@ -104,14 +104,14 @@ public:
         buske_adhesive_force.SetAdhesionEnergyParameter(200);
 
         // Test node force calculation
-        for (unsigned step=0; step<40; step++)
+        for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
             double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+            for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
             {
                 cell_population.GetNode(i)->ClearAppliedForce();
             }
@@ -136,7 +136,7 @@ public:
         }
 
         // Clean up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -188,14 +188,14 @@ public:
         buske_elastic_force.SetDeformationEnergyParameter(4.0/3.0);
 
         // Test node force calculation
-        for (unsigned step=0; step<40; step++)
+        for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
             double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+            for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
             {
                 cell_population.GetNode(i)->ClearAppliedForce();
             }
@@ -221,7 +221,7 @@ public:
         }
 
         // Clean up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -268,14 +268,14 @@ public:
         node_elastic_force.reserve(cell_population.GetNumNodes());
         node_compression_force.reserve(cell_population.GetNumNodes());
 
-        for (unsigned step=0; step<40; step++)
+        for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
             double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+            for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
             {
                 cell_population.GetNode(i)->ClearAppliedForce();
             }
@@ -325,14 +325,14 @@ public:
         buske_compression_force.SetCompressionEnergyParameter(1.0);
 
         // Test node force calculation
-        for (unsigned step=0; step<40; step++)
+        for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
             double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+            for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
             {
                 cell_population.GetNode(i)->ClearAppliedForce();
             }
@@ -412,7 +412,7 @@ public:
         }
 
         // When the node-only mesh goes out of scope, then it's a different set of nodes that get destroyed
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

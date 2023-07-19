@@ -290,7 +290,7 @@ public:
         unsigned num_transit = 0;
         unsigned num_differentiated = 0;
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {
@@ -524,7 +524,7 @@ public:
 
         unsigned number_of_cells = 0;
         unsigned number_of_mutant_cells = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        for (auto cell_iter = crypt.Begin();
              cell_iter != crypt.End();
              ++cell_iter)
         {

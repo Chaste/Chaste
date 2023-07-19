@@ -124,7 +124,7 @@ public:
      * any cell whose centre is located outside the ellipse (''x''/20)^2^ + (''y''/10)^2^ < 1. */
     void CheckAndLabelCellsForApoptosisOrDeath()
     {
-        for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
+        for (auto cell_iter = this->mpCellPopulation->Begin();
             cell_iter != this->mpCellPopulation->End();
             ++cell_iter)
         {
@@ -239,7 +239,7 @@ public:
 
         /* ... and check that any cell whose centre is located outside the ellipse
          * (''x''/20)^2^ + (''y''/10)^2^ < 1 has indeed been labelled as dead. */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -260,7 +260,7 @@ public:
          * remaining cells are indeed located within the ellipse. */
         cell_population.RemoveDeadCells();
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {

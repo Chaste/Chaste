@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Goldbeter 1991 System
+ * \todo provide full reference
  */
 class Goldbeter1991OdeSystem : public AbstractOdeSystem
 {
@@ -72,9 +73,11 @@ public:
     /**
      * Default constructor.
      *
-     * @param stateVariables optional initial conditions for state variables (only used in archiving)
+     * @param stateVariables optional initial conditions for state variables 
+     *     (only used in archiving)
      */
-    Goldbeter1991OdeSystem(std::vector<double> stateVariables=std::vector<double>());
+    Goldbeter1991OdeSystem(
+        std::vector<double> stateVariables=std::vector<double>());
 
     /**
      * Destructor.
@@ -82,16 +85,23 @@ public:
     ~Goldbeter1991OdeSystem();
 
     /**
-     * Compute the RHS of the  Collier et al. system of ODEs.
+     * Overridden EvaluateYDerivatives() method.
+     * 
+     * Compute the RHS of the Goldbeter et al (1991) system of ODEs.
      *
-     * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
-     * An ODE solver will call this function repeatedly to solve for y = [y1 ... yn].
+     * Returns a vector representing the RHS of the ODEs at each time step, 
+     * y' = [y1' ... yn']. An ODE solver will call this function repeatedly to 
+     * solve for y = [y1 ... yn].
      *
      * @param time used to evaluate the RHS.
      * @param rY value of the solution vector used to evaluate the RHS.
-     * @param rDY filled in with the resulting derivatives (using  Collier et al. system of equations).
+     * @param rDY filled in with the resulting derivatives (using Goldbeter et 
+     * al (1991) system of equations).
      */
-    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
+    void EvaluateYDerivatives(
+        double time,
+        const std::vector<double>& rY,
+        std::vector<double>& rDY) override;
 };
 
 // Declare identifier for the serializer

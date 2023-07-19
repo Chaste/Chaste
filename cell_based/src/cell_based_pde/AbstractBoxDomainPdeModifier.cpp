@@ -118,7 +118,7 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteC
 
     // Find the centre of the PDE mesh
     c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
-    for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
+    for (unsigned i = 0; i < this->mpFeMesh->GetNumNodes(); ++i)
     {
         centre_of_coarse_mesh += this->mpFeMesh->GetNode(i)->rGetLocation();
     }
@@ -143,13 +143,13 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
         // Find the element in the FE mesh that contains this cell. CellElementMap has been updated so use this.
         unsigned elem_index = mCellPdeElementMap[*cell_iter];
-        Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(elem_index);
+        Element<DIM, DIM>* p_element = this->mpFeMesh->GetElement(elem_index);
 
         const ChastePoint<DIM>& node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        c_vector<double,DIM+1> weights = p_element->CalculateInterpolationWeights(node_location);
+        c_vector<double, DIM+1> weights = p_element->CalculateInterpolationWeights(node_location);
 
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM + 1; ++i)
         {
             double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(i)];
             solution_at_cell += nodal_value * weights(i);
@@ -170,11 +170,11 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
             c_matrix<double, DIM, DIM+1> grad_phi;
             LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
 
-            for (unsigned node_index=0; node_index<DIM+1; node_index++)
+            for (unsigned node_index = 0; node_index < DIM + 1; ++node_index)
             {
                 double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(node_index)];
 
-                for (unsigned j=0; j<DIM; j++)
+                for (unsigned j = 0; j < DIM; ++j)
                 {
                     solution_gradient(j) += nodal_value* grad_phi(j, node_index);
                 }
@@ -183,17 +183,23 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
             switch (DIM)
             {
                 case 1:
+                {
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     break;
+                }
                 case 2:
+                {
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
                     break;
+                }
                 case 3:
+                {
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
                     cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
                     break;
+                }
                 default:
                     NEVER_REACHED;
             }

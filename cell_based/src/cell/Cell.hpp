@@ -331,7 +331,7 @@ public:
     {
         bool cell_has_property = false;
 
-        for (std::set<boost::shared_ptr<AbstractCellProperty> >::iterator property_iter = mCellPropertyCollection.Begin();
+        for (auto property_iter = mCellPropertyCollection.Begin();
              property_iter != mCellPropertyCollection.End();
              ++property_iter)
         {

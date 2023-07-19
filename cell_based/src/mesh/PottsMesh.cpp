@@ -55,26 +55,26 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
     mMooreNeighbouringNodeIndices = mooreNeighbouringNodeIndices;
 
     // Populate mNodes and mElements
-    for (unsigned node_index=0; node_index<nodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index < nodes.size(); ++node_index)
     {
         Node<DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
     }
-    for (unsigned elem_index=0; elem_index<pottsElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index < pottsElements.size(); ++elem_index)
     {
         PottsElement<DIM>* p_temp_element = pottsElements[elem_index];
         mElements.push_back(p_temp_element);
     }
 
     // Register elements with nodes
-    for (unsigned index=0; index<mElements.size(); index++)
+    for (unsigned index = 0; index < mElements.size(); ++index)
     {
         PottsElement<DIM>* p_element = mElements[index];
 
         unsigned element_index = p_element->GetIndex();
         unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-        for (unsigned node_index=0; node_index<num_nodes_in_element; node_index++)
+        for (unsigned node_index = 0; node_index  < num_nodes_in_element; ++node_index)
         {
             p_element->GetNode(node_index)->AddElement(element_index);
         }
@@ -120,14 +120,14 @@ template<unsigned DIM>
 void PottsMesh<DIM>::Clear()
 {
     // Delete elements
-    for (unsigned i=0; i<mElements.size(); i++)
+    for (unsigned i = 0; i < mElements.size(); ++i)
     {
         delete mElements[i];
     }
     mElements.clear();
 
     // Delete nodes
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i = 0; i < this->mNodes.size(); ++i)
     {
         delete this->mNodes[i];
     }
@@ -174,7 +174,7 @@ c_vector<double, DIM> PottsMesh<DIM>::GetCentroidOfElement(unsigned index)
     ///\todo This should probably be returning the nearest node
     c_vector<double, DIM> centroid = zero_vector<double>(DIM);
 
-    for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+    for (unsigned local_index = 0; local_index < num_nodes_in_element; ++local_index)
     {
         // Find location of current node and add it to the centroid
         centroid += p_element->GetNodeLocation(local_index);
@@ -190,7 +190,6 @@ double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
     PottsElement<DIM>* p_element = GetElement(index);
     double element_volume = (double) p_element->GetNumNodes();
-
     return element_volume;
 }
 
@@ -205,13 +204,13 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     unsigned num_nodes = p_element->GetNumNodes();
 
     double surface_area = 0.0;
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
         std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
         unsigned local_edges = 2*DIM;
-        for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+        for (auto iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
-             iter++)
+             ++iter)
         {
             std::set<unsigned> neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
 
@@ -255,12 +254,12 @@ void PottsMesh<DIM>::RemoveDeletedElements()
     // Remove any elements that have been removed and re-order the remaining ones
     unsigned num_deleted_elements = mDeletedElementIndices.size();
 
-    for (unsigned index = num_deleted_elements; index>0; index--)
+    for (unsigned index = num_deleted_elements; index > 0; --index)
     {
         unsigned deleted_elem_index = mDeletedElementIndices[index-1];
         delete mElements[deleted_elem_index];
         mElements.erase(mElements.begin()+deleted_elem_index);
-        for (unsigned elem_index=deleted_elem_index; elem_index<mElements.size(); elem_index++)
+        for (unsigned elem_index = deleted_elem_index; elem_index < mElements.size(); ++elem_index)
         {
             mElements[elem_index]->ResetIndex(elem_index);
         }
@@ -271,15 +270,15 @@ void PottsMesh<DIM>::RemoveDeletedElements()
 template<unsigned DIM>
 void PottsMesh<DIM>::DeleteNode(unsigned index)
 {
-    //Mark node as deleted so we don't consider it when iterating over nodes
+    // Mark node as deleted so we don't consider it when iterating over nodes
     this->mNodes[index]->MarkAsDeleted();
 
-    //Remove from Elements
+    // Remove from Elements
     std::set<unsigned> containing_element_indices = this->mNodes[index]->rGetContainingElementIndices();
 
-    for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+    for (auto iter = containing_element_indices.begin();
          iter != containing_element_indices.end();
-         iter++)
+         ++iter)
     {
         assert(mElements[*iter]->GetNumNodes() > 0);
         if (mElements[*iter]->GetNumNodes() == 1)
@@ -299,7 +298,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
     assert(mVonNeumannNeighbouringNodeIndices.size()==mMooreNeighbouringNodeIndices.size());
     for (unsigned node_index = 0;
          node_index < mVonNeumannNeighbouringNodeIndices.size();
-         node_index++)
+         ++node_index)
     {
         // Remove node "index" from the Von Neuman neighbourhood of node "node_index".
         mVonNeumannNeighbouringNodeIndices[node_index].erase(index);
@@ -323,7 +322,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
     assert(mVonNeumannNeighbouringNodeIndices.size()==num_nodes);
     assert(mMooreNeighbouringNodeIndices.size()==num_nodes);
 
-    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
         // Reduce the index of all nodes greater than  node "index"
         if (node_index >= index)
@@ -337,9 +336,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
         // in the Moore and Von Neuman neighbourhoods.
         std::set<unsigned> von_neuman = mVonNeumannNeighbouringNodeIndices[node_index];
         mVonNeumannNeighbouringNodeIndices[node_index].clear();
-        for (std::set<unsigned>::iterator iter = von_neuman.begin();
-             iter != von_neuman.end();
-             iter++)
+        for (auto iter = von_neuman.begin(); iter != von_neuman.end(); ++iter)
         {
             if (*iter >= index)
             {
@@ -352,9 +349,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
         }
         std::set<unsigned> moore = mMooreNeighbouringNodeIndices[node_index];
         mMooreNeighbouringNodeIndices[node_index].clear();
-        for (std::set<unsigned>::iterator iter = moore.begin();
-             iter != moore.end();
-             iter++)
+        for (auto iter = moore.begin(); iter != moore.end(); ++iter)
         {
             if (*iter >= index)
             {
@@ -375,7 +370,9 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
         mElements.erase(mElements.begin()+deleted_elem_index);
         mDeletedElementIndices.clear();
 
-        for (unsigned elem_index=deleted_elem_index; elem_index<GetNumElements(); elem_index++)
+        for (unsigned elem_index = deleted_elem_index;
+             elem_index < GetNumElements();
+             ++elem_index)
         {
             mElements[elem_index]->ResetIndex(elem_index);
         }
@@ -399,7 +396,7 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
 
     // Copy the nodes in this element
     std::vector<Node<DIM>*> nodes_elem;
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         nodes_elem.push_back(pElement->GetNode(i));
     }
@@ -436,9 +433,9 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
     unsigned counter_1 = 0;
     unsigned counter_2 = 0;
 
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
-        if (i<half_num_nodes)
+        if (i < half_num_nodes)
         {
             height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[DIM - 1];
             counter_1++;
@@ -452,7 +449,7 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
     height_midpoint_1 /= (double)counter_1;
     height_midpoint_2 /= (double)counter_2;
 
-    for (unsigned i=num_nodes; i>0; i--)
+    for (unsigned i = num_nodes; i > 0; --i)
     {
         if (i-1 >= half_num_nodes)
         {
@@ -537,7 +534,7 @@ std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elemen
     std::set<unsigned> neighbouring_element_indices;
 
     // Loop over nodes owned by this element
-    for (unsigned local_index=0; local_index<num_nodes; local_index++)
+    for (unsigned local_index = 0; local_index < num_nodes; ++local_index)
     {
         // Get a pointer to this node
         Node<DIM>* p_node = p_element->GetNode(local_index);
@@ -548,7 +545,7 @@ std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elemen
         std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_node->GetIndex());
 
          // Iterate over these neighbouring nodes
-         for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+         for (auto neighbour_iter = neighbouring_node_indices.begin();
               neighbour_iter != neighbouring_node_indices.end();
               ++neighbour_iter)
          {
@@ -586,7 +583,7 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
 
     // Add nodes
     std::vector<double> node_data;
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         node_data = rMeshReader.GetNextNode();
         unsigned is_boundary_node = (bool) node_data[DIM];
@@ -600,7 +597,7 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
     mElements.reserve(rMeshReader.GetNumElements());
 
     // Add elements
-    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+    for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
     {
         // Get the data for this element
         ElementData element_data = rMeshReader.GetNextElementData();
@@ -608,7 +605,7 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
         // Get the nodes owned by this element
         std::vector<Node<DIM>*> nodes;
         unsigned num_nodes_in_element = element_data.NodeIndices.size();
-        for (unsigned j=0; j<num_nodes_in_element; j++)
+        for (unsigned j = 0; j < num_nodes_in_element; ++j)
         {
             assert(element_data.NodeIndices[j] < this->mNodes.size());
             nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);

@@ -323,7 +323,7 @@ public:
         unsigned num_steps = 1000;
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
 
-        for (unsigned i=0; i<num_steps; i++)
+        for (unsigned i = 0; i < num_steps; ++i)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
 
@@ -436,7 +436,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         /* Then we loop over the nodes. */
-        for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             /* For each node we create a cell with our SRN model and simple Stochastic cell cycle model. */
             UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();

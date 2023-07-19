@@ -144,7 +144,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
      * Go through the edges, check its status and the index corresponding to the 
      * edge status before rearrangement. Go through the SRN model.
      */
-    for (unsigned i = 0; i < num_edges; i++)
+    for (unsigned i = 0; i < num_edges; ++i)
     {
         // The remap_index, if +ve refers to the SRN index of the oldModel, if -ve then it's a new edge
         const long remap_index = edge_mapping[i];

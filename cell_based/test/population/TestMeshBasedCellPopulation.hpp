@@ -123,7 +123,7 @@ private:
         cell_population.SetMeinekeDivisionSeparation(0.5);
 
         unsigned counter = 0;
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -198,7 +198,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<mesh.GetNumNodes()-1; i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes()-1; ++i)
         {
             AbstractCellCycleModel* p_cell_cycle_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
@@ -249,8 +249,8 @@ public:
         std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
         CellPtr cell_0 = *cell_iter++;
         CellPtr cell_1 = *cell_iter;
-        std::pair<CellPtr,CellPtr> cell_pair1 = cell_population.CreateCellPair(cell_0, cell_1);
-        std::pair<CellPtr,CellPtr> cell_pair2 = cell_population.CreateCellPair(cell_1, cell_0);
+        std::pair<CellPtr, CellPtr> cell_pair1 = cell_population.CreateCellPair(cell_0, cell_1);
+        std::pair<CellPtr, CellPtr> cell_pair2 = cell_population.CreateCellPair(cell_1, cell_0);
         TS_ASSERT_EQUALS(cell_pair1, cell_pair2);
         TS_ASSERT_EQUALS((cell_pair1.first == cell_0 || cell_pair1.first == cell_1), true);
         TS_ASSERT_EQUALS((cell_pair1.second == cell_0 || cell_pair1.second == cell_1), true);
@@ -530,13 +530,13 @@ public:
 
         // Create a cell population without ghost nodes
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Specify node radii
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->SetRadius(i + 0.5);
         }
@@ -595,11 +595,11 @@ public:
         cell_population.Update();
 
         // Test that, since node radii were set, the Update() preserved them
-        for (unsigned i=0; i<26; i++)
+        for (unsigned i = 0; i < 26; ++i)
         {
             TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 0.5, 1e-6);
         }
-        for (unsigned i=27; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i=27; i<cell_population.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 1.5, 1e-6);
         }
@@ -626,7 +626,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 80u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh.GetNumAllNodes());
 
-        for (unsigned i=0; i<mesh.GetNumAllNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumAllNodes(); ++i)
         {
             TS_ASSERT_EQUALS(cell_population.IsGhostNode(i), false);
         }
@@ -635,7 +635,7 @@ public:
 
         // We expect the cell node indices to be {0,11,...,79}
         std::set<unsigned> expected_node_indices;
-        for (unsigned i=0; i<cell_population.GetNumRealCells(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumRealCells(); ++i)
         {
             expected_node_indices.insert(i);
         }
@@ -643,7 +643,7 @@ public:
         // Get actual cell node indices
         std::set<unsigned> node_indices;
 
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -677,7 +677,7 @@ public:
         MeshBasedCellPopulation<2> cell_population2d(mesh2d, cells2d);
 
         // For coverage of GetVolumeOfCell()
-        for (AbstractCellPopulation<2>::Iterator iter = cell_population2d.Begin();
+        for (auto iter = cell_population2d.Begin();
              iter != cell_population2d.End();
              ++iter)
         {
@@ -730,7 +730,7 @@ public:
         cell_population3d.CreateVoronoiTessellation();
 
         // Test element volumes and surface areas
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_THROWS_THIS(cell_population3d.GetVolumeOfVoronoiElement(i),
                                   "This index does not correspond to a VertexElement");
@@ -745,7 +745,7 @@ public:
         TS_ASSERT_EQUALS(cell_population3d.GetVoronoiTessellation()->GetNumElements(), 1u);
 
         // The faces are not all equal
-        for (unsigned face_index=0; face_index<4; face_index++)
+        for (unsigned face_index = 0; face_index < 4; ++face_index)
         {
             VertexElement<2,3>* p_face = cell_population3d.GetVoronoiTessellation()->GetFace(face_index);
 
@@ -805,7 +805,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         std::vector<CellPtr> cells;
-        for (unsigned elem_index=0; elem_index<mesh.GetNumNodes(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh.GetNumNodes(); ++elem_index)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
@@ -861,7 +861,7 @@ public:
         cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -944,7 +944,7 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i = 0; i < files_to_compare.size(); ++i)
         {
             FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/" + files_to_compare[i]);
             TS_ASSERT(comparer.CompareFiles());
@@ -993,7 +993,7 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         std::vector<CellPtr> cells;
-        for (unsigned elem_index=0; elem_index<mesh.GetNumNodes(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh.GetNumNodes(); ++elem_index)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
@@ -1159,7 +1159,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3-3");
 
         // Coverage of writing CellData to VTK
-        for (AbstractCellPopulation<3>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1219,7 +1219,7 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i = 0; i < files_to_compare.size(); ++i)
         {
             FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestCellPopulationWritersIn3d/" + files_to_compare[i]);
             TS_ASSERT(comparer.CompareFiles());
@@ -1243,7 +1243,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Loop over nodes
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1284,7 +1284,7 @@ public:
         cell_population.SetDataOnAllCells("variable", 100.0);
 
         //Check that the data made it there and that copies of the data are independent
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
         {
@@ -1293,7 +1293,7 @@ public:
         }
 
         cell_population.SetDataOnAllCells("added variable", 200.0);
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
                  ++cell_iter)
         {
@@ -1340,8 +1340,8 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
             unsigned index_for_data = 0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter=p_cell_population->Begin();
-                 cell_iter!=p_cell_population->End();
+            for (auto cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
                 cell_iter->ReadyToDivide();
@@ -1351,7 +1351,7 @@ public:
                 index_for_data++;
             }
 
-            std::pair<CellPtr,CellPtr> cell_pair_0_1 = p_cell_population->CreateCellPair(p_cell_population->GetCellUsingLocationIndex(0), p_cell_population->GetCellUsingLocationIndex(1));
+            std::pair<CellPtr, CellPtr> cell_pair_0_1 = p_cell_population->CreateCellPair(p_cell_population->GetCellUsingLocationIndex(0), p_cell_population->GetCellUsingLocationIndex(1));
             p_cell_population->MarkSpring(cell_pair_0_1);
 
             // Set area-based viscosity
@@ -1389,7 +1389,7 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter=p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter!=p_cell_population->End();
                  ++cell_iter)
             {
@@ -1407,7 +1407,7 @@ public:
             TS_ASSERT_EQUALS(p_cell_population->GetNode(4)->IsBoundaryNode(), false);
 
             // Check the marked spring
-            std::pair<CellPtr,CellPtr> cell_pair_0_1 = p_cell_population->CreateCellPair(p_cell_population->GetCellUsingLocationIndex(0), p_cell_population->GetCellUsingLocationIndex(1));
+            std::pair<CellPtr, CellPtr> cell_pair_0_1 = p_cell_population->CreateCellPair(p_cell_population->GetCellUsingLocationIndex(0), p_cell_population->GetCellUsingLocationIndex(1));
             TS_ASSERT_EQUALS(p_cell_population->IsMarkedSpring(cell_pair_0_1), true);
 
             // Check the simulation time has been restored (through the cell)
@@ -1443,10 +1443,10 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        std::pair<CellPtr,CellPtr> cell_pair_1_2 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(1), cell_population.GetCellUsingLocationIndex(2));
-        std::pair<CellPtr,CellPtr> cell_pair_3_4 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(3), cell_population.GetCellUsingLocationIndex(4));
-        std::pair<CellPtr,CellPtr> cell_pair_1_4 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(1), cell_population.GetCellUsingLocationIndex(4));
-        std::pair<CellPtr,CellPtr> cell_pair_0_2 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(0), cell_population.GetCellUsingLocationIndex(2));
+        std::pair<CellPtr, CellPtr> cell_pair_1_2 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(1), cell_population.GetCellUsingLocationIndex(2));
+        std::pair<CellPtr, CellPtr> cell_pair_3_4 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(3), cell_population.GetCellUsingLocationIndex(4));
+        std::pair<CellPtr, CellPtr> cell_pair_1_4 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(1), cell_population.GetCellUsingLocationIndex(4));
+        std::pair<CellPtr, CellPtr> cell_pair_0_2 = cell_population.CreateCellPair(cell_population.GetCellUsingLocationIndex(0), cell_population.GetCellUsingLocationIndex(2));
 
         // Mark some springs
         cell_population.MarkSpring(cell_pair_1_2);
@@ -1510,7 +1510,7 @@ public:
         cell_population.SetCellAncestorsToLocationIndices();
 
         unsigned counter = 0;
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1524,7 +1524,7 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 5u);
 
         // Reallocate ancestors
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -1556,7 +1556,7 @@ public:
         p_mesh->GetNode(0)->MarkAsDeleted();
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (MeshBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
