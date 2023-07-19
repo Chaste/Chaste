@@ -24,6 +24,9 @@
  * Multiple versions of each function are provided. See the
  * documentation above each, for more info.
  */
+
+#include <memory>
+
 class OpenSimplex2S
 {
   struct Grad2
@@ -66,8 +69,8 @@ class OpenSimplex2S
     int xrv {};
     int yrv {};
     int zrv {};
-    LatticePoint3D* nextOnFailure {};
-    LatticePoint3D* nextOnSuccess {};
+    std::shared_ptr<LatticePoint3D> nextOnFailure {};
+    std::shared_ptr<LatticePoint3D> nextOnSuccess {};
     LatticePoint3D();
     LatticePoint3D(int xrv, int yrv, int zrv, int lattice);
   };

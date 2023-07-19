@@ -228,7 +228,7 @@ double OpenSimplex2S::noise3_BCC(double xr, double yr, double zr)
     double dzr = zri + c->dzr;
     double attn = 0.75 - dxr * dxr - dyr * dyr - dzr * dzr;
     if (attn < 0) {
-      c = c->nextOnFailure;
+      c = c->nextOnFailure.get();
     } else {
       int pxm = (xrb + c->xrv) & PMASK;
       int pym = (yrb + c->yrv) & PMASK;
@@ -238,7 +238,7 @@ double OpenSimplex2S::noise3_BCC(double xr, double yr, double zr)
 
       attn *= attn;
       value += attn * attn * extrapolation;
-      c = c->nextOnSuccess;
+      c = c->nextOnSuccess.get();
     }
   }
   return value;
@@ -459,32 +459,32 @@ void OpenSimplex2S::initLatticePoints()
     k2 = k1 ^ 1;
 
     // The two points within this octant, one from each of the two cubic half-lattices.
-    auto* c0 = new LatticePoint3D(i1, j1, k1, 0);
-    auto* c1 = new LatticePoint3D(i1 + i2, j1 + j2, k1 + k2, 1);
+    auto c0 = std::make_shared<LatticePoint3D>(i1, j1, k1, 0);
+    auto c1 = std::make_shared<LatticePoint3D>(i1 + i2, j1 + j2, k1 + k2, 1);
 
     // (1, 0, 0) vs (0, 1, 1) away from octant.
-    auto* c2 = new LatticePoint3D(i1 ^ 1, j1, k1, 0);
-    auto* c3 = new LatticePoint3D(i1, j1 ^ 1, k1 ^ 1, 0);
+    auto c2 = std::make_shared<LatticePoint3D>(i1 ^ 1, j1, k1, 0);
+    auto c3 = std::make_shared<LatticePoint3D>(i1, j1 ^ 1, k1 ^ 1, 0);
 
     // (1, 0, 0) vs (0, 1, 1) away from octant, on second half-lattice.
-    auto* c4 = new LatticePoint3D(i1 + (i2 ^ 1), j1 + j2, k1 + k2, 1);
-    auto* c5 = new LatticePoint3D(i1 + i2, j1 + (j2 ^ 1), k1 + (k2 ^ 1), 1);
+    auto c4 = std::make_shared<LatticePoint3D>(i1 + (i2 ^ 1), j1 + j2, k1 + k2, 1);
+    auto c5 = std::make_shared<LatticePoint3D>(i1 + i2, j1 + (j2 ^ 1), k1 + (k2 ^ 1), 1);
 
     // (0, 1, 0) vs (1, 0, 1) away from octant.
-    auto* c6 = new LatticePoint3D(i1, j1 ^ 1, k1, 0);
-    auto* c7 = new LatticePoint3D(i1 ^ 1, j1, k1 ^ 1, 0);
+    auto c6 = std::make_shared<LatticePoint3D>(i1, j1 ^ 1, k1, 0);
+    auto c7 = std::make_shared<LatticePoint3D>(i1 ^ 1, j1, k1 ^ 1, 0);
 
     // (0, 1, 0) vs (1, 0, 1) away from octant, on second half-lattice.
-    auto* c8 = new LatticePoint3D(i1 + i2, j1 + (j2 ^ 1), k1 + k2, 1);
-    auto* c9 = new LatticePoint3D(i1 + (i2 ^ 1), j1 + j2, k1 + (k2 ^ 1), 1);
+    auto c8 = std::make_shared<LatticePoint3D>(i1 + i2, j1 + (j2 ^ 1), k1 + k2, 1);
+    auto c9 = std::make_shared<LatticePoint3D>(i1 + (i2 ^ 1), j1 + j2, k1 + (k2 ^ 1), 1);
 
     // (0, 0, 1) vs (1, 1, 0) away from octant.
-    auto* cA = new LatticePoint3D(i1, j1, k1 ^ 1, 0);
-    auto* cB = new LatticePoint3D(i1 ^ 1, j1 ^ 1, k1, 0);
+    auto cA = std::make_shared<LatticePoint3D>(i1, j1, k1 ^ 1, 0);
+    auto cB = std::make_shared<LatticePoint3D>(i1 ^ 1, j1 ^ 1, k1, 0);
 
     // (0, 0, 1) vs (1, 1, 0) away from octant, on second half-lattice.
-    auto* cC = new LatticePoint3D(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
-    auto* cD = new LatticePoint3D(i1 + (i2 ^ 1), j1 + (j2 ^ 1), k1 + k2, 1);
+    auto cC = std::make_shared<LatticePoint3D>(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
+    auto cD = std::make_shared<LatticePoint3D>(i1 + (i2 ^ 1), j1 + (j2 ^ 1), k1 + k2, 1);
 
     // First two points are guaranteed.
     c0->nextOnFailure = c0->nextOnSuccess = c1;
