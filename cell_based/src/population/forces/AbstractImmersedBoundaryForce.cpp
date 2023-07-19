@@ -180,16 +180,6 @@ void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseStdDev(double normalNoise
 }
 
 template<unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceInfo(out_stream& rParamsFile)
-{
-    std::string force_type = GetIdentifier();
-
-    *rParamsFile << "\t\t<" << force_type << ">\n";
-    OutputImmersedBoundaryForceParameters(rParamsFile);
-    *rParamsFile << "\t\t</" << force_type << ">\n";
-}
-
-template<unsigned DIM>
 void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<AdditiveNormalNoise>" << mAdditiveNormalNoise << "</AdditiveNormalNoise>\n";

@@ -127,7 +127,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        ///\todo how can we serialize Eigen arrays/matrices?
         archive & mLowerCorner;
         archive & mUpperCorner;
         archive & mNumGridPts;

@@ -93,20 +93,6 @@ private:
     /** How often we calculate which cells are neighbours */
     unsigned mNodeNeighbourUpdateFrequency;
 
-    /**
-     * Number of grid points in the x direction.
-     *
-     * \todo Duplicate of ImmersedBoundaryMesh::mNumGridPtsX - remove?
-     */
-    unsigned mNumGridPtsX;
-
-    /**
-     * Number of grid points in the y direction.
-     *
-     * \todo Duplicate of ImmersedBoundaryMesh::mNumGridPtY - remove?
-     */
-    unsigned mNumGridPtsY;
-
     /** Number of grid points in the x direction */
     double mGridSpacingX;
 
@@ -243,14 +229,6 @@ private:
      */
     void CalculateSourceGradients(const multi_array<double, 3>& rhs, multi_array<double, 3>& gradients);
 
-    /**
-     * Helper method to set member variables for testing purposes
-     *
-     * @param numGridPtsY the number of grid points in the y direction
-     * @param numGridPtsX the number of grid points in the x direction
-     */
-    void SetMemberVariablesForTesting(unsigned numGridPtsY, unsigned numGridPtsX);
-    
     /**
      * Removes any bias in field sums
      */

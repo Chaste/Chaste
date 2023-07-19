@@ -106,8 +106,6 @@ public:
 
         ImmersedBoundarySimulationModifier<2> modifier;
 
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 0u);
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 0u);
         TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mFftNorm, 0.0, 1e-6);
@@ -135,8 +133,6 @@ public:
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
         TS_ASSERT_THROWS_NOTHING(modifier.SetupConstantMemberVariables(cell_population));
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 128u);
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 128u);
         TS_ASSERT_DELTA(modifier.mGridSpacingX, 1.0 / 128.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mGridSpacingY, 1.0 / 128.0, 1e-6);
         TS_ASSERT_DELTA(modifier.mFftNorm, 128.0 * 128.0, 1e-6);
@@ -188,9 +184,9 @@ public:
         multi_array<double, 3>& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids();
         multi_array<double, 3>& r_rhs_grid = modifier.mpArrays->rGetModifiableRightHandSideGrids();
 
-        for (unsigned x = 0; x < modifier.mNumGridPtsX; x++)
+        for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++)
         {
-            for (unsigned y = 0; y < modifier.mNumGridPtsY; y++)
+            for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++)
             {
                 TS_ASSERT_DELTA(r_rhs_grid[2][x][y], 0.0, 1e-6);
                 for (unsigned dim = 0; dim < 2; dim++)
@@ -245,19 +241,6 @@ public:
     void TestUpwind2d()
     {
         ///\todo Test this method
-    }
-
-    void TestSetMemberVariablesForTesting()
-    {
-        ImmersedBoundarySimulationModifier<2> modifier;
-
-        modifier.SetMemberVariablesForTesting(15, 15);
-
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsX, 15u);
-        TS_ASSERT_EQUALS(modifier.mNumGridPtsY, 15u);
-        TS_ASSERT_DELTA(modifier.mGridSpacingX, 0.0666, 1e-3);
-        TS_ASSERT_DELTA(modifier.mGridSpacingY, 0.0666, 1e-3);
-        TS_ASSERT_DELTA(modifier.mFftNorm, 15.0, 1e-4);
     }
 
     void TestUpdateAtEndOfTimeStep()

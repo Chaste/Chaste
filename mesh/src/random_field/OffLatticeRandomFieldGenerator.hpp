@@ -88,7 +88,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        ///\todo: how can we serialize Eigen arrays/matrices?
         archive & mLowerCorner;
         archive & mUpperCorner;
         archive & mPeriodicity;
@@ -154,11 +153,6 @@ public:
      * Sample an instance of the random field at a given time. First, draw 
      * mNumTotalGridPts random numbers from N(0,1), and then create an 
      * appropriate linear combination of the eigenvectors.
-     *
-     * \todo the statement below doesn't appear to be correct:
-     * 
-     * This method returns early if mLengthScale = 0 (noise is not spatially 
-     * correlated at all).
      *
      * @param rNodes a vector nodes at which to sample the random field
      * @param time time at which to sample the random field

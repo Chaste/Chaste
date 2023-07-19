@@ -50,10 +50,9 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
     std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
     ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    // Allocate memory the first time this method is called
-    if (mPreviousLocations.empty())
+    // Update memory allocation if number of nodes has changed/on first call
+    if (mPreviousLocations.size() != rCellPopulation.GetNumNodes())
     {
-        ///\todo this assumes the number of nodes in the simulation does not change over time
         mPreviousLocations.resize(rCellPopulation.GetNumNodes());
         UpdatePreviousLocations(rCellPopulation);
     }
@@ -107,7 +106,7 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
              * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
              * balance when spread to the grid later (where the multiplicative factor is the local spacing)
              */
-            // \todo: change this to something sigmoidal?
+            // df = K dx
             c_vector<double, DIM> force = unit_perp * (relative_vel_comp * eff_spring_const);
 
             c_vector<double, DIM> force_on_b = force * (elem_spacing / node_a_elem_spacing);
@@ -143,9 +142,6 @@ double ImmersedBoundaryKinematicFeedbackForce<DIM>::CalculateRelativeVelocityCom
 template<unsigned DIM>
 void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    ///\todo this assumes the number of nodes in the simulation does not change over time
-    EXCEPT_IF_NOT(mPreviousLocations.size() == rCellPopulation.GetNumNodes());
-
     // Populate the mPreviousLocations vector with the current location of nodes, so it's ready for next time step
     for (const auto& p_node : rCellPopulation.rGetMesh().rGetNodes())
     {

@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM>
 class FluidSource
 {
-    ///\todo Implement archiving?
 
 private:
 
@@ -62,6 +61,16 @@ private:
 
     /** Index of the immersed boundary element associated with this fluid source. */
     unsigned mAssociatedElementIndex;
+    
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mStrength;
+        archive & mIsSourceAssociatedWithElement;
+        archive & mAssociatedElementIndex;
+    }
 
 public:
 
@@ -164,5 +173,61 @@ public:
      */
     void SetAssociatedElementIndex(unsigned associatedElementIndex);
 };
+
+
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(FluidSource)
+
+namespace boost
+{
+namespace serialization
+{
+/**
+ * Serialize information required to construct a FluidSource.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void save_construct_data(
+    Archive & ar, const FluidSource<SPACE_DIM> * t, const unsigned int file_version)
+{
+
+    // Save data required to construct instance
+    for (unsigned i = 0; i < SPACE_DIM; i++)
+    {
+        //we archive coordinates of mLocation one by one
+        //this is because earlier version of boost (<1.40, I think) cannot archive c_vectors
+        double coord = t->rGetLocation()[i];
+        ar & coord;
+    }
+    unsigned index = t->GetIndex();
+    ar << index;
+
+}
+
+/**
+ * De-serialize constructor parameters and initialize a FluidSource.
+ */
+template<class Archive, unsigned SPACE_DIM>
+inline void load_construct_data(
+    Archive & ar, FluidSource<SPACE_DIM> * t, const unsigned int file_version)
+{
+    // Retrieve data from archive required to construct new instance of Node
+    c_vector<double,SPACE_DIM> location;
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        double coordinate;
+        ar & coordinate;//resume coordinates one by one
+        location[i] = coordinate;
+    }
+
+    unsigned index;
+    ar >> index;
+
+    // Invoke inplace constructor to initialise instance
+    ::new(t)FluidSource<SPACE_DIM>(index, location);
+}
+
+}
+} // namespace ...
 
 #endif //_FLUIDSOURCE_HPP_

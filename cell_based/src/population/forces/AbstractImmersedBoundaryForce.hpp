@@ -116,19 +116,6 @@ public:
         ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
-     * Outputs the name of the immersed boundary force used in 
-     * the simulation to file and then calls OutputImmersedBoundaryForceParameters()
-     * to output all relevant parameters.
-     *
-     * \todo At present, this method is not used in simulations. In contrast, the force method
-     * OutputForceInfo is called in OffLatticeSimulation::OutputAdditionalSimulationSetup().
-     * Call this method in simulations, or else remove it.
-     *
-     * @param rParamsFile the file stream to which the parameters are output
-     */
-    void OutputImmersedBoundaryForceInfo(out_stream& rParamsFile);
-
-    /**
      * Outputs force parameters to file.
      *
      * As this method is pure virtual, it must be overridden

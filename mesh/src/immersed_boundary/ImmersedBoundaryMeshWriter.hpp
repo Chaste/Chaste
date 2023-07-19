@@ -144,7 +144,6 @@ public:
      */
     ~ImmersedBoundaryMeshWriter();
 
-    ///\todo Mesh should be const (#1076)
     /**
      * Write files using a mesh.
      *

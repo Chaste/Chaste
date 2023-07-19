@@ -172,8 +172,6 @@ protected:
     /**
      * Divide an element along the axis passing through two of its nodes.
      *
-     * \todo This method currently assumes SPACE_DIM = 2 (see #866)
-     *
      * @param pElement the element to divide
      * @param nodeAIndex the local index of one node within this element
      * @param nodeBIndex the local index of another node within this element
