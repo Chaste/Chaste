@@ -99,11 +99,12 @@ TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPd
     std::vector<Node<DIM>*> temp_nodes;
 
     // Get the nodes of mpNodesOnlyMesh
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
+    for (auto node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
          node_iter != mpNodesOnlyMesh->GetNodeIteratorEnd();
          ++node_iter)
     {
-        temp_nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation(), node_iter->IsBoundaryNode()));
+        temp_nodes.push_back(
+            new Node<DIM>(node_iter->GetIndex(),node_iter->rGetLocation(), node_iter->IsBoundaryNode()));
     }
 
     return new MutableMesh<DIM,DIM>(temp_nodes);
@@ -118,7 +119,7 @@ void NodeBasedCellPopulation<DIM>::Clear()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Validate()
 {
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -177,9 +178,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      */
     if (mUseVariableRadii)
     {
-        for (auto cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
         {
             double cell_radius = cell_iter->GetCellData()->GetItem("Radius");
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
@@ -206,9 +205,7 @@ void NodeBasedCellPopulation<DIM>::UpdateMapsAfterRemesh(NodeMap& map)
         this->mLocationCellMap.clear();
         this->mCellLocationMap.clear();
 
-        for (std::list<CellPtr>::iterator it = this->mCells.begin();
-             it != this->mCells.end();
-             ++it)
+        for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
         {
             unsigned old_node_index = old_map[(*it).get()];
 
@@ -227,9 +224,7 @@ template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
-         )
+    for (auto cell_iter = this->mCells.begin(); cell_iter != this->mCells.end();)
     {
         if ((*cell_iter)->IsDead())
         {
@@ -302,25 +297,29 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(
+    boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationCountWriter(
+    boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationEventWriter(
+    boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void NodeBasedCellPopulation<DIM>::AcceptCellWriter(
+    boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -350,7 +349,8 @@ void NodeBasedCellPopulation<DIM>::SetLoadBalanceMesh(bool loadBalanceMesh)
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::SetLoadBalanceFrequency(unsigned loadBalanceFrequency)
+void NodeBasedCellPopulation<DIM>::SetLoadBalanceFrequency(
+    unsigned loadBalanceFrequency)
 {
     mLoadBalanceFrequency = loadBalanceFrequency;
 }
@@ -367,16 +367,23 @@ c_vector<double, DIM> NodeBasedCellPopulation<DIM>::GetSizeOfCellPopulation()
     c_vector<double, DIM> local_size = AbstractCellPopulation<DIM, DIM>::GetSizeOfCellPopulation();
     c_vector<double, DIM> global_size;
 
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        MPI_Allreduce(&local_size[i], &global_size[i], 1, MPI_DOUBLE, MPI_MAX, PetscTools::GetWorld());
+        MPI_Allreduce(&local_size[i],
+                      &global_size[i],
+                      1,
+                      MPI_DOUBLE,
+                      MPI_MAX,
+                      PetscTools::GetWorld());
     }
 
     return global_size;
 }
 
 template<unsigned DIM>
-std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadius(unsigned index, double neighbourhoodRadius)
+std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadius(
+    unsigned index,
+    double neighbourhoodRadius)
 {
     // Check neighbourhoodRadius is less than the interaction radius. If not you wont return all the correct nodes
     if (neighbourhoodRadius > mpNodesOnlyMesh->GetMaximumInteractionDistance())
@@ -400,9 +407,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
     std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
-         iter != near_nodes.end();
-         ++iter)
+    for (auto iter = near_nodes.begin(); iter != near_nodes.end(); ++iter)
     {
         // Be sure not to return the index itself.
         if ((*iter) != index)
@@ -457,9 +462,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (std::vector<unsigned>::iterator iter = near_nodes.begin();
-         iter != near_nodes.end();
-         ++iter)
+    for (auto iter = near_nodes.begin(); iter != near_nodes.end(); ++iter)
     {
         // Be sure not to return the index itself
         if ((*iter) != index)
@@ -532,9 +535,9 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell([[maybe_unused]] CellPtr pC
         }
 
         // Loop over this set
-        for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-            iter != neighbouring_node_indices.end();
-            ++iter)
+        for (auto iter = neighbouring_node_indices.begin();
+             iter != neighbouring_node_indices.end();
+             ++iter)
         {
             Node<DIM>* p_node_j = this->GetNode(*iter);
 
@@ -544,7 +547,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell([[maybe_unused]] CellPtr pC
             double neighbouring_cell_radius = p_node_j->GetRadius();
 
             // If this throws then you may not be considering all cell interactions use a larger cut off length
-            assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
+            assert(cell_radius + neighbouring_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
             // Calculate the distance between the two nodes and add to cell radius
             double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
@@ -745,7 +748,7 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
     mpNodesOnlyMesh->DeleteMovedNode(index);
 
     // Update vector of cells
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+    for (auto cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
     {
@@ -846,12 +849,12 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
     {
         unsigned tag = CalculateMessageTag( PetscTools::GetNumProcs()-1, PetscTools::GetMyRank() );
         mLeftCommunicator.IRecvObject(PetscTools::GetNumProcs() - 1, tag);
-}
+    }
     if ( PetscTools::AmTopMost() && mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection() )
     {
         unsigned tag = CalculateMessageTag( 0, PetscTools::GetMyRank() );
         mRightCommunicator.IRecvObject(0, tag);
-}
+    }
 }
 
 template<unsigned DIM>
@@ -876,11 +879,8 @@ template<unsigned DIM>
 std::pair<CellPtr, Node<DIM>* > NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
 {
     Node<DIM>* p_node = this->GetNode(nodeIndex);
-
     CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
-
     std::pair<CellPtr, Node<DIM>* > new_pair(p_cell, p_node);
-
     return new_pair;
 }
 
@@ -888,7 +888,6 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendRight(unsigned nodeIndex)
 {
     std::pair<CellPtr, Node<DIM>* > pair = GetCellNodePair(nodeIndex);
-
     mCellsToSendRight.push_back(pair);
 }
 
@@ -896,7 +895,6 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendLeft(unsigned nodeIndex)
 {
     std::pair<CellPtr, Node<DIM>* > pair = GetCellNodePair(nodeIndex);
-
     mCellsToSendLeft.push_back(pair);
 }
 
@@ -905,7 +903,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
 {
     if (!PetscTools::AmMaster() || mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection() )
     {
-        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
+        for (auto iter = mpCellsRecvLeft->begin();
              iter != mpCellsRecvLeft->end();
              ++iter)
         {
@@ -916,7 +914,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
     }
     if (!PetscTools::AmTopMost() || mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection())
     {
-        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
+        for (auto iter = mpCellsRecvRight->begin();
              iter != mpCellsRecvRight->end();
              ++iter)
         {
@@ -945,14 +943,14 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
     // Post blocking receive calls that wait until communication complete.
     //GetReceivedCells();
 
-    for (std::vector<unsigned>::iterator iter = nodes_to_send_right.begin();
+    for (auto iter = nodes_to_send_right.begin();
          iter != nodes_to_send_right.end();
          ++iter)
     {
         DeleteMovedCell(*iter);
     }
 
-    for (std::vector<unsigned>::iterator iter = nodes_to_send_left.begin();
+    for (auto iter = nodes_to_send_left.begin();
          iter != nodes_to_send_left.end();
          ++iter)
     {
@@ -989,7 +987,7 @@ void NodeBasedCellPopulation<DIM>::AddCellsToSendRight(std::vector<unsigned>& ce
 {
     mCellsToSendRight.clear();
 
-    for (unsigned i=0; i < cellLocationIndices.size(); i++)
+    for (unsigned i = 0; i < cellLocationIndices.size(); ++i)
     {
         AddNodeAndCellToSendRight(cellLocationIndices[i]);
     }
@@ -1000,7 +998,7 @@ void NodeBasedCellPopulation<DIM>::AddCellsToSendLeft(std::vector<unsigned>& cel
 {
     mCellsToSendLeft.clear();
 
-    for (unsigned i=0; i < cellLocationIndices.size(); i++)
+    for (unsigned i = 0; i < cellLocationIndices.size(); ++i)
     {
         AddNodeAndCellToSendLeft(cellLocationIndices[i]);
     }
@@ -1013,9 +1011,9 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 
     if (!PetscTools::AmMaster() || mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection())
     {
-        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
-                iter != mpCellsRecvLeft->end();
-                ++iter)
+        for (auto iter = mpCellsRecvLeft->begin();
+             iter != mpCellsRecvLeft->end();
+             ++iter)
         {
             boost::shared_ptr<Node<DIM> > p_node(iter->second);
             AddHaloCell(iter->first, p_node);
@@ -1024,9 +1022,9 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
     }
     if (!PetscTools::AmTopMost() || mpNodesOnlyMesh->GetIsPeriodicAcrossProcsFromBoxCollection())
     {
-        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
-                iter != mpCellsRecvRight->end();
-                ++iter)
+        for (auto iter = mpCellsRecvRight->begin();
+             iter != mpCellsRecvRight->end();
+             ++iter)
         {
             boost::shared_ptr<Node<DIM> > p_node(iter->second);
             AddHaloCell(iter->first, p_node);
@@ -1040,11 +1038,8 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
 {
     mHaloCells.push_back(pCell);
-
     mpNodesOnlyMesh->AddHaloNode(pNode);
-
     mHaloCellLocationMap[pCell] = pNode->GetIndex();
-
     mLocationHaloCellMap[pNode->GetIndex()] = pCell;
 }
 

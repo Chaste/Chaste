@@ -84,8 +84,7 @@ public:
     /**
      * Output update rule parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile a file stream
      */

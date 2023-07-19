@@ -85,8 +85,10 @@ protected:
      */
     std::set<std::pair<CellPtr,CellPtr> > mMarkedSprings;
 
-    /** A pointer to a division rule that is used to generate the locations of daughter cells when a cell divides.
-     * This is a specialisation for centre-based models.
+    /**
+     * A pointer to a division rule that is used to generate the locations of 
+     * daughter cells when a cell divides. This is a specialisation for centre-
+     * based models.
      */
     boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > mpCentreBasedDivisionRule;
 
@@ -98,21 +100,25 @@ protected:
     AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
     /**
+     * Overridden WriteVtkResultsToFile() method.
+     * \todo declaration not needed in this class?
+     * 
      * Write the current results to mpVtkMetaFile.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory  pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory)=0;
 
     /**
-     * Call #AcceptCellWriter across the whole population,
-     * iterating in an appropriate way for this type of
-     * cell population.
+     * Overridden AcceptCellWritersAcrossPopulation() method.
+     * 
+     * Call #AcceptCellWriter across the whole population, iterating in an 
+     * appropriate way for this type of cell population.
      */
-    virtual void AcceptCellWritersAcrossPopulation();
+    virtual void AcceptCellWritersAcrossPopulation() override;
 
 public:
 
@@ -121,21 +127,24 @@ public:
      *
      * @param rMesh a reference to the mesh underlying the cell population
      * @param rCells a vector of cells
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
      */
-    AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+    AbstractCentreBasedCellPopulation(
+        AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+        std::vector<CellPtr>& rCells,
+        const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
      * Overridden GetLocationOfCellCentre() method.
+     * 
      * Find where a given cell is in space.
      *
      * @param pCell the cell
      *
      * @return the location of the node corresponding to this cell.
      */
-    c_vector<double, SPACE_DIM> GetLocationOfCellCentre(CellPtr pCell);
+    c_vector<double, SPACE_DIM> GetLocationOfCellCentre(CellPtr pCell) override;
 
     /**
      * Get a pointer to the node corresponding to a given cell.
@@ -164,9 +173,11 @@ public:
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            double dirichletBoundaryValue=0.0) override;
 
     /**
+     * Overridden AddCell() method.
+     * 
      * Add a new cell to the cell population.
      *
      * @param pNewCell  the cell to add
@@ -174,7 +185,7 @@ public:
      *
      * @return address of cell as it appears in the cell list
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr()) override;
 
     /**
      * @return a an ordered pair of pointers to two given Cells.
@@ -215,28 +226,34 @@ public:
      *
      * @return whether a given cell is associated with a deleted node.
      */
-    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
      *
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     * Given a cell, returns the set of location indices corresponding to 
+     * neighbouring cells.
      *
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+    virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
-     * Checks whether a given node displacement violates the movement threshold
+     * Check whether a given node displacement violates the movement threshold
      * for this population. If so, a stepSizeException is generated that contains
-     * a warning/error message and a suggested smaller dt that should avoid the problem.
+     * a warning/error message and a suggested smaller dt that should avoid the 
+     * problem.
      *
-     * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
+     * @param nodeIndex Index of the node in question (allows us to check 
+     *     whether this is a ghost or particle)
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt);
+    virtual void CheckForStepSizeException(
+        unsigned nodeIndex,
+        c_vector<double,SPACE_DIM>& rDisplacement,
+        double dt) override;
 
     /**
      * Overridden GetDampingConstant() method.
@@ -254,7 +271,7 @@ public:
      * @param nodeIndex the global index of this node
      * @return the damping constant at the Cell associated with this node
      */
-    virtual double GetDampingConstant(unsigned nodeIndex);
+    virtual double GetDampingConstant(unsigned nodeIndex) override;
 
     /**
      * Find if a given node is a ghost node. The method always returns false
@@ -279,8 +296,7 @@ public:
     /**
      * Method to return the connected nodes in  a centre based simulation.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @return Node pairs for force calculation.
      */
@@ -315,7 +331,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+    virtual void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden GetDefaultTimeStep() method.
@@ -327,7 +343,7 @@ public:
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    virtual double GetDefaultTimeStep() override;
 };
 
 #endif /*ABSTRACTCENTREBASEDCELLPOPULATION_HPP_*/

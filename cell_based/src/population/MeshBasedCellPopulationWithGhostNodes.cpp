@@ -58,11 +58,11 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
         std::set<unsigned> location_indices;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        for (unsigned i = 0; i < this->GetNumNodes(); ++i)
         {
             node_indices.insert(this->GetNode(i)->GetIndex());
         }
-        for (unsigned i=0; i<locationIndices.size(); i++)
+        for (unsigned i = 0; i < locationIndices.size(); ++i)
         {
             location_indices.insert(locationIndices[i]);
         }
@@ -82,10 +82,11 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 }
 
 template<unsigned DIM>
-MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                                                                  double ghostCellSpringStiffness,
-                                                                                  double ghostGhostSpringStiffness,
-                                                                                  double ghostSpringRestLength)
+MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(
+    MutableMesh<DIM, DIM>& rMesh,
+    double ghostCellSpringStiffness,
+    double ghostGhostSpringStiffness,
+    double ghostSpringRestLength)
     : MeshBasedCellPopulation<DIM,DIM>(rMesh),
       mGhostCellSpringStiffness(ghostCellSpringStiffness),
       mGhostGhostSpringStiffness(ghostGhostSpringStiffness),
@@ -132,7 +133,8 @@ std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetGhostNodeIndic
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(
+    const std::set<unsigned>& rGhostNodeIndices)
 {
     // Reinitialise all entries of mIsGhostNode to false
     this->mIsGhostNode = std::vector<bool>(this->mrMesh.GetNumNodes(), false);
@@ -147,7 +149,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::SetGhostNodes(const std::set<un
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForceBetweenGhostNodes(const unsigned& rNodeAGlobalIndex, const unsigned& rNodeBGlobalIndex)
+c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForceBetweenGhostNodes(
+    const unsigned& rNodeAGlobalIndex,
+    const unsigned& rNodeBGlobalIndex)
 {
     assert(rNodeAGlobalIndex != rNodeBGlobalIndex);
     c_vector<double, DIM> unit_difference;
@@ -172,7 +176,9 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
 }
 
 template<unsigned DIM>
-CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(
+    CellPtr pNewCell,
+    CellPtr pParentCell)
 {
     // Add new cell to population
     CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, pParentCell);
@@ -199,7 +205,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
     assert(mIsGhostNode.size()==this->GetNumNodes());
 
     // Look through all of the cells and record what node they are associated with.
-    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
@@ -221,7 +227,8 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::RemoveGhostNode(unsigned nodeIndex)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::RemoveGhostNode(
+    unsigned nodeIndex)
 {
     assert(mIsGhostNode[nodeIndex]);
 
@@ -229,7 +236,8 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::RemoveGhostNode(unsigned nodeIn
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(NodeMap& rMap)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(
+    NodeMap& rMap)
 {
     // Copy mIsGhostNode to a temporary vector
     std::vector<bool> ghost_nodes_before_remesh = mIsGhostNode;
@@ -250,14 +258,14 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(Nod
 }
 
 template<unsigned DIM>
-std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetNeighbouringLocationIndices(
+    CellPtr pCell)
 {
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
     std::set<unsigned> neighbour_indices = this->GetNeighbouringNodeIndices(node_index);
 
     // Remove ghost nodes from the neighbour indices
-    for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
-         iter != neighbour_indices.end();)
+    for (auto iter = neighbour_indices.begin(); iter != neighbour_indices.end();)
     {
         if (this->IsGhostNode(*iter))
         {
@@ -275,19 +283,19 @@ std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetNeighbouringLo
 template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::AcceptCellWritersAcrossPopulation()
 {
-    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
         // If it isn't a ghost node then there might be cell writers attached
-        if (! this->IsGhostNode(node_iter->GetIndex()))
+        if (!this->IsGhostNode(node_iter->GetIndex()))
         {
-            for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+            for (auto cell_writer_iter = this->mCellWriters.begin();
                  cell_writer_iter != this->mCellWriters.end();
                  ++cell_writer_iter)
             {
-                CellPtr cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
-                this->AcceptCellWriter(*cell_writer_iter, cell_from_node);
+                CellPtr p_cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
+                this->AcceptCellWriter(*cell_writer_iter, p_cell_from_node);
             }
         }
     }
@@ -298,15 +306,15 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::ApplyGhostForces()
 {
     // Initialise vector of forces on ghost nodes
     std::vector<c_vector<double, DIM> > drdt(this->GetNumNodes());
-    for (unsigned i=0; i<drdt.size(); i++)
+    for (unsigned i = 0; i < drdt.size(); ++i)
     {
         drdt[i] = zero_vector<double>(DIM);
     }
 
     // Calculate forces on ghost nodes
-    for (typename MutableMesh<DIM, DIM>::EdgeIterator edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
-        edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
-        ++edge_iterator)
+    for (auto edge_iterator = static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesBegin();
+         edge_iterator != static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).EdgesEnd();
+         ++edge_iterator)
     {
         unsigned nodeA_global_index = edge_iterator.GetNodeA()->GetIndex();
         unsigned nodeB_global_index = edge_iterator.GetNodeB()->GetIndex();
@@ -328,7 +336,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::ApplyGhostForces()
         }
     }
 
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -371,7 +379,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->rGetMesh().GetNumNodes();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (auto cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -379,7 +387,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
             std::vector<double> vtk_cell_data(num_vtk_cells);
 
             // Loop over nodes of mesh
-            for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+            for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
                 node_iter != this->rGetMesh().GetNodeIteratorEnd();
                 ++node_iter)
             {
@@ -408,7 +416,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         // Next, record which nodes are ghost nodes
         // Note that the cell writer hierarchy can not be used to do this as ghost nodes don't have corresponding cells.
         std::vector<double> ghosts(num_vtk_cells);
-        for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
             node_iter != this->rGetMesh().GetNodeIteratorEnd();
             ++node_iter)
         {
@@ -433,7 +441,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (auto cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -441,7 +449,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
             std::vector<double> vtk_cell_data(num_vtk_cells);
 
             // Loop over elements of mpVoronoiTessellation
-            for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
+            for (auto elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
                  elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
                  ++elem_iter)
             {
@@ -471,7 +479,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         // Next, record which nodes are ghost nodes
         // Note that the cell writer hierarchy can not be used to do this as ghost nodes don't have corresponding cells.
         std::vector<double> ghosts(num_vtk_cells);
-        for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
+        for (auto elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
              elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
              ++elem_iter)
         {

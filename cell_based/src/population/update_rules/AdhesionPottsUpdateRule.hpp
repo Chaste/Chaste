@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 
 /**
- * An adhesion update rule for use in cell-based simulations
- * using the cellular Potts model.
+ * An adhesion update rule for use in cell-based simulations using the cellular 
+ * Potts model.
  */
 template<unsigned DIM>
 class AdhesionPottsUpdateRule : public AbstractPottsUpdateRule<DIM>
@@ -54,15 +54,15 @@ friend class TestPottsUpdateRules;
 private:
 
     /**
-     * Cell-cell adhesion energy parameter.
-     * Set to the default value 0.1 in the constructor.
+     * Cell-cell adhesion energy parameter. Set to the default value 0.1 in the 
+     * constructor.
      * \todo provide units
      */
     double mCellCellAdhesionEnergyParameter;
 
     /**
-     * Cell-boundary adhesion energy parameter.
-     * Set to the default value 0.2 in the constructor.
+     * Cell-boundary adhesion energy parameter. Set to the default value 0.2 in 
+     * the constructor.
      * \todo provide units
      */
     double mCellBoundaryAdhesionEnergyParameter;
@@ -104,16 +104,18 @@ public:
      * @param targetNodeIndex The index of the target node/lattice site
      * @param rCellPopulation The cell population
      *
-     * @return The difference in the Hamiltonian with the configuration of the target node
-     * having the same spin as the current node with the current configuration. i.e H_1-H_0
+     * @return The difference in the Hamiltonian with the configuration of the 
+     *         target node having the same spin as the current node with the 
+     *         current configuration. i.e H_1-H_0
      */
-    double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                           unsigned targetNodeIndex,
-                                           PottsBasedCellPopulation<DIM>& rCellPopulation);
+    double EvaluateHamiltonianContribution(
+        unsigned currentNodeIndex,
+        unsigned targetNodeIndex,
+        PottsBasedCellPopulation<DIM>& rCellPopulation) override;
 
     /**
-     * Method to calculate the specific interaction between 2 cells can be overridden in
-     * child classes to  implement differential adhesion .etc.
+     * Method to calculate the specific interaction between 2 cells; can be 
+     * overridden in child classes to  implement differential adhesion .etc.
      *
      * @param pCellA pointer to the 1st cell
      * @param pCellB pointer to the 2nd cell
@@ -123,8 +125,8 @@ public:
     virtual double GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB);
 
     /**
-     * Method to calculate the specific interaction between cell and medium can be overridden in
-     * child classes to  implement differential adhesion .etc.
+     * Method to calculate the specific interaction between cell and medium; can 
+     * be overridden in child classes to  implement differential adhesion .etc.
      *
      * @param pCell pointer to the cell
      *
@@ -145,14 +147,16 @@ public:
     /**
      * Set mCellCellAdhesionEnergyParameter.
      *
-     * @param cellCellAdhesionEnergyEnergyParameter the new value of mCellCellAdhesionEnergyParameter
+     * @param cellCellAdhesionEnergyEnergyParameter the new value of 
+     *     mCellCellAdhesionEnergyParameter
      */
     void SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyEnergyParameter);
 
     /**
      * Set mCellBoundaryAdhesionEnergyParameter.
      *
-     * @param cellBoundaryAdhesionEnergyParameter the new value of mCellBoundaryAdhesionEnergyParameter
+     * @param cellBoundaryAdhesionEnergyParameter the new value of 
+     *     mCellBoundaryAdhesionEnergyParameter
      */
     void SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter);
 
@@ -161,7 +165,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

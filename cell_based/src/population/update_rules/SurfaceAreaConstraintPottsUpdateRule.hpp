@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A volume constraint update rule class for use in Potts based simulations.
  *
- * Note this currently assumes cells don't grow, i.e the target volume is constant
- * for each cell over time.
+ * Note this currently assumes cells don't grow, i.e the target volume is 
+ * constant for each cell over time.
  */
 template<unsigned DIM>
 class SurfaceAreaConstraintPottsUpdateRule : public AbstractPottsUpdateRule<DIM>
@@ -56,17 +56,17 @@ friend class TestPottsUpdateRules;
 private:
 
     /**
-     * Cell deformation energy parameter.
-     * Set to the default value 0.5 in the constructor.
+     * Cell deformation energy parameter. Set to the default value 0.5 in the 
+     * constructor.
      * \todo provide units
      */
     double mDeformationEnergyParameter;
 
     /**
+     * Non-dimensional target surface area of a mature (fully-grown) cell, given 
+     * in units of area of lattice site. Set to the default value 16 in the 
+     * constructor.
      * \todo provide units #1829
-     * Non-dimensional target surface area of a mature (fully-grown) cell,
-     * given in units of area of lattice site.
-     * Set to the default value 16 in the constructor.
      */
     double mMatureCellTargetSurfaceArea;
 
@@ -110,9 +110,10 @@ public:
      * @return The difference in the Hamiltonian with the configuration of the target node
      * having the same spin as the current node with the current configuration. i.e H_1-H_0
      */
-    double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                           unsigned targetNodeIndex,
-                                           PottsBasedCellPopulation<DIM>& rCellPopulation);
+    double EvaluateHamiltonianContribution(
+        unsigned currentNodeIndex,
+        unsigned targetNodeIndex,
+        PottsBasedCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * @return mDeformationEnergyParameter
@@ -143,7 +144,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

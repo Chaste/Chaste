@@ -43,11 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 /**
- * A helper method that is called in cell-cycle model tests
- * to check that a cell is progressing through the cell cycle
- * correctly. This is a method which should only be called by
- * cxx-test classes (not source code) as it includes TS_ASSERT
- * calls.
+ * A helper method that is called in cell-cycle model tests to check that a cell 
+ * is progressing through the cell cycle correctly. This is a method which 
+ * should only be called by cxx-test classes (not source code) as it includes 
+ * TS_ASSERT calls.
  *
  * @param pModel Pointer to the cell-cycle model (note must be a phase based model)
  * @param g1Duration Correct duration of the G1 phase, to test against
@@ -134,8 +133,10 @@ void CheckReadyToDivideAndPhaseIsUpdated(AbstractPhaseBasedCellCycleModel* pMode
  * cxx-test classes (not source code) as it includes TS_ASSERT
  * calls.
  *
- * @param pModel Pointer to the cell-cycle model (note must be a simple non phase based model)
- * @param cellCycleDuration Correct duration of the cell cycle phase, to test against
+ * @param pModel Pointer to the cell-cycle model (note must be a simple non 
+ *     phase based model)
+ * @param cellCycleDuration Correct duration of the cell cycle phase, to test 
+ *     against
  */
 void CheckReadyToDivideIsUpdated(AbstractSimpleCellCycleModel* pModel,
                                  double cellCycleDuration)

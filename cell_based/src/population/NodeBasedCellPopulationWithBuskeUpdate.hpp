@@ -43,8 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * A NodeBasedCellPopulationWithBuskeUpdate is a CellPopulation consisting of only nodes in space with associated cells.
- * There are no elements and no mesh. The cell positions are updated according to Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+ * A NodeBasedCellPopulationWithBuskeUpdate is a CellPopulation consisting of 
+ * only nodes in space with associated cells. There are no elements and no mesh. 
+ * The cell positions are updated according to Buske et al (2011) 
+ * (doi:10.1371/journal.pcbi.1001045).
  */
 template<unsigned DIM>
 class NodeBasedCellPopulationWithBuskeUpdate : public NodeBasedCellPopulation<DIM>
@@ -75,11 +77,13 @@ public:
     /**
      * Default constructor.
      *
-     * Note that the cell population will take responsibility for freeing the memory used by the nodes.
+     * Note that the cell population will take responsibility for freeing the 
+     * memory used by the nodes.
      *
      * @param rMesh a mutable nodes-only mesh
      * @param rCells a vector of cells
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
      * @param deleteMesh whether to delete nodes-only mesh in destructor
      */
     NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh,
@@ -95,21 +99,21 @@ public:
     NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh);
 
     /**
-     * Method to movet the cells according to the update from Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
+     * Overridden UpdateNodeLocations() method.
+     * 
+     * Method to move the cells according to the update from Buske et al (2011) 
+     * (doi:10.1371/journal.pcbi.1001045).
      *
      * @param dt the time step
      */
-    virtual void UpdateNodeLocations(double dt);
+    virtual void UpdateNodeLocations(double dt) override;
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

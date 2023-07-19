@@ -36,17 +36,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOnLatticeCellPopulation.hpp"
 
 template<unsigned DIM>
-AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh,
-                                                                    std::vector<CellPtr>& rCells,
-                                                                  const std::vector<unsigned> locationIndices,
-                                                                  bool deleteMesh)
+AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(
+    AbstractMesh<DIM, DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices,
+    bool deleteMesh)
     : AbstractCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
       mUpdateNodesInRandomOrder(true),
       mIterateRandomlyOverUpdateRuleCollection(false)
 {
     std::list<CellPtr>::iterator it = this->mCells.begin();
-    for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
+    for (unsigned i = 0; it != this->mCells.end(); ++it, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
         AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(index, *it);
@@ -74,13 +75,15 @@ bool AbstractOnLatticeCellPopulation<DIM>::GetUpdateNodesInRandomOrder()
 }
 
 template<unsigned DIM>
-void AbstractOnLatticeCellPopulation<DIM>::SetUpdateNodesInRandomOrder(bool updateNodesInRandomOrder)
+void AbstractOnLatticeCellPopulation<DIM>::SetUpdateNodesInRandomOrder(
+    bool updateNodesInRandomOrder)
 {
     mUpdateNodesInRandomOrder = updateNodesInRandomOrder;
 }
 
 template<unsigned DIM>
-void AbstractOnLatticeCellPopulation<DIM>::SetIterateRandomlyOverUpdateRuleCollection(bool iterateRandomly)
+void AbstractOnLatticeCellPopulation<DIM>::SetIterateRandomlyOverUpdateRuleCollection(
+    bool iterateRandomly)
 {
     mIterateRandomlyOverUpdateRuleCollection = iterateRandomly;
 }
@@ -92,13 +95,16 @@ bool AbstractOnLatticeCellPopulation<DIM>::GetIterateRandomlyOverUpdateRuleColle
 }
 
 template<unsigned DIM>
-void AbstractOnLatticeCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
+void AbstractOnLatticeCellPopulation<DIM>::SetNode(
+    unsigned nodeIndex,
+    ChastePoint<DIM>& rNewLocation)
 {
     EXCEPTION("SetNode() cannot be called on a subclass of AbstractOnLatticeCellPopulation.");
 }
 
 template<unsigned DIM>
-std::set<unsigned> AbstractOnLatticeCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
+std::set<unsigned> AbstractOnLatticeCellPopulation<DIM>::GetNeighbouringNodeIndices(
+    unsigned index)
 {
     EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a subclass of AbstractOnLatticeCellPopulation, need to go through the PottsMesh instead");
     std::set<unsigned> neighbouring_node_indices;
@@ -106,7 +112,8 @@ std::set<unsigned> AbstractOnLatticeCellPopulation<DIM>::GetNeighbouringNodeIndi
 }
 
 template<unsigned DIM>
-void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
+void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<UpdateNodesInRandomOrder>" << mUpdateNodesInRandomOrder << "</UpdateNodesInRandomOrder>\n";
     *rParamsFile << "\t\t<IterateRandomlyOverUpdateRuleCollection>" << mIterateRandomlyOverUpdateRuleCollection << "</IterateRandomlyOverUpdateRuleCollection>\n";

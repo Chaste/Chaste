@@ -139,7 +139,8 @@ c_vector<double, SPACE_DIM> PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::GetE
 }
 
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM>
-void PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(
+    out_stream& rParamsFile)
 {
     // This force is not used in a simulation so this method is never called
     NEVER_REACHED;

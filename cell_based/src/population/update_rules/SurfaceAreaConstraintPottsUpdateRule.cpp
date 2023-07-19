@@ -41,7 +41,7 @@ SurfaceAreaConstraintPottsUpdateRule<DIM>::SurfaceAreaConstraintPottsUpdateRule(
       mDeformationEnergyParameter(0.5), // Educated guess
       mMatureCellTargetSurfaceArea(16.0) // Defaults to a 4*4 cell size
 {
-    /// \todo Default values don't apply in 3D.
+    ///\todo Default values don't apply in 3D.
 }
 
 template<unsigned DIM>
@@ -50,9 +50,10 @@ SurfaceAreaConstraintPottsUpdateRule<DIM>::~SurfaceAreaConstraintPottsUpdateRule
 }
 
 template<unsigned DIM>
-double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                                        unsigned targetNodeIndex,
-                                                                        PottsBasedCellPopulation<DIM>& rCellPopulation)
+double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(
+    unsigned currentNodeIndex,
+    unsigned targetNodeIndex,
+    PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
     double delta_H = 0.0;
 
@@ -85,7 +86,7 @@ double SurfaceAreaConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContributio
     unsigned neighbours_in_same_element_as_current_node = 0;
     unsigned neighbours_in_same_element_as_target_node = 0;
     std::set<unsigned> target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
-    for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+    for (auto iter = target_neighbouring_node_indices.begin();
          iter != target_neighbouring_node_indices.end();
          ++iter)
     {

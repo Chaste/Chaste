@@ -60,8 +60,10 @@ public:
      * elements for that node. Note that the gradients are piecewise constant-
      * constant in each element
      *
-     * @param rCellPopulation population on which to calculate gradients - must be instantiation of MeshBasedCellPopulation
-     * @param rItemName is the name of the data from which to form the gradient (e.g. "oxygen").
+     * @param rCellPopulation population on which to calculate gradients - must 
+     *     be instantiation of MeshBasedCellPopulation
+     * @param rItemName is the name of the data from which to form the gradient 
+     *     (e.g. "oxygen").
      */
     void SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation, const std::string& rItemName);
 

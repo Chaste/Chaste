@@ -46,14 +46,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellId.hpp"
 
 /**
- * This class provides setUp and tearDown methods that are common to
- * many cell_based test suites.  Such suites may inherit from this class
- * to avoid having to redefine them.
+ * This class provides setUp and tearDown methods that are common to many 
+ * cell_based test suites. Such suites may inherit from this class to avoid 
+ * having to redefine them.
  *
- * Note that the subclasses of CxxTest::TestSuite need to have names that
- * end with the characters "TestSuite", due to our hack of cxxtest
- * (see r3168 and #593).
- *
+ * Note that the subclasses of CxxTest::TestSuite need to have names that end 
+ * with the characters "TestSuite", due to our hack of cxxtest (see r3168 and 
+ * #593).
  */
 class AbstractCellBasedTestSuite : public CxxTest::TestSuite
 {
@@ -65,8 +64,6 @@ protected:
     {
         SimulationTime::Instance()->SetStartTime(0.0);
         RandomNumberGenerator::Instance()->Reseed(0);
-        // //Unnecessary since previous test's tearDown will have cleared:
-        // CellPropertyRegistry::Instance()->Clear();
         CellId::ResetMaxCellId();
     }
 
@@ -77,7 +74,7 @@ protected:
     {
         SimulationTime::Destroy();
         RandomNumberGenerator::Destroy();
-        CellPropertyRegistry::Instance()->Clear(); // Destroys properties which are still held by a shared pointer
+        CellPropertyRegistry::Instance()->Clear();
     }
 };
 

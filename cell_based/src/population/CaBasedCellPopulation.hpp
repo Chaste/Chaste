@@ -49,14 +49,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM> class AbstractCaBasedDivisionRule; // Circular definition thing.
 
 /**
- * A facade class encapsulating a cell population under the Cellular
- * Automaton (CA) framework.
+ * A facade class encapsulating a cell population under the Cellular Automaton 
+ * (CA) framework.
  *
- * Contains a group of cells and maintains the associations
- * between CellPtrs and nodes in a specialised PottsMesh class.
+ * Contains a group of cells and maintains the associations between CellPtrs and 
+ * nodes in a specialised PottsMesh class.
  *
- * When used here the PottsMesh has no elements as Cells are associated with nodes.
- * The PottsMesh is used to define node connectivity.
+ * When used here the PottsMesh has no elements as Cells are associated with 
+ * nodes. The PottsMesh is used to define node connectivity.
  *
  * Multiple cells can be associated at a single node.
  */
@@ -79,12 +79,16 @@ private:
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
 
-    /** A pointer to a division rule that is used to specify how cells divide. I.e do they move other cells out of the way.
-     * This is a specialisation for CA models. */
+    /**
+     * A pointer to a division rule that is used to specify how cells divide, 
+     * i.e. do they move other cells out of the way. This is a specialisation 
+     * for CA models.
+     */
     boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
 
     /**
-     * Set the empty sites by taking in a set of which nodes indices are empty sites.
+     * Set the empty sites by taking in a set of which nodes indices are empty 
+     * sites.
      *
      * @param rEmptySiteIndices set of node indices corresponding to empty sites
      */
@@ -115,34 +119,39 @@ private:
     /**
      * Overridden Validate() method.
      *
-     * Not used in CA simulations so just contains NEVER_REACHED
+     * Not used in CA simulations so just contains NEVER_REACHED.
      */
-    void Validate();
+    void Validate() override;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * This method offsets cells so can visulaise multiple cells at a single site
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory  pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
 public:
 
     /**
-     * Create a new cell population facade from a mesh, a vector of location indices
-     * and a collection of cells.
+     * Create a new cell population facade from a mesh, a vector of location 
+     * indices and a collection of cells.
      *
-     * There must be precisely one CellPtr for each entry of the locationIndices vector.
+     * There must be precisely one CellPtr for each entry of the locationIndices 
+     * vector.
      *
      * @param rMesh reference to a PottsMesh
      * @param rCells reference to a vector of CellPtrs
-     * @param locationIndices a vector of location indices that correspond to real cells
-     * @param latticeCarryingCapacity an optional parameter to allow more than one cell per site
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
-     *                   (defaults to false)
-     * @param validate whether to validate the cell population when it is created (defaults to false as not used in CA simulations)
+     * @param locationIndices a vector of location indices that correspond to 
+     *     real cells
+     * @param latticeCarryingCapacity an optional parameter to allow more than 
+     *     one cell per site
+     * @param deleteMesh set to true if you want the cell population to free the 
+     *     mesh memory on destruction (defaults to false)
+     * @param validate whether to validate the cell population when it is 
+     *     created (defaults to false as not used in CA simulations)
      */
     CaBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                   std::vector<CellPtr>& rCells,
@@ -169,7 +178,8 @@ public:
     std::vector<unsigned>& rGetAvailableSpaces();
 
     /**
-     * Find if a given node has space available. Overridden in subclasses to implement different division regimes.
+     * Find if a given node has space available. Overridden in subclasses to 
+     * implement different division regimes.
      *
      * \todo Which subclasses? Why is the second input argument needed?
      *
@@ -197,7 +207,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden GetNode() method.
@@ -206,14 +216,14 @@ public:
      *
      * @return a pointer to the node.
      */
-    Node<DIM>* GetNode(unsigned index);
+    Node<DIM>* GetNode(unsigned index) override;
 
     /**
      * Overridden GetNumNodes() method.
      *
      * @return the number of nodes in the cell population.
      */
-    unsigned GetNumNodes();
+    unsigned GetNumNodes() override;
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
@@ -227,35 +237,36 @@ public:
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
      * Overridden GetLocationOfCellCentre() method.
+     * 
      * Find where a given cell is in space.
      *
      * @param pCell the cell
      *
      * @return the location of the node corresponding to this cell.
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell) override;
 
     /**
-     * Overridden AddCellUsingLocationIndex method to add a cell to a given location index.
-     * Also updates mAvailableSpaces
+     * Overridden AddCellUsingLocationIndex() method to add a cell to a given 
+     * location index. Also updates mAvailableSpaces.
      *
      * @param index the location index
-     * @param pCell the cell.
+     * @param pCell the cell
      */
-    void AddCellUsingLocationIndex(unsigned index, CellPtr pCell);
+    void AddCellUsingLocationIndex(unsigned index, CellPtr pCell) override;
 
     /**
-     * Overridden AddCellUsingLocationIndex method to remove a cell from a given location index.
-     * Also updates mAvailableSpaces
+     * Overridden RemoveCellUsingLocationIndex() method to remove a cell from a 
+     * given location index. Also updates mAvailableSpaces.
      *
      * @param index the location index
-     * @param pCell the cell.
+     * @param pCell the cell
      */
-    void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
+    void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell) override;
 
     /**
      * Get a pointer to the node corresponding to a given CellPtr.
@@ -275,7 +286,7 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr()) override;
 
     /**
       * Calculate the propensity of a dividing into a given site.
@@ -292,31 +303,33 @@ public:
                                                unsigned targetNodeIndex,
                                                CellPtr pCell);
     /**
-     * Remove all cells labelled as dead.
-     *
-     * Note that after calling this method the cell population will be in an inconsistent state until
-     * the equivalent of a 'remesh' is performed! So don't try iterating over cells or anything
+     * Overridden RemoveDeadCells() method.
+     * 
+     * Remove all cells labelled as dead. Note that after calling this method 
+     * the cell population will be in an inconsistent state until the equivalent 
+     * of a 'remesh' is performed! So don't try iterating over cells or anything
      * like that.
      *
      * @return number of cells removed
      */
-    unsigned RemoveDeadCells();
+    unsigned RemoveDeadCells() override;
 
     /**
      * Overridden OpenWritersFiles() method.
      *
-     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
+     * Open all files in mCellPopulationWriters and mCellWriters for writing 
+     * (not appending).
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Overridden UpdateCellLocations() method.
      *
      * @param dt time step
      */
-    void UpdateCellLocations(double dt);
+    void UpdateCellLocations(double dt) override;
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
@@ -324,49 +337,46 @@ public:
      * @param pCell the cell
      * @return whether a given cell is associated with a deleted node.
      */
-    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
 
     /**
      * Overridden Update() method.
      *
      * Checks association of nodes with CellPtrs.
      *
-     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
+     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has 
+     *     had Births Or Deaths
      */
-    void Update(bool hasHadBirthsOrDeaths=true);
+    void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
-     * A virtual method to accept a cell population event writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationEventWriter() method.
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Overridden AcceptCellWriter() method.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -374,7 +384,7 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
-    double GetVolumeOfCell(CellPtr pCell);
+    double GetVolumeOfCell(CellPtr pCell) override;
 
     /**
      * Overridden GetWidth() method.
@@ -387,7 +397,7 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    double GetWidth(const unsigned& rDimension);
+    double GetWidth(const unsigned& rDimension) override;
 
     /**
      * Overridden RemoveAllUpdateRules() method.
@@ -395,27 +405,25 @@ public:
      * Remove any update rules previously passed to this population by clearing
      * mUpdateRuleCollection and mSwitchingUpdateRuleCollection.
      */
-    void RemoveAllUpdateRules();
+    void RemoveAllUpdateRules() override;
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden IsRoomToDivide() method.
+     * 
      * Returns whether there are any available neighbouring sites to the
      * one occupied by a given cell.
      *
      * @param pCell pointer to a cell
      * @return whether the cell has any free neighbouring sites
      */
-    bool IsRoomToDivide(CellPtr pCell);
+    bool IsRoomToDivide(CellPtr pCell) override;
 
     /**
      * @return The Ca division rule that is currently being used.
@@ -434,10 +442,10 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule) override;
 
     /**
-     * Overridden AddUpdateRule() method.
+     * Overridden GetUpdateRuleCollection() method.
      *
      * Get the collection of update rules to be used with this population.
      * This vector is comprised of mUpdateRuleCollection and mSwitchingUpdateRuleCollection,
@@ -445,7 +453,7 @@ public:
      *
      * @return the update rule collection
      */
-    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
+    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const override;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -453,35 +461,36 @@ public:
      * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
      *         with a PDE modifier
      * @param rVariableName the name of the cell data item to get
-     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
-     *        (optional; defaults to false)
-     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
-     *        (optional; defaults to 0.0)
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary 
+     *     condition is used (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary 
+     *     condition, if used (optional; defaults to 0.0)
      *
      * @return the value of a CellData item (interpolated if necessary) at a node,
      *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
      * This method can be called by PDE modifier classes.
      */
-    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
-                                            std::string& rVariableName,
-                                            bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+    virtual double GetCellDataItemAtPdeNode(
+        unsigned pdeNodeIndex,
+        std::string& rVariableName,
+        bool dirichletBoundaryConditionApplies=false,
+        double dirichletBoundaryValue=0.0) override;
 
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
      *
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a 
+     *     PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
 };
 
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
-
 
 namespace boost
 {

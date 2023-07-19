@@ -75,43 +75,43 @@ double PottsElement<DIM>::GetAspectRatio()
     // See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
     switch (DIM)
     {
-    case 2:
-    {
-        // Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
-        double mean_x=0;
-        double mean_y=0;
-
-        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        case 2:
         {
-            mean_x += this->mNodes[i]->rGetLocation()[0];
-            mean_y += this->mNodes[i]->rGetLocation()[1];
+            // Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
+            double mean_x = 0;
+            double mean_y = 0;
+
+            for (unsigned i = 0; i < this->GetNumNodes(); ++i)
+            {
+                mean_x += this->mNodes[i]->rGetLocation()[0];
+                mean_y += this->mNodes[i]->rGetLocation()[1];
+            }
+            mean_x /= this->GetNumNodes();
+            mean_y /= this->GetNumNodes();
+
+            double variance_x = 0;
+            double variance_y = 0;
+            double covariance_xy = 0;
+
+            for (unsigned i = 0; i < this->GetNumNodes(); ++i)
+            {
+                variance_x += pow((this->mNodes[i]->rGetLocation()[0]-mean_x),2);
+                variance_y += pow((this->mNodes[i]->rGetLocation()[1]-mean_y),2);
+                covariance_xy += (this->mNodes[i]->rGetLocation()[0]-mean_x)*(this->mNodes[i]->rGetLocation()[1]-mean_y);
+            }
+            variance_x /= this->GetNumNodes();
+            variance_y /= this->GetNumNodes();
+            covariance_xy /= this->GetNumNodes();
+
+            // Calculate max/min eigenvalues
+            double trace = variance_x + variance_y;
+            double det = variance_x*variance_y - covariance_xy*covariance_xy;
+
+            eig_max = 0.5*(trace + sqrt(trace*trace - 4*det));
+            eig_min = 0.5*(trace - sqrt(trace*trace - 4*det));
+
+            break;
         }
-        mean_x /= this->GetNumNodes();
-        mean_y /= this->GetNumNodes();
-
-        double variance_x = 0;
-        double variance_y = 0;
-        double covariance_xy = 0;
-
-        for (unsigned i=0; i<this->GetNumNodes(); i++)
-        {
-            variance_x += pow((this->mNodes[i]->rGetLocation()[0]-mean_x),2);
-            variance_y += pow((this->mNodes[i]->rGetLocation()[1]-mean_y),2);
-            covariance_xy += (this->mNodes[i]->rGetLocation()[0]-mean_x)*(this->mNodes[i]->rGetLocation()[1]-mean_y);
-        }
-        variance_x /= this->GetNumNodes();
-        variance_y /= this->GetNumNodes();
-        covariance_xy /= this->GetNumNodes();
-
-        // Calculate max/min eigenvalues
-        double trace = variance_x+variance_y;
-        double det = variance_x*variance_y - covariance_xy*covariance_xy;
-
-        eig_max = 0.5*(trace+sqrt(trace*trace - 4*det));
-        eig_min = 0.5*(trace-sqrt(trace*trace - 4*det));
-
-        break;
-    }
 //    case 3:
 //    {
 //        double mean_x = 0;
@@ -187,8 +187,8 @@ double PottsElement<DIM>::GetAspectRatio()
 //        eig_min = eigs[0] +eigs[1];
 //        break;
 //    }
-    default:
-        NEVER_REACHED;
+        default:
+            NEVER_REACHED;
     }
 
     // As matrix is symmetric positive semidefinite

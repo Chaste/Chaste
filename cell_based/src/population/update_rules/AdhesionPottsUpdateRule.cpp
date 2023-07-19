@@ -49,9 +49,10 @@ AdhesionPottsUpdateRule<DIM>::~AdhesionPottsUpdateRule()
 }
 
 template<unsigned DIM>
-double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                                unsigned targetNodeIndex,
-                                                                PottsBasedCellPopulation<DIM>& rCellPopulation)
+double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(
+    unsigned currentNodeIndex,
+    unsigned targetNodeIndex,
+    PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
     std::set<unsigned> containing_elements = rCellPopulation.GetNode(currentNodeIndex)->rGetContainingElementIndices();
     std::set<unsigned> new_location_containing_elements = rCellPopulation.GetNode(targetNodeIndex)->rGetContainingElementIndices();
@@ -78,7 +79,7 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
     // Iterate over nodes neighbouring the target node to work out the contact energy contribution
     double delta_H = 0.0;
     std::set<unsigned> target_neighbouring_node_indices = rCellPopulation.rGetMesh().GetVonNeumannNeighbouringNodeIndices(targetNodeIndex);
-    for (std::set<unsigned>::iterator iter = target_neighbouring_node_indices.begin();
+    for (auto iter = target_neighbouring_node_indices.begin();
          iter != target_neighbouring_node_indices.end();
          ++iter)
     {
@@ -152,7 +153,9 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
 }
 
 template<unsigned DIM>
-double AdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
+double AdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(
+    CellPtr pCellA,
+    CellPtr pCellB)
 {
     return GetCellCellAdhesionEnergyParameter();
 }
@@ -176,13 +179,15 @@ double AdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergyParameter()
 }
 
 template<unsigned DIM>
-void AdhesionPottsUpdateRule<DIM>::SetCellCellAdhesionEnergyParameter(double cellCellAdhesionEnergyParameter)
+void AdhesionPottsUpdateRule<DIM>::SetCellCellAdhesionEnergyParameter(
+    double cellCellAdhesionEnergyParameter)
 {
     mCellCellAdhesionEnergyParameter = cellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void AdhesionPottsUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(double cellBoundaryAdhesionEnergyParameter)
+void AdhesionPottsUpdateRule<DIM>::SetCellBoundaryAdhesionEnergyParameter(
+    double cellBoundaryAdhesionEnergyParameter)
 {
     mCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }

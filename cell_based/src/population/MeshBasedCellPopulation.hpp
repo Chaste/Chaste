@@ -95,19 +95,22 @@ private:
 
 protected:
     /**
-     * Pointer to a VertexMesh object that stores the Voronoi tessellation that is dual to
-     * mrMesh. The tessellation is created by calling CreateVoronoiTessellation() and can
-     * be accessed by calling GetVoronoiTessellation().
+     * Pointer to a VertexMesh object that stores the Voronoi tessellation that 
+     * is dual to mrMesh. The tessellation is created by calling 
+     * CreateVoronoiTessellation() and can be accessed by calling 
+     * GetVoronoiTessellation().
      *
-     * The tessellation can be used to compute the area and perimeter (in 2D) or volume and
-     * surface area (in 3D) of the Voronoi element corresponding to each node in the Delaunay
-     * mesh (including ghost nodes) by calling the methods GetVolumeOfVoronoiElement() and
-     * GetSurfaceAreaOfVoronoiElement() respectively. Each of these methods should be called
-     * rather than the relevant method on the VertexMesh. This is because the index of a given
-     * Node in mrMesh may not equal the index of the corresponding VertexElement in
-     * mpVoronoiTessellation; a map between these indices may be accessed by calling the methods
-     * GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex()
-     * and GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex() on mpVoronoiTessellation.
+     * The tessellation can be used to compute the area and perimeter (in 2D) or 
+     * volume and surface area (in 3D) of the Voronoi element corresponding to 
+     * each node in the Delaunay mesh (including ghost nodes) by calling the 
+     * methods GetVolumeOfVoronoiElement() and GetSurfaceAreaOfVoronoiElement() 
+     * respectively. Each of these methods should be called rather than the 
+     * relevant method on the VertexMesh. This is because the index of a given
+     * Node in mrMesh may not equal the index of the corresponding VertexElement 
+     * in mpVoronoiTessellation; a map between these indices may be accessed by 
+     * calling the methods GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex()
+     * and GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex() on 
+     * mpVoronoiTessellation.
      */
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* mpVoronoiTessellation;
 
@@ -121,20 +124,27 @@ protected:
     bool mDeleteMesh;
 
     /**
-     * Keeps track of the rest lengths of springs if these are being used in the simulation.
+     * Keeps track of the rest lengths of springs if these are being used in the 
+     * simulation.
      */
     std::map<std::pair<unsigned,unsigned>, double> mSpringRestLengths;
 
-    /** Whether to use a viscosity that is linear in the cell area, rather than constant. */
+    /**
+     * Whether to use a viscosity that is linear in the cell area, rather than 
+     * constant. */
     bool mUseAreaBasedDampingConstant;
 
-    /** Non-dimensional parameter d0 for use in area-based damping constant calculations. */
+    /**
+     * Non-dimensional parameter d0 for use in area-based damping constant
+     * calculations. */
     double mAreaBasedDampingConstantParameter;
 
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
 
-    /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
+    /**
+     * Whether to bound the voronoi tesselation to avoid infinite cells on 
+     * boundary. */
     bool mBoundVoronoiTessellation;
 
     /** Whether springs have variable rest lengths. */
@@ -151,10 +161,12 @@ protected:
     virtual void UpdateGhostNodesAfterReMesh(NodeMap& rMap);
 
     /**
+     * Overridden Validate() method.
+     * 
      * Check consistency of our internal data structures. Each node must
      * have a cell associated with it.
      */
-    virtual void Validate();
+    virtual void Validate() override;
 
 public:
     /**
@@ -164,8 +176,10 @@ public:
      *
      * @param rMesh a mutable tetrahedral mesh
      * @param rCells cells corresponding to the nodes of the mesh
-     * @param locationIndices an optional vector of location indices that correspond to real cells
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
+     * @param deleteMesh set to true if you want the cell population to free the 
+     *     mesh memory on destruction
      * @param validate whether to validate the cell population
      */
     MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -203,7 +217,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();
@@ -216,7 +230,7 @@ public:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    unsigned AddNode(Node<SPACE_DIM>* pNewNode);
+    unsigned AddNode(Node<SPACE_DIM>* pNewNode) override;
 
     /**
      * Overridden SetNode() method.
@@ -226,7 +240,7 @@ public:
      * @param nodeIndex the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation);
+    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation) override;
 
     /**
      * Overridden GetDampingConstant() method that includes the
@@ -235,7 +249,7 @@ public:
      * @param nodeIndex the global index of this node
      * @return the damping constant for the given Cell.
      */
-    double GetDampingConstant(unsigned nodeIndex);
+    double GetDampingConstant(unsigned nodeIndex) override;
 
     /**
      * Set method for mUseAreaBasedDampingConstant.
@@ -251,21 +265,23 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
-     * Remove all cells that are labelled as dead.
-     *
-     * Note that this now calls MutableMesh::DeleteNodePriorToReMesh()
-     * and therefore a ReMesh(map) must be called before any element
+     * Overridden RemoveDeadCells() method.
+     * 
+     * Remove all cells that are labelled as dead. Note that this calls 
+     * MutableMesh::DeleteNodePriorToReMesh() and therefore a ReMesh(map) must 
+     * be called before any element
      * information is used.
      *
-     * Note also that after calling this method the cell population will be in an inconsistent state until
-     * Update() is called! So don't try iterating over cells or anything like that.
+     * Note also that after calling this method the cell population will be in 
+     * an inconsistent state until Update() is called! So don't try iterating 
+     * over cells or anything like that.
      *
      * @return number of cells removed.
      */
-    virtual unsigned RemoveDeadCells();
+    virtual unsigned RemoveDeadCells() override;
 
     /**
      * Overridden AddCell() method.
@@ -274,73 +290,74 @@ public:
      *
      * @param pNewCell  the cell to add
      * @param pParentCell pointer to a parent cell - this is required for
-     *  mesh-based cell populations
+     *     mesh-based cell populations
      *
-     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     * @return address of cell as it appears in the cell list (internal of this 
+     * method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden WriteResultsToFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteResultsToFiles(const std::string& rDirectory);
+    virtual void WriteResultsToFiles(const std::string& rDirectory) override;
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter) override;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter) override;
 
     /**
-     * A virtual method to accept a cell population event writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationEventWriter() method.
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter) override;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Overridden AcceptCellWriter() method.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(
+        boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Overridden Update(bool hasHadBirthsOrDeaths) method.
      * Fixes up the mappings between cells and nodes.
      *
-     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
-     * not needed in this cell population class
+     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has 
+     *     had Births Or Deaths not needed in this cell population class
      */
-    virtual void Update(bool hasHadBirthsOrDeaths=true);
+    virtual void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
-     *  Tessellates when required: if areas or volumes are needed for
-     *  mUseAreaBasedDampingConstant; if a CellPopulationAreaWriter or
-     *  CellVolumesWriter has been added to the population; or if
-     *  Voronoi data are to be output.
+     * Tessellates when required: if areas or volumes are needed for
+     * mUseAreaBasedDampingConstant; if a CellPopulationAreaWriter or
+     * CellVolumesWriter has been added to the population; or if Voronoi data 
+     * are to be output.
      */
     void TessellateIfNeeded();
 
     /**
-     *  Divides springs longer than the given threshold
+     * Divides springs longer than the given threshold.
      *
-     *  @param springDivisionThreshold  a given threshold
+     * @param springDivisionThreshold  a given threshold
      */
     void DivideLongSprings(double springDivisionThreshold);
 
@@ -351,21 +368,22 @@ public:
      *
      * @return pointer to the Node with given index.
      */
-    Node<SPACE_DIM>* GetNode(unsigned index);
+    Node<SPACE_DIM>* GetNode(unsigned index) override;
 
     /**
      * Overridden GetNumNodes() method.
      *
      * @return the number of nodes in the cell population.
      */
-    unsigned GetNumNodes();
+    unsigned GetNumNodes() override;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory  pathname of the output directory, relative to where 
+     * Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -373,7 +391,7 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
-    double GetVolumeOfCell(CellPtr pCell);
+    double GetVolumeOfCell(CellPtr pCell) override;
 
     /**
      * Create a Voronoi tessellation of the mesh.
@@ -386,26 +404,30 @@ public:
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* GetVoronoiTessellation();
 
     /**
-     * @return the volume (or area in 2D, or length in 1D) of the element of mpVoronoiTessellation associated with
-     * the node with this global index in the Delaunay mesh.
+     * @return the volume (or area in 2D, or length in 1D) of the element of 
+     * mpVoronoiTessellation associated with the node with this global index in 
+     * the Delaunay mesh.
      *
-     * This method should be called instead of calling GetVoronoiTessellation()->GetVolumeOfElement()
-     * because the global indices of Delaunay nodes and Voronoi elements may not match,
-     * e.g. if a node is a ghost node or corresponds to a Voronoi face.
+     * This method should be called instead of calling 
+     * GetVoronoiTessellation()->GetVolumeOfElement() because the global indices 
+     * of Delaunay nodes and Voronoi elements may not match, e.g. if a node is a 
+     * ghost node or corresponds to a Voronoi face.
      *
-     * \todo This method is somewhat redundant following the introduction of the method GetVolumeOfCell() (see #1985).
+     * \todo This method is somewhat redundant following the introduction of the 
+     * method GetVolumeOfCell() (see #1985).
      *
      * @param index a node global index
      */
     double GetVolumeOfVoronoiElement(unsigned index);
 
     /**
-     * @return the surface area of the element of mpVoronoiTessellation associated with
-     * the node with this global index in the Delaunay mesh.
+     * @return the surface area of the element of mpVoronoiTessellation 
+     * associated with the node with this global index in the Delaunay mesh.
      *
-     * This method should be called instead of calling GetVoronoiTessellation()->GetSurfaceAreaOfElement()
-     * because the global indices of Delaunay nodes and Voronoi elements may not match,
-     * e.g. if a node is a ghost node or corresponds to a Voronoi face.
+     * This method should be called instead of calling 
+     * GetVoronoiTessellation()->GetSurfaceAreaOfElement() because the global 
+     * indices of Delaunay nodes and Voronoi elements may not match, e.g. if a 
+     * node is a ghost node or corresponds to a Voronoi face.
      *
      * @param index a node global index
      */
@@ -415,9 +437,10 @@ public:
      * @return the length of the edge of mpVoronoiTessellation associated with
      * the two nodes with these global indices in the Delaunay mesh.
      *
-     * This method should be called instead of calling GetVoronoiTessellation()->GetEdgeLength()
-     * because the global indices of Delaunay nodes and Voronoi elements may not match,
-     * e.g. if a node is a ghost node or corresponds to a Voronoi face.
+     * This method should be called instead of calling 
+     * GetVoronoiTessellation()->GetEdgeLength() because the global indices of 
+     * Delaunay nodes and Voronoi elements may not match, e.g. if a node is a 
+     * ghost node or corresponds to a Voronoi face.
      *
      * @param index1 a node global index
      * @param index2 a node global index
@@ -433,21 +456,22 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    double GetWidth(const unsigned& rDimension);
+    double GetWidth(const unsigned& rDimension) override;
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
+     * 
      * Write any data necessary to a visualization setup file.
      * Used by AbstractCellBasedSimulation::WriteVisualizerSetupFile().
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 
     /**
-     * Iterator over edges in the mesh, which correspond to springs between cells.
-     *
-     * This class takes care of the logic to make sure that you consider each edge exactly once.
+     * Iterator over edges in the mesh, which correspond to springs between 
+     * cells. This class takes care of the logic to make sure that you consider 
+     * each edge exactly once.
      */
     class SpringIterator
     {
@@ -479,7 +503,8 @@ public:
          * @param rOther SpringIterator with which comparison is made
          * @return not-equal
          */
-        bool operator!=(const typename MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& rOther);
+        bool operator!=(
+            const typename MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -493,7 +518,9 @@ public:
          * @param rCellPopulation the cell population
          * @param edgeIter iterator over edges in the mesh
          */
-        SpringIterator(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation, typename MutableMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator edgeIter);
+        SpringIterator(
+            MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
+            typename MutableMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator edgeIter);
 
     private:
 
@@ -530,9 +557,11 @@ public:
     /**
      * Set mAreaBasedDampingConstantParameter.
      *
-     * @param areaBasedDampingConstantParameter the new value of mAreaBasedDampingConstantParameter
+     * @param areaBasedDampingConstantParameter the new value of 
+     *     mAreaBasedDampingConstantParameter
      */
-    void SetAreaBasedDampingConstantParameter(double areaBasedDampingConstantParameter);
+    void SetAreaBasedDampingConstantParameter(
+        double areaBasedDampingConstantParameter);
 
     /**
      * Overridden rGetNodePairs method which uses the Delaunay triangulatiuon
@@ -581,7 +610,8 @@ public:
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
-     * Populate mSpringRestLengths by looping over all springs and calculating the current length
+     * Populate mSpringRestLengths by looping over all springs and calculating 
+     * the current length
      */
     void CalculateRestLengths();
 
@@ -601,7 +631,6 @@ public:
      *  @param restLength the new rest length
      */
     void SetRestLength(unsigned indexA, unsigned indexB, double restLength);
-
 };
 
 #include "SerializationExportWrapper.hpp"

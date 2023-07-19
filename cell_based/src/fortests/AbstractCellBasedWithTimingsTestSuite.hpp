@@ -42,19 +42,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Timer.hpp"
 
 /**
- * This class provides setUp and tearDown methods that time each test,
- * and then do all the regular singleton cleaning via AbstractCellBasedTestSuite.
+ * This class provides setUp and tearDown methods that time each test, and then 
+ * do all the regular singleton cleaning via AbstractCellBasedTestSuite.
  *
- * Note that the subclasses of CxxTest::TestSuite need to have names that
- * end with the characters "TestSuite", due to our hack of cxxtest
- * (see r3168 and #593).
- *
+ * Note that the subclasses of CxxTest::TestSuite need to have names that end 
+ * with the characters "TestSuite", due to our hack of cxxtest (see r3168 and 
+ * #593).
  */
 class AbstractCellBasedWithTimingsTestSuite : public AbstractCellBasedTestSuite
 {
 protected:
     /**
-     * Overridden setUp() method. Resets the timer and calls method on parent class.
+     * Overridden setUp() method. Resets the timer and calls method on parent 
+     * class.
      */
     void setUp()
     {
@@ -63,7 +63,8 @@ protected:
     }
 
     /**
-     * Overridden teardown() method. Prints the amount of time the test took, and calls method on parent class.
+     * Overridden teardown() method. Prints the amount of time the test took, 
+     * and calls method on parent class.
      */
     void tearDown()
     {

@@ -42,9 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 
 /**
- * An adhesion update rule for use in cell-based simulations
- * using the cellular Potts model. This rule implements differential adhesion
- * between unlabelled and labelled cells
+ * An adhesion update rule for use in cell-based simulations using the cellular 
+ * Potts model. This rule implements differential adhesion between unlabelled 
+ * and labelled cells
  */
 template<unsigned DIM>
 class DifferentialAdhesionPottsUpdateRule : public AdhesionPottsUpdateRule<DIM>
@@ -54,22 +54,22 @@ friend class TestPottsUpdateRules;
 private:
 
     /**
-     * LabelledCell-LabelledCell adhesion energy parameter.
-     * Set to the default value 0.1 in the constructor.
+     * LabelledCell-LabelledCell adhesion energy parameter. Set to the default 
+     * value 0.1 in the constructor.
      * \todo provide units
      */
     double mLabelledCellLabelledCellAdhesionEnergyParameter;
 
     /**
-     * LablledCell-cell adhesion energy parameter.
-     * Set to the default value 0.1 in the constructor.
+     * LablledCell-cell adhesion energy parameter. Set to the default value 0.1 
+     * in the constructor.
      * \todo provide units
      */
     double mLabelledCellCellAdhesionEnergyParameter;
 
     /**
-     * LabelledCell-boundary adhesion energy parameter.
-     * Set to the default value 0.2 in the constructor.
+     * LabelledCell-boundary adhesion energy parameter. Set to the default value 
+     * 0.2 in the constructor.
      * \todo provide units
      */
     double mLabelledCellBoundaryAdhesionEnergyParameter;
@@ -104,23 +104,25 @@ public:
     virtual ~DifferentialAdhesionPottsUpdateRule();
 
     /**
-     * Overridden GetCellCellAdhesionEnergy method to implement differential adhesion.
+     * Overridden GetCellCellAdhesionEnergy method to implement differential 
+     * adhesion.
      *
      * @param pCellA pointer to the 1st cell
      * @param pCellB pointer to the 2nd cell
      *
      * @return The cell cell interaction adhesion energy between the two cells
      */
-    virtual double GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB);
+    virtual double GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB) override;
 
     /**
-     * Overridden GetCellBoundaryAdhesionEnergy method to implement differential adhesion.
+     * Overridden GetCellBoundaryAdhesionEnergy method to implement differential 
+     * adhesion.
      *
      * @param pCell pointer to the cell
      *
      * @return Cell boundary interaction adhesion energy for the cell
      */
-    virtual double GetCellBoundaryAdhesionEnergy(CellPtr pCell);
+    virtual double GetCellBoundaryAdhesionEnergy(CellPtr pCell) override;
 
     /**
      * @return mLabelledCellLabelledCellAdhesionEnergyParameter
@@ -140,30 +142,36 @@ public:
     /**
      * Set mLabelledCellLabelledCellAdhesionEnergyParameter.
      *
-     * @param labelledCellLabelledCellAdhesionEnergyParameter the new value of mLabelledCellLabelledCellAdhesionEnergyParameter
+     * @param labelledCellLabelledCellAdhesionEnergyParameter the new value of 
+     *     mLabelledCellLabelledCellAdhesionEnergyParameter
      */
-    void SetLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter);
+    void SetLabelledCellLabelledCellAdhesionEnergyParameter(
+        double labelledCellLabelledCellAdhesionEnergyParameter);
 
     /**
      * Set mLabelledCellCellAdhesionEnergyParameter.
      *
-     * @param labelledCellCellAdhesionEnergyParameter the new value of mLabelledCelldCellAdhesionEnergyParameter
+     * @param labelledCellCellAdhesionEnergyParameter the new value of 
+     *     mLabelledCelldCellAdhesionEnergyParameter
      */
-    void SetLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter);
+    void SetLabelledCellCellAdhesionEnergyParameter(
+        double labelledCellCellAdhesionEnergyParameter);
 
     /**
      * Set mLabelledCellBoundaryAdhesionEnergyParameter.
      *
-     * @param labelledCellBoundaryAdhesionEnergyParameter the new value of mLabelledCellBoundaryAdhesionEnergyParameter
+     * @param labelledCellBoundaryAdhesionEnergyParameter the new value of 
+     *     mLabelledCellBoundaryAdhesionEnergyParameter
      */
-    void SetLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter);
+    void SetLabelledCellBoundaryAdhesionEnergyParameter(
+        double labelledCellBoundaryAdhesionEnergyParameter);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

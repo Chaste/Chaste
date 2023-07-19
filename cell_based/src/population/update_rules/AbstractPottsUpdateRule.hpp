@@ -43,7 +43,8 @@ template<unsigned DIM>
 class PottsBasedCellPopulation; // Circular definition
 
 /**
- * An abstract Potts update rule class, for use in cellular Potts model simulations.
+ * An abstract Potts update rule class, for use in cellular Potts model 
+ * simulations.
  */
 template<unsigned DIM>
 class AbstractPottsUpdateRule : public AbstractUpdateRule<DIM>
@@ -78,26 +79,27 @@ public:
     /**
      * Calculate the contribution to the Hamiltonian.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param currentNodeIndex The index of the current node/lattice site
      * @param targetNodeIndex The index of the target node/lattice site
      * @param rCellPopulation The cell population
      *
-     * @return The difference in the Hamiltonian with the configuration of the target node
-     * having the same spin as the current node with the current configuration. i.e H_1-H_0
+     * @return The difference in the Hamiltonian with the configuration of the 
+     *         target node having the same spin as the current node with the 
+     * current configuration. i.e H_1-H_0
      */
-    virtual double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                   unsigned targetNodeIndex,
-                                                   PottsBasedCellPopulation<DIM>& rCellPopulation)=0;
+    virtual double EvaluateHamiltonianContribution(
+        unsigned currentNodeIndex,
+        unsigned targetNodeIndex,
+        PottsBasedCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
      *
      * @param rParamsFile a file stream
      */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #endif /*ABSTRACTPOTTSUPDATERULE_HPP_*/

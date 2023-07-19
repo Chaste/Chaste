@@ -47,9 +47,10 @@ ChemotaxisPottsUpdateRule<DIM>::~ChemotaxisPottsUpdateRule()
 }
 
 template<unsigned DIM>
-double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                                        unsigned targetNodeIndex,
-                                                                        PottsBasedCellPopulation<DIM>& rCellPopulation)
+double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(
+    unsigned currentNodeIndex,
+    unsigned targetNodeIndex,
+    PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
     double delta_H = 0.0;
 
@@ -59,7 +60,7 @@ double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned 
     c_vector<double, DIM> target_location;
     target_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();
 
-    for (unsigned dimension=0; dimension<DIM; dimension++)
+    for (unsigned dimension = 0; dimension < DIM; ++dimension)
     {
         if (target_location[dimension] > current_location[dimension])
         {

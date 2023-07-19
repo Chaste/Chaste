@@ -40,9 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                                                    std::vector<CellPtr>& rCells,
-                                                                  const std::vector<unsigned> locationIndices)
+AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation(
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices)
     : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
       mMeinekeDivisionSeparation(0.3) // educated guess
 {
@@ -50,7 +51,7 @@ AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCe
     std::list<CellPtr>::iterator it = this->mCells.begin();
     typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
 
-    for (unsigned i=0; it != this->mCells.end(); ++it, ++i, ++node_iter)
+    for (unsigned i = 0; it != this->mCells.end(); ++it, ++i, ++node_iter)
     {
         unsigned index = locationIndices.empty() ? node_iter->GetIndex() : locationIndices[i]; // assume that the ordering matches
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index,*it);
@@ -60,20 +61,23 @@ AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCe
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
+AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCellPopulation(
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
     : AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh),
       mMeinekeDivisionSeparation(0.3) // educated guess
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetLocationOfCellCentre(CellPtr pCell)
+c_vector<double, SPACE_DIM> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetLocationOfCellCentre(
+    CellPtr pCell)
 {
     return GetNodeCorrespondingToCell(pCell)->rGetLocation();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNodeCorrespondingToCell(CellPtr pCell)
+Node<SPACE_DIM>* AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNodeCorrespondingToCell(
+    CellPtr pCell)
 {
     unsigned index = this->GetLocationIndexUsingCell(pCell);
     return this->GetNode(index);
@@ -93,10 +97,13 @@ double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellDataIte
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(
+    CellPtr pNewCell,
+    CellPtr pParentCell)
 {
     // Calculate the locations of the two daughter cells
-    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
+    std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > positions = 
+        mpCentreBasedDivisionRule->CalculateCellDivisionVector(pParentCell, *this);
 
     c_vector<double, SPACE_DIM> parent_position = positions.first;
     c_vector<double, SPACE_DIM> daughter_position = positions.second;
@@ -131,7 +138,9 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::pair<CellPtr,CellPtr> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateCellPair(CellPtr pCell1, CellPtr pCell2)
+std::pair<CellPtr,CellPtr> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateCellPair(
+    CellPtr pCell1,
+    CellPtr pCell2)
 {
     assert(pCell1);
     assert(pCell2);
@@ -152,7 +161,8 @@ std::pair<CellPtr,CellPtr> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsMarkedSpring(const std::pair<CellPtr,CellPtr>& rCellPair)
+bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsMarkedSpring(
+    const std::pair<CellPtr, CellPtr>& rCellPair)
 {
     // the pair should be ordered like this (CreateCellPair will ensure this)
     assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
@@ -161,7 +171,8 @@ bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsMarkedSpring(c
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MarkSpring(std::pair<CellPtr,CellPtr>& rCellPair)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MarkSpring(
+    std::pair<CellPtr, CellPtr>& rCellPair)
 {
     // the pair should be ordered like this (CreateCellPair will ensure this)
     assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
@@ -170,29 +181,35 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MarkSpring(std::
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UnmarkSpring(std::pair<CellPtr,CellPtr>& rCellPair)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UnmarkSpring(
+    std::pair<CellPtr, CellPtr>& rCellPair)
 {
-    // the pair should be ordered like this (CreateCellPair will ensure this)
+    // The pair should be ordered like this (CreateCellPair will ensure this)
     assert(rCellPair.first->GetCellId() < rCellPair.second->GetCellId());
 
     mMarkedSprings.erase(rCellPair);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
+bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAssociatedWithADeletedLocation(
+    CellPtr pCell)
 {
     return GetNodeCorrespondingToCell(pCell)->IsDeleted();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringLocationIndices(
+    CellPtr pCell)
 {
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
     return this->GetNeighbouringNodeIndices(node_index);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(
+    unsigned nodeIndex,
+    c_vector<double,SPACE_DIM>& rDisplacement,
+    double dt)
 {
     double length = norm_2(rDisplacement);
 
@@ -210,7 +227,8 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSize
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstant(unsigned nodeIndex)
+double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingConstant(
+    unsigned nodeIndex)
 {
     if (this->IsGhostNode(nodeIndex) || this->IsParticle(nodeIndex))
     {
@@ -231,13 +249,15 @@ double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDampingCons
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsGhostNode(unsigned index)
+bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsGhostNode(
+    unsigned index)
 {
     return false;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsParticle(unsigned index)
+bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsParticle(
+    unsigned index)
 {
     return false;
 }
@@ -249,7 +269,8 @@ double AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetMeinekeDivi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetMeinekeDivisionSeparation(double divisionSeparation)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetMeinekeDivisionSeparation(
+    double divisionSeparation)
 {
     assert(divisionSeparation <= 1.0);
     assert(divisionSeparation >= 0.0);
@@ -259,11 +280,11 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetMeinekeDivisi
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWritersAcrossPopulation()
 {
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (auto cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -280,13 +301,15 @@ boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > Abst
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCentreBasedDivisionRule(boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCentreBasedDivisionRule(
+    boost::shared_ptr<AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM> > pCentreBasedDivisionRule)
 {
     mpCentreBasedDivisionRule = pCentreBasedDivisionRule;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MeinekeDivisionSeparation>" << mMeinekeDivisionSeparation << "</MeinekeDivisionSeparation>\n";
 

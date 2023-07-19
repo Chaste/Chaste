@@ -39,14 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-
 #include "ObjectCommunicator.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 
 /**
- * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.
- * There are no elements and no mesh.
+ * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in 
+ * space with associated cells. There are no elements.
  */
 template<unsigned DIM>
 class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
@@ -54,11 +53,6 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
     friend class TestNodeBasedCellPopulation;
     friend class TestNodeBasedCellPopulationParallelMethods;
     friend class TestPeriodicNodeBasedCellPopulationParallelMethods;
-
-protected:
-
-    /** Static cast of the mesh from AbstractCellPopulation. */
-    NodesOnlyMesh<DIM>* mpNodesOnlyMesh;
 
 private:
 
@@ -71,10 +65,16 @@ private:
     /** Node pairs for force calculations. */
     std::vector< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
 
-    /** Whether to delete the nodes-only mesh (taken in one of the constructors, defaults to false). */
+    /**
+     * Whether to delete the nodes-only mesh (taken in one of the constructors, 
+     * defaults to false).
+     */
     bool mDeleteMesh;
 
-    /** Whether or not to have cell radii updated from CellData defaults to false.*/
+    /**
+     * Whether or not to have cell radii updated from CellData (defaults to 
+     * false).
+     */
     bool mUseVariableRadii;
 
     /** The cells to send to the right process */
@@ -141,10 +141,11 @@ private:
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population
      */
-    unsigned AddNode(Node<DIM>* pNewNode);
+    unsigned AddNode(Node<DIM>* pNewNode) override;
 
     /**
      * Add a moved cell to this process along with its node.
+     * 
      * @param pCell the pointer to the cell that is to be added.
      * @param pNode the pointer to the node that is to be added.
      */
@@ -152,12 +153,14 @@ private:
 
     /**
      * Delete a cell and its associated node that have moved off this process.
+     * 
      * @param index the location of the cell to be deleted
      */
     void DeleteMovedCell(unsigned index);
 
     /**
-     * Send and receive halo nodes with neighbours and populate memory structures to store them
+     * Send and receive halo nodes with neighbours and populate memory structures 
+     * to store them.
      */
     void RefreshHaloCells();
 
@@ -178,7 +181,8 @@ private:
     void AddNodeAndCellToSendLeft(unsigned nodeIndex);
 
     /**
-     * Add a collection of cells to send right
+     * Add a collection of cells to send right.
+     * 
      * @param cellLocationIndices the list of location indices of cells to send.
      */
     void AddCellsToSendRight(std::vector<unsigned>& cellLocationIndices);
@@ -195,7 +199,9 @@ private:
     void AddReceivedHaloCells();
 
     /**
-     * Add a single halo cell with its node to the halo structures on this process.
+     * Add a single halo cell with its node to the halo structures on this 
+     * process.
+     * 
      * @param pCell the cell to add.
      * @param pNode the node to add.
      */
@@ -208,28 +214,12 @@ private:
      */
     void UpdateMapsAfterRemesh(NodeMap& map);
 
-protected:
-
-    /**
-     * Update mIsParticle if required by a remesh.
-     *
-     * @param rMap A map between node indices before and after remesh
-     */
-    virtual void UpdateParticlesAfterReMesh(NodeMap& rMap);
-
-    /**
-     * Check consistency of our internal data structures.
-     */
-    virtual void Validate();
-
-private:
-
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Helper method to calculate the message tags between processors
@@ -241,6 +231,25 @@ private:
      * @return a unique tag number
      */
     unsigned CalculateMessageTag(unsigned senderI, unsigned receiverJ);
+
+protected:
+
+    /** Static cast of the mesh from AbstractCellPopulation. */
+    NodesOnlyMesh<DIM>* mpNodesOnlyMesh;
+
+    /**
+     * Update mIsParticle if required by a remesh.
+     *
+     * @param rMap A map between node indices before and after remesh
+     */
+    virtual void UpdateParticlesAfterReMesh(NodeMap& rMap);
+
+    /**
+     * Overridden Validate() method.
+     * 
+     * Check consistency of our internal data structures.
+     */
+    virtual void Validate() override;
 
 public:
 
@@ -300,21 +309,23 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
+     * Overridden GetNumNodes() method.
+     * 
      * @return the number of nodes in the cell population.
      */
-    unsigned GetNumNodes();
+    unsigned GetNumNodes() override;
 
     /**
-     * Overridden method from AbstractCellPopulation so that we can access halo cells
-     * through this method.
+     * Overridden method from AbstractCellPopulation so that we can access halo 
+     * cells through this method.
      *
      * @param index the global index of the node assocaited with a cell
      * @return the (set of) cells to which the node is attached.
      */
-    virtual CellPtr GetCellUsingLocationIndex(unsigned index);
+    virtual CellPtr GetCellUsingLocationIndex(unsigned index) override;
 
     /**
      * Overridden GetNode() method.
@@ -323,13 +334,14 @@ public:
      *
      * @return a pointer to the node with a given index.
      */
-    Node<DIM>* GetNode(unsigned index);
+    Node<DIM>* GetNode(unsigned index) override;
 
     /**
-     * Remove all cells labelled as dead.
-     *
-     * Note that after calling this method the cell population will be in an inconsistent state until
-     * the equivalent of a 'remesh' is performed! So don't try iterating over cells or anything
+     * Overridden RemoveDeadCells() method.
+     * 
+     * Remove all cells labelled as dead. Note that after calling this method 
+     * the cell population will be in an inconsistent state until the equivalent 
+     * of a 'remesh' is performed! So don't try iterating over cells or anything
      * like that.
      *
      * @return number of cells removed
@@ -342,61 +354,59 @@ public:
     void Clear();
 
     /**
-     * Remove nodes that have been marked as deleted and update the node cell map.
+     * Overridden Update() method.
+     * 
+     * Remove nodes that have been marked as deleted and update the node cell 
+     * map.
      *
      * @param hasHadBirthsOrDeaths whether cell population has had Births Or Deaths
      */
-    void Update(bool hasHadBirthsOrDeaths=true);
+    void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
-     * Overridden rGetNodePairs method
-     *
      * @return Node pairs for force calculation.
      */
     std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& rGetNodePairs();
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
-     * A virtual method to accept a cell population event writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationEventWriter() method.
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Overridden AcceptCellWriter() method.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(
+        boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * @return the maximum interaction distance between cells, defined in NodesOnlyMesh.
@@ -436,7 +446,7 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    double GetWidth(const unsigned& rDimension);
+    double GetWidth(const unsigned& rDimension) override;
 
     /**
      * Overridden GetSizeOfCellPopulation to work in parallel.
@@ -466,7 +476,7 @@ public:
      * @param index the node index
      * @return the set of neighbouring node indices.
      */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
 
     /**
      * Overridden AddCell() method.
@@ -479,7 +489,7 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -487,7 +497,7 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh node
      */
-    double GetVolumeOfCell(CellPtr pCell);
+    double GetVolumeOfCell(CellPtr pCell) override;
 
     /////////////////////////////////////////////////////
     // Parallel methods

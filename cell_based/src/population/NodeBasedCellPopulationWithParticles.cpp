@@ -42,10 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesCountWriter.hpp"
 
 template<unsigned DIM>
-NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh)
+NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
+    NodesOnlyMesh<DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices,
+    bool deleteMesh)
     : NodeBasedCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh, false)
 {
     EXCEPT_IF_NOT(PetscTools::IsSequential());
@@ -56,13 +57,13 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
         std::set<unsigned> location_indices;
         std::set<unsigned> particle_indices;
 
-        for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
+        for (auto node_iter = rMesh.GetNodeIteratorBegin();
              node_iter != rMesh.GetNodeIteratorEnd();
              ++node_iter)
         {
             node_indices.insert(node_iter->GetIndex());
         }
-        for (unsigned i=0; i<locationIndices.size(); i++)
+        for (unsigned i = 0; i < locationIndices.size(); ++i)
         {
             location_indices.insert(locationIndices[i]);
         }
@@ -76,7 +77,7 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
     }
     else
     {
-        for (typename NodesOnlyMesh<DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
+        for (auto node_iter = rMesh.GetNodeIteratorBegin();
              node_iter != rMesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -87,7 +88,8 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
 }
 
 template<unsigned DIM>
-NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh)
+NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
+    NodesOnlyMesh<DIM>& rMesh)
     : NodeBasedCellPopulation<DIM>(rMesh)
 {
 }
@@ -103,7 +105,7 @@ std::set<unsigned> NodeBasedCellPopulationWithParticles<DIM>::GetParticleIndices
 {
     std::set<unsigned> particle_indices;
 
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -117,9 +119,10 @@ std::set<unsigned> NodeBasedCellPopulationWithParticles<DIM>::GetParticleIndices
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulationWithParticles<DIM>::SetParticles(const std::set<unsigned>& rParticleIndices)
+void NodeBasedCellPopulationWithParticles<DIM>::SetParticles(
+    const std::set<unsigned>& rParticleIndices)
 {
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -137,7 +140,9 @@ void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlesAfterReMesh(NodeM
 }
 
 template<unsigned DIM>
-CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(
+    CellPtr pNewCell,
+    CellPtr pParentCell)
 {
     assert(pNewCell);
 
@@ -158,7 +163,7 @@ template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::Validate()
 {
     std::map<unsigned, bool> validated_nodes;
-    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -166,7 +171,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
     }
 
     // Look through all of the cells and record what node they are associated with.
-    for (auto cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
@@ -178,7 +183,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
         validated_nodes[node_index] = true;
     }
 
-    for (std::map<unsigned, bool>::iterator map_iter = validated_nodes.begin();
+    for (auto map_iter = validated_nodes.begin();
          map_iter != validated_nodes.end();
          map_iter++)
     {
@@ -192,14 +197,14 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulation()
 {
-    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
         // If it isn't a particle then there might be cell writers attached
         if (! this->IsParticle(node_iter->GetIndex()))
         {
-            for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+            for (auto cell_writer_iter = this->mCellWriters.begin();
                  cell_writer_iter != this->mCellWriters.end();
                  ++cell_writer_iter)
             {
@@ -211,7 +216,8 @@ void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulatio
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
+void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(
+    const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     // Store the present time as a string
@@ -238,7 +244,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     }
 
     std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         std::vector<double> cell_data_var(num_nodes);
         cell_data.push_back(cell_data_var);
@@ -249,7 +255,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     mesh_writer.SetParallelFiles(*(this->mpNodesOnlyMesh));
 
     // Iterate over any cell writers that are present
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (auto cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {
@@ -257,7 +263,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
         std::vector<double> vtk_cell_data(num_nodes);
 
         // Loop over nodes
-        for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+        for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
              node_iter != this->mrMesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -280,15 +286,13 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     }
 
     // Loop over cells
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         // Get the node index corresponding to this cell
         unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
-        for (unsigned var=0; var<num_cell_data_items; var++)
+        for (unsigned var = 0; var < num_cell_data_items; ++var)
         {
             cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
@@ -299,7 +303,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     mesh_writer.AddPointData("Process rank", rank);
 
     // Loop over nodes
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -311,7 +315,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
 
     if (num_cell_data_items > 0)
     {
-        for (unsigned var=0; var<cell_data.size(); var++)
+        for (unsigned var = 0; var < cell_data.size(); ++var)
         {
             mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
         }

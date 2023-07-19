@@ -45,12 +45,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A facade class encapsulating a mesh-based cell population with ghost nodes.
  *
- * If simulating a crypt with a mesh-based cell population, the mesh should be surrounded by at
- * least one layer of ghost nodes. These are nodes which do not correspond to a cell,
- * but are necessary for remeshing (because the remesher tries to create a convex hull
- * of the set of nodes) and visualization purposes. The MeshBasedCellPopulationWithGhostNodes
- * class deals with these ghost nodes, hiding the 'ghost nodes' concept from the
- * OffLatticeSimulation class, so the latter only ever deals with real cells.
+ * If simulating a crypt with a mesh-based cell population, the mesh should be 
+ * surrounded by at least one layer of ghost nodes. These are nodes which do not 
+ * correspond to a cell, but are necessary for remeshing (because the remesher 
+ * tries to create a convex hull of the set of nodes) and visualization purposes. 
+ * The MeshBasedCellPopulationWithGhostNodes class deals with these ghost nodes, 
+ * hiding the 'ghost nodes' concept from the OffLatticeSimulation class, so the 
+ * latter only ever deals with real cells.
  */
 template<unsigned DIM>
 class MeshBasedCellPopulationWithGhostNodes : public MeshBasedCellPopulation<DIM>
@@ -104,9 +105,9 @@ private:
 
     /**
      * This is called after a cell population has been constructed to check the
-     * user gave consistent instructions. Check consistency of our
-     * internal data structures:
-     * Each node must have a cell associated with it OR must be a ghost node.
+     * user gave consistent instructions. Check consistency of our internal data 
+     * structures: each node must have a cell associated with it OR must be a 
+     * ghost node.
      *
      * It is called after cells are added or removed from MeshBasedCellPopulation
      * as it is an overridden virtual method.
@@ -115,12 +116,12 @@ private:
 
 protected:
     /**
-     * Overridden method
+     * Overridden AcceptCellWritersAcrossPopulation() method.
      *
-     * Calls #AcceptCellWriter across the whole population,
-     * iterating in an appropriate way to skip ghost nodes.
+     * Calls #AcceptCellWriter across the whole population, iterating in an 
+     * appropriate way to skip ghost nodes.
      */
-    virtual void AcceptCellWritersAcrossPopulation();
+    virtual void AcceptCellWritersAcrossPopulation() override;
 
 public:
 
@@ -129,11 +130,16 @@ public:
      *
      * @param rMesh a mutable tetrahedral mesh
      * @param rCells cells corresponding to the nodes of the mesh
-     * @param locationIndices an optional vector of location indices that correspond to real cells
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
-     * @param ghostCellSpringStiffness spring stiffness used to move the ghost nodes when connected to cells defaults to 15.0.
-     * @param ghostGhostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
-     * @param ghostSpringRestLength spring rest length used to move the ghost nodes defaults to 1.0.
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
+     * @param deleteMesh set to true if you want the cell population to free the 
+     *     mesh memory on destruction
+     * @param ghostCellSpringStiffness spring stiffness used to move the ghost 
+     *     nodes when connected to cells defaults to 15.0.
+     * @param ghostGhostSpringStiffness spring stiffness used to move the ghost 
+     *     nodes defaults to 15.0.
+     * @param ghostSpringRestLength spring rest length used to move the ghost 
+     *     nodes defaults to 1.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
                                           std::vector<CellPtr>& rCells,
@@ -147,9 +153,12 @@ public:
      * Constructor for use by the de-serializer.
      *
      * @param rMesh a mutable tetrahedral mesh.
-     * @param ghostCellSpringStiffness spring stiffness used to move the ghost nodes when connected to cells defaults to 15.0.
-     * @param ghostGhostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
-     * @param ghostSpringRestLength spring rest length used to move the ghost nodes defaults to 1.0.
+     * @param ghostCellSpringStiffness spring stiffness used to move the ghost 
+     *     nodes when connected to cells defaults to 15.0.
+     * @param ghostGhostSpringStiffness spring stiffness used to move the ghost 
+     *     nodes defaults to 15.0.
+     * @param ghostSpringRestLength spring rest length used to move the ghost 
+     *     nodes defaults to 1.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
                                           double ghostCellSpringStiffness=15.0,
@@ -168,7 +177,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
@@ -178,17 +187,18 @@ public:
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
-     * Set the ghost nodes by taking in a set of which nodes indices are ghost nodes.
+     * Set the ghost nodes by taking in a set of which nodes indices are ghost 
+     * nodes.
      *
      * @param rGhostNodeIndices set of node indices corresponding to ghost nodes
      */
     void SetGhostNodes(const std::set<unsigned>& rGhostNodeIndices);
 
     /**
-     * Applies the appropriate force to each ghost node in the population.
+     * Apply the appropriate force to each ghost node in the population.
      * Called by AbstractNumericalMethod.
      */
     void ApplyGhostForces();
@@ -201,14 +211,14 @@ public:
     /**
      * Overridden IsGhostNode() method.
      *
-     * Find if a given node is a ghost node. The abstract method always returns false
-     * but is overridden in subclasses.
+     * Find if a given node is a ghost node. The abstract method always returns 
+     * false but is overridden in subclasses.
      *
      * @param index the global index of a specified node
      *
      * @return whether the node is a ghost node
      */
-    bool IsGhostNode(unsigned index);
+    bool IsGhostNode(unsigned index) override;
 
     /**
      * @return the indices of those nodes that are ghost nodes.
@@ -235,7 +245,9 @@ public:
      *
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double, DIM> CalculateForceBetweenGhostNodes(const unsigned& rNodeAGlobalIndex, const unsigned& rNodeBGlobalIndex);
+    c_vector<double, DIM> CalculateForceBetweenGhostNodes(
+        const unsigned& rNodeAGlobalIndex,
+        const unsigned& rNodeBGlobalIndex);
 
     /**
      * Overridden AddCell() method.
@@ -244,36 +256,37 @@ public:
      *
      * @param pNewCell  the cell to add
      * @param pParentCell pointer to a parent cell  - this is required for
-     *  mesh-based cell populations
-     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     *     mesh-based cell populations
+     * @return address of cell as it appears in the cell list (internal of this 
+     *     method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden OpenWritersFiles() method.
      *
-     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
+     * Open all files in mCellPopulationWriters and mCellWriters for writing 
+     * (not appending).
      *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * @param rOutputFileHandler handler for the directory in which to open this 
+     *     file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory  pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 };
 
 

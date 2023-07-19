@@ -43,15 +43,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaBasedCellPopulation.hpp"
 
 /**
- * A random switching update rule for use in cell-based simulations
- * using the cellular CA model.
+ * A random switching update rule for use in cell-based simulations using the 
+ * cellular CA model.
  *
  * The probability of performing a switch is
  *
  * P* delta_t
  *
- * Where P is the mSwitchingParameter.
- * delta_t is the timestep.
+ * where P is the mSwitchingParameter and delta_t is the timestep.
  */
 template<unsigned DIM>
 class RandomCaSwitchingUpdateRule : public AbstractCaSwitchingUpdateRule<DIM>
@@ -61,8 +60,8 @@ friend class TestCaUpdateRules;
 private:
 
     /**
-     * Switching parameter for update rule.
-     * Set to the default value 0.5 in the constructor.
+     * Switching parameter for update rule. Set to the default value 0.5 in the 
+     * constructor.
      * \todo provide units
      */
     double mSwitchingParameter;
@@ -95,26 +94,30 @@ public:
     ~RandomCaSwitchingUpdateRule();
 
     /**
-      * Calculate the probability of a given switch. Here this is hust
-      *
-      * mSwitchingParameter * dt
-      *
-      * @param currentNodeIndex The index of the current node/lattice site
-      * @param neighbourNodeIndex The index of the neighbour node/lattice site
-      * @param rCellPopulation The cell population
-      * @param dt is the time interval
-      * @param deltaX defines the size of the lattice site
-      * @return The probability of the cells associated to the current node and the target node switching.
-      */
+     * Overridden EvaluateSwitchingProbability() method.
+     * 
+     * Calculate the probability of a given switch. Here this is just
+     *
+     * mSwitchingParameter * dt
+     *
+     * @param currentNodeIndex The index of the current node/lattice site
+     * @param neighbourNodeIndex The index of the neighbour node/lattice site
+     * @param rCellPopulation The cell population
+     * @param dt is the time interval
+     * @param deltaX defines the size of the lattice site
+     * 
+     * @return The probability of the cells associated to the current node and 
+     *         the target node switching.
+     */
      double EvaluateSwitchingProbability(unsigned currentNodeIndex,
                                         unsigned neighbourNodeIndex,
                                         CaBasedCellPopulation<DIM>& rCellPopulation,
                                         double dt,
-                                        double deltaX);
+                                        double deltaX) override;
 
     /**
-      * @return mSwitchingParameter
-      */
+     * @return mSwitchingParameter
+     */
     double GetSwitchingParameter();
 
     /**
@@ -129,7 +132,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

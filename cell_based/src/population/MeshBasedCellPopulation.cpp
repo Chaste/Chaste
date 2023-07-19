@@ -49,11 +49,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPopulationAreaWriter.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh,
-                                      bool validate)
+MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(
+    MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices,
+    bool deleteMesh,
+    bool validate)
     : AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
       mpVoronoiTessellation(nullptr),
       mDeleteMesh(deleteMesh),
@@ -73,7 +74,7 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
     }
 
     // Initialise the applied force at each node to zero
-    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -82,7 +83,8 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
+MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(
+    MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>* >(&(this->mrMesh));
@@ -122,13 +124,16 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetAreaBasedDampingConstan
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
+unsigned MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddNode(
+    Node<SPACE_DIM>* pNewNode)
 {
     return mpMutableMesh->AddNode(pNewNode);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetNode(
+    unsigned nodeIndex,
+    ChastePoint<SPACE_DIM>& rNewLocation)
 {
     static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>&>((this->mrMesh)).SetNode(nodeIndex, rNewLocation, false);
 }
@@ -190,13 +195,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Validate()
 {
     std::vector<bool> validated_node = std::vector<bool>(this->GetNumNodes(), false);
 
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
         validated_node[node_index] = true;
     }
 
-    for (unsigned i=0; i<validated_node.size(); i++)
+    for (unsigned i = 0; i < validated_node.size(); ++i)
     {
         if (!validated_node[i])
         {
@@ -227,21 +232,19 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
-    for (std::list<CellPtr>::iterator it = this->mCells.begin();
-         it != this->mCells.end();
-         )
+    for (auto it = this->mCells.begin(); it != this->mCells.end();)
     {
         if ((*it)->IsDead())
         {
             // Check if this cell is in a marked spring
             std::vector<const std::pair<CellPtr,CellPtr>*> pairs_to_remove; // Pairs that must be purged
-            for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
+            for (auto it1 = this->mMarkedSprings.begin();
                  it1 != this->mMarkedSprings.end();
                  ++it1)
             {
                 const std::pair<CellPtr,CellPtr>& r_pair = *it1;
 
-                for (unsigned i=0; i<2; i++)
+                for (unsigned i = 0; i < 2; ++i)
                 {
                     CellPtr p_cell = (i==0 ? r_pair.first : r_pair.second);
 
@@ -255,7 +258,7 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::RemoveDeadCells()
             }
 
             // Purge any marked springs that contained this cell
-            for (std::vector<const std::pair<CellPtr,CellPtr>* >::iterator pair_it = pairs_to_remove.begin();
+            for (auto pair_it = pairs_to_remove.begin();
                  pair_it != pairs_to_remove.end();
                  ++pair_it)
             {
@@ -283,18 +286,21 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::RemoveDeadCells()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOrDeaths)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(
+    bool hasHadBirthsOrDeaths)
 {
     ///\todo check if there is a more efficient way of keeping track of node velocity information (#2404)
     bool output_node_velocities = (this-> template HasWriter<NodeVelocityWriter>());
 
     /**
-     * If node radii are set, then we must keep a record of these, since they will be cleared during
-     * the remeshing process. We then restore these attributes to the nodes after calling ReMesh().
+     * If node radii are set, then we must keep a record of these, since they 
+     * will be cleared during the remeshing process. We then restore these 
+     * attributes to the nodes after calling ReMesh().
      *
-     * At present, we check whether node radii are set by interrogating the radius of the first node
-     * in the mesh and asking if it is strictly greater than zero (the default value, as set in the
-     * NodeAttributes constructor). Hence, we assume that either ALL node radii are set, or NONE are.
+     * At present, we check whether node radii are set by interrogating the 
+     * radius of the first node in the mesh and asking if it is strictly greater 
+     * than zero (the default value, as set in the NodeAttributes constructor). 
+     * Hence, we assume that either ALL node radii are set, or NONE are.
      *
      * \todo There may be a better way of checking if node radii are set (#2694)
      */
@@ -304,7 +310,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
     {
         if (this->mrMesh.GetNodeIteratorBegin()->GetRadius() > 0.0)
         {
-            for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+            for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
                  node_iter != this->mrMesh.GetNodeIteratorEnd();
                  ++node_iter)
             {
@@ -319,11 +325,12 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
     if (output_node_velocities)
     {
         /*
-         * If outputting node velocities, we must keep a record of the applied force at each
-         * node, since this will be cleared during the remeshing process. We then restore
-         * these attributes to the nodes after calling ReMesh().
+         * If outputting node velocities, we must keep a record of the applied
+         * force at each node, since this will be cleared during the remeshing 
+         * process. We then restore these attributes to the nodes after calling 
+         * ReMesh().
          */
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+        for (auto node_iter = this->mrMesh.GetNodeIteratorBegin();
              node_iter != this->mrMesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -348,7 +355,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
         this->mLocationCellMap.clear();
         this->mCellLocationMap.clear();
 
-        for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
+        for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
         {
             unsigned old_node_index = old_cell_location_map[(*it).get()];
 
@@ -374,7 +381,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
     {
         if (old_node_radius_map[this->mCellLocationMap[(*(this->mCells.begin())).get()]] > 0.0)
         {
-            for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
+            for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
             {
                 unsigned node_index = this->mCellLocationMap[(*it).get()];
                 this->GetNode(node_index)->SetRadius(old_node_radius_map[node_index]);
@@ -382,7 +389,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
         }
         if (output_node_velocities)
         {
-            for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
+            for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
             {
                 unsigned node_index = this->mCellLocationMap[(*it).get()];
                 this->GetNode(node_index)->AddAppliedForceContribution(old_node_applied_force_map[node_index]);
@@ -392,7 +399,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
 
     // Purge any marked springs that are no longer springs
     std::vector<const std::pair<CellPtr,CellPtr>*> springs_to_remove;
-    for (std::set<std::pair<CellPtr,CellPtr> >::iterator spring_it = this->mMarkedSprings.begin();
+    for (auto spring_it = this->mMarkedSprings.begin();
          spring_it != this->mMarkedSprings.end();
          ++spring_it)
     {
@@ -405,7 +412,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
 
         // For each element containing node1, if it also contains node2 then the cells are joined
         std::set<unsigned> node2_elements = p_node_2->rGetContainingElementIndices();
-        for (typename Node<SPACE_DIM>::ContainingElementIterator elem_iter = p_node_1->ContainingElementsBegin();
+        for (auto elem_iter = p_node_1->ContainingElementsBegin();
              elem_iter != p_node_1->ContainingElementsEnd();
              ++elem_iter)
         {
@@ -424,7 +431,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
     }
 
     // Remove any springs necessary
-    for (std::vector<const std::pair<CellPtr,CellPtr>* >::iterator spring_it = springs_to_remove.begin();
+    for (auto spring_it = springs_to_remove.begin();
          spring_it != springs_to_remove.end();
          ++spring_it)
     {
@@ -440,7 +447,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(bool hasHadBirthsOr
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::TessellateIfNeeded()
 {
-    if ((SPACE_DIM==2 || SPACE_DIM==3)&&(ELEMENT_DIM==SPACE_DIM))
+    if ((SPACE_DIM == 2 || SPACE_DIM == 3) && (ELEMENT_DIM == SPACE_DIM))
     {
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::TESSELLATION);
         if (mUseAreaBasedDampingConstant ||
@@ -455,7 +462,8 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::TessellateIfNeeded()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::DivideLongSprings([[maybe_unused]] double springDivisionThreshold) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::DivideLongSprings(
+    [[maybe_unused]] double springDivisionThreshold) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     // Only implemented for 2D elements
     if constexpr (ELEMENT_DIM == 2)
@@ -464,7 +472,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::DivideLongSprings([[maybe_
         new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 
         // Add new cells onto new nodes
-        for (unsigned index=0; index<new_nodes.size(); index++)
+        for (unsigned index = 0; index < new_nodes.size(); ++index)
         {
             // Copy the cell attached to one of the neighbouring nodes onto the new node
             unsigned new_node_index = new_nodes[index][0];
@@ -506,7 +514,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::DivideLongSprings([[maybe_
             mSpringRestLengths[node_pair] = 0.5*old_rest_length;
 
             // If necessary add other new spring rest lengths
-            for (unsigned pair_index=3; pair_index<5; pair_index++)
+            for (unsigned pair_index = 3; pair_index < 5; ++pair_index)
             {
                 unsigned other_node_index = new_nodes[index][pair_index];
 
@@ -526,7 +534,8 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::DivideLongSprings([[maybe_
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Node<SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index)
+Node<SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNode(
+    unsigned index)
 {
     return this->mrMesh.GetNode(index);
 }
@@ -543,7 +552,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateGhostNodesAfterReMes
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+CellPtr MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(
+    CellPtr pNewCell,
+    CellPtr pParentCell)
 {
     assert(pNewCell);
     assert(pParentCell);
@@ -579,7 +590,8 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFil
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(
+    const std::string& rDirectory)
 {
     if (SimulationTime::Instance()->GetTimeStepsElapsed() == 0 && this->mpVoronoiTessellation == nullptr)
     {
@@ -590,31 +602,36 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const 
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptPopulationWriter(
+    boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptPopulationCountWriter(
+    boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptPopulationEventWriter(
+    boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWriter(
+    boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(
+    const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     // Store the present time as a string
@@ -630,7 +647,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
     std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         std::vector<double> cell_data_var(num_cells_from_mesh);
         cell_data.push_back(cell_data_var);
@@ -643,7 +660,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (auto cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -651,7 +668,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
             std::vector<double> vtk_cell_data(num_cells);
 
             // Loop over cells
-            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+            for (auto cell_iter = this->Begin();
                  cell_iter != this->End();
                  ++cell_iter)
             {
@@ -666,14 +683,14 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
         }
 
         // Loop over cells
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+        for (auto cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {
             // Get the node index corresponding to this cell
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-            for (unsigned var=0; var<num_cell_data_items; var++)
+            for (unsigned var = 0; var < num_cell_data_items; ++var)
             {
                 cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
             }
@@ -699,7 +716,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (auto cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -707,7 +724,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
             std::vector<double> vtk_cell_data(num_cells);
 
             // Loop over elements of mpVoronoiTessellation
-            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
+            for (auto elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
                  elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
                  ++elem_iter)
             {
@@ -726,7 +743,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
         }
 
         // Loop over elements of mpVoronoiTessellation
-        for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
+        for (auto elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
              elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
              ++elem_iter)
         {
@@ -737,13 +754,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
             unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
             CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
-            for (unsigned var=0; var<num_cell_data_items; var++)
+            for (unsigned var = 0; var < num_cell_data_items; ++var)
             {
                 cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
 
-        for (unsigned var=0; var<cell_data.size(); var++)
+        for (unsigned var = 0; var < cell_data.size(); ++var)
         {
             mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
         }
@@ -759,7 +776,8 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(cons
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfCell(CellPtr pCell)
+double MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfCell(
+    CellPtr pCell)
 {
     double cell_volume = 0;
 
@@ -788,7 +806,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfCell(CellPtr 
             cell_volume = DBL_MAX;
         }
     }
-    else if (SPACE_DIM==3 && ELEMENT_DIM==2)
+    else if (SPACE_DIM == 3 && ELEMENT_DIM == 2)
     {
         unsigned node_index = this->GetLocationIndexUsingCell(pCell);
 
@@ -796,7 +814,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfCell(CellPtr 
 
         assert(!(p_node->rGetContainingElementIndices().empty()));
 
-        for (typename Node<SPACE_DIM>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
+        for (auto elem_iter = p_node->ContainingElementsBegin();
              elem_iter != p_node->ContainingElementsEnd();
              ++elem_iter)
         {
@@ -919,12 +937,12 @@ typename MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& MeshBa
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator::SpringIterator(
-            MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
-            typename MutableMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator edgeIter)
+    MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
+    typename MutableMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator edgeIter)
     : mrCellPopulation(rCellPopulation),
       mEdgeIter(edgeIter)
 {
-    if (mEdgeIter!=static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>*>(&(this->mrCellPopulation.mrMesh))->EdgesEnd())
+    if (mEdgeIter != static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>*>(&(this->mrCellPopulation.mrMesh))->EdgesEnd())
     {
         bool a_is_ghost = mrCellPopulation.IsGhostNode(mEdgeIter.GetNodeA()->GetIndex());
         bool b_is_ghost = mrCellPopulation.IsGhostNode(mEdgeIter.GetNodeB()->GetIndex());
@@ -1082,9 +1100,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckCellPointers()
 {
     bool res = true;
-    for (std::list<CellPtr>::iterator it=this->mCells.begin();
-         it!=this->mCells.end();
-         ++it)
+    for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
     {
         CellPtr p_cell = *it;
         assert(p_cell);
@@ -1114,13 +1130,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckCellPointers()
 // LCOV_EXCL_STOP
 
     res = true;
-    for (std::set<std::pair<CellPtr,CellPtr> >::iterator it1 = this->mMarkedSprings.begin();
+    for (auto it1 = this->mMarkedSprings.begin();
          it1 != this->mMarkedSprings.end();
          ++it1)
     {
         const std::pair<CellPtr,CellPtr>& r_pair = *it1;
 
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             CellPtr p_cell = (i==0 ? r_pair.first : r_pair.second);
 
@@ -1210,7 +1226,7 @@ std::set<unsigned> MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbour
 
     // Loop over containing elements
     std::set<unsigned> neighbouring_node_indices;
-    for (typename Node<SPACE_DIM>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
+    for (auto elem_iter = p_node->ContainingElementsBegin();
          elem_iter != p_node->ContainingElementsEnd();
          ++elem_iter)
     {
@@ -1218,7 +1234,7 @@ std::set<unsigned> MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbour
         Element<ELEMENT_DIM, SPACE_DIM>* p_element = static_cast<MutableMesh<ELEMENT_DIM, SPACE_DIM>&>((this->mrMesh)).GetElement(*elem_iter);
 
         // Loop over nodes contained in this element
-        for (unsigned i=0; i<p_element->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_element->GetNumNodes(); ++i)
         {
             // Get index of this node and add its index to the set if not the original node
             unsigned node_index = p_element->GetNodeGlobalIndex(i);
@@ -1237,7 +1253,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CalculateRestLengths()
     mSpringRestLengths.clear();
 
     // Iterate over all springs and add calculate separation of adjacent  node pairs
-    for (SpringIterator spring_iterator = SpringsBegin();
+    for (auto spring_iterator = SpringsBegin();
          spring_iterator != SpringsEnd();
          ++spring_iterator)
     {

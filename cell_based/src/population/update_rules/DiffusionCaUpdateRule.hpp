@@ -43,16 +43,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaBasedCellPopulation.hpp"
 
 /**
- * A diffusion update rule for use in cell-based simulations
- * using the cellular CA model.
+ * A diffusion update rule for use in cell-based simulations using the cellular 
+ * CA model.
  *
  * The probability of moving to an adjacent lattice site is
  *
  * D*delta_t/(2*delta_x*delta_x)
  *
- * Where D is the mDiffusionParameter.
- * delta_t is the timestep.
- * delta_x is the separation of the two lattice sites.
+ * where D is the mDiffusionParameter, delta_t is the timestep, and delta_x is 
+ * the separation of the two lattice sites.
  */
 template<unsigned DIM>
 class DiffusionCaUpdateRule : public AbstractCaUpdateRule<DIM>
@@ -62,8 +61,8 @@ friend class TestCaUpdateRules;
 private:
 
     /**
-     * Diffusion parameter for update rule.
-     * Set to the default value 0.5 in the constructor.
+     * Diffusion parameter for update rule. Set to the default value 0.5 in the 
+     * constructor.
      * \todo provide units
      */
     double mDiffusionParameter;
@@ -96,24 +95,30 @@ public:
     ~DiffusionCaUpdateRule();
 
     /**
+     * Overridden EvaluateProbability() method.
+     * 
      * Calculate the probability of a given move.
      *
-     * Uses random diffusion to each neighbouring node, scaled according to distance.
+     * Uses random diffusion to each neighbouring node, scaled according to 
+     * distance.
      *
      * @param currentNodeIndex The index of the current node/lattice site
      * @param targetNodeIndex The index of the target node/lattice site
      * @param rCellPopulation The cell population
      * @param dt is the time interval
      * @param deltaX defines the size of the lattice site
-     * @param cell a pointer to the cell (needed if more than one cell per lattice site
-     * @return The probability of the cell moving from the current node to the target node
+     * @param cell a pointer to the cell (needed if more than one cell per 
+     *             lattice site
+     * 
+     * @return The probability of the cell moving from the current node to the 
+     *         target node
      */
     double EvaluateProbability(unsigned currentNodeIndex,
                                unsigned targetNodeIndex,
                                CaBasedCellPopulation<DIM>& rCellPopulation,
                                double dt,
                                double deltaX,
-                               CellPtr cell);
+                               CellPtr cell) override;
 
     /**
       * @return mDiffusionParameter
@@ -132,7 +137,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

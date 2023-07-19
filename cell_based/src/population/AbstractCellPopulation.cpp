@@ -67,9 +67,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                    std::vector<CellPtr>& rCells,
-                                    const std::vector<unsigned> locationIndices)
+AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices)
     : mrMesh(rMesh),
       mCells(rCells.begin(), rCells.end()),
       mCentroid(zero_vector<double>(SPACE_DIM)),
@@ -77,9 +78,9 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
       mOutputResultsForChasteVisualizer(true)
 {
     /*
-     * To avoid double-counting problems, clear the passed-in cells vector.
-     * We force a reallocation of memory so that subsequent usage of the
-     * vector is more likely to give an error.
+     * To avoid double-counting problems, clear the passed-in cells vector. We 
+     * force a reallocation of memory so that subsequent usage of the vector is 
+     * more likely to give an error.
      */
     std::vector<CellPtr>().swap(rCells);
 
@@ -97,7 +98,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
     mCellLocationMap.clear();
 
     std::list<CellPtr>::iterator it = mCells.begin();
-    for (unsigned i=0; it != mCells.end(); ++it, ++i)
+    for (unsigned i = 0; it != mCells.end(); ++it, ++i)
     {
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor)
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
@@ -109,7 +110,8 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
+AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
     : mrMesh(rMesh)
 {
 }
@@ -122,9 +124,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::~AbstractCellPopulation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
-         cell_iter!=this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         cell_iter->InitialiseCellCycleModel();
         cell_iter->InitialiseSrnModel();
@@ -132,11 +132,11 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(const std::string& rDataName, double dataValue)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(
+    const std::string& rDataName,
+    double dataValue)
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
-         cell_iter!=this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         cell_iter->GetCellData()->SetItem(rDataName, dataValue);
     }
@@ -158,9 +158,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNumRealCells()
 {
     unsigned counter = 0;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
-         cell_iter!=this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         counter++;
     }
@@ -176,7 +174,7 @@ unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNumAllCells()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCellAncestorsToLocationIndices()
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (mCellLocationMap[(*cell_iter).get()]));
         cell_iter->SetAncestor(p_cell_ancestor);
@@ -187,7 +185,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::set<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellAncestors()
 {
     std::set<unsigned> remaining_ancestors;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         remaining_ancestors.insert(cell_iter->GetAncestor());
     }
@@ -202,7 +200,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
         = mpCellPropertyRegistry->rGetAllCellProperties();
 
     // Calculate mutation states count
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
+    for (unsigned i = 0; i < r_cell_properties.size(); ++i)
     {
         if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
         {
@@ -216,11 +214,21 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
         // Make sure the vector on each process has the same size
         unsigned local_size = mutation_state_count.size();
         unsigned global_size;
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
+        MPI_Allreduce(&local_size,
+                      &global_size,
+                      1,
+                      MPI_UNSIGNED,
+                      MPI_MAX,
+                      PetscTools::GetWorld());
         assert(local_size == global_size);
 
         std::vector<unsigned> mutation_counts(global_size);
-        MPI_Allreduce(&mutation_state_count[0], &mutation_counts[0], mutation_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        MPI_Allreduce(&mutation_state_count[0],
+                      &mutation_counts[0],
+                      mutation_counts.size(),
+                      MPI_UNSIGNED,
+                      MPI_SUM,
+                      PetscTools::GetWorld());
 
         mutation_state_count = mutation_counts;
     }
@@ -236,7 +244,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
         = mpCellPropertyRegistry->rGetAllCellProperties();
 
     // Calculate proliferative types count
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
+    for (unsigned i = 0; i < r_cell_properties.size(); ++i)
     {
         if (r_cell_properties[i]->IsSubType<AbstractCellProliferativeType>())
         {
@@ -251,11 +259,21 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
         unsigned local_size = proliferative_type_count.size();
         unsigned global_size;
 
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
+        MPI_Allreduce(&local_size,
+                      &global_size,
+                      1,
+                      MPI_UNSIGNED,
+                      MPI_MAX,
+                      PetscTools::GetWorld());
         assert(local_size == global_size);
 
         std::vector<unsigned> total_types_counts(global_size);
-        MPI_Allreduce(&proliferative_type_count[0], &total_types_counts[0], total_types_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        MPI_Allreduce(&proliferative_type_count[0],
+                      &total_types_counts[0],
+                      total_types_counts.size(),
+                      MPI_UNSIGNED,
+                      MPI_SUM,
+                      PetscTools::GetWorld());
 
         proliferative_type_count = total_types_counts;
     }
@@ -267,7 +285,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyclePhaseCount()
 {
     std::vector<unsigned> cell_cycle_phase_count(5);
-    for (unsigned i=0; i<5; i++)
+    for (unsigned i = 0; i < 5; i++)
     {
         cell_cycle_phase_count[i] = 0;
     }
@@ -283,27 +301,35 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
             EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
         }
 
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
+        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
         {
             switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
             {
                 case G_ZERO_PHASE:
+                {
                     cell_cycle_phase_count[0]++;
                     break;
+                }
                 case G_ONE_PHASE:
+                {
                     cell_cycle_phase_count[1]++;
                     break;
+                }
                 case S_PHASE:
+                {
                     cell_cycle_phase_count[2]++;
                     break;
+                }
                 case G_TWO_PHASE:
+                {
                     cell_cycle_phase_count[3]++;
                     break;
+                }
                 case M_PHASE:
+                {
                     cell_cycle_phase_count[4]++;
                     break;
+                }
                 default:
                     NEVER_REACHED;
             }
@@ -314,7 +340,12 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
     if (PetscTools::IsParallel())
     {
         std::vector<unsigned> phase_counts(cell_cycle_phase_count.size(), 0u);
-        MPI_Allreduce(&cell_cycle_phase_count[0], &phase_counts[0], phase_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        MPI_Allreduce(&cell_cycle_phase_count[0],
+                      &phase_counts[0],
+                      phase_counts.size(),
+                      MPI_UNSIGNED,
+                      MPI_SUM,
+                      PetscTools::GetWorld());
 
         cell_cycle_phase_count = phase_counts;
     }
@@ -323,7 +354,8 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationIndex(unsigned index)
+CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationIndex(
+    unsigned index)
 {
     // Get the set of pointers to cells corresponding to this location index
     std::set<CellPtr> cells = mLocationCellMap[index];
@@ -403,17 +435,21 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::RemoveCellUsingLocationInde
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::MoveCellInLocationMap(CellPtr pCell, unsigned old_index, unsigned new_index)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::MoveCellInLocationMap(
+    CellPtr pCell,
+    unsigned oldIndex,
+    unsigned newIndex)
 {
     // Remove the cell from its current location
-    RemoveCellUsingLocationIndex(old_index, pCell);
+    RemoveCellUsingLocationIndex(oldIndex, pCell);
 
     // Add it to the new location
-    AddCellUsingLocationIndex(new_index, pCell);
+    AddCellUsingLocationIndex(newIndex, pCell);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetLocationIndexUsingCell(CellPtr pCell)
+unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetLocationIndexUsingCell(
+    CellPtr pCell)
 {
     // Check the cell is in the map
     assert(this->mCellLocationMap.find(pCell.get()) != this->mCellLocationMap.end());
@@ -453,7 +489,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultCellMutationState
  */
 // LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::set<std::pair<unsigned, unsigned>> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringEdgeIndices(CellPtr cell, unsigned pEdgeLocalIndex)
+std::set<std::pair<unsigned, unsigned>> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringEdgeIndices(
+    CellPtr cell,
+    unsigned pEdgeLocalIndex)
 {
     return std::set<std::pair<unsigned, unsigned>>();
 }
@@ -463,9 +501,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfCellPopulation()
 {
     mCentroid = zero_vector<double>(SPACE_DIM);
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         mCentroid += GetLocationOfCellCentre(*cell_iter);
     }
@@ -518,7 +554,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseWritersFiles()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(
+    OutputFileHandler& rOutputFileHandler)
 {
 #ifdef CHASTE_VTK
     mpVtkMetaFile = rOutputFileHandler.OpenOutputFile("results.pvd");
@@ -580,7 +617,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenRoundRobinWritersFilesForAppend(
+    OutputFileHandler& rOutputFileHandler)
 {
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
     typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
@@ -595,7 +633,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenRoundRobinWritersFilesF
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(
+    const std::string& rDirectory)
 {
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
     typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
@@ -623,7 +662,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                 }
             }
 
-            for (typename std::vector<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
+            for (auto pop_writer_iter = mCellPopulationWriters.begin();
                  pop_writer_iter != mCellPopulationWriters.end();
                  ++pop_writer_iter)
             {
@@ -660,7 +699,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                 p_count_writer->WriteTimeStamp();
             }
         }
-        for (typename std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator count_writer_iter = mCellPopulationCountWriters.begin();
+        for (auto count_writer_iter = mCellPopulationCountWriters.begin();
              count_writer_iter != mCellPopulationCountWriters.end();
              ++count_writer_iter)
         {
@@ -689,7 +728,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                 p_event_writer->OpenOutputFileForAppend(output_file_handler);
             }
         }
-        for (typename std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator event_writer_iter = mCellPopulationEventWriters.begin();
+        for (auto event_writer_iter = mCellPopulationEventWriters.begin();
              event_writer_iter != mCellPopulationEventWriters.end();
              ++event_writer_iter)
         {
@@ -716,11 +755,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWritersAcrossPopulation()
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
-        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
+        for (auto cell_writer_iter = mCellWriters.begin();
              cell_writer_iter != mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -730,7 +767,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWritersAcrossPopu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(out_stream& rParamsFile)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(
+    out_stream& rParamsFile)
 {
     std::string cell_population_type = GetIdentifier();
 
@@ -748,9 +786,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
      */
     std::set<std::string> unique_cell_cycle_models;
     std::vector<CellPtr> first_cell_with_unique_CCM;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         std::string identifier = cell_iter->GetCellCycleModel()->GetIdentifier();
         if (unique_cell_cycle_models.count(identifier) == 0)
@@ -761,7 +797,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
     }
 
     // Loop over unique cell-cycle models
-    for (unsigned i=0; i<first_cell_with_unique_CCM.size(); i++)
+    for (unsigned i = 0; i < first_cell_with_unique_CCM.size(); ++i)
     {
         // Output cell-cycle model details
         first_cell_with_unique_CCM[i]->GetCellCycleModel()->OutputCellCycleModelInfo(rParamsFile);
@@ -779,9 +815,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
      */
     std::set<std::string> unique_srn_models;
     std::vector<CellPtr> first_cell_with_unique_SRN;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         std::string identifier = cell_iter->GetSrnModel()->GetIdentifier();
         if (unique_srn_models.count(identifier) == 0)
@@ -792,7 +826,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
     }
 
     // Loop over unique SRN models
-    for (unsigned i=0; i<first_cell_with_unique_SRN.size(); i++)
+    for (unsigned i = 0; i < first_cell_with_unique_SRN.size(); ++i)
     {
         // Output SRN model details
         first_cell_with_unique_SRN[i]->GetSrnModel()->OutputSrnModelInfo(rParamsFile);
@@ -802,13 +836,15 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(ou
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<OutputResultsForChasteVisualizer>" << mOutputResultsForChasteVisualizer << "</OutputResultsForChasteVisualizer>\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SimulationSetupHook(
+    AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation)
 {
 }
 
@@ -819,7 +855,8 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputResultsForChasteVi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVisualizer(bool outputResultsForChasteVisualizer)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVisualizer(
+    bool outputResultsForChasteVisualizer)
 {
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
 }
@@ -830,7 +867,8 @@ std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivi
     return mDivisionsInformation;
 }
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(std::string divisionInformation)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(
+    std::string divisionInformation)
 {
     mDivisionsInformation.push_back(divisionInformation);
 }
@@ -848,7 +886,8 @@ std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemo
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(std::string removalInformation)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(
+    std::string removalInformation)
 {
     mRemovalsInformation.push_back(removalInformation);
 }
@@ -860,15 +899,17 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(CellPtr pCell, std::string killerInfo)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(
+    CellPtr pCell,
+    std::string killerInfo)
 {
-    //If necessary store the information about the cell removal
+    // If necessary store the information about the cell removal
     c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(pCell);
     if (HasWriter<CellRemovalLocationsWriter>())
     {
         std::stringstream removal_info;
         removal_info << SimulationTime::Instance()->GetTime() << "\t";
-        for (unsigned i = 0; i < SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             removal_info << cell_location[i] << "\t";
         }
@@ -879,50 +920,53 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(CellPtr pCell, std::string killerInfo)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(
+    CellPtr pCell,
+    std::string killerInfo)
 {
-    //If necessary store the information about the cell removal
+    // If necessary store the information about the cell removal
     GenerateRemovalInformation(pCell, killerInfo);
 
-    //Mark cell as dead
+    // Mark cell as dead
     pCell->Kill();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(CellPtr pCell, std::string killerInfo)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(
+    CellPtr pCell,
+    std::string killerInfo)
 {
-    //If necessary store the information about the cell removal
+    // If necessary store the information about the cell removal
     GenerateRemovalInformation(pCell, killerInfo);
 
-    //Mark cell as Apoptotic
+    // Mark cell as Apoptotic
     pCell->StartApoptosis();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(CellPtr pCell)
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(
+    CellPtr pCell)
 {
     return true;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSizeOfCellPopulation()
+c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSizeOfCellPopulation()
 {
     // Compute the centre of mass of the cell population
-    c_vector<double,SPACE_DIM> centre = GetCentroidOfCellPopulation();
+    c_vector<double, SPACE_DIM> centre = GetCentroidOfCellPopulation();
 
     // Loop over cells and find the maximum distance from the centre of mass in each dimension
-    c_vector<double,SPACE_DIM> max_distance_from_centre = zero_vector<double>(SPACE_DIM);
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    c_vector<double, SPACE_DIM> max_distance_from_centre = zero_vector<double>(SPACE_DIM);
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
-        c_vector<double,SPACE_DIM> cell_location = GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(*cell_iter);
 
         // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-        c_vector<double,SPACE_DIM> displacement;
+        c_vector<double, SPACE_DIM> displacement;
         displacement = centre - cell_location;
 
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             if (displacement[i] > max_distance_from_centre[i])
             {
@@ -935,7 +979,9 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOrderedPair(unsigned index1, unsigned index2)
+std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOrderedPair(
+    unsigned index1,
+    unsigned index2)
 {
     assert(index1 != index2);
 
@@ -954,7 +1000,8 @@ std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Cre
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(
+    unsigned pdeNodeIndex)
 {
     bool non_apoptotic_cell_present = false;
 

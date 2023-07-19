@@ -104,9 +104,10 @@ public:
      *
      * @param rMesh a refernce to the mesh underlying the cell population
      * @param rCells a vector of cells
-     * @param locationIndices an optional vector of location indices that correspond to real cells
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
-     *            (defaults to false)
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
+     * @param deleteMesh set to true if you want the cell population to free the 
+     *     mesh memory on destruction (defaults to false)
      */
     AbstractOnLatticeCellPopulation(AbstractMesh<DIM, DIM>& rMesh,
                                     std::vector<CellPtr>& rCells,
@@ -121,8 +122,7 @@ public:
     /**
      * Update cell locations over the course of a time step of specified length.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param dt time step
      */
@@ -157,49 +157,49 @@ public:
     /**
      * Overridden SetNode() method.
      *
-     * This method throws an exception if called on a subclass of AbstractOnLatticeCellPopulation,
-     * since in such classes the lattice is assumed to be fixed.
+     * This method throws an exception if called on a subclass of 
+     * AbstractOnLatticeCellPopulation, since in such classes the lattice is 
+     * assumed to be fixed.
      *
      * @param index the index of the node to be moved
      * @param rNewLocation the new target location of the node
      */
-    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
+    void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation) override;
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
      *
-     * This method currently returns an exception as the two types of neighbourhood
-     * (Moore and Von Neumann) are defined in the PottsMesh.
+     * This method currently returns an exception as the two types of 
+     * neighbourhood (Moore and Von Neumann) are defined in the PottsMesh.
      *
      * @param index the node index
      * @return the set of neighbouring node indices.
      */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
 
     /**
-     * Outputs parameters to file.
+     * Overridden OutputCellPopulationParameters() method
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+    virtual void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden GetDefaultTimeStep() method.
      *
-     * @return a default value for the time step to use
-     * when simulating the cell population.
+     * @return a default value for the time step to use when simulating the cell 
+     *     population.
      *
      * A hard-coded value of 0.1 is returned. However, note that the time
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    virtual double GetDefaultTimeStep() override;
 
     /**
      * Add an update rule to be used with this population.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pUpdateRule pointer to an update rule
      */

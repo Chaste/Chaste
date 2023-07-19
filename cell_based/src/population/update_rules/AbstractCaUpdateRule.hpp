@@ -76,21 +76,20 @@ public:
     virtual ~AbstractCaUpdateRule();
 
    /**
-     * Calculate the probability of a given move.
-     *
-     * Uses random diffusion to each neighbouring node, scaled according to distance.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param currentNodeIndex The index of the current node/lattice site
-     * @param targetNodeIndex The index of the target node/lattice site
-     * @param rCellPopulation The cell population
-     * @param dt is the time interval
-     * @param deltaX defines the size of the lattice site
-     * @param cell a pointer to the cell (needed if more than one cell per lattice site
-     * @return The probability of the cell moving from the current node to the target node
-     */
+    * Calculate the probability of a given move.
+    * 
+    * As this method is pure virtual, it must be overridden in subclasses.
+    *
+    * @param currentNodeIndex The index of the current node/lattice site
+    * @param targetNodeIndex The index of the target node/lattice site
+    * @param rCellPopulation The cell population
+    * @param dt is the time interval
+    * @param deltaX defines the size of the lattice site
+    * @param cell a pointer to the cell (needed if more than one cell per 
+    *             lattice site
+    * @return The probability of the cell moving from the current node to the 
+    *         target node
+    */
     double virtual EvaluateProbability(unsigned currentNodeIndex,
                                        unsigned targetNodeIndex,
                                        CaBasedCellPopulation<DIM>& rCellPopulation,
@@ -99,7 +98,7 @@ public:
                                        CellPtr cell)=0;
 
     /**
-     * Overridden OutputUpdateRuleParameters() method.
+     * Output update rule parameters to file.
      *
      * @param rParamsFile a file stream
      */

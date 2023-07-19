@@ -48,11 +48,12 @@ RandomCaSwitchingUpdateRule<DIM>::~RandomCaSwitchingUpdateRule()
 }
 
 template<unsigned DIM>
-double RandomCaSwitchingUpdateRule<DIM>::EvaluateSwitchingProbability(unsigned currentNodeIndex,
-                                                                      unsigned neighbourNodeIndex,
-                                                                      CaBasedCellPopulation<DIM>& rCellPopulation,
-                                                                      double dt,
-                                                                      double deltaX)
+double RandomCaSwitchingUpdateRule<DIM>::EvaluateSwitchingProbability(
+    unsigned currentNodeIndex,
+    unsigned neighbourNodeIndex,
+    CaBasedCellPopulation<DIM>& rCellPopulation,
+    double dt,
+    double deltaX)
 {
     return mSwitchingParameter*dt;
 }
@@ -64,13 +65,15 @@ double RandomCaSwitchingUpdateRule<DIM>::GetSwitchingParameter()
 }
 
 template<unsigned DIM>
-void RandomCaSwitchingUpdateRule<DIM>::SetSwitchingParameter(double switchingParameter)
+void RandomCaSwitchingUpdateRule<DIM>::SetSwitchingParameter(
+    double switchingParameter)
 {
     mSwitchingParameter = switchingParameter;
 }
 
 template<unsigned DIM>
-void RandomCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void RandomCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SwitchingParameter>" << mSwitchingParameter << "</SwitchingParameter>\n";
 

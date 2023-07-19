@@ -55,16 +55,13 @@ class PottsMeshWriter : public AbstractMeshWriter<SPACE_DIM, SPACE_DIM>
 {
 private:
 
-    /**
-     * If writing from a mesh object, the mesh to write to disk.
-     * Otherwise NULL.
-     */
+    /** If writing from a mesh object, the mesh to write to disk, else NULL. */
     PottsMesh<SPACE_DIM>* mpMesh;
 
-    /** Iterators over the mesh */
+    /** Iterators over the mesh. */
     MeshPottsWriterIterators<SPACE_DIM>* mpIters;
 
-    /** Track deleted nodes so they don't get written */
+    /** Track deleted nodes so they don't get written. */
     NodeMap* mpNodeMap;
 
     /** What was the last index written to #mpNodeMap ? */
@@ -75,13 +72,15 @@ public:
     /**
      * Constructor.
      *
-     * @param rDirectory reference to the output directory, relative to where Chaste output is stored
+     * @param rDirectory reference to the output directory, relative to where 
+     *     Chaste output is stored
      * @param rBaseName reference to the base name for results files
-     * @param clearOutputDir whether to clear the output directory prior to writing files (defaults to true)
+     * @param clearOutputDir whether to clear the output directory prior to 
+     *     writing files (defaults to true)
      */
     PottsMeshWriter(const std::string& rDirectory,
-                     const std::string& rBaseName,
-                     const bool clearOutputDir=true);
+                    const std::string& rBaseName,
+                    const bool clearOutputDir=true);
 
     /**
      * Destructor.
@@ -97,20 +96,23 @@ public:
     void WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh);
 
     /**
-     * @return the coordinates of the next node to be written to file
+     * Overridden GetNextNode() method.
+     * 
+     * @return the coordinates of the next node to be written to file.
      */
-    std::vector<double> GetNextNode();
+    std::vector<double> GetNextNode() override;
 
     /**
+     * Overridden GetNextElement() method.
+     * 
      * @return the data (indices/attributes) of the next element to be written to file
      */
-    ElementData GetNextElement();
+    ElementData GetNextElement() override;
 
     /**
-     * Write mesh data to files.
-     * This method must be overridden in concrete classes.
+     * Overridden WriteFiles() method. 
      */
-    void WriteFiles();
+    void WriteFiles() override;
 };
 
 #endif /*POTTSMESHWRITER_HPP_*/

@@ -41,7 +41,7 @@ VolumeConstraintPottsUpdateRule<DIM>::VolumeConstraintPottsUpdateRule()
       mDeformationEnergyParameter(0.5), // Educated guess
       mMatureCellTargetVolume(16.0) // Defaults to a 4*4 cell size
 {
-        /// \todo Default values don't apply in 3D.
+    ///\todo Default values don't apply in 3D.
 }
 
 template<unsigned DIM>
@@ -50,9 +50,10 @@ VolumeConstraintPottsUpdateRule<DIM>::~VolumeConstraintPottsUpdateRule()
 }
 
 template<unsigned DIM>
-double VolumeConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                                                        unsigned targetNodeIndex,
-                                                                        PottsBasedCellPopulation<DIM>& rCellPopulation)
+double VolumeConstraintPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(
+    unsigned currentNodeIndex,
+    unsigned targetNodeIndex,
+    PottsBasedCellPopulation<DIM>& rCellPopulation)
 {
     double delta_H = 0.0;
 
@@ -105,7 +106,8 @@ double VolumeConstraintPottsUpdateRule<DIM>::GetDeformationEnergyParameter()
 }
 
 template<unsigned DIM>
-void VolumeConstraintPottsUpdateRule<DIM>::SetDeformationEnergyParameter(double deformationEnergyParameter)
+void VolumeConstraintPottsUpdateRule<DIM>::SetDeformationEnergyParameter(
+    double deformationEnergyParameter)
 {
     mDeformationEnergyParameter = deformationEnergyParameter;
 }
@@ -117,14 +119,16 @@ double VolumeConstraintPottsUpdateRule<DIM>::GetMatureCellTargetVolume() const
 }
 
 template<unsigned DIM>
-void VolumeConstraintPottsUpdateRule<DIM>::SetMatureCellTargetVolume(double matureCellTargetVolume)
+void VolumeConstraintPottsUpdateRule<DIM>::SetMatureCellTargetVolume(
+    double matureCellTargetVolume)
 {
     assert(matureCellTargetVolume >= 0.0);
     mMatureCellTargetVolume = matureCellTargetVolume;
 }
 
 template<unsigned DIM>
-void VolumeConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void VolumeConstraintPottsUpdateRule<DIM>::OutputUpdateRuleParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DeformationEnergyParameter>" << mDeformationEnergyParameter << "</DeformationEnergyParameter>\n";
     *rParamsFile << "\t\t\t<MatureCellTargetVolume>" << mMatureCellTargetVolume << "</MatureCellTargetVolume>\n";

@@ -52,7 +52,9 @@ DifferentialAdhesionPottsUpdateRule<DIM>::~DifferentialAdhesionPottsUpdateRule()
 }
 
 template<unsigned DIM>
-double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB)
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(
+    CellPtr pCellA,
+    CellPtr pCellB)
 {
     if (pCellA->HasCellProperty<CellLabel>() && pCellB->HasCellProperty<CellLabel>())
     {
@@ -69,7 +71,8 @@ double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellCellAdhesionEnergy(CellP
 }
 
 template<unsigned DIM>
-double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(CellPtr pCell)
+double DifferentialAdhesionPottsUpdateRule<DIM>::GetCellBoundaryAdhesionEnergy(
+    CellPtr pCell)
 {
     if (pCell->HasCellProperty<CellLabel>())
     {
@@ -100,19 +103,22 @@ double DifferentialAdhesionPottsUpdateRule<DIM>::GetLabelledCellBoundaryAdhesion
 }
 
 template<unsigned DIM>
-void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellLabelledCellAdhesionEnergyParameter(double labelledCellLabelledCellAdhesionEnergyParameter)
+void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellLabelledCellAdhesionEnergyParameter(
+    double labelledCellLabelledCellAdhesionEnergyParameter)
 {
     mLabelledCellLabelledCellAdhesionEnergyParameter = labelledCellLabelledCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellCellAdhesionEnergyParameter(double labelledCellCellAdhesionEnergyParameter)
+void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellCellAdhesionEnergyParameter(
+    double labelledCellCellAdhesionEnergyParameter)
 {
     mLabelledCellCellAdhesionEnergyParameter = labelledCellCellAdhesionEnergyParameter;
 }
 
 template<unsigned DIM>
-void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellBoundaryAdhesionEnergyParameter(double labelledCellBoundaryAdhesionEnergyParameter)
+void DifferentialAdhesionPottsUpdateRule<DIM>::SetLabelledCellBoundaryAdhesionEnergyParameter(
+    double labelledCellBoundaryAdhesionEnergyParameter)
 {
     mLabelledCellBoundaryAdhesionEnergyParameter = labelledCellBoundaryAdhesionEnergyParameter;
 }

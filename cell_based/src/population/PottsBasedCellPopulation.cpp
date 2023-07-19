@@ -49,15 +49,13 @@ void PottsBasedCellPopulation<DIM>::Validate()
     // Check each element has only one cell associated with it
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
         validated_element[elem_index]++;
     }
 
-    for (unsigned i=0; i<validated_element.size(); i++)
+    for (unsigned i = 0; i < validated_element.size(); ++i)
     {
         if (validated_element[i] == 0)
         {
@@ -72,11 +70,12 @@ void PottsBasedCellPopulation<DIM>::Validate()
 }
 
 template<unsigned DIM>
-PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
-                                                        std::vector<CellPtr>& rCells,
-                                                        bool deleteMesh,
-                                                        bool validate,
-                                                        const std::vector<unsigned> locationIndices)
+PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(
+    PottsMesh<DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    bool deleteMesh,
+    bool validate,
+    const std::vector<unsigned> locationIndices)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
       mpElementTessellation(nullptr),
       mpMutableMesh(nullptr),
@@ -105,8 +104,11 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh)
 template<unsigned DIM>
 PottsBasedCellPopulation<DIM>::~PottsBasedCellPopulation()
 {
-    // This pointer is always null because PottsBasedCellPopulation::CreateElementTessellation
-    // is not implemented. See #1666 in the trac ticket archive for more information.
+    /*
+     * This pointer is always null because 
+     * PottsBasedCellPopulation::CreateElementTessellation() is not implemented. 
+     * See #1666 in the trac ticket archive for more information.
+     */
     assert(mpElementTessellation == nullptr);
 
     delete mpMutableMesh;
@@ -135,9 +137,7 @@ TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForP
     std::vector<Node<DIM>*> temp_nodes;
 
     // Create nodes at the centre of the cells
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         unsigned index = this->GetLocationIndexUsingCell(*cell_iter);
         c_vector<double, DIM> location = this->GetLocationOfCellCentre(*cell_iter);
@@ -213,9 +213,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
-         )
+    for (auto cell_iter = this->mCells.begin(); cell_iter != this->mCells.end();)
     {
         if ((*cell_iter)->IsDead())
         {
@@ -251,7 +249,6 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
      * For each time step (i.e. each time this method is called) we sample
      * mrMesh.GetNumNodes() nodes. This is known as a Monte Carlo Step (MCS).
      */
-
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
     unsigned num_nodes = this->mrMesh.GetNumNodes();
 
@@ -262,7 +259,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
         p_gen->Shuffle(this->mUpdateRuleCollection);
     }
 
-    for (unsigned i=0; i<num_nodes*mNumSweepsPerTimestep; i++)
+    for (unsigned i = 0; i < num_nodes*mNumSweepsPerTimestep; ++i)
     {
         unsigned node_index;
 
@@ -291,7 +288,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
             std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            for (unsigned j=0; j<chosen_neighbour; j++)
+            for (unsigned j = 0; j < chosen_neighbour; ++j)
             {
                 neighbour_iter++;
             }
@@ -308,7 +305,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 double delta_H = 0.0; // This is H_1-H_0.
 
                 // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-                for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter = this->mUpdateRuleCollection.begin();
+                for (auto iter = this->mUpdateRuleCollection.begin();
                      iter != this->mUpdateRuleCollection.end();
                      ++iter)
                 {
@@ -326,7 +323,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     // Do swap
 
                     // Remove the current node from any elements containing it (there should be at most one such element)
-                    for (std::set<unsigned>::iterator iter = containing_elements.begin();
+                    for (auto iter = containing_elements.begin();
                          iter != containing_elements.end();
                          ++iter)
                     {
@@ -336,7 +333,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     }
 
                     // Next add the current node to any elements containing the neighbouring node (there should be at most one such element)
-                    for (std::set<unsigned>::iterator iter = neighbour_containing_elements.begin();
+                    for (auto iter = neighbour_containing_elements.begin();
                          iter != neighbour_containing_elements.end();
                          ++iter)
                     {
@@ -384,25 +381,30 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles(const std::string& rDire
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(
+    boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void PottsBasedCellPopulation<DIM>::AcceptPopulationCountWriter(
+    boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+void PottsBasedCellPopulation<DIM>::AcceptPopulationEventWriter(
+    boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void PottsBasedCellPopulation<DIM>::AcceptCellWriter(
+    boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter,
+    CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -429,7 +431,8 @@ double PottsBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
+void PottsBasedCellPopulation<DIM>::AddUpdateRule(
+    boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
     assert(bool(dynamic_cast<AbstractPottsUpdateRule<DIM>*>(pUpdateRule.get())));
     this->mUpdateRuleCollection.push_back(pUpdateRule);
@@ -467,7 +470,7 @@ void PottsBasedCellPopulation<DIM>::CreateMutableMesh()
 
     // Get the nodes of the PottsMesh
     std::vector<Node<DIM>*> nodes;
-    for (unsigned node_index=0; node_index<this->mrMesh.GetNumNodes(); node_index++)
+    for (unsigned node_index = 0; node_index < this->mrMesh.GetNumNodes(); ++node_index)
     {
       const c_vector<double, DIM>& r_location = this->mrMesh.GetNode(node_index)->rGetLocation();
       nodes.push_back(new Node<DIM>(node_index, r_location));
@@ -530,7 +533,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
     // Iterate over any cell writers that are present
     unsigned num_nodes = GetNumNodes();
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (auto cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {
@@ -538,7 +541,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         std::vector<double> vtk_cell_data(num_nodes);
 
         // Iterate over nodes in the mesh
-        for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
+        for (auto iter = mpPottsMesh->GetNodeIteratorBegin();
              iter != mpPottsMesh->GetNodeIteratorEnd();
              ++iter)
         {
@@ -572,13 +575,13 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
     std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         std::vector<double> cell_data_var(num_nodes);
         cell_data.push_back(cell_data_var);
     }
 
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
+    for (auto iter = mpPottsMesh->GetNodeIteratorBegin();
          iter != mpPottsMesh->GetNodeIteratorEnd();
          ++iter)
     {
@@ -589,7 +592,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
         // If there are no elements associated with this node, then we set the value of any VTK cell data to be -1 at this node...
         if (element_indices.empty())
         {
-            for (unsigned var=0; var<num_cell_data_items; var++)
+            for (unsigned var = 0; var < num_cell_data_items; ++var)
             {
                 cell_data[var][node_index] = -1.0;
             }
@@ -601,7 +604,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             unsigned elem_index = *(element_indices.begin());
             CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
 
-            for (unsigned var=0; var<num_cell_data_items; var++)
+            for (unsigned var = 0; var < num_cell_data_items; ++var)
             {
                 cell_data[var][node_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
@@ -635,7 +638,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
         unsigned outline_node_index = 0;
         unsigned outline_element_index = 0;
-        for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
+        for (auto iter = mpPottsMesh->GetNodeIteratorBegin();
              iter != mpPottsMesh->GetNodeIteratorEnd();
              ++iter)
         {
@@ -645,7 +648,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
             std::set<unsigned> target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
 
-            for (std::set<unsigned>::iterator neighbour_iter = target_neighbouring_node_indices.begin();
+            for (auto neighbour_iter = target_neighbouring_node_indices.begin();
                  neighbour_iter != target_neighbouring_node_indices.end();
                  ++neighbour_iter)
             {

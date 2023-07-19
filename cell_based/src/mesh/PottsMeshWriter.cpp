@@ -48,10 +48,6 @@ struct MeshPottsWriterIterators
     typename PottsMesh<SPACE_DIM>::PottsElementIterator* pElemIter;
 };
 
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
-
 template<unsigned SPACE_DIM>
 PottsMeshWriter<SPACE_DIM>::PottsMeshWriter(const std::string& rDirectory,
                                             const std::string& rBaseName,
@@ -91,10 +87,10 @@ std::vector<double> PottsMeshWriter<SPACE_DIM>::GetNextNode()
         // Sanity check
         assert(this->mNumNodes == mpMesh->GetNumNodes());
 
-        std::vector<double> coordinates(SPACE_DIM+1);
+        std::vector<double> coordinates(SPACE_DIM + 1);
 
         // Get the node coordinates using the node iterator (thus skipping deleted nodes)
-        for (unsigned j=0; j<SPACE_DIM; j++)
+        for (unsigned j = 0; j < SPACE_DIM; ++j)
         {
             coordinates[j] = (*(mpIters->pNodeIter))->GetPoint()[j];
         }
@@ -119,7 +115,7 @@ ElementData PottsMeshWriter<SPACE_DIM>::GetNextElement()
 
         ElementData elem_data;
         elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
-        for (unsigned j=0; j<elem_data.NodeIndices.size(); j++)
+        for (unsigned j = 0; j < elem_data.NodeIndices.size(); ++j)
         {
             unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -188,11 +184,11 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
     *p_node_file << std::setprecision(6);
 
     // Write each node's data
-    for (unsigned item_num=0; item_num<num_nodes; item_num++)
+    for (unsigned item_num = 0; item_num < num_nodes; ++item_num)
     {
         std::vector<double> current_item = this->GetNextNode();
         *p_node_file << item_num;
-        for (unsigned i=0; i<SPACE_DIM+1; i++)
+        for (unsigned i = 0; i < SPACE_DIM + 1; ++i)
         {
             *p_node_file << "\t" << current_item[i];
         }
@@ -224,7 +220,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
     }
 
     // Write each element's data
-    for (unsigned item_num=0; item_num<num_elements; item_num++)
+    for (unsigned item_num = 0; item_num < num_elements; ++item_num)
     {
         // Get data for this element
         ElementData elem_data = this->GetNextElement();
@@ -236,7 +232,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
         *p_element_file << item_num <<  "\t" << node_indices.size();
 
         // Write the node indices owned by this element to file
-        for (unsigned i=0; i<node_indices.size(); i++)
+        for (unsigned i = 0; i < node_indices.size(); ++i)
         {
             *p_element_file << "\t" << node_indices[i];
         }

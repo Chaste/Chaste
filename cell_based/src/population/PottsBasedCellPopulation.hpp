@@ -47,14 +47,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * A facade class encapsulating a cell population under the Cellular
- * Potts Model framework.
+ * A facade class encapsulating a cell population under the Cellular Potts Model 
+ * framework.
  *
- * Contains a group of cells and maintains the associations
- * between CellPtrs and elements in a specialised PottsMesh class.
+ * Contains a group of cells and maintains the associations between CellPtrs and 
+ * elements in a specialised PottsMesh class.
  *
- * The code currently requires the PottsMesh object to be fixed,
- * in the sense that no new nodes or elements can be added.
+ * The code currently requires the PottsMesh object to be fixed, in the sense 
+ * that no new nodes or elements can be added.
  */
 template<unsigned DIM>
 class PottsBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
@@ -64,21 +64,22 @@ class PottsBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 private:
 
     /**
-     * Pointer to a VertexMesh object that stores the Element tessellation that is used to
-     * visualize mrMesh. The tessellation is created by calling CreateElementTessellation()
-     * and can be accessed by calling GetElementTessellation().
+     * Pointer to a VertexMesh object that stores the Element tessellation that 
+     * is used to visualize mrMesh. The tessellation is created by calling 
+     * CreateElementTessellation() and can be accessed by calling 
+     * GetElementTessellation().
      */
     VertexMesh<DIM,DIM>* mpElementTessellation;
 
     /**
-     * A static cast of the Abstract mesh from `AbstractCellPopulation`
-     * for use in this class
+     * A static cast of the Abstract mesh from `AbstractCellPopulation` for use 
+     * in this class.
      */
     PottsMesh<DIM>* mpPottsMesh;
 
     /**
-     * Pointer to a MutableMesh that can be created from the nodes of the PottsMesh in
-     * order to solve PDEs on the population.
+     * Pointer to a MutableMesh that can be created from the nodes of the 
+     * PottsMesh in order to solve PDEs on the population.
      */
     MutableMesh<DIM,DIM>* mpMutableMesh;
 
@@ -132,9 +133,10 @@ private:
      * OpenWritersFiles(), distinct cells can be visualized when viewing VTK
      * output of Potts model simulations.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
 public:
 
@@ -146,10 +148,12 @@ public:
      *
      * @param rMesh reference to a PottsMesh
      * @param rCells reference to a vector of CellPtrs
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
-     *                   (defaults to false)
-     * @param validate whether to validate the cell population when it is created (defaults to true)
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param deleteMesh set to true if you want the cell population to free the 
+     *     mesh memory on destruction (defaults to false)
+     * @param validate whether to validate the cell population when it is 
+     *     created (defaults to true)
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
      */
     PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
                              std::vector<CellPtr>& rCells,
@@ -186,7 +190,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Get a particular PottsElement.
@@ -209,34 +213,37 @@ public:
      *
      * @return a pointer to the node.
      */
-    Node<DIM>* GetNode(unsigned index);
+    Node<DIM>* GetNode(unsigned index) override;
 
     /**
      * Overridden GetNumNodes() method.
      *
      * @return the number of nodes in the cell population.
      */
-    unsigned GetNumNodes();
+    unsigned GetNumNodes() override;
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
      *
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     * Given a cell, returns the set of location indices corresponding to 
+     * neighbouring cells.
      *
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
      * Overridden GetLocationOfCellCentre() method.
+     * 
      * Find where a given cell is in space.
      *
      * @param pCell the cell
      *
-     * @return the location of the centre of mass of the element corresponding to this cell.
+     * @return the location of the centre of mass of the element corresponding 
+     *     to this cell.
      */
-    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
+    c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell) override;
 
     /**
      * Get a pointer to the element corresponding to a given CellPtr.
@@ -254,27 +261,30 @@ public:
      *
      * @param pNewCell  the cell to add
      * @param pParentCell pointer to a parent cell (if required)
-     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     * 
+     * @return address of cell as it appears in the cell list (internal of this 
+     *     method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr()) override;
 
     /**
-     * Remove all cells labelled as dead.
-     *
-     * Note that after calling this method the cell population will be in an inconsistent state until
-     * the equivalent of a 'remesh' is performed! So don't try iterating over cells or anything
+     * Overridden RemoveDeadCells() methods.
+     * 
+     * Remove all cells labelled as dead. Note that after calling this method 
+     * the cell population will be in an inconsistent state until the equivalent 
+     * of a 'remesh' is performed! So don't try iterating over cells or anything 
      * like that.
      *
      * @return number of cells removed
      */
-    unsigned RemoveDeadCells();
+    unsigned RemoveDeadCells() override;
 
     /**
      * Overridden UpdateCellLocations() method.
      *
      * @param dt time step
      */
-    void UpdateCellLocations(double dt);
+    void UpdateCellLocations(double dt) override;
 
     /**
      * Overridden IsCellAssociatedWithADeletedLocation() method.
@@ -282,64 +292,70 @@ public:
      * @param pCell the cell
      * @return whether a given cell is associated with a deleted element.
      */
-    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
 
     /**
-     * Remove the PottsElements which have been marked as deleted, and update the correspondence
-     * with CellPtrs.
+     * Overridden Update() method.
+     * 
+     * Remove the PottsElements which have been marked as deleted, and update 
+     * the correspondence with CellPtrs.
      *
-     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
+     * @param hasHadBirthsOrDeaths a bool saying whether cell population has had 
+     *     Births Or Deaths
      */
-    void Update(bool hasHadBirthsOrDeaths=true);
+    void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
      * Overridden OpenWritersFiles() method.
      *
-     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
+     * Open all files in mCellPopulationWriters and mCellWriters for writing 
+     * (not appending).
      *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * @param rOutputFileHandler handler for the directory in which to open this 
+     *     file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Overridden WriteResultsToFiles() method.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
-    virtual void WriteResultsToFiles(const std::string& rDirectory);
+    virtual void WriteResultsToFiles(const std::string& rDirectory) override;
 
     /**
-     * A virtual method to accept a cell population writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
-     * A virtual method to accept a cell population count writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
-     * A virtual method to accept a cell population event writer so it can
-     * write data from this object to file.
+     * Overridden AcceptPopulationEventWriter() method.
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
-     * A virtual method to accept a cell writer so it can
-     * write data from this object to file.
+     * Overridden AcceptCellWriter() method.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(
+        boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -347,7 +363,7 @@ public:
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
-    double GetVolumeOfCell(CellPtr pCell);
+    double GetVolumeOfCell(CellPtr pCell) override;
 
     /**
      * Overridden GetWidth() method.
@@ -358,17 +374,14 @@ public:
      * @param rDimension a dimension (0,1 or 2)
      * @return The maximum distance between any nodes in this dimension.
      */
-    double GetWidth(const unsigned& rDimension);
+    double GetWidth(const unsigned& rDimension) override;
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method. 
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Set mTemperature.
@@ -419,7 +432,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule) override;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -439,7 +452,7 @@ public:
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            double dirichletBoundaryValue=0.0) override;
 };
 
 #include "SerializationExportWrapper.hpp"

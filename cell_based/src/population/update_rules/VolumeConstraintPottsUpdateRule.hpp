@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A volume constraint update rule class for use in Potts based simulations.
  *
- * Note this currently assumes cells don't grow, i.e the target volume is constant
- * for each cell over time.
+ * Note this currently assumes cells don't grow, i.e the target volume is 
+ * constant for each cell over time.
  */
 template<unsigned DIM>
 class VolumeConstraintPottsUpdateRule : public AbstractPottsUpdateRule<DIM>
@@ -56,16 +56,15 @@ friend class TestPottsUpdateRules;
 private:
 
     /**
-     * Cell deformation energy parameter.
-     * Set to the default value 0.5 in the constructor.
+     * Cell deformation energy parameter. Set to the default value 0.5 in the 
+     * constructor.
      * \todo provide units
      */
     double mDeformationEnergyParameter;
 
     /**
-     * Non-dimensional target volume of a mature (fully-grown) cell,
-     * given in number of lattice sites.
-     * Set to the default value 16 in the constructor.
+     * Non-dimensional target volume of a mature (fully-grown) cell, given in 
+     * number of lattice sites. Set to the default value 16 in the constructor.
      */
     double mMatureCellTargetVolume;
 
@@ -98,7 +97,7 @@ public:
     ~VolumeConstraintPottsUpdateRule();
 
     /**
-     * Overridden EvaluateHamiltonianContribution() method
+     * Overridden EvaluateHamiltonianContribution() method.
      *
      * Uses sum_elements alpha (V_i - V_i^T)^2.
      *
@@ -109,9 +108,10 @@ public:
      * @return The difference in the Hamiltonian with the configuration of the target node
      * having the same spin as the current node with the current configuration. i.e H_1-H_0
      */
-    double EvaluateHamiltonianContribution(unsigned currentNodeIndex,
-                                           unsigned targetNodeIndex,
-                                           PottsBasedCellPopulation<DIM>& rCellPopulation);
+    double EvaluateHamiltonianContribution(
+        unsigned currentNodeIndex,
+        unsigned targetNodeIndex,
+        PottsBasedCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * @return mDeformationEnergyParameter
@@ -142,7 +142,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

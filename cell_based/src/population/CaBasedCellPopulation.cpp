@@ -57,12 +57,13 @@ void CaBasedCellPopulation<DIM>::Validate()
 // LCOV_EXCL_STOP
 
 template<unsigned DIM>
-CaBasedCellPopulation<DIM>::CaBasedCellPopulation(PottsMesh<DIM>& rMesh,
-                                                        std::vector<CellPtr>& rCells,
-                                                        const std::vector<unsigned> locationIndices,
-                                                        unsigned latticeCarryingCapacity,
-                                                        bool deleteMesh,
-                                                        bool validate)
+CaBasedCellPopulation<DIM>::CaBasedCellPopulation(
+    PottsMesh<DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices,
+    unsigned latticeCarryingCapacity,
+    bool deleteMesh,
+    bool validate)
     : AbstractOnLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh),
       mLatticeCarryingCapacity(latticeCarryingCapacity)
 {
@@ -81,7 +82,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(PottsMesh<DIM>& rMesh,
         // Create a set of node indices corresponding to empty sites.
         // Note iterating over mCells is OK as it has the same order as location indices at this point (its just coppied from rCells)
         std::list<CellPtr>::iterator it = this->mCells.begin();
-        for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
+        for (unsigned i = 0; it != this->mCells.end(); ++it, ++i)
         {
             assert(i < locationIndices.size());
             if (!IsSiteAvailable(locationIndices[i],*it))
@@ -144,9 +145,7 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
 
     // Create nodes at the centre of the cells
     unsigned cell_index = 0;
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         temp_nodes.push_back(new Node<DIM>(cell_index, this->GetLocationOfCellCentre(*cell_iter)));
         cell_index++;
@@ -168,15 +167,14 @@ unsigned CaBasedCellPopulation<DIM>::GetNumNodes()
 }
 
 template<unsigned DIM>
-std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(
+    CellPtr pCell)
 {
     unsigned index = this->GetLocationIndexUsingCell(pCell);
     std::set<unsigned> candidates = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(index);
 
     std::set<unsigned> neighbour_indices;
-    for (std::set<unsigned>::iterator iter = candidates.begin();
-         iter != candidates.end();
-         ++iter)
+    for (auto iter = candidates.begin(); iter != candidates.end(); ++iter)
     {
         if (!IsSiteAvailable(*iter, pCell))
         {
@@ -188,7 +186,8 @@ std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(Ce
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> CaBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
+c_vector<double, DIM> CaBasedCellPopulation<DIM>::GetLocationOfCellCentre(
+    CellPtr pCell)
 {
     return this->mrMesh.GetNode(this->GetLocationIndexUsingCell(pCell))->rGetLocation();
 }
@@ -200,7 +199,9 @@ Node<DIM>* CaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
+void CaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(
+    unsigned index,
+    CellPtr pCell)
 {
     if (!IsSiteAvailable(index, pCell))
     {
@@ -212,12 +213,12 @@ void CaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellP
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell)
+void CaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(
+    unsigned index,
+    CellPtr pCell)
 {
     AbstractCellPopulation<DIM,DIM>::RemoveCellUsingLocationIndex(index, pCell);
-
     mAvailableSpaces[index]++;
-
     assert(mAvailableSpaces[index] <= mLatticeCarryingCapacity);
 }
 
@@ -230,7 +231,8 @@ bool CaBasedCellPopulation<DIM>::IsRoomToDivide(CellPtr pCell)
 template<unsigned DIM>
 CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
 {
-    unsigned daughter_node_index = mpCaBasedDivisionRule->CalculateDaughterNodeIndex(pNewCell,pParentCell,*this);
+    unsigned daughter_node_index = 
+        mpCaBasedDivisionRule->CalculateDaughterNodeIndex(pNewCell, pParentCell, *this);
 
     // Associate the new cell with the neighbouring node
     this->mCells.push_back(pNewCell);
@@ -243,9 +245,10 @@ CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCel
 }
 
 template<unsigned DIM>
-double CaBasedCellPopulation<DIM>:: EvaluateDivisionPropensity(unsigned currentNodeIndex,
-                                                               unsigned targetNodeIndex,
-                                                               CellPtr pCell)
+double CaBasedCellPopulation<DIM>:: EvaluateDivisionPropensity(
+    unsigned currentNodeIndex,
+    unsigned targetNodeIndex,
+    CellPtr pCell)
 {
     return 1.0;
 }
@@ -255,7 +258,7 @@ unsigned CaBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     unsigned num_removed = 0;
 
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+    for (auto cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          )
     {
@@ -290,7 +293,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     {
         // Iterate over cells
         ///\todo make this sweep random
-        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+        for (auto cell_iter = this->mCells.begin();
              cell_iter != this->mCells.end();
              ++cell_iter)
         {
@@ -307,7 +310,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 unsigned num_neighbours = neighbouring_node_indices.size();
                 double probability_of_not_moving = 1.0;
 
-                for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+                for (auto iter = neighbouring_node_indices.begin();
                      iter != neighbouring_node_indices.end();
                      ++iter)
                 {
@@ -318,7 +321,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     if (IsSiteAvailable(*iter, *cell_iter))
                     {
                         // Iterating over the update rule
-                        for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = this->mUpdateRuleCollection.begin();
+                        for (auto iter_rule = this->mUpdateRuleCollection.begin();
                              iter_rule != this->mUpdateRuleCollection.end();
                              ++iter_rule)
                         {
@@ -354,7 +357,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 double random_number = p_gen->ranf();
 
                 double total_probability = 0.0;
-                for (unsigned counter=0; counter<num_neighbours; counter++)
+                for (unsigned counter = 0; counter < num_neighbours; ++counter)
                 {
                     total_probability += neighbouring_node_propensities[counter];
                     if (total_probability >= random_number)
@@ -376,10 +379,10 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     }
 
     /*
-     * Here we loop over the nodes and select a neighbour to test if
-     * the cells (associated with the nodes) should swap locations
-     * or if a cell should move to an empty node
-     * Note this currently only works for latticeCarryingCapacity = 1
+     * Here we loop over the nodes and select a neighbour to test if the cells 
+     * (associated with the nodes) should swap locations or if a cell should 
+     * move to an empty node. Note this currently only works for 
+     * latticeCarryingCapacity = 1.
      */
     if (!(mSwitchingUpdateRuleCollection.empty()))
     {
@@ -585,11 +588,11 @@ const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > CaBasedCellPopul
 {
     std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > update_rules;
 
-    for (unsigned i=0; i<this->mUpdateRuleCollection.size(); i++)
+    for (unsigned i = 0; i < this->mUpdateRuleCollection.size(); ++i)
     {
         update_rules.push_back(this->mUpdateRuleCollection[i]);
     }
-    for (unsigned i=0; i<mSwitchingUpdateRuleCollection.size(); i++)
+    for (unsigned i = 0; i < mSwitchingUpdateRuleCollection.size(); ++i)
     {
         update_rules.push_back(mSwitchingUpdateRuleCollection[i]);
     }
@@ -642,7 +645,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         cell_data_names = this->Begin()->GetCellData()->GetKeys();
     }
     std::vector<std::vector<double> > cell_data;
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         std::vector<double> cell_data_var(num_cells);
         cell_data.push_back(cell_data_var);
@@ -654,7 +657,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Create a counter to keep track of how many cells are at a lattice site
     unsigned num_sites = this->mrMesh.GetNumNodes();
     boost::scoped_array<unsigned> number_of_cells_at_site(new unsigned[num_sites]);
-    for (unsigned i=0; i<num_sites; i++)
+    for (unsigned i = 0; i < num_sites; ++i)
     {
         number_of_cells_at_site[i] = 0;
     }
@@ -662,9 +665,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
     std::vector<Node<DIM>*> nodes;
     unsigned node_index = 0;
-    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         // Get the location index of this cell and update the counter number_of_cells_at_site
         unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
@@ -689,13 +690,13 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
             else
             {
                 RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-                for (unsigned i=0; i<DIM; i++)
+                for (unsigned i = 0; i < DIM; ++i)
                 {
                     offset[i] = p_gen->ranf(); // This assumes that all sites are 1 unit apart
                 }
             }
 
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
                 coords[i] += offset[i];
             }
@@ -706,7 +707,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     }
 
     // Iterate over any cell writers that are present
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (auto cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {
@@ -716,7 +717,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
         // Loop over cells
         unsigned cell_index = 0;
-        for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+        for (auto cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {
@@ -730,17 +731,17 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
     // Loop over cells to output the cell data
     unsigned cell_index = 0;
-    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+    for (auto cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
-        for (unsigned var=0; var<num_cell_data_items; var++)
+        for (unsigned var = 0; var < num_cell_data_items; ++var)
         {
             cell_data[var][cell_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
         cell_index++;
     }
-    for (unsigned var=0; var<num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
     }
@@ -755,7 +756,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Use an approximation of the node spacing as the interaction distance for the nodes only mesh. This is to
     // avoid rounding errors in distributed box collection.
     double volume = this->mrMesh.GetWidth(0);
-    for (unsigned idx=1; idx<DIM; idx++)
+    for (unsigned idx = 1; idx < DIM; ++idx)
     {
         volume *= this->mrMesh.GetWidth(idx);
     }
@@ -814,7 +815,7 @@ bool CaBasedCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigne
     auto cell_iter = this->Begin();
 
     assert(pdeNodeIndex < this->GetNumRealCells());
-    for (unsigned i=0; i<pdeNodeIndex; i++)
+    for (unsigned i = 0; i < pdeNodeIndex; ++i)
     {
         ++cell_iter;
     }

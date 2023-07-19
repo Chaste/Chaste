@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AbstractCaSwitchingUpdateRule<DIM>::AbstractCaSwitchingUpdateRule()
-: AbstractUpdateRule<DIM>()
+    : AbstractUpdateRule<DIM>()
 {
 }
 
@@ -47,7 +47,8 @@ AbstractCaSwitchingUpdateRule<DIM>::~AbstractCaSwitchingUpdateRule()
 }
 
 template<unsigned DIM>
-void AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AbstractCaSwitchingUpdateRule<DIM>::OutputUpdateRuleParameters(
+    out_stream& rParamsFile)
 {
     // Call method on direct parent class
     AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

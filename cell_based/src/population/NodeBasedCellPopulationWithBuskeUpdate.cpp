@@ -38,16 +38,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeLinearSystemSolver.hpp"
 
 template<unsigned DIM>
-NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh)
+NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpdate(
+    NodesOnlyMesh<DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    const std::vector<unsigned> locationIndices,
+bool deleteMesh)
     : NodeBasedCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh)
 {
 }
 
 template<unsigned DIM>
-NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh)
+NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpdate(
+    NodesOnlyMesh<DIM>& rMesh)
     : NodeBasedCellPopulation<DIM>(rMesh)
 {
     // No Validate() because the cells are not associated with the cell population yet in archiving
@@ -70,10 +72,8 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
     // Then an rGetForceVector for RHS
     Vec& r_vector = solver.rGetForceVector();
 
-    // Iterate over all nodes associated with real cells to construct the matrix A.
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    // Iterate over all nodes associated with real cells to construct the matrix A
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         // Get index of node associated with cell
         unsigned global_node_index = this->GetLocationIndexUsingCell((*cell_iter));
@@ -97,7 +97,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         // Get the set of node indices corresponding to this cell's neighbours
         std::set<unsigned> neighbouring_node_indices = this->GetNeighbouringNodeIndices(global_node_index);
 
-        for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+        for (auto iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
              ++iter)
         {
@@ -132,7 +132,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
                 Aij = M_PI*(radius_of_cell_i*radius_of_cell_i - xij*xij);
 
                 // This is contribution from the sum term in (A7)
-                for (unsigned i=0; i<DIM; i++)
+                for (unsigned i = 0; i < DIM; ++i)
                 {
                     PetscMatTools::AddToElement(r_matrix, DIM*neighbour_node_index+i, DIM*neighbour_node_index+i, -damping_const*Aij);
                     PetscMatTools::AddToElement(r_matrix, DIM*node_index+i, DIM*node_index+i, damping_const*Aij);
@@ -141,7 +141,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         }
 
         // This is the standard contribution (i.e. not in the sum) in (A7)
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             PetscMatTools::AddToElement(r_matrix, DIM*node_index+i, DIM*node_index+i, damping_const);
         }
@@ -154,7 +154,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         current_location = this->GetNode(global_node_index)->rGetLocation();
         forces = this->GetNode(global_node_index)->rGetAppliedForce();
 
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             PetscVecTools::SetElement(initial_condition, DIM*node_index+i, current_location(i));
             PetscVecTools::SetElement(r_vector, DIM*node_index+i, forces(i));
@@ -170,9 +170,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
     ReplicatableVector soln_next_timestep_repl(soln_next_timestep);
 
     // Iterate over all nodes associated with real cells to update the node locations
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
     {
         // Get index of node associated with cell
         unsigned global_node_index = this->GetLocationIndexUsingCell((*cell_iter));
@@ -182,7 +180,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         c_vector<double, DIM> new_node_location;
 
         // Get new node location
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             new_node_location(i) = soln_next_timestep_repl[DIM*node_index+i];
         }
@@ -199,7 +197,8 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulationWithBuskeUpdate<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
+void NodeBasedCellPopulationWithBuskeUpdate<DIM>::OutputCellPopulationParameters(
+    out_stream& rParamsFile)
 {
     // Currently no specific parameters to output all come from parent classes
 

@@ -76,16 +76,20 @@ public:
     virtual ~AbstractCaSwitchingUpdateRule();
 
    /**
-     * Calculate the probability of a given switch.
-     *
-     * @param currentNodeIndex The index of the current node/lattice site
-     * @param neighbourNodeIndex The index of the neighbour node/lattice site
-     * @param rCellPopulation The cell population
-     * @param dt is the time interval
-     * @param deltaX defines the size of the lattice site
-     * @return The probability of the cells associated to the current node and the target node switching.
+    * Calculate the probability of a given switch.
+    * 
+    * As this method is pure virtual, it must be overridden in subclasses.
+    *
+    * @param currentNodeIndex The index of the current node/lattice site
+    * @param neighbourNodeIndex The index of the neighbour node/lattice site
+    * @param rCellPopulation The cell population
+    * @param dt is the time interval
+    * @param deltaX defines the size of the lattice site
+    * 
+    * @return The probability of the cells associated to the current node and 
+    *         the target node switching.
      */
-    double virtual EvaluateSwitchingProbability(unsigned currentNodeIndex,
+    virtual double EvaluateSwitchingProbability(unsigned currentNodeIndex,
                                                unsigned neighbourNodeIndex,
                                                CaBasedCellPopulation<DIM>& rCellPopulation,
                                                double dt,
@@ -96,7 +100,7 @@ public:
      *
      * @param rParamsFile a file stream
      */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #endif /*ABSTRACTCASWITCHINGUPDATERULE_HPP_*/

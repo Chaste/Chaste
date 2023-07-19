@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 
 /**
- * An abstract facade class encapsulating an off-lattice (centre- or
- * vertex-based) cell population.
+ * An abstract facade class encapsulating an off-lattice (centre- or vertex-
+ * based) cell population.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractOffLatticeCellPopulation : public AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>
@@ -66,7 +66,7 @@ private:
 
 protected:
     /**
-     * Damping constant for normal cells has units of kg s^-1
+     * Damping constant for normal cells has units of kg s^-1.
      * Represented by the parameter eta in the model by Meineke et al (2001) in
      * their off-lattice model of the intestinal crypt
      * (doi:10.1046/j.0960-7722.2001.00216.x).
@@ -80,8 +80,8 @@ protected:
 
     /**
      * The absolute distance which a cell is permitted to move in one time-step.
-     * Movement beyond this threshold will trigger UpdateNodeLocations to throw an exception
-     *
+     * Movement beyond this threshold will trigger UpdateNodeLocations to throw 
+     * an exception.
      */
     double mAbsoluteMovementThreshold;
 
@@ -99,17 +99,18 @@ public:
      *
      * @param rMesh a refernce to the mesh underlying the cell population
      * @param rCells a vector of cells
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
      */
-    AbstractOffLatticeCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                                    std::vector<CellPtr>& rCells,
-                                    const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+    AbstractOffLatticeCellPopulation(
+        AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+        std::vector<CellPtr>& rCells,
+        const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
      * Add a new node to the cell population.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pNewNode pointer to the new node
      * @return global index of new node in cell population.
@@ -117,25 +118,12 @@ public:
     virtual unsigned AddNode(Node<SPACE_DIM>* pNewNode)=0;
 
     /**
-     * Move the node with a given index to a new point in space.
+     * This is a deprecated method and only used in 
+     * NodesOnlyCellPopulationWithBuskeUpdate.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param nodeIndex the index of the node to be moved
-     * @param rNewLocation the new target location of the node
-     */
-    virtual void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM>& rNewLocation)=0;
-
-    /**
-     * This is a deprecated method and only used in NodesOnlyCellPopulationWithBuskeUpdate.
-     *
-     * Update the location of each node in the cell population given
-     * a vector of forces on nodes and a time step over which to
-     * integrate the equations of motion.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Update the location of each node in the cell population given a vector of 
+     * forces on nodes and a time step over which to integrate the equations of 
+     * motion.
      *
      * @param dt time step
      */
@@ -144,7 +132,8 @@ public:
     /**
      * Checks whether a given node displacement violates the movement threshold
      * for this population. If so, a stepSizeException is generated that contains
-     * a warning/error message and a suggested smaller dt that should avoid the problem.
+     * a warning/error message and a suggested smaller dt that should avoid the 
+     * problem.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
@@ -158,8 +147,7 @@ public:
     /**
      * Get the damping constant for this node - ie d in drdt = F/d.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param nodeIndex the global index of this node
      * @return the damping constant at the node.
@@ -207,7 +195,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+    virtual void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 };
 
 #endif /*ABSTRACTOFFLATTICECELLPOPULATION_HPP_*/

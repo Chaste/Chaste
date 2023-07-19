@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A NodeBasedCellPopulationWithParticles is a NodeBasedCellPopulation with cells interacting with
- * particles, such as ECM or fluid particles.
+ * A NodeBasedCellPopulationWithParticles is a NodeBasedCellPopulation with 
+ * cells interacting with particles, such as ECM or fluid particles.
  */
 template<unsigned DIM>
 class NodeBasedCellPopulationWithParticles : public NodeBasedCellPopulation<DIM>
@@ -53,6 +53,8 @@ class NodeBasedCellPopulationWithParticles : public NodeBasedCellPopulation<DIM>
 
 protected:
     /**
+     * Overridden Validate() method.
+     * 
      * Check consistency of our internal data structures.
      */
     void Validate();
@@ -60,10 +62,10 @@ protected:
     /**
      * Overridden AcceptCellWritersAcrossPopulation() method.
      *
-     * Calls #AcceptCellWriter() across the whole population,
-     * iterating in an appropriate way to skip particle nodes.
+     * Calls #AcceptCellWriter() across the whole population, iterating in an 
+     * appropriate way to skip particle nodes.
      */
-    virtual void AcceptCellWritersAcrossPopulation();
+    virtual void AcceptCellWritersAcrossPopulation() override;
 
 private:
 
@@ -96,11 +98,13 @@ public:
     /**
      * Default constructor.
      *
-     * Note that the cell population will take responsibility for freeing the memory used by the nodes.
+     * Note that the cell population will take responsibility for freeing the 
+     * memory used by the nodes.
      *
      * @param rMesh a mutable nodes-only mesh
      * @param rCells a vector of cells
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
      * @param deleteMesh whether to delete nodes-only mesh in destructor
      */
     NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh,
@@ -114,7 +118,6 @@ public:
      * @param rMesh a mutable nodes-only mesh
      */
     NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh);
-
 
     /**
      * Update mIsParticle if required by a remesh.
@@ -145,28 +148,27 @@ public:
      * Add a new cell to the cell population and update mIsParticle.
      *
      * @param pNewCell  the cell to add
-     * @param pParentCell pointer to a parent cell  - this is required for
-     *  mesh-based cell populations
-     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     * @param pParentCell pointer to a parent cell - this is required for
+     *     mesh-based cell populations
+     * @return address of cell as it appears in the cell list (internal of this 
+     *     method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory  pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
-     * Outputs CellPopulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputCellPopulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

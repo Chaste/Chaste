@@ -99,21 +99,22 @@ private:
     }
 
     /**
-     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
+     * Open all files in mCellPopulationWriters and mCellWriters in append mode 
+     * for writing.
      *
-     * Files in mCellPopulationCountWriters are NOT opened in this call since they are not written in
-     * a round-robin fashion.
+     * Files in mCellPopulationCountWriters are NOT opened in this call since 
+     * they are not written in a round-robin fashion.
      *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * @param rOutputFileHandler handler for the directory in which to open this 
+     *     file.
      */
     void OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
 
     /**
      * Close all files in mCellPopulationWriters and mCellWriters.
      *
-     * Files in mCellPopulationCountWriters are NOT closed in this call since they are not written in
-     * a round-robin fashion
-     *
+     * Files in mCellPopulationCountWriters are NOT closed in this call since 
+     * they are not written in a round-robin fashion.
      */
     void CloseRoundRobinWritersFiles();
 
@@ -140,7 +141,10 @@ protected:
     /** Cell property registry. */
     boost::shared_ptr<CellPropertyRegistry> mpCellPropertyRegistry;
 
-    /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
+    /**
+     * Whether to write results to file for visualization using the Chaste java 
+     * visualizer (defaults to true).
+     */
     bool mOutputResultsForChasteVisualizer;
 
     /** A list of cell writers. */
@@ -156,32 +160,31 @@ protected:
     std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationEventWriters;
 
     /**
-     * Details of cell divisions, to be used by CellDivisionLocationsWriter
-     * The locations are stored until they are cleared by ClearDivisionsInformation().
+     * Details of cell divisions, to be used by CellDivisionLocationsWriter. The 
+     * locations are stored until they are cleared by ClearDivisionsInformation().
      */
     std::vector<std::string> mDivisionsInformation;
 
     /**
-     * Details of cell removals, to be used by CellRemovalLocationsWriter
-     * The locations are stored until they are cleared by ClearRemovalsInformation().
+     * Details of cell removals, to be used by CellRemovalLocationsWriter. The 
+     * locations are stored until they are cleared by ClearRemovalsInformation().
      */
     std::vector<std::string> mRemovalsInformation;
 
     /**
      * Check consistency of our internal data structures.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual void Validate()=0;
 
     /**
      * Write the current results to mpVtkMetaFile.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory pathname of the output directory, relative to where 
+     *                   Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory)=0;
 
@@ -205,13 +208,14 @@ public:
     /**
      * AbstractCellPopulation Constructor.
      *
-     * @note Warning: the passed-in vector of cells will be emptied, even if the constructor
-     * throws an exception!
+     * @note Warning: the passed-in vector of cells will be emptied, even if the 
+     *     constructor throws an exception!
      *
      * @param rMesh a reference to the mesh underlying the cell population
-     * @param rCells a vector of cells.  Copies of the cells will be stored in the cell population,
-     *     and the passed-in vector cleared.
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param rCells a vector of cells. Copies of the cells will be stored in 
+     *               the cell population, and the passed-in vector cleared.
+     * @param locationIndices an optional vector of location indices that 
+     *                        correspond to real cells
      */
     AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                             std::vector<CellPtr>& rCells,
@@ -228,9 +232,11 @@ public:
     void InitialiseCells();
 
     /**
-     * Add an item of cell data to every cell in the population
+     * Add an item of cell data to every cell in the population.
+     * 
      * @param rDataName is the name associated with the data
-     * @param dataValue is the value of the data, initially the same for each cell
+     * @param dataValue is the value of the data, initially the same for each 
+     *                  cell
      */
     void SetDataOnAllCells(const std::string& rDataName, double dataValue);
 
@@ -243,20 +249,19 @@ public:
      * @return a shared to a tetrahedral mesh, for use with a PDE modifier.
      * This method is called by AbstractGrowingDomainPdeModifier.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier()=0;
 
     /**
-     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a PDE modifier
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a 
+     *                     PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 
@@ -264,17 +269,18 @@ public:
      * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
      *         with a PDE modifier
      * @param rVariableName the name of the cell data item to get
-     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
-     *        (optional; defaults to false)
-     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
-     *        (optional; defaults to 0.0)
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary 
+     *        condition is used (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary 
+     *        condition, if used (optional; defaults to 0.0)
      *
-     * @return the value of a CellData item (interpolated if necessary) at a node,
-     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * @return the value of a CellData item (interpolated if necessary) at a 
+     *         node, specified by its index in a tetrahedral mesh for use with a 
+     *         PDE modifier.
+     * 
      * This method can be called by PDE modifier classes.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
@@ -287,8 +293,7 @@ public:
     std::list<CellPtr>& rGetCells();
 
     /**
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @return the number of nodes in the cell population.
      */
@@ -297,8 +302,7 @@ public:
     /**
      * Find where a given cell is in space.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCell the cell
      * @return the location of the cell
@@ -308,8 +312,7 @@ public:
     /**
      * Get a pointer to the node with a given index.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param index  global index of the specified node
      * @return a pointer to the node with a given index.
@@ -319,8 +322,7 @@ public:
     /**
      * Move the node with a given index to a new point in space.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param nodeIndex the index of the node to be moved
      * @param rNewLocation the new target location of the node
@@ -330,8 +332,7 @@ public:
     /**
      * Helper method for establishing if a cell is real.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCell the cell
      * @return whether a given cell is associated with a deleted
@@ -350,22 +351,21 @@ public:
     /**
      * Add a new cell to the cell population.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pNewCell  the cell to add
      * @param pParentCell pointer to a parent cell (if required)
      *
-     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
+     * @return address of cell as it appears in the cell list (internal of this 
+     *         method uses a copy constructor along the way).
      */
     virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell=CellPtr())=0;
 
     /**
-     * @return a default value for the time step to use when simulating
-     * the cell population.
+     * @return a default value for the time step to use when simulating the cell 
+     *         population.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * Note that the time step can be reset by calling SetDt() on the
      * simulation object used to simulate the cell population.
@@ -377,28 +377,28 @@ public:
     /**
      * Remove all cells labelled as dead.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @return number of cells removed
      */
     virtual unsigned RemoveDeadCells()=0;
 
     /**
-     * Remove the Nodes (for cell-centre) or VertexElements (for cell-vertex) which
-     * have been marked as deleted and update the correspondence with Cells.
+     * Remove the Nodes (for cell-centre) or VertexElements (for cell-vertex) 
+     * which have been marked as deleted and update the correspondence with Cells.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
-     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
+     * @param hasHadBirthsOrDeaths bool saying whether cell population has 
+     *                             had Births Or Deaths
      */
     virtual void Update(bool hasHadBirthsOrDeaths=true)=0;
 
     /**
-     * Find out how many cells of each mutation state there are
+     * Find out how many cells of each mutation state there are.
      *
-     * @return The number of cells of each mutation state (evaluated at each visualizer output), with default ordering
+     * @return The number of cells of each mutation state (evaluated at each 
+     *         visualizer output), with default ordering
      * [0] = healthy count
      * [1] = APC one hit
      * [2] = APC two hit
@@ -409,7 +409,8 @@ public:
     /**
      * Find out how many cells of each type there are.
      *
-     * @return The number of cells of each type (evaluated at each visualizer output), with default ordering
+     * @return The number of cells of each type (evaluated at each visualizer 
+     *         output), with default ordering
      * [0] = STEM
      * [1] = TRANSIT
      * [2] = DIFFERENTIATED
@@ -420,7 +421,8 @@ public:
     /**
      * Find out how many cells in each cell cycle phase there are.
      *
-     * @return The number of cells of each phase (evaluated at each visualizer output)
+     * @return The number of cells of each phase (evaluated at each visualizer 
+     *         output)
      * [0] = G_ZERO_PHASE
      * [1] = G_ONE_PHASE
      * [2] = S_PHASE
@@ -430,39 +432,42 @@ public:
     std::vector<unsigned> GetCellCyclePhaseCount();
 
     /**
-     * This counts the number of cells that the cell iterator covers. It does not include dead cells or cells that are
-     * associated with a deleted location in the mesh.
+     * This counts the number of cells that the cell iterator covers. It does 
+     * not include dead cells or cells that are associated with a deleted 
+     * location in the mesh.
      *
      * @return the number of real cells.
      */
     unsigned GetNumRealCells();
 
     /**
-     * This returns the number of cells that are present in the internal mCells vector. It also includes dead cells and cells
-     * that are associated with a deleted location in the mesh.
+     * This returns the number of cells that are present in the internal mCells 
+     * vector. It also includes dead cells and cells that are associated with a 
+     * deleted location in the mesh.
      *
      * @return the number of real cells.
      */
     unsigned GetNumAllCells();
 
     /**
-     * Sets the Ancestor index of all the cells at this time to be the
-     * same as their location index, can be used to trace clonal populations.
+     * Sets the Ancestor index of all the cells at this time to be the same as 
+     * their location index, can be used to trace clonal populations.
      */
     void SetCellAncestorsToLocationIndices();
 
     /**
-     * Loops over cells and makes a list of the ancestors that
-     * are part of the cell population.
+     * Loops over cells and makes a list of the ancestors that are part of the 
+     * cell population.
      *
-     * @return remaining_ancestors  The size of this set tells you how many clonal populations remain.
+     * @return the set of cell ancestors; the size of this set tells you how 
+     *         many clonal populations remain.
      */
     std::set<unsigned> GetCellAncestors();
 
     /**
-     * Get the cell corresponding to a given location index.
-     *
-     * This method assumes that there is at most one cell attached to a location index and an assertion fails if not.
+     * Get the cell corresponding to a given location index. This method assumes 
+     * that there is at most one cell attached to a location index and an 
+     * assertion fails if not.
      * \todo should be an exception?
      *
      * @param index the location index
@@ -472,9 +477,8 @@ public:
     virtual CellPtr GetCellUsingLocationIndex(unsigned index);
 
     /**
-     * Get the set of cells corresponding to a given location index.
-     *
-     * Note that the set may be empty.
+     * Get the set of cells corresponding to a given location index. Note that 
+     * the set may be empty.
      *
      * @param index the location index
      *
@@ -483,7 +487,7 @@ public:
     std::set<CellPtr> GetCellsUsingLocationIndex(unsigned index);
 
     /**
-     * Returns whether or not a cell is associated with a location index
+     * Returns whether or not a cell is associated with a location index.
      *
      * @param index the location index
      *
@@ -492,11 +496,11 @@ public:
     virtual bool IsCellAttachedToLocationIndex(unsigned index);
 
     /**
-     * Set the cell corresponding to a given location index.
-     *
-     * Assumes there is one cell for each location index and replaces any existing cell attached to the location index.
-     * If you wish to attach an additional cell to a location index use AddCellUsingLocaitonIndex as SetCellUsingLocation
-     * Index will overwrite cells attached to this index.
+     * Set the cell corresponding to a given location index. Assumes there is 
+     * one cell for each location index and replaces any existing cell attached 
+     * to the location index. If you wish to attach an additional cell to a 
+     * location index use AddCellUsingLocaitonIndex(), as 
+     * SetCellUsingLocationIndex() will overwrite cells attached to this index.
      *
      * @param index the location index
      * @param pCell the cell.
@@ -520,18 +524,20 @@ public:
     virtual void RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell);
 
     /**
-     * Change the location index of a cell in mLocationCellMap and mCellLocationMap
+     * Change the location index of a cell in mLocationCellMap and 
+     * mCellLocationMap.
      *
      * @param pCell the cell to move
-     * @param old_index the old location index
-     * @param new_index the new location index
+     * @param oldIndex the old location index
+     * @param newIndex the new location index
      */
-    void MoveCellInLocationMap(CellPtr pCell, unsigned old_index, unsigned new_index);
+    void MoveCellInLocationMap(CellPtr pCell, unsigned oldIndex, unsigned newIndex);
 
     /**
      * Get the location index corresponding to a given cell.
      *
-     * Assumes there is one location index for each cell and an assertion fails if not.
+     * Assumes there is one location index for each cell and an assertion fails 
+     * if not.
      *
      * @param pCell the cell
      *
@@ -545,18 +551,19 @@ public:
     boost::shared_ptr<CellPropertyRegistry> GetCellPropertyRegistry();
 
     /**
-     * Set a default ordering on cell mutation states and cell proliferative types, so that
-     * existing tests don't need to specify the old ordering explicitly.
+     * Set a default ordering on cell mutation states and cell proliferative 
+     * types, so that existing tests don't need to specify the old ordering 
+     * explicitly.
      */
     void SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
     /**
      * Calculate the 'width' of any dimension of the cell population.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rDimension a dimension (0,1 or 2)
+     * 
      * @return The maximum distance between any nodes in this dimension.
      */
     virtual double GetWidth(const unsigned& rDimension)=0;
@@ -573,32 +580,36 @@ public:
     /**
      * Given a node index, returns the set of neighbouring node indices.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param index the node index
+     * 
      * @return the set of neighbouring node indices.
      */
     virtual std::set<unsigned> GetNeighbouringNodeIndices(unsigned index)=0;
 
     /**
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     * Given a cell, returns the set of location indices corresponding to 
+     * neighbouring cells.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCell a cell
+     * 
      * @return the set of neighbouring location indices.
      */
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell)=0;
 
     /**
-     * Gets the local edge index of the neighbouring element
+     * Get the local edge index of the neighbouring element.
+     * 
      * @param pCell  Cell pointer
      * @param pEdgeIndex Local edge index
      * @return pair of element location and local edge index
      */
-    virtual std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeIndex);
+    virtual std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(
+        CellPtr pCell,
+        unsigned pEdgeIndex);
 
     /**
      * @return the centroid of the cell population.
@@ -611,17 +622,21 @@ public:
     virtual void UpdateCellProcessLocation();
 
     /**
-     * Open output files (and, if required, write headers) for any writers in the members
-     * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
+     * Open output files (and, if required, write headers) for any writers in 
+     * the members mCellPopulationCountWriters, mCellPopulationWriters and 
+     * mCellWriters.
      *
-     * The method also writes the header for the .pvd output file if VTK is available.
+     * The method also writes the header for the .pvd output file if VTK is 
+     * available.
      *
      * Before doing this, the method also creates appropriate writer objects if
      * mOutputResultsForChasteVisualizer is set to true.
      *
-     * This method is public because it is called by the simulation class at the start of the Solve() call.
+     * This method is public because it is called by the simulation class at the 
+     * start of the Solve() call.
      *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * @param rOutputFileHandler handler for the directory in which to open this 
+     *                           file.
      */
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
@@ -636,50 +651,54 @@ public:
     /**
      * Write results from the current cell population state to output files.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory pathname of the output directory, relative to where 
+     *                   Chaste output is stored
      */
     virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
-     * Accept a cell population writer so it can write data from this object to file.
+     * Accept a cell population writer so it can write data from this object to 
+     * file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
+    virtual void AcceptPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
-     * Accept a cell population count writer so it can write data from this object to file.
+     * Accept a cell population count writer so it can write data from this 
+     * object to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
+    virtual void AcceptPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
-     * Accept a cell population event writer so it can write data from this object to file.
+     * Accept a cell population event writer so it can write data from this 
+     * object to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
+    virtual void AcceptPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
 
     /**
      * Accept a cell writer so it can write data from this object to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) = 0;
+    virtual void AcceptCellWriter(
+        boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) = 0;
 
     /**
      * Return details of all divisions since the last sampling time step.
@@ -691,7 +710,8 @@ public:
     /**
      * Add information for a division event.
      *
-     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent Cell ID, New Cell ID.
+     * Division Time, Location of Parent Cell (x,y,z), Age on Division, Parent 
+     * Cell ID, New Cell ID.
      *
      * @param divisionInformation  division information string
      */
@@ -722,7 +742,8 @@ public:
     void ClearRemovalsInformation();
 
     /**
-     * Helper method to store information about the removal in mRemovalInformation
+     * Helper method to store information about the removal in 
+     * mRemovalInformation.
      *
      * @param pCell the cell
      * @param killerInfo additional information the killer wants output i.e. the type of killer.
@@ -730,53 +751,58 @@ public:
     void GenerateRemovalInformation(CellPtr pCell, std::string killerInfo);
 
     /**
-     * Helper method to mark a cell as killed and store information about the removal.
+     * Helper method to mark a cell as killed and store information about the 
+     * removal.
      *
      * @param pCell the cell
-     * @param killerInfo additional information the killer wants output i.e. the type of killer.
+     * @param killerInfo additional information the killer wants output, i.e. 
+     *                   the type of killer
      */
     void KillCell(CellPtr pCell, std::string killerInfo);
 
     /**
-     * Helper method to mark a cell as starting apoptosis and store information about the removal.
+     * Helper method to mark a cell as starting apoptosis and store information 
+     * about the removal.
      *
      * @param pCell the cell
-     * @param killerInfo additional information the killer wants output i.e. the type of killer.
+     * @param killerInfo additional information the killer wants output, i.e. 
+     *                   the type of killer.
      */
     void StartApoptosisOnCell(CellPtr pCell, std::string killerInfo);
 
     /**
-     * Outputs CellPopulation used in the simulation to file and then calls OutputCellPopulationParameters to output all relevant parameters.
+     * Output CellPopulation used in the simulation to file and then call 
+     * OutputCellPopulationParameters() to output all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputCellPopulationInfo(out_stream& rParamsFile);
 
     /**
-     * Outputs CellPopulation parameters to file
+     * Outputs CellPopulation parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellPopulationParameters(out_stream& rParamsFile)=0;
 
     /**
-     * Empty hook method to provide the ability to specify some additional property
-     * of a cell-based simulation object.
+     * Empty hook method to provide the ability to specify some additional 
+     * property of a cell-based simulation object.
      *
-     * This method is called immediately prior to calling SetupSolve() within the
-     * Solve() method in AbstractCellBasedSimulation.
+     * This method is called immediately prior to calling SetupSolve() within 
+     * the Solve() method in AbstractCellBasedSimulation.
      *
-     * This method can be overridden, for example, to add a T2SwapCellKiller to the
-     * simulation object in the case of a VertexBasedCellPopulation. This functionality
-     * avoids the need for static or dynamic casts to specific cell population types
-     * within simulation methods.
+     * This method can be overridden, for example, to add a T2SwapCellKiller to 
+     * the simulation object in the case of a VertexBasedCellPopulation. This 
+     * functionality avoids the need for static or dynamic casts to specific 
+     * cell population types within simulation methods.
      *
      * @param pSimulation pointer to a cell-based simulation object
      */
-    virtual void SimulationSetupHook(AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation);
+    virtual void SimulationSetupHook(
+        AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>* pSimulation);
 
     /**
      * @return mOutputResultsForChasteVisualizer
@@ -784,10 +810,9 @@ public:
     bool GetOutputResultsForChasteVisualizer();
 
     /**
-     * Add a cell population writer based on its type. Template parameters are inferred from the population.
-     * The implementation of this function must be available in the header file.
-     *
-     * @return This method returns void
+     * Add a cell population writer based on its type. Template parameters are 
+     * inferred from the population. The implementation of this function must be 
+     * available in the header file.
      */
     template<template <unsigned, unsigned> class T>
     void AddPopulationWriter()
@@ -796,10 +821,9 @@ public:
     }
 
     /**
-     * Add a cell writer based on its type. Template parameters are inferred from the population.
-     * The implementation of this function must be available in the header file.
-     *
-     * @return This method returns void
+     * Add a cell writer based on its type. Template parameters are inferred 
+     * from the population. The implementation of this function must be available 
+     * in the header file.
      */
     template<template <unsigned, unsigned> class T>
     void AddCellWriter()
@@ -808,10 +832,9 @@ public:
     }
 
     /**
-     * Add a cell population count writer based on its type. Template parameters are inferred from the population.
-     * The implementation of this function must be available in the header file.
-     *
-     * @return This method returns void
+     * Add a cell population count writer based on its type. Template parameters 
+     * are inferred from the population. The implementation of this function must 
+     * be available in the header file.
      */
     template<template <unsigned, unsigned> class T>
     void AddCellPopulationCountWriter()
@@ -820,10 +843,9 @@ public:
     }
 
     /**
-     * Add a cell population event writer based on its type. Template parameters are inferred from the population.
-     * The implementation of this function must be available in the header file.
-     *
-     * @return This method returns void
+     * Add a cell population event writer based on its type. Template parameters 
+     * are inferred from the population. The implementation of this function must 
+     * be available in the header file.
      */
     template<template <unsigned, unsigned> class T>
     void AddCellPopulationEventWriter()
@@ -832,57 +854,57 @@ public:
     }
 
     /**
-     * Add a cell population writer through an input argument.
-     * This alternative to the templated AddPopulationWriter()
-     * method allows the user to, for example, add a writer
-     * with a non-default value for its member mFileName.
+     * Add a cell population writer through an input argument. This alternative 
+     * to the templated AddPopulationWriter() method allows the user to, for 
+     * example, add a writer with a non-default value for its member mFileName.
      *
      * @param pPopulationWriter shared pointer to a cell population writer
-     * @return This method returns void
      */
-    void AddPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
+    void AddPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
     {
         mCellPopulationWriters.push_back(pPopulationWriter);
     }
 
     /**
-     * Add a cell writer through an input argument.
-     * This alternative to the templated AddCellWriter()
-     * method allows the user to, for example, add a writer
-     * with a non-default value for its member mFileName.
+     * Add a cell writer through an input argument. This alternative to the 
+     * templated AddCellWriter() method allows the user to, for example, add a 
+     * writer with a non-default value for its member mFileName.
      *
      * @param pCellWriter shared pointer to a cell writer
-     * @return This method returns void
      */
-    void AddCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter)
+    void AddCellWriter(
+        boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter)
     {
         mCellWriters.push_back(pCellWriter);
     }
 
     /**
-     * Add a cell population count writer through an input argument.
-     * This alternative to the templated AddCellPopulationCountWriter()
-     * method allows the user to, for example, add a writer
-     * with a non-default value for its member mFileName.
+     * Add a cell population count writer through an input argument. This 
+     * alternative to the templated AddCellPopulationCountWriter() method allows 
+     * the user to, for example, add a writer with a non-default value for its 
+     * member mFileName.
      *
-     * @param pCellPopulationCountWriter shared pointer to a cell population count writer
-     * @return This method returns void
+     * @param pCellPopulationCountWriter shared pointer to a cell population 
+     *                                   count writer
      */
-    void AddCellPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationCountWriter)
+    void AddCellPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationCountWriter)
     {
         mCellPopulationCountWriters.push_back(pCellPopulationCountWriter);
     }
 
     /**
-     * Add a cell population count writer through an input argument.
-     * This alternative to the templated AddCellPopulationEventWriter()
-     * method allows the user to, for example, add a writer
-     * with a non-default value for its member mFileName.
+     * Add a cell population count writer through an input argument. This 
+     * alternative to the templated AddCellPopulationEventWriter() method allows 
+     * the user to, for example, add a writer with a non-default value for its 
+     * member mFileName.
      *
-     * @param pCellPopulationEventWriter shared pointer to a cell population event writer
-     * @return This method returns void
+     * @param pCellPopulationEventWriter shared pointer to a cell population 
+     *                                   event writer
      */
-    void AddCellPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
+    void AddCellPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
     {
         mCellPopulationEventWriters.push_back(pCellPopulationEventWriter);
     }
@@ -933,7 +955,8 @@ public:
     /**
      * Set mOutputResultsForChasteVisualizer.
      *
-     * @param outputResultsForChasteVisualizer the new value of mOutputResultsForChasteVisualizer
+     * @param outputResultsForChasteVisualizer the new value of 
+     *     mOutputResultsForChasteVisualizer
      */
     void SetOutputResultsForChasteVisualizer(bool outputResultsForChasteVisualizer);
 
@@ -962,9 +985,8 @@ public:
 
     /**
      * Iterator class allows one to iterate over cells in the cell population.
-     * Dereferencing the iterator will give you the current cell.
-     * There are also methods to get the node representing this cell,
-     * and the location of that node.
+     * Dereferencing the iterator will give you the current cell. There are also 
+     * methods to get the node representing this cell, and the location of that node.
      */
     class Iterator
     {
@@ -978,7 +1000,9 @@ public:
 
         /**
          * Unusually for an iterator over a collection of pointers, this method
-         * allows you to access the object pointed at, rather than the pointer itself.
+         * allows you to access the object pointed at, rather than the pointer 
+         * itself.
+         * 
          * @return pointer
          */
         inline CellPtr operator->();
@@ -989,7 +1013,8 @@ public:
          * @param rOther iterator with which comparison is made
          * @return not-equal
          */
-        inline bool operator!=(const typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther);
+        inline bool operator!=(
+            const typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -1003,7 +1028,8 @@ public:
          * @param rCellPopulation the cell population
          * @param cellIter iterator over list of cells
          */
-        Iterator(AbstractCellPopulation& rCellPopulation, std::list<CellPtr>::iterator cellIter);
+        Iterator(AbstractCellPopulation& rCellPopulation,
+                 std::list<CellPtr>::iterator cellIter);
 
         /**
          * The iterator must have a virtual destructor.
@@ -1015,6 +1041,7 @@ public:
 
         /**
          * Private helper function.
+         * 
          * @return whether we're pointing at a real cell.
          * Assumes we are within range (i.e. not at End).
          *
@@ -1024,6 +1051,7 @@ public:
 
         /**
          * Private helper function.
+         * 
          * @return whether we're at the end of the cells.
          */
         inline bool IsAtEnd();
@@ -1067,7 +1095,8 @@ CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator->()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator!=(const typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther)
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator!=(
+    const typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther)
 {
     return mCellIter != rOther.mCellIter;
 }
@@ -1097,7 +1126,9 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::IsAtEnd()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::Iterator(AbstractCellPopulation& rCellPopulation, std::list<CellPtr>::iterator cellIter)
+AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::Iterator(
+    AbstractCellPopulation& rCellPopulation,
+    std::list<CellPtr>::iterator cellIter)
     : mrCellPopulation(rCellPopulation),
       mCellIter(cellIter)
 {

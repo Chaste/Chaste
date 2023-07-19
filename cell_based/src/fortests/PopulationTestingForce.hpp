@@ -109,7 +109,8 @@ public:
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation) override;
 
     /**
-     * Helper method to return the expected step location for ForwardEulerNumericalMethod.
+     * Helper method to return the expected step location for 
+     * ForwardEulerNumericalMethod.
      *
      * @return the expected location after one step
      *

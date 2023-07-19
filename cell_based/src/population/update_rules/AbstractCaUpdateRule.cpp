@@ -47,7 +47,8 @@ AbstractCaUpdateRule<DIM>::~AbstractCaUpdateRule()
 }
 
 template<unsigned DIM>
-void AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(
+    out_stream& rParamsFile)
 {
     // Call method on direct parent class
     AbstractUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);

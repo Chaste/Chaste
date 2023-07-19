@@ -37,13 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
-c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(unsigned nodeIndex)
+c_vector<double, DIM>& CellwiseDataGradient<DIM>::rGetGradient(
+    unsigned nodeIndex)
 {
     return mGradients[nodeIndex];
 }
 
 template<unsigned DIM>
-void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCellPopulation, const std::string& rItemName)
+void CellwiseDataGradient<DIM>::SetupGradients(
+    AbstractCellPopulation<DIM>& rCellPopulation,
+    const std::string& rItemName)
 {
     MeshBasedCellPopulation<DIM>* pCellPopulation = static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation));
     TetrahedralMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
@@ -60,7 +63,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
     // The number of elements containing a given node (excl ghost elements)
     std::vector<unsigned> num_real_elems_for_node(num_nodes, 0);
 
-    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+    for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
     {
         Element<DIM,DIM>& r_elem = *(r_mesh.GetElement(elem_index));
 
@@ -74,7 +77,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
 
         bool is_ghost_element = false;
 
-        for (unsigned node_index=0; node_index<DIM+1; node_index++)
+        for (unsigned node_index = 0; node_index < DIM + 1; ++node_index)
         {
             unsigned node_global_index = r_elem.GetNodeGlobalIndex(node_index);
 
@@ -92,7 +95,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
             double pde_solution = p_cell->GetCellData()->GetItem(rItemName);
 
             // Interpolate gradient
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
                 gradients_on_elements[elem_index](i) += pde_solution* grad_phi(i, node_index);
             }
@@ -101,7 +104,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
         // Add gradient at element to gradient at node
         if (!is_ghost_element)
         {
-            for (unsigned node_index=0; node_index<DIM+1; node_index++)
+            for (unsigned node_index = 0; node_index < DIM + 1; ++node_index)
             {
                 unsigned node_global_index = r_elem.GetNodeGlobalIndex(node_index);
                 mGradients[node_global_index] += gradients_on_elements[elem_index];
