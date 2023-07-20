@@ -153,7 +153,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* A {{{NagaiHondaForce}}} has to be used together with a child class of {{{AbstractTargetAreaModifier}}}.
+        /* We now pass a "target area modifier" to the simulation.
          * This modifies the target area of individual cells and thus alters the relative forces
          * between neighbouring cells.
          */

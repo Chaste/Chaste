@@ -348,7 +348,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 

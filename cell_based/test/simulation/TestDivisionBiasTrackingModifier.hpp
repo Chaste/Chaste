@@ -344,6 +344,7 @@ public:
         MAKE_PTR(FarhadifarForce<2>, p_force);
         simulator.AddForce(p_force);
 
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         p_growth_modifier->SetGrowthDuration(1.0);
         simulator.AddSimulationModifier(p_growth_modifier);

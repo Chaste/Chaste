@@ -167,7 +167,7 @@ public:
      *
      * @param numSteps the new maximum number of steps
      */
-    void SetMaxSteps(long int numSteps);
+    void SetMaxSteps(long numSteps);
 
     /**
      * If using CVODE, set relative and absolute tolerances; both scalars.

@@ -415,7 +415,7 @@ public:
             {
                 cardiac_problem.Solve();
             }
-            catch (Exception e)
+            catch (const Exception& e)
             {
                 WARNING("This run threw an exception.  Check convergence results\n");
                 std::cout << e.GetMessage() << std::endl;
@@ -476,7 +476,7 @@ public:
                     ConductionVelocity  = ppc.CalculateConductionVelocity(first_quadrant_node,third_quadrant_node,0.5*mesh_width);
                 }
                 // LCOV_EXCL_START
-                catch (Exception e)
+                catch (const Exception& e)
                 {
                     std::cout << "Warning - this run threw an exception in calculating propagation.  Check convergence results\n";
                     std::cout << e.GetMessage() << std::endl;

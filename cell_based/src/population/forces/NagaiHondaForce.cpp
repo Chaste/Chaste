@@ -44,7 +44,8 @@ NagaiHondaForce<DIM>::NagaiHondaForce()
                                                       // the sigma parameter in the Nagai & Honda
                                                       // paper. In the paper, the sigma value is
                                                       // set to 0.01.
-     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 in the Nagai & Honda paper.
+     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0), // This is 0.01 in the Nagai & Honda paper
+     mNagaiHondaTargetAreaParameter(1.0)
 {
 }
 
@@ -67,6 +68,13 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     unsigned num_nodes = p_cell_population->GetNumNodes();
     unsigned num_elements = p_cell_population->GetNumElements();
 
+    /*
+     * Check if a subclass of AbstractTargetAreaModifier is being used by 
+     * interrogating the first cell (assuming either all cells, or no cells, in 
+     * the population have the CellData item "target area").
+     */
+    bool using_target_area_modifier = p_cell_population->Begin()->GetCellData()->HasItem("target area");
+
     // Begin by computing the area and perimeter of each element in the mesh, to avoid having to do this multiple times
     std::vector<double> element_areas(num_elements);
     std::vector<double> element_perimeters(num_elements);
@@ -78,17 +86,14 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         unsigned elem_index = elem_iter->GetIndex();
         element_areas[elem_index] = p_cell_population->rGetMesh().GetVolumeOfElement(elem_index);
         element_perimeters[elem_index] = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(elem_index);
-        try
+
+        if (using_target_area_modifier)
         {
-            // If we haven't specified a growth modifier, there won't be any target areas in the CellData array and CellData
-            // will throw an exception that it doesn't have "target area" entries.  We add this piece of code to give a more
-            // understandable message. There is a slight chance that the exception is thrown although the error is not about the
-            // target areas.
             target_areas[elem_index] = p_cell_population->GetCellUsingLocationIndex(elem_index)->GetCellData()->GetItem("target area");
         }
-        catch (Exception&)
+        else
         {
-            EXCEPTION("You need to add an AbstractTargetAreaModifier to the simulation in order to use NagaiHondaForce");
+            target_areas[elem_index] = mNagaiHondaTargetAreaParameter;
         }
     }
 
@@ -217,6 +222,12 @@ double NagaiHondaForce<DIM>::GetNagaiHondaCellBoundaryAdhesionEnergyParameter()
 }
 
 template<unsigned DIM>
+double NagaiHondaForce<DIM>::GetNagaiHondaTargetAreaParameter()
+{
+    return mNagaiHondaTargetAreaParameter;
+}
+
+template<unsigned DIM>
 void NagaiHondaForce<DIM>::SetNagaiHondaDeformationEnergyParameter(double deformationEnergyParameter)
 {
     mNagaiHondaDeformationEnergyParameter = deformationEnergyParameter;
@@ -241,12 +252,19 @@ void NagaiHondaForce<DIM>::SetNagaiHondaCellBoundaryAdhesionEnergyParameter(doub
 }
 
 template<unsigned DIM>
+void NagaiHondaForce<DIM>::SetNagaiHondaTargetAreaParameter(double nagaiHondaTargetAreaParameter)
+{
+    mNagaiHondaTargetAreaParameter = nagaiHondaTargetAreaParameter;
+}
+
+template<unsigned DIM>
 void NagaiHondaForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<NagaiHondaDeformationEnergyParameter>" << mNagaiHondaDeformationEnergyParameter << "</NagaiHondaDeformationEnergyParameter>\n";
     *rParamsFile << "\t\t\t<NagaiHondaMembraneSurfaceEnergyParameter>" << mNagaiHondaMembraneSurfaceEnergyParameter << "</NagaiHondaMembraneSurfaceEnergyParameter>\n";
     *rParamsFile << "\t\t\t<NagaiHondaCellCellAdhesionEnergyParameter>" << mNagaiHondaCellCellAdhesionEnergyParameter << "</NagaiHondaCellCellAdhesionEnergyParameter>\n";
     *rParamsFile << "\t\t\t<NagaiHondaCellBoundaryAdhesionEnergyParameter>" << mNagaiHondaCellBoundaryAdhesionEnergyParameter << "</NagaiHondaCellBoundaryAdhesionEnergyParameter>\n";
+    *rParamsFile << "\t\t\t<NagaiHondaTargetAreaParameter>" << mNagaiHondaTargetAreaParameter << "</NagaiHondaTargetAreaParameter>\n";
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

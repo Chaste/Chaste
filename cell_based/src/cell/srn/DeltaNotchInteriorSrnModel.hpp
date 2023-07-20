@@ -43,11 +43,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSrnModel.hpp"
 
 /**
- * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in the sub-cellular reaction network.
- * This class represents model describing cytoplasmic (interior, nuclear) concentration of Delta Notch
- * Together with DeltaNotchEdgeSrn, this class can model feedback between cytoplasmic and junctional concentration,
- * and cell-cell communication via edge (junctional) concentrations
- * \todo #2987 document this class more thoroughly here
+ * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in 
+ * the sub-cellular reaction network. This class represents model describing 
+ * cytoplasmic (interior, nuclear) concentration of Delta Notch. Together with 
+ * DeltaNotchEdgeSrn, this class can model feedback between cytoplasmic and 
+ * junctional concentration, and cell-cell communication via edge (junctional) 
+ * concentrations.
  */
 class DeltaNotchInteriorSrnModel : public AbstractOdeSrnModel
 {
@@ -69,14 +70,19 @@ private:
 
 protected:
     /**
-     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
-     * is by calling that method, to ensure that a model of the correct subclass is created.
-     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     * Protected copy-constructor for use by CreateSrnModel(). The only way for 
+     * external code to create a copy of a SRN model is by calling that method, 
+     * to ensure that a model of the correct subclass is created. 
+     * 
+     * This copy-constructor helps subclasses to ensure that all member 
+     * variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
-     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
-     * can be done in InitialiseDaughterCell().
+     * This method is called by child classes to set member variables for a 
+     * daughter cell upon cell division. Note that the parent SRN model will 
+     * have had ResetForDivision() called just before CreateSrnModel() is 
+     * called, so performing an exact copy of the parent is suitable behaviour. 
+     * Any daughter-cell-specific initialisation can be done in 
+     * InitialiseDaughterCell().
      *
      * @param rModel  the SRN model to copy.
      */
@@ -97,25 +103,25 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel() override;
+    virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Overriden ResetForDivision() method for custom cell division mitosis
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system for cell interior.
      */
-    virtual void Initialise() override; // override
+    virtual void Initialise();
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      *
      */
-    virtual void SimulateToCurrentTime() override;
+    virtual void SimulateToCurrentTime();
 
     /**
      * Updates model parameters, such as total edge concnetration of Delta/Notch, via processing data
@@ -158,14 +164,15 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
      * Sets how much of Delta/Notch is returned back to interior after a junction is shrunk
      * Override the method to reflect user-define assumptions
-     * @param p_shrunk_edge_srn
+     * 
+     * @param pShrunkEdgeSrn Pointer to an SRN model
      */
-    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn) override;
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn);
 };
 
 // Declare identifier for the serializer
